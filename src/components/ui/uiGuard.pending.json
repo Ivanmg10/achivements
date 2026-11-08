@@ -11,26 +11,6 @@
     "components/route-error/route-error-card/RouteErrorCard.tsx",
     "components/statusGameList/StatusGameItem.tsx"
   ],
-  "avatar": [
-    "components/achievement-modal/AchievementModal.tsx",
-    "components/admin-panel/AdminEditUserModal.tsx",
-    "components/admin-panel/admin-user-card/AdminUserCard.tsx",
-    "components/avatar-modal/AvatarModal.tsx",
-    "components/following-page/following-card/FollowingCard.tsx",
-    "components/following-page/following-hero/FollowingHero.tsx",
-    "components/following-page/following-rankings-teaser/FollowingRankingsTeaser.tsx",
-    "components/game-info-comments/GameInfoComments.tsx",
-    "components/main-header/MainHeader.tsx",
-    "components/main-page/main-page-friends/main-page-friends-leaderboard/MainPageFriendsLeaderboard.tsx",
-    "components/main-page/main-page-friends/main-page-friends-shared/MainPageFriendsShared.tsx",
-    "components/public-user-page/public-user-compare/PublicUserCompare.tsx",
-    "components/public-user-page/public-user-hero/PublicUserHero.tsx",
-    "components/search-modal/search-modal-home/SearchModalHome.tsx",
-    "components/user-game-page/user-game-page-banner/UserGamePageBanner.tsx",
-    "components/user-page/user-identity-card/UserIdentityCard.tsx",
-    "components/user-summary/UserSummary.tsx",
-    "components/welcome-page/welcome-page-profile-preview/WelcomePageProfilePreview.tsx"
-  ],
   "listRow": [],
   "figure": [
     "components/layout-modal/layout-modal-preview/layout-modal-preview-sample-profile/LayoutModalPreviewSampleProfile.tsx",

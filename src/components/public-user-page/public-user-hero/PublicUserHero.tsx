@@ -1,8 +1,7 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
-import { IconArrowsDiff, IconPencil, IconUser } from '@tabler/icons-react'
+import { IconArrowsDiff, IconPencil } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { CheevoUser } from '@/hooks/useCheevoUser'
 import { codeToFlag, findCountry } from '@/utils/countries'
@@ -11,10 +10,10 @@ import PublicUserPlatformChips from '../public-user-platform-chips/PublicUserPla
 import PublicUserShareButton from '../public-user-share-button/PublicUserShareButton'
 import PublicUserFollowButton from '../public-user-follow-button/PublicUserFollowButton'
 import PublicUserKpis from '../public-user-kpis/PublicUserKpis'
-import PresenceDot from '@/components/presence-dot/PresenceDot'
 import PresenceLabel from '@/components/presence-label/PresenceLabel'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import Button from '@/components/ui/Button'
+import Avatar from '@/components/ui/Avatar'
 
 /**
  * The top of a user's page, in the account card's style: their avatar's
@@ -32,24 +31,8 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
       <div className="relative px-4 sm:px-6 pt-6 pb-5 flex flex-col gap-5 enter-rows">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-4 sm:gap-5 min-w-0">
-            <span className="relative shrink-0">
-              {user.avatar ? (
-                <Image
-                  src={user.avatar}
-                  alt=""
-                  width={112}
-                  height={112}
-                  className="rounded-full w-20 h-20 sm:w-28 sm:h-28 object-cover bg-bg-main ring-4 ring-bg-card shadow-xl shadow-black/40"
-                  unoptimized
-                />
-              ) : (
-                <span aria-hidden="true" className="rounded-full w-20 h-20 sm:w-28 sm:h-28 bg-bg-main ring-4 ring-bg-card flex items-center justify-center">
-                  <IconUser size={32} className="text-text-secondary" />
-                </span>
-              )}
-              {/* Not on your own page: you know you are here. The line under the name says it too. */}
-              {!user.isSelf && <PresenceDot online={user.online} size="lg" />}
-            </span>
+            {/* Not on your own page: you know you are here. The line under the name says it too. */}
+            <Avatar src={user.avatar} name={user.username} size={80} sizeSm={112} fallback="icon" online={user.isSelf ? undefined : user.online} ring="ring-4 ring-bg-card shadow-xl shadow-black/40" />
 
             <div className="flex flex-col gap-1.5 min-w-0">
               <div className="flex items-center gap-2 flex-wrap min-w-0">

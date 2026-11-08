@@ -1,13 +1,12 @@
 'use client'
 
-import Image from 'next/image'
-import { IconUser, IconUsers } from '@tabler/icons-react'
+import { IconUsers } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { FriendOverview } from '@/utils/friends'
-import PresenceDot from '@/components/presence-dot/PresenceDot'
 import { CountUp } from '@/components/ui/CountUp'
 import { Skeleton } from '@/components/ui/Skeleton'
 import Kicker from '@/components/ui/Kicker'
+import Avatar from '@/components/ui/Avatar'
 
 const STACK_MAX = 5
 
@@ -64,16 +63,7 @@ export default function FollowingHero({ users, isLoading = false, className = ''
             </p>
             <div aria-hidden="true" className="flex items-center pb-0.5 pl-2">
               {stack.map((u) => (
-                <span key={u.username} className="relative -ml-2">
-                  {u.avatar ? (
-                    <Image src={u.avatar} alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover ring-[3px] ring-bg-card" unoptimized />
-                  ) : (
-                    <span className="w-9 h-9 rounded-full bg-bg-main ring-[3px] ring-bg-card flex items-center justify-center">
-                      <IconUser size={14} className="text-text-secondary" />
-                    </span>
-                  )}
-                  <PresenceDot online={u.online} size="xs" />
-                </span>
+                <Avatar key={u.username} src={u.avatar} name={u.username} size={36} fallback="icon" online={u.online} ring="ring-[3px] ring-bg-card" className="-ml-2" />
               ))}
               {more > 0 && (
                 <span className="ml-1.5 h-9 px-2 rounded-chip bg-ink/[0.08] text-xs font-bold text-text-secondary flex items-center tabular-nums">

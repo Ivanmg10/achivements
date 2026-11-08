@@ -1,8 +1,7 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
-import { IconFolders, IconUser } from '@tabler/icons-react'
+import { IconFolders } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { RecentAchievement } from '@/types/types'
 import { recentAsBadge, type FriendOverview, type LastPlayed } from '@/utils/friends'
@@ -10,10 +9,10 @@ import { codeToFlag, findCountry } from '@/utils/countries'
 import FollowingCardBanner from '../following-card-banner/FollowingCardBanner'
 import FollowingCardBadges from '../following-card-badges/FollowingCardBadges'
 import FollowingCardPlatforms from '../following-card-platforms/FollowingCardPlatforms'
-import PresenceDot from '@/components/presence-dot/PresenceDot'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import PresenceLabel from '@/components/presence-label/PresenceLabel'
 import Kicker from '@/components/ui/Kicker'
+import Avatar from '@/components/ui/Avatar'
 
 const RECENT_MAX = 5
 
@@ -43,17 +42,8 @@ export default function FollowingCard({
 
       <div className="px-4 pb-4 flex flex-col gap-3 flex-1">
         <div className="relative flex items-end gap-3 -mt-7 min-w-0">
-          <span className="relative shrink-0">
-            {friend.avatar ? (
-              <Image src={friend.avatar} alt="" width={60} height={60} className="w-15 h-15 rounded-full object-cover bg-bg-main ring-4 ring-bg-card" unoptimized />
-            ) : (
-              <span aria-hidden="true" className="w-15 h-15 rounded-full bg-bg-main ring-4 ring-bg-card flex items-center justify-center">
-                <IconUser size={24} className="text-text-secondary" />
-              </span>
-            )}
-            {/* The text below says it too: the dot is not the only sign. */}
-            <PresenceDot online={friend.online} />
-          </span>
+          {/* The text below says it too: the dot is not the only sign. */}
+            <Avatar src={friend.avatar} name={friend.username} size={60} fallback="icon" online={friend.online} ring="ring-4 ring-bg-card" />
           <div className="flex flex-col min-w-0 pb-0.5">
             <span className="flex items-center gap-1.5 min-w-0">
               <Link

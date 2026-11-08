@@ -3,7 +3,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useBackRegistry } from '@/context/BackInterceptContext'
@@ -12,6 +11,7 @@ import { useStreakSummary } from '@/hooks/useStreakSummary'
 import { IconHome, IconChevronLeft, IconSearch, IconMenu } from '@tabler/icons-react'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { Skeleton } from '@/components/ui/Skeleton'
+import Avatar from '@/components/ui/Avatar'
 
 // Downloaded the first time it is opened, not with the page.
 const SearchModal = dynamic(() => import('@/components/search-modal/SearchModal'), { loading: () => null })
@@ -222,22 +222,7 @@ export default function MainHeader() {
                 <span className="text-[0.9375rem] font-bold hidden sm:block text-text-main leading-none">
                   {session.user?.name ?? session.user?.email}
                 </span>
-                {avatarSrc ? (
-                  <Image
-                    className="w-8 h-8 rounded-full object-cover shrink-0"
-                    width={64}
-                    height={64}
-                    src={avatarSrc}
-                    alt=""
-                    unoptimized
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
-                    <span className="text-xs font-bold text-accent">
-                      {(session.user?.name ?? session.user?.email ?? '?')[0].toUpperCase()}
-                    </span>
-                  </div>
-                )}
+                <Avatar src={avatarSrc} name={session.user?.name ?? session.user?.email ?? '?'} size={32} />
               </Link>
             </>
           ) : status === 'loading' ? (

@@ -1,15 +1,14 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
-import { IconArrowsDiff, IconUser } from '@tabler/icons-react'
+import { IconArrowsDiff } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { SharedGameRow } from '@/utils/friends'
 import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
 import GameIcon from '@/components/game-icon/GameIcon'
 import EmptyState from '@/components/empty-state/EmptyState'
-import PresenceDot from '@/components/presence-dot/PresenceDot'
 import Kicker from '@/components/ui/Kicker'
+import Avatar from '@/components/ui/Avatar'
 
 /**
  * Your games that the people you follow play too, the most shared first: your
@@ -42,16 +41,7 @@ export default function MainPageFriendsShared({ rows }: { rows: SharedGameRow[] 
                       title={`${f.username} · ${f.pct}%${f.online ? ` · ${T.following.online}` : ''}`}
                       className="flex items-center gap-1 rounded-full bg-bg-card pl-0.5 pr-2 py-0.5 text-[11px] tabular-nums hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                     >
-                      <span className="relative shrink-0">
-                        {f.avatar ? (
-                          <Image src={f.avatar} alt="" width={20} height={20} className="w-5 h-5 rounded-full object-cover" unoptimized />
-                        ) : (
-                          <span aria-hidden="true" className="w-5 h-5 rounded-full bg-bg-main flex items-center justify-center">
-                            <IconUser size={11} className="text-text-secondary" />
-                          </span>
-                        )}
-                        <PresenceDot online={f.online} size="xs" />
-                      </span>
+                      <Avatar src={f.avatar} name={f.username} size={20} fallback="icon" online={f.online} />
                       <span className={f.pct >= 100 ? 'text-success font-semibold' : 'text-text-secondary'}>{f.pct}%</span>
                     </Link>
                   ))}

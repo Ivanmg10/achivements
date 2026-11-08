@@ -17,6 +17,7 @@ import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { parseUnlockTime } from '@/utils/dates'
 import { raTypeTag } from '@/components/ui/dataTable'
 import { raBadgeUrl, raAvatarUrl } from '@/utils/raAssets'
+import Avatar from '@/components/ui/Avatar'
 
 interface AchievementUnlock {
   User: string
@@ -250,13 +251,7 @@ export default function AchievementModal({
                           <div key={i} className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-2">
                               {u.User ? (
-                                <Image
-                                  src={raAvatarUrl(u.User)}
-                                  alt={u.User}
-                                  width={28}
-                                  height={28}
-                                  className="w-7 h-7 rounded-full object-cover"
-                                />
+                                <Avatar src={raAvatarUrl(u.User)} name={u.User} size={28} />
                               ) : (
                                 <div className="w-7 h-7 rounded-full bg-ink/10 shrink-0" />
                               )}
@@ -310,13 +305,7 @@ export default function AchievementModal({
                       {pageComments.map((c, i) => (
                         <div key={i} className="flex gap-3">
                           {c.User ? (
-                            <Image
-                              src={raAvatarUrl(c.User)}
-                              alt={c.User}
-                              width={32}
-                              height={32}
-                              className="w-8 h-8 rounded-full object-cover shrink-0"
-                            />
+                            <Avatar src={raAvatarUrl(c.User)} name={c.User} size={32} />
                           ) : (
                             <div className="w-8 h-8 rounded-full bg-ink/10 shrink-0" />
                           )}

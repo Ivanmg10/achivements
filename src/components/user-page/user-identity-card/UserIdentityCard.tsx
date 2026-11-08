@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import Image from 'next/image'
 import { signOut, useSession } from 'next-auth/react'
 import { IconAlertTriangle, IconPencil } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
@@ -23,6 +22,7 @@ import { summarizeSteamLibrary } from '@/utils/steamFeed'
 import { codeToFlag, countryName, findCountry } from '@/utils/countries'
 import Button from '@/components/ui/Button'
 import Tag from '@/components/ui/Tag'
+import Avatar from '@/components/ui/Avatar'
 
 // Modals are downloaded the first time they are wanted, not with the page — the admin panel above all.
 const AdminPanelModal = dynamic(() => import('@/components/admin-panel/admin-panel-modal/AdminPanelModal'), { loading: () => null })
@@ -82,20 +82,7 @@ export default function UserIdentityCard() {
             aria-label={T.userPage.editAvatar}
             className="relative group shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
-            {user?.avatar ? (
-              <Image
-                src={user.avatar}
-                alt=""
-                width={112}
-                height={112}
-                className="rounded-full w-24 h-24 sm:w-28 sm:h-28 object-cover ring-4 ring-bg-card shadow-[0_14px_30px_rgb(0_0_0/0.5)]"
-                unoptimized
-              />
-            ) : (
-              <span className="rounded-full w-24 h-24 sm:w-28 sm:h-28 bg-bg-main ring-4 ring-bg-card flex items-center justify-center">
-                <IconPencil size={24} className="text-text-secondary" aria-hidden="true" />
-              </span>
-            )}
+            <Avatar src={user?.avatar} name={user?.name ?? ''} size={96} sizeSm={112} fallback="icon" ring="ring-4 ring-bg-card shadow-[0_14px_30px_rgb(0_0_0/0.5)]" />
             <span
               aria-hidden="true"
               className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"

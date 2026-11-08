@@ -194,7 +194,8 @@ test('a tag comes from Tag, never a tinted rounded-tag box by hand', () => {
 })
 
 test('a person\'s picture comes from Avatar, which carries their presence dot', () => {
-  expect(newOffenders('avatar', NEW_RULES.avatar)).toEqual([])
+  // AvatarModal previews the picture being chosen, not a person: it names it for a screen reader and reacts to its failing.
+  expect(newOffenders('avatar', NEW_RULES.avatar, ['components/avatar-modal/AvatarModal.tsx'])).toEqual([])
 })
 
 test('a row to pick from comes from ListRow / LIST_ROW', () => {

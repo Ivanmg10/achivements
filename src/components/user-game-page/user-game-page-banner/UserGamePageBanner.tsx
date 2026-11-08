@@ -1,11 +1,10 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
-import { IconArrowLeft, IconArrowsDiff, IconExternalLink, IconUser } from '@tabler/icons-react'
+import { IconArrowLeft, IconArrowsDiff, IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { CheevoUser } from '@/hooks/useCheevoUser'
-import PresenceDot from '@/components/presence-dot/PresenceDot'
+import Avatar from '@/components/ui/Avatar'
 
 /**
  * Whose progress this is, with the way back to their profile; the game's own
@@ -33,16 +32,7 @@ export default function UserGamePageBanner({
         className="flex items-center gap-2 min-w-0 rounded-box pr-2 hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
         <IconArrowLeft size={16} className="shrink-0" aria-hidden="true" />
-        <span className="relative shrink-0">
-          {user.avatar ? (
-            <Image src={user.avatar} alt="" width={28} height={28} className="w-7 h-7 rounded-full object-cover" unoptimized />
-          ) : (
-            <span aria-hidden="true" className="w-7 h-7 rounded-full bg-bg-main flex items-center justify-center">
-              <IconUser size={14} className="text-text-secondary" />
-            </span>
-          )}
-          {!user.isSelf && <PresenceDot online={user.online} size="sm" announce />}
-        </span>
+        <Avatar src={user.avatar} name={user.username} size={28} fallback="icon" online={user.isSelf ? undefined : user.online} announce />
         <span className="text-sm font-medium truncate">{T.userGame.progressOf.replace('{u}', user.username)}</span>
       </Link>
 

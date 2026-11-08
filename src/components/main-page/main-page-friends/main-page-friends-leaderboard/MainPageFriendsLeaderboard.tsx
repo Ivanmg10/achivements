@@ -1,14 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
-import { IconCrown, IconUser } from '@tabler/icons-react'
+import { IconCrown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { rankBy, type LeaderRow, type StatKey } from '@/utils/friends'
-import PresenceDot from '@/components/presence-dot/PresenceDot'
 import { pillClass } from '@/components/ui/Pill'
 import Kicker from '@/components/ui/Kicker'
+import Avatar from '@/components/ui/Avatar'
 
 const KEYS: StatKey[] = ['week', 'activeDays', 'streak', 'completed']
 
@@ -55,16 +54,7 @@ export default function MainPageFriendsLeaderboard({ rows }: { rows: LeaderRow[]
               <span className="w-6 text-center text-xs font-semibold tabular-nums text-text-secondary shrink-0">
                 {i === 0 && r.stats[key] > 0 ? <IconCrown size={16} className="text-warning inline" aria-label={T.friends.leader} /> : i + 1}
               </span>
-              <span className="relative shrink-0">
-                {r.avatar ? (
-                  <Image src={r.avatar} alt="" width={28} height={28} className="w-7 h-7 rounded-full object-cover" unoptimized />
-                ) : (
-                  <span aria-hidden="true" className="w-7 h-7 rounded-full bg-bg-main flex items-center justify-center">
-                    <IconUser size={14} className="text-text-secondary" />
-                  </span>
-                )}
-                <PresenceDot online={r.online} size="sm" announce />
-              </span>
+              <Avatar src={r.avatar} name={r.username} size={28} fallback="icon" online={r.online} announce />
               <span className="flex flex-col gap-1 min-w-0 flex-1">
                 <span className="text-sm font-medium truncate">
                   {r.username}

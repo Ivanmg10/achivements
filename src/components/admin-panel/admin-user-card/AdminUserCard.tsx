@@ -1,13 +1,13 @@
 'use client'
 
-import Image from 'next/image'
-import { IconPencil, IconShield, IconShieldOff, IconTrash, IconUser } from '@tabler/icons-react'
+import { IconPencil, IconShield, IconShieldOff, IconTrash } from '@tabler/icons-react'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { codeToFlag, findCountry } from '@/utils/countries'
 import type { AdminUser } from '@/types/user'
+import Avatar from '@/components/ui/Avatar'
 
 /**
  * One user in the admin panel, as a card: avatar, name, the accounts they
@@ -33,20 +33,7 @@ export default function AdminUserCard({
   return (
     <li className="bg-bg-card rounded-card p-4 flex flex-col gap-3 ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow">
       <div className="flex items-start gap-3">
-        {user.avatar ? (
-          <Image
-            src={user.avatar}
-            alt=""
-            width={44}
-            height={44}
-            className="rounded-full w-11 h-11 object-cover shrink-0"
-            unoptimized
-          />
-        ) : (
-          <span className="rounded-full w-11 h-11 bg-bg-main flex items-center justify-center shrink-0">
-            <IconUser size={18} className="text-text-secondary" aria-hidden="true" />
-          </span>
-        )}
+        <Avatar src={user.avatar} name={user.username} size={44} fallback="icon" />
 
         <div className="flex flex-col gap-0.5 min-w-0 flex-1">
           <span className="flex items-center gap-1.5 flex-wrap">

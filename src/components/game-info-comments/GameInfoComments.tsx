@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { GameComment } from '@/app/api/getGameComments/route'
-import Image from 'next/image'
 import Link from 'next/link'
 import { IconChevronUp } from '@tabler/icons-react'
 import { SURFACE } from '@/components/ui/surface'
@@ -14,6 +13,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { raAvatarUrl } from '@/utils/raAssets'
 import Tag from '@/components/ui/Tag'
+import Avatar from '@/components/ui/Avatar'
 
 const PREVIEW_COUNT = 2
 
@@ -152,13 +152,7 @@ function CommentRow({ comment, last }: { comment: GameComment; last: boolean }) 
         tabIndex={-1}
         aria-hidden="true"
       >
-        <Image
-          src={raAvatarUrl(comment.User)}
-          alt={comment.User}
-          width={32}
-          height={32}
-          className="w-[2.125rem] h-[2.125rem] rounded-full object-cover bg-ink/10"
-        />
+        <Avatar src={raAvatarUrl(comment.User)} name={comment.User} size={34} />
       </Link>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
