@@ -2,7 +2,6 @@
 
 import { memo, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { createPortal } from 'react-dom'
 import { AnimatePresence } from 'framer-motion'
 import { IconAlertTriangle } from '@tabler/icons-react'
 import { RetroAchievement } from '@/types/types'
@@ -11,11 +10,10 @@ import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import { capList } from '@/utils/utils'
-import { tooltipStyle } from '@/utils/tooltipStyle'
-import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { raTypeTag } from '@/components/ui/dataTable'
 import { raBadgeUrl } from '@/utils/raAssets'
+import CursorTooltip from '@/components/ui/CursorTooltip'
 
 type TooltipData = { achievement: RetroAchievement; x: number; y: number }
 
@@ -178,13 +176,8 @@ export const AchievementGrid = memo(function AchievementGrid({
       )}
 
       {/* Portal so the tooltip escapes any ancestor Framer Motion transform stacking context */}
-      {tooltip &&
-        createPortal(
-          <div
-            role="tooltip"
-            className={`fixed z-50 pointer-events-none ${TOOLTIP_SURFACE} p-3 max-w-65`}
-            style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
-          >
+      {tooltip && (
+        <CursorTooltip x={tooltip.x} y={tooltip.y}>
             <p className="text-sm font-semibold text-text-main">{tooltip.achievement.Title}</p>
             <p className="text-xs text-text-secondary mt-1 leading-snug">
               {tooltip.achievement.Description}
@@ -215,9 +208,8 @@ export const AchievementGrid = memo(function AchievementGrid({
                 ).toLocaleDateString()}
               </p>
             )}
-          </div>,
-          document.body
-        )}
+          </CursorTooltip>
+      )}
 
       <AnimatePresence>
         {selected && (

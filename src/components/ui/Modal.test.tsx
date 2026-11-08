@@ -69,3 +69,10 @@ it('opens near the top as a panel when placed there, centred (a sheet on a phone
   expect(screen.getByRole('dialog')).toHaveClass('rounded-sheet')
   expect(screen.getByRole('dialog').parentElement).toHaveClass('items-start', 'pt-[12vh]')
 })
+
+it('can have no padding round its body, for rows that reach the edges', () => {
+  const { rerender } = render(<Modal isOpen onClose={() => {}} aria-label="Search"><p>row</p></Modal>)
+  expect(screen.getByText('row').parentElement).toHaveClass('px-6')
+  rerender(<Modal isOpen onClose={() => {}} aria-label="Search" flush><p>row</p></Modal>)
+  expect(screen.getByText('row').parentElement).not.toHaveClass('px-6')
+})

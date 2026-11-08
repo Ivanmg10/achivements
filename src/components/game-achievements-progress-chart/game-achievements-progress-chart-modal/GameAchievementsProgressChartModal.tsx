@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useId } from 'react'
-import { createPortal } from 'react-dom'
 import { AnimatePresence } from 'framer-motion'
 import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -40,7 +39,7 @@ export default function GameAchievementsProgressChartModal({
 
   const sorted = [...items].sort((a, b) => (b.earnedAt ?? '').localeCompare(a.earnedAt ?? ''))
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {isOpen && (
         <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={titleId} size="md" showClose={false} className="gap-3">
@@ -66,7 +65,6 @@ export default function GameAchievementsProgressChartModal({
             </div>
           </Modal>
       )}
-    </AnimatePresence>,
-    document.body,
+    </AnimatePresence>
   )
 }

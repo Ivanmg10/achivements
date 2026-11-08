@@ -4,7 +4,6 @@ import { RetroAchievement } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useId, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
@@ -112,8 +111,7 @@ export default function AchievementModal({
       })
     : null
 
-  // In body: a transformed ancestor (the home's sections) would otherwise trap it under later sections.
-  return createPortal(
+  return (
     <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="xl" showClose={false} className="gap-4">
         {/* Header */}
         <div className="flex items-start gap-4 p-6 border-b border-bg-header">
@@ -331,7 +329,6 @@ export default function AchievementModal({
             )
           })()}
         </div>
-      </Modal>,
-    document.body,
+      </Modal>
   )
 }

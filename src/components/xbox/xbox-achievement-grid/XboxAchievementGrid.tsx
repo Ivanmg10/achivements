@@ -4,7 +4,6 @@ import { memo, useRef, useState } from 'react'
 import { decimal } from '@/utils/utils'
 import Image from 'next/image'
 import Link from 'next/link'
-import { createPortal } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { capList } from '@/utils/utils'
 import { formatDate } from '@/utils/dates'
@@ -18,8 +17,7 @@ import { useRevealedAchievements } from '@/hooks/useRevealedAchievements'
 import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements'
 import { useSubject } from '@/context/SubjectContext'
 import type { XboxAchievement } from '@/types/xbox'
-import { tooltipStyle } from '@/utils/tooltipStyle'
-import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
+import CursorTooltip from '@/components/ui/CursorTooltip'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -135,13 +133,8 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
       {capped && <ShowAllButton total={achievements.length} expanded={showAll} onToggle={() => setShowAll((v) => !v)} />}
 
       {/* Portal so the tooltip escapes any ancestor transform stacking context */}
-      {tooltip &&
-        createPortal(
-          <div
-            role="tooltip"
-            className={`fixed z-50 pointer-events-none ${TOOLTIP_SURFACE} p-3 max-w-65`}
-            style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
-          >
+      {tooltip && (
+        <CursorTooltip x={tooltip.x} y={tooltip.y}>
             <p className="text-sm font-semibold text-text-main">{nameOf(tooltip.achievement)}</p>
             <p className="text-xs text-text-secondary mt-1 leading-snug">
               {concealed(tooltip.achievement) ? T.xbox.secretAchievementDesc : tooltip.achievement.description}
@@ -161,9 +154,8 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
               )}
             </div>
             {tooltip.achievement.unlockedAt && <p className="text-xs text-text-secondary mt-1">{formatDate(tooltip.achievement.unlockedAt, lang)}</p>}
-          </div>,
-          document.body,
-        )}
+          </CursorTooltip>
+      )}
     </>
   )
 })

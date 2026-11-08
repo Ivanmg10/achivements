@@ -1,7 +1,6 @@
 'use client'
 
 import { ReactNode, useId } from 'react'
-import { createPortal } from 'react-dom'
 import { IconBrandYoutube, IconBook2, IconCheck, IconLock, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { FadeImage } from '@/components/ui/FadeImage'
@@ -63,8 +62,7 @@ export default function AchievementDetailModal({
     : null
   const guideLabel = { youtube: T.achievementDetail.youtube, steamGuides: T.achievementDetail.steamGuides, psnProfiles: T.achievementDetail.psnProfiles, trueAchievements: T.achievementDetail.trueAchievements }
 
-  // In body: a transformed ancestor (the home's sections) would otherwise trap it under later sections.
-  return createPortal(
+  return (
     <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="md" showClose={false} className="gap-4">
         <div className="flex items-start gap-4 p-5 sm:p-6 border-b border-bg-header">
           {iconUrl ? (
@@ -138,7 +136,6 @@ export default function AchievementDetailModal({
             </ul>
           </div>
         )}
-      </Modal>,
-    document.body,
+      </Modal>
   )
 }

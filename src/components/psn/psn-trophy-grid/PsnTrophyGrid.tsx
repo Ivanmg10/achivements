@@ -4,7 +4,6 @@ import { memo, useRef, useState } from 'react'
 import { decimal } from '@/utils/utils'
 import Image from 'next/image'
 import Link from 'next/link'
-import { createPortal } from 'react-dom'
 import ConcealedBadge from '@/components/concealed-badge/ConcealedBadge'
 import { useLanguage } from '@/context/LanguageContext'
 import { capList } from '@/utils/utils'
@@ -19,8 +18,7 @@ import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
 import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy, PsnTrophyGroup, TrophyGrade } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
-import { tooltipStyle } from '@/utils/tooltipStyle'
-import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
+import CursorTooltip from '@/components/ui/CursorTooltip'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -168,13 +166,8 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
       {capped && <ShowAllButton total={trophies.length} expanded={showAll} onToggle={() => setShowAll((v) => !v)} />}
 
       {/* Portal so the tooltip escapes any ancestor transform stacking context */}
-      {tooltip &&
-        createPortal(
-          <div
-            role="tooltip"
-            className={`fixed z-50 pointer-events-none ${TOOLTIP_SURFACE} p-3 max-w-65`}
-            style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
-          >
+      {tooltip && (
+        <CursorTooltip x={tooltip.x} y={tooltip.y}>
             <p className="text-sm font-semibold text-text-main">{nameOf(tooltip.trophy)}</p>
             <p className="text-xs text-text-secondary mt-1 leading-snug">
               {concealed(tooltip.trophy) ? T.psn.hiddenTrophyDesc : tooltip.trophy.detail}
@@ -194,9 +187,8 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
               )}
             </div>
             {tooltip.trophy.earnedAt && <p className="text-xs text-text-secondary mt-1">{formatDate(tooltip.trophy.earnedAt, lang)}</p>}
-          </div>,
-          document.body,
-        )}
+          </CursorTooltip>
+      )}
     </>
   )
 })

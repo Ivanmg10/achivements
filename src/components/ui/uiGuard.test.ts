@@ -78,11 +78,10 @@ test('checkboxes come from Checkbox', () => {
 })
 
 test('dialogs come from Modal', () => {
-  // Not dialogs: the sign-in backdrop, the welcome's curtain. The search panel still moves to Modal placement="top" (#120 → Open).
+  // Not dialogs: the sign-in backdrop, the welcome's curtain.
   const allowed = [
     path.join('app', '(auth)', 'authPage', 'page.tsx'),
     path.join('components', 'welcome-curtain', 'WelcomeCurtain.tsx'),
-    path.join('components', 'search-modal', 'SearchModal.tsx'),
   ]
   expect(offenders(/className="fixed inset-0[^"]*bg-black/).filter((f) => !allowed.includes(f))).toEqual([])
 })
@@ -245,7 +244,8 @@ test('a dialog is a Modal (placement="top" for a panel or a menu): no hand-made 
 })
 
 test('only the library portals: Modal portals itself, so wrapping it in createPortal is never needed', () => {
-  expect(newOffenders('portal', NEW_RULES.portal)).toEqual([])
+  // The welcome's curtain is decorative and covers the page, not a dialog.
+  expect(newOffenders('portal', NEW_RULES.portal, ['components/welcome-curtain/WelcomeCurtain.tsx'])).toEqual([])
 })
 
 test('the focus ring is the focus-ring utility, never its three classes typed out', () => {

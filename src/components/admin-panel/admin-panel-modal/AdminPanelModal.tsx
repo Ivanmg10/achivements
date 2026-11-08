@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createPortal } from 'react-dom'
 import { AnimatePresence } from 'framer-motion'
 import { IconX } from '@tabler/icons-react'
 import AdminPanel, { AdminPanelMode } from '@/components/admin-panel/AdminPanel'
@@ -23,7 +22,7 @@ export default function AdminPanelModal({ isOpen, onClose }: { isOpen: boolean; 
 
   if (typeof document === 'undefined') return null
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {isOpen && (
         <Modal isOpen={isOpen} onClose={onClose} size={mode === 'open' ? 'xl' : 'sm'} showClose={false} aria-label="Admin panel" className="gap-4">
@@ -41,7 +40,6 @@ export default function AdminPanelModal({ isOpen, onClose }: { isOpen: boolean; 
             />
           </Modal>
       )}
-    </AnimatePresence>,
-    document.body,
+    </AnimatePresence>
   )
 }

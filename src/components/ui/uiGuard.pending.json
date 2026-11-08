@@ -12,24 +12,6 @@
     "components/statusGameList/StatusGameItem.tsx"
   ],
   "listRow": [],
-  "dialogRole": [
-    "components/layout-modal/LayoutModal.tsx",
-    "components/search-modal/SearchModal.tsx"
-  ],
-  "portal": [
-    "components/achievement-detail-modal/AchievementDetailModal.tsx",
-    "components/achievement-grid/AchievementGrid.tsx",
-    "components/achievement-modal/AchievementModal.tsx",
-    "components/admin-panel/admin-panel-modal/AdminPanelModal.tsx",
-    "components/game-achievements-progress-chart/game-achievements-progress-chart-modal/GameAchievementsProgressChartModal.tsx",
-    "components/game-info-header/GameHashesModal.tsx",
-    "components/groups/GroupModal.tsx",
-    "components/groups/add-game-modal/AddGameModal.tsx",
-    "components/psn/psn-trophy-grid/PsnTrophyGrid.tsx",
-    "components/steam/steam-achievement-grid/SteamAchievementGrid.tsx",
-    "components/welcome-curtain/WelcomeCurtain.tsx",
-    "components/xbox/xbox-achievement-grid/XboxAchievementGrid.tsx"
-  ],
   "focusRing": [
     "app/(main)/groups/(list)/page.tsx",
     "app/(main)/groups/[id]/page.tsx",
@@ -273,7 +255,6 @@
   ],
   "variants": [
     "components/auth-page/AuthPage.tsx",
-    "components/library-game-detail/LibraryGameDetail.tsx",
-    "components/search-modal/SearchModal.tsx"
+    "components/library-game-detail/LibraryGameDetail.tsx"
   ]
 }

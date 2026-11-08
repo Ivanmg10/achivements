@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useId, useRef, useMemo } from 'react'
-import { createPortal } from 'react-dom'
 import { AnimatePresence } from 'framer-motion'
 import { IconSearch, IconX, IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -167,7 +166,7 @@ export default function AddGameModal({
   // On <body>, so the page's animated (transformed) wrapper does not become its frame.
   if (typeof document === 'undefined') return null
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {isOpen && (
         <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={titleId} size="xl" showClose={false} className="gap-4">
@@ -285,7 +284,6 @@ export default function AddGameModal({
             </div>
           </Modal>
       )}
-    </AnimatePresence>,
-    document.body,
+    </AnimatePresence>
   )
 }

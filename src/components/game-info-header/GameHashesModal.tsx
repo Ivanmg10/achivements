@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { AnimatePresence } from 'framer-motion'
 import { IconX, IconHash, IconCopy, IconCheck } from '@tabler/icons-react'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
@@ -88,7 +87,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
 
   if (!mounted) return null
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {isOpen && (
         <Modal isOpen={isOpen} onClose={onClose} size="md" showClose={false} className="gap-4">
@@ -174,7 +173,6 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
             </div>
           </Modal>
       )}
-    </AnimatePresence>,
-    document.body,
+    </AnimatePresence>
   )
 }

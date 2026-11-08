@@ -33,6 +33,8 @@ export type ModalProps = {
   placement?: keyof typeof PLACEMENTS
   /** The quiet ✕ in the corner; on unless the content has its own way out. */
   showClose?: boolean
+  /** No padding round the body: a command panel or a menu whose rows reach the edges. */
+  flush?: boolean
   /** Names the dialog when there is no `title` (otherwise its first heading does). */
   'aria-label'?: string
   /** Or the id of the element in the content that names it. */
@@ -59,6 +61,7 @@ export default function Modal({
   backdrop = 'default',
   placement = 'center',
   showClose = true,
+  flush = false,
   'aria-label': ariaLabel,
   'aria-labelledby': labelledBy,
   className = 'gap-5',
@@ -180,7 +183,7 @@ export default function Modal({
               </div>
             )}
 
-            <div className={`flex flex-col overflow-y-auto px-6 ${title ? 'pt-5' : 'pt-6'} ${footer ? 'pb-5' : 'pb-6'} ${className}`}>{children}</div>
+            <div className={`flex flex-col overflow-y-auto ${flush ? '' : `px-6 ${title ? 'pt-5' : 'pt-6'} ${footer ? 'pb-5' : 'pb-6'}`} ${className}`}>{children}</div>
 
             {footer && (
               <div className="flex flex-wrap items-center justify-end gap-2 px-6 py-4 shadow-hairline-t">{footer}</div>

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useId, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { AnimatePresence } from 'framer-motion'
 import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -119,7 +118,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
   // On <body>, so an animated (transformed) page wrapper does not become its frame.
   if (typeof document === 'undefined') return null
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {isOpen && (
         <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={headingId} size={isEditing ? 'md' : 'xl'} showClose={false} className="gap-4">
@@ -210,7 +209,6 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
             </form>
           </Modal>
       )}
-    </AnimatePresence>,
-    document.body,
+    </AnimatePresence>
   )
 }

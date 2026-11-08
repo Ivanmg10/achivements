@@ -41,7 +41,7 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
   const body = useRef<HTMLDivElement>(null)
 
   /** The dialog, which every transition here stays inside: the page behind keeps its blur. */
-  const panel = () => body.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined
+  const panel = () => body.current?.closest<HTMLElement>('[role=dialog]') ?? undefined
 
   function close() {
     if (triedFont) setFont(triedFont)
