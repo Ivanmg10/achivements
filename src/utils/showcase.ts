@@ -92,7 +92,7 @@ export type ShowcaseChoice = {
   entry: ShowcaseEntry | null
 }
 
-type ChoiceInput = {
+export type ChoiceInput = {
   key: string
   title: string
   description?: string | null
@@ -100,7 +100,6 @@ type ChoiceInput = {
   earnedAt?: string | null
   hidden?: boolean
 }
-
 
 /** A game's achievements as picker choices, earned first (newest first), then the rest in the game's order. */
 export function showcaseChoices(source: ShowcaseEntry['source'], gameId: number, gameTitle: string, list: ChoiceInput[]): ShowcaseChoice[] {
