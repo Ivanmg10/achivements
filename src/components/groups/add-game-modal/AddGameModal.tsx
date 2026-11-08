@@ -54,6 +54,8 @@ export default function AddGameModal({
   const [selected, setSelected] = useState<Map<string, GameCandidate>>(new Map())
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(false)
+  // The id whose lookup failed: the notice is for that id only, so it goes when another is typed.
+  const [failedId, setFailedId] = useState<number | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const titleId = useId()
 
@@ -64,6 +66,7 @@ export default function AddGameModal({
       setSource(null)
       setSelected(new Map())
       setError(false)
+      setFailedId(null)
     }
   })
 
@@ -109,8 +112,12 @@ export default function AddGameModal({
   }
 
   async function addDirectById(id: number) {
+    setFailedId(null)
     const c = await fetchRaCandidateById(id)
-    if (!c) return
+    if (!c) {
+      setFailedId(id)
+      return
+    }
     toggle(c)
     setQuery('')
   }
@@ -200,6 +207,7 @@ export default function AddGameModal({
 
             <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4">
               {directGameId && directKey && !existingKeys.has(directKey) ? (
+                <>
                 <button
                   type="button"
                   onClick={() => addDirectById(directGameId)}
@@ -212,6 +220,12 @@ export default function AddGameModal({
                   </span>
                   {selected.has(directKey) && <IconCheck className="w-4 h-4 text-accent" aria-hidden />}
                 </button>
+                {failedId === directGameId && (
+                  <p role="alert" className="text-xs text-danger mt-2">
+                    {T.search.noResults}
+                  </p>
+                )}
+                </>
               ) : shown.length > 0 ? (
                 <>
                   {!searching && (
