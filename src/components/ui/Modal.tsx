@@ -147,7 +147,7 @@ export default function Modal({
                 type="button"
                 onClick={onClose}
                 aria-label={T.cards.close}
-                className="absolute top-3 right-3 z-10 w-9 h-9 inline-flex items-center justify-center rounded-button text-text-secondary hover:text-text-main hover:bg-ink/[0.08] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="absolute top-3 right-3 z-10 w-9 h-9 inline-flex items-center justify-center rounded-button text-text-secondary hover:text-text-main hover:bg-ink/[0.08] transition-colors focus-ring"
               >
                 <IconX size={18} aria-hidden="true" />
               </button>
@@ -173,7 +173,7 @@ export default function Modal({
             <div className={`flex flex-col overflow-y-auto px-6 ${title ? 'pt-5' : 'pt-6'} ${footer ? 'pb-5' : 'pb-6'} ${className}`}>{children}</div>
 
             {footer && (
-              <div className="flex flex-wrap items-center justify-end gap-2 px-6 py-4 shadow-[inset_0_1px_0_rgb(var(--ink)/0.08)]">{footer}</div>
+              <div className="flex flex-wrap items-center justify-end gap-2 px-6 py-4 shadow-hairline-t">{footer}</div>
             )}
           </motion.div>
         </motion.div>

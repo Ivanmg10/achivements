@@ -41,9 +41,8 @@ export function CircularProgress({
         <svg
           width={size}
           height={size}
-          className="-rotate-90"
+          className={`-rotate-90 ${isComplete ? 'drop-shadow-done' : ''}`}
           aria-hidden="true"
-          style={isComplete ? { filter: 'drop-shadow(0 0 6px rgb(var(--progress) / 0.6))' } : undefined}
         >
           <circle
             cx={size / 2}

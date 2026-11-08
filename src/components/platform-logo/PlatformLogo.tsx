@@ -20,9 +20,9 @@ export default function PlatformLogo({
   label?: string
   className?: string
 }) {
-  if (source === 'steam') return <SteamLogo size={size} className={`text-[#66c0f4] ${className}`} aria-label={label} />
-  if (source === 'psn') return <PlaystationLogo size={size} className={`text-[#0070d1] ${className}`} aria-label={label} />
-  if (source === 'xbox') return <XboxLogo size={size} className={`text-[#107c10] ${className}`} aria-label={label} />
+  if (source === 'steam') return <SteamLogo size={size} className={`text-steam ${className}`} aria-label={label} />
+  if (source === 'psn') return <PlaystationLogo size={size} className={`text-psn ${className}`} aria-label={label} />
+  if (source === 'xbox') return <XboxLogo size={size} className={`text-xbox ${className}`} aria-label={label} />
   return (
     <span className={`inline-flex shrink-0 ${className}`} {...(label ? { role: 'img', 'aria-label': label } : {})}>
       <RaLogo height={Math.round(size * 0.85)} />

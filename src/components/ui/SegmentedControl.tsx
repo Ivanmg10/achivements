@@ -55,7 +55,7 @@ export default function SegmentedControl<V extends string>({
             type="button"
             aria-pressed={on}
             onClick={() => onChange(v)}
-            className={`flex items-center justify-center gap-1.5 whitespace-nowrap font-semibold rounded-chip transition-colors duration-(--motion-hover) cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${height} ${
+            className={`flex items-center justify-center gap-1.5 whitespace-nowrap font-semibold rounded-chip transition-colors duration-(--motion-hover) cursor-pointer focus-ring ${height} ${
               on ? (tone === 'outline' ? 'text-text-main' : 'text-bg-main') : 'text-text-secondary hover:text-text-main'
             }`}
           >

@@ -19,7 +19,7 @@ type FieldShape = {
 export function fieldClass({ invalid = false, icon = false, size = 'md', multiline = false }: FieldShape = {}, className = '') {
   return (
     `w-full ${multiline ? 'rounded-area' : 'rounded-field'} bg-bg-main text-text-main placeholder:text-text-secondary outline-none ` +
-    'shadow-[inset_0_2px_4px_rgb(0_0_0/0.22)] ring-1 ring-inset transition-[background-color,box-shadow] duration-(--motion-hover) ' +
+    'shadow-sunken ring-1 ring-inset transition-[background-color,box-shadow] duration-(--motion-hover) ' +
     'focus-visible:bg-bg-card focus-visible:ring-2 disabled:opacity-60 disabled:cursor-not-allowed ' +
     (invalid
       ? 'ring-danger/70 hover:ring-danger focus-visible:ring-danger '

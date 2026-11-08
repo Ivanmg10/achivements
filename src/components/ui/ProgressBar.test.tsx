@@ -40,7 +40,7 @@ test('a finished bar glows in the theme colour, by either share; no other colour
 
   rerender(<ProgressBar pct={100} label="x" />)
   expect(screen.getByRole('progressbar')).toHaveAttribute('data-complete', 'true')
-  expect(screen.getByRole('progressbar').style.filter).toContain('var(--progress)')
+  expect(screen.getByRole('progressbar')).toHaveClass('drop-shadow-done')
   expect(fill(container, 'main')?.style.background).toContain('var(--progress)')
   expect(fill(container, 'main')?.style.background).not.toContain('success')
 
@@ -74,8 +74,8 @@ test('accepts custom sizing classes', () => {
 
 test('only a finished bar glows, and its ends come from the design tokens', () => {
   const { rerender } = render(<ProgressBar pct={40} label="x" />)
-  expect(screen.getByRole('progressbar').style.filter).toBe('')
+  expect(screen.getByRole('progressbar')).not.toHaveClass('drop-shadow-done')
   expect((screen.getByRole('progressbar').querySelector('[data-track]') as HTMLElement).style.clipPath).toBe('var(--clip-3)')
   rerender(<ProgressBar pct={100} label="x" />)
-  expect(screen.getByRole('progressbar').style.filter).toContain('drop-shadow')
+  expect(screen.getByRole('progressbar')).toHaveClass('drop-shadow-done')
 })

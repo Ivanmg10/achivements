@@ -21,7 +21,7 @@ export default function Shelf({
           <button
             type="button"
             onClick={action.onClick}
-            className="ml-auto text-xs text-text-secondary hover:text-text-main underline underline-offset-4 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="ml-auto text-xs text-text-secondary hover:text-text-main underline underline-offset-4 rounded focus-ring"
           >
             {action.label}
           </button>

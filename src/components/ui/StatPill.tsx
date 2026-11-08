@@ -29,8 +29,8 @@ export function StatPill({
   onClick?: () => void
 }) {
   const { lang } = useLanguage()
-  const interactiveCls = 'text-left hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
-  const largeInteractiveCls = "text-left isolate after:content-[''] after:absolute after:inset-0 after:-z-10 after:rounded-tile after:skew-x-(--slant-pill) after:transition-colors hover:after:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+  const interactiveCls = 'text-left hover:bg-ink/5 transition-colors focus-ring'
+  const largeInteractiveCls = "text-left isolate after:content-[''] after:absolute after:inset-0 after:-z-10 after:rounded-tile after:skew-x-(--slant-pill) after:transition-colors hover:after:bg-ink/5 transition-colors focus-ring"
 
   if (size === 'sm') {
     const inner = (

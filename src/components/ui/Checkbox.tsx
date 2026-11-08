@@ -23,7 +23,7 @@ export default function Checkbox({ checked, onChange, children, className = '', 
           checked={checked}
           disabled={disabled}
           onChange={(e) => onChange(e.target.checked)}
-          className="peer appearance-none w-[1.125rem] h-[1.125rem] rounded-[5px] bg-bg-main ring-1 ring-inset ring-ink/25 shadow-[inset_0_1px_2px_rgb(0_0_0/0.25)] transition-colors duration-(--motion-hover) checked:bg-accent checked:ring-accent hover:ring-accent/60 cursor-[inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="peer appearance-none w-[1.125rem] h-[1.125rem] rounded-[5px] bg-bg-main ring-1 ring-inset ring-ink/25 shadow-[inset_0_1px_2px_rgb(0_0_0/0.25)] transition-colors duration-(--motion-hover) checked:bg-accent checked:ring-accent hover:ring-accent/60 cursor-[inherit] focus-ring"
           {...input}
         />
         <IconCheck

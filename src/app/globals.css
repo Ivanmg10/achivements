@@ -60,6 +60,36 @@
   --radius-badge: var(--r-badge);
   --radius-cell: var(--r-cell);
   --radius-nav: var(--r-nav);
+
+  /* A line between two parts, drawn as an inset shadow so it never moves the layout: a table's head and a section's edge, then a row's. */
+  --color-hairline: rgb(var(--ink) / 0.1);
+  --shadow-hairline-t: inset 0 1px 0 rgb(var(--ink) / 0.1);
+  --shadow-hairline-b: inset 0 -1px 0 rgb(var(--ink) / 0.1);
+  --shadow-hairline-b-soft: inset 0 -1px 0 rgb(var(--ink) / 0.05);
+  /* What you type into sits below the card. */
+  --shadow-sunken: inset 0 2px 4px rgb(0 0 0 / 0.22);
+  /* The one glow: a finished bar or ring (`drop-shadow-done`). */
+  --drop-shadow-done: 0 0 6px rgb(var(--progress) / 0.6);
+
+  /*
+     The platforms' own colours, the same in every theme: their logos, their marks and the charts that
+     compare them, never a bar's progress. `steam-perfect` is Steam's green for a game at 100 %,
+     `platinum` PlayStation's top trophy.
+  */
+  --color-ra: #2a80c7;
+  --color-ra-gold: #e5b53f;
+  --color-steam: #66c0f4;
+  --color-steam-dark: #1b2838;
+  --color-steam-perfect: #a4d007;
+  --color-psn: #0070d1;
+  --color-psn-dark: #003791;
+  --color-xbox: #107c10;
+  --color-platinum: rgb(125 211 252);
+}
+
+/* The library's focus ring: every control, link and card that takes the keyboard. */
+@utility focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70;
 }
 
 /* ============================================

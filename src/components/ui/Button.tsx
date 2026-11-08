@@ -10,7 +10,7 @@ const BASE =
   'relative isolate inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none ' +
   "before:content-[''] before:absolute before:inset-y-0 before:inset-x-(--button-inset) before:-z-10 before:rounded-button before:skew-x-(--slant-button) before:transition-colors before:duration-(--motion-hover) " +
   'transition-colors duration-(--motion-hover) disabled:opacity-50 disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:pointer-events-none ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main focus-visible:rounded-button'
+  'focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main focus-visible:rounded-button'
 
 const VARIANTS: Record<Variant, string> = {
   primary: 'text-bg-main before:bg-accent hover:before:bg-accent-hover',

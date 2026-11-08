@@ -8,7 +8,7 @@ import { useId } from 'react'
 export function choiceClass(selected: boolean, className = '') {
   return (
     'relative flex items-start gap-2.5 p-3 rounded-control text-left cursor-pointer ring-1 transition-colors duration-(--motion-hover) ' +
-    'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 disabled:opacity-50 ' +
+    'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/70 focus-ring disabled:opacity-50 ' +
     (selected ? 'ring-2 ring-accent bg-accent/10 ' : 'ring-ink/10 bg-bg-main hover:ring-accent/50 ') +
     className
   )
