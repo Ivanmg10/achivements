@@ -9,6 +9,7 @@ import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import MainPageProfileNowPlaying from '../../main-page-profile-now-playing/MainPageProfileNowPlaying'
 import { steamAssetUrl } from '@/lib/steamAssets'
+import Facts from '@/components/ui/Facts'
 
 /**
  * The game card in the Steam profile — MainPageProfileRaGame's counterpart:
@@ -35,7 +36,7 @@ export default function MainPageProfileStGame({
       kicker={playingNow ? T.profileRa.playingNow : T.steam.lastPlayed}
       icon={<SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageIcon} size={52} className="w-full h-full" />}
       title={game.title}
-      sub={`Steam · ${playtime}`}
+      sub={<Facts items={['Steam', playtime]} />}
       share={hasCounts ? `${Math.round(game.pctWon).toLocaleString(lang)} %` : null}
       done={hasCounts && game.pctWon >= 100}
       bar={hasCounts ? <ProgressBar pct={game.pctWon} label={game.title} /> : null}

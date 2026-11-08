@@ -10,6 +10,7 @@ import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDi
 import GroupPlatformLogos from '@/components/groups/group-platform-logos/GroupPlatformLogos'
 import { relativeTime } from '@/utils/dates'
 import Tag from '@/components/ui/Tag'
+import Facts from '@/components/ui/Facts'
 
 /**
  * A group as an album: its first games' covers as a banner, a ring with how far
@@ -82,9 +83,7 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
                 <Tag tone="success">{T.groups.completedCount.replace('{n}', String(group.completed_count))}</Tag>
               )}
               <span className="ml-auto text-text-secondary truncate">
-                {group.total_possible > 0 &&
-                  `${T.groups.achievementsCount.replace('{earned}', String(group.total_awarded)).replace('{total}', String(group.total_possible))} · `}
-                {relativeTime(group.updated_at, lang)}
+                <Facts items={[group.total_possible > 0 && T.groups.achievementsCount.replace('{earned}', String(group.total_awarded)).replace('{total}', String(group.total_possible)), relativeTime(group.updated_at, lang)]} />
               </span>
             </>
           )}

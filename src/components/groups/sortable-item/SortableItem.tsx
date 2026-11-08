@@ -18,6 +18,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { relativeTime } from '@/utils/dates'
 import { raImageUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
+import Facts from '@/components/ui/Facts'
 
 // About three rows on a wide card; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
@@ -129,7 +130,7 @@ export default function SortableItem({
             {ptsTotal > 0 ? `${ptsEarned} / ${ptsTotal} ${T.statusGameItem.pointsEarned}` : '\u00a0'}
           </p>
           <p className="text-xs text-text-secondary mt-1">
-            {played} · {added}
+            <Facts items={[played, added]} />
           </p>
         </div>
 

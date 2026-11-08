@@ -11,6 +11,7 @@ import { useHeatmapGrid, HEATMAP_GAP as GAP, HEATMAP_MAX_DAYS } from '@/hooks/us
 import { Skeleton } from '@/components/ui/Skeleton'
 import { utcDay, formatDay } from '@/utils/dates'
 import Kicker from '@/components/ui/Kicker'
+import Facts from '@/components/ui/Facts'
 
 /** Empty, then the theme's accent at rising strength: one hue per theme, so every theme reads the same way. */
 /*
@@ -149,7 +150,7 @@ export default function MainPageHeatmap({
         <div className="flex items-center gap-3">
           {!isLoading && activeDays > 0 && (
             <p className="text-[11px] text-text-secondary">
-              {T.cards.activeDays.replace('{n}', String(activeDays))} · {T.lineChart.bestDay.replace('{n}', String(best))}
+              <Facts items={[T.cards.activeDays.replace('{n}', String(activeDays)), T.lineChart.bestDay.replace('{n}', String(best))]} />
             </p>
           )}
           <p className="text-sm font-bold tabular-nums text-text-main">{isLoading ? <Skeleton className="h-[1lh] w-8" /> : totalAch}</p>

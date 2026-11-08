@@ -7,6 +7,7 @@ import GroupCoverMosaic from '@/components/groups/group-cover-mosaic/GroupCoverM
 import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgressBar'
 import GroupPlatformLogos, { platformCounts } from '@/components/groups/group-platform-logos/GroupPlatformLogos'
 import { relativeTime } from '@/utils/dates'
+import Facts from '@/components/ui/Facts'
 
 /**
  * A group in the list: its covers, name and privacy, how many games and from
@@ -41,13 +42,7 @@ export default function GroupCard({ group }: { group: GameGroup }) {
         <GroupProgressBar earned={group.total_awarded} total={group.total_possible} label={group.title} />
 
         <p className="text-xs text-text-secondary truncate">
-          {group.total_possible > 0 && (
-            <>
-              {T.groups.achievementsCount.replace('{earned}', String(group.total_awarded)).replace('{total}', String(group.total_possible))}
-              {' · '}
-            </>
-          )}
-          {T.groups.updatedAgo.replace('{when}', relativeTime(group.updated_at, lang))}
+          <Facts items={[group.total_possible > 0 && T.groups.achievementsCount.replace('{earned}', String(group.total_awarded)).replace('{total}', String(group.total_possible)), T.groups.updatedAgo.replace('{when}', relativeTime(group.updated_at, lang))]} />
         </p>
       </div>
     </Link>

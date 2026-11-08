@@ -22,6 +22,7 @@ import MainPageGroupFeatureGame from '@/components/main-page/main-page-group-fea
 import Button from '@/components/ui/Button'
 import { Skeleton } from '@/components/ui/Skeleton'
 import Kicker from '@/components/ui/Kicker'
+import Facts from '@/components/ui/Facts'
 
 // Downloaded the first time it is opened, not with the page.
 const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'), { loading: () => null })
@@ -107,8 +108,7 @@ export default function MainPageGroupFeature({
               </Link>
             </h3>
             <p className="text-xs text-text-secondary truncate">
-              {plural(items.length || group.game_count, T.plurals.games, lang)}
-              {counts.total > 0 && ` · ${T.groups.summary.replace('{earned}', counts.earned.toLocaleString(lang)).replace('{total}', counts.total.toLocaleString(lang))}`}
+              <Facts items={[plural(items.length || group.game_count, T.plurals.games, lang), counts.total > 0 && T.groups.summary.replace('{earned}', counts.earned.toLocaleString(lang)).replace('{total}', counts.total.toLocaleString(lang))]} />
             </p>
             {items.length > 0 && (
               <ul className="flex flex-wrap gap-1.5 mt-1 text-[11px]">

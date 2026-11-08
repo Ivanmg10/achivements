@@ -11,6 +11,7 @@ import { CountUp } from '@/components/ui/CountUp'
 import Button from '@/components/ui/Button'
 import IconButton from '@/components/ui/IconButton'
 import Tag from '@/components/ui/Tag'
+import Facts from '@/components/ui/Facts'
 
 /**
  * The top of a group's page: its games' covers as a faded banner, a ring with
@@ -89,8 +90,7 @@ export default function GroupDetailHero({
                 <Privacy className="w-3 h-3" aria-hidden="true" />
                 {group.is_public ? T.groups.public : T.groups.private}
               </Tag>
-              {plural(gameCount, T.plurals.games, lang)}
-              {summary.total > 0 && ` · ${T.groups.summary.replace('{earned}', String(summary.earned)).replace('{total}', String(summary.total))}`}
+              <Facts items={[plural(gameCount, T.plurals.games, lang), summary.total > 0 && T.groups.summary.replace('{earned}', String(summary.earned)).replace('{total}', String(summary.total))]} />
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               {summary.total > 0 && group.icon && (

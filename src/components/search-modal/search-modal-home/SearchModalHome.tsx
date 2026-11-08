@@ -13,6 +13,7 @@ import SearchModalGroup from '../search-modal-group/SearchModalGroup'
 import SearchModalRow from '../search-modal-row/SearchModalRow'
 import { relativeTime } from '@/utils/dates'
 import Avatar from '@/components/ui/Avatar'
+import Facts from '@/components/ui/Facts'
 
 const SHOWN_GAMES = 2
 
@@ -53,7 +54,7 @@ export default function SearchModalHome({
                 <SearchModalRow
                   media={g.icon ? <FadeImage src={g.icon} alt="" width={40} height={40} className="w-full h-full" unoptimized /> : null}
                   title={g.title}
-                  sub={[g.console, g.total > 0 ? `${g.earned} / ${g.total}` : null, g.lastPlayed ? relativeTime(g.lastPlayed, lang) : null].filter(Boolean).join(' · ')}
+                  sub={<Facts items={[g.console, g.total > 0 && `${g.earned}/${g.total}`, g.lastPlayed && relativeTime(g.lastPlayed, lang)]} />}
                   onSelect={() => onGo(gameHref(g.source, g.id))}
                 />
               </li>

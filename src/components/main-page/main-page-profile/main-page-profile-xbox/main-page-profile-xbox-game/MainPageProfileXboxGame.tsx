@@ -10,6 +10,7 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import type { XboxGameProgress } from '@/types/xbox'
 import { useSubject } from '@/context/SubjectContext'
 import { formatDate } from '@/utils/dates'
+import Facts from '@/components/ui/Facts'
 
 /**
  * The game card in the Xbox profile — the PSN one's counterpart: the last game
@@ -29,7 +30,7 @@ export default function MainPageProfileXboxGame({ game }: { game: XboxGameProgre
       kicker={T.steam.lastPlayed}
       icon={<GameIcon source="xbox" id={game.id} imageUrl={game.imageIcon} size={52} className="w-full h-full" />}
       title={game.title}
-      sub={[game.consoleName, playtime, when].filter(Boolean).join(' · ')}
+      sub={<Facts items={[game.consoleName, playtime, when]} />}
       share={`${game.pctWon.toLocaleString(lang)} %`}
       done={game.pctWon >= 100}
       bar={

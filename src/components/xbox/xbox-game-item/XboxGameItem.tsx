@@ -18,6 +18,7 @@ import { xboxBackdrop } from '@/utils/xboxTitles'
 import type { XboxGameProgress } from '@/types/xbox'
 import { useSubject } from '@/context/SubjectContext'
 import Tag from '@/components/ui/Tag'
+import Facts from '@/components/ui/Facts'
 
 /**
  * One Xbox game as a compact row card — PsnGameItem's counterpart in the
@@ -103,26 +104,21 @@ export default function XboxGameItem({
               />
             </span>
 
-            <span className="flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-text-secondary">
-              <span className="whitespace-nowrap">{progressText}</span>
-              <span className="opacity-40" aria-hidden="true">·</span>
-              <XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} />
-              {game.playtimeMinutes !== null && (
-                <>
-                  <span className="opacity-40" aria-hidden="true">·</span>
-                  <span className="flex items-center gap-1">
-                    <IconClock size={12} aria-hidden="true" />
-                    <span className="sr-only">{T.steam.playtime}: </span>
-                    {formatPlaytime(game.playtimeMinutes, T.steam, lang)}
-                  </span>
-                </>
-              )}
-              {game.lastPlayed && (
-                <>
-                  <span className="opacity-40" aria-hidden="true">·</span>
-                  <span>{formatDate(game.lastPlayed, lang)}</span>
-                </>
-              )}
+            <span className="flex flex-wrap items-center text-[0.8125rem] text-text-secondary">
+              <Facts
+                items={[
+                  <span key="a" className="whitespace-nowrap">{progressText}</span>,
+                  <XboxGamerscore key="g" earned={game.earnedGamerscore} total={game.totalGamerscore} />,
+                  game.playtimeMinutes !== null && (
+                    <span key="h" className="flex items-center gap-1">
+                      <IconClock size={12} aria-hidden="true" />
+                      <span className="sr-only">{T.steam.playtime}: </span>
+                      {formatPlaytime(game.playtimeMinutes, T.steam, lang)}
+                    </span>
+                  ),
+                  game.lastPlayed && <span key="d">{formatDate(game.lastPlayed, lang)}</span>,
+                ]}
+              />
             </span>
           </button>
         </div>

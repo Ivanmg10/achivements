@@ -10,6 +10,7 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
 import { formatDate } from '@/utils/dates'
+import Facts from '@/components/ui/Facts'
 
 /**
  * The game card in the PSN profile — the Steam one's counterpart: the last
@@ -30,7 +31,7 @@ export default function MainPageProfilePsnGame({ game }: { game: PsnGameProgress
       kicker={T.steam.lastPlayed}
       icon={<GameIcon source="psn" id={game.id} imageUrl={game.imageIcon} size={52} className="w-full h-full" />}
       title={game.title}
-      sub={[game.consoleName, playtime, when].filter(Boolean).join(' · ')}
+      sub={<Facts items={[game.consoleName, playtime, when]} />}
       share={`${game.pctWon.toLocaleString(lang)} %`}
       done={game.pctWon >= 100}
       bar={

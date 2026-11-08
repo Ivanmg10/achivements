@@ -13,6 +13,7 @@ import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { relativeTime } from '@/utils/dates'
 import { kickerClass } from '@/components/ui/Kicker'
+import Facts from '@/components/ui/Facts'
 
 // Downloaded the first time it is opened, not with the page.
 const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
@@ -122,7 +123,7 @@ export default function MainPageGroups({
                   {group.title}
                 </span>
                 <span className="text-[10px] text-text-secondary truncate">
-                  {plural(group.game_count, T.plurals.games, lang)} · {relativeTime(group.updated_at, lang)}
+                  <Facts items={[plural(group.game_count, T.plurals.games, lang), relativeTime(group.updated_at, lang)]} />
                 </span>
                 <GroupProgressBar earned={group.total_awarded} total={group.total_possible} label={group.title} />
               </div>

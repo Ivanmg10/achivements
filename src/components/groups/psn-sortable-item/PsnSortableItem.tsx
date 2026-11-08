@@ -18,6 +18,7 @@ import { psnBackdrop, psnTitleId, psnPlatformTone } from '@/utils/psnTitles'
 import type { GameGroupItem } from '@/types/types'
 import { relativeTime } from '@/utils/dates'
 import Tag from '@/components/ui/Tag'
+import Facts from '@/components/ui/Facts'
 
 /**
  * A PSN game in a group — SteamSortableItem's counterpart: drag handle, icon,
@@ -126,9 +127,7 @@ export default function PsnSortableItem({
             )}
           </span>
           <span className="text-xs text-text-secondary mt-1">
-            {game?.lastPlayed ? T.groups.playedAgo.replace('{when}', relativeTime(game.lastPlayed, lang)) : T.groups.neverPlayed}
-            {' · '}
-            {T.groups.addedAgo.replace('{when}', relativeTime(item.added_at, lang))}
+            <Facts items={[game?.lastPlayed ? T.groups.playedAgo.replace('{when}', relativeTime(game.lastPlayed, lang)) : T.groups.neverPlayed, T.groups.addedAgo.replace('{when}', relativeTime(item.added_at, lang))]} />
           </span>
         </div>
 

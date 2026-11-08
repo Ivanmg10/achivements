@@ -15,6 +15,7 @@ import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import { raImageUrl } from '@/utils/raAssets'
 import Tag from '@/components/ui/Tag'
+import Facts from '@/components/ui/Facts'
 
 const CONSOLE_BY_NAME = new Map(CONSOLES.map((c) => [c.name, c.icon]))
 
@@ -126,20 +127,14 @@ export default function RaGameItem({
               />
             </span>
 
-            <span className="flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-text-secondary">
-              {total > 0 && (
-                <>
-                  <span className="whitespace-nowrap">
-                    {earnedAch}/{total} {T.statusGameItem.achievements}
-                  </span>
-                  <span className="opacity-40" aria-hidden="true">·</span>
-                  <span className="whitespace-nowrap">
-                    {earnedPts}/{game.PossibleScore} pts
-                  </span>
-                  <span className="opacity-40" aria-hidden="true">·</span>
-                </>
-              )}
-              <span className="whitespace-nowrap">{formatDate(game.LastPlayed, lang)}</span>
+            <span className="flex flex-wrap items-center text-[0.8125rem] text-text-secondary">
+              <Facts
+                items={[
+                  total > 0 && <span key="a" className="whitespace-nowrap">{earnedAch}/{total} {T.statusGameItem.achievements}</span>,
+                  total > 0 && <span key="p" className="whitespace-nowrap">{earnedPts}/{game.PossibleScore} pts</span>,
+                  <span key="d" className="whitespace-nowrap">{formatDate(game.LastPlayed, lang)}</span>,
+                ]}
+              />
             </span>
           </button>
         </div>

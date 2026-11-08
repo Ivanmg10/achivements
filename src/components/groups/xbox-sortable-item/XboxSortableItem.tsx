@@ -19,6 +19,7 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import type { GameGroupItem } from '@/types/types'
 import { relativeTime } from '@/utils/dates'
 import Tag from '@/components/ui/Tag'
+import Facts from '@/components/ui/Facts'
 
 /**
  * An Xbox game in a group — PsnSortableItem's counterpart: drag handle, icon,
@@ -121,10 +122,13 @@ export default function XboxSortableItem({
           {/* Kept when there is nothing to show, so every card is the same height. */}
           {game ? <XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} className="mt-1" /> : <span aria-hidden="true" className="text-xs mt-1">{' '}</span>}
           <span className="text-xs text-text-secondary mt-1">
-            {game?.lastPlayed ? T.groups.playedAgo.replace('{when}', relativeTime(game.lastPlayed, lang)) : T.groups.neverPlayed}
-            {game?.playtimeMinutes != null && ` · ${T.steam.playtime} ${formatPlaytime(game.playtimeMinutes, T.steam, lang)}`}
-            {' · '}
-            {T.groups.addedAgo.replace('{when}', relativeTime(item.added_at, lang))}
+            <Facts
+              items={[
+                game?.lastPlayed ? T.groups.playedAgo.replace('{when}', relativeTime(game.lastPlayed, lang)) : T.groups.neverPlayed,
+                game?.playtimeMinutes != null && `${T.steam.playtime} ${formatPlaytime(game.playtimeMinutes, T.steam, lang)}`,
+                T.groups.addedAgo.replace('{when}', relativeTime(item.added_at, lang)),
+              ]}
+            />
           </span>
         </div>
 

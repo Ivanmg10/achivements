@@ -17,6 +17,7 @@ import type { SteamGameProgress } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import Tag from '@/components/ui/Tag'
+import Facts from '@/components/ui/Facts'
 
 /**
  * One Steam game as a compact row card — the Steam counterpart of an RA card
@@ -119,20 +120,18 @@ export default function SteamGameItem({
               />
             </span>
 
-            <span className="flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-text-secondary">
-              <span className="whitespace-nowrap">{progressText}</span>
-              <span className="opacity-40" aria-hidden="true">·</span>
-              <span className="flex items-center gap-1">
-                <IconClock size={12} aria-hidden="true" />
-                <span className="sr-only">{T.steam.playtime}: </span>
-                {playtime}
-              </span>
-              {game.lastPlayed && (
-                <>
-                  <span className="opacity-40" aria-hidden="true">·</span>
-                  <span>{formatDate(game.lastPlayed, lang)}</span>
-                </>
-              )}
+            <span className="flex flex-wrap items-center text-[0.8125rem] text-text-secondary">
+              <Facts
+                items={[
+                  <span key="a" className="whitespace-nowrap">{progressText}</span>,
+                  <span key="h" className="flex items-center gap-1">
+                    <IconClock size={12} aria-hidden="true" />
+                    <span className="sr-only">{T.steam.playtime}: </span>
+                    {playtime}
+                  </span>,
+                  game.lastPlayed && <span key="d">{formatDate(game.lastPlayed, lang)}</span>,
+                ]}
+              />
             </span>
           </button>
         </div>
