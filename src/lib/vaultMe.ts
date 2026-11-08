@@ -3,6 +3,7 @@ import { loadRanking, weekStartRanks } from '@/lib/rankings'
 import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
 import { utcDay } from '@/utils/dates'
 import type { GameSource } from '@/types/game'
+import { notHidden } from '@/lib/gameVisibility'
 
 export type VaultMe = {
   /** All time, every platform the viewer may see. */
@@ -51,7 +52,7 @@ export async function loadVaultMe(id: number, xbox: boolean): Promise<VaultMe> {
     ),
     queryRows<{ n: number }>(`SELECT COUNT(*)::int AS n FROM score_games g
       WHERE g.user_id = $1 AND g.provisional AND ($2::boolean OR g.source <> 'xbox')
-        AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)`, [id, xbox]),
+        AND ${notHidden('g')}`, [id, xbox]),
     queryRows<{ start: string; points: number }>(
       `SELECT to_char(start, 'YYYY-MM-DD') AS start, SUM(points)::int AS points FROM score_periods
        WHERE user_id = $1 AND kind = 'w' AND start >= $2::date AND ($3::boolean OR source <> 'xbox')
@@ -63,7 +64,7 @@ export async function loadVaultMe(id: number, xbox: boolean): Promise<VaultMe> {
               ROUND(SUM((x->>1)::numeric * g.stack_factor::numeric))::int AS points
        FROM score_games g, jsonb_array_elements(g.unlocks) x
        WHERE g.user_id = $1 AND g.flag IS DISTINCT FROM 'suspect' AND ($3::boolean OR g.source <> 'xbox')
-         AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)
+         AND ${notHidden('g')}
          AND (x->>0)::bigint >= EXTRACT(EPOCH FROM $2::date)::bigint
          AND (x->>0)::bigint < EXTRACT(EPOCH FROM ($2::date + interval '7 days'))::bigint
        GROUP BY start`,

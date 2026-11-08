@@ -4,6 +4,7 @@ import { requireSession } from '@/lib/apiAuth'
 import { presenceColumns } from '@/lib/presence'
 import { canUseXbox } from '@/utils/xboxAccess'
 import { vaultTotalsOrNone } from '@/lib/rankings'
+import { notHidden } from '@/lib/gameVisibility'
 
 /**
  * The people you follow as the Friends section's cards show them, from our
@@ -45,7 +46,7 @@ export async function GET(req?: Request) {
                                 ORDER BY sc.position, sc.created_at)
                 FROM showcase_achievements sc
                 WHERE sc.user_id = u.id AND ($2::boolean OR sc.source <> 'xbox')
-                  AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = u.id AND h.source = sc.source AND h.game_id = sc.game_id)
+                  AND ${notHidden('sc', 'u.id')}
               ), '[]'::json) AS showcase,
               COALESCE((SELECT json_agg(h.source || ':' || h.game_id) FROM hidden_games h WHERE h.user_id = u.id), '[]'::json) AS "hiddenGames"
        FROM follows f JOIN users u ON u.id = ${them}

@@ -21,6 +21,7 @@ import { hiddenConsolesFrom, psnGradeShare, psnScoreInputs, raScoreInputs, steam
 import { monthStart, weekStart } from '@/utils/vaultLevel'
 import { latestFullSetCompletedAt, psnBaseCompletedAt, raAwardCompletedAt } from '@/utils/completionDates'
 import type { GameSource } from '@/types/game'
+import { notHidden } from '@/lib/gameVisibility'
 
 /**
  * Keeps a user's Vault Points up to date (docs/rankings-plan.md). Each
@@ -389,7 +390,7 @@ async function refreshSource(
   const kept = await queryRows<{ game_id: string; title: string; points: number }>(
     `SELECT g.game_id, g.title, g.points FROM score_games g
      WHERE g.user_id = $1 AND g.source = $2
-       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)`,
+       AND ${notHidden('g')}`,
     [userId, plan.source],
   )
   const factors = stackFactors(kept.map((r) => ({ key: stackKey(r.title), points: r.points })))
@@ -417,7 +418,7 @@ export async function rebuildPeriods(userId: number): Promise<void> {
   const rows = await queryRows<{ source: string; unlocks: ScoreUnlock[]; stack_factor: number }>(
     `SELECT g.source, g.unlocks, g.stack_factor FROM score_games g
      WHERE g.user_id = $1 AND g.flag IS DISTINCT FROM 'suspect'
-       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)`,
+       AND ${notHidden('g')}`,
     [userId],
   )
   const totals = new Map<string, { source: string; kind: 'w' | 'm'; start: string; points: number }>()
