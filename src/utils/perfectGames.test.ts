@@ -153,6 +153,12 @@ const psnGame = (id: number, pctWon: number, lastPlayed = '2024-01-02T00:00:00.0
 })
 
 describe('PSN', () => {
+  test('perfectDates: a PSN game that is not completed gets no date (UT-10)', () => {
+    const dates = perfectDates([], [], [psnGame(100, 100), psnGame(200, 50)])
+    expect(dates.get('psn:100')).toBe('2024-01-02T00:00:00.000Z')
+    expect(dates.has('psn:200')).toBe(false)
+  })
+
   test('a PSN game at 100% is perfect, dated by its base completion', () => {
     const games = buildPerfectGames([], [], [psnGame(100, 100), psnGame(200, 50)])
     expect(games.map((g) => g.key)).toEqual(['psn:100'])
