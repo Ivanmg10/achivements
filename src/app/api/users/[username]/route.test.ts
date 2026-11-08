@@ -1,14 +1,20 @@
-jest.mock('@/lib/apiAuth', () => ({ dataOwner: jest.fn() }))
+jest.mock('@/lib/apiAuth', () => ({ requireSession: jest.fn() }))
 jest.mock('@/lib/publicUser', () => ({ findPublicUser: jest.fn(), hiddenGameKeys: jest.fn() }))
 jest.mock('@/lib/groupList', () => ({ listGroups: jest.fn() }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/rankings', () => ({ vaultTotalsOrNone: jest.fn(async (ids: number[]) => new Map(ids.map((id) => [id, 1234]))) }))
 
 import { GET } from './route'
-import { dataOwner } from '@/lib/apiAuth'
+import { NextResponse } from 'next/server'
+import { requireSession } from '@/lib/apiAuth'
 import { findPublicUser, hiddenGameKeys } from '@/lib/publicUser'
 import { listGroups } from '@/lib/groupList'
 import pool from '@/lib/db'
+
+const signIn = (user: { id: string; raid?: string; admin?: boolean } | null) =>
+  (requireSession as jest.Mock).mockResolvedValue(
+    user ? { ok: true, id: user.id, user } : { ok: false, response: NextResponse.json({ message: 'No autorizado' }, { status: 401 }) },
+  )
 
 const get = (username = 'ivan') =>
   GET({} as Request, { params: Promise.resolve({ username }) })
@@ -23,7 +29,7 @@ const GROUP = { id: 3, title: 'RPGs', is_public: true }
 
 beforeEach(() => {
   jest.clearAllMocks()
-  ;(dataOwner as jest.Mock).mockResolvedValue({ id: '1', raid: 'my-key' })
+  ;signIn({ id: '1', raid: 'my-key' })
   ;(findPublicUser as jest.Mock).mockResolvedValue(ROW)
   ;(hiddenGameKeys as jest.Mock).mockResolvedValue(['ra:9'])
   ;(listGroups as jest.Mock).mockResolvedValue([GROUP])
@@ -33,7 +39,7 @@ beforeEach(() => {
 const body = async (res: Promise<unknown>) => ((await res) as { data: Record<string, unknown> }).data
 
 test('signed-out visitors get the auth answer', async () => {
-  ;(dataOwner as jest.Mock).mockResolvedValue(null)
+  ;signIn(null)
   expect((await get()).status).toBe(401)
   expect(findPublicUser).not.toHaveBeenCalled()
 })
@@ -70,7 +76,7 @@ test('the gender is shown only when they chose to show it', async () => {
 })
 
 test('tells the owner it is their own page', async () => {
-  ;(dataOwner as jest.Mock).mockResolvedValue({ id: '7' })
+  ;signIn({ id: '7' })
   expect((await body(get())).isSelf).toBe(true)
 })
 
@@ -86,15 +92,15 @@ test('a failing lookup is a 500', async () => {
 })
 
 test('RA is offered when the viewer has a key, or the user has one of their own', async () => {
-  ;(dataOwner as jest.Mock).mockResolvedValue({ id: '1', raid: 'my-key' })
+  ;signIn({ id: '1', raid: 'my-key' })
   expect(((await get()) as unknown as { data: { ra: string } }).data.ra).toBe('IvanRA')
-  ;(dataOwner as jest.Mock).mockResolvedValue({ id: '1' })
+  ;signIn({ id: '1' })
   ;(findPublicUser as jest.Mock).mockResolvedValue({ ...ROW, hasRaKey: true })
   expect(((await get()) as unknown as { data: { ra: string } }).data.ra).toBe('IvanRA')
 })
 
 test('RA is not offered when nobody could read it', async () => {
-  ;(dataOwner as jest.Mock).mockResolvedValue({ id: '1' })
+  ;signIn({ id: '1' })
   expect(((await get()) as unknown as { data: { ra: string | null } }).data.ra).toBeNull()
 })
 
@@ -106,7 +112,7 @@ describe('a private profile', () => {
   })
 
   test('is still there for its owner', async () => {
-    ;(dataOwner as jest.Mock).mockResolvedValue({ id: '7', raid: 'my-key' })
+    ;signIn({ id: '7', raid: 'my-key' })
     expect((await get()).status).toBe(200)
   })
 })
@@ -132,12 +138,12 @@ describe('Xbox is admin-only', () => {
   test('their hidden Xbox games are left out for a viewer who is not an admin', async () => {
     ;(hiddenGameKeys as jest.Mock).mockResolvedValue(['ra:9', 'xbox:12'])
     expect((await body(get())).hiddenGames).toEqual(['ra:9'])
-    ;(dataOwner as jest.Mock).mockResolvedValue({ id: '1', admin: true })
+    ;signIn({ id: '1', admin: true })
     expect((await body(get())).hiddenGames).toEqual(['ra:9', 'xbox:12'])
   })
 
   test('an admin viewer sees the account, its name, its favourite and its groups', async () => {
-    ;(dataOwner as jest.Mock).mockResolvedValue({ id: '1', raid: 'my-key', admin: true })
+    ;signIn({ id: '1', raid: 'my-key', admin: true })
     ;(findPublicUser as jest.Mock).mockResolvedValue(WITH_XBOX)
     const data = await body(get())
     expect(data.xbox).toBe(true)
@@ -147,7 +153,7 @@ describe('Xbox is admin-only', () => {
   })
 
   test('a user with no Xbox account has none, even for an admin', async () => {
-    ;(dataOwner as jest.Mock).mockResolvedValue({ id: '1', admin: true })
+    ;signIn({ id: '1', admin: true })
     ;(findPublicUser as jest.Mock).mockResolvedValue({ ...ROW, xboxxuid: null, xboxgamertag: 'stale' })
     const data = await body(get())
     expect(data.xbox).toBe(false)

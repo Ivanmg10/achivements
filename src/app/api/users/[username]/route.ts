@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { dataOwner } from '@/lib/apiAuth'
+import { requireSession } from '@/lib/apiAuth'
 import { findPublicUser, hiddenGameKeys } from '@/lib/publicUser'
 import { listGroups } from '@/lib/groupList'
 import pool from '@/lib/db'
@@ -15,8 +15,9 @@ import type { GameSource, SavedGame } from '@/types/game'
  * they chose to show it.
  */
 export async function GET(_req: Request, { params }: { params: Promise<{ username: string }> }) {
-  const viewer = await dataOwner()
-  if (!viewer) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+  const auth = await requireSession()
+  if (!auth.ok) return auth.response
+  const viewer = auth.user
 
   try {
     const { username } = await params
