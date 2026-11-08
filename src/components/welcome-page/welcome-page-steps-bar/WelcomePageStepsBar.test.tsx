@@ -35,3 +35,11 @@ test('announces the step once', () => {
   renderBar()
   expect(screen.getByRole('status')).toHaveTextContent(`Step 4 of 8 · ${T.steps.psn}`)
 })
+
+test('the phone progress has a segment per step, however many there are (C-13)', () => {
+  const { container } = render(<WelcomePageStepsBar index={0} seen={0} states={STATES} onGo={jest.fn()} onBack={jest.fn()} onSkipAll={jest.fn()} />)
+  const strip = container.querySelector('ol[aria-hidden="true"]')!
+  expect(strip.className).not.toMatch(/grid-cols-\d/)
+  expect(strip.children.length).toBeGreaterThan(0)
+  for (const segment of Array.from(strip.children)) expect(segment.className).toContain('flex-1')
+})
