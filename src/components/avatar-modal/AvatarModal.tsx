@@ -4,11 +4,10 @@ import { useId, useState } from 'react'
 import Image from 'next/image'
 import { IconChevronDown, IconLink, IconPhotoUp, IconUser, IconX } from '@tabler/icons-react'
 import CommonModal from '@/components/common-modal/CommonModal'
-import Spinner from '@/components/main-spinner/Spinner'
 import { useAvatarUpload } from '@/hooks/useAvatarUpload'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
 import { useLanguage } from '@/context/LanguageContext'
-import { buttonClass } from '@/components/ui/Button'
+import Button, { buttonClass } from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 
 const BUTTON = 'flex-1'
@@ -130,10 +129,9 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
 
       {upload.picked && (
         <div className="flex gap-2.5">
-          <button type="button" onClick={saveUpload} disabled={upload.busy} className={PRIMARY}>
-            {upload.busy && <Spinner size={16} />}
+          <Button onClick={saveUpload} loading={upload.busy} className={BUTTON}>
             {upload.busy ? t.saving : t.uploadSave}
-          </button>
+          </Button>
           <button type="button" onClick={upload.reset} disabled={upload.busy} className={SECONDARY}>
             {t.cancel}
           </button>

@@ -6,8 +6,8 @@ import { IconExternalLink, IconKey, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRaSignupCheck, type RaSignupAccount } from '@/hooks/useRaSignupCheck'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
-import Spinner from '@/components/main-spinner/Spinner'
 import RaLogo from '@/components/ra-logo/RaLogo'
+import Button from '@/components/ui/Button'
 
 const RA_SETTINGS = 'https://retroachievements.org/settings'
 
@@ -115,20 +115,9 @@ export default function RegisterUserFormRa({
               <IconExternalLink size={12} aria-hidden="true" />
             </a>
           </details>
-          <button
-            type="submit"
-            disabled={checking || disabled || !username.trim() || !apiKey.trim()}
-            className="w-full py-2.5 rounded-tile font-semibold text-sm flex items-center justify-center gap-2 bg-bg-main border border-ink/15 hover:border-accent transition-colors disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            {checking ? (
-              <>
-                <Spinner size={14} />
-                {t.raChecking}
-              </>
-            ) : (
-              t.raCheck
-            )}
-          </button>
+          <Button type="submit" variant="secondary" loading={checking} disabled={disabled || !username.trim() || !apiKey.trim()} className="w-full">
+              {checking ? t.raChecking : t.raCheck}
+            </Button>
         </form>
       )}
 

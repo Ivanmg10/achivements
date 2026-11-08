@@ -8,7 +8,6 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { SteamSignupProfile } from '@/hooks/useSteamSignup'
 import { checkEmail, checkUsername, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
-import Spinner from '@/components/main-spinner/Spinner'
 import Button from '@/components/ui/Button'
 
 /** The Steam account Steam confirmed, and the username and email it still needs. */
@@ -105,15 +104,10 @@ export default function SteamSignupFormFields({
 
         <Button
           type="submit"
-          disabled={submitting}
+          loading={submitting}
           size="lg" className="w-full mt-2"
         >
-          {submitting ? (
-            <>
-              <Spinner size={16} />
-              {T.steamAuth.creating}
-            </>
-          ) : (
+          {submitting ? (T.steamAuth.creating) : (
             <>
               {T.steamAuth.create}
               <IconArrowRight size={16} aria-hidden="true" />

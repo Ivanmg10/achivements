@@ -6,7 +6,6 @@ import { signIn } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
-import Spinner from '@/components/main-spinner/Spinner'
 import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
 import WelcomeEntryCurtain from '@/components/welcome-entry-curtain/WelcomeEntryCurtain'
 import RegisterUserFormRa from '@/components/register-user-form/register-user-form-ra/RegisterUserFormRa'
@@ -188,16 +187,12 @@ export default function RegisterUserForm({
 
         <Button
           type="submit"
+          loading={submitting}
           // With the RA section open, its account is checked first (or the section closed).
-          disabled={submitting || (raOpen && !raAccount)}
+          disabled={raOpen && !raAccount}
           size="lg" className="w-full mt-2"
         >
-          {submitting ? (
-            <>
-              <Spinner size={16} />
-              {T.registerForm.creating}
-            </>
-          ) : (
+          {submitting ? (T.registerForm.creating) : (
             <>
               {T.registerForm.createAccount}
               <IconArrowRight size={16} aria-hidden="true" />

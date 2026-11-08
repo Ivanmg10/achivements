@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { IconMail, IconX } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
-import Spinner from '@/components/main-spinner/Spinner'
 import { useLanguage } from '@/context/LanguageContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import Button from '@/components/ui/Button'
@@ -113,15 +112,10 @@ export default function ForgotPasswordModal({ isOpen, onClose }: { isOpen: boole
                   />
                   <Button
                     type="submit"
-                    disabled={submitting}
+                    loading={submitting}
                     className="w-full"
                   >
-                    {submitting ? (
-                      <>
-                        <Spinner size={16} />
-                        {T.passwordReset.sending}
-                      </>
-                    ) : (
+                    {submitting ? (T.passwordReset.sending) : (
                       T.passwordReset.send
                     )}
                   </Button>

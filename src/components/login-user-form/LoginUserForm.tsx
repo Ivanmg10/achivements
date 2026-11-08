@@ -7,7 +7,6 @@ import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
-import Spinner from '@/components/main-spinner/Spinner'
 import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import Button from '@/components/ui/Button'
@@ -104,15 +103,10 @@ export default function LoginUserForm({
 
         <Button
           type="submit"
-          disabled={submitting}
+          loading={submitting}
           size="lg" className="w-full mt-2"
         >
-          {submitting ? (
-            <>
-              <Spinner size={16} />
-              {T.loginForm.signingIn}
-            </>
-          ) : (
+          {submitting ? (T.loginForm.signingIn) : (
             <>
               {T.loginForm.signIn}
               <IconArrowRight size={16} aria-hidden="true" />

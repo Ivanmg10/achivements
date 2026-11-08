@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { IconArrowRight, IconLock } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
-import Spinner from '@/components/main-spinner/Spinner'
 import { useLanguage } from '@/context/LanguageContext'
 import { checkPassword, PASSWORD_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
@@ -113,15 +112,10 @@ export default function ResetPasswordForm() {
 
             <Button
               type="submit"
-              disabled={submitting}
+              loading={submitting}
               size="lg" className="w-full mt-2"
             >
-              {submitting ? (
-                <>
-                  <Spinner size={16} />
-                  {T.passwordReset.saving}
-                </>
-              ) : (
+              {submitting ? (T.passwordReset.saving) : (
                 <>
                   {T.passwordReset.save}
                   <IconArrowRight size={16} aria-hidden="true" />
