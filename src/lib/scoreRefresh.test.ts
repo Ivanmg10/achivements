@@ -40,7 +40,8 @@ import pool from '@/lib/db'
 import { readCache, writeCache } from '@/lib/steamCache'
 import { allowAttempt } from '@/lib/attemptLimit'
 import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
-import { XboxError } from '@/lib/xboxClient'
+import { XboxError, xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
+import { xboxGameFixture } from '@/test-utils/xboxFixtures'
 import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raClient'
 import { getOwnedGames } from '@/lib/steamClient'
 import { fetchPlayerAchievements, withLastPlayed } from '@/lib/steamProgress'
@@ -254,6 +255,20 @@ describe('refreshScore', () => {
     expect(getGameInfoAndUserProgress).toHaveBeenCalledWith('ivan', 'key', 5)
     expect(writes).toEqual([expect.objectContaining({ game_id: 5, provisional: false, completed: false })])
   })
+})
+
+test("Xbox's spent quota does not hold the fill up: its estimate stands (the ring stuck at 99 %)", async () => {
+  userRow = user({ psnaccountid: 'acc', xboxxuid: 'xuid' })
+  ;(xboxLibrary as jest.Mock).mockResolvedValue([xboxGameFixture({ id: 11 }), xboxGameFixture({ id: 12 })])
+  ;(xboxGameAchievements as jest.Mock).mockRejectedValue(new XboxError('rate-limited', 'quota'))
+  let result = await refreshScore(7, Date.now() + 10_000)
+  expect(result.platforms.xbox).toMatchObject({ state: 'estimated', error: 'busy' })
+  expect(result.complete).toBe(true)
+
+  ;(xboxLibrary as jest.Mock).mockRejectedValue(new XboxError('rate-limited', 'quota'))
+  result = await refreshScore(7, Date.now() + 10_000)
+  expect(result.platforms.xbox).toMatchObject({ state: 'estimated', error: 'busy' })
+  expect(result.complete).toBe(true)
 })
 
 test('Xbox score reads at most two changed games per pass', () => {

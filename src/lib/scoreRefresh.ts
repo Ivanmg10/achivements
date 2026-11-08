@@ -292,8 +292,8 @@ async function refreshSource(
   } catch (err) {
     console.error(`[scoreRefresh] ${plan.source} list`, userId, err)
     const error = classifyFailure(plan.source, err)
-    // Busy is waited out (the fill goes on); the rest need the user, or a later pass.
-    return { read: 0, total: 0, state: error === 'busy' ? 'reading' : 'error', error }
+    // Busy is waited out (the fill goes on, but Xbox's estimate stands); the rest need the user, or a later pass.
+    return { read: 0, total: 0, state: error !== 'busy' ? 'error' : plan.source === 'xbox' ? 'estimated' : 'reading', error }
   }
 
   const hiddenConsoles = hiddenConsolesFrom(user.preferences, plan.source)
@@ -402,9 +402,11 @@ async function refreshSource(
   if (skipped >= 4 && readNow === 0) return { ...progress, state: 'error', error: 'unavailable' }
   const done = progress.read + skipped >= progress.total
   if (done) return { ...progress, state: 'done' }
-  // Xbox's 150 calls an hour for the whole app: its gamerscore estimate is the settled state.
-  if (plan.source === 'xbox' && !stopped) return { ...progress, state: 'estimated' }
-  return { ...progress, state: 'reading', ...(stopped ? { error: stopped } : {}) }
+  const why = stopped ? { error: stopped } : {}
+  // Xbox's 150 calls an hour for the whole app: its gamerscore estimate is the settled state, quota spent or not
+  // (waiting on it left every other platform read and the header's ring at 99 % until the hour turned).
+  if (plan.source === 'xbox') return { ...progress, state: 'estimated', ...why }
+  return { ...progress, state: 'reading', ...why }
 }
 
 /** Weeks and months, per platform, rebuilt from the stored games. */
