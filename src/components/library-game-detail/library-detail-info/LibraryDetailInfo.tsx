@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
+import Kicker from '@/components/ui/Kicker'
 
 export type InfoRow = { label: string; value: string }
 
@@ -15,7 +16,7 @@ export default function LibraryDetailInfo({ rows }: { rows: InfoRow[] }) {
       <dl className="flex flex-col gap-2 px-1">
         {rows.map((r) => (
           <div key={r.label} className="flex items-baseline justify-between gap-3">
-            <dt className="text-[11px] uppercase tracking-wide text-text-secondary shrink-0">{r.label}</dt>
+            <Kicker as="dt" className="shrink-0">{r.label}</Kicker>
             <dd className="text-sm font-medium text-right min-w-0 truncate" title={r.value}>{r.value}</dd>
           </div>
         ))}

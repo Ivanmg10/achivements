@@ -1,6 +1,6 @@
 import type { ElementType, ReactNode } from 'react'
 
-type Tone = 'muted' | 'accent' | 'danger'
+type Tone = 'muted' | 'accent' | 'danger' | 'warning' | 'inherit'
 type Size = 'xs' | 'sm' | 'md'
 
 const SIZES: Record<Size, string> = {
@@ -13,6 +13,9 @@ const TONES: Record<Tone, string> = {
   muted: 'text-text-secondary',
   accent: 'text-accent',
   danger: 'text-danger',
+  warning: 'text-warning',
+  // The colour is the caller's: a tier's hue, a label on a picture.
+  inherit: '',
 }
 
 /** The kicker's classes, for an element that cannot be a `Kicker` (a `<dt>`, a `<th>`). */

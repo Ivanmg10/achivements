@@ -12,6 +12,7 @@ import WeekAchievementsModal from '@/components/week-achievements-modal/WeekAchi
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { parseUnlockTime, utcDay } from '@/utils/dates'
+import Kicker from '@/components/ui/Kicker'
 
 type Metric = 'pts' | 'ach'
 
@@ -80,7 +81,7 @@ export default function MainPageBestPeriod({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestPerformance}</p>
+      <Kicker>{T.cards.bestPerformance}</Kicker>
 
       {isLoading ? (
         <div className="flex flex-col gap-2">

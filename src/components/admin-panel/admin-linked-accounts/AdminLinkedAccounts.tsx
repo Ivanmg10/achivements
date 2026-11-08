@@ -9,6 +9,7 @@ import { notify } from '@/lib/notify'
 import { buttonClass } from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import type { GameSource } from '@/types/game'
+import Kicker from '@/components/ui/Kicker'
 
 const PLATFORM_NAMES: Record<GameSource, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
 
@@ -73,7 +74,7 @@ export default function AdminLinkedAccounts({
 
   return (
     <div className="bg-bg-main/50 rounded-tile p-3 flex flex-col gap-4">
-      <span className="text-xs text-text-secondary uppercase tracking-wider">Linked accounts</span>
+      <Kicker as="span" size="md">Linked accounts</Kicker>
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-sm">

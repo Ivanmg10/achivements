@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { StatPill } from '@/components/ui/StatPill'
+import Kicker from '@/components/ui/Kicker'
 
 /** The fixed profile card beside the sample home's recent games. */
 export default function LayoutModalPreviewSampleProfile() {
@@ -12,7 +13,7 @@ export default function LayoutModalPreviewSampleProfile() {
         <span aria-hidden="true" className="h-12 w-12 rounded-full bg-accent/25 ring-1 ring-inset ring-accent/40" />
         <div className="min-w-0">
           <p className="truncate text-sm font-bold text-text-main">CheevoVault</p>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-text-secondary">LV 27</p>
+          <Kicker size="md">LV 27</Kicker>
         </div>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">

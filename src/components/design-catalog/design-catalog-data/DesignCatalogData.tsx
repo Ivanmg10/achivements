@@ -17,6 +17,7 @@ import { STREAK_TIERS } from '@/utils/streakTier'
 import { pointsForLevel } from '@/utils/vaultLevel'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
+import Kicker from '@/components/ui/Kicker'
 
 const TAG_TONES: TagTone[] = ['muted', 'neutral', 'accent', 'info', 'success', 'warning', 'danger', 'hardcore']
 const LEVELS = [1, 10, 20, 30, 45, 60, 75, 90]
@@ -142,8 +143,8 @@ export default function DesignCatalogData() {
 
       <DesignCatalogPiece id="game-card">
         <div className="grid gap-3 lg:grid-cols-2">
-          <Panel><p className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-text-secondary">Colourful</p><GameRow style="tinted" /></Panel>
-          <Panel><p className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-text-secondary">Flat</p><GameRow style="flat" /></Panel>
+          <Panel><Kicker size="sm">Colourful</Kicker><GameRow style="tinted" /></Panel>
+          <Panel><Kicker size="sm">Flat</Kicker><GameRow style="flat" /></Panel>
         </div>
       </DesignCatalogPiece>
     </>

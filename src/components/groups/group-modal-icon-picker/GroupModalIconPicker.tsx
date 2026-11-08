@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { fieldClass } from '@/components/ui/Input'
+import Kicker from '@/components/ui/Kicker'
 
 /** The icons offered in one tap, by category. Anything else goes in the field below them. */
 export const ICON_CATEGORIES = {
@@ -29,7 +30,7 @@ export default function GroupModalIconPicker({ value, onChange }: { value: strin
 
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="text-[10px] uppercase tracking-widest text-text-secondary mb-2">{T.groups.icon}</legend>
+      <Kicker as="legend" className="mb-2">{T.groups.icon}</Kicker>
 
       <div role="group" aria-label={T.groups.icon} className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
         {CATEGORIES.map((c) => (

@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import StatusBadge from '@/components/status-badge/StatusBadge'
 import RouteErrorCard from '@/components/route-error/route-error-card/RouteErrorCard'
 import { STATUS_BUTTON, STATUS_SCREEN } from '@/components/status-badge/statusScreen'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * What a route group shows when one of its pages throws: the 404's twin in
@@ -46,7 +47,7 @@ export default function RouteError({
         />
       </div>
       <div role="alert" className="flex flex-col items-center gap-2">
-        <p className="text-xs font-semibold tracking-[0.14em] uppercase text-danger">{T.errorBoundary.eyebrow}</p>
+        <Kicker size="md" tone="danger">{T.errorBoundary.eyebrow}</Kicker>
         <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 text-balance">{T.errorBoundary.title}</h1>
         <p className="text-sm text-text-secondary max-w-sm">{T.errorBoundary.subtitle}</p>
       </div>

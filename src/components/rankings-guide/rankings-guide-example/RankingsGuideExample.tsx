@@ -6,6 +6,7 @@ import type { VaultGuideText } from '@/translations/vaultGuide'
 import { PLATFORM_FILL } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { exampleScores } from '@/utils/vaultExamples'
 import { slantStyle } from '@/components/ui/shape'
+import Kicker from '@/components/ui/Kicker'
 
 const SLANT = slantStyle(5)
 const PLATFORMS = ['psn', 'steam', 'ra'] as const
@@ -29,7 +30,7 @@ export default function RankingsGuideExample({ text }: { text: VaultGuideText['e
 
   return (
     <div className="bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] rounded-pane p-4 flex flex-col gap-3">
-      <p className="text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary">{text.aaa}</p>
+      <Kicker size="sm">{text.aaa}</Kicker>
       <ul className="flex flex-col gap-2.5">
         {rows.map((r, i) => (
           <li key={r.label} className={`grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)_4.5rem] sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_4.5rem] items-center gap-3 text-sm ${i === rows.length - 2 ? 'mt-2 pt-3 border-t border-ink/[0.07]' : ''}`}>

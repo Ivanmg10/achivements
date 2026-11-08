@@ -13,6 +13,8 @@ test('its tone and size come from the piece, never from className', () => {
   expect(kickerClass('accent', 'md')).toContain('text-accent')
   expect(kickerClass('accent', 'md')).toContain('tracking-[0.14em]')
   expect(kickerClass('danger', 'sm')).toContain('text-danger')
+  expect(kickerClass('warning', 'xs')).toContain('text-warning')
+  expect(kickerClass('inherit', 'xs')).not.toContain('text-text')
 })
 
 test('a section head names its section and puts its aside at the end', () => {

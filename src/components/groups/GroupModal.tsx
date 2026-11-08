@@ -18,8 +18,8 @@ import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosai
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
+import { kickerClass } from '@/components/ui/Kicker'
 
-const LABEL = 'text-[10px] uppercase tracking-widest text-text-secondary'
 
 type Props = {
   isOpen: boolean
@@ -38,7 +38,7 @@ type Props = {
 function Counter({ htmlFor, label, length, max }: { htmlFor: string; label: string; length: number; max: number }) {
   return (
     <div className="flex items-center justify-between">
-      <label htmlFor={htmlFor} className={LABEL}>{label}</label>
+      <label htmlFor={htmlFor} className={kickerClass()}>{label}</label>
       <span aria-hidden="true" className={`text-[10px] tabular-nums ${length >= max ? 'text-danger' : 'text-text-secondary'}`}>{length}/{max}</span>
     </div>
   )

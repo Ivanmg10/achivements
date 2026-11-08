@@ -11,6 +11,7 @@ import LayoutModalPreviewHeader from './layout-modal-preview-header/LayoutModalP
 import LayoutModalPreviewSampleGameCard from './layout-modal-preview-sample-game-card/LayoutModalPreviewSampleGameCard'
 import LayoutModalPreviewSampleProfile from './layout-modal-preview-sample-profile/LayoutModalPreviewSampleProfile'
 import { SAMPLE_GAMES, SAMPLE_LEAD_ID } from './layout-modal-preview-sample'
+import { kickerClass } from '@/components/ui/Kicker'
 
 const GROW = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const }
 
@@ -47,7 +48,7 @@ export default function LayoutModalPreview({ font }: { font: FontStyle }) {
             <div className="grid min-w-0 items-start gap-3 @2xl:grid-cols-[1.55fr_1fr]">
               <div className="flex min-w-0 flex-col gap-2">
                 {!cover && (
-                  <motion.p layout="position" className="text-xs font-bold uppercase tracking-[0.14em] text-text-secondary">
+                  <motion.p layout="position" className={kickerClass('muted', 'md')}>
                     {T.homeLayout.continueKicker}
                   </motion.p>
                 )}

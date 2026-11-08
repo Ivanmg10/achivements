@@ -7,6 +7,7 @@ import type { FriendPin } from '@/utils/friends'
 import { gameHref } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
+import Kicker from '@/components/ui/Kicker'
 
 const SIZE = {
   md: { px: 40, box: 'w-10 h-10 rounded-box', gap: 'gap-1.5' },
@@ -57,10 +58,10 @@ export default function FollowingCardBadges({
               id={tip}
               className={`pointer-events-none absolute bottom-full left-0 mb-2 w-64 max-w-[80vw] z-20 ${TOOLTIP_SURFACE} px-3 py-2 flex flex-col gap-0.5 opacity-0 invisible transition-opacity group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible`}
             >
-              <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-text-secondary">
+              <Kicker as="span" className="flex items-center gap-1.5">
                 <PlatformLogo source={p.source} size={10} />
                 <span className="truncate">{p.gameTitle}</span>
-              </span>
+              </Kicker>
               <span className="text-sm font-semibold text-text-main">{p.title ?? '—'}</span>
               {p.description && <span className="text-xs text-text-secondary">{p.description}</span>}
             </span>

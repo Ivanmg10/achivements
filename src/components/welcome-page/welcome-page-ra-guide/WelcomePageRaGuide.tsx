@@ -1,6 +1,7 @@
 import { IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
+import Kicker from '@/components/ui/Kicker'
 
 const RA_SETTINGS = 'https://retroachievements.org/settings'
 const STEP_CLASS = [styles.step1, styles.step2, styles.step3]
@@ -19,7 +20,7 @@ export default function WelcomePageRaGuide() {
   return (
     <div className={`${styles.card} rounded-card bg-bg-card ring-1 ring-ink/[0.06] p-4 sm:p-5 flex flex-col gap-3`}>
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-text-secondary">{t.guideTitle}</h2>
+        <Kicker as="h2" size="md">{t.guideTitle}</Kicker>
         <a
           href={RA_SETTINGS}
           target="_blank"

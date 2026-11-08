@@ -5,8 +5,9 @@ import { useSession } from 'next-auth/react'
 import CommonModal from '../common-modal/CommonModal'
 import { useLanguage } from '@/context/LanguageContext'
 import Button from '@/components/ui/Button'
-import { fieldClass } from '@/components/ui/Input'
+import { Field, fieldClass } from '@/components/ui/Input'
 import Notice from '@/components/ui/Notice'
+import Kicker from '@/components/ui/Kicker'
 
 /** The avatar has its own modal (`AvatarModal`). */
 export type EditProfileField = 'name' | 'email'
@@ -96,64 +97,57 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
 
       {/* Current value */}
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-text-secondary uppercase tracking-wider">
+        <Kicker as="span" size="md">
           {T.editProfileModal.current}
-        </label>
+        </Kicker>
         <div className="bg-bg-main rounded-tile px-4 py-3 text-text-secondary font-mono text-sm">
           {currentValue || '—'}
         </div>
       </div>
 
       {/* New value */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="edit-new-value" className="text-xs text-text-secondary uppercase tracking-wider">
-          {T.editProfileModal.newLabel} {label}
-        </label>
-        <input
-          id="edit-new-value"
-          type={field === 'email' ? 'email' : 'text'}
-          value={newValue}
-          onChange={(e) => { setNewValue(e.target.value); setError(null) }}
-          className={fieldClass()}
-          disabled={loading || success}
-          autoFocus
-        />
-      </div>
-
-      {/* Confirm value */}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="edit-confirm-value" className="text-xs text-text-secondary uppercase tracking-wider">
-          {T.editProfileModal.confirmLabel} {label}
-        </label>
-        <input
-          id="edit-confirm-value"
-          type={field === 'email' ? 'email' : 'text'}
-          value={confirmValue}
-          onChange={(e) => { setConfirmValue(e.target.value); setError(null) }}
-          aria-describedby={mismatch ? 'edit-mismatch-error' : undefined}
-          className={fieldClass({ invalid: mismatch })}
-          disabled={loading || success}
-        />
-        {mismatch && (
-          <span id="edit-mismatch-error" role="alert" className="text-xs text-danger">{T.editProfileModal.mismatch}</span>
-        )}
-      </div>
-
-      {needsPassword && (
-        <div className="flex flex-col gap-1">
-          <label htmlFor="edit-current-password" className="text-xs text-text-secondary uppercase tracking-wider">
-            {T.changePassword.current}
-          </label>
+      <Field label={`${T.editProfileModal.newLabel} ${label}`}>
+        {(control) => (
           <input
-            id="edit-current-password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => { setPassword(e.target.value); setError(null) }}
+            {...control}
+            type={field === 'email' ? 'email' : 'text'}
+            value={newValue}
+            onChange={(e) => { setNewValue(e.target.value); setError(null) }}
             className={fieldClass()}
             disabled={loading || success}
+            autoFocus
           />
-        </div>
+        )}
+      </Field>
+
+      {/* Confirm value */}
+      <Field label={`${T.editProfileModal.confirmLabel} ${label}`} error={mismatch ? T.editProfileModal.mismatch : undefined}>
+        {(control) => (
+          <input
+            {...control}
+            type={field === 'email' ? 'email' : 'text'}
+            value={confirmValue}
+            onChange={(e) => { setConfirmValue(e.target.value); setError(null) }}
+            className={fieldClass({ invalid: mismatch })}
+            disabled={loading || success}
+          />
+        )}
+      </Field>
+
+      {needsPassword && (
+        <Field label={T.changePassword.current}>
+          {(control) => (
+            <input
+              {...control}
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setError(null) }}
+              className={fieldClass()}
+              disabled={loading || success}
+            />
+          )}
+        </Field>
       )}
 
       {/* Error */}

@@ -6,6 +6,7 @@ import { plural } from '@/utils/utils'
 import { streakInk, streakTier } from '@/utils/streakTier'
 import { CountUp } from '@/components/ui/CountUp'
 import { formatDay } from '@/utils/dates'
+import { kickerClass } from '@/components/ui/Kicker'
 
 interface Props {
   activeStreak: Streak | null
@@ -50,7 +51,7 @@ export default function StreakStatsBanner({ activeStreak, bestStreak, lastActive
       style={{ backgroundImage: `linear-gradient(110deg, rgb(${tier.color} / 0.22), transparent 55%)` }}
     >
       <div className="flex-1 min-w-0 flex flex-col gap-2 enter-rows">
-        <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: streakInk(tier) }}>{kicker}</p>
+        <p className={kickerClass('inherit', 'md')} style={{ color: streakInk(tier) }}>{kicker}</p>
         {activeStreak ? (
           <>
             <p className="font-display italic font-extrabold text-6xl sm:text-[6.5rem] leading-[0.9] pr-3 text-text-main">

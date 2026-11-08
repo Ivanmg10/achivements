@@ -7,6 +7,7 @@ import type { FriendOverview } from '@/utils/friends'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
 import { CountUp } from '@/components/ui/CountUp'
 import { Skeleton } from '@/components/ui/Skeleton'
+import Kicker from '@/components/ui/Kicker'
 
 const STACK_MAX = 5
 
@@ -59,7 +60,7 @@ export default function FollowingHero({ users, isLoading = false, className = ''
           <div className="flex items-end gap-x-5 gap-y-3 flex-wrap">
             <p className="flex flex-col">
               <CountUp value={users.length} locale={lang} className="font-display italic font-extrabold text-[3.25rem] leading-[0.85] pr-1" />
-              <span className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-text-secondary mt-1.5">{T.following.people}</span>
+              <Kicker as="span" size="sm" className="mt-1.5">{T.following.people}</Kicker>
             </p>
             <div aria-hidden="true" className="flex items-center pb-0.5 pl-2">
               {stack.map((u) => (

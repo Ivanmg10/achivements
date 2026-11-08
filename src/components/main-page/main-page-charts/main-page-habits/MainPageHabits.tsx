@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { playHabits } from '@/utils/activityInsights'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { Skeleton } from '@/components/ui/Skeleton'
+import Kicker from '@/components/ui/Kicker'
 
 const HOUR_MARKS = [0, 6, 12, 18]
 /** A Monday, to name the weekdays in the app's language. */
@@ -45,7 +46,7 @@ export default function MainPageHabits({ achievements, isLoading }: { achievemen
 
   const header = (
     <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.habits}</p>
+      <Kicker>{T.cards.habits}</Kicker>
       <p className="text-[10px] text-text-secondary">{T.cards.habitsHint}</p>
     </div>
   )

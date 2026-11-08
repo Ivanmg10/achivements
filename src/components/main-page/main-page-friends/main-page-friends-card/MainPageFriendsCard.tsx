@@ -9,6 +9,7 @@ import { candidateIconUrl } from '@/utils/gameCandidates'
 import { gameHref, GAME_SOURCES } from '@/utils/gameRef'
 import UserSummary from '@/components/user-summary/UserSummary'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * One person you follow, from our own data: who they are, their favourite
@@ -58,10 +59,10 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
       )}
 
       <div className="flex flex-col gap-1">
-        <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-text-secondary">
+        <Kicker className="flex items-center gap-1.5">
           <IconTrophy size={12} aria-hidden="true" />
           {T.friends.showcase}
-        </p>
+        </Kicker>
         {friend.showcase.length === 0 ? (
           <p className="text-xs text-text-secondary italic">{T.friends.noShowcase}</p>
         ) : (

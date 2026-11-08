@@ -9,6 +9,7 @@ import { gameHref } from '@/utils/gameRef'
 import { achievementBadgeUrl } from '@/utils/utils'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { relativeTime } from '@/utils/dates'
+import Kicker from '@/components/ui/Kicker'
 
 /** What the people you follow unlocked lately, all together and newest first; each opens their progress in that game. */
 export default function MainPageFriendsFeed({ items }: { items: FeedItem[] }) {
@@ -16,7 +17,7 @@ export default function MainPageFriendsFeed({ items }: { items: FeedItem[] }) {
 
   return (
     <div className="flex flex-col gap-3 min-h-0 flex-1">
-      <h3 className="text-[10px] uppercase tracking-widest text-text-secondary">{T.friends.feed}</h3>
+      <Kicker as="h3">{T.friends.feed}</Kicker>
       {items.length === 0 ? (
         // Centred in whatever height the card is given (it stretches to the column beside it).
         <EmptyState icon={<IconSparkles className="w-6 h-6" />} title={T.friends.feedEmpty} size="compact" className="py-6 flex-1 justify-center" />

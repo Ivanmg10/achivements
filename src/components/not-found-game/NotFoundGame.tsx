@@ -8,6 +8,7 @@ import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { STATUS_BUTTON, STATUS_SCREEN } from '@/components/status-badge/statusScreen'
 import { PLATFORM_NAME } from '@/utils/gameRef'
 import type { GameSource } from '@/types/game'
+import Kicker from '@/components/ui/Kicker'
 
 
 /**
@@ -30,7 +31,7 @@ export default function NotFoundGame({ source }: { source: GameSource }) {
         <IconDeviceGamepad2 size={36} stroke={1.5} />
       </div>
       <div className="flex flex-col items-center gap-2">
-        <p className="text-xs font-semibold tracking-[0.14em] uppercase text-accent">{T.notFound.gameEyebrow}</p>
+        <Kicker size="md" tone="accent">{T.notFound.gameEyebrow}</Kicker>
         <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 text-balance">{T.notFound.gameTitle}</h1>
         <p className="text-sm text-text-secondary max-w-sm">
           {T.notFound.gameSubtitle.replace('{platform}', PLATFORM_NAME[source])}

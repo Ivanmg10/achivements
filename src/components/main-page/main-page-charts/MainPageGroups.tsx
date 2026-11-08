@@ -12,6 +12,7 @@ import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { relativeTime } from '@/utils/dates'
+import { kickerClass } from '@/components/ui/Kicker'
 
 // Downloaded the first time it is opened, not with the page.
 const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
@@ -70,7 +71,7 @@ export default function MainPageGroups({
       <div className="flex items-center justify-between">
         <Link
           href="/groups"
-          className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-text-main transition-colors"
+          className={`${kickerClass()} hover:text-text-main transition-colors`}
         >
           {T.groups.title}
         </Link>

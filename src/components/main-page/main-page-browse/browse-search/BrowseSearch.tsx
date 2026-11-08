@@ -11,6 +11,7 @@ import BrowseSearchChips from '../browse-search-chips/BrowseSearchChips'
 import { fieldClass } from '@/components/ui/Input'
 import type { GameSource } from '@/types/game'
 import type { GameStatus } from '@/types/game'
+import { kickerClass } from '@/components/ui/Kicker'
 
 const SHOWN = 4
 
@@ -27,7 +28,7 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <label htmlFor={inputId} className="text-[10px] uppercase tracking-widest text-text-secondary">
+      <label htmlFor={inputId} className={kickerClass()}>
         {T.cards.searchTitle}
       </label>
       <div className="relative">

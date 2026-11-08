@@ -46,6 +46,7 @@ import MainPagePinnedSection from '../main-page-pinned-section/MainPagePinnedSec
 import MainPageCollection from '../main-page-collection/MainPageCollection'
 import MainPageGroupsSection from '../main-page-groups-section/MainPageGroupsSection'
 import MainPageFriends from '../main-page-friends/MainPageFriends'
+import Kicker from '@/components/ui/Kicker'
 
 /** Sections that load their own data: mounted (hidden) once the browser is idle, unless opened first. */
 const LOADS_ITS_OWN = new Set(['pinned', 'groups', 'browse'])
@@ -175,7 +176,7 @@ export default function MainPageCharts() {
             </SectionFallback>
           </ChartCard>
           <ChartCard>
-            <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.dailyAchievements}</p>
+            <Kicker>{T.cards.dailyAchievements}</Kicker>
             <SectionFallback error={achError} onRefresh={refetchAch}>
               <div aria-hidden="true">
                 <AchievementsLineChart achievements={recent} isLoading={achLoading} />

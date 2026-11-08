@@ -9,6 +9,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import { Skeleton } from '@/components/ui/Skeleton'
 import type { GameStatus } from '@/types/game'
+import { kickerClass } from '@/components/ui/Kicker'
 
 const CONSOLE_MAP = new Map(CONSOLES.map((c) => [c.id, c]))
 
@@ -60,7 +61,7 @@ export default function MainPageConsoleNav() {
     <div className="flex flex-col gap-3">
       <Link
         href="/allGames"
-        className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-text-main transition-colors self-start"
+        className={`${kickerClass()} hover:text-text-main transition-colors self-start`}
       >
         {T.cards.navigation}
       </Link>

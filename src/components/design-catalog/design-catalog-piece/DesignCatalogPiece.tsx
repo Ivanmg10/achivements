@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { SURFACE } from '@/components/ui/surface'
 import { pieceById } from '../catalogue'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * One piece of the design system as a card: its name and where it lives, what
@@ -26,7 +27,7 @@ export default function DesignCatalogPiece({ id, children }: { id: string; child
         <footer className="grid gap-5 lg:grid-cols-2 pt-4 shadow-[inset_0_1px_0_rgb(var(--ink)/0.08)]">
           {piece.props && (
             <dl className="flex flex-col gap-2">
-              <dt className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-text-secondary">Props and options</dt>
+              <Kicker as="dt" size="sm">Props and options</Kicker>
               {piece.props.map(([name, what]) => (
                 <dd key={name} className="text-[0.8125rem] leading-snug">
                   <code className="text-accent">{name}</code> <span className="text-text-secondary">{what}</span>
@@ -36,7 +37,7 @@ export default function DesignCatalogPiece({ id, children }: { id: string; child
           )}
           {piece.rules && (
             <div className="flex flex-col gap-2">
-              <p className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-text-secondary">Rules</p>
+              <Kicker size="sm">Rules</Kicker>
               <ul className="flex flex-col gap-1.5">
                 {piece.rules.map((rule) => (
                   <li
@@ -80,9 +81,9 @@ export function Compare({ children }: { children: ReactNode }) {
     <div className="grid gap-3 lg:grid-cols-2">
       {DESIGNS.map(({ shape, label, note }) => (
         <div key={shape} data-shape={shape} role="group" aria-label={label} className="rounded-pane bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] p-4 sm:p-5 flex flex-col gap-4">
-          <p className="flex items-baseline gap-2 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-text-secondary">
+          <Kicker size="sm" className="flex items-baseline gap-2">
             {label} <span className="font-normal normal-case tracking-normal">· {note}</span>
-          </p>
+          </Kicker>
           {children}
         </div>
       ))}

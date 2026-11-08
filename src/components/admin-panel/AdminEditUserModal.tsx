@@ -12,6 +12,7 @@ import { notify } from '@/lib/notify'
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import Switch from '@/components/ui/Switch'
+import Kicker from '@/components/ui/Kicker'
 
 interface Props {
   isOpen: boolean
@@ -142,7 +143,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
 
         {/* Location */}
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-text-secondary uppercase tracking-wider">Location</span>
+          <Kicker as="span" size="md">Location</Kicker>
           {!showCountryPicker ? (
             <div className="flex items-center gap-2">
               <button
@@ -199,7 +200,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
 
         {/* Admin toggle */}
         <div className="flex items-center justify-between">
-          <span className="text-xs text-text-secondary uppercase tracking-wider">Admin</span>
+          <Kicker as="span" size="md">Admin</Kicker>
           <div className="flex items-center gap-3">
             {user.id === currentAdminId && (
               <span className="text-xs text-text-secondary italic">Can&apos;t remove own admin</span>
@@ -248,7 +249,7 @@ function FieldRow({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-xs text-text-secondary uppercase tracking-wider">{label}</span>
+      <Kicker as="span" size="md">{label}</Kicker>
       <div className="flex items-center gap-2">
         <div className="flex-1">{children}</div>
         {canSave && <SaveButton saving={saving} onClick={onSave} />}

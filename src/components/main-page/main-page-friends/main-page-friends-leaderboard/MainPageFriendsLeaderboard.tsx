@@ -8,6 +8,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { rankBy, type LeaderRow, type StatKey } from '@/utils/friends'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
 import { pillClass } from '@/components/ui/Pill'
+import Kicker from '@/components/ui/Kicker'
 
 const KEYS: StatKey[] = ['week', 'activeDays', 'streak', 'completed']
 
@@ -37,7 +38,7 @@ export default function MainPageFriendsLeaderboard({ rows }: { rows: LeaderRow[]
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-[10px] uppercase tracking-widest text-text-secondary">{T.friends.leaderboard}</h3>
+        <Kicker as="h3">{T.friends.leaderboard}</Kicker>
         <div role="group" aria-label={T.friends.rankBy} className="flex flex-wrap gap-1.5">
           {KEYS.map((k) => (
             <button key={k} type="button" aria-pressed={key === k} onClick={() => setKey(k)} className={chipClass(key === k)}>
@@ -67,7 +68,7 @@ export default function MainPageFriendsLeaderboard({ rows }: { rows: LeaderRow[]
               <span className="flex flex-col gap-1 min-w-0 flex-1">
                 <span className="text-sm font-medium truncate">
                   {r.username}
-                  {r.isMe && <span className="ml-1.5 text-[10px] uppercase tracking-wider text-accent">{T.userProfile.you}</span>}
+                  {r.isMe && <Kicker as="span" tone="accent" className="ml-1.5">{T.userProfile.you}</Kicker>}
                 </span>
                 <span aria-hidden="true" className="h-1 rounded-full bg-ink/10 overflow-hidden">
                   <span className="block h-full rounded-full bg-progress" style={{ width: `${(r.stats[key] / max) * 100}%` }} />

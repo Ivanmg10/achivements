@@ -19,6 +19,7 @@ import { useRetryingRead } from '@/hooks/useRetryingRead'
 import { useSubject } from '@/context/SubjectContext'
 import { parseUnlockTime } from '@/utils/dates'
 import { raImageUrl } from '@/utils/raAssets'
+import Kicker from '@/components/ui/Kicker'
 
 const ABANDONED_DAYS = 30
 const DAY_MS = 1000 * 60 * 60 * 24
@@ -132,9 +133,9 @@ export default function MainPageAbandoned({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">
+      <Kicker>
         {T.cards.abandoned} — {ABANDONED_DAYS}{T.cards.abandonedIdle}
-      </p>
+      </Kicker>
 
       {loading ? (
         <SkeletonGameList count={7} />

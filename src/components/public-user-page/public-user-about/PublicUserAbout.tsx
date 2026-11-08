@@ -17,6 +17,7 @@ import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import type { GameSource } from '@/types/game'
+import Kicker from '@/components/ui/Kicker'
 
 const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
 
@@ -58,9 +59,9 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <section aria-labelledby="public-user-preferences" className="bg-bg-card rounded-tile p-4 flex flex-col gap-4">
-        <h2 id="public-user-preferences" className="text-[10px] uppercase tracking-widest text-text-secondary">
+        <Kicker as="h2" id="public-user-preferences">
           {T.userProfile.preferences}
-        </h2>
+        </Kicker>
         <dl className="flex flex-col gap-3">
           {themeName && (
             <Fact icon={<IconPalette size={18} />} label={T.userTheme.theme}>
@@ -74,7 +75,7 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
           )}
         </dl>
 
-        <h3 className="text-[10px] uppercase tracking-widest text-text-secondary pt-1">{T.userProfile.favoriteGames}</h3>
+        <Kicker as="h3" className="pt-1">{T.userProfile.favoriteGames}</Kicker>
         {favorites.length === 0 ? (
           <p className="text-xs text-text-secondary italic">{T.userProfile.noFavorites}</p>
         ) : (
@@ -103,10 +104,10 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
       </section>
 
       <section aria-labelledby="public-user-groups" className="bg-bg-card rounded-tile p-4 flex flex-col gap-3 lg:col-span-2">
-        <h2 id="public-user-groups" className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-text-secondary">
+        <Kicker as="h2" id="public-user-groups" className="flex items-center gap-2">
           <IconFolders size={14} aria-hidden="true" />
           {T.userProfile.publicGroups}
-        </h2>
+        </Kicker>
         {groups.length === 0 ? (
           <EmptyState icon={<IconFolders className="w-6 h-6" />} title={T.userProfile.noGroups} subtitle={T.userProfile.noGroupsHint} className="py-8" />
         ) : (

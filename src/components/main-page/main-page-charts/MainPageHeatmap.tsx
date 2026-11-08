@@ -10,6 +10,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useHeatmapGrid, HEATMAP_GAP as GAP, HEATMAP_MAX_DAYS } from '@/hooks/useHeatmapGrid'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { utcDay, formatDay } from '@/utils/dates'
+import Kicker from '@/components/ui/Kicker'
 
 /** Empty, then the theme's accent at rising strength: one hue per theme, so every theme reads the same way. */
 /*
@@ -142,9 +143,9 @@ export default function MainPageHeatmap({
     >
       {/* header */}
       <div className="flex items-center justify-between flex-wrap gap-1 shrink-0 mb-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">
+        <Kicker>
           {title ?? `${T.cards.activityLabel} — ${label}`}
-        </p>
+        </Kicker>
         <div className="flex items-center gap-3">
           {!isLoading && activeDays > 0 && (
             <p className="text-[11px] text-text-secondary">

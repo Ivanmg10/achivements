@@ -5,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { codeToFlag, findCountry } from '@/utils/countries'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
+import { kickerClass } from '@/components/ui/Kicker'
 
 const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
 
@@ -23,7 +24,7 @@ export default function WelcomePageProfilePreview({ online = false }: { online?:
 
   return (
     <>
-      <span className={`${styles.in} text-xs font-bold uppercase tracking-[0.12em] text-text-secondary`}>{T.welcome.profile.preview}</span>
+      <span className={`${styles.in} ${kickerClass('muted', 'md')}`}>{T.welcome.profile.preview}</span>
       <div className={`${styles.card} rounded-card bg-bg-card ring-1 ring-ink/[0.06] overflow-hidden`}>
         <div className="h-20 bg-linear-to-br from-accent/55 to-bg-card" />
         <div className="px-5 pb-5 -mt-10 flex flex-col gap-2 min-w-0">

@@ -3,6 +3,7 @@
 import Select from '@/components/ui/Select'
 import { useActiveSection } from '../useActiveSection'
 import { ALL_PIECES, GROUPS } from '../catalogue'
+import Kicker from '@/components/ui/Kicker'
 
 const IDS = ALL_PIECES.map((p) => p.id)
 
@@ -32,7 +33,7 @@ export default function DesignCatalogSidebar() {
         <ul className="flex flex-col gap-5">
           {GROUPS.map((group) => (
             <li key={group.id}>
-              <p className="px-3 pb-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-text-secondary">{group.title}</p>
+              <Kicker size="sm" className="px-3 pb-1.5">{group.title}</Kicker>
               <ul className="flex flex-col">
                 {group.pieces.map((piece) => {
                   const on = piece.id === active

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { IconArrowRight, IconChevronLeft, IconChevronRight, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { ICON_BUTTON, PRIMARY_BUTTON } from '@/components/welcome-page/welcomeArt'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * One look choice, opened: its row grows into this (`layoutId`), as the intro's
@@ -73,9 +74,9 @@ export default function WelcomePagePreferencesDetail({
             {index + 1}
           </span>
           <div className="flex flex-col min-w-0">
-            <span className="text-xs font-bold uppercase tracking-[0.12em] text-accent">
+            <Kicker as="span" size="md" tone="accent">
               {T.welcome.shortCount.replace('{n}', String(index + 1)).replace('{total}', String(total))}
-            </span>
+            </Kicker>
             <h2 id="welcome-choice-title" ref={titleRef} tabIndex={-1} className="font-display italic font-extrabold text-3xl leading-none outline-none break-words">
               {label}
             </h2>

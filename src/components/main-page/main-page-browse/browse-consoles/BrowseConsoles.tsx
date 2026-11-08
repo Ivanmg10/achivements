@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { CONSOLES } from '@/constants'
 import type { ConsoleSummary } from '@/utils/library'
 import { ProgressBar } from '@/components/ui/ProgressBar'
+import Kicker from '@/components/ui/Kicker'
 
 const ICON_BY_ID = new Map(CONSOLES.map((c) => [c.id, c.icon]))
 
@@ -20,7 +21,7 @@ export default function BrowseConsoles({ consoles }: { consoles: ConsoleSummary[
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.consolesTitle}</p>
+      <Kicker>{T.cards.consolesTitle}</Kicker>
       <ul className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 enter-cards">
         {consoles.map((c) => {
           const icon = ICON_BY_ID.get(c.consoleId)

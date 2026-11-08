@@ -13,6 +13,7 @@ import FollowingCardPlatforms from '../following-card-platforms/FollowingCardPla
 import PresenceDot from '@/components/presence-dot/PresenceDot'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import PresenceLabel from '@/components/presence-label/PresenceLabel'
+import Kicker from '@/components/ui/Kicker'
 
 const RECENT_MAX = 5
 
@@ -82,7 +83,7 @@ export default function FollowingCard({
         {/* Not known yet (or beyond the follows whose games are read): nothing, rather than a wrong "none". */}
         {recent && (
           <div className="flex flex-col gap-2">
-            <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.following.recentUnlocks}</p>
+            <Kicker>{T.following.recentUnlocks}</Kicker>
             {recent.length === 0 ? (
               <p className="text-xs text-text-secondary italic">{T.following.noRecentUnlocks}</p>
             ) : (

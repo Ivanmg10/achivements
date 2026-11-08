@@ -11,6 +11,7 @@ import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDi
 import GroupPlatformLogos from '@/components/groups/group-platform-logos/GroupPlatformLogos'
 import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgressBar'
 import { relativeTime } from '@/utils/dates'
+import Kicker from '@/components/ui/Kicker'
 
 const TILE = 'flex flex-col items-center justify-center gap-1 aspect-square rounded-tile border-2 border-dashed border-ink/10 text-xs text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
@@ -55,7 +56,7 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
         </p>
         {group.next_up && (
           <div className="mt-auto rounded-tile bg-bg-main/60 p-3 flex flex-col gap-0.5">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-accent">{T.groups.nextUp}</span>
+            <Kicker as="span" size="sm" tone="accent">{T.groups.nextUp}</Kicker>
             <span className="text-sm">
               {T.groups.nextUpLeft.replace('{left}', String(group.next_up.left)).replace('{game}', group.next_up.title)}
             </span>

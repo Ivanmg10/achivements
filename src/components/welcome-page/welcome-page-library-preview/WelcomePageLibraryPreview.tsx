@@ -1,6 +1,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
+import { kickerClass } from '@/components/ui/Kicker'
 
 const ROWS = [
   { name: '62%', progress: 72 },
@@ -17,7 +18,7 @@ export default function WelcomePageLibraryPreview({ art }: { art: string }) {
 
   return (
     <>
-      <span className={`${styles.in} text-xs font-bold uppercase tracking-[0.12em] text-text-secondary`}>{T.welcome.library.title}</span>
+      <span className={`${styles.in} ${kickerClass('muted', 'md')}`}>{T.welcome.library.title}</span>
       <div aria-hidden="true" className="flex flex-col gap-2.5">
         {ROWS.map((row, i) => (
           <div

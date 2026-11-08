@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * The game being played (or played last) under the profile card, the same on
@@ -38,7 +39,7 @@ export default function MainPageProfileNowPlaying({
       className="relative isolate rounded-pane px-3.5 py-3 flex flex-col gap-2.5 w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       <GameCardBackdrop src={tintSrc} />
-      <span className="text-[0.6875rem] font-bold uppercase tracking-[0.09em] text-text-secondary truncate">{kicker}</span>
+      <Kicker as="span" size="sm" className="truncate">{kicker}</Kicker>
       <span className="flex gap-3 items-center min-w-0">
         <span className="w-[3.25rem] h-[3.25rem] shrink-0 rounded-tile overflow-hidden shadow-[0_6px_18px_rgb(0_0_0/0.45)]">{icon}</span>
         <span className="flex flex-col min-w-0 flex-1">

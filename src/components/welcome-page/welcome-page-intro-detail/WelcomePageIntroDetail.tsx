@@ -4,6 +4,7 @@ import { IconArrowRight, IconCheck, IconChevronLeft, IconChevronRight, IconX } f
 import { useLanguage } from '@/context/LanguageContext'
 import WelcomePageIntroArt from '@/components/welcome-page/welcome-page-intro-art/WelcomePageIntroArt'
 import { ICON_BUTTON, PRIMARY_BUTTON, QUIET_BUTTON } from '@/components/welcome-page/welcomeArt'
+import Kicker from '@/components/ui/Kicker'
 
 export type IntroPerk = { title: string; text: string; detail: string; highlights: string[] }
 
@@ -69,9 +70,9 @@ export default function WelcomePageIntroDetail({
               {T.welcome.back}
             </button>
             <span aria-hidden="true" className="w-px h-4 bg-ink/15" />
-            <span className="text-[0.8125rem] font-bold uppercase tracking-[0.12em] text-accent">
+            <Kicker as="span" size="md" tone="accent">
               {T.welcome.pointCount.replace('{n}', String(index + 1)).replace('{total}', String(total))}
-            </span>
+            </Kicker>
           </div>
 
           <div className="flex items-start gap-4">

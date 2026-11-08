@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { buttonClass } from '@/components/ui/Button'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { SAMPLE_LEAD_ID, sampleHero, type SampleGame } from '../layout-modal-preview-sample'
+import Kicker from '@/components/ui/Kicker'
 
 const SETTLE = { duration: 0.3, delay: 0.2 }
 
@@ -14,7 +15,7 @@ export default function LayoutModalPreviewCoverHero({ game, kicker, open }: { ga
       <FadeImage src={sampleHero(game)} alt="" fill sizes="56rem" className="absolute! inset-0 -z-20" imgClassName="h-full w-full object-cover object-[50%_30%]" />
       <span aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-r from-black/90 to-black/20" />
       <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={SETTLE} className="flex flex-col items-start gap-1.5">
-        <span className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-white/80">{kicker}</span>
+        <Kicker as="span" size="sm" tone="inherit" className="text-white/80">{kicker}</Kicker>
         <span className="font-display italic font-extrabold text-3xl leading-none text-white pr-2 @2xl:text-4xl">{game.title}</span>
         <span className={buttonClass('primary', 'sm', 'mt-1')}>{open}</span>
       </motion.span>

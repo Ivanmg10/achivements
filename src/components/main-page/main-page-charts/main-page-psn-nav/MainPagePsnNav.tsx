@@ -6,6 +6,7 @@ import { usePsnGamesByCategory } from '@/hooks/usePsnGamesByCategory'
 import GameIcon from '@/components/game-icon/GameIcon'
 import { gameHref } from '@/utils/gameRef'
 import { Skeleton } from '@/components/ui/Skeleton'
+import Kicker from '@/components/ui/Kicker'
 
 const PREVIEW = 6
 
@@ -31,7 +32,7 @@ export default function MainPagePsnNav() {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.navigation}</p>
+      <Kicker>{T.cards.navigation}</Kicker>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {SECTIONS.map(({ slug, emoji }) => {
           const { games } = sections[slug]

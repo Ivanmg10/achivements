@@ -14,6 +14,7 @@ import MainPagePinnedSectionSortable from '../main-page-pinned-section-sortable/
 import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { RememberedHeight } from '@/components/ui/RememberedHeight'
 import { SectionFallback } from '@/components/ui/SectionFallback'
+import Kicker from '@/components/ui/Kicker'
 
 const GRID = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2'
 
@@ -46,7 +47,7 @@ export default function MainPagePinnedSectionGames() {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.pinnedGames.title}</p>
+        <Kicker>{T.pinnedGames.title}</Kicker>
         {!isLoading && pinned.length > 0 && <span className="text-[10px] text-text-secondary tabular-nums">{pinned.length}</span>}
       </div>
       {isLoading ? (

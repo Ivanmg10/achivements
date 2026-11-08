@@ -11,6 +11,7 @@ import type { ShowcaseEntry } from '@/utils/showcase'
 import { formatRarity } from '@/utils/steamFeed'
 import type { GuideLink } from '@/utils/guideLinks'
 import Modal from '@/components/ui/Modal'
+import Kicker from '@/components/ui/Kicker'
 
 const GUIDE_ICON = { youtube: IconBrandYoutube, steamGuides: IconBook2, psnProfiles: IconBook2, trueAchievements: IconBook2 }
 
@@ -116,7 +117,7 @@ export default function AchievementDetailModal({
 
         {guides.length > 0 && (
           <div className="flex flex-col gap-2 p-5 sm:p-6">
-            <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wide">{T.achievementDetail.findGuide}</h3>
+            <Kicker as="h3" size="md">{T.achievementDetail.findGuide}</Kicker>
             <ul className="flex flex-wrap gap-2">
               {guides.map((g) => {
                 const Icon = GUIDE_ICON[g.kind]

@@ -9,6 +9,7 @@ import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
 import GameIcon from '@/components/game-icon/GameIcon'
 import EmptyState from '@/components/empty-state/EmptyState'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * Your games that the people you follow play too, the most shared first: your
@@ -19,7 +20,7 @@ export default function MainPageFriendsShared({ rows }: { rows: SharedGameRow[] 
 
   return (
     <div className="flex flex-col gap-3">
-      <h3 className="text-[10px] uppercase tracking-widest text-text-secondary">{T.friends.shared}</h3>
+      <Kicker as="h3">{T.friends.shared}</Kicker>
       {rows.length === 0 ? (
         <EmptyState icon={<IconArrowsDiff className="w-6 h-6" />} title={T.friends.sharedEmpty} size="compact" className="py-6" />
       ) : (

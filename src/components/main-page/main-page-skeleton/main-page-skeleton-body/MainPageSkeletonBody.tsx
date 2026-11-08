@@ -6,6 +6,7 @@ import AchievementsLineChart from '@/components/achivements-line-chart/Achieveme
 import MainPageHeatmap from '../../main-page-charts/MainPageHeatmap'
 import MainPageProfileSkeleton from '../../main-page-profile/main-page-profile-skeleton/MainPageProfileSkeleton'
 import MainPagePortadaSkeleton, { PortadaSideSkeleton } from '../../main-page-portada-skeleton/MainPagePortadaSkeleton'
+import Kicker from '@/components/ui/Kicker'
 
 const ROWS = 6
 const PINS = 4
@@ -85,7 +86,7 @@ export default function MainPageSkeletonBody({ cover, pinned, label }: { cover: 
                 <MainPageHeatmap achievements={NO_ACHIEVEMENTS} isLoading />
               </div>
               <div className="bg-bg-card rounded-tile p-4 flex flex-col gap-3 h-full">
-                <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.dailyAchievements}</p>
+                <Kicker>{T.cards.dailyAchievements}</Kicker>
                 <AchievementsLineChart achievements={NO_ACHIEVEMENTS} isLoading />
               </div>
             </div>

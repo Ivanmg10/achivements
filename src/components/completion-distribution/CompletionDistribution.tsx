@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { completionBuckets } from '@/utils/utils'
 import { Skeleton } from '@/components/ui/Skeleton'
+import Kicker from '@/components/ui/Kicker'
 
 /** Ordered bands, least complete first — a magnitude scale, so one hue, light to dark. */
 const BAND_LABELS = ['<25%', '25–49%', '50–74%', '75–99%', '100%']
@@ -54,7 +55,7 @@ export default function CompletionDistribution({
 
   return (
     <div className="flex flex-col gap-2">
-      {showTitle && <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.completionDistTitle}</p>}
+      {showTitle && <Kicker>{T.charts.completionDistTitle}</Kicker>}
 
       {total === 0 ? (
         <p className="text-xs text-text-secondary">{T.cards.noData}</p>

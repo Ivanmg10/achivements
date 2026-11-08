@@ -9,6 +9,7 @@ import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
 import { relativeTime } from '@/utils/dates'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * The top of a Following card. Its backdrop is the last game played, blurred
@@ -47,9 +48,9 @@ export default function FollowingCardBanner({ friend, lastPlayed }: { friend: Fr
           >
             <PlatformLogo source={lastPlayed.source} size={12} label={PLATFORM_NAME[lastPlayed.source]} />
             <span className="flex flex-col min-w-0">
-              <span className="text-[0.625rem] font-bold uppercase tracking-[0.09em] text-text-secondary truncate">
+              <Kicker as="span" size="sm" className="truncate">
                 {T.following.lastPlayed} · {relativeTime(lastPlayed.at, lang)}
-              </span>
+              </Kicker>
               <span className="text-[0.8125rem] font-bold text-white truncate">{lastPlayed.title}</span>
             </span>
           </Link>

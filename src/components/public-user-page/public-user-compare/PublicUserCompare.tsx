@@ -14,6 +14,7 @@ import PublicUserDuelRow from '../public-user-duel-row/PublicUserDuelRow'
 import PublicUserSharedGameRow from '../public-user-shared-game-row/PublicUserSharedGameRow'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
 import { Skeleton } from '@/components/ui/Skeleton'
+import Kicker from '@/components/ui/Kicker'
 
 /** The signed-in viewer's own numbers, read outside the profile's providers. */
 export type ViewerStats = {
@@ -134,9 +135,9 @@ export default function PublicUserCompare({
 
       <section aria-labelledby="public-compare-shared" className="bg-bg-card rounded-tile p-4 flex flex-col gap-3">
         <div className="flex items-baseline justify-between gap-2">
-          <h2 id="public-compare-shared" className="text-[10px] uppercase tracking-widest text-text-secondary">
+          <Kicker as="h2" id="public-compare-shared">
             {T.userProfile.sharedGames}
-          </h2>
+          </Kicker>
           {!loading && shared.length > 0 && <span className="text-xs text-text-secondary tabular-nums">{shared.length.toLocaleString(lang)}</span>}
         </div>
         {loading ? (
