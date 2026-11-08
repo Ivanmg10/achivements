@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import SteamRarestAchievements from './SteamRarestAchievements'
 import { en } from '@/translations/en'
+import { SubjectContext } from '@/context/SubjectContext'
 import type { SteamAchievementUnified } from '@/types/steam'
 
 function ach(apiname: string, overrides: Partial<SteamAchievementUnified> = {}): SteamAchievementUnified {
