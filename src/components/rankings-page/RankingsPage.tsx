@@ -9,6 +9,7 @@ import { useVaultMe } from '@/hooks/useVaultMe'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useVaultFillState } from '@/context/VaultFillContext'
 import EmptyState from '@/components/empty-state/EmptyState'
+import Button from '@/components/ui/Button'
 import Tag from '@/components/ui/Tag'
 import RankingsPageToolbar from './rankings-page-toolbar/RankingsPageToolbar'
 import RankingsPagePodium from './rankings-page-podium/RankingsPagePodium'
@@ -108,13 +109,9 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
                   </>
                 )}
                 {hasMore && (
-                  <button
-                    onClick={more}
-                    disabled={loadingMore}
-                    className="self-center px-4 py-2 rounded-full text-sm font-medium bg-bg-card text-text-secondary hover:text-text-main disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-                  >
+                  <Button variant="secondary" onClick={more} loading={loadingMore} className="self-center">
                     {T.rankings.more}
-                  </button>
+                  </Button>
                 )}
                 {moreFailed && <p role="alert" className="text-center text-xs text-danger">{T.rankings.loadError}</p>}
               </>

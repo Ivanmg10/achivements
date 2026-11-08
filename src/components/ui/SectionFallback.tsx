@@ -2,6 +2,7 @@
 
 import { IconRefresh } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import Button from './Button'
 import Kicker from './Kicker'
 
 export function SectionFallback({
@@ -23,13 +24,10 @@ export function SectionFallback({
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
         <Kicker role="alert">{T.charts.failedToLoad}</Kicker>
-        <button
-          onClick={onRefresh}
-          className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-bg-main border border-accent/30 text-text-main rounded-chip hover:bg-accent/10 transition-colors focus-ring"
-        >
+        <Button variant="secondary" size="sm" onClick={onRefresh}>
           <IconRefresh size={12} aria-hidden="true" />
           {T.gameInfoPage.retry}
-        </button>
+        </Button>
       </div>
     </div>
   )

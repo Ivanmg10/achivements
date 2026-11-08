@@ -11,6 +11,7 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
 import { psnBaseCompletedAt } from '@/utils/completionDates'
 import type { GameStatus } from '@/types/game'
+import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const asCategory = (c?: string): GameStatus => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
@@ -39,13 +40,7 @@ export default function PsnLibraryDetail({ game, category }: { game: PsnGameProg
       completedAt={completedAt}
       state={isLoading ? 'loading' : error ? 'error' : 'ready'}
       errorNode={
-        <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-danger">{T.psn.trophiesError}</p>
-          {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}
-          <button onClick={retry} className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">
-            {T.psn.retry}
-          </button>
-        </div>
+        <ErrorRetry message={T.psn.trophiesError} hint={error === 'private' ? T.psn.errors.private : undefined} retryLabel={T.psn.retry} onRetry={retry} />
       }
       ring={{ earned, total, label: T.psn.trophies }}
       ringExtra={<PsnTrophyCounts earned={game.earned} of={game.defined} className="flex-col items-start! lg:items-center!" />}

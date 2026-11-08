@@ -12,23 +12,6 @@
     "components/statusGameList/StatusGameItem.tsx"
   ],
   "listRow": [],
-  "pillButton": [
-    "components/psn/psn-category-section/PsnCategorySection.tsx",
-    "components/psn/psn-collection-expanded/PsnCollectionExpanded.tsx",
-    "components/psn/psn-game-item-trophies/PsnGameItemTrophies.tsx",
-    "components/psn/psn-library-detail/PsnLibraryDetail.tsx",
-    "components/psn/psn-recently-played-expanded/PsnRecentlyPlayedExpanded.tsx",
-    "components/rankings-page/RankingsPage.tsx",
-    "components/recent-games-list/RecentGamesList.tsx",
-    "components/steam/steam-category-section/SteamCategorySection.tsx",
-    "components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements.tsx",
-    "components/steam/steam-library-detail/SteamLibraryDetail.tsx",
-    "components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded.tsx",
-    "components/user-page/user-consoles-preference/UserConsolesPreference.tsx",
-    "components/xbox/xbox-category-section/XboxCategorySection.tsx",
-    "components/xbox/xbox-library-detail/XboxLibraryDetail.tsx",
-    "components/xbox/xbox-recently-played-expanded/XboxRecentlyPlayedExpanded.tsx"
-  ],
   "notice": [
     "components/avatar-modal/AvatarModal.tsx",
     "components/change-password-modal/ChangePasswordModal.tsx",
@@ -194,7 +177,6 @@
     "components/user-game-page/user-game-page-banner/UserGamePageBanner.tsx",
     "components/user-game-page/user-game-page-notice/UserGamePageNotice.tsx",
     "components/user-page/profile-field/ProfileField.tsx",
-    "components/user-page/user-consoles-preference/UserConsolesPreference.tsx",
     "components/user-page/user-follow-stats/UserFollowStats.tsx",
     "components/user-page/user-identity-card/UserIdentityCard.tsx",
     "components/user-page/user-platform-card/UserPlatformCard.tsx",

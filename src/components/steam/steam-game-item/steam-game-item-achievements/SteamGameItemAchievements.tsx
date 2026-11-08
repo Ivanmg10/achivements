@@ -4,6 +4,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
 import { SteamAchievementGrid } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import { Skeleton } from '@/components/ui/Skeleton'
+import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const SKELETON_BADGES = 12
 
@@ -42,18 +43,7 @@ export default function SteamGameItemAchievements({
 
   if (error) {
     return (
-      <div className="flex flex-col items-start gap-2">
-        <p role="alert" className="text-sm text-danger">
-          {T.steam.achievementsError}
-        </p>
-        <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
-        <button
-          onClick={retry}
-          className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors"
-        >
-          {T.steam.retry}
-        </button>
-      </div>
+      <ErrorRetry message={T.steam.achievementsError} hint={T.steam.privateProfileHint} retryLabel={T.steam.retry} onRetry={retry} />
     )
   }
 

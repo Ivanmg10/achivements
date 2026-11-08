@@ -14,6 +14,7 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import { STATUS_GRID_COLS } from '@/components/status-grid-control/statusGridCols'
 import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
+import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const SKELETON_CARDS = 4
 
@@ -70,15 +71,7 @@ export default function XboxCategorySection({
           ))}
         </div>
       ) : error ? (
-        <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-danger">
-            {T.xbox.gamesError}
-          </p>
-          {error === 'private' && <p className="text-xs text-text-secondary">{T.xbox.errors.private}</p>}
-          <button onClick={refetch} className="text-xs bg-bg-card px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">
-            {T.xbox.retry}
-          </button>
-        </div>
+        <ErrorRetry message={T.xbox.gamesError} hint={error === 'private' ? T.xbox.errors.private : undefined} retryLabel={T.xbox.retry} onRetry={refetch} />
       ) : games.length === 0 ? (
         <EmptyState
           size="compact"

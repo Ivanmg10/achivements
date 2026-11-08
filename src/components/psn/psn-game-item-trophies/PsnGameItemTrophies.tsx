@@ -4,6 +4,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { usePsnTrophies } from '@/hooks/usePsnTrophies'
 import { PsnTrophyGrid } from '@/components/psn/psn-trophy-grid/PsnTrophyGrid'
 import { Skeleton } from '@/components/ui/Skeleton'
+import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const SKELETON_BADGES = 12
 
@@ -45,15 +46,7 @@ export default function PsnGameItemTrophies({
 
   if (error) {
     return (
-      <div className="flex flex-col items-start gap-2">
-        <p role="alert" className="text-sm text-danger">
-          {T.psn.trophiesError}
-        </p>
-        {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}
-        <button onClick={retry} className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">
-          {T.psn.retry}
-        </button>
-      </div>
+      <ErrorRetry message={T.psn.trophiesError} hint={error === 'private' ? T.psn.errors.private : undefined} retryLabel={T.psn.retry} onRetry={retry} />
     )
   }
 

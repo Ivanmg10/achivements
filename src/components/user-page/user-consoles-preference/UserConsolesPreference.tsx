@@ -5,6 +5,7 @@ import { IconDeviceGamepad2 } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHiddenConsoles } from '@/hooks/useHiddenConsoles'
 import type { ConsoleOption } from '@/utils/consoleFilter'
+import Button from '@/components/ui/Button'
 import Checkbox from '@/components/ui/Checkbox'
 import type { GameSource } from '@/types/game'
 
@@ -34,9 +35,9 @@ export default function UserConsolesPreference({ source, consoles }: { source: G
           <span className="text-sm font-medium">{T.userData.consolesShown.replace('{n}', String(shown)).replace('{m}', String(consoles.length))}</span>
         </span>
         {hidden.size > 0 && (
-          <button onClick={showAll} className="shrink-0 text-xs bg-bg-card px-3 py-1 rounded-full hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+          <Button variant="secondary" size="sm" onClick={showAll} className="shrink-0">
             {T.userData.consolesAll}
-          </button>
+          </Button>
         )}
       </div>
 
