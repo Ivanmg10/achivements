@@ -1685,8 +1685,8 @@ export const de: Translations = {
   },
   homeLayout: {
     layoutLabel: 'Layout',
-    shapeSlantedHint: 'Schräge Enden bei Schaltflächen, Balken und Tags.',
-    shapeRoundHint: 'Weiche Ecken, Buttons und Tags als Pillen, runde Schalter.',
+    shapeSlantedHint: 'Hauptschaltfläche, Level und Serie sind schräg; ein Schrägstrich markiert den offenen Tab.',
+    shapeRoundHint: 'Weiche Ecken, Buttons und Tags als Pillen; ein Punkt markiert den offenen Tab.',
     shapeLabel: 'Form',
     shapeSlanted: 'Schräg',
     shapeRound: 'Rund',

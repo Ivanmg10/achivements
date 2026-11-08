@@ -65,7 +65,7 @@ export default function StreakDayStrip({
                   }`}
                   style={{ height: h }}
                 >
-                  {cut && <span className="absolute left-0 right-0 top-2 h-[3px] bg-bg-card skew-y-(--slant-cut)" />}
+                  {cut && <span className="absolute left-0 right-0 top-2 h-[3px] bg-bg-card skew-y-(--slant)" />}
                 </span>
               </button>
             )

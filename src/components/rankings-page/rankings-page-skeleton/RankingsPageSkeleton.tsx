@@ -1,10 +1,10 @@
-import { slantStyle } from '@/components/ui/shape'
 import { Skeleton } from '@/components/ui/Skeleton'
 
 /** A page is twenty: the three on the podium and the rest in rows. */
 const PAGE = 20
 const ON_PODIUM = 3
-const SLANT = slantStyle(14)
+/** A step leans on the one angle, as the podium's do; upright and rounded in the round design. */
+const STEP_SHAPE = { borderRadius: 'var(--bar-radius)' }
 
 /** A place on the podium, block for block: picture, name and level, points, and its step. */
 function Step({ who, avatar, step }: { who: string; avatar: string; step: string }) {
@@ -16,7 +16,7 @@ function Step({ who, avatar, step }: { who: string; avatar: string; step: string
         <Skeleton radius="tag" className="h-6 w-16 max-w-full" />
       </div>
       <Skeleton className="h-[22.5px] sm:h-[37.5px] w-4/5" />
-      <Skeleton radius="tag" className={`self-stretch mx-2 sm:mx-3.5 ${step}`} style={SLANT} />
+      <Skeleton radius="tag" className={`self-stretch mx-2 sm:mx-3.5 skew-x-(--slant) ${step}`} style={STEP_SHAPE} />
     </div>
   )
 }

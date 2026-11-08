@@ -1685,8 +1685,8 @@ export const es: Translations = {
   },
   homeLayout: {
     layoutLabel: 'Diseño',
-    shapeSlantedHint: 'Extremos inclinados en botones, barras y etiquetas.',
-    shapeRoundHint: 'Esquinas suaves, botones y etiquetas en píldora, switches redondos.',
+    shapeSlantedHint: 'Se inclinan el botón principal, el nivel y la racha; una barra marca la pestaña abierta.',
+    shapeRoundHint: 'Esquinas suaves, botones y etiquetas en píldora; un punto marca la pestaña abierta.',
     shapeLabel: 'Forma',
     shapeSlanted: 'Inclinada',
     shapeRound: 'Redondeada',

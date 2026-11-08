@@ -4,12 +4,10 @@ import { useLanguage } from '@/context/LanguageContext'
 import { Streak } from '@/types/types'
 import { decimal, plural } from '@/utils/utils'
 import SectionHead from '@/components/ui/SectionHead'
-import { slantStyle } from '@/components/ui/shape'
 import { streakInk, streakTier } from '@/utils/streakTier'
 import { formatDay } from '@/utils/dates'
 
 const MAX_ROWS = 6
-const SLANT = slantStyle(6)
 
 interface Props {
   streaks: Streak[]
@@ -23,7 +21,7 @@ interface Props {
 
 /**
  * The longest streaks as a ranked list: the place in the display face, a
- * slanted bar in the colour of its tier and as long as the streak against the
+ * bar (upright: it is data) in the colour of its tier and as long as the streak against the
  * best (the one going now says so), its dates under it and its days on the
  * right. Picking one shows it day by day and on the year; picking it again lets go.
  */
@@ -63,8 +61,8 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
                 <span className="flex flex-col gap-1 min-w-0">
                   <span
                     aria-hidden="true"
-                    className="enter-grow-x h-[1.375rem] flex items-center px-3 text-xs font-bold text-bg-main whitespace-nowrap overflow-hidden"
-                    style={{ ...SLANT, width: `${Math.max(12, (streak.days / maxDays) * 88)}%`, backgroundColor: `rgb(${tier.color})` }}
+                    className="enter-grow-x h-[1.375rem] flex items-center px-3 rounded-(--bar-radius) text-xs font-bold text-bg-main whitespace-nowrap overflow-hidden"
+                    style={{ width: `${Math.max(12, (streak.days / maxDays) * 88)}%`, backgroundColor: `rgb(${tier.color})` }}
                   >
                     {live && T.streak.ongoing}
                   </span>

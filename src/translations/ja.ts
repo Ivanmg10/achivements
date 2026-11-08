@@ -1685,8 +1685,8 @@ export const ja: Translations = {
   },
   homeLayout: {
     layoutLabel: 'レイアウト',
-    shapeSlantedHint: 'ボタン・バー・タグの端が斜めになります。',
-    shapeRoundHint: 'やわらかい角、丸いボタンとタグ、丸いスイッチ。',
+    shapeSlantedHint: 'メインボタン、レベル、連続記録が斜めになり、開いているタブをスラッシュで示します。',
+    shapeRoundHint: 'やわらかい角、丸いボタンとタグ。開いているタブを点で示します。',
     shapeLabel: '形',
     shapeSlanted: '斜め',
     shapeRound: '丸み',

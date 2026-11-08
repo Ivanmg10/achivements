@@ -34,7 +34,7 @@ export default function RankingsGuideExample({ text }: { text: VaultGuideText['e
         {rows.map((r, i) => (
           <li key={r.label} className={`grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)_4.5rem] sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_4.5rem] items-center gap-3 text-sm ${i === rows.length - 2 ? 'mt-2 pt-3 border-t border-ink/[0.07]' : ''}`}>
             <span className="leading-tight">{r.label}</span>
-            <DataBar track share={r.value / max} cut={5} color={r.color} className="h-3" />
+            <DataBar track share={r.value / max} color={r.color} className="h-3" />
             <span className="text-right text-base font-extrabold tabular-nums">
               {r.value.toLocaleString(lang)} <span className="text-[0.6875rem] font-semibold text-text-secondary">{T.rankings.vp}</span>
             </span>

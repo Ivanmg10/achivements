@@ -23,7 +23,7 @@ export default function StreakWeekdays({ counts }: { counts: number[] }) {
           <li key={WEEK[i]} className="flex-1 flex flex-col items-center gap-1.5 min-w-0">
             <span className="text-sm font-extrabold tabular-nums text-text-main">{n.toLocaleString(lang)}</span>
             <div className="w-full flex items-end" style={{ height: BAR_HEIGHT }}>
-              <DataBar axis="y" share={n / max} cut={8} min={4} tone={i === top ? 'accent' : 'soft'} grow className="w-full" style={{ '--i': i } as CSSProperties} />
+              <DataBar axis="y" share={n / max} min={4} tone={i === top ? 'accent' : 'soft'} grow className="w-full" style={{ '--i': i } as CSSProperties} />
             </div>
             <span className="text-[0.8125rem] text-text-secondary">
               <span aria-hidden="true">{formatDay(WEEK[i], lang, { weekday: 'narrow' })}</span>

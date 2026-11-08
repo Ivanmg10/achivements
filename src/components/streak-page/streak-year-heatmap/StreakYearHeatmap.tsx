@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { slantStyle } from '@/components/ui/shape'
 import type { Streak } from '@/types/types'
 import { plural } from '@/utils/utils'
 import SectionHead from '@/components/ui/SectionHead'
@@ -76,8 +75,8 @@ export default function StreakYearHeatmap({
           {onGrid && (
             <span
               aria-hidden="true"
-              className="absolute top-[0.9rem] h-[3px] bg-accent transition-[left,width] duration-(--motion-indicator) ease-(--enter-ease) motion-reduce:transition-none"
-              style={{ ...slantStyle(3), left: `calc(0.25rem + (100% - 0.5rem) * ${firstCol / columns.length})`, width: `calc((100% - 0.5rem) * ${(lastCol - firstCol + 1) / columns.length} - ${GAP}px)` }}
+              className="absolute top-[0.9rem] h-[3px] bg-accent rounded-(--bar-radius) transition-[left,width] duration-(--motion-indicator) ease-(--enter-ease) motion-reduce:transition-none"
+              style={{ left: `calc(0.25rem + (100% - 0.5rem) * ${firstCol / columns.length})`, width: `calc((100% - 0.5rem) * ${(lastCol - firstCol + 1) / columns.length} - ${GAP}px)` }}
             />
           )}
           <div role="group" aria-label={T.streak.yearTitle} className="grid" style={{ gap: GAP, gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}>

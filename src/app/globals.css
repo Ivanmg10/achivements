@@ -194,18 +194,10 @@
    the slanted one inside a round page.
 */
 :root {
-  --slant-button: -12deg;
-  --slant-pill: -14deg;
-  --slant-line: -30deg;
-  --slant-mark: -20deg;
-  --slant-cut: -12deg;
-  --clip-3: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
-  --clip-4: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
-  --clip-5: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
-  --clip-6: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
-  --clip-8: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
-  --clip-14: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
-  --clip-fill: polygon(0 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  /* The one angle (12°): only the big gestures and the player's own marks lean on it, never data. */
+  --slant: -12deg;
+  /* The signature: in front of the tab you are on, between the facts of a line, between figures. */
+  --mark: "/";
   --bar-radius: 0;
   --r-chip: 0.5rem;
   --r-button: 0.75rem;
@@ -340,18 +332,8 @@ html[data-font="fira"],
    slanted specimen stays slanted inside a round page.
 */
 [data-shape="slanted"] {
-  --slant-button: -12deg;
-  --slant-pill: -14deg;
-  --slant-line: -30deg;
-  --slant-mark: -20deg;
-  --slant-cut: -12deg;
-  --clip-3: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
-  --clip-4: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
-  --clip-5: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
-  --clip-6: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
-  --clip-8: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
-  --clip-14: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
-  --clip-fill: polygon(0 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  --slant: -12deg;
+  --mark: "/";
   --bar-radius: 0;
   --r-chip: 0.5rem;
   --r-button: 0.75rem;
@@ -380,20 +362,10 @@ html[data-font="fira"],
   --knob-shift: 1.125rem;
 }
 
-/* The round design: no slant anywhere, bars rounded at the ends, soft surfaces a step rounder than the slanted design's, and every one-line control (button, field, tag, chip, icon button) a pill or a circle. */
+/* The round design: no slant anywhere, a dot for the mark, bars rounded at the ends, soft surfaces a step rounder than the slanted design's, and every one-line control (button, field, tag, chip, icon button) a pill or a circle. */
 [data-shape="round"] {
-  --slant-button: 0deg;
-  --slant-pill: 0deg;
-  --slant-line: 0deg;
-  --slant-mark: 0deg;
-  --slant-cut: 0deg;
-  --clip-3: none;
-  --clip-4: none;
-  --clip-5: none;
-  --clip-6: none;
-  --clip-8: none;
-  --clip-14: none;
-  --clip-fill: none;
+  --slant: 0deg;
+  --mark: "\2022";
   --bar-radius: 0.75rem;
   --r-chip: 9999px;
   --r-button: 9999px;
