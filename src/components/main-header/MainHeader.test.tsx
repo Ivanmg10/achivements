@@ -1,5 +1,5 @@
 import { en } from '@/translations/en'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import MainHeader from './MainHeader'
 import { useSession } from 'next-auth/react'
 
@@ -7,7 +7,32 @@ jest.mock('@/hooks/useRecentAchievements', () => ({
   useRecentAchievements: () => ({ achievements: [] }),
 }))
 
-jest.mock('@/components/search-modal/SearchModal', () => () => null)
+const mockSearchModal = jest.fn()
+jest.mock('@/components/search-modal/SearchModal', () => (props: unknown) => {
+  mockSearchModal(props)
+  return null
+})
+
+describe('type to search', () => {
+  const lastProps = () => mockSearchModal.mock.calls.at(-1)![0] as { isOpen: boolean; initialQuery: string }
+  beforeEach(() => {
+    mockSearchModal.mockClear()
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', rausername: 'Ivan' } } })
+  })
+
+  test('a printable key opens search with that key typed in', async () => {
+    render(<MainHeader />)
+    fireEvent.keyDown(document, { key: 'z' })
+    await waitFor(() => expect(lastProps()).toMatchObject({ isOpen: true, initialQuery: 'z' }))
+  })
+
+  test('"/" opens search empty: it is the shortcut, not text to search for', async () => {
+    render(<MainHeader />)
+    const notPrevented = fireEvent.keyDown(document, { key: '/' })
+    expect(notPrevented).toBe(false)
+    await waitFor(() => expect(lastProps()).toMatchObject({ isOpen: true, initialQuery: '' }))
+  })
+})
 
 test('renders sign in link when no session', () => {
   ;(useSession as jest.Mock).mockReturnValue({ data: null })

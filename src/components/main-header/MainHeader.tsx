@@ -94,7 +94,8 @@ export default function MainHeader() {
       const tag = (document.activeElement?.tagName ?? '').toLowerCase()
       if (['input', 'textarea', 'select'].includes(tag)) return
       if (document.activeElement?.getAttribute('contenteditable')) return
-      setInitialQuery(e.key)
+      if (e.key === '/') e.preventDefault()
+      setInitialQuery(e.key === '/' ? '' : e.key)
       setSearchOpen(true)
     }
     document.addEventListener('keydown', handler)
