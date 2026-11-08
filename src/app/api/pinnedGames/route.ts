@@ -4,7 +4,7 @@ import pool from '@/lib/db'
 import { isGameSource } from '@/utils/gameRef'
 import { dbId } from '@/utils/dbId'
 import { sourceAllowed } from '@/utils/xboxAccess'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 /**
  * Pinned games, RA or Steam. A pin is (source, game_id) — RA game ids and

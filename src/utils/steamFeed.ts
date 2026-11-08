@@ -3,13 +3,12 @@ import type { SteamGameProgress } from '@/types/steam'
 import type { PsnCollection, PsnGameProgress } from '@/types/psn'
 import type { XboxGameProgress } from '@/types/xbox'
 import { formatDate, unlockIso } from '@/utils/dates'
+import type { GameStatus } from '@/types/game'
 
 /**
  * Pure helpers for putting Steam games next to RA ones: category rules, the
  * merged recent feed, and playtime formatting.
  */
-
-export type SteamCategory = 'wantToPlay' | 'playing' | 'completed'
 
 /**
  * Whether a Steam game has achievements at all. Steam lists every game owned,
@@ -35,7 +34,7 @@ export function hasSteamAchievements(game: SteamGameProgress): boolean {
  * played game whose counts have not loaded — progress unknown, so placing it
  * would be a guess.
  */
-export function classifySteamGame(game: SteamGameProgress): SteamCategory | null {
+export function classifySteamGame(game: SteamGameProgress): GameStatus | null {
   if (game.playtimeForever === 0) return 'wantToPlay'
   if (!game.achievementsLoaded || game.maxPossible === 0) return null
   if (game.numAwarded >= game.maxPossible) return 'completed'

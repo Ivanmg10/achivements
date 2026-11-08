@@ -1,11 +1,11 @@
 import type { PinnedAchievement } from '@/types/types'
-import type { GameSource } from '@/types/steam'
 import type { Translations } from '@/translations/en'
 import { pinnedKey } from '@/utils/utils'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import { raBadgeUrl } from '@/utils/raAssets'
+import type { GameSource } from '@/types/game'
 
 /** A pinned achievement of any platform, in the one shape its tile draws. */
 export type PinnedView = {

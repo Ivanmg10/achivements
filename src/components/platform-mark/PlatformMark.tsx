@@ -1,5 +1,5 @@
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 /**
  * The small round platform mark in a game tile's corner: its platform's logo

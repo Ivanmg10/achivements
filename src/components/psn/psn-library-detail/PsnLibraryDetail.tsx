@@ -5,13 +5,14 @@ import { useLanguage } from '@/context/LanguageContext'
 import { usePsnTrophies } from '@/hooks/usePsnTrophies'
 import { PsnTrophyGrid } from '@/components/psn/psn-trophy-grid/PsnTrophyGrid'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
-import LibraryGameDetail, { type LibraryCategory } from '@/components/library-game-detail/LibraryGameDetail'
+import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetail'
 import { fromPsn } from '@/utils/gameInsights'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
 import { psnBaseCompletedAt } from '@/utils/completionDates'
+import type { GameStatus } from '@/types/game'
 
-const asCategory = (c?: string): LibraryCategory => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
+const asCategory = (c?: string): GameStatus => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * An opened PSN card in a status list: Steam's counterpart. Trophies load

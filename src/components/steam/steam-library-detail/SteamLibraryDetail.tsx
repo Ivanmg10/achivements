@@ -4,13 +4,14 @@ import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
 import { SteamAchievementGrid } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
-import LibraryGameDetail, { type LibraryCategory } from '@/components/library-game-detail/LibraryGameDetail'
+import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetail'
 import { fromSteam } from '@/utils/gameInsights'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
 import { latestFullSetCompletedAt } from '@/utils/completionDates'
+import type { GameStatus } from '@/types/game'
 
-const asCategory = (c?: string): LibraryCategory => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
+const asCategory = (c?: string): GameStatus => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * An opened Steam card in a status list. The achievements load when this

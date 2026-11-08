@@ -1,7 +1,4 @@
-import type { GameProgressBase, GameSource } from './game'
-
-/** Moved to types/game.ts; re-exported until the importers follow (see the worklog, #119). */
-export type { GameProgressBase, GameSource }
+import type { GameProgressBase, GameSource } from '@/types/game'
 
 /**
  * Steam Web API response shapes, plus the unified game/achievement model the

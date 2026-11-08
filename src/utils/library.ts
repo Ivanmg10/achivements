@@ -9,9 +9,9 @@ import type { XboxGameProgress } from '@/types/xbox'
 import { normalizeTitle } from '@/utils/gameCandidates'
 import { raImageUrl } from '@/utils/raAssets'
 import type { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
-import type { GameSource, SteamGameProgress } from '@/types/steam'
-
-export type LibraryStatus = 'playing' | 'wantToPlay' | 'completed'
+import type { SteamGameProgress } from '@/types/steam'
+import type { GameSource } from '@/types/game'
+import type { GameStatus } from '@/types/game'
 
 /** One game of any platform, in the shape Browse lists, searches and picks from. */
 export type LibraryGame = {
@@ -24,7 +24,7 @@ export type LibraryGame = {
   iconUrl?: string
   /** Box art where it differs from the icon (PSN's store art); the picker shows it. */
   coverUrl?: string
-  status: LibraryStatus
+  status: GameStatus
   /** 0–100; 0 for a game not started. */
   pct: number
   href: string
@@ -88,7 +88,7 @@ export function buildLibrary(
   return [...byKey.values()]
 }
 
-export type LibraryFilter = { query: string; source: GameSource | 'all'; status: LibraryStatus | 'all' }
+export type LibraryFilter = { query: string; source: GameSource | 'all'; status: GameStatus | 'all' }
 
 /** Accent- and case-insensitive title match, plus the platform and status chips. */
 export function filterLibrary(games: LibraryGame[], { query, source, status }: LibraryFilter): LibraryGame[] {

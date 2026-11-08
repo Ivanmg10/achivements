@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import { IconFolder } from '@tabler/icons-react'
 import type { GameGroup } from '@/types/types'
-import type { GameSource } from '@/types/steam'
 import { raImageUrl } from '@/utils/raAssets'
+import type { GameSource } from '@/types/game'
 
 const isUrl = (s: string) => /^https?:\/\//i.test(s)
 

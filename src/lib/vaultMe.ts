@@ -1,8 +1,8 @@
 import { queryRows } from '@/lib/queryRows'
 import { loadRanking, weekStartRanks } from '@/lib/rankings'
-import type { GameSource } from '@/types/steam'
 import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
 import { utcDay } from '@/utils/dates'
+import type { GameSource } from '@/types/game'
 
 export type VaultMe = {
   /** All time, every platform the viewer may see. */

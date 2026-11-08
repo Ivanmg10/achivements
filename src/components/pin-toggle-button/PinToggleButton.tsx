@@ -5,8 +5,8 @@ import { IconPin, IconPinFilled } from '@tabler/icons-react'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
-import type { GameSource } from '@/types/steam'
 import { notify } from '@/lib/notify'
+import type { GameSource } from '@/types/game'
 
 export function PinToggleButton({
   gameId,

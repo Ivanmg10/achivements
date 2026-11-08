@@ -1,8 +1,8 @@
 import { useLanguage } from '@/context/LanguageContext'
-import type { GameSource } from '@/types/steam'
 import { PLATFORM_NAME } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { pillClass } from '@/components/ui/Pill'
+import type { GameSource } from '@/types/game'
 
 /** All platforms, or one, among those the user has games on; the current one pressed. */
 export default function AddGameModalPlatforms({

@@ -3,13 +3,14 @@ import pool from '@/lib/db'
 import { requireSession } from '@/lib/apiAuth'
 import { dbId } from '@/utils/dbId'
 import { canUseXbox, sourceAllowed } from '@/utils/xboxAccess'
+import type { GameSource } from '@/types/game'
 
 /** Enough for any list of goals; a cap so one account cannot fill the table. */
 const PINS_MAX = 1000
 const TEXT_MAX = 300
 const SNAPSHOT_MAX = 8 * 1024
 
-function parseSource(req: NextRequest): 'ra' | 'steam' | 'psn' | 'xbox' {
+function parseSource(req: NextRequest): GameSource {
   const source = req.nextUrl.searchParams.get('source')
   return source === 'steam' || source === 'psn' || source === 'xbox' ? source : 'ra'
 }

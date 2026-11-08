@@ -3,9 +3,9 @@ import { queryRows } from '@/lib/queryRows'
 import { presenceColumns } from '@/lib/presence'
 import { notHidden } from '@/lib/gameVisibility'
 import { isUploadedAvatar } from '@/lib/avatarImage'
-import type { GameSource } from '@/types/steam'
 import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
 import { readCache, writeCache } from '@/lib/steamCache'
+import type { GameSource } from '@/types/game'
 
 /**
  * The rankings, read from the stored scores (scoreRefresh keeps them). Only

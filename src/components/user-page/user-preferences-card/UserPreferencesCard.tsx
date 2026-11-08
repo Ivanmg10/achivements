@@ -18,8 +18,8 @@ import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { useLanguage } from '@/context/LanguageContext'
 import { useStoredChoice } from '@/hooks/useStoredChoice'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
-import type { GameSource } from '@/types/steam'
 import { notify } from '@/lib/notify'
+import type { GameSource } from '@/types/game'
 
 // Modals are downloaded the first time they are wanted, not with the page.
 const FavoriteGameModal = dynamic(() => import('@/components/favorite-game-modal/FavoriteGameModal'), { loading: () => null })

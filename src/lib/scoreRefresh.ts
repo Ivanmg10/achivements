@@ -12,7 +12,7 @@ import { readRaKey } from '@/lib/raKey'
 import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
 import { XboxError, xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
 import { runWithXboxTelemetry } from '@/lib/xboxTelemetry'
-import type { GameSource, SteamOwnedGamesResponse } from '@/types/steam'
+import type { SteamOwnedGamesResponse } from '@/types/steam'
 import type { TrophyCounts } from '@/types/psn'
 import { isConsoleShown } from '@/utils/consoleFilter'
 import { canUseXbox } from '@/utils/xboxAccess'
@@ -20,6 +20,7 @@ import { RULES_VERSION, looksUnlockedByTool, provisionalScore, scoreGame, stackF
 import { hiddenConsolesFrom, psnGradeShare, psnScoreInputs, raScoreInputs, steamScoreInputs, xboxScoreInputs } from '@/utils/vaultScoreInputs'
 import { monthStart, weekStart } from '@/utils/vaultLevel'
 import { latestFullSetCompletedAt, psnBaseCompletedAt, raAwardCompletedAt } from '@/utils/completionDates'
+import type { GameSource } from '@/types/game'
 
 /**
  * Keeps a user's Vault Points up to date (docs/rankings-plan.md). Each

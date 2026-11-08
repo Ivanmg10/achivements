@@ -2,9 +2,9 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { useVaultFillState } from '@/context/VaultFillContext'
-import type { GameSource } from '@/types/steam'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { fillMessage } from '@/utils/vaultFill'
+import type { GameSource } from '@/types/game'
 
 /**
  * On a platform's card, right after linking it: its Vault Points being

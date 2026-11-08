@@ -7,7 +7,6 @@ import { IconSearch, IconX, IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import type { GameGroupItem } from '@/types/types'
-import type { GameSource } from '@/types/steam'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { fetchRaCandidateById } from '@/utils/apiCallsUtils'
@@ -21,6 +20,7 @@ import { notify } from '@/lib/notify'
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
+import type { GameSource } from '@/types/game'
 
 const RESULTS_MAX = 40
 

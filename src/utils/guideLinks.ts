@@ -1,4 +1,4 @@
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 export type GuideLink = { kind: 'youtube' | 'steamGuides' | 'psnProfiles' | 'trueAchievements'; href: string }
 

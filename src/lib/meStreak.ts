@@ -11,7 +11,7 @@ import { psnToRecentAchievement } from '@/utils/psnMappers'
 import { xboxToRecentAchievement } from '@/utils/xboxMappers'
 import { streakSummary, type StreakSummary } from '@/utils/streaks'
 import type { RecentAchievement } from '@/types/types'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 /** The signed-in user's accounts, as the session has them (never someone else's: see the route). */
 export type StreakOwner = {

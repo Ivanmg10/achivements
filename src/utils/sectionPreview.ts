@@ -1,10 +1,11 @@
 import type { CategoryGame } from '@/hooks/useGamesByCategory'
-import type { GameSource, SteamGameProgress } from '@/types/steam'
+import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
 import { PSN_PLATFORM } from '@/utils/psnMappers'
 import type { XboxGameProgress } from '@/types/xbox'
 import { XBOX_PLATFORM } from '@/utils/xboxMappers'
 import { raGameId } from '@/utils/gameRef'
+import type { GameSource } from '@/types/game'
 
 /**
  * A game shown in a folded section's preview: enough to draw a small card

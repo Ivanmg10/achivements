@@ -5,10 +5,11 @@ import { classifyXboxGame } from '@/utils/xboxTitles'
 import type { XboxGameProgress } from '@/types/xbox'
 import { gameKey } from '@/utils/gameRef'
 import type { RetroAchievementsGameCompleted, UserAward } from '@/types/types'
-import type { GameSource, SteamGameProgress } from '@/types/steam'
+import type { SteamGameProgress } from '@/types/steam'
 import { validCompletionDate } from '@/utils/completionDates'
 import { parseUnlockTime } from '@/utils/dates'
 import { raImageUrl } from '@/utils/raAssets'
+import type { GameSource } from '@/types/game'
 
 /**
  * A game with every achievement, from either platform, in one shape — what

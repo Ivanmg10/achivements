@@ -2,9 +2,9 @@ import { PinnedAchievement, RecentAchievement, RetroAchievement, RetroAchievemen
 import { CategoryGame } from '@/hooks/useGamesByCategory'
 import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
-import type { GameSource } from '@/types/steam'
 import { localDay, parseUnlockTime, utcDay } from '@/utils/dates'
 import { raBadgeUrl, raImageUrl } from '@/utils/raAssets'
+import type { GameSource } from '@/types/game'
 
 /** The last `totalDays` days up to `end` (today unless said otherwise), each with how many achievements fell on it. */
 export const groupByDays = (achievements: RecentAchievement[], totalDays: number, end: Date = new Date()) => {

@@ -15,7 +15,8 @@ import type { XboxGameProgress } from '@/types/xbox'
 import type { PsnGameProgress } from '@/types/psn'
 import { toSteamGameDetails } from '@/utils/steamMappers'
 import { mapLimit, parseReleaseYear } from '@/utils/utils'
-import type { GameSource, SteamAppDetailsResponse, SteamGameDetails } from '@/types/steam'
+import type { SteamAppDetailsResponse, SteamGameDetails } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 const RA_TTL = 4 * 60 * 60 * 1000
 /** Lookups at a time: RA and the Steam store both turn away bursts. */

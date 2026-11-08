@@ -6,10 +6,9 @@ import { useGamesData } from '@/context/GamesDataContext'
 import { useRaLinked } from '@/hooks/useRaLinked'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { raGameId } from '@/utils/gameRef'
+import type { GameStatus } from '@/types/game'
 
-type ValidCategory = 'wantToPlay' | 'playing' | 'completed'
-
-function isValidCategory(cat: string): cat is ValidCategory {
+function isValidCategory(cat: string): cat is GameStatus {
   return cat === 'wantToPlay' || cat === 'playing' || cat === 'completed'
 }
 

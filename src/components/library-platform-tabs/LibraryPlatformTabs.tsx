@@ -3,7 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import Tabs from '@/components/ui/Tabs'
 import { PLATFORM_NAME, GAME_SOURCES } from '@/utils/gameRef'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 export type PlatformChoice = GameSource | 'all'
 

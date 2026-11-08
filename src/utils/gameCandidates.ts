@@ -8,8 +8,9 @@ import { XBOX_PLATFORM } from '@/utils/xboxMappers'
 import type { XboxGameProgress } from '@/types/xbox'
 import type { PsnGameProgress } from '@/types/psn'
 import type { RecentlyPlayedGame, RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
-import type { GameSource, SteamGameProgress } from '@/types/steam'
+import type { SteamGameProgress } from '@/types/steam'
 import { raImageUrl } from '@/utils/raAssets'
+import type { GameSource } from '@/types/game'
 
 /**
  * A game the user can pick — to pin, to add to a group, or to jump to from

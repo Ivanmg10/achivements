@@ -1,6 +1,7 @@
-import type { GameSource, SteamAchievementUnified } from '@/types/steam'
+import type { SteamAchievementUnified } from '@/types/steam'
 import type { PsnTrophy } from '@/types/psn'
 import type { XboxAchievement } from '@/types/xbox'
+import type { GameSource } from '@/types/game'
 
 /** Every theme the app has a stylesheet for; the endpoints that store one accept only these. */
 export const THEMES = ['dark', 'light', 'dark-red', 'dark-green', 'dark-blue', 'dark-white', 'light-red', 'light-green', 'light-blue', 'light-black', 'blue', 'purple', 'green', 'red', 'midnight', 'crimson', 'sakura', 'arctic', 'black-ops-2', 'steam-retro', 'snake-eater', 'venom'] as const

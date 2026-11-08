@@ -2,11 +2,11 @@
 
 import { IconCheck, IconSearch } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import type { GameSource } from '@/types/steam'
 import { PLATFORM_NAME, GAME_SOURCES } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { fieldClass } from '@/components/ui/Input'
 import { pillClass } from '@/components/ui/Pill'
+import type { GameSource } from '@/types/game'
 
 
 /**

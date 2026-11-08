@@ -3,11 +3,11 @@
 import { IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useVaultFillState } from '@/context/VaultFillContext'
-import type { GameSource } from '@/types/steam'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { PLATFORM_FILL, PLATFORM_NAMES } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { fillMessage } from '@/utils/vaultFill'
 import { GAME_SOURCES } from '@/utils/gameRef'
+import type { GameSource } from '@/types/game'
 
 /**
  * How the Vault Points fill is getting on, one small card per platform: games

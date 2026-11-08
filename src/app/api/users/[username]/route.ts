@@ -5,9 +5,7 @@ import { listGroups } from '@/lib/groupList'
 import pool from '@/lib/db'
 import { canUseXbox } from '@/utils/xboxAccess'
 import { vaultTotalsOrNone } from '@/lib/rankings'
-import type { GameSource } from '@/types/steam'
-
-type SavedGame = { id: number; title: string; imageIcon: string } | null
+import type { GameSource, SavedGame } from '@/types/game'
 
 /**
  * A CheevoVault user's public profile: who they are, which platforms they

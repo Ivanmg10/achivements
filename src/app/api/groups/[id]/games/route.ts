@@ -4,8 +4,8 @@ import pool from '@/lib/db'
 import { isGameSource } from '@/utils/gameRef'
 import { dbId } from '@/utils/dbId'
 import { sourceAllowed } from '@/utils/xboxAccess'
-import type { GameSource } from '@/types/steam'
 import { GROUP_ITEMS_MAX, readItemCounts, readItemFields } from '@/utils/groupValidation'
+import type { GameSource } from '@/types/game'
 
 /**
  * Group items can be RA or Steam games; an item is (source, game_id), since RA

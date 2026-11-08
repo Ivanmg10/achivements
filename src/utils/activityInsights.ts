@@ -1,6 +1,6 @@
 import type { RecentAchievement } from '@/types/types'
-import type { GameSource } from '@/types/steam'
 import { localDay, parseUnlockTime } from '@/utils/dates'
+import type { GameSource } from '@/types/game'
 
 /**
  * What the Activity section reads from the year of unlocks the streak already

@@ -2,7 +2,7 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 /**
  * A platform's logo in its own colour, at about `size` px. Decorative by

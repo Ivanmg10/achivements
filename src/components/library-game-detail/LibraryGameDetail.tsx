@@ -18,8 +18,7 @@ import LibraryDetailInfo, { type InfoRow } from './library-detail-info/LibraryDe
 import LibraryDetailSkeleton from '@/components/library-detail-skeleton/LibraryDetailSkeleton'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { formatDate, unlockSpan } from '@/utils/dates'
-
-export type LibraryCategory = 'wantToPlay' | 'playing' | 'completed'
+import type { GameStatus } from '@/types/game'
 
 const SKELETON_BADGES = 24
 const PANEL = 'bg-bg-main/55 ring-1 ring-inset ring-ink/[0.06] rounded-pane p-3.5 min-w-0'
@@ -58,7 +57,7 @@ export default function LibraryGameDetail({
   grid,
   empty,
 }: {
-  category: LibraryCategory
+  category: GameStatus
   items: InsightAchievement[]
   state: 'loading' | 'error' | 'ready'
   /** Shown instead of the panels when the achievements could not be loaded. */

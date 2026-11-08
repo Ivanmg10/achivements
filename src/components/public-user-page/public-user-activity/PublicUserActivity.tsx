@@ -1,10 +1,11 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
-import { useMainPlatform, type MainPlatform } from '@/context/MainPlatformContext'
+import { useMainPlatform } from '@/context/MainPlatformContext'
 import { PLATFORM_NAME } from '@/utils/gameRef'
 import MainPageProfileTabs, { profilePanelId, profileTabId } from '@/components/main-page/main-page-profile/main-page-profile-tabs/MainPageProfileTabs'
 import MainPageCharts from '@/components/main-page/main-page-charts/MainPageCharts'
+import type { GameSource } from '@/types/game'
 
 const ID_PREFIX = 'public-activity-platform'
 
@@ -22,7 +23,7 @@ export default function PublicUserActivity() {
     <div className="flex flex-col gap-2">
       {tabbed && (
         <div className="bg-bg-card rounded-tile px-4 pt-3">
-          <MainPageProfileTabs<MainPlatform>
+          <MainPageProfileTabs<GameSource>
             idPrefix={ID_PREFIX}
             label={T.userProfile.statsPlatform}
             selected={platform}

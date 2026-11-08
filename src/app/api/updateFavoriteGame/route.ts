@@ -4,7 +4,7 @@ import pool from '@/lib/db'
 import { forgetUser } from '@/lib/userRecord'
 import { isGameSource } from '@/utils/gameRef'
 import { sourceAllowed } from '@/utils/xboxAccess'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 /** One favourite per platform, each in its own column. No source means RA. */
 const COLUMN: Record<GameSource, string> = {

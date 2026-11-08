@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { useRaBoxArt } from '@/hooks/useRaBoxArt'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 /**
  * A game's cover as its game page shows it: RA box art, Steam's portrait,

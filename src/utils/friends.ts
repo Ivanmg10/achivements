@@ -1,6 +1,6 @@
 import { parseUnlockTime, utcDay } from '@/utils/dates'
 import type { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
-import type { GameSource, SteamGameProgress, SteamRecentAchievement } from '@/types/steam'
+import type { SteamGameProgress, SteamRecentAchievement } from '@/types/steam'
 import type { PsnGameProgress, PsnRecentTrophy } from '@/types/psn'
 import type { XboxGameProgress, XboxRecentAchievement } from '@/types/xbox'
 import type { UserSearchResult } from '@/hooks/useUserSearch'
@@ -10,8 +10,7 @@ import { steamAssetUrl } from '@/lib/steamAssets'
 import { toRecentAchievement } from '@/utils/steamMappers'
 import { psnToRecentAchievement } from '@/utils/psnMappers'
 import { xboxToRecentAchievement } from '@/utils/xboxMappers'
-
-type SavedGame = { id: number; title: string; imageIcon: string } | null
+import type { GameSource, SavedGame } from '@/types/game'
 
 export type FriendPin = {
   source: GameSource

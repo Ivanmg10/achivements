@@ -3,9 +3,9 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import type { FillAnswer, FillStatus } from '@/lib/scoreRefresh'
-import type { GameSource } from '@/types/steam'
 import { levelOf, tierOf } from '@/utils/vaultLevel'
 import { PLATFORM_NAME } from '@/utils/gameRef'
+import type { GameSource } from '@/types/game'
 
 /** Polling while a pass runs, and the waits between passes. */
 const POLL_MS = 2_500

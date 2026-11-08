@@ -1,6 +1,6 @@
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { PLATFORM_NAME } from '@/utils/gameRef'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 /**
  * The platform a game is from, with its logo and name. Small on a card; large

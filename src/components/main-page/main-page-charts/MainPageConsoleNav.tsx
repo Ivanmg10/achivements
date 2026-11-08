@@ -8,6 +8,7 @@ import { CONSOLES } from '@/constants'
 import { useLanguage } from '@/context/LanguageContext'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import { Skeleton } from '@/components/ui/Skeleton'
+import type { GameStatus } from '@/types/game'
 
 const CONSOLE_MAP = new Map(CONSOLES.map((c) => [c.id, c]))
 
@@ -15,7 +16,7 @@ const SECTION_SLUGS = [
   { slug: 'wantToPlay', emoji: '🔖', key: 'wantToPlay' as const },
   { slug: 'playing',    emoji: '🎮', key: 'playing'    as const },
   { slug: 'completed',  emoji: '🏆', key: 'completed'  as const },
-] satisfies { slug: string; emoji: string; key: 'playing' | 'wantToPlay' | 'completed' }[]
+] satisfies { slug: string; emoji: string; key: GameStatus }[]
 
 function hasGamesForConsole(
   games: { ConsoleID: number }[],

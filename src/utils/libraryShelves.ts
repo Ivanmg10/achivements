@@ -1,7 +1,7 @@
 import { titleMatches } from '@/utils/gameCandidates'
 import { gameHref, raGameId } from '@/utils/gameRef'
 import { matchesQuick, type LibraryEntry, type QuickFilter } from '@/utils/libraryInsights'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 export type ShelfId = 'continue' | 'almost' | 'stalled' | 'rest' | 'recent' | 'older' | 'start' | 'backlog'
 

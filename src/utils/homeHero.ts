@@ -1,8 +1,8 @@
 import type { RecentFeedItem } from '@/utils/steamFeed'
-import type { GameSource } from '@/types/steam'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import type { PsnGameProgress } from '@/types/psn'
 import { raImageUrl } from '@/utils/raAssets'
+import type { GameSource } from '@/types/game'
 
 /** Art narrower than a console's 8:7 screen, or flatter than this, does not survive the cover's crop. */
 const ASPECT_MIN = 8 / 7

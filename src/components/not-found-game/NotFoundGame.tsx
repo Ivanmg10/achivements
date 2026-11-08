@@ -2,12 +2,12 @@
 
 import Link from 'next/link'
 import { IconArrowLeft, IconBooks, IconDeviceGamepad2 } from '@tabler/icons-react'
-import type { GameSource } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGoBack } from '@/hooks/useGoBack'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { STATUS_BUTTON, STATUS_SCREEN } from '@/components/status-badge/statusScreen'
 import { PLATFORM_NAME } from '@/utils/gameRef'
+import type { GameSource } from '@/types/game'
 
 
 /**

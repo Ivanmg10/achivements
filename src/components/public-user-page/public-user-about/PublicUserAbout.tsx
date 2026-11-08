@@ -7,7 +7,6 @@ import { IconFolders, IconGenderBigender, IconPalette } from '@tabler/icons-reac
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import type { CheevoUser } from '@/hooks/useCheevoUser'
-import type { GameSource } from '@/types/steam'
 import { isTheme } from '@/types/types'
 import { candidateIconUrl } from '@/utils/gameCandidates'
 import { gameHref, GAME_SOURCES } from '@/utils/gameRef'
@@ -17,6 +16,7 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
+import type { GameSource } from '@/types/game'
 
 const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
 

@@ -1,4 +1,5 @@
 import type { XboxGameProgress } from '@/types/xbox'
+import type { GameStatus } from '@/types/game'
 
 /** The largest id the INTEGER game_id columns hold. */
 const MAX_ID = 2_147_483_647
@@ -24,14 +25,12 @@ export function isXboxTitleId(value: string): boolean {
   return xboxNumericId(value) !== null
 }
 
-export type XboxCategory = 'wantToPlay' | 'playing' | 'completed'
-
 /**
  * Where an Xbox game goes among the category pages: completed at 100 % of its
  * gamerscore, in progress with something earned, and "no achievements" when it
  * was launched but nothing earned yet.
  */
-export function classifyXboxGame(game: Pick<XboxGameProgress, 'pctWon'>): XboxCategory {
+export function classifyXboxGame(game: Pick<XboxGameProgress, 'pctWon'>): GameStatus {
   if (game.pctWon >= 100) return 'completed'
   if (game.pctWon > 0) return 'playing'
   return 'wantToPlay'

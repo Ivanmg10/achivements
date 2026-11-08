@@ -1,8 +1,8 @@
 'use client'
 
 import { slantStyle } from '@/components/ui/shape'
-import type { GameSource } from '@/types/steam'
 import { GAME_SOURCES } from '@/utils/gameRef'
+import type { GameSource } from '@/types/game'
 
 const NAMES: Record<GameSource, string> = { ra: 'RA', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
 /** The same platform colours as the charts that compare platforms (CompletionDistribution). */
