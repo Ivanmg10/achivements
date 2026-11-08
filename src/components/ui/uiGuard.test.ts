@@ -154,6 +154,8 @@ test('a disclosure and a show-more button come from the library (Accordion, Show
 const NEW_RULES = {
   kicker: /["'`][^"'`]*(?:\buppercase\b[^"'`]*\btracking-|\btracking-[^"'`]*\buppercase\b)/,
   tag: /["'`](?=[^"'`]*\brounded-tag\b)(?=[^"'`]*(?:\bh-(?:5|6|\[1\.375rem\])|\bpy-0\.5)(?![\w-]))/,
+  avatar: /\brounded-full\b[^"'`]*\bobject-cover\b|\bobject-cover\b[^"'`]*\brounded-full\b|from '@\/components\/presence-dot\/PresenceDot'/,
+  listRow: /\bhover:bg-accent\/10 focus-visible:bg-accent\/10\b/,
 }
 
 test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
@@ -162,4 +164,12 @@ test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class
 
 test('a tag comes from Tag, never a tinted rounded-tag box by hand', () => {
   expect(newOffenders('tag', NEW_RULES.tag)).toEqual([])
+})
+
+test('a person\'s picture comes from Avatar, which carries their presence dot', () => {
+  expect(newOffenders('avatar', NEW_RULES.avatar)).toEqual([])
+})
+
+test('a row to pick from comes from ListRow / LIST_ROW', () => {
+  expect(newOffenders('listRow', NEW_RULES.listRow)).toEqual([])
 })

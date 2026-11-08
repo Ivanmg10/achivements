@@ -1,8 +1,11 @@
 'use client'
 
+import { IconDeviceGamepad2 } from '@tabler/icons-react'
 import { StatPill, StatCard } from '@/components/ui/StatPill'
 import RarityBadge from '@/components/ui/RarityBadge'
 import Tag, { type TagTone } from '@/components/ui/Tag'
+import Avatar from '@/components/ui/Avatar'
+import ListRow from '@/components/ui/ListRow'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import StreakTag from '@/components/ui/StreakTag'
@@ -81,6 +84,25 @@ export default function DesignCatalogData() {
           <Specimen name="overlay, on a picture">
             <span className="rounded-tile p-3 bg-accent/40"><Tag tone="overlay">Steam</Tag></span>
           </Specimen>
+        </Compare>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="avatar">
+        <Panel>
+          <Specimen name="initial · 32 · 40 · 56 · 72, online">
+            {[32, 40, 56, 72].map((s) => <Avatar key={s} name="Palmera" size={s} online />)}
+          </Specimen>
+          <Specimen name="icon fallback · a ring">
+            <Avatar name="Palmera" size={60} fallback="icon" />
+            <Avatar name="Palmera" size={60} ring="ring-2 ring-hardcore" />
+          </Specimen>
+        </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="list-row">
+        <Compare>
+          <ListRow media={<IconDeviceGamepad2 size={20} aria-hidden="true" />} title="Celeste" sub="Steam · 42 %" trailing={<Tag size="sm">PC</Tag>} />
+          <ListRow media={<Avatar name="Palmera" size={40} />} title="Palmera" sub="Level 57" />
         </Compare>
       </DesignCatalogPiece>
 

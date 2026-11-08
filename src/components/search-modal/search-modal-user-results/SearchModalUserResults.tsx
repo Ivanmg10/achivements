@@ -5,7 +5,7 @@ import type { UserSearchResult } from '@/hooks/useUserSearch'
 import type { RecentUser } from '@/hooks/useRecentUsers'
 import UserSummary from '@/components/user-summary/UserSummary'
 import SearchModalGroup from '../search-modal-group/SearchModalGroup'
-import { SEARCH_ROW } from '../search-modal-row/SearchModalRow'
+import { LIST_ROW } from '@/components/ui/ListRow'
 import { Skeleton } from '@/components/ui/Skeleton'
 
 /**
@@ -48,7 +48,7 @@ export default function SearchModalUserResults({
         <ul aria-label={T.userSearch.resultsLabel}>
           {users.results.map((u) => (
             <li key={u.username}>
-              <button type="button" data-search-option className={SEARCH_ROW} onClick={() => onSelect(u)}>
+              <button type="button" data-search-option className={LIST_ROW} onClick={() => onSelect(u)}>
                 <UserSummary user={u} />
               </button>
             </li>
