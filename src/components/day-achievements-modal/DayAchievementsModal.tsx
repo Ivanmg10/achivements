@@ -54,7 +54,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
           <button
             onClick={onClose}
             aria-label="Close"
-            className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-ring"
           >
             <IconX size={16} />
           </button>
@@ -72,7 +72,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                     key={`${award.AwardType}-${award.AwardData}`}
                     href={gameHref('ra', award.AwardData, subject)}
                     onClick={onClose}
-                    className="flex items-center gap-3 p-3 rounded-tile bg-bg-main hover:bg-bg-card transition-colors group ring-1 ring-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    className="flex items-center gap-3 p-3 rounded-tile bg-bg-main hover:bg-bg-card transition-colors group ring-1 ring-ink/5 focus-ring"
                   >
                     <div className="relative shrink-0">
                       {award.ImageIcon ? (

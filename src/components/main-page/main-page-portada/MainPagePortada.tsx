@@ -142,7 +142,7 @@ export default function MainPagePortada() {
                     aria-label={achievement.title}
                     aria-describedby={descriptionId}
                     onClick={() => setSelected(achievement)}
-                    className="w-full h-full rounded-tile overflow-hidden ring-1 ring-ink/20 bg-bg-main/70 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    className="w-full h-full rounded-tile overflow-hidden ring-1 ring-ink/20 bg-bg-main/70 cursor-pointer focus-ring"
                   >
                     {achievement.iconUrl && (
                       <Image src={achievement.iconUrl} alt="" width={48} height={48} unoptimized className="w-full h-full object-cover grayscale" />
@@ -166,7 +166,7 @@ export default function MainPagePortada() {
                   href={gameHref(hero.source, hero.id)}
                   aria-label={T.homeLayout.unearnedRemaining.replace('{n}', String(remaining))}
                   title={T.homeLayout.openGame}
-                  className="w-full h-full rounded-tile overflow-hidden ring-1 ring-ink/20 bg-bg-main/70 flex items-center justify-center text-sm font-bold hover:ring-accent/40 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="w-full h-full rounded-tile overflow-hidden ring-1 ring-ink/20 bg-bg-main/70 flex items-center justify-center text-sm font-bold hover:ring-accent/40 transition-shadow focus-ring"
                 >
                   +{remaining}
                 </Link>

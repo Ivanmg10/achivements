@@ -31,7 +31,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
             type="button"
             onClick={onClose}
             aria-label={T.userPage.close}
-            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-ring"
           >
             <IconX size={18} aria-hidden="true" />
           </button>
@@ -67,7 +67,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
                   type="button"
                   onClick={() => showGame(g.id, g.source)}
                   aria-label={T.userPage.showGame.replace('{title}', g.title)}
-                  className="p-2 rounded-chip text-text-secondary hover:text-accent hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="p-2 rounded-chip text-text-secondary hover:text-accent hover:bg-ink/5 transition-colors focus-ring"
                 >
                   <IconEye size={18} aria-hidden="true" />
                 </button>

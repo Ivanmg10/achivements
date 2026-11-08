@@ -93,7 +93,7 @@ export default function AchievementDetailModal({
             type="button"
             onClick={onClose}
             aria-label={T.achievementDetail.close}
-            className="p-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-ring"
           >
             <IconX className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -125,7 +125,7 @@ export default function AchievementDetailModal({
                       href={g.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-chip bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-chip bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-ring"
                     >
                       <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                       {guideLabel[g.kind]}

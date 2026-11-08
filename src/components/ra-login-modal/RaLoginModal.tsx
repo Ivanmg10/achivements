@@ -57,7 +57,7 @@ export default function RaLoginModal({
               href="https://retroachievements.org/settings"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-ring"
             >
               {T.connect.raKeyHelp}
             </a>

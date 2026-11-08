@@ -40,7 +40,7 @@ export default function MainPageXboxNav() {
             <div key={slug} className="bg-bg-main rounded-box p-3 flex flex-col gap-2.5">
               <Link
                 href={`/${slug}`}
-                className="flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
+                className="flex items-center justify-between group focus-ring rounded"
               >
                 <span className="flex items-center gap-1.5">
                   <span className="text-sm leading-none" aria-hidden="true">{emoji}</span>
@@ -65,7 +65,7 @@ export default function MainPageXboxNav() {
                       href={gameHref('xbox', g.id)}
                       title={g.title}
                       aria-label={g.title}
-                      className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                      className="rounded focus-ring"
                     >
                       <GameIcon source="xbox" id={g.id} imageUrl={g.imageIcon} size={32} className="w-8 h-8 rounded-box-sm hover:scale-110 transition-transform" />
                     </Link>

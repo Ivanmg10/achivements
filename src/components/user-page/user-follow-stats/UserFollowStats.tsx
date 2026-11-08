@@ -6,7 +6,7 @@ import { useFollowCounts } from '@/hooks/useFollowCounts'
 import { plural } from '@/utils/utils'
 import { Skeleton } from '@/components/ui/Skeleton'
 
-const LINK = 'hover:text-text-main hover:underline underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+const LINK = 'hover:text-text-main hover:underline underline-offset-2 rounded focus-ring'
 
 /**
  * How many you follow and how many follow you, in the line under your name,

@@ -48,7 +48,7 @@ export default function FollowingCard({
             <span className="flex items-center gap-1.5 min-w-0">
               <Link
                 href={`/user/${encodeURIComponent(friend.username)}`}
-                className="truncate text-[1.0625rem] font-extrabold hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="truncate text-[1.0625rem] font-extrabold hover:underline rounded focus-ring"
               >
                 {friend.username}
               </Link>

@@ -29,7 +29,7 @@ export default function BrowseConsoles({ consoles }: { consoles: ConsoleSummary[
             <li key={c.consoleId}>
               <Link
                 href={`/playing/${c.consoleId}`}
-                className="relative isolate flex flex-col gap-2 h-full rounded-tile bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="relative isolate flex flex-col gap-2 h-full rounded-tile bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-ring"
               >
                 <span className="flex items-center gap-2 min-w-0">
                   {icon && <Image src={icon} alt="" width={20} height={20} className="w-5 h-5 object-contain shrink-0" />}

@@ -44,7 +44,7 @@ export default function FollowingCardBadges({
               href={gameHref(p.source, p.gameId, username)}
               aria-label={`${p.title ?? '—'} · ${p.gameTitle}`}
               aria-describedby={p.description ? tip : undefined}
-              className="block rounded-box transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="block rounded-box transition-transform hover:-translate-y-0.5 focus-ring"
             >
               {p.badge ? (
                 <Image src={p.badge} alt="" width={px} height={px} className={`${box} object-cover`} unoptimized />

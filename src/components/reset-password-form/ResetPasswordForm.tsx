@@ -124,7 +124,7 @@ export default function ResetPasswordForm() {
       <p className="text-center mt-5">
         <Link
           href="/authPage"
-          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors text-sm rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors text-sm rounded focus-ring"
         >
           {T.passwordReset.backToSignIn}
         </Link>

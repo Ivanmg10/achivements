@@ -87,7 +87,7 @@ export default function UserPlatformCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${name} — ${T.userData.openProfile}`}
-                className="font-extrabold truncate hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="font-extrabold truncate hover:underline rounded focus-ring"
               >
                 {name}
               </a>

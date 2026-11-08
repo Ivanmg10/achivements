@@ -38,7 +38,7 @@ export default function RankingsGuide() {
         <IconTrophy aria-hidden="true" size={240} stroke={1} className="hidden sm:block absolute -right-8 -bottom-10 text-accent/[0.08] pointer-events-none" />
         <Link
           href="/rankings"
-          className="relative self-start inline-flex items-center gap-1.5 text-sm font-semibold text-text-secondary hover:text-text-main rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="relative self-start inline-flex items-center gap-1.5 text-sm font-semibold text-text-secondary hover:text-text-main rounded focus-ring"
         >
           <IconArrowLeft size={15} aria-hidden="true" />
           {g.back}

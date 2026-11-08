@@ -34,4 +34,4 @@ export const QUIET_BUTTON = buttonClass('quiet', 'sm')
 
 /** The arrows that go through the opened points and choices. */
 export const ICON_BUTTON =
-  'w-11 h-11 rounded-tile flex items-center justify-center ring-1 ring-inset ring-ink/15 text-text-main hover:bg-ink/5 disabled:opacity-30 disabled:cursor-default transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+  'w-11 h-11 rounded-tile flex items-center justify-center ring-1 ring-inset ring-ink/15 text-text-main hover:bg-ink/5 disabled:opacity-30 disabled:cursor-default transition-colors focus-ring'

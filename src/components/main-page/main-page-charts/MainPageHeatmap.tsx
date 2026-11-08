@@ -158,7 +158,7 @@ export default function MainPageHeatmap({
               onClick={onRefresh}
               disabled={isLoading}
               aria-label="Refresh heatmap"
-              className="text-text-secondary hover:text-text-main disabled:opacity-30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
+              className="text-text-secondary hover:text-text-main disabled:opacity-30 transition-colors focus-ring rounded"
             >
               <IconRefresh size={12} className={isLoading ? 'animate-spin' : ''} />
             </button>

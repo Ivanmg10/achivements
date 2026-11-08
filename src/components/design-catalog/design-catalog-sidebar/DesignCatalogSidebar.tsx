@@ -42,7 +42,7 @@ export default function DesignCatalogSidebar() {
                       <a
                         href={`#${piece.id}`}
                         aria-current={on ? 'location' : undefined}
-                        className={`relative block rounded-control px-3 py-1.5 text-sm transition-colors duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 before:content-[''] before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:bg-accent before:skew-y-(--slant-mark) before:transition-opacity ${
+                        className={`relative block rounded-control px-3 py-1.5 text-sm transition-colors duration-(--motion-hover) focus-ring before:content-[''] before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:bg-accent before:skew-y-(--slant-mark) before:transition-opacity ${
                           on ? 'font-bold text-text-main bg-ink/[0.06] before:opacity-100' : 'font-medium text-text-secondary hover:text-text-main hover:bg-ink/[0.04] before:opacity-0'
                         }`}
                       >

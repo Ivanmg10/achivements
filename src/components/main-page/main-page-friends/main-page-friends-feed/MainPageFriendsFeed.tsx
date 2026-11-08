@@ -29,7 +29,7 @@ export default function MainPageFriendsFeed({ items }: { items: FeedItem[] }) {
               <li key={`${username}:${a.Source ?? 'ra'}:${a.GameID}:${a.AchievementID}:${a.Date}`}>
                 <Link
                   href={gameHref(a.Source ?? 'ra', a.GameID, username)}
-                  className="flex items-center gap-2.5 px-2 py-1.5 rounded-box hover:bg-ink/[0.06] transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="flex items-center gap-2.5 px-2 py-1.5 rounded-box hover:bg-ink/[0.06] transition-colors min-w-0 focus-ring"
                 >
                   {badge ? (
                     <Image src={badge} alt="" width={36} height={36} className="w-9 h-9 rounded-box-sm object-cover shrink-0" unoptimized />

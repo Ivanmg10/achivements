@@ -86,7 +86,7 @@ export default function SortableItem({
           <button
             {...attributes}
             {...listeners}
-            className="relative z-10 text-text-secondary/40 hover:text-text-secondary transition-colors cursor-grab active:cursor-grabbing shrink-0 touch-none self-stretch flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="relative z-10 text-text-secondary/40 hover:text-text-secondary transition-colors cursor-grab active:cursor-grabbing shrink-0 touch-none self-stretch flex items-center rounded focus-ring"
             aria-label={T.cards.dragToReorder}
           >
             <IconGripVertical className="w-4 h-4" aria-hidden="true" />
@@ -105,7 +105,7 @@ export default function SortableItem({
         <div className="flex flex-col flex-1 min-w-0 gap-1">
           <Link
             href={href}
-            className="relative z-10 self-start max-w-full hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="relative z-10 self-start max-w-full hover:underline decoration-ink/50 underline-offset-2 rounded focus-ring"
           >
             <p title={item.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{item.title}</p>
           </Link>
@@ -148,7 +148,7 @@ export default function SortableItem({
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${item.title}`}
-            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-ring"
           >
             <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               ▼

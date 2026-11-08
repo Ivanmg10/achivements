@@ -29,7 +29,7 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
   return (
     <Link
       href={gameHref(game.source, game.id)}
-      className="relative isolate group flex items-center gap-3 rounded-card bg-bg-card p-2.5 pr-3 ring-1 ring-ink/5 hover:ring-ink/15 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 min-w-0 overflow-hidden"
+      className="relative isolate group flex items-center gap-3 rounded-card bg-bg-card p-2.5 pr-3 ring-1 ring-ink/5 hover:ring-ink/15 transition-all focus-ring min-w-0 overflow-hidden"
     >
       <GameCardBackdrop src={art} surface="card" eager={eager} />
       {game.source === 'steam' ? (

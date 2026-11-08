@@ -27,7 +27,7 @@ function Chip({ icon, name, href, opens }: { icon: ReactNode; name: string; href
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`${name} — ${opens}`}
-        className={`${CHIP} hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+        className={`${CHIP} hover:bg-ink/10 transition-colors focus-ring`}
       >
         {icon}
         <span className="truncate">{name}</span>

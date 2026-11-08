@@ -91,7 +91,7 @@ export default function RaGameItem({
           <span className="flex items-center gap-2 min-w-0">
             <Link
               href={href}
-              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 rounded focus-ring"
             >
               <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.Title}</span>
             </Link>
@@ -103,7 +103,7 @@ export default function RaGameItem({
             aria-expanded={expanded}
             aria-controls={panelId}
             aria-label={`${expanded ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.Title}`}
-            className="flex flex-col gap-1 w-full text-left rounded group cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="flex flex-col gap-1 w-full text-left rounded group cursor-pointer before:absolute before:inset-0 before:content-[''] focus-ring"
           >
             <span className="flex items-center gap-2 w-full">
               {total > 0 && (

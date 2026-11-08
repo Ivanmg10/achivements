@@ -51,7 +51,7 @@ export default function RankingsPageUser({
         {linked ? (
           <Link
             href={`/user/${encodeURIComponent(row.username)}`}
-            className="min-w-0 truncate hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="min-w-0 truncate hover:underline rounded focus-ring"
           >
             {name}
           </Link>

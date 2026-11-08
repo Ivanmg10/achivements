@@ -75,7 +75,7 @@ export default function MainPageStatsRail({
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(section.id)}
             onKeyDown={(e) => handleKeyDown(e, i)}
-            className={`relative snap-start shrink-0 flex items-center gap-2.5 px-3.5 py-2 lg:py-2.5 rounded-tile text-sm whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+            className={`relative snap-start shrink-0 flex items-center gap-2.5 px-3.5 py-2 lg:py-2.5 rounded-tile text-sm whitespace-nowrap transition-colors focus-ring ${
               selected ? 'text-text-main font-semibold' : 'text-text-secondary hover:text-text-main hover:bg-ink/5'
             }`}
           >

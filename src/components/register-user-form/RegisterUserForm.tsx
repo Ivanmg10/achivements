@@ -206,7 +206,7 @@ export default function RegisterUserForm({
         <button
           type="button"
           onClick={() => setRaOpen(true)}
-          className="mt-3 w-full py-3 rounded-tile font-semibold flex items-center justify-center gap-2 bg-bg-card text-text-main border border-ink/15 hover:border-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="mt-3 w-full py-3 rounded-tile font-semibold flex items-center justify-center gap-2 bg-bg-card text-text-main border border-ink/15 hover:border-accent transition-colors focus-ring"
         >
           <RaLogo height={16} />
           {T.registerForm.raCta}
@@ -230,7 +230,7 @@ export default function RegisterUserForm({
         <button
           type="button"
           onClick={() => setIsLogin(true)}
-          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-ring"
         >
           {T.registerForm.alreadyHaveAccountAction}
         </button>

@@ -60,7 +60,7 @@ export default function RegisterUserFormRa({
             type="button"
             onClick={() => onChange(null)}
             disabled={disabled}
-            className="text-sm text-accent underline underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="text-sm text-accent underline underline-offset-2 rounded focus-ring"
           >
             {t.raChange}
           </button>
@@ -96,7 +96,7 @@ export default function RegisterUserFormRa({
             disabled={checking || disabled}
           />
           <details className="text-xs text-text-secondary">
-            <summary className="cursor-pointer text-accent rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+            <summary className="cursor-pointer text-accent rounded focus-ring">
               {t.raWhere}
             </summary>
             <ol className="mt-2 list-decimal pl-5 flex flex-col gap-1">
@@ -124,7 +124,7 @@ export default function RegisterUserFormRa({
         type="button"
         onClick={onClose}
         disabled={disabled}
-        className="self-center text-xs text-text-secondary hover:text-text-main underline underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="self-center text-xs text-text-secondary hover:text-text-main underline underline-offset-2 rounded focus-ring"
       >
         {t.raOff}
       </button>

@@ -51,7 +51,7 @@ export default function LibraryEntryDetail({ entry, category }: { entry: Library
           <Link
             href={entryHref(entry)}
             title={T.libraryLayout.openGame}
-            className="min-w-0 text-2xl sm:text-[2rem] font-extrabold leading-none truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="min-w-0 text-2xl sm:text-[2rem] font-extrabold leading-none truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-ring"
           >
             {entry.title}
           </Link>

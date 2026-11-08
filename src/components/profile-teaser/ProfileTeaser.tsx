@@ -52,7 +52,7 @@ export default function ProfileTeaser({ teaser }: { teaser: Teaser }) {
           </Button>
           <Link
             href="/rankings"
-            className="px-4 py-2 rounded-full bg-ink/10 text-sm font-semibold hover:bg-ink/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="px-4 py-2 rounded-full bg-ink/10 text-sm font-semibold hover:bg-ink/15 transition-colors focus-ring"
           >
             {T.rankings.seeAll}
           </Link>

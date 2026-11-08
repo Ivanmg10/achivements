@@ -37,7 +37,7 @@ export default function ShowcaseTile({
           type="button"
           onClick={onRemove}
           aria-label={`${T.showcase.remove}: ${item.title}`}
-          className="absolute right-1.5 top-1.5 p-1 rounded-box-md text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="absolute right-1.5 top-1.5 p-1 rounded-box-md text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-ring"
         >
           <IconX size={14} aria-hidden="true" />
         </button>
@@ -53,7 +53,7 @@ export default function ShowcaseTile({
         <span className="text-sm font-semibold leading-tight line-clamp-2">{item.title}</span>
         <Link
           href={gameHref(item.source, item.gameId, subject)}
-          className="flex items-center justify-center gap-1 text-[11px] text-text-secondary hover:text-text-main hover:underline min-w-0 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="flex items-center justify-center gap-1 text-[11px] text-text-secondary hover:text-text-main hover:underline min-w-0 rounded focus-ring"
         >
           <PlatformLogo source={item.source} size={10} label={PLATFORM_NAME[item.source]} />
           <span className="truncate">{item.gameTitle}</span>

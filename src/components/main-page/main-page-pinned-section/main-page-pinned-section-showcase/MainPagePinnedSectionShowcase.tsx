@@ -72,7 +72,7 @@ export default function MainPagePinnedSectionShowcase() {
               key={i}
               type="button"
               onClick={() => setPickerOpen(true)}
-              className={`${SLOT} rounded-tile border-2 border-dashed border-ink/15 text-text-secondary hover:text-accent hover:border-accent/50 flex flex-col items-center justify-center gap-2 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+              className={`${SLOT} rounded-tile border-2 border-dashed border-ink/15 text-text-secondary hover:text-accent hover:border-accent/50 flex flex-col items-center justify-center gap-2 text-xs transition-colors focus-ring`}
             >
               <IconPlus size={22} aria-hidden="true" />
               {T.showcase.addSlot}

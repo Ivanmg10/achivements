@@ -75,7 +75,7 @@ export default function MainPageFriendsLeaderboard({ rows }: { rows: LeaderRow[]
               ) : (
                 <Link
                   href={`/user/${encodeURIComponent(r.username)}#compare`}
-                  className={`${cls} hover:bg-ink/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+                  className={`${cls} hover:bg-ink/[0.06] transition-colors focus-ring`}
                 >
                   {inner}
                 </Link>

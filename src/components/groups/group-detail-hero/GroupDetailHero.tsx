@@ -58,7 +58,7 @@ export default function GroupDetailHero({
       <div className="relative flex-1 flex flex-col justify-end gap-5 px-4 sm:px-9 pt-5 pb-7 sm:pt-24">
         <Link
           href="/groups"
-          className="sm:absolute sm:top-6 sm:left-9 self-start font-semibold inline-flex items-center gap-1 text-sm text-text-secondary hover:text-text-main rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="sm:absolute sm:top-6 sm:left-9 self-start font-semibold inline-flex items-center gap-1 text-sm text-text-secondary hover:text-text-main rounded focus-ring"
         >
           <IconArrowLeft className="w-4 h-4" aria-hidden="true" />
           {T.groups.backToGroups}

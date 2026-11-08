@@ -101,7 +101,7 @@ export default function StreakYearHeatmap({
                       aria-label={label}
                       aria-pressed={inSelected}
                       title={label}
-                      className="w-full rounded-cell transition-colors duration-(--motion-open) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 hover:ring-1 hover:ring-text-main/60"
+                      className="w-full rounded-cell transition-colors duration-(--motion-open) focus-ring hover:ring-1 hover:ring-text-main/60"
                       style={style}
                     />
                   ) : (

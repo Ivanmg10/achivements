@@ -33,7 +33,7 @@ export default function MainPagePortadaSideStreak() {
   return (
     <Link
       href="/racha"
-      className={`${SURFACE} p-5 flex flex-col gap-3 hover:ring-accent/40 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+      className={`${SURFACE} p-5 flex flex-col gap-3 hover:ring-accent/40 transition-shadow focus-ring`}
     >
       <span className="flex items-baseline justify-between gap-3">
         <span className="font-bold" style={{ color: streakInk(tier) }}>{plural(activeStreak.days, T.plurals.streakOf, lang)}</span>

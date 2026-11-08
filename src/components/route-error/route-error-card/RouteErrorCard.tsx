@@ -40,7 +40,7 @@ export default function RouteErrorCard({ digest }: { digest?: string }) {
             <button
               type="button"
               onClick={handleCopy}
-              className="font-medium text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="font-medium text-accent hover:underline rounded focus-ring"
             >
               {T.errorBoundary.copy}
             </button>

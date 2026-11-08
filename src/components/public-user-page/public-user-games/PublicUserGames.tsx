@@ -129,7 +129,7 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
             <button
               type="button"
               onClick={() => setShown((n) => n + PAGE)}
-              className="self-center rounded-full bg-bg-main px-4 py-1.5 text-xs font-medium text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="self-center rounded-full bg-bg-main px-4 py-1.5 text-xs font-medium text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-ring"
             >
               {T.userProfile.showMore.replace('{n}', (filtered.length - shown).toLocaleString(lang))}
             </button>

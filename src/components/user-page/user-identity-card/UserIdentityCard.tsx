@@ -81,7 +81,7 @@ export default function UserIdentityCard() {
           <button
             onClick={() => setAvatarOpen(true)}
             aria-label={T.userPage.editAvatar}
-            className="relative group shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="relative group shrink-0 rounded-full focus-ring"
           >
             <Avatar src={user?.avatar} name={user?.name ?? ''} size={96} sizeSm={112} fallback="icon" ring="ring-4 ring-bg-card shadow-[0_14px_30px_rgb(0_0_0/0.5)]" />
             <span

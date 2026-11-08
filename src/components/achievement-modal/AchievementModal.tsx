@@ -133,7 +133,7 @@ export default function AchievementModal({
                   onClick={onToggleFavorite}
                   aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
                   aria-pressed={isFavorited}
-                  className={`shrink-0 rounded transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+                  className={`shrink-0 rounded transition-colors duration-150 focus-ring ${
                     isFavorited ? 'text-warning hover:text-warning/80' : 'text-text-secondary hover:text-warning'
                   }`}
                 >

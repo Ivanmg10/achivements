@@ -62,7 +62,7 @@ export default function GameInfoAchivement({
           <h3 className="text-[0.9375rem] font-bold">
             <button
               onClick={onClick}
-              className="text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-ring"
             >
               {achievement.Title}
             </button>
@@ -73,7 +73,7 @@ export default function GameInfoAchivement({
               onClick={() => onToggleFavorite(achievement)}
               aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
               aria-pressed={isFavorited}
-              className={`relative z-10 shrink-0 rounded transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+              className={`relative z-10 shrink-0 rounded transition-colors duration-150 focus-ring ${
                 isFavorited ? 'text-hardcore' : 'text-text-secondary/60 hover:text-hardcore'
               }`}
             >

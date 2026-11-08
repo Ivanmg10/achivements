@@ -25,7 +25,7 @@ export default function WelcomePageRaGuide() {
           href={RA_SETTINGS}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 min-h-10 px-2 -mr-2 rounded-tile text-sm font-semibold text-text-main hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="inline-flex items-center gap-1.5 min-h-10 px-2 -mr-2 rounded-tile text-sm font-semibold text-text-main hover:text-accent transition-colors focus-ring"
         >
           {t.openRa}
           <IconExternalLink size={14} aria-hidden="true" />

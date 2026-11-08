@@ -131,7 +131,7 @@ export default function MainPageGroups({
           {!onSelect && groups.length > 4 ? (
             <Link
               href="/groups"
-              className="flex items-center gap-2.5 bg-bg-main rounded-box p-2 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="flex items-center gap-2.5 bg-bg-main rounded-box p-2 hover:bg-ink/5 transition-colors focus-ring"
             >
               <div className="w-9 h-9 rounded-box bg-bg-card flex items-center justify-center shrink-0">
                 <IconFolder className="w-4 h-4 text-text-secondary" aria-hidden />

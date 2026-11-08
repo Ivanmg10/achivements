@@ -45,7 +45,7 @@ export default function PeriodAchievementsModal({ title, achievements, onClose }
           <button
             onClick={onClose}
             aria-label={T.cards.close}
-            className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-ring"
           >
             <IconX size={16} />
           </button>

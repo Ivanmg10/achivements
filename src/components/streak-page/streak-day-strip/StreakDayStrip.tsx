@@ -50,7 +50,7 @@ export default function StreakDayStrip({
                 aria-pressed={on}
                 aria-label={`${formatDay(day, lang, { weekday: 'long', day: 'numeric', month: 'long' })}: ${plural(n, T.plurals.achievements, lang)}`}
                 title={`${short(day)} · ${plural(n, T.plurals.achievements, lang)}`}
-                className="group relative flex-1 min-w-2.5 max-w-8 h-full flex flex-col justify-end items-center rounded-chip focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="group relative flex-1 min-w-2.5 max-w-8 h-full flex flex-col justify-end items-center rounded-chip focus-ring"
               >
                 {cut && (
                   <span aria-hidden="true" className={`text-[10px] font-bold tabular-nums mb-0.5 ${on ? 'text-accent' : 'text-text-secondary'}`}>

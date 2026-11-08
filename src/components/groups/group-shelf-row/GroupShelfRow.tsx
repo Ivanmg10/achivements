@@ -13,7 +13,7 @@ import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgre
 import { relativeTime } from '@/utils/dates'
 import Kicker from '@/components/ui/Kicker'
 
-const TILE = 'flex flex-col items-center justify-center gap-1 aspect-square rounded-tile border-2 border-dashed border-ink/10 text-xs text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+const TILE = 'flex flex-col items-center justify-center gap-1 aspect-square rounded-tile border-2 border-dashed border-ink/10 text-xs text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-ring'
 
 /**
  * A group as a shelf: its name, progress and the game closest to done on one
@@ -37,7 +37,7 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
             </span>
           )}
           <h2 className="min-w-0">
-            <Link href={href} className="block text-xl font-bold truncate hover:text-accent transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+            <Link href={href} className="block text-xl font-bold truncate hover:text-accent transition-colors rounded focus-ring">
               {group.title}
             </Link>
           </h2>
@@ -71,7 +71,7 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
           const pct = total > 0 ? Math.min(100, Math.round(((g.num_awarded ?? 0) / total) * 100)) : 0
           return (
             <li key={`${g.source}:${g.game_id}`} className="min-w-0">
-              <Link href={gameHref(g.source, g.game_id)} className="group flex flex-col gap-1.5 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+              <Link href={gameHref(g.source, g.game_id)} className="group flex flex-col gap-1.5 rounded-tile focus-ring">
                 <div className="aspect-square rounded-tile overflow-hidden bg-bg-main ring-1 ring-ink/5 group-hover:ring-ink/30 transition-all">
                   {src && <Image src={src} alt="" width={160} height={160} className="w-full h-full object-cover" unoptimized />}
                 </div>

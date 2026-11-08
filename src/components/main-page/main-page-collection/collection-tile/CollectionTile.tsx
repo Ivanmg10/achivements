@@ -23,7 +23,7 @@ export default function CollectionTile({ game, date }: { game: PerfectGame; date
   return (
     <Link
       href={gameHref(game.source, game.id, subject)}
-      className="group flex flex-col items-center gap-1.5 min-w-0 rounded-box p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="group flex flex-col items-center gap-1.5 min-w-0 rounded-box p-1 focus-ring"
     >
       <span className="relative w-14 h-14 shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5">
         <GameIcon source={game.source} id={game.id} imageUrl={game.imageUrl} size={56} className="w-14 h-14 rounded-box ring-1 ring-ink/10" />

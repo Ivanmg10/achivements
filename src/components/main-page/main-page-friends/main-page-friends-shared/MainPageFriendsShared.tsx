@@ -39,7 +39,7 @@ export default function MainPageFriendsShared({ rows }: { rows: SharedGameRow[] 
                       href={`${gameHref(game.source, game.id, f.username)}?compare=1`}
                       aria-label={`${T.friends.compareWith.replace('{u}', f.username)} (${f.pct}%)`}
                       title={`${f.username} · ${f.pct}%${f.online ? ` · ${T.following.online}` : ''}`}
-                      className="flex items-center gap-1 rounded-full bg-bg-card pl-0.5 pr-2 py-0.5 text-[11px] tabular-nums hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                      className="flex items-center gap-1 rounded-full bg-bg-card pl-0.5 pr-2 py-0.5 text-[11px] tabular-nums hover:bg-ink/10 transition-colors focus-ring"
                     >
                       <Avatar src={f.avatar} name={f.username} size={20} fallback="icon" online={f.online} />
                       <span className={f.pct >= 100 ? 'text-success font-semibold' : 'text-text-secondary'}>{f.pct}%</span>

@@ -67,7 +67,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
           </h1>
           <p className="text-sm sm:text-[0.9375rem] text-text-secondary">
             {T.rankings.intro}{' '}
-            <Link href="/rankings/how" className="font-bold text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+            <Link href="/rankings/how" className="font-bold text-accent hover:underline rounded focus-ring">
               {T.rankings.how}
             </Link>
           </p>
@@ -82,7 +82,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
             ) : error ? (
               <div className="bg-bg-card rounded-card flex flex-col items-center gap-2 py-10 text-center">
                 <p role="alert" className="text-sm text-danger">{T.rankings.loadError}</p>
-                <button onClick={retry} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+                <button onClick={retry} className="text-sm text-accent hover:underline rounded focus-ring">
                   {T.rankings.retry}
                 </button>
               </div>

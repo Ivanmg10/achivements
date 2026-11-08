@@ -55,7 +55,7 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
                 onClick={() => onSelect(streak)}
                 aria-label={`${plural(streak.days, T.plurals.days, lang)}, ${short(streak.start)} – ${short(streak.end)}${live ? `, ${T.streak.ongoing}` : ''}`}
                 aria-pressed={on}
-                className={`w-full grid grid-cols-[2rem_minmax(0,1fr)_3.5rem] items-center gap-3 px-2 py-1.5 rounded-control text-left transition-colors duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+                className={`w-full grid grid-cols-[2rem_minmax(0,1fr)_3.5rem] items-center gap-3 px-2 py-1.5 rounded-control text-left transition-colors duration-(--motion-hover) focus-ring ${
                   on ? 'bg-ink/[0.06] ring-1 ring-inset ring-ink/20' : 'hover:bg-ink/[0.04]'
                 }`}
               >

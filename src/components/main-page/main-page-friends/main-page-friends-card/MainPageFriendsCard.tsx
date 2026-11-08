@@ -27,7 +27,7 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
       <div className="flex items-center justify-between gap-2 min-w-0">
         <Link
           href={`/user/${encodeURIComponent(friend.username)}`}
-          className="flex items-center gap-3 rounded-box -m-1 p-1 hover:bg-ink/[0.06] transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="flex items-center gap-3 rounded-box -m-1 p-1 hover:bg-ink/[0.06] transition-colors min-w-0 focus-ring"
         >
           <UserSummary user={friend} size={40} />
         </Link>
@@ -44,7 +44,7 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
                   href={gameHref(source, game!.id, friend.username)}
                   title={game!.title}
                   aria-label={game!.title}
-                  className="block rounded-box focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="block rounded-box focus-ring"
                 >
                   {icon ? (
                     <Image src={icon} alt="" width={36} height={36} className="w-9 h-9 rounded-box object-cover" unoptimized />

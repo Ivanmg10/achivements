@@ -52,7 +52,7 @@ export default function WelcomePageIntroDetail({
         type="button"
         onClick={onClose}
         aria-label={T.editProfileModal.close}
-        className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 w-10 h-10 rounded-tile flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 w-10 h-10 rounded-tile flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors focus-ring"
       >
         <IconX size={20} aria-hidden="true" />
       </button>

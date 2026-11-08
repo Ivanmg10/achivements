@@ -56,7 +56,7 @@ export default function WelcomePagePreferencesDetail({
         type="button"
         onClick={onClose}
         aria-label={T.editProfileModal.close}
-        className="absolute top-2.5 right-2.5 z-20 w-10 h-10 rounded-tile flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute top-2.5 right-2.5 z-20 w-10 h-10 rounded-tile flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors focus-ring"
       >
         <IconX size={20} aria-hidden="true" />
       </button>

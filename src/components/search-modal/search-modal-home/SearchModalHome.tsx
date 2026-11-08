@@ -66,7 +66,7 @@ export default function SearchModalHome({
         <SearchModalGroup
           title={T.search.recentSearches}
           aside={
-            <button type="button" onClick={onClearSearches} className="text-xs text-text-secondary hover:text-text-main rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+            <button type="button" onClick={onClearSearches} className="text-xs text-text-secondary hover:text-text-main rounded focus-ring">
               {T.search.clearRecent}
             </button>
           }

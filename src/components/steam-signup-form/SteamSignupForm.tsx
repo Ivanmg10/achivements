@@ -67,7 +67,7 @@ export default function SteamSignupForm({ outcome }: { outcome: string }) {
       <p className="text-center mt-5">
         <Link
           href="/authPage"
-          className="text-text-secondary hover:text-text-main text-sm underline underline-offset-2 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="text-text-secondary hover:text-text-main text-sm underline underline-offset-2 transition-colors rounded focus-ring"
         >
           {s.back}
         </Link>

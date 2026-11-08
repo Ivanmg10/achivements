@@ -84,7 +84,7 @@ export default function StatusGameItem({
           <div className="flex flex-col flex-1 min-w-0 gap-1">
             <Link
               href={`/gameInfo/${gameId}`}
-              className="relative z-10 self-start max-w-full min-w-0 hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="relative z-10 self-start max-w-full min-w-0 hover:underline decoration-ink/50 underline-offset-2 rounded focus-ring"
             >
               <p title={game.Title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game.Title}</p>
             </Link>
@@ -176,7 +176,7 @@ export default function StatusGameItem({
               aria-expanded={open}
               aria-controls={panelId}
               aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.Title}`}
-              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-ring"
             >
               <span
                 aria-hidden="true"

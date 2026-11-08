@@ -73,7 +73,7 @@ export default function MainPageConsoleNav() {
             <div key={slug} className="bg-bg-main rounded-box p-3 flex flex-col gap-2.5">
               <Link
                 href={`/${slug}`}
-                className="flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
+                className="flex items-center justify-between group focus-ring rounded"
               >
                 <div className="flex items-center gap-1.5">
                   <span className="text-sm leading-none">{emoji}</span>
@@ -94,7 +94,7 @@ export default function MainPageConsoleNav() {
                       href={`/${slug}/${con.id}`}
                       title={con.name}
                       // On a phone only the consoles with games: the greyed-out rest made each list very long.
-                      className={`items-center gap-1.5 rounded-tag px-2 py-1.5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+                      className={`items-center gap-1.5 rounded-tag px-2 py-1.5 transition-colors group focus-ring ${
                         active
                           ? `flex ${def.color} hover:brightness-125`
                           : 'hidden sm:flex bg-bg-card/40 text-text-secondary hover:bg-bg-card hover:text-text-secondary'

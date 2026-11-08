@@ -58,7 +58,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', completed = 
           <Link
             href={href}
             title={T.libraryLayout.openGame}
-            className={`relative z-10 block w-fit max-w-full font-bold leading-tight line-clamp-2 hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${title}`}
+            className={`relative z-10 block w-fit max-w-full font-bold leading-tight line-clamp-2 hover:underline decoration-ink/50 underline-offset-2 rounded focus-ring ${title}`}
           >
             {entry.title}
           </Link>
@@ -75,7 +75,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', completed = 
         type="button"
         onClick={() => onPick(entry)}
         aria-label={`${T.libraryLayout.openInList}: ${entry.title}`}
-        className="absolute inset-0 z-[1] rounded-card cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 z-[1] rounded-card cursor-pointer focus-ring"
       />
     </div>
   )

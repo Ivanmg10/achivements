@@ -54,7 +54,7 @@ export default function ToastItem({ toast }: { toast: Toast }) {
             toast.action!.onClick()
             dismissToast(toast.id)
           }}
-          className="shrink-0 -my-0.5 px-2 py-0.5 rounded-chip font-semibold text-accent hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="shrink-0 -my-0.5 px-2 py-0.5 rounded-chip font-semibold text-accent hover:bg-accent/10 focus-ring"
         >
           {toast.action.label}
         </button>
@@ -62,7 +62,7 @@ export default function ToastItem({ toast }: { toast: Toast }) {
       <button
         onClick={() => dismissToast(toast.id)}
         aria-label={T.toast.close}
-        className="shrink-0 -mr-1 p-0.5 rounded-chip text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="shrink-0 -mr-1 p-0.5 rounded-chip text-text-secondary hover:text-text-main focus-ring"
       >
         <IconX size={16} aria-hidden="true" />
       </button>

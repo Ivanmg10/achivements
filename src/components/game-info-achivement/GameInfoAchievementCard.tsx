@@ -45,7 +45,7 @@ export default function GameInfoAchievementCard({
         type="button"
         onClick={onClick}
         aria-label={achievement.Title}
-        className="absolute inset-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 rounded-tile focus-ring"
       />
       {/* Badge */}
       <div className="relative shrink-0">

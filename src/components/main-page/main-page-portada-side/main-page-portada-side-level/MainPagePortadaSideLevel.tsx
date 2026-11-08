@@ -31,7 +31,7 @@ export default function MainPagePortadaSideLevel() {
   return (
     <Link
       href="/rankings"
-      className={`${SURFACE} p-5 sm:px-6 flex flex-col gap-4 hover:ring-accent/40 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+      className={`${SURFACE} p-5 sm:px-6 flex flex-col gap-4 hover:ring-accent/40 transition-shadow focus-ring`}
     >
       <span className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5">
         <CircularProgress

@@ -44,7 +44,7 @@ export default function ShowcasePickerModalGame({
           <button
             type="button"
             onClick={retry}
-            className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="text-sm text-accent hover:underline rounded focus-ring"
           >
             {T.publicProfile.retry}
           </button>

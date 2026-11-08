@@ -57,11 +57,11 @@ export default function GroupDetailPage() {
       <div className={`${PAGE} justify-center gap-3 text-center`}>
         <p role="alert" className="text-text-secondary">{status === 'missing' ? T.groups.notFound : T.groups.loadError}</p>
         {status === 'error' ? (
-          <button onClick={retry} className="text-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded">
+          <button onClick={retry} className="text-sm text-accent hover:underline focus-ring rounded">
             {T.groups.retry}
           </button>
         ) : (
-          <Link href="/groups" className="text-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded">
+          <Link href="/groups" className="text-sm text-accent hover:underline focus-ring rounded">
             {T.groups.backToGroups}
           </Link>
         )}
@@ -113,7 +113,7 @@ export default function GroupDetailPage() {
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
                 <p className="text-sm text-text-secondary">{T.groups.noGamesFilter}</p>
-                <button onClick={clear} className="text-xs text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded">
+                <button onClick={clear} className="text-xs text-accent hover:underline focus-ring rounded">
                   {T.groups.clearFilters}
                 </button>
               </div>

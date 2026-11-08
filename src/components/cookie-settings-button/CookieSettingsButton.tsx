@@ -14,7 +14,7 @@ export default function CookieSettingsButton() {
   return (
     <button
       onClick={() => choose(null)}
-      className="text-text-secondary hover:text-accent underline-offset-2 hover:underline transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="text-text-secondary hover:text-accent underline-offset-2 hover:underline transition-colors rounded focus-ring"
     >
       {T.cookies.settings}
     </button>
