@@ -7,7 +7,7 @@ export const de: VaultGuideText = {
   description: 'Wie CheevoVault Erfolge von RetroAchievements, Steam und PlayStation bewertet, damit jede Plattform gleich viel zählt.',
   heading: 'So funktionieren Vault-Punkte',
   intro:
-    'Jede Plattform zählt Erfolge auf ihre Weise: Xbox in Gamerscore, PlayStation in Bronze, Silber und Gold, RetroAchievements in Punkten, Steam gar nicht. Wer das einfach addiert, macht die Plattform wichtiger als das Spielen. Vault-Punkte messen jeden Erfolg gleich, egal wo er verdient wurde.',
+    'Jede Plattform zählt Erfolge auf ihre Weise: PlayStation in Bronze, Silber und Gold, RetroAchievements in Punkten, Steam gar nicht. Wer das einfach addiert, macht die Plattform wichtiger als das Spielen. Vault-Punkte messen jeden Erfolg gleich, egal wo er verdient wurde.',
   back: 'Zurück zu den Ranglisten',
   bag: {
     heading: 'Jedes Spiel ist bis zu 1.000 Punkte wert',
@@ -82,7 +82,7 @@ export const fr: VaultGuideText = {
   description: 'Comment CheevoVault note les succès de RetroAchievements, Steam et PlayStation pour que chaque plateforme vaille autant.',
   heading: 'Comment fonctionnent les Points Vault',
   intro:
-    'Chaque plateforme compte les succès à sa façon : Xbox en gamerscore, PlayStation en bronze, argent et or, RetroAchievements en points, et Steam pas du tout. Les additionner donnerait plus de poids à la plateforme qu’à ta façon de jouer. Les Points Vault mesurent chaque succès de la même manière, où qu’il ait été obtenu.',
+    'Chaque plateforme compte les succès à sa façon : PlayStation en bronze, argent et or, RetroAchievements en points, et Steam pas du tout. Les additionner donnerait plus de poids à la plateforme qu’à ta façon de jouer. Les Points Vault mesurent chaque succès de la même manière, où qu’il ait été obtenu.',
   back: 'Retour aux classements',
   bag: {
     heading: 'Chaque jeu vaut jusqu’à 1 000 points',
@@ -157,7 +157,7 @@ export const it: VaultGuideText = {
   description: 'Come CheevoVault valuta gli obiettivi di RetroAchievements, Steam e PlayStation perché ogni piattaforma valga lo stesso.',
   heading: 'Come funzionano i Punti Vault',
   intro:
-    'Ogni piattaforma conta gli obiettivi a modo suo: Xbox in gamerscore, PlayStation in bronzo, argento e oro, RetroAchievements in punti, Steam per niente. Sommarli darebbe più peso alla piattaforma che al modo in cui giochi. I Punti Vault misurano ogni obiettivo allo stesso modo, ovunque sia stato ottenuto.',
+    'Ogni piattaforma conta gli obiettivi a modo suo: PlayStation in bronzo, argento e oro, RetroAchievements in punti, Steam per niente. Sommarli darebbe più peso alla piattaforma che al modo in cui giochi. I Punti Vault misurano ogni obiettivo allo stesso modo, ovunque sia stato ottenuto.',
   back: 'Torna alle classifiche',
   bag: {
     heading: 'Ogni gioco vale fino a 1.000 punti',
@@ -232,7 +232,7 @@ export const ja: VaultGuideText = {
   description: 'CheevoVaultがRetroAchievements、Steam、PlayStationの実績をどのプラットフォームでも同じ価値になるよう採点する方法。',
   heading: 'Vaultポイントの仕組み',
   intro:
-    'プラットフォームごとに実績の数え方は違います。Xboxはゲーマースコア、PlayStationはブロンズ・シルバー・ゴールド、RetroAchievementsはポイント、Steamは数えません。そのまま足すと、どう遊んだかよりどこで遊んだかが重要になってしまいます。Vaultポイントは、どこで獲得したかに関係なく、すべての実績を同じ基準で測ります。',
+    'プラットフォームごとに実績の数え方は違います。PlayStationはブロンズ・シルバー・ゴールド、RetroAchievementsはポイント、Steamは数えません。そのまま足すと、どう遊んだかよりどこで遊んだかが重要になってしまいます。Vaultポイントは、どこで獲得したかに関係なく、すべての実績を同じ基準で測ります。',
   back: 'ランキングに戻る',
   bag: {
     heading: 'どのゲームも最大1,000ポイント',
@@ -307,7 +307,7 @@ export const pl: VaultGuideText = {
   description: 'Jak CheevoVault punktuje osiągnięcia z RetroAchievements, Steam i PlayStation, aby każda platforma była warta tyle samo.',
   heading: 'Jak działają Punkty Vault',
   intro:
-    'Każda platforma liczy osiągnięcia po swojemu: Xbox w gamerscore, PlayStation w brązie, srebrze i złocie, RetroAchievements w punktach, a Steam wcale. Zsumowanie ich dałoby większą wagę platformie niż temu, jak grasz. Punkty Vault mierzą każde osiągnięcie tak samo, niezależnie od tego, gdzie zostało zdobyte.',
+    'Każda platforma liczy osiągnięcia po swojemu: PlayStation w brązie, srebrze i złocie, RetroAchievements w punktach, a Steam wcale. Zsumowanie ich dałoby większą wagę platformie niż temu, jak grasz. Punkty Vault mierzą każde osiągnięcie tak samo, niezależnie od tego, gdzie zostało zdobyte.',
   back: 'Wróć do rankingów',
   bag: {
     heading: 'Każda gra jest warta do 1000 punktów',
@@ -382,7 +382,7 @@ export const pt: VaultGuideText = {
   description: 'Como o CheevoVault pontua as conquistas do RetroAchievements, Steam e PlayStation para que todas as plataformas valham o mesmo.',
   heading: 'Como funcionam os Pontos Vault',
   intro:
-    'Cada plataforma conta as conquistas à sua maneira: a Xbox em gamerscore, a PlayStation em bronze, prata e ouro, o RetroAchievements em pontos e a Steam não as conta. Somá-las daria mais peso à plataforma do que à forma como jogas. Os Pontos Vault medem todas as conquistas da mesma maneira, onde quer que as tenhas obtido.',
+    'Cada plataforma conta as conquistas à sua maneira: a PlayStation em bronze, prata e ouro, o RetroAchievements em pontos e a Steam não as conta. Somá-las daria mais peso à plataforma do que à forma como jogas. Os Pontos Vault medem todas as conquistas da mesma maneira, onde quer que as tenhas obtido.',
   back: 'Voltar aos rankings',
   bag: {
     heading: 'Cada jogo vale até 1000 pontos',
@@ -457,7 +457,7 @@ export const ru: VaultGuideText = {
   description: 'Как CheevoVault оценивает достижения RetroAchievements, Steam и PlayStation, чтобы все платформы стоили одинаково.',
   heading: 'Как работают очки Vault',
   intro:
-    'Каждая платформа считает достижения по-своему: Xbox в gamerscore, PlayStation в бронзе, серебре и золоте, RetroAchievements в очках, а Steam никак. Если их просто сложить, важнее станет платформа, а не то, как вы играете. Очки Vault измеряют каждое достижение одинаково, где бы оно ни было получено.',
+    'Каждая платформа считает достижения по-своему: PlayStation в бронзе, серебре и золоте, RetroAchievements в очках, а Steam никак. Если их просто сложить, важнее станет платформа, а не то, как вы играете. Очки Vault измеряют каждое достижение одинаково, где бы оно ни было получено.',
   back: 'Назад к рейтингам',
   bag: {
     heading: 'Каждая игра стоит до 1000 очков',

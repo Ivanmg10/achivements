@@ -37,7 +37,7 @@ export default function UserVaultLevel() {
                 {T.rankings.fillShort} · {fill.pct} %
               </span>
             ) : (
-              <VaultLevelBadge points={me.points} />
+              <VaultLevelBadge points={me.points} compact="phone" />
             )}
           </span>
           <span className="flex items-center gap-1.5 tabular-nums shrink-0">

@@ -14,6 +14,7 @@ import CollectionNumbers from './collection-numbers/CollectionNumbers'
 import CollectionClosest from './collection-closest/CollectionClosest'
 import { RememberedHeight } from '@/components/ui/RememberedHeight'
 import MainPageCollectionSkeleton from './main-page-collection-skeleton/MainPageCollectionSkeleton'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 
 /** Boxes on the shelf: enough to fill the card's width, few enough to read each one. */
 const SHELF = 5
@@ -41,7 +42,7 @@ export default function MainPageCollection({
   inProgress?: RetroAchievementsGameCompleted[]
   isLoading?: boolean
 }) {
-  const { order, saveOrder } = usePerfectGamesOrder()
+  const { order, saveOrder, error: orderError, retry: retryOrder } = usePerfectGamesOrder()
   const raw = useMemo(() => buildPerfectGames(games, steamGames, psnGames, xboxGames), [games, steamGames, psnGames, xboxGames])
   const ordered = useMemo(() => applyPerfectOrder(raw, order), [raw, order])
   const counts = useMemo(() => countPerfectGames(raw), [raw])
@@ -71,7 +72,10 @@ export default function MainPageCollection({
       {/* What could join the collection next, beside it; with nothing near 100% the collection takes the row. */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <ChartCard className="xl:col-span-2 xl:last:col-span-3">
-          <CollectionGrid games={ordered} allGames={raw} dates={dates} order={order} onSaveOrder={saveOrder} />
+          {/* A failed read of the user's order must not pass for their order (the games would show in the default one). */}
+          <SectionFallback error={orderError} onRefresh={retryOrder}>
+            <CollectionGrid games={ordered} allGames={raw} dates={dates} order={order} onSaveOrder={saveOrder} />
+          </SectionFallback>
         </ChartCard>
         <CollectionClosest inProgress={inProgress} steamGames={steamGames} psnGames={psnGames} xboxGames={xboxGames} />
       </div>

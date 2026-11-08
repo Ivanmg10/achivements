@@ -1,5 +1,6 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
+jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
 jest.mock('@/lib/steamCache', () => ({
   ...jest.requireActual('@/lib/steamCache'),
   withSteamCache: jest.fn(),
@@ -11,6 +12,7 @@ import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
 import { withSteamCache } from '@/lib/steamCache'
 import { loadActivityAchievements } from '@/lib/steamRecentAchievements'
+import { visibleGamesForUser } from '@/lib/gameVisibility'
 
 const LIST = [{ appId: 1, apiname: 'A' }]
 
@@ -67,4 +69,11 @@ test('defaults to English and is never browser-cached', async () => {
 test('returns 503 when Steam is unavailable', async () => {
   ;(loadActivityAchievements as jest.Mock).mockRejectedValue(new Error('down'))
   expect((await GET(makeRequest())).status).toBe(503)
+})
+
+test('leaves out the games the player hid', async () => {
+  ;(visibleGamesForUser as jest.Mock).mockImplementationOnce(async (_id, games) => games.filter((g: { appId: number }) => g.appId !== 1))
+  const res = await GET(makeRequest())
+  expect((res as unknown as { data: unknown }).data).toEqual([])
+  expect(visibleGamesForUser).toHaveBeenCalledWith('7', expect.any(Array), 'steam', expect.any(Function))
 })

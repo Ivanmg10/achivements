@@ -9,6 +9,7 @@ import { calcAvgPerDay, decimal } from '@/utils/utils'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
+import { parseUnlockTime } from '@/utils/dates'
 
 const DAY_MS = 86_400_000
 
@@ -45,7 +46,7 @@ export default function MainPagePsnStats({
     return {
       todayKey,
       today: achievements.filter((a) => a.Date.startsWith(todayKey)),
-      week: achievements.filter((a) => new Date(a.Date.replace(' ', 'T')).getTime() >= weekAgo),
+      week: achievements.filter((a) => parseUnlockTime(a.Date) >= weekAgo),
       month: achievements.filter((a) => a.Date.slice(0, 7) === monthKey),
       avg: calcAvgPerDay(achievements, 30),
     }

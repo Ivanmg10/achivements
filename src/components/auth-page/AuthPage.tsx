@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import LoginUserForm from '@/components/login-user-form/LoginUserForm'
 import RegisterUserForm from '@/components/register-user-form/RegisterUserForm'
 import LegalLinks from '@/components/legal-links/LegalLinks'
@@ -8,13 +10,15 @@ import AuthBrand from '@/components/auth-brand/AuthBrand'
 import AuthFormCard from '@/components/auth-form-card/AuthFormCard'
 import AuthDesktopFormPanel from '@/components/auth-desktop-form-panel/AuthDesktopFormPanel'
 import SteamSignupForm from '@/components/steam-signup-form/SteamSignupForm'
-import { useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
 import { formTransition } from '@/lib/animations'
+import { useIsClient } from '@/hooks/useIsClient'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 
 const fromRight = { initial: { opacity: 0, x: 60 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: 60 } }
 const fromLeft  = { initial: { opacity: 0, x: -60 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -60 } }
 const SLIDE_T   = { duration: 0.32, ease: 'easeOut' as const }
+/** Tailwind's `lg`, where the page changes from the phone layout to the two halves. */
+const WIDE = '(min-width: 1024px)'
 
 /**
  * The sign-in and register page. `wantsRegister` opens it on the register form,
@@ -25,10 +29,19 @@ export default function AuthPage({ wantsRegister, steam }: { wantsRegister: bool
   const [isLogin, setIsLogin] = useState(!wantsRegister)
   const [hasRegister, setHasRegister] = useState(false)
 
+  // Both layouts are in the page (CSS shows one), but the forms mount in the one in use only, so there is
+  // one form with one state. Until the browser can say which, both hold it, as the server printed them.
+  const isClient = useIsClient()
+  const isWide = useMediaQuery(WIDE)
+  const inPhone = !isClient || !isWide
+  const inDesktop = !isClient || isWide
+  const signInForm = steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />
+  const registerForm = <RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setHasRegister} />
+
   return (
     <div className="relative bg-bg-main text-text-main min-h-[100dvh] lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
 
-      {/* ── Mobile: the art wall behind, the form on a frosted card over it ── */}
+      {/* Phone: the art wall behind, the form on a frosted card over it. */}
       <div className="lg:hidden flex-1 relative flex flex-col items-center justify-center gap-6 px-4 pt-10 pb-4">
         <div aria-hidden="true" className="fixed inset-0 opacity-30 pointer-events-none select-none">
           <AuthCollagePanel />
@@ -41,26 +54,26 @@ export default function AuthPage({ wantsRegister, steam }: { wantsRegister: bool
           {isLogin ? (
             <motion.div key="m-login" className="relative z-10 w-full" variants={formTransition} initial="hidden" animate="visible" exit="exit">
               <AuthFormCard>
-                {steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />}
+                {inPhone && signInForm}
               </AuthFormCard>
             </motion.div>
           ) : (
             <motion.div key="m-register" className="relative z-10 w-full" variants={formTransition} initial="hidden" animate="visible" exit="exit">
               <AuthFormCard>
-                <RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setHasRegister} />
+                {inPhone && registerForm}
               </AuthFormCard>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* ── Desktop izquierda: login form ↔ collage ── */}
+      {/* Desktop, left: the sign-in form or the art wall. */}
       <div className="hidden lg:flex flex-col relative lg:w-[42%] px-10 h-full">
         <AnimatePresence mode="wait" initial={false}>
           {isLogin ? (
             <motion.div key="d-login" className="relative w-full h-full" {...fromLeft} transition={SLIDE_T}>
               <AuthDesktopFormPanel>
-                {steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />}
+                {inDesktop && signInForm}
               </AuthDesktopFormPanel>
             </motion.div>
           ) : (
@@ -71,7 +84,7 @@ export default function AuthPage({ wantsRegister, steam }: { wantsRegister: bool
         </AnimatePresence>
       </div>
 
-      {/* ── Desktop derecha: collage ↔ register form ── */}
+      {/* Desktop, right: the art wall or the register form. */}
       <div className="hidden lg:flex flex-col relative lg:w-[58%] h-full">
         <AnimatePresence mode="wait" initial={false}>
           {isLogin ? (
@@ -81,7 +94,7 @@ export default function AuthPage({ wantsRegister, steam }: { wantsRegister: bool
           ) : (
             <motion.div key="d-register" className="relative z-10 w-full h-full" {...fromRight} transition={SLIDE_T}>
               <AuthDesktopFormPanel>
-                <RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setHasRegister} />
+                {inDesktop && registerForm}
               </AuthDesktopFormPanel>
             </motion.div>
           )}

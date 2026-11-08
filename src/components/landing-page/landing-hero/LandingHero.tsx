@@ -5,6 +5,7 @@ import { IconArrowRight } from '@tabler/icons-react'
 import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
 import { useLanguage } from '@/context/LanguageContext'
 import { buttonClass } from '@/components/ui/Button'
+import { REGISTER_HREF } from '@/utils/authLinks'
 
 const PRIMARY = buttonClass('primary', 'lg')
 
@@ -26,7 +27,7 @@ export default function LandingHero() {
           {T.landing.intro}
         </p>
         <div>
-          <Link href="/authPage?mode=register" className={PRIMARY}>
+          <Link href={REGISTER_HREF} className={PRIMARY}>
             {T.landing.createAccount}
             <IconArrowRight size={18} aria-hidden="true" />
           </Link>

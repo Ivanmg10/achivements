@@ -23,9 +23,10 @@ export async function GET(request: NextRequest) {
       `achievementDetail:${id}:${achievementId}`,
       TTL,
       async () => {
+        // A failure of either reaches the catch below: a pair with a failed half is never cached for five minutes.
         const [unlocks, comments] = await Promise.all([
-          getAchievementUnlocks(rausername, raid, achievementId).catch(() => null),
-          getAchievementComments(rausername, raid, achievementId).catch(() => null),
+          getAchievementUnlocks(rausername, raid, achievementId),
+          getAchievementComments(rausername, raid, achievementId),
         ])
 
         return { unlocks, comments }
@@ -33,7 +34,6 @@ export async function GET(request: NextRequest) {
       (d) => d !== null,
     )
 
-    if (!data) return NextResponse.json({ message: 'Not found' }, { status: 404 })
     return cachedJson(data, TTL)
   } catch (err) {
     console.error('[getAchievementDetail]', err)

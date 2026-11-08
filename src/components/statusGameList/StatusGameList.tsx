@@ -2,6 +2,7 @@ import { CategoryGame } from '../../hooks/useGamesByCategory'
 import { UserAward } from '@/types/types'
 import StatusGameItem from './StatusGameItem'
 import { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
+import { STATUS_GRID_COLS } from '@/components/status-grid-control/statusGridCols'
 
 export type GameExtraData = {
   lastPlayed?: string
@@ -9,13 +10,6 @@ export type GameExtraData = {
   possibleScore?: number
   scoreAchieved?: number
   scoreAchievedHardcore?: number
-}
-
-// Columns the grid control asks for, fewer on narrower screens.
-export const STATUS_GRID_COLS: Record<StatusGridCols, string> = {
-  1: 'grid-cols-1',
-  2: 'grid-cols-1 md:grid-cols-2 grid-flow-row-dense',
-  3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-flow-row-dense',
 }
 
 /**

@@ -51,7 +51,8 @@ export async function GET(request: NextRequest) {
         if (d && (!lastPlayed || d > lastPlayed)) lastPlayed = d;
       }
       return [gameId, lastPlayed];
-    } catch {
+    } catch (err) {
+      console.error('[getGamesLastPlayed]', gameId, err);
       return [gameId, null];
     }
   }

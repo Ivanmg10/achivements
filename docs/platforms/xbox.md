@@ -30,6 +30,9 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   that show *other* people's data (public profile, follows, search, groups,
   favorites) which drop Xbox rows and fields for a non-admin viewer. A new
   place that lists games or accounts must filter Xbox the same way.
+- **`useXboxEnabled` is false until the session is read**: a page that 404s on it holds its skeleton
+  while `useAuthSession().status === 'loading'` (the game page 404'd every full load, #118). A game
+  page whose library read failed says why with a retry, never "not found".
 - `users.xboxxuid`/`xboxgamertag` are in the session (`xboxxuid`); users link by
   typing a gamertag, which nothing proves is theirs (like PSN), so no uniqueness.
 - Secret achievements stay concealed until the viewer reveals them

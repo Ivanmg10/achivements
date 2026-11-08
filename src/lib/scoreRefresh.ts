@@ -1,6 +1,7 @@
 import { after } from 'next/server'
 import pool from '@/lib/db'
 import { queryRows } from '@/lib/queryRows'
+import { vaultTotals } from '@/lib/rankings'
 import { allowAttempt } from '@/lib/attemptLimit'
 import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raClient'
 import { getOwnedGames } from '@/lib/steamClient'
@@ -14,6 +15,7 @@ import { runWithXboxTelemetry } from '@/lib/xboxTelemetry'
 import type { GameSource, SteamOwnedGamesResponse } from '@/types/steam'
 import type { TrophyCounts } from '@/types/psn'
 import { isConsoleShown } from '@/utils/consoleFilter'
+import { canUseXbox } from '@/utils/xboxAccess'
 import { RULES_VERSION, looksUnlockedByTool, provisionalScore, scoreGame, stackFactors, stackKey, type GameScore, type ScoreUnlock } from '@/utils/vaultScore'
 import { hiddenConsolesFrom, psnGradeShare, psnScoreInputs, raScoreInputs, steamScoreInputs, xboxScoreInputs } from '@/utils/vaultScoreInputs'
 import { monthStart, weekStart } from '@/utils/vaultLevel'
@@ -292,8 +294,8 @@ async function refreshSource(
   } catch (err) {
     console.error(`[scoreRefresh] ${plan.source} list`, userId, err)
     const error = classifyFailure(plan.source, err)
-    // Busy is waited out (the fill goes on); the rest need the user, or a later pass.
-    return { read: 0, total: 0, state: error === 'busy' ? 'reading' : 'error', error }
+    // Busy is waited out (the fill goes on, but Xbox's estimate stands); the rest need the user, or a later pass.
+    return { read: 0, total: 0, state: error !== 'busy' ? 'error' : plan.source === 'xbox' ? 'estimated' : 'reading', error }
   }
 
   const hiddenConsoles = hiddenConsolesFrom(user.preferences, plan.source)
@@ -402,9 +404,11 @@ async function refreshSource(
   if (skipped >= 4 && readNow === 0) return { ...progress, state: 'error', error: 'unavailable' }
   const done = progress.read + skipped >= progress.total
   if (done) return { ...progress, state: 'done' }
-  // Xbox's 150 calls an hour for the whole app: its gamerscore estimate is the settled state.
-  if (plan.source === 'xbox' && !stopped) return { ...progress, state: 'estimated' }
-  return { ...progress, state: 'reading', ...(stopped ? { error: stopped } : {}) }
+  const why = stopped ? { error: stopped } : {}
+  // Xbox's 150 calls an hour for the whole app: its gamerscore estimate is the settled state, quota spent or not
+  // (waiting on it left every other platform read and the header's ring at 99 % until the hour turned).
+  if (plan.source === 'xbox') return { ...progress, state: 'estimated', ...why }
+  return { ...progress, state: 'reading', ...why }
 }
 
 /** Weeks and months, per platform, rebuilt from the stored games. */
@@ -526,12 +530,10 @@ async function saveFillStatus(userId: number, status: FillStatus): Promise<void>
   }
 }
 
+/** The same total the header and the rankings show (hidden games and other accounts left out), for the "ready" toast's level. */
 async function totalPoints(userId: number): Promise<number> {
-  const rows = await queryRows<{ points: number | null }>(
-    `SELECT SUM(points * stack_factor)::float AS points FROM score_games WHERE user_id = $1 AND flag IS DISTINCT FROM 'suspect'`,
-    [userId],
-  )
-  return Math.round(rows[0]?.points ?? 0)
+  const [user] = await queryRows<{ admin: boolean | null }>('SELECT admin FROM users WHERE id = $1', [userId])
+  return (await vaultTotals([userId], canUseXbox(user?.admin))).get(userId) ?? 0
 }
 
 /**

@@ -122,10 +122,22 @@ test("a change of theme swaps the favicon without touching anything else", () =>
       <TestConsumer />
     </ThemeProvider>,
   );
-  expect(link.getAttribute("href")).toBe(themeIconHref("dark"));
   fireEvent.click(screen.getByText("set red"));
   expect(link.getAttribute("href")).toBe(themeIconHref("red"));
   link.remove();
+});
+
+test("signed out with nothing picked, the stored theme is not written over with the default (V7)", () => {
+  localStorage.setItem("app-theme", "venom");
+  document.documentElement.dataset.theme = "venom";
+  (useSession as jest.Mock).mockReturnValue({ data: null, status: "unauthenticated" });
+  render(
+    <ThemeProvider defaultTheme="dark">
+      <TestConsumer />
+    </ThemeProvider>,
+  );
+  expect(localStorage.getItem("app-theme")).toBe("venom");
+  expect(document.documentElement.dataset.theme).toBe("venom");
 });
 
 test("a re-render of the provider keeps the same value, so what reads the theme is not re-rendered for nothing", () => {

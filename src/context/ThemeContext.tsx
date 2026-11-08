@@ -5,6 +5,7 @@ import { setThemeIcon } from "@/utils/themeIcon";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -29,6 +30,9 @@ export function ThemeProvider({
   const { data: session, status } = useAuthSession();
   const [theme, setTheme] = useState<Theme>(defaultTheme);
   const [syncedTheme, setSyncedTheme] = useState<string | undefined>(undefined);
+  // The theme is only the default until the account's arrives or someone picks one. Until then the page keeps what the
+  // root layout's script painted from this browser's last theme, and the stored one is not written over with the default.
+  const [decided, setDecided] = useState(false);
 
   // The account's theme is taken during render, not in an effect, so the page
   // is never repainted in the default for a frame before it arrives. An
@@ -36,13 +40,21 @@ export function ThemeProvider({
   const sessionTheme = session?.user?.theme;
   if (sessionTheme !== syncedTheme) {
     setSyncedTheme(sessionTheme);
-    if (sessionTheme) setTheme(isTheme(sessionTheme) ? sessionTheme : defaultTheme);
+    if (sessionTheme) {
+      setTheme(isTheme(sessionTheme) ? sessionTheme : defaultTheme);
+      setDecided(true);
+    }
   }
 
+  const pickTheme = useCallback((next: Theme) => {
+    setTheme(next);
+    setDecided(true);
+  }, []);
+
   useEffect(() => {
-    // While the session loads, the theme painted by the script in the root
-    // layout (the last one this browser used) stays on screen.
-    if (status === "loading") return;
+    // While the session loads, and while signed out with nothing picked, the theme
+    // painted by the script in the root layout (the last one this browser used) stays.
+    if (status === "loading" || (!decided && status !== "authenticated")) return;
     document.documentElement.dataset.theme = theme;
     setThemeIcon(theme);
     try {
@@ -50,10 +62,10 @@ export function ThemeProvider({
     } catch {
       // Storage blocked: the next load starts dark, as before.
     }
-  }, [theme, status]);
+  }, [theme, status, decided]);
 
   // One object per change of theme: the session updating re-renders this provider, and everything that reads the theme with it.
-  const value = useMemo(() => ({ theme, setTheme }), [theme]);
+  const value = useMemo(() => ({ theme, setTheme: pickTheme }), [theme, pickTheme]);
 
   return (
     <ThemeContext.Provider value={value}>

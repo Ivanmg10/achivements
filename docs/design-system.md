@@ -132,7 +132,9 @@ flag is read from the database, never the session).
   reads the choice: it reads tokens. A bar's cut ends are `slantStyle(px)`
   (`ui/shape.ts`), a mark's lean `skew-y-(--slant-mark)`, a control's `skew-x-(--slant-button)`.
   **Never a literal `polygon(...)` or `skew-*-[..]`** (`uiGuard.test.ts` fails on it). The round
-  design may override the shape tokens; no theme may (`designTokens.test.ts`). The welcome curtain's
+  design may override the shape tokens; no theme may (`designTokens.test.ts`). The base shape tokens sit on
+  `:root` only, never on `[data-theme]`, so an element that carries a theme (the theme chooser's preview)
+  inherits the page's design instead of restating the slanted one (AP-06, 2026-11-08). The welcome curtain's
   fixed clip paths are the documented decorative exception and do not follow the shape choice.
 - **The round design must always be rounder than the slanted one (2026-11-01, #78):** every surface a step
   softer (`--r-card`, `-sheet`, `-pane`, `-tile`, `-control`, `-area`, `-box*`; `designTokens.test.ts` fails if one

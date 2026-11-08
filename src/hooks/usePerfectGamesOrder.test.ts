@@ -37,13 +37,35 @@ test('fetches saved order once when authenticated', async () => {
   expect(fetch).toHaveBeenCalledTimes(1)
 })
 
-test('sets empty order when the GET response is not ok', async () => {
+test('a failed read is an error to retry, not an order that looks like the default one (HK-09)', async () => {
   ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
-  ;(fetch as jest.Mock).mockResolvedValue({ ok: false })
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: false })
 
   const { result } = renderHook(() => usePerfectGamesOrder())
   await waitFor(() => expect(result.current.isLoading).toBe(false))
-  expect(result.current.order).toEqual([])
+  expect(result.current.error).toBe(true)
+  expect(console.error).toHaveBeenCalled()
+
+  ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => [{ source: 'ra', game_id: 3, position: 0 }] })
+  act(() => result.current.retry())
+  await waitFor(() => expect(result.current.order).toEqual(['ra:3']))
+  expect(result.current.error).toBe(false)
+})
+
+test('saveOrder puts the saved order back when the PUT fails (HK-09)', async () => {
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
+  ;(fetch as jest.Mock)
+    .mockResolvedValueOnce({ ok: true, json: async () => [{ source: 'ra', game_id: 1, position: 0 }] })
+    .mockResolvedValueOnce({ ok: false })
+
+  const { result } = renderHook(() => usePerfectGamesOrder())
+  await waitFor(() => expect(result.current.order).toEqual(['ra:1']))
+
+  await act(async () => {
+    await expect(result.current.saveOrder!(['ra:2', 'ra:1'])).rejects.toThrow()
+  })
+  expect(result.current.order).toEqual(['ra:1'])
 })
 
 test('saveOrder PUTs the new order and updates state optimistically', async () => {

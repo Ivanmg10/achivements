@@ -27,3 +27,12 @@ test('in the viewer language, all nine of them', () => {
   expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(vaultGuideText('es').heading)
   for (const lang of ['de', 'fr', 'it', 'ja', 'pl', 'pt', 'ru'] as const) expect(vaultGuideText(lang).heading).not.toBe(vaultGuideText('en').heading)
 })
+
+test('a signed-out visitor never reads Xbox while it is admin-only (V3-15)', () => {
+  const { container } = render(<RankingsGuide />)
+  expect(container.textContent).not.toMatch(/xbox/i)
+  for (const lang of ['en', 'es', 'de', 'fr', 'it', 'ja', 'pl', 'pt', 'ru'] as const) {
+    const { example, ...rest } = vaultGuideText(lang)
+    expect(JSON.stringify({ ...rest, example: { ...example, platforms: undefined } })).not.toMatch(/xbox/i)
+  }
+})

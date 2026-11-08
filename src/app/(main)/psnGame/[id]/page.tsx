@@ -2,6 +2,7 @@
 
 import { notFound, useParams } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { usePsnTrophies } from '@/hooks/usePsnTrophies'
 import { usePsnGameDetails } from '@/hooks/usePsnGameDetails'
@@ -29,11 +30,13 @@ export default function PsnGamePage() {
   const { id: rawId } = useParams()
   const titleId = typeof rawId === 'string' && isPsnTitleId(rawId) ? rawId : null
   const { T } = useLanguage()
+  const { status } = useAuthSession()
   const { isLinked, fullLibrary, libraryLoading } = usePsnGamesData()
   const { trophies, groups, isLoading, error, retry } = usePsnTrophies(isLinked ? titleId : null)
   const { details } = usePsnGameDetails(isLinked ? titleId : null)
 
   if (titleId === null) notFound()
+  if (status === 'loading') return <GameInfoSkeleton />
 
   if (!isLinked) {
     return (

@@ -11,6 +11,7 @@ import { achievementBadgeUrl, formatDay, plural } from '@/utils/utils'
 import { gameHref } from '@/utils/gameRef'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import StreakCompletionCard from '../streak-completion-card/StreakCompletionCard'
+import { parseUnlockTime } from '@/utils/dates'
 
 // Downloaded the first time a day with more than fits is opened.
 const DayAchievementsModal = dynamic(() => import('@/components/day-achievements-modal/DayAchievementsModal'), { loading: () => null })
@@ -37,7 +38,7 @@ export default function StreakDayRow({ date, today, achievements, awards = [] }:
   const overflow = achievements.length - MAX_BADGES
   const first = achievements[0]
   const games = [...new Set(achievements.map((a) => a.GameTitle))]
-  const time = first ? new Date(first.Date.replace(' ', 'T')).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' }) : ''
+  const time = first ? new Date(parseUnlockTime(first.Date)).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' }) : ''
   const detail =
     achievements.length === 1 && first ? `${first.GameTitle} · ${first.Title}, ${time}` : games.join(', ')
 

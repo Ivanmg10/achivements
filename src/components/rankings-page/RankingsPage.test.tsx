@@ -59,7 +59,7 @@ test('signed out: only the global list, names open their public card, and how to
   render(<RankingsPage signedIn={false} />)
   expect(screen.queryByRole('tab', { name: en.rankings.following })).not.toBeInTheDocument()
   expect(screen.getAllByRole('link', { name: 'user4' })[0]).toHaveAttribute('href', '/user/user4')
-  expect(screen.getByRole('link', { name: en.rankings.joinCta })).toHaveAttribute('href', '/authPage')
+  expect(screen.getByRole('link', { name: en.rankings.joinCta })).toHaveAttribute('href', '/authPage?mode=register')
 })
 
 test('your zone below the list when you are not in it, widened on demand; your level beside', () => {

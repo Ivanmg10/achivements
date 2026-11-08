@@ -124,6 +124,17 @@ test('a pasted RA id offers that RA game', async () => {
   expect(fetchRaCandidateById).toHaveBeenCalledWith(1234)
 })
 
+test('an RA id that cannot be looked up says so, next to the id, and not for another id (B-02)', async () => {
+  ;(fetchRaCandidateById as jest.Mock).mockResolvedValue(null)
+  renderModal()
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: '9999' } })
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`${en.search.openById} #9999`) }))
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.search.noResults)
+
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: '8888' } })
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+})
+
 test('opening it again starts over: no search and nothing selected from last time', () => {
   const props = { onClose: jest.fn(), groupId: 3, existingKeys: new Set<string>(), onAdded: jest.fn() }
   const { rerender } = render(<AddGameModal isOpen {...props} />)

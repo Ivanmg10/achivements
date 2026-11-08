@@ -9,6 +9,19 @@ import { Skeleton } from '@/components/ui/Skeleton'
 
 export type PlatformStat = { label: string; value: string; accent?: string; loading?: boolean }
 
+/**
+ * A figure of a platform card. While it is on its way it is `loading` (a skeleton in its place);
+ * the dash is only for a value that is truly absent.
+ */
+export function platformStat(
+  label: string,
+  value: string | number | null | undefined,
+  { lang, loading = false, accent }: { lang: string; loading?: boolean; accent?: string },
+): PlatformStat {
+  const text = value === null || value === undefined || value === '' ? '—' : typeof value === 'number' ? value.toLocaleString(lang) : value
+  return { label, value: text, accent, loading }
+}
+
 export const DISCONNECT_CLASS = buttonClass('danger', 'md', 'w-full')
 export const CONNECT_CLASS = buttonClass('primary', 'md', 'w-full')
 

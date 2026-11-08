@@ -5,6 +5,7 @@ import { FadeImage } from '@/components/ui/FadeImage'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { decimal } from '@/utils/utils'
+import { raTypeTag } from '@/components/ui/dataTable'
 
 export default function GameInfoAchievementCard({
   achievement,
@@ -21,11 +22,6 @@ export default function GameInfoAchievementCard({
 }) {
   const { T, lang } = useLanguage()
 
-  const TYPE_BADGES: Record<string, { label: string; className: string }> = {
-    progression: { label: T.achievement.progression, className: 'bg-info/20 text-info' },
-    win_condition: { label: T.achievement.winCondition, className: 'bg-warning/20 text-warning' },
-    missable: { label: T.achievement.missable, className: 'bg-danger/20 text-danger' },
-  }
 
   const earned = !!achievement.DateEarned
   const earnedHardcore = !!achievement.DateEarnedHardcore
@@ -33,7 +29,7 @@ export default function GameInfoAchievementCard({
     numDistinctPlayers > 0
       ? decimal(((achievement.NumAwarded / numDistinctPlayers) * 100), lang)
       : null
-  const typeBadge = achievement.Type ? TYPE_BADGES[achievement.Type] : null
+  const typeBadge = raTypeTag(achievement.Type, T.achievement)
 
   // A div, not a button: the favourite star is a button of its own, and a
   // button inside a button is invalid HTML. The whole card is still the click

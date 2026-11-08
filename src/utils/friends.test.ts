@@ -29,6 +29,12 @@ describe('friendStats', () => {
     expect(friendStats(every, [], NOW)).toMatchObject({ streak: 14, streakCapped: true })
   })
 
+  test('the week edge is read in UTC, as the platform sends it, not in the browser zone', () => {
+    const now = Date.UTC(2026, 9, 24, 18, 29, 59)
+    expect(friendStats([at('2026-10-17 18:30:00')], [], now).week).toBe(1)
+    expect(friendStats([at('2026-10-17 18:29:00')], [], now).week).toBe(0)
+  })
+
   test('an unreadable date is skipped', () => {
     expect(friendStats([at('garbage')], [], NOW).week).toBe(0)
   })

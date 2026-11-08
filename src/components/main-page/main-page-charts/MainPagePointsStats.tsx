@@ -9,6 +9,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
+import { parseUnlockTime } from '@/utils/dates'
 
 export default function MainPagePointsStats({
   achievements,
@@ -57,7 +58,7 @@ export default function MainPagePointsStats({
   const weekAchievements: RecentAchievement[] = []
 
   for (const a of safeList) {
-    const d = new Date(a.Date.replace(' ', 'T'))
+    const d = new Date(parseUnlockTime(a.Date))
     if (a.Date.startsWith(todayKey)) { ptsToday += a.Points; achToday++ }
     if (d >= weekAgo) weekAchievements.push(a)
   }

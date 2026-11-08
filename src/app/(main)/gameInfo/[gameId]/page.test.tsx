@@ -23,7 +23,8 @@ global.fetch = jest.fn()
 import { render, screen, act } from '@testing-library/react'
 import GameInfo from './page'
 import { useSession } from 'next-auth/react'
-import { useParams } from 'next/navigation'
+import { useParams, notFound } from 'next/navigation'
+import { en } from '@/translations/en'
 
 beforeEach(() => {
   ;(useParams as jest.Mock).mockReturnValue({ gameId: '1234' })
@@ -74,5 +75,24 @@ test('renders error message on fetch failure', async () => {
   await act(async () => {
     render(<GameInfo />)
   })
-  expect(screen.getByText(/Error 500/)).toBeInTheDocument()
+  expect(screen.getByRole('alert')).toHaveTextContent(en.gameInfoPage.loadError)
+  expect(screen.queryByText(/Error 500/)).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: en.gameInfoPage.retry })).toBeInTheDocument()
+})
+
+test('a game RA does not know is the not-found screen, not an error to retry (V2-09)', async () => {
+  ;(useSession as jest.Mock).mockReturnValue({
+    data: { user: { rausername: 'ivan', raLinked: true } },
+    status: 'authenticated',
+  })
+  ;(fetch as jest.Mock).mockResolvedValue({ ok: false, status: 404 })
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  try {
+    await act(async () => {
+      render(<GameInfo />)
+    })
+  } catch {
+    // Like Next, the mocked notFound() throws to end the render.
+  }
+  expect(notFound).toHaveBeenCalled()
 })

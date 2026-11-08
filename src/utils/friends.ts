@@ -1,3 +1,4 @@
+import { parseUnlockTime } from '@/utils/dates'
 import type { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
 import type { GameSource, SteamGameProgress, SteamRecentAchievement } from '@/types/steam'
 import type { PsnGameProgress, PsnRecentTrophy } from '@/types/psn'
@@ -72,7 +73,7 @@ export function friendStats(recent: RecentAchievement[], games: LibraryGame[], n
   const days = new Set<string>()
   let week = 0
   for (const a of recent) {
-    const t = Date.parse(a.Date.replace(' ', 'T'))
+    const t = parseUnlockTime(a.Date)
     if (Number.isNaN(t)) continue
     if (t >= now - 7 * DAY) week++
     if (t >= now - ACTIVITY_DAYS * DAY) days.add(a.Date.slice(0, 10))
@@ -147,7 +148,7 @@ export function filterFollowing<U extends UserSearchResult>(users: U[], query: s
 /** The game someone played last, with art for a backdrop: wide art (a store header) or an icon, to be blurred. */
 export type LastPlayed = { source: GameSource; id: number; title: string; at: string; image: string | null; wide: boolean }
 
-const playedAt = (s: string) => Date.parse(s.includes('T') ? s : s.replace(' ', 'T'))
+const playedAt = parseUnlockTime
 
 /**
  * The most recently played game across platforms. Steam, PSN and Xbox say when

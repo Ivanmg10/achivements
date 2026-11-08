@@ -7,13 +7,9 @@ import { useSteamLink } from '@/hooks/useSteamLink'
 import { useSteamProfile } from '@/hooks/useSteamProfile'
 import { notify } from '@/lib/notify'
 import { formatPlaytime, summarizeSteamLibrary } from '@/utils/steamFeed'
-import UserPlatformCard, { DISCONNECT_CLASS, PlatformStat } from '@/components/user-page/user-platform-card/UserPlatformCard'
+import UserPlatformCard, { DISCONNECT_CLASS, platformStat, PlatformStat } from '@/components/user-page/user-platform-card/UserPlatformCard'
 import UserSteamCardLink from './user-steam-card-link/UserSteamCardLink'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
-
-/** A dash rather than a zero while the numbers are still loading. */
-const pending = (loading: boolean, value: number | null | undefined, lang: string) =>
-  loading || value === null || value === undefined ? '—' : value.toLocaleString(lang)
 
 /**
  * Steam on the account page and in onboarding. Linked through Steam's own
@@ -26,15 +22,13 @@ export default function UserSteamCard() {
   const { profile } = useSteamProfile()
   const steam = summarizeSteamLibrary(library)
 
+  const loading = libraryLoading
   const stats: PlatformStat[] = [
-    { label: T.userStats.games, value: pending(libraryLoading, steam.totalGames, lang) },
-    { label: T.steam.perfect, value: pending(libraryLoading, steam.perfect, lang), accent: 'text-success' },
-    { label: T.steam.achievements, value: pending(libraryLoading, steam.unlocked, lang) },
-    { label: T.userStats.inProgress, value: pending(libraryLoading, steam.playing, lang) },
-    {
-      label: T.steam.playtime,
-      value: libraryLoading ? '—' : formatPlaytime(steam.totalMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang),
-    },
+    platformStat(T.userStats.games, steam.totalGames, { lang, loading }),
+    platformStat(T.steam.perfect, steam.perfect, { lang, loading, accent: 'text-success' }),
+    platformStat(T.steam.achievements, steam.unlocked, { lang, loading }),
+    platformStat(T.userStats.inProgress, steam.playing, { lang, loading }),
+    platformStat(T.steam.playtime, formatPlaytime(steam.totalMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang), { lang, loading }),
   ]
 
   const handleUnlink = async () => {

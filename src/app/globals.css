@@ -92,11 +92,16 @@
 
   --hardcore: 250 204 21;
   --softcore: 96 165 250;
+}
 
-  /*
-     The design: shapes, sizes and motion the components read. Every theme
-     shares them; a future site-wide design is another set of these values.
-  */
+/*
+   The design: shapes, sizes and motion the components read. Every theme
+   shares them; a future site-wide design is another set of these values.
+   On `:root` only, never on `[data-theme]`: an element that carries a theme
+   (the theme chooser's preview) must inherit the page's design, not restate
+   the slanted one inside a round page.
+*/
+:root {
   --slant-button: -12deg;
   --slant-pill: -14deg;
   --slant-line: -30deg;

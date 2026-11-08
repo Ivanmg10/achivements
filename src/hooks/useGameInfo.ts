@@ -11,10 +11,12 @@ type State = {
   subsets: SubsetGame[]
   /** The game is in, its subsets are still being looked up. */
   subsetsLoading: boolean
+  /** RA does not know this game: a not-found page, not an error to retry. */
+  missing: boolean
   error: string | null
 }
 
-const EMPTY: State = { game: null, parentId: null, parentIcon: '', subsets: [], subsetsLoading: false, error: null }
+const EMPTY: State = { game: null, parentId: null, parentIcon: '', subsets: [], subsetsLoading: false, missing: false, error: null }
 
 /** The title a subset shares with its main game, for looking the subsets up. */
 function baseTitle(title: string | null | undefined): string {
@@ -48,6 +50,10 @@ export function useGameInfo(gameId: string | null) {
       let game: RetroAchievementsGameWithAchievements
       try {
         const res = await fetch(`/api/getGameProgression?gameId=${gameId}`)
+        if (res.status === 404) {
+          set({ missing: true })
+          return
+        }
         if (!res.ok) throw new Error(`Error ${res.status}`)
         game = await res.json()
       } catch (err) {

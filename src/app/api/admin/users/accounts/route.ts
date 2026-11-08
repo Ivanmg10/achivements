@@ -162,15 +162,13 @@ export async function DELETE(req: Request) {
       await pool.query('UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL, raid_hash = NULL WHERE id = $1', [target.id])
     } else if (platform === 'steam') {
       await pool.query('UPDATE users SET steamid = NULL, steamusername = NULL, steam_login_id = NULL WHERE id = $1', [target.id])
-      await clearUserCache(String(target.id))
       await forgetUnlocks(String(target.id))
     } else if (platform === 'psn') {
       await pool.query('UPDATE users SET psnaccountid = NULL, psnusername = NULL WHERE id = $1', [target.id])
-      await clearUserCache(String(target.id))
     } else {
       await pool.query('UPDATE users SET xboxxuid = NULL, xboxgamertag = NULL WHERE id = $1', [target.id])
-      await clearUserCache(String(target.id))
     }
+    await clearUserCache(String(target.id))
     forgetUser(target.id)
     await logAdminAction(auth.admin, `unlink-${platform}`, target)
 

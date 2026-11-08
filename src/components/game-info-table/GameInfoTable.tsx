@@ -16,6 +16,7 @@ import { IconTrophyOff } from '@tabler/icons-react'
 import AchievementTableToolbar from '@/components/achievement-table-toolbar/AchievementTableToolbar'
 import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
 import { TABLE, TH } from '@/components/ui/dataTable'
+import { parseUnlockTime } from '@/utils/dates'
 
 type Filter = 'all' | 'earned' | 'unearned' | 'missable'
 type SortDir = 'asc' | 'desc'
@@ -87,7 +88,7 @@ export default function GameInfoTable({
         if (!a.DateEarned && !b.DateEarned) return 0
         if (!a.DateEarned) return 1
         if (!b.DateEarned) return -1
-        return new Date(b.DateEarned).getTime() - new Date(a.DateEarned).getTime()
+        return parseUnlockTime(b.DateEarned) - parseUnlockTime(a.DateEarned)
       }
       return a.DisplayOrder - b.DisplayOrder
     }

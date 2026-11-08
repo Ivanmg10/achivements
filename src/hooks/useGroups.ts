@@ -24,7 +24,8 @@ export function useGroups() {
       const data = await res.json()
       setGroups(Array.isArray(data) ? data : [])
       setError(null)
-    } catch {
+    } catch (err) {
+      console.error('[useGroups] read', err)
       setError('Error loading groups')
     } finally {
       setIsLoading(false)

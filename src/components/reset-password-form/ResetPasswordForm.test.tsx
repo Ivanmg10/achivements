@@ -70,3 +70,11 @@ test('always offers the way back to signing in', () => {
   withToken('tok')
   expect(screen.getByRole('link', { name: en.passwordReset.backToSignIn }).getAttribute('href')).toBe('/authPage')
 })
+
+test('a failed save says the password was not saved, not that an account failed', async () => {
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, json: () => Promise.resolve({}) })
+  withToken('tok')
+  fill('secret12')
+  save()
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.passwordReset.saveFailed)
+})

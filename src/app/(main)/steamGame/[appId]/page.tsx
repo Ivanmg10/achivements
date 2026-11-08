@@ -2,6 +2,7 @@
 
 import { notFound, useParams } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
 import { useSteamGameDetails } from '@/hooks/useSteamGameDetails'
@@ -28,6 +29,7 @@ export default function SteamGamePage() {
   const { appId: rawId } = useParams()
   const appId = typeof rawId === 'string' && /^\d+$/.test(rawId) ? Number(rawId) : null
   const { T } = useLanguage()
+  const { status } = useAuthSession()
   const { isLinked, fullLibrary, libraryLoading } = useSteamGamesData()
   const { achievements, isLoading: achievementsLoading, error: achievementsError, retry } = useSteamAchievements(
     isLinked ? appId : null,
@@ -35,6 +37,7 @@ export default function SteamGamePage() {
   const { details, isLoading: detailsLoading } = useSteamGameDetails(isLinked ? appId : null)
 
   if (appId === null) notFound()
+  if (status === 'loading') return <GameInfoSkeleton />
 
   if (!isLinked) {
     return (

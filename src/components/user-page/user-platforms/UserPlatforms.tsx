@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import UserPlatformCard, {
   CONNECT_CLASS,
   DISCONNECT_CLASS,
+  platformStat,
   PlatformStat,
 } from '@/components/user-page/user-platform-card/UserPlatformCard'
 import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
@@ -21,10 +22,6 @@ import { useUserAwards } from '@/hooks/useUserAwards'
 import { unlinkRaUser } from '@/utils/apiCallsUtils'
 import { RetroAchievementsUserProfile } from '@/types/types'
 import { notify } from '@/lib/notify'
-
-/** A dash rather than a zero while the numbers are still loading. */
-const pending = (loading: boolean, value: number | null | undefined, lang: string) =>
-  loading || value === null || value === undefined ? '—' : value.toLocaleString(lang)
 
 /**
  * The platforms CheevoVault can track, side by side: who you are on
@@ -55,7 +52,7 @@ export default function UserPlatforms() {
       value: (raUser?.TotalPoints ?? 0).toLocaleString(lang),
       accent: 'text-warning',
     },
-    { label: T.userStats.masteries, value: pending(awardsLoading, awards?.MasteryAwardsCount, lang), accent: 'text-success' },
+    platformStat(T.userStats.masteries, awards?.MasteryAwardsCount, { lang, loading: awardsLoading, accent: 'text-success' }),
     { label: T.userStats.games, value: all.length.toLocaleString(lang) },
     { label: T.userStats.inProgress, value: inProgress.length.toLocaleString(lang) },
   ]

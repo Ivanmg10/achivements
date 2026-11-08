@@ -10,6 +10,7 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import { totalXboxPlaytime } from '@/utils/xboxTitles'
 import UserPlatformCard, {
   DISCONNECT_CLASS,
+  platformStat,
   PlatformStat,
 } from '@/components/user-page/user-platform-card/UserPlatformCard'
 import UserXboxCardForm from '@/components/user-page/user-xbox-card/user-xbox-card-form/UserXboxCardForm'
@@ -29,16 +30,15 @@ export default function UserXboxCard() {
   if (!enabled) return null
 
   const name = summary?.gamertag || gamertag
-  const value = (n: number | undefined) => (isLoading || n === undefined ? '—' : n.toLocaleString(lang))
+  const summaryOpts = { lang, loading: isLoading }
+  const minutes = totalXboxPlaytime(library)
   const stats: PlatformStat[] = [
-    { label: T.xbox.gamerscore, value: value(summary?.gamerscore), accent: 'text-success' },
-    { label: T.userStats.games, value: value(summary?.games) },
-    { label: T.xbox.achievements, value: value(summary?.achievementsUnlocked) },
-    { label: T.xbox.tier, value: isLoading ? '—' : summary?.tier || '—' },
-    {
-      label: T.steam.playtime,
-      value: libraryLoading || totalXboxPlaytime(library) === 0 ? '—' : formatPlaytime(totalXboxPlaytime(library), { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang),
-    },
+    platformStat(T.xbox.gamerscore, summary?.gamerscore, { ...summaryOpts, accent: 'text-success' }),
+    platformStat(T.userStats.games, summary?.games, summaryOpts),
+    platformStat(T.xbox.achievements, summary?.achievementsUnlocked, summaryOpts),
+    platformStat(T.xbox.tier, summary?.tier, summaryOpts),
+    // No play time reads as absent, not as "0 min".
+    platformStat(T.steam.playtime, minutes === 0 ? null : formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang), { lang, loading: libraryLoading }),
   ]
 
   const handleLink = async (tag: string) => {

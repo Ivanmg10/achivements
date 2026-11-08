@@ -18,6 +18,7 @@ export function usePerfectGamesOrder() {
   // Coming back to a page: the order as it showed, at once, while it is read again (lastAnswers).
   const [order, setOrder] = useState<string[]>(() => lastAnswer<string[]>(user, url) ?? [])
   const [isLoading, setIsLoading] = useState(() => lastAnswer(user, url) === undefined)
+  const [error, setError] = useState(false)
   const fetched = useRef(false)
 
   const fetchOrder = useCallback(async () => {
@@ -28,8 +29,11 @@ export function usePerfectGamesOrder() {
       // Rows saved before Steam joined the card carry no source: they are RA's.
       const data: { game_id: number; source?: GameSource; position: number }[] = await res.json()
       setOrder(data.map((d) => gameKey(d.source ?? 'ra', d.game_id)))
-    } catch {
-      setOrder([])
+      setError(false)
+    } catch (err) {
+      // Not an empty order: the games would show in the default one and look like the user's. The reader offers to try again.
+      console.error('[usePerfectGamesOrder] read', err)
+      setError(true)
     } finally {
       setIsLoading(false)
     }
@@ -46,17 +50,30 @@ export function usePerfectGamesOrder() {
     fetchOrder()
   }, [status, fetchOrder])
 
+  const retry = useCallback(() => {
+    setError(false)
+    setIsLoading(true)
+    fetchOrder()
+  }, [fetchOrder])
+
+  // Optimistic: the new order at once, the old one back if it could not be saved (the caller says so).
   const saveOrder = useCallback(async (newOrder: string[]) => {
+    const before = order
     setOrder(newOrder)
-    const res = await fetch('/api/perfectGamesOrder', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order: newOrder }),
-    })
-    if (!res.ok) throw new Error('Error saving order')
-  }, [])
+    try {
+      const res = await fetch('/api/perfectGamesOrder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: newOrder }),
+      })
+      if (!res.ok) throw new Error('Error saving order')
+    } catch (err) {
+      setOrder(before)
+      throw err
+    }
+  }, [order])
 
   // Someone else's order is theirs to change: there it can only be read.
   // Signed out there is nothing to wait for.
-  return { order, isLoading: isLoading && status !== 'unauthenticated', saveOrder: subject ? undefined : saveOrder }
+  return { order, isLoading: isLoading && status !== 'unauthenticated', error, retry, saveOrder: subject ? undefined : saveOrder }
 }

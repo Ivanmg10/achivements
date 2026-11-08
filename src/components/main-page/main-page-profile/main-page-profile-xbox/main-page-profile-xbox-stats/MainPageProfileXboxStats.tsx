@@ -22,12 +22,12 @@ export default function MainPageProfileXboxStats({
 }) {
   const { T, lang } = useLanguage()
   const minutes = totalXboxPlaytime(library)
-  const playtime = isLoading || minutes === 0 ? '—' : formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)
+  const playtime = minutes === 0 ? '—' : formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)
 
   return (
     <div className="grid grid-cols-2 gap-2">
       <StatCard label={T.steam.statGames} value={summary.games.toLocaleString(lang)} />
-      <StatCard label={T.steam.totalPlaytime} value={playtime} />
+      <StatCard label={T.steam.totalPlaytime} value={playtime} loading={isLoading} />
       <StatCard label={T.xbox.gamerscore} value={summary.gamerscore.toLocaleString(lang)} accent="text-success" />
       <StatCard label={T.xbox.achievements} value={summary.achievementsUnlocked.toLocaleString(lang)} />
     </div>

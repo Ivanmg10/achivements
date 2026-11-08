@@ -226,7 +226,7 @@ export function perfectDates(
     if ((byKey.get(key) ?? '') < a.AwardedAt) byKey.set(key, a.AwardedAt)
   }
   for (const g of steamGames) if (classifySteamGame(g) === 'completed' && validCompletionDate(g.lastUnlock)) byKey.set(gameKey('steam', g.id), validCompletionDate(g.lastUnlock)!)
-  for (const g of psnGames) if (g.completedAt) byKey.set(gameKey('psn', g.id), g.completedAt)
+  for (const g of psnGames) if (classifyPsnGame(g) === 'completed' && g.completedAt) byKey.set(gameKey('psn', g.id), g.completedAt)
   for (const g of xboxGames) if (classifyXboxGame(g) === 'completed' && g.completedAt) byKey.set(gameKey('xbox', g.id), g.completedAt)
   return byKey
 }

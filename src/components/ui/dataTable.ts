@@ -39,3 +39,16 @@ export function badgeImgClass(locked: boolean) {
 
 /** An achievement's type (progression, missable…) beside its title. */
 export const TYPE_TAG = 'inline-flex items-center h-5 px-2 rounded-tag text-[0.6875rem] font-bold whitespace-nowrap'
+
+/** RA's achievement types as a tag: its label and tint, or null for a type with none. One map for every place that shows it. */
+export function raTypeTag(
+  type: string | null | undefined,
+  labels: { progression: string; winCondition: string; missable: string },
+): { label: string; className: string } | null {
+  switch (type) {
+    case 'progression': return { label: labels.progression, className: 'bg-info/20 text-info' }
+    case 'win_condition': return { label: labels.winCondition, className: 'bg-warning/20 text-warning' }
+    case 'missable': return { label: labels.missable, className: 'bg-danger/20 text-danger' }
+    default: return null
+  }
+}

@@ -49,9 +49,9 @@ export default function ResetPasswordForm() {
       const data = await res.json().catch(() => ({}))
 
       if (res.ok) setDone(true)
-      else setError(data.error === 'invalid-token' ? T.passwordReset.invalidToken : T.registerForm.errorCreating)
+      else setError(data.error === 'invalid-token' ? T.passwordReset.invalidToken : T.passwordReset.saveFailed)
     } catch {
-      setError(T.registerForm.errorCreating)
+      setError(T.passwordReset.saveFailed)
     }
     setSubmitting(false)
   }
