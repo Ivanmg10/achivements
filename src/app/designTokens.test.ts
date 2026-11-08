@@ -14,11 +14,23 @@ const DESIGN_TOKENS = [
   '--motion-hover', '--motion-open', '--motion-indicator', '--ease-spring',
 ]
 
-/** The block every theme inherits from (`:root, [data-theme] { … }`). */
-function baseBlock() {
+/** The colours every theme inherits from (`:root, [data-theme] { … }`). */
+function coloursBlock() {
   const start = css.indexOf(':root,\n[data-theme] {')
   return css.slice(start, css.indexOf('}', start))
 }
+
+/** The colours plus the design (`:root { … }`): everything a theme inherits. */
+function baseBlock() {
+  const design = css.indexOf('\n:root {')
+  return coloursBlock() + css.slice(design, css.indexOf('}', design))
+}
+
+test('the shapes are on :root only, so a theme preview inside a round page stays round (AP-06)', () => {
+  for (const token of SHAPE_TOKEN_NAMES) expect(coloursBlock()).not.toContain(`${token}:`)
+})
+
+const SHAPE_TOKEN_NAMES = ['--slant-button', '--clip-4', '--r-card', '--r-button', '--r-box', '--bar-radius']
 
 test('a font preview shows its font: it takes the family, and Barlow can undo a page in another font', () => {
   for (const font of ['barlow', 'sofia', 'fira']) expect(css).toContain(`[data-font="${font}"]:not(html)`)
