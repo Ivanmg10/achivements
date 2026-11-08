@@ -99,6 +99,7 @@ describe('RetroAchievements', () => {
   test('unlinking clears the account and logs it', async () => {
     expect((await DELETE(del('id=11&platform=ra'))).status).toBe(200)
     expect(updates()[0][0]).toContain('raid = NULL')
+    expect(clearUserCache).toHaveBeenCalledWith('11')
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-ra', BOB)
   })
 })
