@@ -1,6 +1,4 @@
-import { slantStyle } from '@/components/ui/shape'
-
-const SLANT = slantStyle(4)
+import DataBar from '@/components/ui/DataBar'
 
 /**
  * A two-column table of the guide (a rarity and what it is worth, say), the
@@ -24,9 +22,7 @@ export default function RankingsGuideTable({ head, rows, weights }: { head: [str
               <td className="px-4 py-2.5 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.05)]">{label}</td>
               {weights && (
                 <td aria-hidden="true" className="px-2 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.05)]">
-                  <span className="block h-2 bg-ink/[0.08]" style={SLANT}>
-                    <span className="block h-full bg-accent" style={{ ...SLANT, width: `${Math.max(4, (weights[i] ?? 0) * 100)}%` }} />
-                  </span>
+                  <DataBar track share={Math.max(0.04, weights[i] ?? 0)} className="h-2" />
                 </td>
               )}
               <td className="px-4 py-2.5 text-right text-base font-extrabold tabular-nums shadow-[inset_0_-1px_0_rgb(var(--ink)/0.05)]">{value}</td>

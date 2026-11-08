@@ -157,6 +157,7 @@ const NEW_RULES = {
   avatar: /\brounded-full\b[^"'`]*\bobject-cover\b|\bobject-cover\b[^"'`]*\brounded-full\b|from '@\/components\/presence-dot\/PresenceDot'/,
   listRow: /\bhover:bg-accent\/10 focus-visible:bg-accent\/10\b/,
   figure: /\b(?:StatPill|StatCard)\b/,
+  dataBar: /\bslantStyle\(/,
 }
 
 test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
@@ -177,4 +178,8 @@ test('a row to pick from comes from ListRow / LIST_ROW', () => {
 
 test('a labelled number comes from Figure; StatPill and StatCard are its old names', () => {
   expect(newOffenders('figure', NEW_RULES.figure)).toEqual([])
+})
+
+test('a chart bar with cut ends comes from DataBar, never slantStyle on a hand-made bar', () => {
+  expect(newOffenders('dataBar', NEW_RULES.dataBar)).toEqual([])
 })

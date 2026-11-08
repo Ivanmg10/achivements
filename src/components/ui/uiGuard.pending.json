@@ -151,5 +151,20 @@
     "components/main-page/main-page-profile/main-page-profile-ra/main-page-profile-ra-stats/MainPageProfileRaStats.tsx",
     "components/main-page/main-page-profile/main-page-profile-st/main-page-profile-st-stats/MainPageProfileStStats.tsx",
     "components/main-page/main-page-profile/main-page-profile-xbox/main-page-profile-xbox-stats/MainPageProfileXboxStats.tsx"
+  ],
+  "dataBar": [
+    "components/design-catalog/catalogue.ts",
+    "components/design-catalog/design-catalog-foundations/DesignCatalogFoundations.tsx",
+    "components/following-page/following-rankings-teaser/FollowingRankingsTeaser.tsx",
+    "components/main-page/main-page-portada-side/main-page-portada-side-streak/MainPagePortadaSideStreak.tsx",
+    "components/rankings-guide/rankings-guide-example/RankingsGuideExample.tsx",
+    "components/rankings-page/rankings-page-podium/RankingsPagePodium.tsx",
+    "components/rankings-page/rankings-page-skeleton/RankingsPageSkeleton.tsx",
+    "components/streak-page/streak-chart/StreakChart.tsx",
+    "components/streak-page/streak-weekdays/StreakWeekdays.tsx",
+    "components/streak-page/streak-year-heatmap/StreakYearHeatmap.tsx",
+    "components/user-page/user-shape-preference/user-shape-preference-preview/UserShapePreferencePreview.tsx",
+    "components/vault-platform-split/VaultPlatformSplit.tsx",
+    "components/vault-weeks-chart/VaultWeeksChart.tsx"
   ]
 }

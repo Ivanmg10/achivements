@@ -8,6 +8,7 @@ import Avatar from '@/components/ui/Avatar'
 import ListRow from '@/components/ui/ListRow'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { CircularProgress } from '@/components/ui/CircularProgress'
+import DataBar from '@/components/ui/DataBar'
 import StreakTag from '@/components/ui/StreakTag'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
@@ -57,6 +58,19 @@ export default function DesignCatalogData() {
           <ProgressBar pct={45} softPct={62} label="Hardcore under softcore" />
           <ProgressBar pct={100} label="Finished" />
           <ProgressBar pct={70} label="Taller" height="h-3" />
+        </Compare>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="data-bar">
+        <Compare>
+          <Specimen name="x · track · cut 4">
+            <span className="flex flex-col gap-2 w-48">{[0.9, 0.55, 0.2].map((s) => <DataBar key={s} track share={s} className="h-2" />)}</span>
+          </Specimen>
+          <Specimen name="y · cut 8 · soft and accent">
+            <span className="flex items-end gap-2 h-24 w-48">
+              {[0.3, 0.6, 1, 0.45, 0.15].map((s, i) => <span key={i} className="flex-1 h-full flex items-end"><DataBar axis="y" cut={8} min={4} share={s} tone={s === 1 ? 'accent' : 'soft'} className="w-full" /></span>)}
+            </span>
+          </Specimen>
         </Compare>
       </DesignCatalogPiece>
 
