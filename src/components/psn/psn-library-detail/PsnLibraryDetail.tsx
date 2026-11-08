@@ -45,7 +45,7 @@ export default function PsnLibraryDetail({ game, category }: { game: PsnGameProg
       ring={{ earned, total, label: T.psn.trophies }}
       ringExtra={<PsnTrophyCounts earned={game.earned} of={game.defined} className="flex-col items-start! lg:items-center!" />}
       facts={
-        game.playtimeMinutes ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, T.steam, lang), className: 'text-[#0070d1]' }] : []
+        game.playtimeMinutes ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, T.steam, lang), className: 'text-psn' }] : []
       }
       empty={T.psn.noTrophies}
       grid={<PsnTrophyGrid gameId={game.id} gameTitle={game.title} trophies={trophies} groups={groups} badgeSize={48} limit={60} />}

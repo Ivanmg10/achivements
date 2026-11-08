@@ -55,7 +55,7 @@ export default function UserPlatformCard({
   logo: ReactNode
   /** The same logo, larger, for the disconnected state. */
   bigLogo?: ReactNode
-  /** Gradient stops for the card's outline, e.g. "from-[#66c0f4] to-[#1b2838]". */
+  /** Gradient stops for the card's outline, e.g. "from-steam to-steam-dark". */
   gradient: string
   connected: boolean
   /** A message about the last connection attempt. */

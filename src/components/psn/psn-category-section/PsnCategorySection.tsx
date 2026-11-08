@@ -55,7 +55,7 @@ export default function PsnCategorySection({
   return (
     <CollapsibleSection
       title={T.psn.gamesSection}
-      icon={<PlaystationLogo size={22} className="text-[#0070d1]" aria-hidden="true" />}
+      icon={<PlaystationLogo size={22} className="text-psn" aria-hidden="true" />}
       count={loading || error ? undefined : games.length}
       storageKey={`psn-section-open:${category}`}
       preview={

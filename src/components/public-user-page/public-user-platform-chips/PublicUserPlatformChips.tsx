@@ -56,13 +56,13 @@ export default function PublicUserPlatformChips({ user }: { user: CheevoUser }) 
         />
       )}
       {user.steam && (
-        <Chip icon={<SteamLogo size={13} className="text-[#66c0f4] shrink-0" aria-hidden="true" />} name={user.steamName || 'Steam'} opens="" />
+        <Chip icon={<SteamLogo size={13} className="text-steam shrink-0" aria-hidden="true" />} name={user.steamName || 'Steam'} opens="" />
       )}
       {user.psn && (
-        <Chip icon={<PlaystationLogo size={13} className="text-[#0070d1] shrink-0" aria-hidden="true" />} name={user.psnName || 'PlayStation'} opens="" />
+        <Chip icon={<PlaystationLogo size={13} className="text-psn shrink-0" aria-hidden="true" />} name={user.psnName || 'PlayStation'} opens="" />
       )}
       {user.xbox && (
-        <Chip icon={<XboxLogo size={13} className="text-[#107c10] shrink-0" aria-hidden="true" />} name={user.xboxName || 'Xbox'} opens="" />
+        <Chip icon={<XboxLogo size={13} className="text-xbox shrink-0" aria-hidden="true" />} name={user.xboxName || 'Xbox'} opens="" />
       )}
     </ul>
   )

@@ -55,9 +55,9 @@ export default function UserXboxCard() {
       name="Xbox"
       source="xbox"
       href={name ? `https://www.xbox.com/play/user/${encodeURIComponent(name)}` : undefined}
-      logo={<XboxLogo size={18} className="text-[#107c10]" aria-hidden="true" />}
-      bigLogo={<XboxLogo size={40} className="text-[#107c10]" aria-hidden="true" />}
-      gradient="from-[#107c10] via-[#107c10]/40 to-[#0b4d0b]"
+      logo={<XboxLogo size={18} className="text-xbox" aria-hidden="true" />}
+      bigLogo={<XboxLogo size={40} className="text-xbox" aria-hidden="true" />}
+      gradient="from-xbox via-xbox/40 to-xbox-dark"
       connected={isLinked}
       hint={T.xbox.connectHint}
       status={

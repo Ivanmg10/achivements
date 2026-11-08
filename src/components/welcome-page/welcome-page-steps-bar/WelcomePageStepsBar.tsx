@@ -11,8 +11,8 @@ export type WelcomeStepState = 'current' | 'done' | 'linked' | 'later' | 'pendin
 
 const PLATFORM_MARK: Partial<Record<WelcomeStep, ReactNode>> = {
   ra: <RaLogo height={10} />,
-  steam: <SteamLogo size={14} className="text-[#66c0f4]" aria-hidden="true" />,
-  psn: <PlaystationLogo size={14} className="text-[#0070d1]" aria-hidden="true" />,
+  steam: <SteamLogo size={14} className="text-steam" aria-hidden="true" />,
+  psn: <PlaystationLogo size={14} className="text-psn" aria-hidden="true" />,
 }
 
 /**

@@ -24,9 +24,9 @@ export default function GroupPlatformLogos({ group, label }: { group: GameGroup;
   return (
     <span className="flex items-center gap-1.5 shrink-0" role="img" aria-label={label ?? names.join(', ')}>
       {n.ra > 0 && <RaLogo height={11} className="opacity-70" />}
-      {n.steam > 0 && <SteamLogo size={11} className="text-[#66c0f4]/80" />}
-      {n.psn > 0 && <PlaystationLogo size={11} className="text-[#0070d1]" />}
-      {n.xbox > 0 && <XboxLogo size={11} className="text-[#107c10]" />}
+      {n.steam > 0 && <SteamLogo size={11} className="text-steam/80" />}
+      {n.psn > 0 && <PlaystationLogo size={11} className="text-psn" />}
+      {n.xbox > 0 && <XboxLogo size={11} className="text-xbox" />}
     </span>
   )
 }

@@ -62,7 +62,7 @@ export default function SteamCategorySection({
   return (
     <CollapsibleSection
       title={title ?? T.steam.gamesSection}
-      icon={<SteamLogo size={22} className="text-[#66c0f4]" aria-hidden="true" />}
+      icon={<SteamLogo size={22} className="text-steam" aria-hidden="true" />}
       count={loading || error ? undefined : games.length}
       storageKey={`steam-section-open:${category}`}
       className={className}

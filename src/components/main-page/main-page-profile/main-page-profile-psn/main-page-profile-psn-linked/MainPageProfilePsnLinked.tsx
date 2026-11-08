@@ -20,7 +20,7 @@ import MainPageProfileCard from '../../main-page-profile-card/MainPageProfileCar
 import Tag from '@/components/ui/Tag'
 
 /** Sony's trophy-level tiers in groups of three: bronze, silver, gold, then platinum at 10. */
-const TIER_RING = ['border-warning', 'border-zinc-400', 'border-hardcore', 'border-sky-300']
+const TIER_RING = ['border-warning', 'border-silver', 'border-hardcore', 'border-platinum']
 
 /**
  * A linked PSN profile, built like the Steam one block for block: header
@@ -72,14 +72,14 @@ export default function MainPageProfilePsnLinked({
     <div className="flex flex-col gap-3.5 w-full h-full">
       <MainPageProfileCard
         avatarSrc={summary.avatarUrl || null}
-        avatarFallback={<span className="w-full h-full bg-[#003791] flex items-center justify-center"><PlaystationLogo size={32} className="text-white" /></span>}
-        ring="#0070d1"
+        avatarFallback={<span className="w-full h-full bg-psn-dark flex items-center justify-center"><PlaystationLogo size={32} className="text-white" /></span>}
+        ring="var(--color-psn)"
         name={summary.onlineId}
         actions={
           <MainPageProfileActions
             href={`https://profile.playstation.com/${encodeURIComponent(summary.onlineId)}`}
             linkLabel={T.psn.viewOnPsn}
-            ringClass="focus:ring-[#0070d1]"
+            ringClass="focus:ring-psn"
             onRefresh={refresh}
           />
         }

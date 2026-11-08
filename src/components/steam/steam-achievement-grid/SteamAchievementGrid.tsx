@@ -94,7 +94,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
               }}
               onBlur={hide}
               className={`block rounded-box overflow-hidden shrink-0 transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                a.earned ? 'ring-2 ring-[#66c0f4]' : ''
+                a.earned ? 'ring-2 ring-steam' : ''
               }`}
             >
               {a.badgeUrl ? (
@@ -141,7 +141,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
                 </span>
               )}
               {tooltip.achievement.earned ? (
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-[#66c0f4]/20 text-[#66c0f4]">
+                <span className="text-xs px-1.5 py-0.5 rounded-full bg-steam/20 text-steam">
                   {T.steam.earned}
                 </span>
               ) : (

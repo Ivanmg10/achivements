@@ -88,7 +88,7 @@ export default function SteamGameItem({
           <span className="flex items-center gap-2 min-w-0">
             <Link
               href={href}
-              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
+              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam rounded"
             >
               <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.title}</span>
             </Link>
@@ -101,7 +101,7 @@ export default function SteamGameItem({
             aria-expanded={isExpanded}
             aria-controls={panelId}
             aria-label={`${isExpanded ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.title}`}
-            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] group"
+            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam group"
           >
             <span className="flex items-center gap-2 w-full">
               {hasCounts && (

@@ -16,7 +16,7 @@ import Tag from '@/components/ui/Tag'
  */
 
 const CARD = 'rounded-card bg-bg-card ring-1 ring-ink/[0.06]'
-const ARTS = [STEP_SKY.ra, STEP_SKY.steam, STEP_SKY.psn, 'linear-gradient(135deg, rgb(var(--accent)), #f0abfc)']
+const ARTS = [STEP_SKY.ra, STEP_SKY.steam, STEP_SKY.psn, 'linear-gradient(135deg, rgb(var(--accent)), var(--color-art-pink))']
 
 function Bar({ w, strong = false }: { w: string; strong?: boolean }) {
   return <span className={`block h-2.5 rounded-full ${strong ? 'bg-ink/20' : 'bg-ink/10'}`} style={{ width: w }} />
@@ -31,7 +31,7 @@ function Library() {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex gap-2">
-        {[<RaLogo key="ra" height={11} />, <SteamLogo key="st" size={14} className="text-[#66c0f4]" />, <PlaystationLogo key="ps" size={14} className="text-[#0070d1]" />].map((logo, i) => (
+        {[<RaLogo key="ra" height={11} />, <SteamLogo key="st" size={14} className="text-steam" />, <PlaystationLogo key="ps" size={14} className="text-psn" />].map((logo, i) => (
           <span key={i} className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-full ring-1 ring-inset ${i === 1 ? 'ring-ink/40 bg-ink/5' : 'ring-ink/10'}`}>
             {logo}
             <span className="block w-8 h-2 rounded-full bg-ink/15" />
@@ -138,7 +138,7 @@ function Points() {
       <div className="flex-1 flex flex-col gap-2">
         {rows.map((row) => (
           <div key={row.place} className={`${CARD} flex items-center gap-3 p-3 ${row.you ? 'ring-accent/50' : ''}`}>
-            <span className={`w-6 text-center font-display italic font-extrabold text-xl ${row.place === 1 ? 'text-[#e5b53f]' : 'text-text-secondary'}`}>{row.place}</span>
+            <span className={`w-6 text-center font-display italic font-extrabold text-xl ${row.place === 1 ? 'text-ra-gold' : 'text-text-secondary'}`}>{row.place}</span>
             <span className="w-8 h-8 rounded-full shrink-0 bg-ink/15" />
             <span className="flex-1"><Bar w={row.w} strong /></span>
             <span className="text-xs font-bold tabular-nums">{row.vp} <span className="text-text-secondary font-medium">VP</span></span>

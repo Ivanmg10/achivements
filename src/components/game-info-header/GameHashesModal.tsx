@@ -23,9 +23,9 @@ type Props = {
 }
 
 const LABEL_COLORS: Record<string, string> = {
-  REDUMP: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+  REDUMP: 'bg-redump/20 text-redump-ink border-redump/30',
   'NO-INTRO': 'bg-success/20 text-success border-success/30',
-  TOSEC: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+  TOSEC: 'bg-tosec/20 text-tosec-ink border-tosec/30',
   'NOINTRO': 'bg-success/20 text-success border-success/30',
 }
 

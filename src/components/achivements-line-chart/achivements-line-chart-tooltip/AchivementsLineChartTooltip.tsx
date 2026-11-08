@@ -26,8 +26,8 @@ export default function AchivementsLineChartTooltip({
   const count = (n: number) => (n === 1 ? T.lineChart.oneAchievement : `${n} ${T.lineChart.achievements}`)
   const rows = [
     { name: 'RetroAchievements', value: day.ra, swatch: 'bg-chart-2' },
-    { name: 'Steam', value: day.steam, swatch: 'bg-[#66c0f4]' },
-    { name: 'PlayStation', value: day.psn, swatch: 'bg-[#0070d1]' },
+    { name: 'Steam', value: day.steam, swatch: 'bg-steam' },
+    { name: 'PlayStation', value: day.psn, swatch: 'bg-psn' },
     { name: 'Xbox', value: day.xbox, swatch: 'bg-success' },
   ].filter((r) => r.value > 0)
 

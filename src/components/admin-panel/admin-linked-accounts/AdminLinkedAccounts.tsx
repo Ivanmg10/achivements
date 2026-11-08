@@ -116,7 +116,7 @@ export default function AdminLinkedAccounts({
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-sm">
-          <SteamLogo size={12} className="text-[#66c0f4]" />
+          <SteamLogo size={12} className="text-steam" />
           {user.steamid ? (
             <>
               <span className="font-medium flex-1 truncate">{user.steamusername ?? user.steamid}</span>
@@ -152,7 +152,7 @@ export default function AdminLinkedAccounts({
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-sm">
-          <PlaystationLogo size={12} className="text-[#0070d1]" />
+          <PlaystationLogo size={12} className="text-psn" />
           {user.psnaccountid ? (
             <>
               <span className="font-medium flex-1 truncate">{user.psnusername ?? user.psnaccountid}</span>
@@ -188,7 +188,7 @@ export default function AdminLinkedAccounts({
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-sm">
-          <XboxLogo size={12} className="text-[#107c10]" />
+          <XboxLogo size={12} className="text-xbox" />
           {user.xboxxuid ? (
             <>
               <span className="font-medium flex-1 truncate">{user.xboxgamertag ?? user.xboxxuid}</span>

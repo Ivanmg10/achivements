@@ -41,9 +41,9 @@ export default function UserSteamCard() {
       name="Steam"
       source="steam"
       href={steamId ? `https://steamcommunity.com/profiles/${encodeURIComponent(steamId)}` : undefined}
-      logo={<SteamLogo size={18} className="text-[#66c0f4]" aria-hidden="true" />}
-      bigLogo={<SteamLogo size={40} className="text-[#66c0f4]" aria-hidden="true" />}
-      gradient="from-[#66c0f4] via-[#2a475e] to-[#1b2838]"
+      logo={<SteamLogo size={18} className="text-steam" aria-hidden="true" />}
+      bigLogo={<SteamLogo size={40} className="text-steam" aria-hidden="true" />}
+      gradient="from-steam via-steam-slate to-steam-dark"
       connected={isLinked}
       hint={T.userPage.steamConnectHint}
       identity={

@@ -173,7 +173,16 @@ const NEW_RULES = {
 
 // Where a platform's or a tier's own hue, or a fixed colour, belongs: the tokens (globals.css), the logo, and the
 // pictures drawn on the server (no theme there). Never a component.
-const OWN_COLOURS = ['utils/themeIcon.ts', 'app/apple-icon.tsx', 'app/(main)/user/[username]/opengraph-image.tsx']
+// Also fixed on purpose: the RA guide draws RetroAchievements' own dark page (not ours, so no theme), the welcome curtain's
+// ink on its white badge, and the browser bar's colour (`THEME_COLOR`, read before any theme exists).
+const OWN_COLOURS = [
+  'utils/themeIcon.ts',
+  'app/apple-icon.tsx',
+  'app/(main)/user/[username]/opengraph-image.tsx',
+  'components/welcome-page/welcome-page-ra-guide/WelcomePageRaGuide.tsx',
+  'components/welcome-curtain/WelcomeCurtain.tsx',
+  'lib/siteUrl.ts',
+]
 
 test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
   // A table's head is the table's own look (ui/dataTable.ts TH), not a kicker; the sortable head inherits it.

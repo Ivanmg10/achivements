@@ -26,7 +26,7 @@ export default function SteamExpandedStats({
   return (
     <GameExpandedStatList
       stats={[
-        { label: T.steam.playtime, value: formatPlaytime(playtimeForever, T.steam, lang), className: 'text-[#66c0f4]' },
+        { label: T.steam.playtime, value: formatPlaytime(playtimeForever, T.steam, lang), className: 'text-steam' },
         { label: T.steam.last2Weeks, value: formatPlaytime(playtime2Weeks, T.steam, lang), className: 'text-text-main' },
         { label: T.gameExpanded.completion, value: `${completionPct}%`, className: 'text-success', wide: false },
         { label: T.gameExpanded.remaining, value: String(remaining), className: 'text-info' },

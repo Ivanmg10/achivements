@@ -102,12 +102,12 @@ export default function CollectionNumbers({
           </PlatformTile>
         )}
         {steamGames.length > 0 && (
-          <PlatformTile label="Steam" logo={<SteamLogo size={12} className="text-[#66c0f4]" aria-hidden="true" />} value={steam.perfect} valueClass="text-[#66c0f4]" caption={perfectOf(fractions.length)}>
+          <PlatformTile label="Steam" logo={<SteamLogo size={12} className="text-steam" aria-hidden="true" />} value={steam.perfect} valueClass="text-steam" caption={perfectOf(fractions.length)}>
             <CompletionDistribution fractions={fractions} tone="steam" showTitle={false} note={hasUnloadedProgress(steamGames) ? T.steam.partialProgressNote : undefined} />
           </PlatformTile>
         )}
         {psnGames.length > 0 && (
-          <PlatformTile label="PlayStation" logo={<PlaystationLogo size={12} className="text-[#0070d1]" aria-hidden="true" />} value={psnPerfect} valueClass="text-[#0070d1]" caption={perfectOf(psnGames.length)}>
+          <PlatformTile label="PlayStation" logo={<PlaystationLogo size={12} className="text-psn" aria-hidden="true" />} value={psnPerfect} valueClass="text-psn" caption={perfectOf(psnGames.length)}>
             <CompletionDistribution fractions={psnFractions} tone="psn" showTitle={false} />
           </PlatformTile>
         )}

@@ -43,7 +43,7 @@ export default function XboxLibraryDetail({ game, category }: { game: XboxGamePr
       }
       ring={{ earned, total, label: T.xbox.achievements }}
       ringExtra={<XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} />}
-      facts={game.playtimeMinutes ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, T.steam, lang), className: 'text-[#107c10]' }] : []}
+      facts={game.playtimeMinutes ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, T.steam, lang), className: 'text-xbox' }] : []}
       empty={T.xbox.noAchievements}
       grid={<XboxAchievementGrid gameId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={48} limit={60} />}
     />

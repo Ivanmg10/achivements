@@ -68,7 +68,7 @@ export default function UserPlatforms() {
         href={raUser?.User ? `https://retroachievements.org/user/${encodeURIComponent(raUser.User)}` : undefined}
         logo={<RaLogo height={18} />}
         bigLogo={<RaLogo height={40} />}
-        gradient="from-[#2a80c7] via-[#2a80c7]/40 to-[#e5b53f]"
+        gradient="from-ra via-ra/40 to-ra-gold"
         connected={raConnected}
         hint={T.userPage.raConnectHint}
         identity={

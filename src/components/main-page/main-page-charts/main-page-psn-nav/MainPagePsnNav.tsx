@@ -48,7 +48,7 @@ export default function MainPagePsnNav() {
                     {T.categories[slug]}
                   </span>
                 </span>
-                <span className="text-[10px] font-semibold text-[#0070d1] tabular-nums">{loading ? '—' : games.length}</span>
+                <span className="text-[10px] font-semibold text-psn tabular-nums">{loading ? '—' : games.length}</span>
               </Link>
 
               {loading ? (

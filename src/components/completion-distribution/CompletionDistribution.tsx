@@ -9,8 +9,8 @@ const BAND_LABELS = ['<25%', '25–49%', '50–74%', '75–99%', '100%']
 
 const TONES = {
   ra: ['bg-accent/20', 'bg-accent/35', 'bg-accent/55', 'bg-accent/75', 'bg-accent'],
-  steam: ['bg-[#66c0f4]/20', 'bg-[#66c0f4]/35', 'bg-[#66c0f4]/55', 'bg-[#66c0f4]/75', 'bg-[#66c0f4]'],
-  psn: ['bg-[#0070d1]/20', 'bg-[#0070d1]/35', 'bg-[#0070d1]/55', 'bg-[#0070d1]/75', 'bg-[#0070d1]'],
+  steam: ['bg-steam/20', 'bg-steam/35', 'bg-steam/55', 'bg-steam/75', 'bg-steam'],
+  psn: ['bg-psn/20', 'bg-psn/35', 'bg-psn/55', 'bg-psn/75', 'bg-psn'],
   xbox: ['bg-success/20', 'bg-success/35', 'bg-success/55', 'bg-success/75', 'bg-success'],
 } as const
 

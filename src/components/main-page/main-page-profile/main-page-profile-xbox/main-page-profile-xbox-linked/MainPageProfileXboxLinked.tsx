@@ -71,8 +71,8 @@ export default function MainPageProfileXboxLinked({
     <div className="flex flex-col gap-3.5 w-full h-full">
       <MainPageProfileCard
         avatarSrc={summary.avatarUrl || null}
-        avatarFallback={<span className="w-full h-full bg-[#107c10] flex items-center justify-center"><XboxLogo size={32} className="text-white" /></span>}
-        ring="#107c10"
+        avatarFallback={<span className="w-full h-full bg-xbox flex items-center justify-center"><XboxLogo size={32} className="text-white" /></span>}
+        ring="var(--color-xbox)"
         name={summary.gamertag}
         actions={
           <MainPageProfileActions

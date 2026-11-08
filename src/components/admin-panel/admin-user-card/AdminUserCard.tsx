@@ -61,19 +61,19 @@ export default function AdminUserCard({
           </span>
         </li>
         <li className="flex items-center gap-1.5 min-w-0">
-          <SteamLogo size={11} className={user.steamusername ? 'text-[#66c0f4]' : 'text-text-secondary/30'} />
+          <SteamLogo size={11} className={user.steamusername ? 'text-steam' : 'text-text-secondary/30'} />
           <span className={`truncate ${user.steamusername ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
             {user.steamusername ?? '—'}
           </span>
         </li>
         <li className="flex items-center gap-1.5 min-w-0">
-          <PlaystationLogo size={11} className={user.psnusername ? 'text-[#0070d1]' : 'text-text-secondary/30'} />
+          <PlaystationLogo size={11} className={user.psnusername ? 'text-psn' : 'text-text-secondary/30'} />
           <span className={`truncate ${user.psnusername ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
             {user.psnusername ?? '—'}
           </span>
         </li>
         <li className="flex items-center gap-1.5 min-w-0">
-          <XboxLogo size={11} className={user.xboxgamertag ? 'text-[#107c10]' : 'text-text-secondary/30'} />
+          <XboxLogo size={11} className={user.xboxgamertag ? 'text-xbox' : 'text-text-secondary/30'} />
           <span className={`truncate ${user.xboxgamertag ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
             {user.xboxgamertag ?? '—'}
           </span>

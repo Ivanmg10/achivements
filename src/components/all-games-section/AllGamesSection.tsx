@@ -14,9 +14,9 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 const CATEGORY_META: Record<GameStatus, { icon: string; badge: string }> = {
-  wantToPlay: { icon: '🔖', badge: 'bg-purple-900/50 text-purple-300' },
-  playing:    { icon: '🎮', badge: 'bg-blue-900/50   text-blue-300'   },
-  completed:  { icon: '🏆', badge: 'bg-green-900/50  text-success'  },
+  wantToPlay: { icon: '🔖', badge: 'bg-status-want-bg/50 text-status-want' },
+  playing:    { icon: '🎮', badge: 'bg-status-playing-bg/50 text-status-playing'   },
+  completed:  { icon: '🏆', badge: 'bg-status-done-bg/50 text-success'  },
 }
 
 export default function AllGamesSection({

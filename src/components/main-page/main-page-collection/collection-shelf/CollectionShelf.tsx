@@ -12,9 +12,9 @@ import { useSubject } from '@/context/SubjectContext'
 
 /** Medal per place, metal-like; the number on it says the place too, so colour is never the only cue. */
 const MEDALS = [
-  'bg-linear-to-b from-warning to-warning text-amber-950',
-  'bg-linear-to-b from-zinc-100 to-zinc-400 text-zinc-900',
-  'bg-linear-to-b from-warning to-warning text-orange-950',
+  'bg-linear-to-b from-warning to-warning text-gold-ink',
+  'bg-linear-to-b from-silver-light to-silver text-silver-ink',
+  'bg-linear-to-b from-warning to-warning text-bronze-ink',
   'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-ink/10',
   'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-ink/10',
 ]
@@ -44,13 +44,13 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
           {counts.steam > 0 && (
             <>
               <span aria-hidden="true">·</span>
-              <span className="text-[#66c0f4] font-semibold">{counts.steam} Steam</span>
+              <span className="text-steam font-semibold">{counts.steam} Steam</span>
             </>
           )}
           {counts.psn > 0 && (
             <>
               <span aria-hidden="true">·</span>
-              <span className="text-[#0070d1] font-semibold">{counts.psn} PlayStation</span>
+              <span className="text-psn font-semibold">{counts.psn} PlayStation</span>
             </>
           )}
           {counts.xbox > 0 && (

@@ -64,7 +64,7 @@ export default function PsnGameItem({
             imageUrl={game.imageIcon}
             size={64}
             className={`rounded-tile w-14 h-14 sm:w-16 sm:h-16 shadow-[0_6px_18px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:scale-105 ${
-              perfect ? 'ring-2 ring-sky-300' : 'ring-1 ring-ink/10'
+              perfect ? 'ring-2 ring-platinum' : 'ring-1 ring-ink/10'
             }`}
           />
         </Link>
@@ -73,7 +73,7 @@ export default function PsnGameItem({
           <span className="flex items-center gap-2 min-w-0">
             <Link
               href={href}
-              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] rounded"
+              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn rounded"
             >
               <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.title}</span>
             </Link>
@@ -86,7 +86,7 @@ export default function PsnGameItem({
             aria-expanded={isExpanded}
             aria-controls={panelId}
             aria-label={`${isExpanded ? T.psn.hideTrophies : T.psn.showTrophies}: ${game.title}`}
-            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] group"
+            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn group"
           >
             <span className="flex items-center gap-2 w-full">
               <ProgressBar pct={game.pctWon} label={game.title} className="flex-1" />
@@ -107,7 +107,7 @@ export default function PsnGameItem({
               {game.earned.platinum > 0 && (
                 <>
                   <span className="opacity-40" aria-hidden="true">·</span>
-                  <span className="text-sky-300">{T.psn.platinum}</span>
+                  <span className="text-platinum">{T.psn.platinum}</span>
                 </>
               )}
               {game.playtimeMinutes !== null && (

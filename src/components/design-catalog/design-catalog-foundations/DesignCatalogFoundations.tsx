@@ -25,6 +25,35 @@ const PLATFORM: [string, string, string][] = [
   ['platinum', 'bg-platinum', 'a PlayStation platinum'],
   ['xbox', 'bg-xbox', 'Xbox'],
 ]
+const OTHER_HUES: [string, string, string][] = [
+  ['silver · silver-light', 'bg-silver', 'a PlayStation silver, the medals'],
+  ['gold-ink · bronze-ink', 'bg-gold-ink', 'ink on a medal'],
+  ['status-playing', 'bg-status-playing', 'playing (-bg: its tint)'],
+  ['status-want', 'bg-status-want', 'want to play (-bg: its tint)'],
+  ['status-done-bg', 'bg-status-done-bg', 'completed, under the success text'],
+  ['hardcore-deep', 'bg-hardcore-deep', 'a tint behind the hardcore gold'],
+  ['offline', 'bg-offline', 'a Steam profile that is offline'],
+  ['redump · tosec', 'bg-redump', 'the hash databases (-ink: the text)'],
+  ['best-period', 'bg-best-period', 'the best-period purple (-soft: its chip)'],
+  ['award-mastered', 'bg-award-mastered', 'RA awards: mastered, completed, beaten'],
+  ['steam-button · -slate', 'bg-steam-button', 'Steam’s own sign-in button'],
+  ['xbox-dark · psn-night', 'bg-xbox-dark', 'the platforms’ darker ends, for gradients'],
+]
+const CONSOLES: [string, string][] = [
+  ['console-ps1', 'bg-console-ps1/40 text-console-ps1-ink'],
+  ['console-ps2', 'bg-console-ps2/40 text-console-ps2-ink'],
+  ['console-psp', 'bg-console-psp/40 text-console-psp-ink'],
+  ['console-gb', 'bg-console-gb/40 text-console-gb-ink'],
+  ['console-gbc', 'bg-console-gbc/40 text-console-gbc-ink'],
+  ['console-gba', 'bg-console-gba/40 text-console-gba-ink'],
+  ['console-nds', 'bg-console-nds/40 text-warning'],
+  ['console-gamecube', 'bg-console-gamecube/40 text-console-gamecube-ink'],
+  ['console-wii', 'bg-console-wii/40 text-console-wii-ink'],
+  ['console-megadrive', 'bg-console-megadrive/40 text-console-megadrive-ink'],
+  ['console-n64', 'bg-console-n64/40 text-hardcore'],
+  ['console-snes', 'bg-console-snes/40 text-console-snes-ink'],
+  ['console-dreamcast', 'bg-console-dreamcast/40 text-console-dreamcast-ink'],
+]
 const LINES: [string, string][] = [
   ['shadow-hairline-t / -b', 'shadow-hairline-b'],
   ['shadow-hairline-b-soft', 'shadow-hairline-b-soft'],
@@ -61,6 +90,10 @@ export default function DesignCatalogFoundations() {
           <div className="flex flex-wrap gap-4">{MEANING.map(([n, c, u]) => <Swatch key={n} name={n} cls={c} use={u} />)}</div>
           <div className="flex flex-wrap gap-4">{INK.map(([n, c]) => <Swatch key={n} name={n} cls={c} use="tints of the text colour: hairlines and washes" />)}</div>
           <div className="flex flex-wrap gap-4">{PLATFORM.map(([n, c, u]) => <Swatch key={n} name={n} cls={c} use={u} />)}</div>
+          <div className="flex flex-wrap gap-4">{OTHER_HUES.map(([n, c, u]) => <Swatch key={n} name={n} cls={c} use={u} />)}</div>
+          <div className="flex flex-wrap gap-4">
+            {CONSOLES.map(([n, c]) => <Swatch key={n} name={n} cls={c} use="a console’s tint and ink" />)}
+          </div>
           <div className="flex flex-wrap gap-4">
             {LINES.map(([n, c]) => <Swatch key={n} name={n} cls={`bg-bg-main ${c}`} />)}
             <div className="flex flex-col gap-1.5 w-28">

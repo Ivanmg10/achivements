@@ -23,9 +23,9 @@ const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'gend
 
 const PLATFORM_ICONS: Record<GameSource, ReactNode> = {
   ra: <RaLogo height={10} />,
-  steam: <SteamLogo size={14} className="text-[#66c0f4]" aria-hidden="true" />,
-  psn: <PlaystationLogo size={14} className="text-[#0070d1]" aria-hidden="true" />,
-  xbox: <XboxLogo size={14} className="text-[#107c10]" aria-hidden="true" />,
+  steam: <SteamLogo size={14} className="text-steam" aria-hidden="true" />,
+  psn: <PlaystationLogo size={14} className="text-psn" aria-hidden="true" />,
+  xbox: <XboxLogo size={14} className="text-xbox" aria-hidden="true" />,
 }
 
 function Fact({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {

@@ -40,7 +40,7 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
       }
       ring={{ earned, total, label: T.gameExpanded.allAchievements }}
       facts={[
-        { label: T.steam.playtime, value: formatPlaytime(game.playtimeForever, T.steam, lang), className: 'text-[#66c0f4]' },
+        { label: T.steam.playtime, value: formatPlaytime(game.playtimeForever, T.steam, lang), className: 'text-steam' },
         ...(game.playtime2Weeks > 0 ? [{ label: T.steam.last2Weeks, value: formatPlaytime(game.playtime2Weeks, T.steam, lang) }] : []),
       ]}
       empty={T.steam.noAchievements}

@@ -47,7 +47,7 @@ export default function MainPageSteamNav() {
                     {T.categories[slug]}
                   </span>
                 </span>
-                <span className="text-[10px] font-semibold text-[#66c0f4] tabular-nums">{loading ? '—' : games.length}</span>
+                <span className="text-[10px] font-semibold text-steam tabular-nums">{loading ? '—' : games.length}</span>
               </Link>
 
               {loading ? (

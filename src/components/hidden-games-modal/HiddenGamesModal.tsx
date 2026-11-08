@@ -52,11 +52,11 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
                   <span className="text-sm font-medium truncate">{g.title}</span>
                   <span className="flex items-center gap-1.5 text-[11px] text-text-secondary">
                     {g.source === 'steam' ? (
-                      <SteamLogo size={11} className="text-[#66c0f4]" aria-hidden="true" />
+                      <SteamLogo size={11} className="text-steam" aria-hidden="true" />
                     ) : g.source === 'psn' ? (
-                      <PlaystationLogo size={11} className="text-[#0070d1]" aria-hidden="true" />
+                      <PlaystationLogo size={11} className="text-psn" aria-hidden="true" />
                     ) : g.source === 'xbox' ? (
-                      <XboxLogo size={11} className="text-[#107c10]" aria-hidden="true" />
+                      <XboxLogo size={11} className="text-xbox" aria-hidden="true" />
                     ) : (
                       <RaLogo height={9} />
                     )}

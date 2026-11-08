@@ -17,9 +17,9 @@ import Kicker from '@/components/ui/Kicker'
 
 const LOGOS: Record<GameSource, ReactNode> = {
   ra: <RaLogo height={11} />,
-  steam: <SteamLogo size={14} className="text-[#66c0f4]" aria-hidden="true" />,
-  psn: <PlaystationLogo size={14} className="text-[#0070d1]" aria-hidden="true" />,
-  xbox: <XboxLogo size={14} className="text-[#107c10]" aria-hidden="true" />,
+  steam: <SteamLogo size={14} className="text-steam" aria-hidden="true" />,
+  psn: <PlaystationLogo size={14} className="text-psn" aria-hidden="true" />,
+  xbox: <XboxLogo size={14} className="text-xbox" aria-hidden="true" />,
 }
 
 /** Games played on each platform: how many, at 100%, under way, and how far along on average. */

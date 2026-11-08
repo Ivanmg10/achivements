@@ -29,9 +29,9 @@ const TOOLTIP_DELAY_MS = 450
 
 /** The ring an earned trophy gets, in its grade's colour. */
 const GRADE_RING: Record<TrophyGrade, string> = {
-  platinum: 'ring-sky-300',
+  platinum: 'ring-platinum',
   gold: 'ring-hardcore',
-  silver: 'ring-zinc-400',
+  silver: 'ring-silver',
   bronze: 'ring-warning',
 }
 
@@ -181,7 +181,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
                 </span>
               )}
               {tooltip.trophy.earned ? (
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-[#0070d1]/20 text-[#4da3ff]">{T.psn.earned}</span>
+                <span className="text-xs px-1.5 py-0.5 rounded-full bg-psn/20 text-psn-light">{T.psn.earned}</span>
               ) : (
                 <span className="text-xs text-text-secondary">{T.achievement.notEarned}</span>
               )}

@@ -58,11 +58,11 @@ export default function LandingBento() {
             RetroAchievements
           </li>
           <li className="flex items-center gap-2">
-            <SteamLogo size={15} className="text-[#66c0f4]" aria-hidden="true" />
+            <SteamLogo size={15} className="text-steam" aria-hidden="true" />
             Steam
           </li>
           <li className="flex items-center gap-2">
-            <PlaystationLogo size={15} className="text-[#0070d1]" aria-hidden="true" />
+            <PlaystationLogo size={15} className="text-psn" aria-hidden="true" />
             PlayStation
           </li>
         </ul>
