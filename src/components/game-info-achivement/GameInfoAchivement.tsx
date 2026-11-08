@@ -3,7 +3,7 @@ import { RetroAchievement } from '@/types/types'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { useLanguage } from '@/context/LanguageContext'
 import RarityBadge from '@/components/ui/RarityBadge'
-import { badgeClass, badgeImgClass, MID, NUM, ROW, TD, TD_FIRST, TYPE_TAG } from '@/components/ui/dataTable'
+import { badgeClass, badgeImgClass, MID, NUM, raTypeTag, ROW, TD, TD_FIRST, TYPE_TAG } from '@/components/ui/dataTable'
 
 /**
  * One achievement as a row of the RA game table. The title is the button that
@@ -28,18 +28,13 @@ export default function GameInfoAchivement({
 }) {
   const { T, lang } = useLanguage()
 
-  const TYPE_BADGES: Record<string, { label: string; className: string }> = {
-    progression: { label: T.achievement.progression, className: 'bg-info/[0.14] text-info' },
-    win_condition: { label: T.achievement.winCondition, className: 'bg-warning/[0.16] text-warning' },
-    missable: { label: T.achievement.missable, className: 'bg-danger/[0.16] text-danger' },
-  }
 
   if (!achievement) return null
 
   const earned = !!achievement.DateEarned
   const earnedHardcore = !!achievement.DateEarnedHardcore
   const rarityPct = numDistinctPlayers > 0 ? (achievement.NumAwarded / numDistinctPlayers) * 100 : null
-  const typeBadge = achievement.Type ? TYPE_BADGES[achievement.Type] : null
+  const typeBadge = raTypeTag(achievement.Type, T.achievement)
   const fmt = (n: number) => n.toLocaleString(lang)
   const when = achievement.DateEarnedHardcore ?? achievement.DateEarned
   const earnedDate = when

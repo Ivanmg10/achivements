@@ -15,6 +15,7 @@ import Modal from '@/components/ui/Modal'
 import { decimal } from '@/utils/utils'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { parseUnlockTime } from '@/utils/dates'
+import { raTypeTag } from '@/components/ui/dataTable'
 
 interface AchievementUnlock {
   User: string
@@ -83,13 +84,8 @@ export default function AchievementModal({
 
   const COMMENTS_PER_PAGE = 50
 
-  const TYPE_BADGES: Record<string, { label: string; className: string }> = {
-    progression: { label: T.achievement.progression, className: 'bg-info/20 text-info' },
-    win_condition: { label: T.achievement.winCondition, className: 'bg-warning/20 text-warning' },
-    missable: { label: T.achievement.missable, className: 'bg-danger/20 text-danger' },
-  }
 
-  const typeBadge = achievement.Type ? TYPE_BADGES[achievement.Type] : null
+  const typeBadge = raTypeTag(achievement.Type, T.achievement)
   const earned = !!achievement.DateEarned
   const earnedHardcore = !!achievement.DateEarnedHardcore
   const rarityPct = numDistinctPlayers > 0

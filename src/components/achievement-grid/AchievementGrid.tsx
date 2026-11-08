@@ -14,6 +14,7 @@ import { capList } from '@/utils/utils'
 import { tooltipStyle } from '@/utils/tooltipStyle'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { raTypeTag } from '@/components/ui/dataTable'
 
 type TooltipData = { achievement: RetroAchievement; x: number; y: number }
 
@@ -87,11 +88,7 @@ export const AchievementGrid = memo(function AchievementGrid({
     }
   }, [badgeKey])
 
-  const TYPE_BADGES: Record<string, { label: string; className: string }> = {
-    progression: { label: T.achievement.progression, className: 'bg-info/20 text-info' },
-    win_condition: { label: T.achievement.completed, className: 'bg-warning/20 text-warning' },
-    missable: { label: T.achievement.missable, className: 'bg-danger/20 text-danger' },
-  }
+  const tooltipTag = tooltip ? raTypeTag(tooltip.achievement.Type, T.achievement) : null
 
   function handleEnter(a: RetroAchievement, x: number, y: number) {
     hoverTimeout.current = setTimeout(() => setTooltip({ achievement: a, x, y }), 450)
@@ -193,12 +190,8 @@ export const AchievementGrid = memo(function AchievementGrid({
             </p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span className="text-xs text-text-secondary">{tooltip.achievement.Points} pts</span>
-              {tooltip.achievement.Type && TYPE_BADGES[tooltip.achievement.Type] && (
-                <span
-                  className={`text-xs px-1.5 py-0.5 rounded-full ${TYPE_BADGES[tooltip.achievement.Type].className}`}
-                >
-                  {TYPE_BADGES[tooltip.achievement.Type].label}
-                </span>
+              {tooltipTag && (
+                <span className={`text-xs px-1.5 py-0.5 rounded-full ${tooltipTag.className}`}>{tooltipTag.label}</span>
               )}
               {tooltip.achievement.DateEarnedHardcore && (
                 <span className="text-xs px-1.5 py-0.5 rounded-full bg-warning/20 text-warning">
