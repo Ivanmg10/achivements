@@ -56,8 +56,7 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 - *`src/utils/raAssets.ts` (UT-01, D2-05):* `raImageUrl(path)`, `raBadgeUrl(name)`, `raAvatarUrl(user)` (moved from
   `lib/raProfile`, which reaches RA's client and so could not be imported by components).
 - *Types (UT-03, UT-09):* `src/types/game.ts` — `GameSource`, `GameStatus`, `SavedGame`, `GameProgressBase`,
-  `GameAchievement` (the core `InsightAchievement` and `CompareAchievement` now extend). `types/steam.ts` re-exports
-  `GameSource` and `GameProgressBase` until their importers move.
+  `GameAchievement` (the core `InsightAchievement` and `CompareAchievement` now extend). `GameSource` and `GameProgressBase` are imported from here (the old re-export in `types/steam.ts` is gone).
 - *Platforms (UT-02):* `isGameSource` reads `GAME_SOURCES`; `raGameId(g)` (UT-08) in `gameRef.ts`.
 - *Hidden games in SQL (LB-01):* `notHidden(row, user?)` in `src/lib/gameVisibility.ts`.
 - *One game's achievements on any platform (HK-05):* `src/utils/gameAchievements.ts` — `fetchGameAchievements(source,
@@ -72,7 +71,7 @@ need these first.
 **Decisions** — API kept to what the real uses need. The 401 bodies were kept per route, as asked ("same responses"),
 though no client reads them; unifying them is a one-line change per route later. `T.psn[grade]` instead of a
 `trophyGradeLabel`. `raGameId` keeps the library lists' priority (`GameID`, then `ID`). The re-export in `types/steam.ts`
-is temporary.
+was dropped in the second round.
 **Visible changes (drifts fixed, on purpose)** — *Dates:* `formatDate` was fixed to `en-GB`; it now uses the reader's
 language, so an English reader sees "Sep 07, 2026" instead of "07 Sept 2026", and a Spanish one "07 sept 2026" (lists,
 cards and trophy/achievement tooltips). *Loaders:* the copies disagreed, the hook keeps one behaviour: a new URL, account
@@ -84,70 +83,44 @@ waiting when the dates answer is malformed (it used to wait forever). `RecentAch
 session is read, as the other providers are (it said "not loading, nothing" for that moment). A final failure logs
 `[useRetryingRead] <url>`; per-attempt logs of pins and the showcase are gone. *Upstream:* a Steam error now carries
 `retryAfter` too (nothing reads it).
-**Open — the list for the next agent (same branch; one commit per helper; `npx tsc --noEmit`, lint and `npx jest --ci`
-after each).** Grep from `src/`, skip tests unless they import what moved.
-1. **Dates** (`src/utils/dates.ts`).
-   - `grep -rnE "toISOString\(\)\.(split\('T'\)\[0\]|slice\(0, 10\))"` (34 sites in 17 files) → `utcDay(d)`. *Trap:* a few
-     build a **local** date and then take its UTC day (`groupByDays` in `utils.tsx`); `utcDay` keeps that exactly, do not
-     switch one to `localDay` unless it is a bug you can show. Server day keys (`vaultMe`, `upstreamCount`, `streaks`) stay UTC.
-   - Local `YYYY-MM-DD` built by hand in `StreakYearHeatmap.tsx:14` and `StreakPage.tsx:30` → `localDay`.
-   - Move `relativeTime`, `formatDay`, `daysBetween` and `unlockSpan` from `utils.tsx` to `dates.ts` (update imports).
-     Fold `formatUnlockDate` (`gameCompare.ts`), `formatUnlock` (`steamFeed.ts`) and `lastPlayedAgo` (`libraryShelves.ts`)
-     into `formatDate` / `relativeTime` where they are the same thing.
-   - `grep -rn "toLocaleDateString("` (51): where the input is a platform's date string, `formatDate(s, lang, options)`.
-     *Trap:* a calendar day ("2026-06-05") is `formatDay` (read as local), not `formatDate`; keep each call's options.
-   - *Do not touch* `raIso` in `vaultScoreInputs.ts`: it keeps an ISO string as it came and writes `…Z` without
-     milliseconds; the score inputs carry it, so changing it may change stored unlock data. `unlockTime` in
-     `activityInsights.ts` is already on `parseUnlockTime`.
-2. **RA URLs** (`src/utils/raAssets.ts`).
-   - `grep -rln "media.retroachievements.org/Badge/"` (12 files) → `raBadgeUrl(name)`; `grep -rln 'retroachievements.org${'`
-     (23 files) → `raImageUrl(path)`; `UserPic` in `AchievementModal.tsx` and `GameInfoComments.tsx` → `raAvatarUrl(user)`;
-     drop `raBadge` (`gameCompare.ts`), `raImage` (`useGameInsights.ts`, already gone) and similar.
-   - *Traps:* the helpers return `undefined` for nothing; where the field is `string | null` write `raBadgeUrl(x) ?? null`.
-     Links to RA **pages** (`https://retroachievements.org/game/…`, `/user/…`) are not pictures: leave them.
-     `raAvatarUrl` encodes the name (a no-op for RA names).
-3. **Platforms** (`src/utils/gameRef.ts`).
-   - Lists: `FollowingCardPlatforms.tsx:8`, `FollowingToolbar.tsx:11`, `AddGameModal.tsx:25`, `LibraryPlatformTabs.tsx:28`,
-     `MainPageFriendsCard.tsx:20`, `PublicUserAbout.tsx:51`, `PublicUserGames.tsx:39`, `UserSummary.tsx:18`,
-     `VaultPlatformSplit.tsx:6`, `MainPlatformContext.tsx:12`, `library.ts:149` → `GAME_SOURCES`. *Trap:* where it is
-     `as const` and the code needs the literal type, `GAME_SOURCES` is `readonly GameSource[]`, which is enough for a
-     `.filter`/`.map`; check the result's type. `PLATFORM_STEPS` (`useWelcomeSteps.ts`) leaves Xbox out on purpose: keep it.
-   - Names: `useVaultFill.ts:16`, `AdminRankings.tsx:9`, `NotFoundGame.tsx:11`, `user/[username]/opengraph-image.tsx:13`
-     → `PLATFORM_NAME`. *Keep:* `aiExport.ts` ("PlayStation Network", for the prompt) and `AdminLinkedAccounts.tsx` ("PSN").
-   - RA id: `[category]/(list)/page.tsx:145,154`, `sectionPreview.ts:37`, `useGamesByCategory.ts:73`, `libraryShelves.ts:23`
-     → `raGameId(g)`. *Trap:* the want-to-play reads `g.ID ?? g.GameID!` (`library.ts:60`, `gameCandidates.ts:87`,
-     `useAllGamesGlobal`) put `ID` first, the other way round; leave them unless you show both always agree.
-4. **Types** (`src/types/game.ts`).
-   - `grep -rlE "import type \{[^}]*\bGameSource\b[^}]*\} from '@/types/steam'"` (57 files) → import `GameSource` (and
-     `GameProgressBase`) from `@/types/game`; then delete the re-export at the top of `types/steam.ts`.
-   - Status aliases → `GameStatus`: `SteamCategory` (`steamFeed.ts`), `PsnCategory` (`psnTitles.ts`), `XboxCategory`
-     (`xboxTitles.ts`), `LibraryCategory` (`LibraryGameDetail.tsx`), `ValidCategory` (`useGamesByCategory.ts`), the inline
-     one in `MainPageConsoleNav.tsx:18`, `LibraryStatus` (`library.ts`). Delete each alias and update its importers.
-   - `SavedGame` copies in `api/users/[username]/route.ts:10`, `lib/publicUser.ts:23`, `utils/friends.ts:14`, inline in
-     `useCheevoUser.ts` → `import type { SavedGame } from '@/types/game'`.
-   - `MainPlatform` (`MainPlatformContext.tsx`), `Platform` (`aiExport.ts`, `AdminLinkedAccounts.tsx`), inline unions in
-     `api/favorites/route.ts` (`parseSource`) → `GameSource`.
-   - Not done, and not mechanical (UT-09/UT-10, better in #125): merging the `fromRa…fromXbox` and `*CompareList` mappers.
-     *Traps:* RA's date is `DateEarnedHardcore ?? DateEarned` in insights but `||` in compare (an empty string differs),
-     compare sorts RA by `DisplayOrder` and insights do not.
-5. **Hidden games in SQL** (`notHidden` in `src/lib/gameVisibility.ts`): `grep -rn "hidden_games h WHERE"`.
-   `vaultMe.ts:53,65` and `scoreRefresh.ts:391,419` → `${notHidden('g')}`; `groupList.ts:28` →
-   `${notHidden('game_group_items', 'g.user_id')}`, `:35` → `notHidden('n', 'g.user_id')`, `:40` → `notHidden('i', 'g.user_id')`;
-   `api/groups/[id]/route.ts:48` → `notHidden('i', '$3')`; `api/follows/overview/route.ts:48` → `notHidden('sc', 'u.id')`.
-   The text is identical, so the SQL-string tests keep passing. *Keep by hand:* the overview's four favourites (literal
-   source, id from JSON), its `"hiddenGames"` list, and the `JOIN hidden_games` in `follows/playing`.
-6. **One game's achievements** (`raAchievementList` in `src/utils/gameAchievements.ts`):
-   `grep -rn "Object.values(.*Achievements ?? {})"` — `GameInfoHeader.tsx:57`, `GameInfoTable.tsx:56`, `SortableItem.tsx:70`,
-   `PinnedGameRow.tsx:60`, `RaLibraryDetail.tsx:46`, `RARecentlyPlayed.tsx:165`, `useGroupPage.ts:134`, `aiExport.ts:82`,
-   `gameCompare.ts:37` → `raAchievementList(game)` followed by the call site's own filter or sort.
-7. **PSN grades:** `grep -rln "platinum: T.psn.platinum"` (7 files) → `T.psn[t.type]`. *Trap:* `PsnTrophyCounts` and
-   `PsnTrophyGrid` keep a map they look up by grade; `T.psn[grade]` replaces the lookup, `TROPHY_GRADES` keeps the order.
-8. **Sessions, left on purpose:** `groups/[id]` GET and `rankings` GET read an optional session (signed out is allowed);
+**Done in the second round (`refactor/119-shared-helpers-2`, one commit per point):** the day keys (every `toISOString()` split/slice
+→ `utcDay`, 2 hand-built local ones → `localDay`), `relativeTime`/`formatDay`/`daysBetween`/`unlockSpan` moved to `dates.ts`, 16 platform
+`toLocaleDateString` sites and the three calendar-day tooltips → `formatDate`/`formatDay`; ~40 files of RA picture URLs → `raAssets`; the
+platform list (`GAME_SOURCES`, 13 sites), names (`PLATFORM_NAME`, 4) and `raGameId` (4 files, 5 sites); `GameSource`/`GameProgressBase`
+imports (59 files) and the re-export in `types/steam.ts` is gone; the 7 status aliases → `GameStatus`; the `SavedGame` and
+`MainPlatform`/`Platform`/`parseSource` copies; `notHidden` (9 SQL sites, 5 files); `raAchievementList` (9 files); `T.psn[grade]` (7
+files); `api/users/[username]` GET on `requireSession`. Things a reader may see: a platform date that cannot be read now shows "—"
+instead of "Invalid Date" (`formatDate`), and `formatUnlock` (date and time) is `formatDate` with its options.
+**Open — what really is left (same rules: one commit per helper; `npx tsc --noEmit`, lint and `npx jest --ci` after each).**
+1. **Dates.** Left on purpose, each differs from the helper:
+   - `toLocaleDateString(undefined, …)` / no argument, i.e. the **browser's** locale, not the app's language (`AchievementGrid`,
+     `AchievementModal` ×3, `GameInfoComments`, `AdminPsnToken`, `AdminXboxGame`): moving them to `formatDate(s, lang)` changes
+     what the reader sees. Do it only if the owner agrees the app's language should win there.
+   - `'default'` locale on calendar days (`DayAchievementsModal`, `PeriodAchievementsModal`, `WeekAchievementsModal`): same reason.
+   - RA strings that may carry no zone and are read by `new Date(x)` as **local** time (`LibraryListRow`, `LibraryDetailMilestones`,
+     `LibraryGameDetail:112` `completedAt`, `ShowcaseTile`, `StatusGameItem` ×3 on RA's `AwardedAt` and `lastPlayed`): `formatDate` would read them as UTC. Check what each really holds, and fix as a
+     bug if they are zone-less (a day near midnight shifts), not as a refactor.
+   - `formatUnlockDate` (`gameCompare.ts`) answers `null` for "no date" (the caller shows "earned, no date"), `formatDate` answers
+     "—"; `lastPlayedAgo` (`libraryShelves.ts`) counts calendar days with `numeric: 'auto'`, `relativeTime` uses short units. Not the
+     same thing, so both stay. `VaultWeeksChart` formats a UTC day (`timeZone: 'UTC'`), `formatDay` reads local.
+   - `raIso` (`vaultScoreInputs.ts`): do not touch (stored unlock data). `unlockTime` in `activityInsights.ts` is already on `parseUnlockTime`.
+2. **RA URLs.** Left: `AuthCollagePanel` and `LandingBento` (constant lists of `media.retroachievements.org/Images/…` pictures, not
+   built from a path); links to RA **pages** (`/user/…`, `/game/…`, `/settings`); the image proxy's host list. Where the field was
+   unguarded in an `<Image src>` the call is `raImageUrl(x)!` (its JSX is already inside a `x ? … : …` / `x && …` guard).
+3. **Platforms.** `PLATFORM_STEPS` (Xbox out on purpose), `aiExport.ts` ("PlayStation Network"), `AdminLinkedAccounts.tsx` ("PSN") and
+   `VaultPlatformSplit`'s short names ("RA", "PSN") stay. The want-to-play reads that put `ID` before `GameID` (`library.ts:60`,
+   `gameCandidates.ts:87`, `useAllGamesGlobal`) stay as they are (opposite priority to `raGameId`); the OG card
+   (`user/[username]/opengraph-image.tsx`) keeps its own three-platform list (no Xbox) and takes only the names.
+4. **Types.** Not done, and not mechanical (UT-09/UT-10, better in #125): merging the `fromRa…fromXbox` and `*CompareList` mappers.
+   *Traps:* RA's date is `DateEarnedHardcore ?? DateEarned` in insights but `||` in compare (an empty string differs), compare
+   sorts RA by `DisplayOrder` and insights do not.
+5. **Sessions, left on purpose:** `groups/[id]` GET and `rankings` GET read an optional session (signed out is allowed);
    `perfectGamesOrder` GET and `showcase` GET read the **viewer's** admin flag after `dataOwner(req)` named someone else.
-   `api/users/[username]/route.ts:20` calls `dataOwner()` with no request, which is `requireSession()` in disguise: move it.
-9. Optional, judgement needed: `usePsnSummary`, `useXboxSummary`, `useSteamProfile`, `usePsnTrophies`,
-   `useXboxAchievements` keep a `hasFetched` ref with no background retry; `useRetryingRead` could replace them only if
-   retrying their platforms is wanted (Xbox has a 150-calls-an-hour budget: ask first).
+6. **`notHidden` — kept by hand:** the overview's four favourites (literal source, id from JSON), its `"hiddenGames"` list, and the
+   `JOIN hidden_games` in `follows/playing`.
+7. Optional, judgement needed: `usePsnSummary`, `useXboxSummary`, `useSteamProfile`, `usePsnTrophies`, `useXboxAchievements` keep a
+   `hasFetched` ref with no background retry; `useRetryingRead` could replace them only if retrying their platforms is wanted
+   (Xbox has a 150-calls-an-hour budget: ask first). Not touched.
 **Watch out** — Never change a key derivation in `secretBox`, `raKey`, `adminAuth`, `emailVerification` or `steamLogin`:
 `secrets.test.ts` fails, and so would every sealed key and link in production. `useRetryingRead`'s `parse` must be made
 once (module level): a new function per render starts a new read every render. A route test that mocks `@/lib/apiAuth`
