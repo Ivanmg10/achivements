@@ -1,6 +1,7 @@
 import { after } from 'next/server'
 import pool from '@/lib/db'
 import { queryRows } from '@/lib/queryRows'
+import { vaultTotals } from '@/lib/rankings'
 import { allowAttempt } from '@/lib/attemptLimit'
 import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raClient'
 import { getOwnedGames } from '@/lib/steamClient'
@@ -14,6 +15,7 @@ import { runWithXboxTelemetry } from '@/lib/xboxTelemetry'
 import type { GameSource, SteamOwnedGamesResponse } from '@/types/steam'
 import type { TrophyCounts } from '@/types/psn'
 import { isConsoleShown } from '@/utils/consoleFilter'
+import { canUseXbox } from '@/utils/xboxAccess'
 import { RULES_VERSION, looksUnlockedByTool, provisionalScore, scoreGame, stackFactors, stackKey, type GameScore, type ScoreUnlock } from '@/utils/vaultScore'
 import { hiddenConsolesFrom, psnGradeShare, psnScoreInputs, raScoreInputs, steamScoreInputs, xboxScoreInputs } from '@/utils/vaultScoreInputs'
 import { monthStart, weekStart } from '@/utils/vaultLevel'
@@ -528,12 +530,10 @@ async function saveFillStatus(userId: number, status: FillStatus): Promise<void>
   }
 }
 
+/** The same total the header and the rankings show (hidden games and other accounts left out), for the "ready" toast's level. */
 async function totalPoints(userId: number): Promise<number> {
-  const rows = await queryRows<{ points: number | null }>(
-    `SELECT SUM(points * stack_factor)::float AS points FROM score_games WHERE user_id = $1 AND flag IS DISTINCT FROM 'suspect'`,
-    [userId],
-  )
-  return Math.round(rows[0]?.points ?? 0)
+  const [user] = await queryRows<{ admin: boolean | null }>('SELECT admin FROM users WHERE id = $1', [userId])
+  return (await vaultTotals([userId], canUseXbox(user?.admin))).get(userId) ?? 0
 }
 
 /**

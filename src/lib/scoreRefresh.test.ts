@@ -12,6 +12,7 @@ jest.mock('@/lib/steamProgress', () => ({
   loadGlobalPct: jest.fn(async () => new Map()),
   withLastPlayed: jest.fn(async (_auth: unknown, data: unknown) => data),
 }))
+jest.mock('@/lib/rankings', () => ({ vaultTotals: jest.fn() }))
 jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn(async () => true) }))
 jest.mock('@/lib/upstreamCount', () => ({ steamBudgetLow: jest.fn(async () => false) }))
 jest.mock('@/lib/psnClient', () => {
@@ -39,6 +40,7 @@ jest.mock('@/lib/xboxClient', () => {
 import pool from '@/lib/db'
 import { readCache, writeCache } from '@/lib/steamCache'
 import { allowAttempt } from '@/lib/attemptLimit'
+import { vaultTotals } from '@/lib/rankings'
 import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
 import { XboxError, xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
@@ -76,6 +78,7 @@ beforeEach(() => {
   ;(pool.connect as jest.Mock).mockResolvedValue(client)
   client.query.mockResolvedValue({ rows: [] })
   ;(allowAttempt as jest.Mock).mockResolvedValue(true)
+  ;(vaultTotals as jest.Mock).mockResolvedValue(new Map([[7, 1234]]))
   query.mockImplementation(async (sql: string, params: unknown[]) => {
     if (sql.includes('FROM users WHERE id')) return { rows: [userRow] }
     if (sql.includes('SELECT source, game_id FROM hidden_games')) return { rows: [{ source: 'psn', game_id: 3 }] }
@@ -88,7 +91,6 @@ beforeEach(() => {
       kept = params[2] as number[]
       return { rowCount: 1 }
     }
-    if (sql.includes('SUM(points * stack_factor)')) return { rows: [{ points: 1234.4 }] }
     if (sql.includes('UPDATE users SET score_refreshed_at')) return { rowCount: 1 }
     return { rows: [], rowCount: 0 }
   })
@@ -294,6 +296,18 @@ describe('passes and their status', () => {
     expect(saved[0]).toMatchObject({ running: true })
     expect(saved.at(-1)).toMatchObject({ running: false, complete: true })
     expect(query.mock.calls.some(([sql]) => sql === 'UPDATE users SET score_refreshed_at = now() WHERE id = $1')).toBe(true)
+  })
+
+  it("the total a pass reports is the header's: vaultTotals, Xbox only for an admin (LB-02)", async () => {
+    ;(readCache as jest.Mock).mockResolvedValue(null)
+    ;(vaultTotals as jest.Mock).mockResolvedValue(new Map([[7, 800]]))
+    userRow = user({ psnaccountid: 'acc', admin: true })
+    expect(await runScorePass(7, 10_000)).toMatchObject({ points: 800 })
+    expect(vaultTotals).toHaveBeenLastCalledWith([7], true)
+
+    userRow = user({ psnaccountid: 'acc', admin: false })
+    await runScorePass(7, 10_000)
+    expect(vaultTotals).toHaveBeenLastCalledWith([7], false)
   })
 
   it('an unfinished pass leaves the row free for the next one', async () => {
