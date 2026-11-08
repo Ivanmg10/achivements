@@ -3,13 +3,10 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
+import { STATUS_GRID_COLS } from '@/components/status-grid-control/statusGridCols'
+import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 
 const CARDS = 6
-const GRID: Record<number, string> = {
-  1: 'grid-cols-1',
-  2: 'grid-cols-1 lg:grid-cols-2',
-  3: 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3',
-}
 
 /**
  * A status list (want to play, playing, completed) while it loads, in the
@@ -17,7 +14,7 @@ const GRID: Record<number, string> = {
  * cards shaped like the real ones (cover, title, chips, counts). It sits
  * where the list will be instead of covering the screen. Announced once.
  */
-export default function StatusPageSkeleton({ cols = 2 }: { cols?: number }) {
+export default function StatusPageSkeleton({ cols = 2 }: { cols?: StatusGridCols }) {
   const { T } = useLanguage()
 
   return (
@@ -36,7 +33,7 @@ export default function StatusPageSkeleton({ cols = 2 }: { cols?: number }) {
             <Skeleton key={i} radius="chip" className="h-7" style={{ width: `${w * 0.25}rem` }} />
           ))}
         </div>
-        <div className={`grid gap-2 ${GRID[cols] ?? GRID[2]}`}>
+        <div className={`grid gap-3 items-start w-full ${STATUS_GRID_COLS[cols]}`}>
           {Array.from({ length: CARDS }, (_, i) => (
             <GameCardSkeleton key={i} />
           ))}

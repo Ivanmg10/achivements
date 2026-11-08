@@ -2,7 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import type { LibraryEntry } from '@/utils/libraryInsights'
-import { STATUS_GRID_COLS } from '@/components/statusGameList/StatusGameList'
+import { STATUS_GRID_COLS } from '@/components/status-grid-control/statusGridCols'
 import StatusGameItem from '@/components/statusGameList/StatusGameItem'
 import SteamStatusGameItem from '@/components/steam/steam-status-game-item/SteamStatusGameItem'
 import PsnStatusGameItem from '@/components/psn/psn-status-game-item/PsnStatusGameItem'

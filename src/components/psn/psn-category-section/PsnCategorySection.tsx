@@ -11,7 +11,7 @@ import CollapsibleSection from '@/components/collapsible-section/CollapsibleSect
 import CollapsibleSectionPreview from '@/components/collapsible-section/collapsible-section-preview/CollapsibleSectionPreview'
 import PsnStatusGameItem from '@/components/psn/psn-status-game-item/PsnStatusGameItem'
 import EmptyState from '@/components/empty-state/EmptyState'
-import { STATUS_GRID_COLS } from '@/components/statusGameList/StatusGameList'
+import { STATUS_GRID_COLS } from '@/components/status-grid-control/statusGridCols'
 import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
 

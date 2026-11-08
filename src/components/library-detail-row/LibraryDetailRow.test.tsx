@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import LibraryDetailRow from './LibraryDetailRow'
-import { STATUS_GRID_COLS } from '@/components/statusGameList/StatusGameList'
+import { STATUS_GRID_COLS } from '@/components/status-grid-control/statusGridCols'
 
 test('draws nothing while closed', () => {
   render(<LibraryDetailRow open={false} id="p" title="Hades"><p>inside</p></LibraryDetailRow>)

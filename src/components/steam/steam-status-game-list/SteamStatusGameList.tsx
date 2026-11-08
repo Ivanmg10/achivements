@@ -1,5 +1,5 @@
 import SteamStatusGameItem from '@/components/steam/steam-status-game-item/SteamStatusGameItem'
-import { STATUS_GRID_COLS } from '@/components/statusGameList/StatusGameList'
+import { STATUS_GRID_COLS } from '@/components/status-grid-control/statusGridCols'
 import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import type { SteamGameProgress } from '@/types/steam'
 
