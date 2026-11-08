@@ -11,6 +11,7 @@ import BrowseSearchChips from '../browse-search-chips/BrowseSearchChips'
 import { fieldClass } from '@/components/ui/Input'
 import type { GameSource } from '@/types/game'
 import type { GameStatus } from '@/types/game'
+import { kickerClass } from '@/components/ui/Kicker'
 
 const SHOWN = 4
 
@@ -27,7 +28,7 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <label htmlFor={inputId} className="text-[10px] uppercase tracking-widest text-text-secondary">
+      <label htmlFor={inputId} className={kickerClass()}>
         {T.cards.searchTitle}
       </label>
       <div className="relative">
@@ -75,7 +76,7 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
             <li key={g.key}>
               <Link
                 href={g.href}
-                className="flex items-center gap-2.5 rounded-tile bg-bg-main p-2 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 min-w-0"
+                className="flex items-center gap-2.5 rounded-tile bg-bg-main p-2 hover:bg-ink/5 transition-colors focus-ring min-w-0"
               >
                 {g.iconUrl ? (
                   <Image src={g.iconUrl} alt="" width={32} height={32} unoptimized className="w-8 h-8 rounded-box-md object-cover shrink-0" />

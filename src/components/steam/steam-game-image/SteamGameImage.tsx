@@ -55,9 +55,9 @@ export default function SteamGameImage({
         role={alt ? 'img' : undefined}
         aria-label={alt || undefined}
         aria-hidden={alt ? undefined : true}
-        className={`bg-[#1b2838] flex items-center justify-center ${className}`}
+        className={`bg-steam-dark flex items-center justify-center ${className}`}
       >
-        <SteamLogo size={Math.round(size / 2)} className="text-[#66c0f4]" aria-hidden="true" />
+        <SteamLogo size={Math.round(size / 2)} className="text-steam" aria-hidden="true" />
       </div>
     )
   }

@@ -12,6 +12,7 @@ import DesignCatalogControls from './design-catalog-controls/DesignCatalogContro
 import DesignCatalogData from './design-catalog-data/DesignCatalogData'
 import DesignCatalogDisclosure from './design-catalog-disclosure/DesignCatalogDisclosure'
 import DesignCatalogFeedback from './design-catalog-feedback/DesignCatalogFeedback'
+import Kicker from '@/components/ui/Kicker'
 
 const COUNT = GROUPS.reduce((n, g) => n + g.pieces.length, 0)
 
@@ -34,7 +35,7 @@ export default function DesignCatalog() {
         className="relative overflow-hidden rounded-card ring-1 ring-inset ring-ink/[0.06] p-6 sm:p-10 flex flex-col gap-5"
         style={{ background: 'radial-gradient(ellipse at top left, rgb(var(--accent) / 0.2), transparent 60%), rgb(var(--bg-card))' }}
       >
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">CheevoVault · {COUNT} pieces · admins only</p>
+        <Kicker size="md" tone="accent">CheevoVault · {COUNT} pieces · admins only</Kicker>
         <h1 className="enter-rise font-display italic font-extrabold text-5xl sm:text-[5rem] leading-[0.9] pr-2">Design system</h1>
         <p className="max-w-3xl text-base sm:text-lg text-text-main/85 leading-relaxed">
           Every piece of <code>src/components/ui</code>, live. New screens are built from these; a missing piece is added here first, with its test.

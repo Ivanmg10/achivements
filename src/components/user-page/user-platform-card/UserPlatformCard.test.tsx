@@ -4,7 +4,7 @@ import { en } from '@/translations/en'
 
 describe('platformStat', () => {
   test("a number is written in the reader's language, and is loading while it is on its way", () => {
-    expect(platformStat('Games', 1234, { lang: 'es' })).toEqual({ label: 'Games', value: (1234).toLocaleString('es'), accent: undefined, loading: false })
+    expect(platformStat('Games', 1234, { lang: 'es' })).toEqual({ label: 'Games', value: (1234).toLocaleString('es'), tone: undefined, loading: false })
     expect(platformStat('Games', undefined, { lang: 'en', loading: true })).toMatchObject({ value: '—', loading: true })
   })
 

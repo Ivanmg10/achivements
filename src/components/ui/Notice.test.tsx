@@ -8,6 +8,12 @@ it('announces an error, tinted in the danger colour', () => {
   expect(alert.className).toContain('bg-danger/10')
 })
 
+it('a warning can be announced too, and a small one fits a line in a card', () => {
+  render(<Notice tone="warning" alert size="sm">Your key stopped working</Notice>)
+  const alert = screen.getByRole('alert')
+  expect(alert).toHaveClass('text-xs', 'rounded-box')
+})
+
 it('says the rest politely, with a title and an action', () => {
   render(<Notice tone="success" title="Saved" action={<button>Undo</button>}>Your profile is public now</Notice>)
   expect(screen.getByRole('status')).toHaveTextContent('Saved')

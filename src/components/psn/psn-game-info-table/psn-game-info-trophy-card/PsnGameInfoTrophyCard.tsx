@@ -49,7 +49,7 @@ export default function PsnGameInfoTrophyCard({
         type="button"
         onClick={onOpen}
         aria-label={concealed ? T.psn.hiddenTrophy : t.name}
-        className="absolute inset-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 rounded-tile focus-ring"
       />
       <div className="relative shrink-0 pointer-events-none">
       {t.iconUrl && !concealed ? (

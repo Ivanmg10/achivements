@@ -1,9 +1,14 @@
 'use client'
 
-import { StatPill, StatCard } from '@/components/ui/StatPill'
+import { IconDeviceGamepad2 } from '@tabler/icons-react'
+import Figure from '@/components/ui/Figure'
 import RarityBadge from '@/components/ui/RarityBadge'
+import Tag, { type TagTone } from '@/components/ui/Tag'
+import Avatar from '@/components/ui/Avatar'
+import ListRow from '@/components/ui/ListRow'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { CircularProgress } from '@/components/ui/CircularProgress'
+import DataBar from '@/components/ui/DataBar'
 import StreakTag from '@/components/ui/StreakTag'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
@@ -12,7 +17,9 @@ import { STREAK_TIERS } from '@/utils/streakTier'
 import { pointsForLevel } from '@/utils/vaultLevel'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
+import Kicker from '@/components/ui/Kicker'
 
+const TAG_TONES: TagTone[] = ['muted', 'neutral', 'accent', 'info', 'success', 'warning', 'danger', 'hardcore']
 const LEVELS = [1, 10, 20, 30, 45, 60, 75, 90]
 const GAME_ART = steamAssetUrl(1927720, 'cover')
 
@@ -37,9 +44,10 @@ export default function DesignCatalogData() {
       <DesignCatalogPiece id="figures">
         <Panel>
           <div className="flex flex-wrap items-start gap-8">
-            <Specimen name="StatPill lg"><StatPill label="Vault Points" value="143.820" sub="this week +48" /></Specimen>
-            <Specimen name="StatPill sm"><StatPill size="sm" label="Games" value={273} /></Specimen>
-            <Specimen name="StatCard"><StatCard label="Hardcore points" value={8893} accent="text-hardcore" /></Specimen>
+            <Specimen name="bare"><Figure label="Vault Points" value="143.820" sub="this week +48" /></Specimen>
+            <Specimen name="tile"><Figure look="tile" label="Games" value={273} /></Specimen>
+            <Specimen name="card · tone hardcore"><Figure look="card" label="Hardcore points" value={8893} tone="hardcore" /></Specimen>
+            <Specimen name="card compact · tone platinum"><Figure look="card" compact label="Platinum" value={12} tone="platinum" /></Specimen>
             <Specimen name="RarityBadge: 62 · 24 · 6.1 · 0.8 · unknown">{[62, 24, 6.1, 0.8, null].map((p, i) => <RarityBadge key={i} pct={p} />)}</Specimen>
           </div>
         </Panel>
@@ -54,6 +62,19 @@ export default function DesignCatalogData() {
         </Compare>
       </DesignCatalogPiece>
 
+      <DesignCatalogPiece id="data-bar">
+        <Compare>
+          <Specimen name="x · track · cut 4">
+            <span className="flex flex-col gap-2 w-48">{[0.9, 0.55, 0.2].map((s) => <DataBar key={s} track share={s} className="h-2" />)}</span>
+          </Specimen>
+          <Specimen name="y · cut 8 · soft and accent">
+            <span className="flex items-end gap-2 h-24 w-48">
+              {[0.3, 0.6, 1, 0.45, 0.15].map((s, i) => <span key={i} className="flex-1 h-full flex items-end"><DataBar axis="y" cut={8} min={4} share={s} tone={s === 1 ? 'accent' : 'soft'} className="w-full" /></span>)}
+            </span>
+          </Specimen>
+        </Compare>
+      </DesignCatalogPiece>
+
       <DesignCatalogPiece id="progress-ring">
         <Panel>
           <div className="flex flex-wrap items-center gap-8">
@@ -62,6 +83,43 @@ export default function DesignCatalogData() {
             <CircularProgress earned={69} total={100} size={128} strokeWidth={10} ariaLabel="69 %" center={<span className="font-display italic font-extrabold text-[2.5rem] leading-none">69%</span>} label="With its own centre" />
           </div>
         </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="tag">
+        <Compare>
+          <Specimen name="tone · md">{TAG_TONES.map((t) => <Tag key={t} tone={t}>{t}</Tag>)}</Specimen>
+          <Specimen name="size sm · md · lg">
+            <Tag size="sm" tone="info">Progression</Tag>
+            <Tag tone="accent">Beta</Tag>
+            <Tag size="lg" tone="neutral">PS5</Tag>
+          </Specimen>
+          <Specimen name="slant · lg">
+            <Tag slant size="lg" tone="neutral">Nintendo 64</Tag>
+            <Tag slant size="lg" tone="danger">2 missable</Tag>
+          </Specimen>
+          <Specimen name="overlay, on a picture">
+            <span className="rounded-tile p-3 bg-accent/40"><Tag tone="overlay">Steam</Tag></span>
+          </Specimen>
+        </Compare>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="avatar">
+        <Panel>
+          <Specimen name="initial · 32 · 40 · 56 · 72, online">
+            {[32, 40, 56, 72].map((s) => <Avatar key={s} name="Palmera" size={s} online />)}
+          </Specimen>
+          <Specimen name="icon fallback · a ring">
+            <Avatar name="Palmera" size={60} fallback="icon" />
+            <Avatar name="Palmera" size={60} ring="ring-2 ring-hardcore" />
+          </Specimen>
+        </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="list-row">
+        <Compare>
+          <ListRow media={<IconDeviceGamepad2 size={20} aria-hidden="true" />} title="Celeste" sub="Steam · 42 %" trailing={<Tag size="sm">PC</Tag>} />
+          <ListRow media={<Avatar name="Palmera" size={40} />} title="Palmera" sub="Level 57" />
+        </Compare>
       </DesignCatalogPiece>
 
       <DesignCatalogPiece id="streak-tag">
@@ -85,8 +143,8 @@ export default function DesignCatalogData() {
 
       <DesignCatalogPiece id="game-card">
         <div className="grid gap-3 lg:grid-cols-2">
-          <Panel><p className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-text-secondary">Colourful</p><GameRow style="tinted" /></Panel>
-          <Panel><p className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-text-secondary">Flat</p><GameRow style="flat" /></Panel>
+          <Panel><Kicker size="sm">Colourful</Kicker><GameRow style="tinted" /></Panel>
+          <Panel><Kicker size="sm">Flat</Kicker><GameRow style="flat" /></Panel>
         </div>
       </DesignCatalogPiece>
     </>

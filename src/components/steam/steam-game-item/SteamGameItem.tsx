@@ -10,13 +10,13 @@ import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamRecentlyPlayedExpanded from '@/components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { formatPlaytime } from '@/utils/steamFeed'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/dates'
 import type { SteamGameProgress } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
+import Tag from '@/components/ui/Tag'
 
 /**
  * One Steam game as a compact row card — the Steam counterpart of an RA card
@@ -44,7 +44,6 @@ export default function SteamGameItem({
   const subject = useSubject()
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
 
   const isExpanded = expanded ?? localExpanded
@@ -66,8 +65,7 @@ export default function SteamGameItem({
 
   return (
     <div
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} />
 
@@ -90,12 +88,12 @@ export default function SteamGameItem({
           <span className="flex items-center gap-2 min-w-0">
             <Link
               href={href}
-              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
+              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam rounded"
             >
               <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.title}</span>
             </Link>
-            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><SteamLogo size={12} className="opacity-60" aria-hidden="true" />
-                Steam</span>
+            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate"><SteamLogo size={12} className="opacity-60" aria-hidden="true" />
+                Steam</Tag>
           </span>
 
           <button
@@ -103,7 +101,7 @@ export default function SteamGameItem({
             aria-expanded={isExpanded}
             aria-controls={panelId}
             aria-label={`${isExpanded ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.title}`}
-            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] group"
+            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam group"
           >
             <span className="flex items-center gap-2 w-full">
               {hasCounts && (

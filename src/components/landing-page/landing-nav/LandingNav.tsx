@@ -18,13 +18,13 @@ export default function LandingNav() {
       >
         <Link
           href="/"
-          className="text-lg font-extrabold tracking-tight rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="text-lg font-extrabold tracking-tight rounded focus-ring"
         >
           {T.authPage.brand}
         </Link>
         <Link
           href="/authPage"
-          className="px-4 py-1.5 rounded-full text-sm font-medium bg-bg-main ring-1 ring-ink/10 hover:ring-ink/25 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="px-4 py-1.5 rounded-full text-sm font-medium bg-bg-main ring-1 ring-ink/10 hover:ring-ink/25 transition-shadow focus-ring"
         >
           {T.landing.signIn}
         </Link>

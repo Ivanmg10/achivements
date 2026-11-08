@@ -13,12 +13,12 @@ import GameIcon from '@/components/game-icon/GameIcon'
 import XboxGameItemAchievements from '@/components/xbox/xbox-game-item-achievements/XboxGameItemAchievements'
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { gameHref } from '@/utils/gameRef'
-import { xboxBackdrop, xboxPlatformChip, xboxTitleId } from '@/utils/xboxTitles'
+import { xboxBackdrop, xboxPlatformTone, xboxTitleId } from '@/utils/xboxTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { GameGroupItem } from '@/types/types'
 import { relativeTime } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * An Xbox game in a group — PsnSortableItem's counterpart: drag handle, icon,
@@ -41,7 +41,6 @@ export default function XboxSortableItem({
   const { fullLibrary } = useXboxGamesData()
   const [open, setOpen] = useState(false)
   const panelId = useId()
-  const onPointerMove = useSpotlight()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: !draggable,
@@ -65,8 +64,7 @@ export default function XboxSortableItem({
     <div
       ref={setNodeRef}
       style={style}
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`relative isolate bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       <GameCardBackdrop src={game ? xboxBackdrop(game) : icon} surface="card" />
       <div className="relative flex items-center gap-3 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">
@@ -103,10 +101,10 @@ export default function XboxSortableItem({
             </p>
           </Link>
           <span className="flex items-center gap-1.5 flex-wrap">
-            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${xboxPlatformChip(game?.consoleName ?? '')}`}>
+            <Tag size="xs" tone={xboxPlatformTone(game?.consoleName ?? '')}>
               <XboxLogo size={12} aria-hidden="true" />
               {game?.consoleName || 'Xbox'}
-            </span>
+            </Tag>
             {isComplete && (
               <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-success/10 text-success">
                 <span aria-hidden="true">★</span> {T.steam.perfect}

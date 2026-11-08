@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import { Skeleton } from '@/components/ui/Skeleton'
+import Kicker from '@/components/ui/Kicker'
 
 const PREVIEW = 6
 
@@ -30,7 +31,7 @@ export default function MainPageSteamNav() {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.navigation}</p>
+      <Kicker>{T.cards.navigation}</Kicker>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {SECTIONS.map(({ slug, emoji }) => {
           const { games } = sections[slug]
@@ -38,7 +39,7 @@ export default function MainPageSteamNav() {
             <div key={slug} className="bg-bg-main rounded-box p-3 flex flex-col gap-2.5">
               <Link
                 href={`/${slug}`}
-                className="flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
+                className="flex items-center justify-between group focus-ring rounded"
               >
                 <span className="flex items-center gap-1.5">
                   <span className="text-sm leading-none" aria-hidden="true">{emoji}</span>
@@ -46,7 +47,7 @@ export default function MainPageSteamNav() {
                     {T.categories[slug]}
                   </span>
                 </span>
-                <span className="text-[10px] font-semibold text-[#66c0f4] tabular-nums">{loading ? '—' : games.length}</span>
+                <span className="text-[10px] font-semibold text-steam tabular-nums">{loading ? '—' : games.length}</span>
               </Link>
 
               {loading ? (
@@ -63,7 +64,7 @@ export default function MainPageSteamNav() {
                       href={`/steamGame/${g.id}`}
                       title={g.title}
                       aria-label={g.title}
-                      className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                      className="rounded focus-ring"
                     >
                       {g.imageIcon ? (
                         <Image src={g.imageIcon} alt="" width={32} height={32} className="rounded-box-sm hover:scale-110 transition-transform" />

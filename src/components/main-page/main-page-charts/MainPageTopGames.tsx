@@ -11,6 +11,7 @@ import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { useSubject } from '@/context/SubjectContext'
 import { utcDay } from '@/utils/dates'
+import Kicker from '@/components/ui/Kicker'
 
 export default function MainPageTopGames({ achievements, isLoading }: { achievements: RecentAchievement[]; isLoading?: boolean }) {
   const { T } = useLanguage()
@@ -42,7 +43,7 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
   if (data.length === 0) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mostActiveGames}</p>
+        <Kicker>{T.cards.mostActiveGames}</Kicker>
         <EmptyState icon={<IconActivity className="w-6 h-6" />} title={T.cards.noData} size="compact" className="py-2" />
       </div>
     )
@@ -50,7 +51,7 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
 
   return (
     <div className="flex flex-col gap-2 flex-1">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mostActiveGames}</p>
+      <Kicker>{T.cards.mostActiveGames}</Kicker>
       <div className="flex flex-col gap-2 flex-1 enter-rows">
         {data.map(({ name, count, href, icon, console: con }) => (
           // The bar is each game against the busiest one, so the ranking reads at a glance.

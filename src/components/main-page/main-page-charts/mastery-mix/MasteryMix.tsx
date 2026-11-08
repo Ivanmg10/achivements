@@ -12,10 +12,10 @@ import type { UserAwards } from '@/types/types'
 export default function MasteryMix({ awards }: { awards: UserAwards }) {
   const { T } = useLanguage()
   const mix = [
-    { value: awards.MasteryAwardsCount ?? 0, label: T.cards.mastered, color: 'bg-[#D97706]' },
-    { value: awards.CompletionAwardsCount ?? 0, label: T.cards.completedSC, color: 'bg-[#2563EB]' },
-    { value: awards.BeatenHardcoreAwardsCount ?? 0, label: T.userStats.beatenHC, color: 'bg-[#15803D]' },
-    { value: awards.BeatenSoftcoreAwardsCount ?? 0, label: T.userStats.beatenSC, color: 'bg-[#9333EA]' },
+    { value: awards.MasteryAwardsCount ?? 0, label: T.cards.mastered, color: 'bg-award-mastered' },
+    { value: awards.CompletionAwardsCount ?? 0, label: T.cards.completedSC, color: 'bg-award-completed' },
+    { value: awards.BeatenHardcoreAwardsCount ?? 0, label: T.userStats.beatenHC, color: 'bg-award-beaten-hardcore' },
+    { value: awards.BeatenSoftcoreAwardsCount ?? 0, label: T.userStats.beatenSC, color: 'bg-award-beaten-softcore' },
   ]
   const total = mix.reduce((sum, m) => sum + m.value, 0)
   if (total === 0) return null

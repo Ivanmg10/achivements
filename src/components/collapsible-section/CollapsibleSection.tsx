@@ -66,7 +66,7 @@ export default function CollapsibleSection({
           onClick={() => setAndRemember(!open)}
           aria-expanded={open}
           aria-controls={panelId}
-          className="group w-full flex items-center gap-2.5 text-left rounded-tile px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="group w-full flex items-center gap-2.5 text-left rounded-tile px-1 py-1 focus-ring"
         >
           {icon}
           <span id={titleId}>{title}</span>
@@ -102,7 +102,7 @@ export default function CollapsibleSection({
               {preview}
               <button
                 onClick={() => setAndRemember(true)}
-                className="self-center flex items-center gap-1.5 rounded-full border border-ink/10 bg-ink/5 px-4 py-1.5 text-xs font-medium text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="self-center flex items-center gap-1.5 rounded-full border border-ink/10 bg-ink/5 px-4 py-1.5 text-xs font-medium text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-ring"
               >
                 {showAllLabel}
                 <IconChevronDown size={14} aria-hidden="true" />

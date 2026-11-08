@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Spinner from './Spinner'
 
 type Variant = 'primary' | 'secondary' | 'quiet' | 'danger'
 type Size = 'sm' | 'md' | 'lg'
@@ -10,7 +11,7 @@ const BASE =
   'relative isolate inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none ' +
   "before:content-[''] before:absolute before:inset-y-0 before:inset-x-(--button-inset) before:-z-10 before:rounded-button before:skew-x-(--slant-button) before:transition-colors before:duration-(--motion-hover) " +
   'transition-colors duration-(--motion-hover) disabled:opacity-50 disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:pointer-events-none ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main focus-visible:rounded-button'
+  'focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main focus-visible:rounded-button'
 
 const VARIANTS: Record<Variant, string> = {
   primary: 'text-bg-main before:bg-accent hover:before:bg-accent-hover',
@@ -28,10 +29,6 @@ const SIZES: Record<Size, string> = {
 /** The classes of a library button, for the rare place that cannot render `Button` itself. */
 export function buttonClass(variant: Variant = 'primary', size: Size = 'md', className = '') {
   return `${BASE} ${VARIANTS[variant]} ${SIZES[size]} ${className}`
-}
-
-function Spinner() {
-  return <span aria-hidden="true" className="w-4 h-4 rounded-full border-2 border-current border-r-transparent animate-spin motion-reduce:animate-none" />
 }
 
 type Common = {

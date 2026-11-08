@@ -23,11 +23,11 @@ export default function AuthBrand() {
           RetroAchievements
         </li>
         <li className={`${CHIP} bg-bg-card/70 text-text-main ring-ink/10`}>
-          <SteamLogo size={12} className="text-[#66c0f4]" aria-hidden="true" />
+          <SteamLogo size={12} className="text-steam" aria-hidden="true" />
           Steam
         </li>
         <li className={`${CHIP} bg-bg-card/70 text-text-main ring-ink/10`}>
-          <PlaystationLogo size={12} className="text-[#0070d1]" aria-hidden="true" />
+          <PlaystationLogo size={12} className="text-psn" aria-hidden="true" />
           PlayStation
         </li>
       </ul>

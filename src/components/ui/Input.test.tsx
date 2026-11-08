@@ -6,7 +6,7 @@ describe('fieldClass', () => {
   it('is sunken and lights up with the accent', () => {
     const cls = fieldClass()
     expect(cls).toContain('bg-bg-main')
-    expect(cls).toContain('shadow-[inset')
+    expect(cls).toContain('shadow-sunken')
     expect(cls).toContain('hover:ring-accent/50')
     expect(cls).toContain('focus-visible:ring-accent')
   })

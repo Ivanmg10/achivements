@@ -4,6 +4,7 @@ export const ja: Translations = {
   header: {
     signIn: 'ログイン',
     status: 'ライブラリ',
+    menu: 'メニュー',
   },
   sidePanel: {
     userSettings: 'ユーザー設定',

@@ -4,7 +4,6 @@ import { RetroAchievement } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useId, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
@@ -17,6 +16,7 @@ import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { parseUnlockTime } from '@/utils/dates'
 import { raTypeTag } from '@/components/ui/dataTable'
 import { raBadgeUrl, raAvatarUrl } from '@/utils/raAssets'
+import Avatar from '@/components/ui/Avatar'
 
 interface AchievementUnlock {
   User: string
@@ -111,8 +111,7 @@ export default function AchievementModal({
       })
     : null
 
-  // In body: a transformed ancestor (the home's sections) would otherwise trap it under later sections.
-  return createPortal(
+  return (
     <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="xl" showClose={false} className="gap-4">
         {/* Header */}
         <div className="flex items-start gap-4 p-6 border-b border-bg-header">
@@ -134,7 +133,7 @@ export default function AchievementModal({
                   onClick={onToggleFavorite}
                   aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
                   aria-pressed={isFavorited}
-                  className={`shrink-0 rounded transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+                  className={`shrink-0 rounded transition-colors duration-150 focus-ring ${
                     isFavorited ? 'text-warning hover:text-warning/80' : 'text-text-secondary hover:text-warning'
                   }`}
                 >
@@ -250,19 +249,13 @@ export default function AchievementModal({
                           <div key={i} className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-2">
                               {u.User ? (
-                                <Image
-                                  src={raAvatarUrl(u.User)}
-                                  alt={u.User}
-                                  width={28}
-                                  height={28}
-                                  className="w-7 h-7 rounded-full object-cover"
-                                />
+                                <Avatar src={raAvatarUrl(u.User)} name={u.User} size={28} />
                               ) : (
                                 <div className="w-7 h-7 rounded-full bg-ink/10 shrink-0" />
                               )}
                               <p className="text-sm">{u.User}</p>
                               {u.HardcoreMode === '1' && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-900/60 text-hardcore">HC</span>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-hardcore-deep/60 text-hardcore">HC</span>
                               )}
                             </div>
                             <p className="text-xs text-text-secondary tabular-nums">
@@ -310,13 +303,7 @@ export default function AchievementModal({
                       {pageComments.map((c, i) => (
                         <div key={i} className="flex gap-3">
                           {c.User ? (
-                            <Image
-                              src={raAvatarUrl(c.User)}
-                              alt={c.User}
-                              width={32}
-                              height={32}
-                              className="w-8 h-8 rounded-full object-cover shrink-0"
-                            />
+                            <Avatar src={raAvatarUrl(c.User)} name={c.User} size={32} />
                           ) : (
                             <div className="w-8 h-8 rounded-full bg-ink/10 shrink-0" />
                           )}
@@ -342,7 +329,6 @@ export default function AchievementModal({
             )
           })()}
         </div>
-      </Modal>,
-    document.body,
+      </Modal>
   )
 }

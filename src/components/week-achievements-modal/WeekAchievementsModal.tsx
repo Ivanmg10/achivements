@@ -7,6 +7,7 @@ import { IconX } from '@tabler/icons-react'
 import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
 import Modal from '@/components/ui/Modal'
 import { utcDay } from '@/utils/dates'
+import Kicker from '@/components/ui/Kicker'
 
 interface Props {
   startDate: string
@@ -47,7 +48,7 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
     <Modal isOpen onClose={onClose} size="lg" showClose={false} aria-label={T.cards.weekOf.replace('{date}', startDate)} className="gap-3">
         <div className="flex items-start justify-between gap-2 shrink-0">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestWeek}</p>
+            <Kicker>{T.cards.bestWeek}</Kicker>
             <p className="text-sm font-semibold text-text-main mt-0.5">
               {T.cards.weekOf.replace('{date}', startDate)}
             </p>
@@ -55,7 +56,7 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
           <button
             onClick={onClose}
             aria-label="Close"
-            className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-ring"
           >
             <IconX size={16} />
           </button>

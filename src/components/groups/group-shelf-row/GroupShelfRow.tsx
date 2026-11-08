@@ -11,8 +11,9 @@ import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDi
 import GroupPlatformLogos from '@/components/groups/group-platform-logos/GroupPlatformLogos'
 import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgressBar'
 import { relativeTime } from '@/utils/dates'
+import Kicker from '@/components/ui/Kicker'
 
-const TILE = 'flex flex-col items-center justify-center gap-1 aspect-square rounded-tile border-2 border-dashed border-ink/10 text-xs text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+const TILE = 'flex flex-col items-center justify-center gap-1 aspect-square rounded-tile border-2 border-dashed border-ink/10 text-xs text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-ring'
 
 /**
  * A group as a shelf: its name, progress and the game closest to done on one
@@ -27,7 +28,7 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
   const more = group.game_count - games.length
 
   return (
-    <article className="spotlight bg-bg-card rounded-card ring-1 ring-ink/5 p-4 sm:p-5 grid gap-5 md:grid-cols-[260px_1fr]">
+    <article className="relative isolate bg-bg-card rounded-card ring-1 ring-ink/5 p-4 sm:p-5 grid gap-5 md:grid-cols-[260px_1fr]">
       <div className="flex flex-col gap-2 min-w-0">
         <div className="flex items-center gap-2 min-w-0">
           {group.icon && (
@@ -36,7 +37,7 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
             </span>
           )}
           <h2 className="min-w-0">
-            <Link href={href} className="block text-xl font-bold truncate hover:text-accent transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+            <Link href={href} className="block text-xl font-bold truncate hover:text-accent transition-colors rounded focus-ring">
               {group.title}
             </Link>
           </h2>
@@ -55,7 +56,7 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
         </p>
         {group.next_up && (
           <div className="mt-auto rounded-tile bg-bg-main/60 p-3 flex flex-col gap-0.5">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-accent">{T.groups.nextUp}</span>
+            <Kicker as="span" size="sm" tone="accent">{T.groups.nextUp}</Kicker>
             <span className="text-sm">
               {T.groups.nextUpLeft.replace('{left}', String(group.next_up.left)).replace('{game}', group.next_up.title)}
             </span>
@@ -70,7 +71,7 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
           const pct = total > 0 ? Math.min(100, Math.round(((g.num_awarded ?? 0) / total) * 100)) : 0
           return (
             <li key={`${g.source}:${g.game_id}`} className="min-w-0">
-              <Link href={gameHref(g.source, g.game_id)} className="group flex flex-col gap-1.5 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+              <Link href={gameHref(g.source, g.game_id)} className="group flex flex-col gap-1.5 rounded-tile focus-ring">
                 <div className="aspect-square rounded-tile overflow-hidden bg-bg-main ring-1 ring-ink/5 group-hover:ring-ink/30 transition-all">
                   {src && <Image src={src} alt="" width={160} height={160} className="w-full h-full object-cover" unoptimized />}
                 </div>

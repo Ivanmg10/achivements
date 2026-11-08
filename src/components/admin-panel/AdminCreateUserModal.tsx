@@ -8,7 +8,7 @@ import { adminFetch } from '@/utils/adminFetch'
 import { notify } from '@/lib/notify'
 import { PASSWORD_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
-import { fieldClass } from '@/components/ui/Input'
+import { Field, fieldClass } from '@/components/ui/Input'
 import Switch from '@/components/ui/Switch'
 import Notice from '@/components/ui/Notice'
 
@@ -58,34 +58,34 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
       <h2 className="text-xl font-bold">Create user</h2>
 
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="create-username" className="text-xs text-text-secondary uppercase tracking-wider">Username *</label>
-          <input id="create-username" value={username} onChange={e => { setUsername(e.target.value); setError(null) }}
-            autoFocus
-            className={fieldClass()} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="create-email" className="text-xs text-text-secondary uppercase tracking-wider">Email</label>
-          <input id="create-email" type="email" value={email} onChange={e => setEmail(e.target.value)}
-            className={fieldClass()} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="create-password" className="text-xs text-text-secondary uppercase tracking-wider">Password *</label>
-          <div className="relative">
-            <input id="create-password" type={showPass ? 'text' : 'password'} value={password}
-              onChange={e => { setPassword(e.target.value); setError(null) }}
-              className={fieldClass({}, 'pr-10')} />
-            <button type="button" onClick={() => setShowPass(s => !s)}
-              aria-label={showPass ? 'Hide password' : 'Show password'}
-              aria-pressed={showPass}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main" tabIndex={-1}>
-              {showPass ? <IconEyeOff size={16} aria-hidden="true" /> : <IconEye size={16} aria-hidden="true" />}
-            </button>
-          </div>
-          {password.length > 0 && password.length < PASSWORD_MIN && (
-            <span className="text-xs text-text-secondary">Minimum {PASSWORD_MIN} characters</span>
+        <Field label="Username *">
+          {(control) => (
+            <input {...control} value={username} onChange={e => { setUsername(e.target.value); setError(null) }}
+              autoFocus
+              className={fieldClass()} />
           )}
-        </div>
+        </Field>
+        <Field label="Email">
+          {(control) => (
+            <input {...control} type="email" value={email} onChange={e => setEmail(e.target.value)}
+              className={fieldClass()} />
+          )}
+        </Field>
+        <Field label="Password *" hint={password.length > 0 && password.length < PASSWORD_MIN ? `Minimum ${PASSWORD_MIN} characters` : undefined}>
+          {(control) => (
+            <div className="relative">
+              <input {...control} type={showPass ? 'text' : 'password'} value={password}
+                onChange={e => { setPassword(e.target.value); setError(null) }}
+                className={fieldClass({}, 'pr-10')} />
+              <button type="button" onClick={() => setShowPass(s => !s)}
+                aria-label={showPass ? 'Hide password' : 'Show password'}
+                aria-pressed={showPass}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main" tabIndex={-1}>
+                {showPass ? <IconEyeOff size={16} aria-hidden="true" /> : <IconEye size={16} aria-hidden="true" />}
+              </button>
+            </div>
+          )}
+        </Field>
         <div className="flex items-center gap-3">
           <Switch checked={isAdmin} onChange={setIsAdmin} aria-label="Admin privileges" />
           <span className="text-sm">Admin</span>

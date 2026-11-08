@@ -9,6 +9,7 @@ import { notify } from '@/lib/notify'
 import { buttonClass } from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import type { GameSource } from '@/types/game'
+import Kicker from '@/components/ui/Kicker'
 
 const PLATFORM_NAMES: Record<GameSource, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
 
@@ -73,7 +74,7 @@ export default function AdminLinkedAccounts({
 
   return (
     <div className="bg-bg-main/50 rounded-tile p-3 flex flex-col gap-4">
-      <span className="text-xs text-text-secondary uppercase tracking-wider">Linked accounts</span>
+      <Kicker as="span" size="md">Linked accounts</Kicker>
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-sm">
@@ -115,7 +116,7 @@ export default function AdminLinkedAccounts({
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-sm">
-          <SteamLogo size={12} className="text-[#66c0f4]" />
+          <SteamLogo size={12} className="text-steam" />
           {user.steamid ? (
             <>
               <span className="font-medium flex-1 truncate">{user.steamusername ?? user.steamid}</span>
@@ -151,7 +152,7 @@ export default function AdminLinkedAccounts({
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-sm">
-          <PlaystationLogo size={12} className="text-[#0070d1]" />
+          <PlaystationLogo size={12} className="text-psn" />
           {user.psnaccountid ? (
             <>
               <span className="font-medium flex-1 truncate">{user.psnusername ?? user.psnaccountid}</span>
@@ -187,7 +188,7 @@ export default function AdminLinkedAccounts({
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-sm">
-          <XboxLogo size={12} className="text-[#107c10]" />
+          <XboxLogo size={12} className="text-xbox" />
           {user.xboxxuid ? (
             <>
               <span className="font-medium flex-1 truncate">{user.xboxgamertag ?? user.xboxxuid}</span>

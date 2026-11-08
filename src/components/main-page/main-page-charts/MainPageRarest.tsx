@@ -17,6 +17,7 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import { useSubject } from '@/context/SubjectContext'
 import { decimal } from '@/utils/utils'
 import { raBadgeUrl } from '@/utils/raAssets'
+import Kicker from '@/components/ui/Kicker'
 
 const SHOWN = 6
 
@@ -105,7 +106,7 @@ export default function MainPageRarest({
   if (rows.length === 0) {
     return (
       <div className="flex flex-col gap-2 h-full">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.rarestUnlocks}</p>
+        <Kicker>{T.cards.rarestUnlocks}</Kicker>
         <EmptyState
           icon={<IconSparkles className="w-6 h-6" />}
           title={T.cards.noRarityData}
@@ -119,7 +120,7 @@ export default function MainPageRarest({
 
   return (
     <div className="flex flex-col gap-2 flex-1">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.rarestUnlocks}</p>
+      <Kicker>{T.cards.rarestUnlocks}</Kicker>
       <div className="flex flex-col gap-2 flex-1 enter-rows">
         {rows.map(({ key, ...row }) => (
           <GameListRow key={key} {...row} statClassName="text-hardcore" />

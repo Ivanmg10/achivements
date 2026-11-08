@@ -39,7 +39,7 @@ export default function SteamGameInfoAchievementCard({
         type="button"
         onClick={onOpen}
         aria-label={concealed ? T.steam.hiddenAchievement : a.title}
-        className="absolute inset-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 rounded-tile focus-ring"
       />
       {a.badgeUrl ? (
         <Image

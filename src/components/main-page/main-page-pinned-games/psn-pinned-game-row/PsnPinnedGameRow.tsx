@@ -6,7 +6,6 @@ import { CSS } from '@dnd-kit/utilities'
 import { IconChevronDown, IconGripVertical } from '@tabler/icons-react'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import GameIcon from '@/components/game-icon/GameIcon'
@@ -25,7 +24,6 @@ import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
  */
 export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId: number; isOpen: boolean; onToggle: () => void }) {
   const { T } = useLanguage()
-  const onPointerMove = useSpotlight()
   const { fullLibrary, libraryLoading } = usePsnGamesData()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: gameKey('psn', gameId) })
   const style = { transform: CSS.Transform.toString(transform), transition }
@@ -51,8 +49,7 @@ export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId:
     <div
       ref={setNodeRef}
       style={style}
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
       <GameCardBackdrop src={psnBackdrop(game)} />
       <div className="flex items-center gap-3 px-3 py-3 w-full">
@@ -60,7 +57,7 @@ export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId:
           {...attributes}
           {...listeners}
           aria-label={T.cards.dragToReorder}
-          className="text-text-secondary/30 hover:text-text-secondary cursor-grab active:cursor-grabbing touch-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] rounded"
+          className="text-text-secondary/30 hover:text-text-secondary cursor-grab active:cursor-grabbing touch-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn rounded"
         >
           <IconGripVertical className="w-4 h-4" aria-hidden />
         </button>
@@ -73,7 +70,7 @@ export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId:
         <div className="flex flex-col min-w-0 flex-1 gap-1">
           <Link
             href={href}
-            className="w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] rounded"
+            className="w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn rounded"
           >
             <span className="text-base font-bold block truncate leading-tight">{game.title}</span>
           </Link>
@@ -89,7 +86,7 @@ export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId:
               onClick={onToggle}
               aria-expanded={isOpen}
               aria-label={`${isOpen ? T.psn.hideTrophies : T.psn.showTrophies}: ${game.title}`}
-              className="p-1 rounded-box-sm text-text-secondary/40 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] shrink-0"
+              className="p-1 rounded-box-sm text-text-secondary/40 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn shrink-0"
             >
               <IconChevronDown size={14} aria-hidden="true" className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
             </button>

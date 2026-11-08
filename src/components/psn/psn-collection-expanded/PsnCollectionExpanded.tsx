@@ -11,6 +11,7 @@ import PsnTrophyGridGroup from '@/components/psn/psn-trophy-grid/psn-trophy-grid
 import PsnRarestTrophies from '@/components/psn/psn-rarest-trophies/PsnRarestTrophies'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
 import { Skeleton } from '@/components/ui/Skeleton'
+import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const SKELETON_BADGES = 24
 const NONE: TrophyCounts = { bronze: 0, silver: 0, gold: 0, platinum: 0 }
@@ -54,15 +55,7 @@ export default function PsnCollectionExpanded({ games }: { games: PsnGameProgres
             ))}
           </ul>
         ) : error ? (
-          <div className="flex flex-col items-start gap-2">
-            <p role="alert" className="text-sm text-danger">
-              {T.psn.trophiesError}
-            </p>
-            {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}
-            <button onClick={retry} className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">
-              {T.psn.retry}
-            </button>
-          </div>
+          <ErrorRetry message={T.psn.trophiesError} hint={error === 'private' ? T.psn.errors.private : undefined} retryLabel={T.psn.retry} onRetry={retry} />
         ) : (
           games.map((g) => {
             const { trophies = [], groups = [] } = byGame[g.titleId] ?? {}

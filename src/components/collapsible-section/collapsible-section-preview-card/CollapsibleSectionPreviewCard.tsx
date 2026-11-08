@@ -6,7 +6,6 @@ import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import GameIcon from '@/components/game-icon/GameIcon'
 import { gameHref } from '@/utils/gameRef'
 import { steamAssetUrl } from '@/lib/steamAssets'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import type { PreviewGame } from '@/utils/sectionPreview'
 import { ProgressBar } from '@/components/ui/ProgressBar'
@@ -18,7 +17,6 @@ import { raImageUrl } from '@/utils/raAssets'
  * card — a teaser, not the list.
  */
 export default function CollapsibleSectionPreviewCard({ game, eager = false }: { game: PreviewGame; eager?: boolean }) {
-  const onPointerMove = useSpotlight()
   const art =
     game.source === 'steam'
       ? steamAssetUrl(game.id, 'header')
@@ -31,8 +29,7 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
   return (
     <Link
       href={gameHref(game.source, game.id)}
-      onPointerMove={onPointerMove}
-      className="spotlight group flex items-center gap-3 rounded-card bg-bg-card p-2.5 pr-3 ring-1 ring-ink/5 hover:ring-ink/15 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 min-w-0 overflow-hidden"
+      className="relative isolate group flex items-center gap-3 rounded-card bg-bg-card p-2.5 pr-3 ring-1 ring-ink/5 hover:ring-ink/15 transition-all focus-ring min-w-0 overflow-hidden"
     >
       <GameCardBackdrop src={art} surface="card" eager={eager} />
       {game.source === 'steam' ? (

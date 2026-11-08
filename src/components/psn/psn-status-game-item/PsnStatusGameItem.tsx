@@ -13,13 +13,13 @@ import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { useExclusiveOpen } from '@/hooks/useExclusiveOpen'
 import { gameHref } from '@/utils/gameRef'
-import { psnBackdrop, psnPlatformChip } from '@/utils/psnTitles'
+import { psnBackdrop, psnPlatformTone } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
 import { formatDate } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A PSN game on a category page, laid out like SteamStatusGameItem so the
@@ -33,7 +33,6 @@ import { formatDate } from '@/utils/dates'
 export default function PsnStatusGameItem({ game, category }: { game: PsnGameProgress; /** Which list it is in: what the opened card shows depends on it. */ category?: string }) {
   const { T, lang } = useLanguage()
   const [open, toggle] = useExclusiveOpen(`psn:${game.id}`)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
   const href = gameHref('psn', game.id)
   const isComplete = game.pctWon >= 100
@@ -44,8 +43,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
   return (
     <>
       <div
-        onPointerMove={onPointerMove}
-        className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
+        className={`relative isolate bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
         <GameCardBackdrop src={psnBackdrop(game)} surface="card" />
         {/* relative: the expand button stretches over this whole header (see the chevron). */}
@@ -54,7 +52,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
           <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
             <div
               className={`w-16 h-16 sm:w-24 sm:h-24 rounded-tile overflow-hidden transition-all duration-150 ${
-                isComplete ? 'ring-2 ring-sky-300/70 hover:ring-sky-300' : 'hover:ring-2 hover:ring-ink/40'
+                isComplete ? 'ring-2 ring-platinum/70 hover:ring-platinum' : 'hover:ring-2 hover:ring-ink/40'
               }`}
             >
               <GameIcon source="psn" id={game.id} imageUrl={game.imageIcon} size={96} className="w-16 h-16 sm:w-24 sm:h-24" />
@@ -64,19 +62,19 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
           <div className="flex flex-col flex-1 min-w-0 gap-1">
             <Link
               href={href}
-              className="relative z-10 self-start max-w-full min-w-0 hover:underline decoration-ink/50 underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] rounded"
+              className="relative z-10 self-start max-w-full min-w-0 hover:underline decoration-ink/50 underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn rounded"
             >
               <p title={game.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">
                 {game.title}
               </p>
             </Link>
             <span className="flex items-center gap-1.5 flex-wrap">
-              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${psnPlatformChip(game.consoleName)}`}>
+              <Tag size="xs" tone={psnPlatformTone(game.consoleName)}>
                 <PlaystationLogo size={12} aria-hidden="true" />
                 {game.consoleName}
-              </span>
+              </Tag>
               {game.earned.platinum > 0 && (
-                <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-sky-300/10 text-sky-300">
+                <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-platinum/10 text-platinum">
                   <span aria-hidden="true">★</span> {T.psn.platinum}
                 </span>
               )}
@@ -114,7 +112,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
               aria-expanded={open}
               aria-controls={panelId}
               aria-label={`${open ? T.psn.hideTrophies : T.psn.showTrophies}: ${game.title}`}
-              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
+              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn"
             >
               <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                 ▼

@@ -6,7 +6,6 @@ import { CSS } from '@dnd-kit/utilities'
 import { IconChevronDown, IconGripVertical } from '@tabler/icons-react'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import GameIcon from '@/components/game-icon/GameIcon'
@@ -26,7 +25,6 @@ import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
  */
 export default function XboxPinnedGameRow({ gameId, isOpen, onToggle }: { gameId: number; isOpen: boolean; onToggle: () => void }) {
   const { T } = useLanguage()
-  const onPointerMove = useSpotlight()
   const { fullLibrary, libraryLoading } = useXboxGamesData()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: gameKey('xbox', gameId) })
   const style = { transform: CSS.Transform.toString(transform), transition }
@@ -52,8 +50,7 @@ export default function XboxPinnedGameRow({ gameId, isOpen, onToggle }: { gameId
     <div
       ref={setNodeRef}
       style={style}
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
       <GameCardBackdrop src={xboxBackdrop(game)} />
       <div className="flex items-center gap-3 px-3 py-3 w-full">

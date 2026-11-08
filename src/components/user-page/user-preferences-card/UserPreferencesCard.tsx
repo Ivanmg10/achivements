@@ -90,9 +90,9 @@ export default function UserPreferencesCard() {
 
   const platforms: Record<GameSource, { label: string; icon: ReactNode; extras?: ReactNode }> = {
     ra: { label: T.userPage.favoriteRaGame, icon: <RaLogo height={11} />, extras: <UserRaPreferences /> },
-    steam: { label: T.userPage.favoriteSteamGame, icon: <SteamLogo size={18} className="text-[#66c0f4]" aria-hidden="true" /> },
-    psn: { label: T.userPage.favoritePsnGame, icon: <PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />, extras: <UserPsnPreferences /> },
-    xbox: { label: T.userPage.favoriteXboxGame, icon: <XboxLogo size={18} className="text-[#107c10]" aria-hidden="true" />, extras: <UserXboxPreferences /> },
+    steam: { label: T.userPage.favoriteSteamGame, icon: <SteamLogo size={18} className="text-steam" aria-hidden="true" /> },
+    psn: { label: T.userPage.favoritePsnGame, icon: <PlaystationLogo size={18} className="text-psn" aria-hidden="true" />, extras: <UserPsnPreferences /> },
+    xbox: { label: T.userPage.favoriteXboxGame, icon: <XboxLogo size={18} className="text-xbox" aria-hidden="true" />, extras: <UserXboxPreferences /> },
   }
 
   return (

@@ -3,10 +3,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { CONSOLES } from '@/constants'
 import type { ConsoleSummary } from '@/utils/library'
 import { ProgressBar } from '@/components/ui/ProgressBar'
+import Kicker from '@/components/ui/Kicker'
 
 const ICON_BY_ID = new Map(CONSOLES.map((c) => [c.id, c.icon]))
 
@@ -17,12 +17,11 @@ const ICON_BY_ID = new Map(CONSOLES.map((c) => [c.id, c.icon]))
  */
 export default function BrowseConsoles({ consoles }: { consoles: ConsoleSummary[] }) {
   const { T } = useLanguage()
-  const onPointerMove = useSpotlight()
   if (consoles.length === 0) return null
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.consolesTitle}</p>
+      <Kicker>{T.cards.consolesTitle}</Kicker>
       <ul className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 enter-cards">
         {consoles.map((c) => {
           const icon = ICON_BY_ID.get(c.consoleId)
@@ -30,8 +29,7 @@ export default function BrowseConsoles({ consoles }: { consoles: ConsoleSummary[
             <li key={c.consoleId}>
               <Link
                 href={`/playing/${c.consoleId}`}
-                onPointerMove={onPointerMove}
-                className="spotlight flex flex-col gap-2 h-full rounded-tile bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="relative isolate flex flex-col gap-2 h-full rounded-tile bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-ring"
               >
                 <span className="flex items-center gap-2 min-w-0">
                   {icon && <Image src={icon} alt="" width={20} height={20} className="w-5 h-5 object-contain shrink-0" />}

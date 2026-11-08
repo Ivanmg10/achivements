@@ -9,6 +9,7 @@ import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
 import { relativeTime } from '@/utils/dates'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * The top of a Following card. Its backdrop is the last game played, blurred
@@ -43,13 +44,13 @@ export default function FollowingCardBanner({ friend, lastPlayed }: { friend: Fr
         {lastPlayed && (
           <Link
             href={gameHref(lastPlayed.source, lastPlayed.id, friend.username)}
-            className="flex items-center gap-2 min-w-0 max-w-[85%] rounded-box bg-black/45 backdrop-blur-sm px-2.5 py-1.5 hover:bg-black/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="flex items-center gap-2 min-w-0 max-w-[85%] rounded-box bg-black/45 backdrop-blur-sm px-2.5 py-1.5 hover:bg-black/60 transition-colors focus-ring"
           >
             <PlatformLogo source={lastPlayed.source} size={12} label={PLATFORM_NAME[lastPlayed.source]} />
             <span className="flex flex-col min-w-0">
-              <span className="text-[0.625rem] font-bold uppercase tracking-[0.09em] text-text-secondary truncate">
+              <Kicker as="span" size="sm" className="truncate">
                 {T.following.lastPlayed} · {relativeTime(lastPlayed.at, lang)}
-              </span>
+              </Kicker>
               <span className="text-[0.8125rem] font-bold text-white truncate">{lastPlayed.title}</span>
             </span>
           </Link>

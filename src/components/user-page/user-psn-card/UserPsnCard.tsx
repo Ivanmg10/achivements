@@ -33,7 +33,7 @@ export default function UserPsnCard() {
   const stats: PlatformStat[] = [
     platformStat(T.psn.level, summary?.trophyLevel, summaryOpts),
     platformStat(T.userStats.games, summary?.games, summaryOpts),
-    platformStat(T.psn.platinum, earned?.platinum, { ...summaryOpts, accent: 'text-sky-300' }),
+    platformStat(T.psn.platinum, earned?.platinum, { ...summaryOpts, tone: 'platinum' }),
     platformStat(T.steam.playtime, formatPlaytime(minutes, T.steam, lang), { lang, loading: libraryLoading }),
     platformStat(T.psn.trophies, earned ? countTrophies(earned) : undefined, summaryOpts),
   ]
@@ -52,9 +52,9 @@ export default function UserPsnCard() {
       name="PlayStation Network"
       source="psn"
       href={onlineId ? `https://profile.playstation.com/${encodeURIComponent(onlineId)}` : undefined}
-      logo={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />}
-      bigLogo={<PlaystationLogo size={40} className="text-[#0070d1]" aria-hidden="true" />}
-      gradient="from-[#0070d1] via-[#0070d1]/40 to-[#003791]"
+      logo={<PlaystationLogo size={18} className="text-psn" aria-hidden="true" />}
+      bigLogo={<PlaystationLogo size={40} className="text-psn" aria-hidden="true" />}
+      gradient="from-psn via-psn/40 to-psn-dark"
       connected={isLinked}
       hint={T.psn.connectHint}
       status={

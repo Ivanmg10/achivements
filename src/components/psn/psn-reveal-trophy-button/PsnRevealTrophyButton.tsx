@@ -28,7 +28,7 @@ export default function PsnRevealTrophyButton({
       aria-pressed={revealed}
       aria-label={revealed ? T.psn.concealTrophy : T.psn.revealTrophy}
       title={revealed ? T.psn.concealTrophy : T.psn.revealTrophy}
-      className={`text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] rounded ${className}`}
+      className={`text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn rounded ${className}`}
     >
       <Icon size={size} aria-hidden="true" />
     </button>

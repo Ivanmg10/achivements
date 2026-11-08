@@ -4,14 +4,15 @@ import { useLanguage } from '@/context/LanguageContext'
 import { candidateIconUrl, CandidateStatus, GameCandidate } from '@/utils/gameCandidates'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { FadeImage } from '@/components/ui/FadeImage'
+import Tag, { type TagTone } from '@/components/ui/Tag'
 import SearchModalRow from '../search-modal-row/SearchModalRow'
 
-const STATUS_CLASSES: Record<CandidateStatus, string> = {
-  'completed-hc': 'bg-hardcore/[0.16] text-hardcore',
-  'completed-sc': 'bg-success/[0.16] text-success',
-  'perfect': 'bg-success/[0.16] text-success',
-  'in-progress': 'bg-info/[0.16] text-info',
-  'want-to-play': 'bg-ink/[0.08] text-text-secondary',
+const STATUS_TONES: Record<CandidateStatus, TagTone> = {
+  'completed-hc': 'hardcore',
+  'completed-sc': 'success',
+  'perfect': 'success',
+  'in-progress': 'info',
+  'want-to-play': 'neutral',
 }
 
 /**
@@ -52,9 +53,9 @@ export default function SearchModalGameResult({
       }
       right={
         game.status && (
-          <span className={`inline-flex items-center h-6 px-2 rounded-tag text-xs font-bold whitespace-nowrap shrink-0 ${STATUS_CLASSES[game.status]}`}>
+          <Tag size="lg" tone={STATUS_TONES[game.status]} className="shrink-0">
             {STATUS_LABELS[game.status]}
-          </span>
+          </Tag>
         )
       }
       onSelect={onSelect}

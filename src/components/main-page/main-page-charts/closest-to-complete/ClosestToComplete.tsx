@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { GameListRow } from '@/components/ui/GameListRow'
+import Kicker from '@/components/ui/Kicker'
 
 export type ClosestGame = {
   /** Unique within the list — game ids repeat across platforms. */
@@ -38,7 +39,7 @@ export default function ClosestToComplete({
 
   return (
     <div className="flex flex-col gap-1.5 enter-rows">
-      <p className="text-[10px] text-text-secondary uppercase tracking-widest">{T.cards.closestToPerfect}</p>
+      <Kicker>{T.cards.closestToPerfect}</Kicker>
       {games.map((game) => (
         <GameListRow
           key={game.key}

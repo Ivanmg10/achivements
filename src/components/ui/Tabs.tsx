@@ -14,7 +14,7 @@ export type Tab<V extends string> = {
 export function tabClass(on: boolean, className = '') {
   return (
     'relative shrink-0 inline-flex items-center gap-2 h-10 px-3 text-sm font-semibold whitespace-nowrap transition-colors duration-(--motion-hover) cursor-pointer ' +
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:rounded-chip ' +
+    'focus-ring focus-visible:rounded-chip ' +
     "after:content-[''] after:absolute after:left-2 after:right-2 after:bottom-0 after:h-1 after:rounded-(--bar-radius) after:bg-accent after:skew-x-(--slant-line) after:origin-left after:transition-transform after:duration-(--motion-open) " +
     (on ? 'text-text-main after:scale-x-100 ' : 'text-text-secondary hover:text-text-main after:scale-x-0 ') +
     className
@@ -22,7 +22,7 @@ export function tabClass(on: boolean, className = '') {
 }
 
 /** The bottom hairline under a row of tabs. */
-export const TAB_ROW = 'flex items-end gap-1 overflow-x-auto shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]'
+export const TAB_ROW = 'flex items-end gap-1 overflow-x-auto shadow-hairline-b'
 
 /** The ids a tab and its panel share, so the panel can say which tab it belongs to. */
 export function tabIds(base: string, value: string) {
@@ -68,7 +68,7 @@ export default function Tabs<V extends string>({
   const text = size === 'sm' ? 'h-9 px-3 text-sm' : 'h-11 px-3.5 text-[0.9375rem]'
 
   return (
-    <div ref={listRef} role="tablist" aria-label={label} className={`flex items-end gap-1 overflow-x-auto shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)] ${className}`}>
+    <div ref={listRef} role="tablist" aria-label={label} className={`flex items-end gap-1 overflow-x-auto shadow-hairline-b ${className}`}>
       {tabs.map((t, i) => {
         const on = t.value === value
         const ids = tabIds(id, t.value)
@@ -83,7 +83,7 @@ export default function Tabs<V extends string>({
             tabIndex={on ? 0 : -1}
             onClick={() => onChange(t.value)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className={`relative shrink-0 inline-flex items-center gap-2 whitespace-nowrap font-semibold transition-colors duration-(--motion-hover) cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:rounded-chip ${text} ${
+            className={`relative shrink-0 inline-flex items-center gap-2 whitespace-nowrap font-semibold transition-colors duration-(--motion-hover) cursor-pointer focus-ring focus-visible:rounded-chip ${text} ${
               on ? 'text-text-main' : 'text-text-secondary hover:text-text-main'
             }`}
           >

@@ -4,12 +4,12 @@ import { useId, useState } from 'react'
 import Image from 'next/image'
 import { IconChevronDown, IconLink, IconPhotoUp, IconUser, IconX } from '@tabler/icons-react'
 import CommonModal from '@/components/common-modal/CommonModal'
-import Spinner from '@/components/main-spinner/Spinner'
 import { useAvatarUpload } from '@/hooks/useAvatarUpload'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
 import { useLanguage } from '@/context/LanguageContext'
-import { buttonClass } from '@/components/ui/Button'
+import Button, { buttonClass } from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
+import Notice from '@/components/ui/Notice'
 
 const BUTTON = 'flex-1'
 const PRIMARY = buttonClass('primary', 'md', BUTTON)
@@ -65,7 +65,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
           type="button"
           onClick={close}
           aria-label={t.close}
-          className="w-9 h-9 -mr-1 -mt-1 shrink-0 rounded-tile flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="w-9 h-9 -mr-1 -mt-1 shrink-0 rounded-tile flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 focus-ring"
         >
           <IconX size={18} aria-hidden="true" />
         </button>
@@ -123,17 +123,14 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
       </label>
 
       {error && (
-        <p role="alert" className="text-sm text-danger bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control px-4 py-2">
-          {error}
-        </p>
+        <Notice tone="danger">{error}</Notice>
       )}
 
       {upload.picked && (
         <div className="flex gap-2.5">
-          <button type="button" onClick={saveUpload} disabled={upload.busy} className={PRIMARY}>
-            {upload.busy && <Spinner size={16} />}
+          <Button onClick={saveUpload} loading={upload.busy} className={BUTTON}>
             {upload.busy ? t.saving : t.uploadSave}
-          </button>
+          </Button>
           <button type="button" onClick={upload.reset} disabled={upload.busy} className={SECONDARY}>
             {t.cancel}
           </button>
@@ -147,7 +144,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
             onClick={() => setLinkOpen((o) => !o)}
             aria-expanded={linkOpen}
             aria-controls={`${inputId}-link`}
-            className="flex items-center gap-3 text-xs text-text-secondary hover:text-text-main transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="flex items-center gap-3 text-xs text-text-secondary hover:text-text-main transition-colors rounded focus-ring"
           >
             <span aria-hidden="true" className="h-px flex-1 bg-ink/10" />
             <IconLink size={14} aria-hidden="true" />

@@ -57,7 +57,7 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
             type="button"
             onClick={onClose}
             aria-label={T.aiExport.close}
-            className="p-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-ring"
           >
             <IconX className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -95,7 +95,7 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
           <button
             type="button"
             onClick={download}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-tile bg-ink/8 hover:bg-ink/12 text-text-main text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-tile bg-ink/8 hover:bg-ink/12 text-text-main text-sm font-semibold transition-colors focus-ring"
           >
             <IconDownload className="w-4 h-4" aria-hidden="true" />
             {T.aiExport.download}

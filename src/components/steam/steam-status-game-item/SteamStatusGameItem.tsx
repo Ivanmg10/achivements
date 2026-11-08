@@ -13,12 +13,12 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { useExclusiveOpen } from '@/hooks/useExclusiveOpen'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import type { SteamGameProgress } from '@/types/steam'
 import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
 import { formatDate } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A Steam game on a category page, laid out like RA's StatusGameItem so the
@@ -41,7 +41,6 @@ export default function SteamStatusGameItem({
 }) {
   const { T, lang } = useLanguage()
   const [open, toggle] = useExclusiveOpen(`steam:${game.id}`)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
   const href = `/steamGame/${game.id}`
 
@@ -61,8 +60,7 @@ export default function SteamStatusGameItem({
   return (
     <>
       <div
-        onPointerMove={onPointerMove}
-        className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
+        className={`relative isolate bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
         {/* The same blurred art and pointer glow as the RA card beside it. */}
         <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} surface="card" />
@@ -72,7 +70,7 @@ export default function SteamStatusGameItem({
           <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
             <div
               className={`w-16 h-16 sm:w-24 sm:h-24 rounded-tile overflow-hidden transition-all duration-150 ${
-                isComplete ? 'ring-2 ring-[#a4d007]/70 hover:ring-[#a4d007]' : 'hover:ring-2 hover:ring-ink/40'
+                isComplete ? 'ring-2 ring-steam-perfect/70 hover:ring-steam-perfect' : 'hover:ring-2 hover:ring-ink/40'
               }`}
             >
               <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageIcon} size={96} className="w-16 h-16 sm:w-24 sm:h-24 block" />
@@ -82,17 +80,17 @@ export default function SteamStatusGameItem({
           <div className="flex flex-col flex-1 min-w-0 gap-1">
             <Link
               href={href}
-              className="relative z-10 self-start max-w-full min-w-0 hover:underline decoration-ink/50 underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
+              className="relative z-10 self-start max-w-full min-w-0 hover:underline decoration-ink/50 underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam rounded"
             >
               <p title={game.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game.title}</p>
             </Link>
             <span className="flex items-center gap-1.5 flex-wrap">
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium bg-[#1b2838] text-[#66c0f4]">
+              <Tag size="xs" tone="steam">
                 <SteamLogo size={12} aria-hidden="true" />
                 Steam
-              </span>
+              </Tag>
               {isComplete && (
-                <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[#a4d007]/10 text-[#a4d007]">
+                <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-steam-perfect/10 text-steam-perfect">
                   <span aria-hidden="true">★</span> {T.steam.perfect}
                 </span>
               )}
@@ -129,7 +127,7 @@ export default function SteamStatusGameItem({
               aria-expanded={open}
               aria-controls={panelId}
               aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.title}`}
-              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam"
             >
               <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                 ▼

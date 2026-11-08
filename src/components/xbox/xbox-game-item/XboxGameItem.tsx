@@ -10,7 +10,6 @@ import GameIcon from '@/components/game-icon/GameIcon'
 import XboxRecentlyPlayedExpanded from '@/components/xbox/xbox-recently-played-expanded/XboxRecentlyPlayedExpanded'
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/dates'
 import { formatPlaytime } from '@/utils/steamFeed'
@@ -18,6 +17,7 @@ import { gameHref } from '@/utils/gameRef'
 import { xboxBackdrop } from '@/utils/xboxTitles'
 import type { XboxGameProgress } from '@/types/xbox'
 import { useSubject } from '@/context/SubjectContext'
+import Tag from '@/components/ui/Tag'
 
 /**
  * One Xbox game as a compact row card — PsnGameItem's counterpart in the
@@ -41,7 +41,6 @@ export default function XboxGameItem({
   const subject = useSubject()
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
 
   const isExpanded = expanded ?? localExpanded
@@ -54,8 +53,7 @@ export default function XboxGameItem({
 
   return (
     <div
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={xboxBackdrop(game)} />
 
@@ -82,8 +80,8 @@ export default function XboxGameItem({
             >
               <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.title}</span>
             </Link>
-            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><XboxLogo size={12} className="opacity-60" aria-hidden="true" />
-                {game.consoleName}</span>
+            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate"><XboxLogo size={12} className="opacity-60" aria-hidden="true" />
+                {game.consoleName}</Tag>
           </span>
 
           <button

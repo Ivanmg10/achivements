@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { IconLock } from '@tabler/icons-react'
 import PasswordInput from '@/components/ui/PasswordInput'
-import Spinner from '@/components/main-spinner/Spinner'
 import Button from '@/components/ui/Button'
 import AdminUnlockRecovery from '@/components/admin-panel/admin-unlock-recovery/AdminUnlockRecovery'
 import AdminUnlockTotp, { type TotpSetup } from '@/components/admin-panel/admin-unlock-totp/AdminUnlockTotp'
@@ -80,19 +79,8 @@ export default function AdminUnlock({ onUnlocked }: { onUnlocked: () => void }) 
       </div>
       {askCode && <AdminUnlockTotp setup={setup} code={code} onChange={(v) => { setCode(v); setError(null) }} disabled={loading} />}
       {error && <p role="alert" className="w-full text-left text-sm text-danger">{error}</p>}
-      <Button
-        type="submit"
-        disabled={!password || loading}
-        size="lg" className="w-full"
-      >
-        {loading ? (
-          <>
-            <Spinner size={16} />
-            Unlocking…
-          </>
-        ) : (
-          'Unlock'
-        )}
+      <Button type="submit" disabled={!password} loading={loading} size="lg" className="w-full">
+        {loading ? 'Unlocking…' : 'Unlock'}
       </Button>
     </form>
   )

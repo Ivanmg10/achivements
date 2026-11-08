@@ -89,7 +89,7 @@ export default function GroupsPage() {
       ) : error ? (
         <div className="flex flex-col items-center gap-2 mt-10 text-center">
           <p role="alert" className="text-sm text-text-secondary">{T.groups.listError}</p>
-          <button onClick={fetchGroups} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+          <button onClick={fetchGroups} className="text-sm text-accent hover:underline rounded focus-ring">
             {T.groups.retry}
           </button>
         </div>

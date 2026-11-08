@@ -38,7 +38,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', completed = 
 
   return (
     <div className="group relative flex flex-col w-full h-full rounded-card bg-bg-card ring-1 ring-ink/5 hover:ring-ink/15 focus-within:ring-2 focus-within:ring-accent/70 transition-shadow">
-      <div className={`relative rounded-t-2xl ${banner}`}>
+      <div className={`relative rounded-t-card ${banner}`}>
         <LibraryShelfBanner entry={entry} />
         <span className="absolute left-3 top-3">
           <LibraryPlatformBadge source={entry.kind} />
@@ -58,7 +58,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', completed = 
           <Link
             href={href}
             title={T.libraryLayout.openGame}
-            className={`relative z-10 block w-fit max-w-full font-bold leading-tight line-clamp-2 hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${title}`}
+            className={`relative z-10 block w-fit max-w-full font-bold leading-tight line-clamp-2 hover:underline decoration-ink/50 underline-offset-2 rounded focus-ring ${title}`}
           >
             {entry.title}
           </Link>
@@ -75,7 +75,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', completed = 
         type="button"
         onClick={() => onPick(entry)}
         aria-label={`${T.libraryLayout.openInList}: ${entry.title}`}
-        className="absolute inset-0 z-[1] rounded-card cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 z-[1] rounded-card cursor-pointer focus-ring"
       />
     </div>
   )

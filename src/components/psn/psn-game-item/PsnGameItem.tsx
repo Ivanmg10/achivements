@@ -9,7 +9,6 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import GameIcon from '@/components/game-icon/GameIcon'
 import PsnRecentlyPlayedExpanded from '@/components/psn/psn-recently-played-expanded/PsnRecentlyPlayedExpanded'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/dates'
 import { gameHref } from '@/utils/gameRef'
@@ -17,6 +16,7 @@ import { psnBackdrop } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
+import Tag from '@/components/ui/Tag'
 
 /**
  * One PSN game as a compact row card — SteamGameItem's counterpart in the
@@ -41,7 +41,6 @@ export default function PsnGameItem({
   const subject = useSubject()
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
 
   const isExpanded = expanded ?? localExpanded
@@ -51,8 +50,7 @@ export default function PsnGameItem({
 
   return (
     <div
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={psnBackdrop(game)} />
 
@@ -66,7 +64,7 @@ export default function PsnGameItem({
             imageUrl={game.imageIcon}
             size={64}
             className={`rounded-tile w-14 h-14 sm:w-16 sm:h-16 shadow-[0_6px_18px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:scale-105 ${
-              perfect ? 'ring-2 ring-sky-300' : 'ring-1 ring-ink/10'
+              perfect ? 'ring-2 ring-platinum' : 'ring-1 ring-ink/10'
             }`}
           />
         </Link>
@@ -75,12 +73,12 @@ export default function PsnGameItem({
           <span className="flex items-center gap-2 min-w-0">
             <Link
               href={href}
-              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] rounded"
+              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn rounded"
             >
               <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.title}</span>
             </Link>
-            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><PlaystationLogo size={12} className="opacity-60" aria-hidden="true" />
-                {game.consoleName}</span>
+            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate"><PlaystationLogo size={12} className="opacity-60" aria-hidden="true" />
+                {game.consoleName}</Tag>
           </span>
 
           <button
@@ -88,7 +86,7 @@ export default function PsnGameItem({
             aria-expanded={isExpanded}
             aria-controls={panelId}
             aria-label={`${isExpanded ? T.psn.hideTrophies : T.psn.showTrophies}: ${game.title}`}
-            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] group"
+            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn group"
           >
             <span className="flex items-center gap-2 w-full">
               <ProgressBar pct={game.pctWon} label={game.title} className="flex-1" />
@@ -109,7 +107,7 @@ export default function PsnGameItem({
               {game.earned.platinum > 0 && (
                 <>
                   <span className="opacity-40" aria-hidden="true">·</span>
-                  <span className="text-sky-300">{T.psn.platinum}</span>
+                  <span className="text-platinum">{T.psn.platinum}</span>
                 </>
               )}
               {game.playtimeMinutes !== null && (

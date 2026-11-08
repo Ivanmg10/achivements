@@ -58,7 +58,7 @@ export default function SteamGameInfoAchievement({
             <button
               type="button"
               onClick={onOpen}
-              className="text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-ring"
             >
               {concealed ? T.steam.hiddenAchievement : a.title}
             </button>

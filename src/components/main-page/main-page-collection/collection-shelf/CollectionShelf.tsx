@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { formatDate } from '@/utils/dates'
 import { gameHref } from '@/utils/gameRef'
 import type { LatestPerfect, PerfectCounts } from '@/utils/perfectGames'
@@ -13,9 +12,9 @@ import { useSubject } from '@/context/SubjectContext'
 
 /** Medal per place, metal-like; the number on it says the place too, so colour is never the only cue. */
 const MEDALS = [
-  'bg-linear-to-b from-warning to-warning text-amber-950',
-  'bg-linear-to-b from-zinc-100 to-zinc-400 text-zinc-900',
-  'bg-linear-to-b from-warning to-warning text-orange-950',
+  'bg-linear-to-b from-warning to-warning text-gold-ink',
+  'bg-linear-to-b from-silver-light to-silver text-silver-ink',
+  'bg-linear-to-b from-warning to-warning text-bronze-ink',
   'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-ink/10',
   'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-ink/10',
 ]
@@ -30,7 +29,6 @@ const MEDALS = [
 export default function CollectionShelf({ games, counts }: { games: LatestPerfect[]; counts: PerfectCounts }) {
   const { T, lang } = useLanguage()
   const subject = useSubject()
-  const onPointerMove = useSpotlight()
 
   return (
     <div className="flex flex-col gap-4">
@@ -46,13 +44,13 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
           {counts.steam > 0 && (
             <>
               <span aria-hidden="true">·</span>
-              <span className="text-[#66c0f4] font-semibold">{counts.steam} Steam</span>
+              <span className="text-steam font-semibold">{counts.steam} Steam</span>
             </>
           )}
           {counts.psn > 0 && (
             <>
               <span aria-hidden="true">·</span>
-              <span className="text-[#0070d1] font-semibold">{counts.psn} PlayStation</span>
+              <span className="text-psn font-semibold">{counts.psn} PlayStation</span>
             </>
           )}
           {counts.xbox > 0 && (
@@ -72,8 +70,7 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
             <li key={game.key} className="snap-start">
               <Link
                 href={gameHref(game.source, game.id, subject)}
-                onPointerMove={onPointerMove}
-                className="spotlight group relative flex flex-col items-center gap-3 h-full rounded-tile bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="relative isolate group flex flex-col items-center gap-3 h-full rounded-tile bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-ring"
               >
                 <span className={`absolute top-2 left-2 z-10 w-6 h-6 rounded-full text-[11px] font-extrabold flex items-center justify-center shadow-md shadow-black/40 ${MEDALS[i]}`}>
                   {i + 1}

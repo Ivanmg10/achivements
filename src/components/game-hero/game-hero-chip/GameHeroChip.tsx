@@ -1,18 +1,11 @@
 import type { ReactNode } from 'react'
+import Tag, { type TagTone } from '@/components/ui/Tag'
 
-/** A chip of the hero's first row (console, state, missables), in the design's 24 px tag. */
-export default function GameHeroChip({ tone = 'neutral', className = '', children }: { tone?: 'neutral' | 'info' | 'success' | 'warning' | 'danger' | 'custom'; className?: string; children: ReactNode }) {
-  const TONES = {
-    neutral: 'bg-ink/[0.08] text-text-main',
-    info: 'bg-info/[0.14] text-info',
-    success: 'bg-success/[0.14] text-success',
-    warning: 'bg-warning/[0.16] text-warning',
-    danger: 'bg-danger/[0.14] text-danger',
-    custom: '',
-  }
+/** A chip of the hero's first row (console, state, missables): the library's 24 px slanted tag. */
+export default function GameHeroChip({ tone = 'neutral', className = '', children }: { tone?: TagTone; className?: string; children: ReactNode }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 h-6 px-[0.5625rem] rounded-tag text-xs font-bold whitespace-nowrap skew-x-(--slant-pill) ${TONES[tone]} ${className}`}>
-      <span className="inline-flex items-center gap-1.5 -skew-x-(--slant-pill)">{children}</span>
-    </span>
+    <Tag slant size="lg" tone={tone} className={className}>
+      {children}
+    </Tag>
   )
 }

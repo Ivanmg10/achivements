@@ -32,7 +32,7 @@ export default function RankingsPageHot({ rows, linked, onSeeWeek }: { rows: Ran
       {onSeeWeek && (
         <button
           onClick={onSeeWeek}
-          className="self-start text-xs font-semibold text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="self-start text-xs font-semibold text-accent hover:underline rounded focus-ring"
         >
           {T.rankings.hotSee}
         </button>

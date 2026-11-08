@@ -5,9 +5,9 @@ import { useLanguage } from '@/context/LanguageContext'
 import { plural } from '@/utils/utils'
 
 const CATEGORY_STYLES: Record<string, string> = {
-  playing:    'bg-blue-900/50 text-blue-300',
-  wantToPlay: 'bg-purple-900/50 text-purple-300',
-  completed:  'bg-green-900/50 text-success',
+  playing:    'bg-status-playing-bg/50 text-status-playing',
+  wantToPlay: 'bg-status-want-bg/50 text-status-want',
+  completed:  'bg-status-done-bg/50 text-success',
 }
 
 export default function StatusPageHeader({

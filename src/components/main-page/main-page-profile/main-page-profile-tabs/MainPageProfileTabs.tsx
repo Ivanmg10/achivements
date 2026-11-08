@@ -58,7 +58,7 @@ export default function MainPageProfileTabs<T extends string>({
     <div
       role="tablist"
       aria-label={label ?? T.steam.profileTabsLabel}
-      className={`flex items-end w-full shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)] ${size === 'md' ? 'gap-5 px-1 overflow-x-auto overflow-y-hidden' : 'gap-0.5 overflow-x-auto overflow-y-hidden'}`}
+      className={`flex items-end w-full shadow-hairline-b ${size === 'md' ? 'gap-5 px-1 overflow-x-auto overflow-y-hidden' : 'gap-0.5 overflow-x-auto overflow-y-hidden'}`}
     >
       {tabs.map((tab, i) => {
         const active = tab.id === selected
@@ -73,7 +73,7 @@ export default function MainPageProfileTabs<T extends string>({
             tabIndex={active ? 0 : -1}
             onClick={() => onSelect(tab.id)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className={`relative flex items-center shrink-0 gap-1.5 ${size === 'md' ? 'px-0.5 pb-2.5 pt-1 text-sm' : 'h-10 px-3 text-sm'} transition-colors duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-t ${
+            className={`relative flex items-center shrink-0 gap-1.5 ${size === 'md' ? 'px-0.5 pb-2.5 pt-1 text-sm' : 'h-10 px-3 text-sm'} transition-colors duration-(--motion-hover) focus-ring rounded-t ${
               active ? 'text-text-main font-semibold' : `text-text-secondary hover:text-text-main ${size === 'md' ? 'font-medium' : 'font-semibold'}`
             }`}
           >

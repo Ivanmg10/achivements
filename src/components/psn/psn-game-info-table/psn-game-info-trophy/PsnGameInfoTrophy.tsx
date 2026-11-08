@@ -79,7 +79,7 @@ export default function PsnGameInfoTrophy({
           <button
             type="button"
             onClick={onOpen}
-            className="text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-ring"
           >
             {concealed ? T.psn.hiddenTrophy : t.name}
           </button>

@@ -5,7 +5,7 @@
 export function pillClass(on: boolean, className = '') {
   return (
     'inline-flex items-center gap-1.5 h-8 px-3 rounded-chip text-xs font-semibold whitespace-nowrap transition-[color,background-color,box-shadow,scale] duration-(--motion-hover) ' +
-    'active:scale-95 motion-reduce:active:scale-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ' +
+    'active:scale-95 motion-reduce:active:scale-100 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus-ring ' +
     (on ? 'bg-accent/15 text-accent ring-1 ring-inset ring-accent/50 ' : 'bg-ink/[0.06] text-text-secondary hover:text-text-main hover:bg-ink/10 ') +
     className
   )

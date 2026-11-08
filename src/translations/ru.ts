@@ -4,6 +4,7 @@ export const ru: Translations = {
   header: {
     signIn: 'Войти',
     status: 'Библиотека',
+    menu: 'Меню',
   },
   sidePanel: {
     userSettings: 'Настройки пользователя',

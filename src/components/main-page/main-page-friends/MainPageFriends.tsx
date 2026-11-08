@@ -18,6 +18,7 @@ import MainPageFriendsFeed from './main-page-friends-feed/MainPageFriendsFeed'
 import MainPageFriendsShared from './main-page-friends-shared/MainPageFriendsShared'
 import MainPageFriendsCard from './main-page-friends-card/MainPageFriendsCard'
 import MainPageFriendsSkeleton from './main-page-friends-skeleton/MainPageFriendsSkeleton'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * Stats & Activity's Friends section: how you rank against the people you
@@ -121,9 +122,9 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
       </div>
 
       <ChartCard className="h-auto!">
-        <h3 className="text-[10px] uppercase tracking-widest text-text-secondary">
+        <Kicker as="h3">
           {T.friends.cards} <span className="tabular-nums">· {friends.length.toLocaleString(lang)}</span>
-        </h3>
+        </Kicker>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 enter-cards">
           {friends.map((f) => (
             <MainPageFriendsCard

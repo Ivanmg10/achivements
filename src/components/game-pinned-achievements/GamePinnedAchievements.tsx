@@ -93,7 +93,7 @@ export function GamePinnedAchievements({
           <button
             onClick={() => setModalOpen(true)}
             aria-label={T.gameExpanded.pinAchievementAria}
-            className="w-full flex-1 rounded-control ring-1 ring-inset ring-accent/35 bg-[repeating-linear-gradient(-60deg,rgb(var(--accent)/0.06)_0_10px,transparent_10px_20px)] text-text-main hover:ring-accent/70 transition-shadow flex flex-col items-center justify-center gap-1.5 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="w-full flex-1 rounded-control ring-1 ring-inset ring-accent/35 bg-[repeating-linear-gradient(-60deg,rgb(var(--accent)/0.06)_0_10px,transparent_10px_20px)] text-text-main hover:ring-accent/70 transition-shadow flex flex-col items-center justify-center gap-1.5 font-semibold focus-ring"
           >
             <IconPlus className="w-6 h-6 text-accent" aria-hidden />
             <span className="text-xs">{T.gameExpanded.pinAchievementAria}</span>
@@ -139,7 +139,7 @@ export function GamePinnedAchievements({
                   <button
                     onClick={() => handleUnpin(row.achievement_id)}
                     aria-label={`${T.gameExpanded.unpinAria} ${row.snapshot.Title}`}
-                    className="text-hardcore hover:text-hardcore transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
+                    className="text-hardcore hover:text-hardcore transition-colors focus-ring rounded"
                   >
                     <IconStarFilled className="w-4 h-4" aria-hidden />
                   </button>
@@ -151,7 +151,7 @@ export function GamePinnedAchievements({
             <button
               onClick={() => setModalOpen(true)}
               aria-label={T.gameExpanded.pinAchievementAria}
-              className="w-full rounded-control ring-1 ring-inset ring-accent/35 bg-[repeating-linear-gradient(-60deg,rgb(var(--accent)/0.06)_0_10px,transparent_10px_20px)] text-text-main hover:ring-accent/70 transition-shadow flex items-center justify-center gap-1.5 py-2 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="w-full rounded-control ring-1 ring-inset ring-accent/35 bg-[repeating-linear-gradient(-60deg,rgb(var(--accent)/0.06)_0_10px,transparent_10px_20px)] text-text-main hover:ring-accent/70 transition-shadow flex items-center justify-center gap-1.5 py-2 font-semibold focus-ring"
             >
               <IconPlus className="w-4 h-4 text-accent" aria-hidden />
               <span className="text-xs">{T.gameExpanded.pinAchievementAria}</span>

@@ -11,6 +11,8 @@ import VaultWeeksChart from '@/components/vault-weeks-chart/VaultWeeksChart'
 import VaultPlatformSplit, { PLATFORM_FILL, PLATFORM_NAMES } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { levelProgress } from '@/utils/vaultLevel'
 import { GAME_SOURCES } from '@/utils/gameRef'
+import Kicker from '@/components/ui/Kicker'
+import Tag from '@/components/ui/Tag'
 
 /** A card of the rankings' side column. */
 export const CARD = 'bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 flex flex-col gap-3'
@@ -71,7 +73,7 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
                 ariaLabel={T.rankings.toLevel.replace('{n}', n(p.span - p.into)).replace('{level}', String(p.level + 1))}
                 center={
                   <span className="flex flex-col items-center">
-                    <span className="text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-text-secondary">{T.rankings.colLevel}</span>
+                    <Kicker as="span" size="sm">{T.rankings.colLevel}</Kicker>
                     <CountUp value={p.level} locale={lang} delay={0.25} className="font-display italic font-extrabold text-[3.875rem] leading-[0.85]" />
                   </span>
                 }
@@ -79,9 +81,9 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
               <span className="flex flex-wrap justify-center items-center gap-1.5">
                 <VaultLevelBadge points={me.points} />
                 {me.rank > 0 && (
-                  <span className="inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-ink/[0.06]">
+                  <Tag>
                     {T.rankings.statRank} #{n(me.rank)}
-                  </span>
+                  </Tag>
                 )}
               </span>
               <p className="text-[0.8125rem] text-text-secondary text-center">

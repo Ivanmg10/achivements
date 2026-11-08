@@ -25,7 +25,7 @@ export default function UserSteamCard() {
   const loading = libraryLoading
   const stats: PlatformStat[] = [
     platformStat(T.userStats.games, steam.totalGames, { lang, loading }),
-    platformStat(T.steam.perfect, steam.perfect, { lang, loading, accent: 'text-success' }),
+    platformStat(T.steam.perfect, steam.perfect, { lang, loading, tone: 'success' }),
     platformStat(T.steam.achievements, steam.unlocked, { lang, loading }),
     platformStat(T.userStats.inProgress, steam.playing, { lang, loading }),
     platformStat(T.steam.playtime, formatPlaytime(steam.totalMinutes, T.steam, lang), { lang, loading }),
@@ -41,9 +41,9 @@ export default function UserSteamCard() {
       name="Steam"
       source="steam"
       href={steamId ? `https://steamcommunity.com/profiles/${encodeURIComponent(steamId)}` : undefined}
-      logo={<SteamLogo size={18} className="text-[#66c0f4]" aria-hidden="true" />}
-      bigLogo={<SteamLogo size={40} className="text-[#66c0f4]" aria-hidden="true" />}
-      gradient="from-[#66c0f4] via-[#2a475e] to-[#1b2838]"
+      logo={<SteamLogo size={18} className="text-steam" aria-hidden="true" />}
+      bigLogo={<SteamLogo size={40} className="text-steam" aria-hidden="true" />}
+      gradient="from-steam via-steam-slate to-steam-dark"
       connected={isLinked}
       hint={T.userPage.steamConnectHint}
       identity={

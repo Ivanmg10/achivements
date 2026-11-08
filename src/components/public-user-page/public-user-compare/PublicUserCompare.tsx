@@ -1,8 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import Image from 'next/image'
-import { IconArrowsDiff, IconUser } from '@tabler/icons-react'
+import { IconArrowsDiff } from '@tabler/icons-react'
 import type { RecentAchievement, Streak } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { useStreakData } from '@/hooks/useStreakData'
@@ -12,8 +11,9 @@ import { sharedGames, type LibraryGame } from '@/utils/library'
 import EmptyState from '@/components/empty-state/EmptyState'
 import PublicUserDuelRow from '../public-user-duel-row/PublicUserDuelRow'
 import PublicUserSharedGameRow from '../public-user-shared-game-row/PublicUserSharedGameRow'
-import PresenceDot from '@/components/presence-dot/PresenceDot'
 import { Skeleton } from '@/components/ui/Skeleton'
+import Kicker from '@/components/ui/Kicker'
+import Avatar from '@/components/ui/Avatar'
 
 /** The signed-in viewer's own numbers, read outside the profile's providers. */
 export type ViewerStats = {
@@ -28,19 +28,9 @@ export type ViewerStats = {
 
 const SHARED_SHOWN = 24
 
-function Avatar({ src, name, online }: { src: string | null; name: string; online?: boolean }) {
-  return (
-    <span className="relative shrink-0">
-      {src ? (
-        <Image src={src} alt="" width={56} height={56} className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover ring-2 ring-bg-card" unoptimized />
-      ) : (
-        <span aria-hidden="true" title={name} className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-bg-main flex items-center justify-center">
-          <IconUser size={22} className="text-text-secondary" />
-        </span>
-      )}
-      <PresenceDot online={online} announce />
-    </span>
-  )
+/** The picture of one side of the duel, as the library draws it (a size that grows from `sm`). */
+function DuelAvatar({ src, name, online }: { src: string | null; name: string; online?: boolean }) {
+  return <Avatar src={src} name={name} size={48} sizeSm={56} fallback="icon" online={online} announce ring="ring-2 ring-bg-card" />
 }
 
 /**
@@ -93,7 +83,7 @@ export default function PublicUserCompare({
         </h2>
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <Avatar src={user.avatar} name={user.username} online={user.online} />
+            <DuelAvatar src={user.avatar} name={user.username} online={user.online} />
             <span className="flex flex-col min-w-0">
               <span className="font-semibold truncate">{user.username}</span>
               {!loading && <span className="text-xs text-text-secondary">{T.userProfile.wins.replace('{n}', String(theirWins))}</span>}
@@ -105,7 +95,7 @@ export default function PublicUserCompare({
               <span className="font-semibold truncate">{T.userProfile.you}</span>
               {!loading && <span className="text-xs text-text-secondary">{T.userProfile.wins.replace('{n}', String(myWins))}</span>}
             </span>
-            <Avatar src={viewer.avatar} name={viewer.name} />
+            <DuelAvatar src={viewer.avatar} name={viewer.name} />
           </div>
         </div>
 
@@ -134,9 +124,9 @@ export default function PublicUserCompare({
 
       <section aria-labelledby="public-compare-shared" className="bg-bg-card rounded-tile p-4 flex flex-col gap-3">
         <div className="flex items-baseline justify-between gap-2">
-          <h2 id="public-compare-shared" className="text-[10px] uppercase tracking-widest text-text-secondary">
+          <Kicker as="h2" id="public-compare-shared">
             {T.userProfile.sharedGames}
-          </h2>
+          </Kicker>
           {!loading && shared.length > 0 && <span className="text-xs text-text-secondary tabular-nums">{shared.length.toLocaleString(lang)}</span>}
         </div>
         {loading ? (

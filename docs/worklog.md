@@ -33,6 +33,115 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-08 — Library gaps, their guard rules, and the cursor spotlight gone (`feat/120-library-pieces`, #120)
+
+**Did** — One commit per piece (antislop audit X2 / plan S4; ids are the audit's). Each piece has its test, its
+specimen in `/design` (`catalogue.ts`) and its rule in `uiGuard.test.ts`, and one caller migrated:
+- *Spotlight removed:* `.spotlight` (CSS), `useSpotlight` and its test, its 23 callers (the class carried
+  `position: relative; isolation: isolate`, so each card now says `relative isolate`). The owner turned it down
+  on the canvas (audit §3.7, V7); the finished bar keeps the only glow.
+- *Tokens (C-16, B-07):* `focus-ring` (`@utility`), `shadow-hairline-t/-b/-b-soft`, `shadow-sunken`,
+  `drop-shadow-done`, and the platform colours `ra`, `ra-gold`, `steam`, `steam-dark`, `steam-perfect`, `psn`,
+  `psn-dark`, `xbox`, `platinum` (`--color-*`, so `text-steam`, `bg-psn/10`…). The library itself uses them;
+  `PlatformLogo` is the first caller outside it.
+- *`Kicker` / `kickerClass(tone, size)` and `SectionHead`* (C-04): `SECTION_LABEL` and `StreakSectionHead` are
+  gone (welcome previews, `SectionFallback`, the four streak cards, `Shelf`).
+- *`Tag`* (B-11): the four Beta tags. *`Avatar`* (B-08): `RankingsPageUser`. *`ListRow` / `LIST_ROW`*: the search
+  panel's row promoted (`SearchModalRow` sits on it, `SEARCH_ROW` is gone). *`Figure`* (V6-12): the account page's
+  platform cards (`PlatformStat` takes a `tone` now); `StatPill` / `StatCard` are wrappers over it. *`DataBar`*:
+  the rankings guide's table. *`Spinner`*: Button's, exported; the admin unlock uses `Button loading`.
+  *`ErrorRetry`* (D1-07): the Xbox achievements panel. *`Modal placement="top"`* (C-01): the phone menu is a
+  `Modal` now (`T.header.menu`, nine languages, also the hamburger's label).
+- *Guard holes (T-05, T-06):* palette classes of every hue, side radii, Framer `variants`, hex literals, hand-made
+  pill buttons, notice boxes, `role="dialog"` / `aria-modal`, `createPortal`, and the token strings.
+**Why** — #120: the library was walked around (kickers in 95 files, the focus ring ×220, platform hex ×116), the
+mechanical cause of "the same thing looks different on every page"; and the owner dropped the spotlight.
+**Decisions** — *Looks kept, where copies differed:* `Kicker` has three sizes, not one tracking (one would have
+moved most of them): `xs` = the 32× home spelling, `sm` = the catalogue's, `md` = the welcome's at 0.14em (its
+copies were 0.12–0.16em). `Tag` tints at 0.14 (0.15 for accent, 0.16 for warning, as the copies most often had).
+The hairline is ink 10 % (the 13× table-head value; the 0.08 of the modal footer and tabs moves up 2 %) and ink
+5 % for a table row. `shadow-sunken` is the field's (the switch's 0.25 moved to 0.22; the checkbox keeps its own
+smaller one). The exported `Spinner` is Button's (current colour), not main-spinner's accent top. *Visible
+changes, on purpose:* `ErrorRetry` is a tinted danger box with a quiet button (the issue asked for it on
+`Notice` + `Button`; the old one was a red line and a pill); the phone menu takes `Modal`'s surface, head (title
+"Menu" in the reader's language) and close, opens at 12 % from the top like the search (it was 15 %), and its rows
+no longer stagger in; `Figure`'s card numbers follow the reader's language. The shape of `Tag` and `DataBar` is
+#127's: both read today's tokens only. `text-sky-300` (PSN platinum) became the `platinum` token, the same colour.
+**Open — the migration, for the next agent (one commit per rule; `npx tsc --noEmit`, lint, `npx jest --ci`
+after each).** Each rule is `NEW_RULES.<key>` in `src/components/ui/uiGuard.test.ts`; its regex is the grep, its
+list in `src/components/ui/uiGuard.pending.json` is the work. **Migrate a file, take it off its list; the test
+fails while a migrated file is still listed. Empty every list, then delete `uiGuard.pending.json` and turn
+`newOffenders` back into plain `offenders`** (it takes a third argument, the files that stay on purpose, and tolerates a rule with no list). Never add a file to a list. Look at each screen in both designs
+(`/design` → the header's Slanted / Rounded) before and after.
+**Points 1–9 are done on `feat/120-library-pieces-2` and 10–13 on `feat/120-library-pieces-3` (2026-11-08), one commit per rule
+(10–13: per block); what is left of each is named. `uiGuard.pending.json` now holds only `kicker` (3) and `tag` (5), the
+leftovers named in points 1 and 2; the rest of the file's mechanism stays until those two are empty.**
+1. DONE `kicker` (86 files → 3): 81 moved to `Kicker` (or `kickerClass()` on a `label`, a link, a `motion.p`, a `const`).
+   `Kicker` got the tones `warning` and `inherit` (the colour is the caller's: a tier, a label on a picture). The four
+   table heads (`SortableHeader`, `RankingsGuide`, `RankingsGuideTable`, `RankingsPageTable`) and `PublicUserHero`'s "your
+   profile" pill (a `rounded-full` chip) are an `allowed` list in the test. The labels of the admin create modal and the profile edit
+   modal are `Field` now (sentence case, semibold, no longer capitals); the admin's rows and the "current value" label are `Kicker md`.
+   *Left:* `AchievementModal` and `ConnectAccounts` (headings at `text-sm`, 14 px: no `Kicker` size is that big, they are titles,
+   #127), `GameHashesModal` (a chip with its own palette hues, the palette rule's).
+2. DONE `tag` (30 → 5): 25 moved to `Tag`. `Tag` got a size `xs` (a row's console: `text-[10px]`, medium, `rounded-tag-sm`),
+   the tones `gold`, `surface`, `custom` (colours from `style`, a tier's hue) and the platforms (`steam`, `psn`, `xbox` and the
+   consoles' `white`, `black`, `sky`), and takes `title` and `style`; `overlay` is `bg-black/40` with the main text (the copies were
+   0.35 to 0.45). `psnPlatformChip`/`xboxPlatformChip` are `psnPlatformTone`/`xboxPlatformTone` now (they returned palette and
+   hex classes; their tests moved). `GameHeroChip` is a slanted large `Tag`; `VaultLevelBadge` sits on `Tag tone="custom"`.
+   *Left:* `AchievementModal` (the comments' pager buttons are not tags), `GameHashesModal` (palette hues),
+   `SortableItem` and `StatusGameItem` (RA's console colours are palette strings from `constants/index.ts`: tokens first,
+   then a `Tag` tone), `RouteErrorCard` (a monospace digest, not a label). `RarityBadge` and `StreakTag` do not sit on `Tag` yet.
+3. DONE `avatar` (18 → 0, one `allowed`): every person's picture is `Avatar`. It got `sizeSm` (the profile pictures that grow
+   from `sm`: two CSS variables) and the dot follows the bigger size up to `lg`. `AvatarModal` is `allowed`: it previews the draft
+   picture, names it for a screen reader and reacts to it failing (`Avatar`'s picture is decorative and has no `onError`).
+   Dots now follow the size (36 px: `sm`, was `xs`; 28 px: `xs`, was `sm`).
+4. DONE `figure` (10 → 0): the ten callers use `Figure`; `ui/StatPill.tsx` and its tests are gone (their cases are in
+   `Figure.test.tsx`). *Left:* `UserVaultStat` still takes a class `accent` (it is not `StatPill`; its icon and sub line are its own).
+5. DONE `dataBar` (13 → 0, seven `allowed`): the portada streak, the weekdays, the weeks, the platform split and the guide's example
+   are `DataBar`. `allowed` (with the reason in the test): the podium steps and their skeleton, the Following teaser's podium, the
+   heatmap's range mark, the streak chart's bars (they carry a label inside), the catalogue's and the shape preference's specimens.
+   `PLATFORM_FILL` uses the platform tokens now and `PLATFORM_COLOR` is its colour for a bar.
+6. DONE `spinner` (12 → 0, three `allowed`): the auth forms, the avatar save and the RA link modal use `Button loading`;
+   `src/components/main-spinner/` is deleted. The RA link modal's spinner-only box now says "Sign in" (a button with a word).
+   `allowed`: `MainHeaderLevel`'s ring and the two refresh icons that turn while they refresh.
+7. DONE `pillButton` (15 → 0): the retries are `ErrorRetry` (each platform keeps its texts; a Steam one always shows its
+   private-profile hint, PSN's and Xbox's only for `private`), the rankings' "more" and the consoles' "show all" are `Button`, and
+   `SectionFallback`'s retry is a `Button`. A visible change on purpose: the retries are a tinted danger box with a quiet button.
+8. DONE `notice` (14 → 0): `Notice` got `alert` (announce a warning at once: the RA key notice, the email notices keep their
+   `role="alert"`) and `size="sm"` (a line inside a card: the vault fill lines). The reset form's "done" box is a `Notice` too.
+9. DONE `dialogRole` (2 → 0) and `portal` (12 → 0, one `allowed`): `SearchModal` is `Modal placement="top"` (`size="lg"`, `flush`,
+   `showClose={false}`, no Framer variants, no Escape handler of its own); `Modal` got `flush` (no padding round the body).
+   `LayoutModal` was already a `Modal`: its `closest('[role="dialog"]')` is spelled `[role=dialog]`. The seven modals that wrapped
+   `Modal` in `createPortal` dropped the wrapper. The four achievement grids use the new `ui/CursorTooltip`. `WelcomeCurtain` is
+   `allowed`. `SearchModal` left the `variants` list on its own.
+10. DONE `focusRing` (143 → 0): the three classes are `focus-ring` in 143 files (a plain replace; none had `ring-inset` or
+   `ring-offset-*` inside the string, so none moved).
+11. DONE `hairline` (11 → 0), `sunken` (2 → 0): 0.08, 0.1 → `shadow-hairline-t/-b`, 0.05 and the comments' 0.06 →
+   `-b-soft`, the two 0.22 insets → `shadow-sunken` (`MainHeader`, `ProfileField`). The tabs' and search modal's 0.08 moved up 2 %.
+12. DONE `hex` (58 → 0, three `allowed`) and `palette` (14 → 0), 70 files. Platform hexes → `steam`, `psn`,
+   `xbox`, `steam-perfect`, `ra-gold`, `ra`, `steam-dark`, `psn-dark`; a `ring="#0070d1"` prop → `ring="var(--color-psn)"`; the
+   welcome's gradients (`welcomeArt.ts`, `WelcomePageIntroArt`) use `var(--color-…)`. **Tokens added** (`globals.css`, all
+   in the exact value the palette class had, as oklch; in the catalogue's Colour section and `docs/design-system.md`):
+   `silver`, `silver-light`, `silver-ink`, `gold-ink`, `bronze-ink` (PSN silver, medals), `hardcore-deep`, `offline`,
+   `status-playing|want` (+ `-bg`), `status-done-bg`, `redump`/`tosec` (+ `-ink`), `best-period` (+ `-soft`), the 13 consoles
+   `console-<name>` (+ `-ink`; NDS and N64 keep `text-warning` / `text-hardcore`), `award-mastered|completed|beaten-hardcore|beaten-softcore`
+   (the four hexes of `MasteryMix`), `steam-button`, `steam-slate`, `steam-night`, `steam-sky`, `psn-night`, `psn-light`, `xbox-dark`,
+   `art-pink`, `art-cyan`. `sky-300` → `platinum`, `zinc-400` → `silver`. *`allowed` for `hex`* (the reason is in the test): the RA guide
+   (a drawing of RetroAchievements' own dark page), `WelcomeCurtain` (its ink on the white badge) and `lib/siteUrl.ts` (`THEME_COLOR`,
+   the browser bar, read before a theme exists). *Left:* `GameHashesModal` and `AchievementModal` are still on the `kicker` / `tag`
+   lists (their palette hues are tokens now).
+13. DONE `sideRadius` (1 → 0): `LibraryShelfCard`'s banner is `rounded-t-card` (1.25 rem, as its card; was 1 rem in the slanted
+   design). `variants` (2 → 0, two `allowed`): `AuthPage` swaps its forms on a click and `LibraryGameDetail`'s panels come in when a
+   card is opened: both are a click's (CLAUDE.md → Entrances), not a load's.
+14. Not in #120, seen on the way: `SURFACE` spelled out by hand (C-05, 38 files) and the hand-drawn icon buttons
+   (C-06) have no rule yet.
+**Watch out** — A token used only as a utility is inlined by `@theme inline`; the `--color-*` variable is in the CSS only if something reads it with `var(...)` (checked in the build output). There is no script to regenerate the lists, on purpose: they only shrink, by hand. A
+rule's text in `catalogue.ts` must not match its own regex (two did, and were reworded). `Avatar`'s `ring` is a
+class on purpose (a highlight, like `PresenceDot`'s), the one exception to "className is layout". The phone menu
+keeps `router.push` buttons (its tests expect them); making them links is #121's dialog pass.
+
+---
+
 ## 2026-11-08 — Shared helpers for dates, RA assets, platforms, types and sessions (`refactor/119-shared-helpers`, #119)
 
 **Did** — One commit per helper (antislop audit X4 / plan S3; ids are the audit's, `docs/audits/antislop-v17/code/`):

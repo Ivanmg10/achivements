@@ -13,12 +13,13 @@ import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { Skeleton } from '@/components/ui/Skeleton'
 import type { GameSource } from '@/types/game'
+import Kicker from '@/components/ui/Kicker'
 
 const LOGOS: Record<GameSource, ReactNode> = {
   ra: <RaLogo height={11} />,
-  steam: <SteamLogo size={14} className="text-[#66c0f4]" aria-hidden="true" />,
-  psn: <PlaystationLogo size={14} className="text-[#0070d1]" aria-hidden="true" />,
-  xbox: <XboxLogo size={14} className="text-[#107c10]" aria-hidden="true" />,
+  steam: <SteamLogo size={14} className="text-steam" aria-hidden="true" />,
+  psn: <PlaystationLogo size={14} className="text-psn" aria-hidden="true" />,
+  xbox: <XboxLogo size={14} className="text-xbox" aria-hidden="true" />,
 }
 
 /** Games played on each platform: how many, at 100%, under way, and how far along on average. */
@@ -28,7 +29,7 @@ export default function PublicUserPlatforms({ games, isLoading }: { games: Libra
 
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="text-[10px] uppercase tracking-widest text-text-secondary">{T.userProfile.byPlatform}</h2>
+      <Kicker as="h2">{T.userProfile.byPlatform}</Kicker>
       {isLoading ? (
         <div aria-busy="true" className="flex flex-col gap-2">
           {[0, 1].map((i) => (

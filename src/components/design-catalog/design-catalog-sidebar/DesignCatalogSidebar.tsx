@@ -3,6 +3,7 @@
 import Select from '@/components/ui/Select'
 import { useActiveSection } from '../useActiveSection'
 import { ALL_PIECES, GROUPS } from '../catalogue'
+import Kicker from '@/components/ui/Kicker'
 
 const IDS = ALL_PIECES.map((p) => p.id)
 
@@ -32,7 +33,7 @@ export default function DesignCatalogSidebar() {
         <ul className="flex flex-col gap-5">
           {GROUPS.map((group) => (
             <li key={group.id}>
-              <p className="px-3 pb-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-text-secondary">{group.title}</p>
+              <Kicker size="sm" className="px-3 pb-1.5">{group.title}</Kicker>
               <ul className="flex flex-col">
                 {group.pieces.map((piece) => {
                   const on = piece.id === active
@@ -41,7 +42,7 @@ export default function DesignCatalogSidebar() {
                       <a
                         href={`#${piece.id}`}
                         aria-current={on ? 'location' : undefined}
-                        className={`relative block rounded-control px-3 py-1.5 text-sm transition-colors duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 before:content-[''] before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:bg-accent before:skew-y-(--slant-mark) before:transition-opacity ${
+                        className={`relative block rounded-control px-3 py-1.5 text-sm transition-colors duration-(--motion-hover) focus-ring before:content-[''] before:absolute before:left-0 before:top-2 before:bottom-2 before:w-[3px] before:bg-accent before:skew-y-(--slant-mark) before:transition-opacity ${
                           on ? 'font-bold text-text-main bg-ink/[0.06] before:opacity-100' : 'font-medium text-text-secondary hover:text-text-main hover:bg-ink/[0.04] before:opacity-0'
                         }`}
                       >

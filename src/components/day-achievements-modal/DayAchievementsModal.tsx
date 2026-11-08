@@ -13,6 +13,7 @@ import { gameHref } from '@/utils/gameRef'
 import Modal from '@/components/ui/Modal'
 import { utcDay } from '@/utils/dates'
 import { raImageUrl } from '@/utils/raAssets'
+import Kicker from '@/components/ui/Kicker'
 
 interface Props {
   date: string
@@ -47,13 +48,13 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
     <Modal isOpen onClose={onClose} size="lg" showClose={false} aria-label={formatted} className="gap-3">
         <div className="flex items-start justify-between gap-2 shrink-0">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.dayModal.title}</p>
+            <Kicker>{T.dayModal.title}</Kicker>
             <p className="text-sm font-semibold text-text-main mt-0.5">{formatted}</p>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-ring"
           >
             <IconX size={16} />
           </button>
@@ -71,7 +72,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                     key={`${award.AwardType}-${award.AwardData}`}
                     href={gameHref('ra', award.AwardData, subject)}
                     onClick={onClose}
-                    className="flex items-center gap-3 p-3 rounded-tile bg-bg-main hover:bg-bg-card transition-colors group ring-1 ring-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    className="flex items-center gap-3 p-3 rounded-tile bg-bg-main hover:bg-bg-card transition-colors group ring-1 ring-ink/5 focus-ring"
                   >
                     <div className="relative shrink-0">
                       {award.ImageIcon ? (

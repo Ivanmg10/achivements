@@ -8,6 +8,7 @@ import { PLATFORM_FILL, PLATFORM_NAMES } from '@/components/vault-platform-split
 import { fillMessage } from '@/utils/vaultFill'
 import { GAME_SOURCES } from '@/utils/gameRef'
 import type { GameSource } from '@/types/game'
+import Notice from '@/components/ui/Notice'
 
 /**
  * How the Vault Points fill is getting on, one small card per platform: games
@@ -69,13 +70,11 @@ export default function VaultFillProgress({ wide = false, className = '' }: { wi
         </ul>
       )}
       {messages.map(([s, message]) => (
-        <p
-          key={s}
-          role={platforms[s]?.state === 'error' ? 'alert' : undefined}
-          className={`text-xs rounded-box px-2.5 py-1.5 ${platforms[s]?.state === 'error' ? 'bg-danger/10 text-text-main ring-1 ring-danger/30' : 'text-text-secondary'}`}
-        >
-          {message}
-        </p>
+        platforms[s]?.state === 'error' ? (
+          <Notice key={s} tone="danger" size="sm">{message}</Notice>
+        ) : (
+          <p key={s} className="text-xs rounded-box px-2.5 py-1.5 text-text-secondary">{message}</p>
+        )
       ))}
       {fill.active && <p className="text-xs text-text-secondary">{T.rankings.fillInRanking}</p>}
     </div>

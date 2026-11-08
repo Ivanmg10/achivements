@@ -1,6 +1,7 @@
 import { IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
+import Kicker from '@/components/ui/Kicker'
 
 const RA_SETTINGS = 'https://retroachievements.org/settings'
 const STEP_CLASS = [styles.step1, styles.step2, styles.step3]
@@ -19,12 +20,12 @@ export default function WelcomePageRaGuide() {
   return (
     <div className={`${styles.card} rounded-card bg-bg-card ring-1 ring-ink/[0.06] p-4 sm:p-5 flex flex-col gap-3`}>
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-text-secondary">{t.guideTitle}</h2>
+        <Kicker as="h2" size="md">{t.guideTitle}</Kicker>
         <a
           href={RA_SETTINGS}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 min-h-10 px-2 -mr-2 rounded-tile text-sm font-semibold text-text-main hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="inline-flex items-center gap-1.5 min-h-10 px-2 -mr-2 rounded-tile text-sm font-semibold text-text-main hover:text-accent transition-colors focus-ring"
         >
           {t.openRa}
           <IconExternalLink size={14} aria-hidden="true" />
@@ -33,7 +34,7 @@ export default function WelcomePageRaGuide() {
       <ol className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         {t.guide.map((line, i) => (
           <li key={line} className={`${STEP_CLASS[i]} flex sm:flex-col gap-2 sm:gap-0.5 p-2.5 rounded-tile bg-bg-main text-[0.8125rem] leading-snug`}>
-            <span aria-hidden="true" className="font-display italic font-extrabold text-xl leading-none text-[#e5b53f]">{i + 1}</span>
+            <span aria-hidden="true" className="font-display italic font-extrabold text-xl leading-none text-ra-gold">{i + 1}</span>
             {line}
           </li>
         ))}
@@ -59,11 +60,11 @@ export default function WelcomePageRaGuide() {
               <span className="flex-1 h-9 rounded-box bg-[#0f1014] ring-1 ring-inset ring-[#2a2c3a] flex items-center px-2.5 font-mono text-[#c9ccd4]">••••••••••••</span>
               <span className="h-9 px-3 rounded-box bg-[#2a2c3a] flex items-center text-xs">Copy</span>
             </div>
-            <span className={`${styles.copied} text-xs text-[#e5b53f]`}>{t.guideCopied}</span>
+            <span className={`${styles.copied} text-xs text-ra-gold`}>{t.guideCopied}</span>
           </div>
         </div>
         <div className={`${styles.cursor} absolute left-0 top-0 w-6 h-6`}>
-          <span className={`${styles.click} absolute -left-2.5 -top-2.5 w-8 h-8 rounded-full bg-[#e5b53f]/60`} />
+          <span className={`${styles.click} absolute -left-2.5 -top-2.5 w-8 h-8 rounded-full bg-ra-gold/60`} />
           <svg width="22" height="22" viewBox="0 0 24 24" className="absolute left-0 top-0">
             <path d="M4 3l7 17 2.5-7L21 10z" fill="#ffffff" stroke="#0f1014" strokeWidth="1.5" strokeLinejoin="round" />
           </svg>

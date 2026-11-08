@@ -4,7 +4,6 @@ import { memo, useRef, useState } from 'react'
 import { decimal } from '@/utils/utils'
 import Image from 'next/image'
 import Link from 'next/link'
-import { createPortal } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
 import { formatDate } from '@/utils/dates'
@@ -15,8 +14,7 @@ import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import { capList } from '@/utils/utils'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
-import { tooltipStyle } from '@/utils/tooltipStyle'
-import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
+import CursorTooltip from '@/components/ui/CursorTooltip'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -96,7 +94,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
               }}
               onBlur={hide}
               className={`block rounded-box overflow-hidden shrink-0 transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                a.earned ? 'ring-2 ring-[#66c0f4]' : ''
+                a.earned ? 'ring-2 ring-steam' : ''
               }`}
             >
               {a.badgeUrl ? (
@@ -129,13 +127,8 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
       {capped && <ShowAllButton total={achievements.length} expanded={showAll} onToggle={() => setShowAll((v) => !v)} />}
 
       {/* Portal so the tooltip escapes any ancestor transform stacking context */}
-      {tooltip &&
-        createPortal(
-          <div
-            role="tooltip"
-            className={`fixed z-50 pointer-events-none ${TOOLTIP_SURFACE} p-3 max-w-65`}
-            style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
-          >
+      {tooltip && (
+        <CursorTooltip x={tooltip.x} y={tooltip.y}>
             <p className="text-sm font-semibold text-text-main">{titleOf(tooltip.achievement)}</p>
             <p className="text-xs text-text-secondary mt-1 leading-snug">
               {concealed(tooltip.achievement) ? T.steam.hiddenAchievementDesc : tooltip.achievement.description}
@@ -148,7 +141,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
                 </span>
               )}
               {tooltip.achievement.earned ? (
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-[#66c0f4]/20 text-[#66c0f4]">
+                <span className="text-xs px-1.5 py-0.5 rounded-full bg-steam/20 text-steam">
                   {T.steam.earned}
                 </span>
               ) : (
@@ -159,9 +152,8 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
             {tooltip.achievement.dateEarned && (
               <p className="text-xs text-text-secondary mt-1">{formatDate(tooltip.achievement.dateEarned, lang)}</p>
             )}
-          </div>,
-          document.body,
-        )}
+          </CursorTooltip>
+      )}
     </>
   )
 })

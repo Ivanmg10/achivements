@@ -47,7 +47,7 @@ export default function XboxGameInfoAchievementCard({
         type="button"
         onClick={onOpen}
         aria-label={concealed ? T.xbox.secretAchievement : a.name}
-        className="absolute inset-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 rounded-tile focus-ring"
       />
       <div className="relative shrink-0 pointer-events-none">
         {a.iconUrl && !concealed ? (

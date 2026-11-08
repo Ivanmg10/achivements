@@ -31,7 +31,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
             type="button"
             onClick={onClose}
             aria-label={T.userPage.close}
-            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-ring"
           >
             <IconX size={18} aria-hidden="true" />
           </button>
@@ -52,11 +52,11 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
                   <span className="text-sm font-medium truncate">{g.title}</span>
                   <span className="flex items-center gap-1.5 text-[11px] text-text-secondary">
                     {g.source === 'steam' ? (
-                      <SteamLogo size={11} className="text-[#66c0f4]" aria-hidden="true" />
+                      <SteamLogo size={11} className="text-steam" aria-hidden="true" />
                     ) : g.source === 'psn' ? (
-                      <PlaystationLogo size={11} className="text-[#0070d1]" aria-hidden="true" />
+                      <PlaystationLogo size={11} className="text-psn" aria-hidden="true" />
                     ) : g.source === 'xbox' ? (
-                      <XboxLogo size={11} className="text-[#107c10]" aria-hidden="true" />
+                      <XboxLogo size={11} className="text-xbox" aria-hidden="true" />
                     ) : (
                       <RaLogo height={9} />
                     )}
@@ -67,7 +67,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
                   type="button"
                   onClick={() => showGame(g.id, g.source)}
                   aria-label={T.userPage.showGame.replace('{title}', g.title)}
-                  className="p-2 rounded-chip text-text-secondary hover:text-accent hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="p-2 rounded-chip text-text-secondary hover:text-accent hover:bg-ink/5 transition-colors focus-ring"
                 >
                   <IconEye size={18} aria-hidden="true" />
                 </button>

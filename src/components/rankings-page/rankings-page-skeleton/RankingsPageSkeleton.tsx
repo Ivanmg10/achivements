@@ -33,11 +33,11 @@ export default function RankingsPageSkeleton({ podium = true }: { podium?: boole
         </div>
       )}
       <div aria-hidden="true" className="flex flex-col gap-1.5 md:gap-0 md:bg-bg-card md:rounded-card md:ring-1 md:ring-inset md:ring-ink/[0.06] md:overflow-hidden">
-        <div className="hidden md:flex items-center h-[35.7px] px-3 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]">
+        <div className="hidden md:flex items-center h-[35.7px] px-3 shadow-hairline-b">
           <Skeleton className="h-3 w-24" />
         </div>
         {Array.from({ length: podium ? PAGE - ON_PODIUM : PAGE }, (_, i) => (
-          <div key={i} className="flex items-center gap-3 h-[102.7px] md:h-[69.4px] bg-bg-card md:bg-transparent rounded-tile md:rounded-none px-3 md:shadow-[inset_0_-1px_0_rgb(var(--ink)/0.05)]">
+          <div key={i} className="flex items-center gap-3 h-[102.7px] md:h-[69.4px] bg-bg-card md:bg-transparent rounded-tile md:rounded-none px-3 md:shadow-hairline-b-soft">
             <Skeleton className="h-6 w-7 shrink-0" />
             <Skeleton radius="circle" className="w-10 h-10 shrink-0" />
             <div className="flex flex-col gap-1.5 flex-1 min-w-0">

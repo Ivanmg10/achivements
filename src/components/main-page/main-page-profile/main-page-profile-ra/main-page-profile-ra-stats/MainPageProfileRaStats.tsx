@@ -2,7 +2,7 @@
 
 import { RetroAchievementsUserProfile } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { StatCard } from '@/components/ui/StatPill'
+import Figure from '@/components/ui/Figure'
 
 export default function MainPageProfileRaStats({
   user,
@@ -16,10 +16,10 @@ export default function MainPageProfileRaStats({
 
   return (
     <div className="grid grid-cols-2 gap-2">
-      <StatCard label={T.profileStats.hardcorePoints} value={n(user.TotalPoints)} accent="text-hardcore" />
-      <StatCard label={T.profileStats.truePoints} value={n(user.TotalTruePoints)} />
-      <StatCard label={T.profileStats.softcorePoints} value={n(user.TotalSoftcorePoints)} />
-      <StatCard label={T.profileStats.hardcoreRatio} value={`${hardcoreRatio.toLocaleString(lang)} %`} />
+      <Figure look="card" label={T.profileStats.hardcorePoints} value={n(user.TotalPoints)} tone="hardcore" />
+      <Figure look="card" label={T.profileStats.truePoints} value={n(user.TotalTruePoints)} />
+      <Figure look="card" label={T.profileStats.softcorePoints} value={n(user.TotalSoftcorePoints)} />
+      <Figure look="card" label={T.profileStats.hardcoreRatio} value={`${hardcoreRatio.toLocaleString(lang)} %`} />
     </div>
   )
 }

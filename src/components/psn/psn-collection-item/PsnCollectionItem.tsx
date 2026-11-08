@@ -4,7 +4,6 @@ import { useId, useState } from 'react'
 import { IconChevronDown, IconClock } from '@tabler/icons-react'
 import type { PsnCollection, PsnGameProgress } from '@/types/psn'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { formatDate } from '@/utils/dates'
 import { psnBackdrop } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
@@ -13,6 +12,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import GameIcon from '@/components/game-icon/GameIcon'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import PsnCollectionExpanded from '@/components/psn/psn-collection-expanded/PsnCollectionExpanded'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A collection (The Ezio Collection) in the recent feed: one card with the
@@ -36,7 +36,6 @@ export default function PsnCollectionItem({
 }) {
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
 
   const isExpanded = expanded ?? localExpanded
@@ -49,8 +48,7 @@ export default function PsnCollectionItem({
 
   return (
     <div
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={collection.heroUrl ?? psnBackdrop(games[0])} />
 
@@ -59,7 +57,7 @@ export default function PsnCollectionItem({
         aria-expanded={isExpanded}
         aria-controls={panelId}
         aria-label={`${isExpanded ? T.psn.hideGames : T.psn.showGames}: ${collection.title}`}
-        className="relative flex items-center gap-3.5 px-3.5 py-2 shrink-0 w-full text-left cursor-pointer rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] group"
+        className="relative flex items-center gap-3.5 px-3.5 py-2 shrink-0 w-full text-left cursor-pointer rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn group"
       >
         <GameIcon
           source="psn"
@@ -72,8 +70,8 @@ export default function PsnCollectionItem({
         <span className="flex flex-col min-w-0 flex-1 gap-1">
           <span className="flex items-center gap-2 min-w-0">
             <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{collection.title}</span>
-            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><PlaystationLogo size={12} className="opacity-60" aria-hidden="true" />
-              {consoles}</span>
+            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate"><PlaystationLogo size={12} className="opacity-60" aria-hidden="true" />
+              {consoles}</Tag>
           </span>
 
           <span className="flex items-center gap-2 w-full">

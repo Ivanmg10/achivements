@@ -51,9 +51,9 @@ export default function UserPlatforms() {
     {
       label: T.profileStats.hardcorePoints,
       value: (raUser?.TotalPoints ?? 0).toLocaleString(lang),
-      accent: 'text-warning',
+      tone: 'warning',
     },
-    platformStat(T.userStats.masteries, awards?.MasteryAwardsCount, { lang, loading: awardsLoading, accent: 'text-success' }),
+    platformStat(T.userStats.masteries, awards?.MasteryAwardsCount, { lang, loading: awardsLoading, tone: 'success' }),
     { label: T.userStats.games, value: all.length.toLocaleString(lang) },
     { label: T.userStats.inProgress, value: inProgress.length.toLocaleString(lang) },
   ]
@@ -68,7 +68,7 @@ export default function UserPlatforms() {
         href={raUser?.User ? `https://retroachievements.org/user/${encodeURIComponent(raUser.User)}` : undefined}
         logo={<RaLogo height={18} />}
         bigLogo={<RaLogo height={40} />}
-        gradient="from-[#2a80c7] via-[#2a80c7]/40 to-[#e5b53f]"
+        gradient="from-ra via-ra/40 to-ra-gold"
         connected={raConnected}
         hint={T.userPage.raConnectHint}
         identity={

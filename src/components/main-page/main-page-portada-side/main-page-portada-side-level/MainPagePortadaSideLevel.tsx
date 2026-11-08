@@ -9,6 +9,7 @@ import { CircularProgress } from '@/components/ui/CircularProgress'
 import { CountUp } from '@/components/ui/CountUp'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import { PortadaLevelSkeleton } from '../../main-page-portada-skeleton/MainPagePortadaSkeleton'
+import Kicker from '@/components/ui/Kicker'
 
 /** Your level beside the cover: the number in big, your tier, your points, what is left to the next and this week's gain. Opens the rankings. */
 export default function MainPagePortadaSideLevel() {
@@ -30,7 +31,7 @@ export default function MainPagePortadaSideLevel() {
   return (
     <Link
       href="/rankings"
-      className={`${SURFACE} p-5 sm:px-6 flex flex-col gap-4 hover:ring-accent/40 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+      className={`${SURFACE} p-5 sm:px-6 flex flex-col gap-4 hover:ring-accent/40 transition-shadow focus-ring`}
     >
       <span className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5">
         <CircularProgress
@@ -42,7 +43,7 @@ export default function MainPagePortadaSideLevel() {
           ariaLabel={T.rankings.toLevel.replace('{n}', n(p.span - p.into)).replace('{level}', String(p.level + 1))}
           center={
             <span className="flex flex-col items-center">
-              <span className="text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-text-secondary">{T.rankings.colLevel}</span>
+              <Kicker as="span" size="sm">{T.rankings.colLevel}</Kicker>
               <CountUp value={p.level} locale={lang} className="font-display italic font-extrabold text-[2.75rem] leading-[0.9]" />
             </span>
           }

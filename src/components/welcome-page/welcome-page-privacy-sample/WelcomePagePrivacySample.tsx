@@ -1,7 +1,7 @@
 import { IconLock, IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import WelcomePageProfilePreview from '@/components/welcome-page/welcome-page-profile-preview/WelcomePageProfilePreview'
-import { SECTION_LABEL } from '@/components/welcome-page/welcomeArt'
+import Kicker from '@/components/ui/Kicker'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
 
 const CARD = `${styles.card} rounded-card bg-bg-card ring-1 ring-ink/[0.06]`
@@ -31,7 +31,7 @@ export default function WelcomePagePrivacySample({
         <WelcomePageProfilePreview online={showPresence} />
       ) : (
         <>
-          <span className={`${styles.in} ${SECTION_LABEL}`}>{T.welcome.profile.preview}</span>
+          <Kicker as="span" size="md" className={styles.in}>{T.welcome.profile.preview}</Kicker>
           <div className={`${CARD} flex items-center gap-3 p-4`}>
             <span aria-hidden="true" className="w-10 h-10 shrink-0 rounded-tile bg-ink/10 text-text-secondary flex items-center justify-center">
               <IconLock size={20} />

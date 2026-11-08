@@ -9,6 +9,8 @@ import { useVaultMe } from '@/hooks/useVaultMe'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useVaultFillState } from '@/context/VaultFillContext'
 import EmptyState from '@/components/empty-state/EmptyState'
+import Button from '@/components/ui/Button'
+import Tag from '@/components/ui/Tag'
 import RankingsPageToolbar from './rankings-page-toolbar/RankingsPageToolbar'
 import RankingsPagePodium from './rankings-page-podium/RankingsPagePodium'
 import RankingsPageTable from './rankings-page-table/RankingsPageTable'
@@ -61,11 +63,11 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
         <header className="flex flex-col gap-3 enter-rows">
           <h1 className="flex items-center gap-2.5 font-display italic font-extrabold text-5xl sm:text-[4.5rem] leading-[0.88] pr-1">
             {T.rankings.title}
-            <span className="not-italic font-sans inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-accent/15 text-accent">{T.rankings.beta}</span>
+            <Tag tone="accent">{T.rankings.beta}</Tag>
           </h1>
           <p className="text-sm sm:text-[0.9375rem] text-text-secondary">
             {T.rankings.intro}{' '}
-            <Link href="/rankings/how" className="font-bold text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+            <Link href="/rankings/how" className="font-bold text-accent hover:underline rounded focus-ring">
               {T.rankings.how}
             </Link>
           </p>
@@ -80,7 +82,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
             ) : error ? (
               <div className="bg-bg-card rounded-card flex flex-col items-center gap-2 py-10 text-center">
                 <p role="alert" className="text-sm text-danger">{T.rankings.loadError}</p>
-                <button onClick={retry} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+                <button onClick={retry} className="text-sm text-accent hover:underline rounded focus-ring">
                   {T.rankings.retry}
                 </button>
               </div>
@@ -107,13 +109,9 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
                   </>
                 )}
                 {hasMore && (
-                  <button
-                    onClick={more}
-                    disabled={loadingMore}
-                    className="self-center px-4 py-2 rounded-full text-sm font-medium bg-bg-card text-text-secondary hover:text-text-main disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-                  >
+                  <Button variant="secondary" onClick={more} loading={loadingMore} className="self-center">
                     {T.rankings.more}
-                  </button>
+                  </Button>
                 )}
                 {moreFailed && <p role="alert" className="text-center text-xs text-danger">{T.rankings.loadError}</p>}
               </>

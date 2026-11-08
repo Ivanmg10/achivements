@@ -16,7 +16,7 @@ export default function MainPageProfileActions({
 }: {
   href: string
   linkLabel: string
-  /** Tailwind focus-ring colour of the platform, e.g. `focus:ring-[#66c0f4]`. */
+  /** Tailwind focus-ring colour of the platform, e.g. `focus:ring-steam`. */
   ringClass: string
   onRefresh?: () => void | Promise<void>
 }) {

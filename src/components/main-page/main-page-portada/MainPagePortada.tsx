@@ -21,6 +21,7 @@ import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 import MainPagePortadaSkeleton from '../main-page-portada-skeleton/MainPagePortadaSkeleton'
 import { relativeTime } from '@/utils/dates'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * The top of the home in its "cover" layout (Preferences → General): the game
@@ -95,15 +96,15 @@ export default function MainPagePortada() {
       <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-bg-main/80 to-transparent to-50%" />
 
       <div className="relative flex flex-col gap-3 p-6 sm:p-12 max-w-3xl justify-center enter-rows">
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">
+        <Kicker size="md" tone="accent">
           {T.homeLayout.continueKicker}
           {when && <span className="text-text-secondary"> · {when}</span>}
-        </p>
+        </Kicker>
         <h2 id="home-cover-title" className="font-display italic font-extrabold text-5xl sm:text-[5rem] leading-[0.9] text-text-main line-clamp-2 pr-2">
           {hero.title}
         </h2>
         {hero.console && (
-          <GameHeroChip tone="custom" className="self-start bg-black/50 text-text-main">
+          <GameHeroChip tone="overlay" className="self-start">
             {hero.console}
           </GameHeroChip>
         )}
@@ -141,7 +142,7 @@ export default function MainPagePortada() {
                     aria-label={achievement.title}
                     aria-describedby={descriptionId}
                     onClick={() => setSelected(achievement)}
-                    className="w-full h-full rounded-tile overflow-hidden ring-1 ring-ink/20 bg-bg-main/70 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    className="w-full h-full rounded-tile overflow-hidden ring-1 ring-ink/20 bg-bg-main/70 cursor-pointer focus-ring"
                   >
                     {achievement.iconUrl && (
                       <Image src={achievement.iconUrl} alt="" width={48} height={48} unoptimized className="w-full h-full object-cover grayscale" />
@@ -165,7 +166,7 @@ export default function MainPagePortada() {
                   href={gameHref(hero.source, hero.id)}
                   aria-label={T.homeLayout.unearnedRemaining.replace('{n}', String(remaining))}
                   title={T.homeLayout.openGame}
-                  className="w-full h-full rounded-tile overflow-hidden ring-1 ring-ink/20 bg-bg-main/70 flex items-center justify-center text-sm font-bold hover:ring-accent/40 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="w-full h-full rounded-tile overflow-hidden ring-1 ring-ink/20 bg-bg-main/70 flex items-center justify-center text-sm font-bold hover:ring-accent/40 transition-shadow focus-ring"
                 >
                   +{remaining}
                 </Link>

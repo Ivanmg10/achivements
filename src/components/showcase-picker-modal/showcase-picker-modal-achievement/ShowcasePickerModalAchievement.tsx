@@ -43,7 +43,7 @@ export default function ShowcasePickerModalAchievement({
       aria-pressed={earned && !inShowcase ? selected : undefined}
       aria-label={state ? `${title} · ${state}` : title}
       aria-describedby={description ? descriptionId : undefined}
-      className={`group relative h-full w-full rounded-tile p-2 flex flex-col items-center gap-1.5 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+      className={`group relative h-full w-full rounded-tile p-2 flex flex-col items-center gap-1.5 text-center transition-all focus-ring ${
         selected
           ? 'bg-accent/15 ring-2 ring-accent'
           : earned && !inShowcase

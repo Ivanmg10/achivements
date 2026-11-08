@@ -10,6 +10,7 @@ import PsnRarestTrophies from '@/components/psn/psn-rarest-trophies/PsnRarestTro
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
 import type { PsnGameProgress } from '@/types/psn'
 import { Skeleton } from '@/components/ui/Skeleton'
+import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const SKELETON_BADGES = 24
 
@@ -47,15 +48,7 @@ export default function PsnRecentlyPlayedExpanded({ game }: { game: PsnGameProgr
             ))}
           </ul>
         ) : error ? (
-          <div className="flex flex-col items-start gap-2">
-            <p role="alert" className="text-sm text-danger">
-              {T.psn.trophiesError}
-            </p>
-            {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}
-            <button onClick={retry} className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">
-              {T.psn.retry}
-            </button>
-          </div>
+          <ErrorRetry message={T.psn.trophiesError} hint={error === 'private' ? T.psn.errors.private : undefined} retryLabel={T.psn.retry} onRetry={retry} />
         ) : loaded ? (
           <PsnTrophyGrid gameId={game.id} gameTitle={game.title} trophies={trophies} groups={groups} badgeSize={40} />
         ) : (

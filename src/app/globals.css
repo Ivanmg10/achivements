@@ -60,6 +60,98 @@
   --radius-badge: var(--r-badge);
   --radius-cell: var(--r-cell);
   --radius-nav: var(--r-nav);
+
+  /* A line between two parts, drawn as an inset shadow so it never moves the layout: a table's head and a section's edge, then a row's. */
+  --color-hairline: rgb(var(--ink) / 0.1);
+  --shadow-hairline-t: inset 0 1px 0 rgb(var(--ink) / 0.1);
+  --shadow-hairline-b: inset 0 -1px 0 rgb(var(--ink) / 0.1);
+  --shadow-hairline-b-soft: inset 0 -1px 0 rgb(var(--ink) / 0.05);
+  /* What you type into sits below the card. */
+  --shadow-sunken: inset 0 2px 4px rgb(0 0 0 / 0.22);
+  /* The one glow: a finished bar or ring (`drop-shadow-done`). */
+  --drop-shadow-done: 0 0 6px rgb(var(--progress) / 0.6);
+
+  /*
+     The platforms' own colours, the same in every theme: their logos, their marks and the charts that
+     compare them, never a bar's progress. `steam-perfect` is Steam's green for a game at 100 %,
+     `platinum` PlayStation's top trophy.
+  */
+  --color-ra: #2a80c7;
+  --color-ra-gold: #e5b53f;
+  --color-steam: #66c0f4;
+  --color-steam-dark: #1b2838;
+  --color-steam-perfect: #a4d007;
+  --color-psn: #0070d1;
+  --color-psn-dark: #003791;
+  --color-xbox: #107c10;
+  --color-platinum: rgb(125 211 252);
+
+  /*
+     The hues that are not a theme's: PlayStation's other trophy grades and the medals' inks, the status
+     badges (playing, want to play, done), the consoles' own tints (RetroAchievements' lists), the hash
+     databases and the best-period purple. The same in every theme, in the values the palette gave them.
+  */
+  --color-silver: oklch(70.5% 0.015 286.067);
+  --color-silver-light: oklch(96.7% 0.001 286.375);
+  --color-silver-ink: oklch(21% 0.006 285.885);
+  --color-gold-ink: oklch(27.9% 0.077 45.635);
+  --color-bronze-ink: oklch(26.6% 0.079 36.259);
+  --color-hardcore-deep: oklch(42.1% 0.095 57.708);
+  --color-offline: oklch(55.1% 0.027 264.364);
+  --color-status-playing: oklch(80.9% 0.105 251.813);
+  --color-status-playing-bg: oklch(37.9% 0.146 265.522);
+  --color-status-want: oklch(82.7% 0.119 306.383);
+  --color-status-want-bg: oklch(38.1% 0.176 304.987);
+  --color-status-done-bg: oklch(39.3% 0.095 152.535);
+  --color-redump: oklch(62.3% 0.214 259.815);
+  --color-redump-ink: oklch(80.9% 0.105 251.813);
+  --color-tosec: oklch(62.7% 0.265 303.9);
+  --color-tosec-ink: oklch(82.7% 0.119 306.383);
+  --color-best-period: oklch(71.4% 0.203 305.504);
+  --color-best-period-soft: oklch(62.7% 0.265 303.9);
+  --color-console-ps1: oklch(37.9% 0.146 265.522);
+  --color-console-ps1-ink: oklch(80.9% 0.105 251.813);
+  --color-console-ps2: oklch(35.9% 0.144 278.697);
+  --color-console-ps2-ink: oklch(78.5% 0.115 274.713);
+  --color-console-psp: oklch(38% 0.189 293.745);
+  --color-console-psp-ink: oklch(81.1% 0.111 293.571);
+  --color-console-gb: oklch(37.2% 0.044 257.287);
+  --color-console-gb-ink: oklch(86.9% 0.022 252.894);
+  --color-console-gbc: oklch(38.6% 0.063 188.416);
+  --color-console-gbc-ink: oklch(85.5% 0.138 181.071);
+  --color-console-gba: oklch(38.1% 0.176 304.987);
+  --color-console-gba-ink: oklch(82.7% 0.119 306.383);
+  --color-console-nds: oklch(40.8% 0.123 38.172);
+  --color-console-gamecube: oklch(43.2% 0.232 292.759);
+  --color-console-gamecube-ink: oklch(89.4% 0.057 293.283);
+  --color-console-wii: oklch(39.1% 0.09 240.876);
+  --color-console-wii-ink: oklch(82.8% 0.111 230.318);
+  --color-console-megadrive: oklch(37% 0.013 285.805);
+  --color-console-megadrive-ink: oklch(87.1% 0.006 286.286);
+  --color-console-n64: oklch(42.1% 0.095 57.708);
+  --color-console-snes: oklch(41% 0.159 10.272);
+  --color-console-snes-ink: oklch(81% 0.117 11.638);
+  --color-console-dreamcast: oklch(39.8% 0.07 227.392);
+  --color-console-dreamcast-ink: oklch(86.5% 0.127 207.078);
+  /* RetroAchievements' awards, and Steam's own sign-in button and the platforms' darker ends. The welcome's gradients end in the pink and the cyan. */
+  --color-award-mastered: #d97706;
+  --color-award-completed: #2563eb;
+  --color-award-beaten-hardcore: #15803d;
+  --color-award-beaten-softcore: #9333ea;
+  --color-steam-button: #171a21;
+  --color-steam-slate: #2a475e;
+  --color-steam-night: #0e1726;
+  --color-steam-sky: #2f7fae;
+  --color-psn-night: #00246b;
+  --color-psn-light: #4da3ff;
+  --color-xbox-dark: #0b4d0b;
+  --color-art-pink: #f0abfc;
+  --color-art-cyan: #67e8f9;
+}
+
+/* The library's focus ring: every control, link and card that takes the keyboard. */
+@utility focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70;
 }
 
 /* ============================================
@@ -738,34 +830,6 @@ html[data-font="fira"],
 }
 .theme-button:hover {
   transform: scale(1.05);
-}
-
-/*
-   Spotlight surface: a soft glow in the theme's accent that follows the
-   pointer (useSpotlight sets --spot-x/--spot-y). Hover devices only.
-*/
-.spotlight {
-  position: relative;
-  isolation: isolate;
-}
-.spotlight::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  background: radial-gradient(
-    360px circle at var(--spot-x, 50%) var(--spot-y, 50%),
-    rgb(var(--accent) / 0.12),
-    transparent 60%
-  );
-}
-@media (hover: hover) {
-  .spotlight:hover::after {
-    opacity: 1;
-  }
 }
 
 /*

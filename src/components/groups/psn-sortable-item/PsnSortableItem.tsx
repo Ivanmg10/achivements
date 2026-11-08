@@ -12,12 +12,12 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import GameIcon from '@/components/game-icon/GameIcon'
 import PsnGameItemTrophies from '@/components/psn/psn-game-item-trophies/PsnGameItemTrophies'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { gameHref } from '@/utils/gameRef'
-import { psnBackdrop, psnTitleId, psnPlatformChip } from '@/utils/psnTitles'
+import { psnBackdrop, psnTitleId, psnPlatformTone } from '@/utils/psnTitles'
 import type { GameGroupItem } from '@/types/types'
 import { relativeTime } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A PSN game in a group — SteamSortableItem's counterpart: drag handle, icon,
@@ -40,7 +40,6 @@ export default function PsnSortableItem({
   const { fullLibrary } = usePsnGamesData()
   const [open, setOpen] = useState(false)
   const panelId = useId()
-  const onPointerMove = useSpotlight()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: !draggable,
@@ -59,8 +58,7 @@ export default function PsnSortableItem({
     <div
       ref={setNodeRef}
       style={style}
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`relative isolate bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       <GameCardBackdrop src={game ? psnBackdrop(game) : icon} surface="card" />
       <div className="relative flex items-center gap-3 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">
@@ -69,7 +67,7 @@ export default function PsnSortableItem({
             {...attributes}
             {...listeners}
             aria-label={T.cards.dragToReorder}
-            className="relative z-10 text-text-secondary/40 hover:text-text-secondary transition-colors cursor-grab active:cursor-grabbing shrink-0 touch-none self-stretch flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
+            className="relative z-10 text-text-secondary/40 hover:text-text-secondary transition-colors cursor-grab active:cursor-grabbing shrink-0 touch-none self-stretch flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn"
           >
             <IconGripVertical className="w-4 h-4" aria-hidden="true" />
           </button>
@@ -81,7 +79,7 @@ export default function PsnSortableItem({
           tabIndex={-1}
           aria-hidden="true"
           className={`relative z-10 shrink-0 rounded-tile transition-all ${
-            isComplete ? 'ring-2 ring-sky-300/70 hover:ring-sky-300' : 'hover:ring-2 hover:ring-ink/40'
+            isComplete ? 'ring-2 ring-platinum/70 hover:ring-platinum' : 'hover:ring-2 hover:ring-ink/40'
           }`}
         >
           <GameIcon source="psn" id={item.game_id} imageUrl={icon} size={96} className="w-16 h-16 sm:w-24 sm:h-24 rounded-tile block" />
@@ -90,19 +88,19 @@ export default function PsnSortableItem({
         <div className="flex flex-col flex-1 min-w-0 gap-1">
           <Link
             href={href}
-            className="relative z-10 self-start max-w-full hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
+            className="relative z-10 self-start max-w-full hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn"
           >
             <p title={game?.title ?? item.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">
               {game?.title ?? item.title}
             </p>
           </Link>
           <span className="flex items-center gap-1.5 flex-wrap">
-            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${psnPlatformChip(game?.consoleName ?? '')}`}>
+            <Tag size="xs" tone={psnPlatformTone(game?.consoleName ?? '')}>
               <PlaystationLogo size={12} aria-hidden="true" />
               {game?.consoleName ?? 'PlayStation'}
-            </span>
+            </Tag>
             {game && game.earned.platinum > 0 && (
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-sky-300/10 text-sky-300">
+              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-platinum/10 text-platinum">
                 <span aria-hidden="true">★</span> {T.psn.platinum}
               </span>
             )}
@@ -149,7 +147,7 @@ export default function PsnSortableItem({
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? T.psn.hideTrophies : T.psn.showTrophies}: ${item.title}`}
-            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
+            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn"
           >
             <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               ▼

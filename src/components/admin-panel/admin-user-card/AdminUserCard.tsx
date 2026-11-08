@@ -1,13 +1,13 @@
 'use client'
 
-import Image from 'next/image'
-import { IconPencil, IconShield, IconShieldOff, IconTrash, IconUser } from '@tabler/icons-react'
+import { IconPencil, IconShield, IconShieldOff, IconTrash } from '@tabler/icons-react'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { codeToFlag, findCountry } from '@/utils/countries'
 import type { AdminUser } from '@/types/user'
+import Avatar from '@/components/ui/Avatar'
 
 /**
  * One user in the admin panel, as a card: avatar, name, the accounts they
@@ -33,20 +33,7 @@ export default function AdminUserCard({
   return (
     <li className="bg-bg-card rounded-card p-4 flex flex-col gap-3 ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow">
       <div className="flex items-start gap-3">
-        {user.avatar ? (
-          <Image
-            src={user.avatar}
-            alt=""
-            width={44}
-            height={44}
-            className="rounded-full w-11 h-11 object-cover shrink-0"
-            unoptimized
-          />
-        ) : (
-          <span className="rounded-full w-11 h-11 bg-bg-main flex items-center justify-center shrink-0">
-            <IconUser size={18} className="text-text-secondary" aria-hidden="true" />
-          </span>
-        )}
+        <Avatar src={user.avatar} name={user.username} size={44} fallback="icon" />
 
         <div className="flex flex-col gap-0.5 min-w-0 flex-1">
           <span className="flex items-center gap-1.5 flex-wrap">
@@ -74,19 +61,19 @@ export default function AdminUserCard({
           </span>
         </li>
         <li className="flex items-center gap-1.5 min-w-0">
-          <SteamLogo size={11} className={user.steamusername ? 'text-[#66c0f4]' : 'text-text-secondary/30'} />
+          <SteamLogo size={11} className={user.steamusername ? 'text-steam' : 'text-text-secondary/30'} />
           <span className={`truncate ${user.steamusername ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
             {user.steamusername ?? '—'}
           </span>
         </li>
         <li className="flex items-center gap-1.5 min-w-0">
-          <PlaystationLogo size={11} className={user.psnusername ? 'text-[#0070d1]' : 'text-text-secondary/30'} />
+          <PlaystationLogo size={11} className={user.psnusername ? 'text-psn' : 'text-text-secondary/30'} />
           <span className={`truncate ${user.psnusername ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
             {user.psnusername ?? '—'}
           </span>
         </li>
         <li className="flex items-center gap-1.5 min-w-0">
-          <XboxLogo size={11} className={user.xboxgamertag ? 'text-[#107c10]' : 'text-text-secondary/30'} />
+          <XboxLogo size={11} className={user.xboxgamertag ? 'text-xbox' : 'text-text-secondary/30'} />
           <span className={`truncate ${user.xboxgamertag ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
             {user.xboxgamertag ?? '—'}
           </span>
@@ -98,7 +85,7 @@ export default function AdminUserCard({
           onClick={onToggleAdmin}
           disabled={isSelf}
           aria-label={user.admin ? `Remove admin from ${user.username}` : `Make ${user.username} admin`}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-tile text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-tile text-xs font-medium transition-colors focus-ring ${
             isSelf
               ? 'opacity-30 cursor-not-allowed bg-bg-main text-text-secondary'
               : user.admin
@@ -112,7 +99,7 @@ export default function AdminUserCard({
         <button
           onClick={onEdit}
           aria-label={`Edit ${user.username}`}
-          className="p-2 rounded-tile bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="p-2 rounded-tile bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-ring"
         >
           <IconPencil size={15} aria-hidden="true" />
         </button>

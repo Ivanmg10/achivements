@@ -1,10 +1,11 @@
 import { ReactNode } from 'react'
 import { IconChevronDown } from '@tabler/icons-react'
+import Kicker from '@/components/ui/Kicker'
 
 export type PeriodTone = 'purple' | 'yellow' | 'red'
 
 const TONES: Record<PeriodTone, { text: string; chip: string; ring: string }> = {
-  purple: { text: 'text-purple-400', chip: 'bg-purple-500/15 text-purple-400', ring: 'focus-visible:ring-purple-500/70' },
+  purple: { text: 'text-best-period', chip: 'bg-best-period-soft/15 text-best-period', ring: 'focus-visible:ring-best-period-soft/70' },
   yellow: { text: 'text-hardcore', chip: 'bg-hardcore/15 text-hardcore', ring: 'focus-visible:ring-hardcore/70' },
   red: { text: 'text-danger', chip: 'bg-danger/15 text-danger', ring: 'focus-visible:ring-danger/70' },
 }
@@ -44,7 +45,7 @@ export default function MainPageBestPeriodRow({
         {icon}
       </span>
       <span className="flex flex-col min-w-0 flex-1 gap-0.5">
-        <span className={`text-[10px] uppercase tracking-widest ${t.text}`}>{label}</span>
+        <Kicker as="span" tone="inherit" className={t.text}>{label}</Kicker>
         <span className="text-xs text-text-secondary truncate">{when}</span>
       </span>
       <span className="flex items-baseline gap-1 shrink-0">

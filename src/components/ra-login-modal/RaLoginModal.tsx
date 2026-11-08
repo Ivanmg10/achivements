@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import CommonModal from '../common-modal/CommonModal'
-import Spinner from '../main-spinner/Spinner'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRaLink } from '@/hooks/useRaLink'
 import { notify } from '@/lib/notify'
+import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 
 export default function RaLoginModal({
@@ -57,7 +57,7 @@ export default function RaLoginModal({
               href="https://retroachievements.org/settings"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-ring"
             >
               {T.connect.raKeyHelp}
             </a>
@@ -68,21 +68,9 @@ export default function RaLoginModal({
             {error}
           </p>
         )}
-        {!isLoading ? (
-          <button
-            type="submit"
-            className="bg-bg-main p-3 rounded-box hover:scale-[1.03] transition-transform duration-200"
-          >
-            {T.raLoginModal.signIn}
-          </button>
-        ) : (
-          <button
-            disabled
-            className="bg-bg-main p-3 rounded-box flex justify-center items-center"
-          >
-            <Spinner size={12} />
-          </button>
-        )}
+        <Button type="submit" variant="secondary" loading={isLoading}>
+          {T.raLoginModal.signIn}
+        </Button>
       </form>
     </CommonModal>
   )

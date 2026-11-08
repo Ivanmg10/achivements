@@ -13,6 +13,7 @@ import type { StatusGridCols } from '@/components/status-grid-control/StatusGrid
 import { steamPreviewGames } from '@/utils/sectionPreview'
 import { matchesQuick, steamProgress, type QuickFilter } from '@/utils/libraryInsights'
 import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
+import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const SKELETON_CARDS = 4
 
@@ -61,7 +62,7 @@ export default function SteamCategorySection({
   return (
     <CollapsibleSection
       title={title ?? T.steam.gamesSection}
-      icon={<SteamLogo size={22} className="text-[#66c0f4]" aria-hidden="true" />}
+      icon={<SteamLogo size={22} className="text-steam" aria-hidden="true" />}
       count={loading || error ? undefined : games.length}
       storageKey={`steam-section-open:${category}`}
       className={className}
@@ -78,18 +79,7 @@ export default function SteamCategorySection({
           ))}
         </div>
       ) : error ? (
-        <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-danger">
-            {T.steam.gamesError}
-          </p>
-          <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
-          <button
-            onClick={refetch}
-            className="text-xs bg-bg-card px-3 py-1 rounded-full hover:bg-ink/10 transition-colors"
-          >
-            {T.steam.retry}
-          </button>
-        </div>
+        <ErrorRetry message={T.steam.gamesError} hint={T.steam.privateProfileHint} retryLabel={T.steam.retry} onRetry={refetch} />
       ) : games.length === 0 ? (
         <EmptyState
           size="compact"

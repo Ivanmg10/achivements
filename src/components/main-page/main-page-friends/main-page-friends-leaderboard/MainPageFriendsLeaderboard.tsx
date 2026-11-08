@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
-import { IconCrown, IconUser } from '@tabler/icons-react'
+import { IconCrown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { rankBy, type LeaderRow, type StatKey } from '@/utils/friends'
-import PresenceDot from '@/components/presence-dot/PresenceDot'
 import { pillClass } from '@/components/ui/Pill'
+import Kicker from '@/components/ui/Kicker'
+import Avatar from '@/components/ui/Avatar'
 
 const KEYS: StatKey[] = ['week', 'activeDays', 'streak', 'completed']
 
@@ -37,7 +37,7 @@ export default function MainPageFriendsLeaderboard({ rows }: { rows: LeaderRow[]
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-[10px] uppercase tracking-widest text-text-secondary">{T.friends.leaderboard}</h3>
+        <Kicker as="h3">{T.friends.leaderboard}</Kicker>
         <div role="group" aria-label={T.friends.rankBy} className="flex flex-wrap gap-1.5">
           {KEYS.map((k) => (
             <button key={k} type="button" aria-pressed={key === k} onClick={() => setKey(k)} className={chipClass(key === k)}>
@@ -54,20 +54,11 @@ export default function MainPageFriendsLeaderboard({ rows }: { rows: LeaderRow[]
               <span className="w-6 text-center text-xs font-semibold tabular-nums text-text-secondary shrink-0">
                 {i === 0 && r.stats[key] > 0 ? <IconCrown size={16} className="text-warning inline" aria-label={T.friends.leader} /> : i + 1}
               </span>
-              <span className="relative shrink-0">
-                {r.avatar ? (
-                  <Image src={r.avatar} alt="" width={28} height={28} className="w-7 h-7 rounded-full object-cover" unoptimized />
-                ) : (
-                  <span aria-hidden="true" className="w-7 h-7 rounded-full bg-bg-main flex items-center justify-center">
-                    <IconUser size={14} className="text-text-secondary" />
-                  </span>
-                )}
-                <PresenceDot online={r.online} size="sm" announce />
-              </span>
+              <Avatar src={r.avatar} name={r.username} size={28} fallback="icon" online={r.online} announce />
               <span className="flex flex-col gap-1 min-w-0 flex-1">
                 <span className="text-sm font-medium truncate">
                   {r.username}
-                  {r.isMe && <span className="ml-1.5 text-[10px] uppercase tracking-wider text-accent">{T.userProfile.you}</span>}
+                  {r.isMe && <Kicker as="span" tone="accent" className="ml-1.5">{T.userProfile.you}</Kicker>}
                 </span>
                 <span aria-hidden="true" className="h-1 rounded-full bg-ink/10 overflow-hidden">
                   <span className="block h-full rounded-full bg-progress" style={{ width: `${(r.stats[key] / max) * 100}%` }} />
@@ -84,7 +75,7 @@ export default function MainPageFriendsLeaderboard({ rows }: { rows: LeaderRow[]
               ) : (
                 <Link
                   href={`/user/${encodeURIComponent(r.username)}#compare`}
-                  className={`${cls} hover:bg-ink/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+                  className={`${cls} hover:bg-ink/[0.06] transition-colors focus-ring`}
                 >
                   {inner}
                 </Link>

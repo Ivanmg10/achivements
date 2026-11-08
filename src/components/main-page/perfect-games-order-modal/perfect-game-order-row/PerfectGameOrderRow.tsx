@@ -44,11 +44,11 @@ export default function PerfectGameOrderRow({ game }: { game: PerfectGame }) {
       )}
       <span className="text-sm truncate flex-1">{game.title}</span>
       {game.source === 'steam' ? (
-        <SteamLogo size={12} className="text-[#66c0f4] shrink-0" aria-label="Steam" />
+        <SteamLogo size={12} className="text-steam shrink-0" aria-label="Steam" />
       ) : game.source === 'psn' ? (
-        <PlaystationLogo size={12} className="text-[#0070d1] shrink-0" aria-label="PlayStation" />
+        <PlaystationLogo size={12} className="text-psn shrink-0" aria-label="PlayStation" />
       ) : game.source === 'xbox' ? (
-        <XboxLogo size={12} className="text-[#107c10] shrink-0" aria-label="Xbox" />
+        <XboxLogo size={12} className="text-xbox shrink-0" aria-label="Xbox" />
       ) : (
         game.hardcore && <span className="w-2 h-2 bg-warning rounded-full shrink-0" title="Hardcore" />
       )}

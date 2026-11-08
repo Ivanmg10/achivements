@@ -12,11 +12,11 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
 import { formatPlaytime } from '@/utils/steamFeed'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import type { GameGroupItem } from '@/types/types'
 import { relativeTime } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A Steam game in a group — SortableItem's counterpart: drag handle, cover,
@@ -40,7 +40,6 @@ export default function SteamSortableItem({
   const { library, recent } = useSteamGamesData()
   const [open, setOpen] = useState(false)
   const panelId = useId()
-  const onPointerMove = useSpotlight()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: !draggable,
@@ -67,8 +66,7 @@ export default function SteamSortableItem({
     <div
       ref={setNodeRef}
       style={style}
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`relative isolate bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       {/* The same blurred art and pointer glow as the game cards in the status lists. */}
       <GameCardBackdrop src={steamAssetUrl(item.game_id, 'header')} surface="card" />
@@ -78,7 +76,7 @@ export default function SteamSortableItem({
             {...attributes}
             {...listeners}
             aria-label={T.cards.dragToReorder}
-            className="relative z-10 text-text-secondary/40 hover:text-text-secondary transition-colors cursor-grab active:cursor-grabbing shrink-0 touch-none self-stretch flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+            className="relative z-10 text-text-secondary/40 hover:text-text-secondary transition-colors cursor-grab active:cursor-grabbing shrink-0 touch-none self-stretch flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam"
           >
             <IconGripVertical className="w-4 h-4" aria-hidden="true" />
           </button>
@@ -90,7 +88,7 @@ export default function SteamSortableItem({
           tabIndex={-1}
           aria-hidden="true"
           className={`relative z-10 shrink-0 rounded-tile transition-all ${
-            isComplete ? 'ring-2 ring-[#a4d007]/70 hover:ring-[#a4d007]' : 'hover:ring-2 hover:ring-ink/40'
+            isComplete ? 'ring-2 ring-steam-perfect/70 hover:ring-steam-perfect' : 'hover:ring-2 hover:ring-ink/40'
           }`}
         >
           <SteamGameImage
@@ -105,17 +103,17 @@ export default function SteamSortableItem({
         <div className="flex flex-col flex-1 min-w-0 gap-1">
           <Link
             href={href}
-            className="relative z-10 self-start max-w-full hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+            className="relative z-10 self-start max-w-full hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam"
           >
             <p title={game?.title ?? item.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game?.title ?? item.title}</p>
           </Link>
           <span className="flex items-center gap-1.5 flex-wrap">
-            <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium bg-[#1b2838] text-[#66c0f4]">
+            <Tag size="xs" tone="steam">
               <SteamLogo size={12} aria-hidden="true" />
               Steam
-            </span>
+            </Tag>
             {isComplete && (
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[#a4d007]/10 text-[#a4d007]">
+              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-steam-perfect/10 text-steam-perfect">
                 <span aria-hidden="true">★</span> {T.steam.perfect}
               </span>
             )}
@@ -161,7 +159,7 @@ export default function SteamSortableItem({
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${item.title}`}
-            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam"
           >
             <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               ▼

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import CommonModal from '../common-modal/CommonModal'
 import AdminLinkedAccounts from './admin-linked-accounts/AdminLinkedAccounts'
 import { adminFetch } from '@/utils/adminFetch'
@@ -12,6 +11,8 @@ import { notify } from '@/lib/notify'
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import Switch from '@/components/ui/Switch'
+import Kicker from '@/components/ui/Kicker'
+import Avatar from '@/components/ui/Avatar'
 
 interface Props {
   isOpen: boolean
@@ -70,14 +71,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
   return (
     <CommonModal isOpen={isOpen} onClose={onClose}>
       <div className="flex items-center gap-3 mb-1 pt-2">
-        {user.avatar ? (
-          <Image src={user.avatar} alt={user.username} width={40} height={40}
-            className="rounded-full w-10 h-10 object-cover shrink-0" unoptimized />
-        ) : (
-          <div className="rounded-full w-10 h-10 bg-bg-main flex items-center justify-center shrink-0">
-            <span className="text-xs text-text-secondary font-bold">{user.username[0]?.toUpperCase()}</span>
-          </div>
-        )}
+        <Avatar src={user.avatar} name={user.username} />
         <div>
           <h2 className="text-xl font-bold">{user.username}</h2>
           <p className="text-xs text-text-secondary font-mono">ID: {user.id}</p>
@@ -133,16 +127,14 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
               placeholder="https://..."
             />
             {(values.avatar as string) && (
-              <Image src={values.avatar as string} alt="Avatar preview" width={32} height={32}
-                className="rounded-full w-8 h-8 object-cover shrink-0" unoptimized
-                onError={() => {}} />
+              <Avatar src={values.avatar as string} name={user.username} size={32} />
             )}
           </div>
         </FieldRow>
 
         {/* Location */}
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-text-secondary uppercase tracking-wider">Location</span>
+          <Kicker as="span" size="md">Location</Kicker>
           {!showCountryPicker ? (
             <div className="flex items-center gap-2">
               <button
@@ -199,7 +191,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
 
         {/* Admin toggle */}
         <div className="flex items-center justify-between">
-          <span className="text-xs text-text-secondary uppercase tracking-wider">Admin</span>
+          <Kicker as="span" size="md">Admin</Kicker>
           <div className="flex items-center gap-3">
             {user.id === currentAdminId && (
               <span className="text-xs text-text-secondary italic">Can&apos;t remove own admin</span>
@@ -248,7 +240,7 @@ function FieldRow({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-xs text-text-secondary uppercase tracking-wider">{label}</span>
+      <Kicker as="span" size="md">{label}</Kicker>
       <div className="flex items-center gap-2">
         <div className="flex-1">{children}</div>
         {canSave && <SaveButton saving={saving} onClick={onSave} />}

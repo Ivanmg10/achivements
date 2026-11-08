@@ -4,6 +4,7 @@ import { CURTAIN_MS, CURTAIN_SWAP_MS, type WelcomeDirection } from '@/hooks/useW
 import { useLanguage } from '@/context/LanguageContext'
 import { QUIET_BUTTON } from '@/components/welcome-page/welcomeArt'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
+import Kicker from '@/components/ui/Kicker'
 
 const ENTER: Record<WelcomeDirection, string | undefined> = { forward: undefined, back: styles.back, none: styles.calm }
 
@@ -83,7 +84,7 @@ export default function WelcomePageStep({
               <span aria-hidden="true" className="w-px h-4 bg-ink/15" />
             </>
           )}
-          <span className="text-xs sm:text-[0.8125rem] font-bold uppercase tracking-[0.12em] text-accent">{kicker}</span>
+          <Kicker as="span" size="md" tone="accent">{kicker}</Kicker>
         </div>
         <h1
           ref={titleRef}

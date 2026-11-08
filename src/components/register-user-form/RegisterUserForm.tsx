@@ -6,7 +6,6 @@ import { signIn } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
-import Spinner from '@/components/main-spinner/Spinner'
 import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
 import WelcomeEntryCurtain from '@/components/welcome-entry-curtain/WelcomeEntryCurtain'
 import RegisterUserFormRa from '@/components/register-user-form/register-user-form-ra/RegisterUserFormRa'
@@ -15,6 +14,7 @@ import { useWelcomeEntry } from '@/hooks/useWelcomeEntry'
 import type { RaSignupAccount } from '@/hooks/useRaSignupCheck'
 import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, suggestUsername, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
 
 export default function RegisterUserForm({
   setIsLogin,
@@ -117,9 +117,7 @@ export default function RegisterUserForm({
       </div>
 
       {error && (
-        <div role="alert" className="mb-5 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3">
-          <p className="text-sm text-danger">{error}</p>
-        </div>
+        <Notice tone="danger" className="mb-5">{error}</Notice>
       )}
 
       {raOpen && (
@@ -188,16 +186,12 @@ export default function RegisterUserForm({
 
         <Button
           type="submit"
+          loading={submitting}
           // With the RA section open, its account is checked first (or the section closed).
-          disabled={submitting || (raOpen && !raAccount)}
+          disabled={raOpen && !raAccount}
           size="lg" className="w-full mt-2"
         >
-          {submitting ? (
-            <>
-              <Spinner size={16} />
-              {T.registerForm.creating}
-            </>
-          ) : (
+          {submitting ? (T.registerForm.creating) : (
             <>
               {T.registerForm.createAccount}
               <IconArrowRight size={16} aria-hidden="true" />
@@ -212,7 +206,7 @@ export default function RegisterUserForm({
         <button
           type="button"
           onClick={() => setRaOpen(true)}
-          className="mt-3 w-full py-3 rounded-tile font-semibold flex items-center justify-center gap-2 bg-bg-card text-text-main border border-ink/15 hover:border-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="mt-3 w-full py-3 rounded-tile font-semibold flex items-center justify-center gap-2 bg-bg-card text-text-main border border-ink/15 hover:border-accent transition-colors focus-ring"
         >
           <RaLogo height={16} />
           {T.registerForm.raCta}
@@ -236,7 +230,7 @@ export default function RegisterUserForm({
         <button
           type="button"
           onClick={() => setIsLogin(true)}
-          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-ring"
         >
           {T.registerForm.alreadyHaveAccountAction}
         </button>

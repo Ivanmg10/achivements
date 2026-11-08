@@ -7,6 +7,7 @@ import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { steamAssetUrl } from '@/lib/steamAssets'
+import Kicker from '@/components/ui/Kicker'
 
 /** A handful of the collage's own art, both platforms, fanned out in the big tile. */
 const COVERS = [
@@ -51,17 +52,17 @@ export default function LandingBento() {
           ))}
         </div>
         <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 pt-4 border-t border-ink/5 text-sm text-text-secondary">
-          <li className="text-xs uppercase tracking-widest text-text-secondary">{T.landing.platformsLead}</li>
+          <Kicker as="li" size="md">{T.landing.platformsLead}</Kicker>
           <li className="flex items-center gap-2">
             <RaLogo height={14} />
             RetroAchievements
           </li>
           <li className="flex items-center gap-2">
-            <SteamLogo size={15} className="text-[#66c0f4]" aria-hidden="true" />
+            <SteamLogo size={15} className="text-steam" aria-hidden="true" />
             Steam
           </li>
           <li className="flex items-center gap-2">
-            <PlaystationLogo size={15} className="text-[#0070d1]" aria-hidden="true" />
+            <PlaystationLogo size={15} className="text-psn" aria-hidden="true" />
             PlayStation
           </li>
         </ul>

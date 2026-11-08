@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import GameIcon from '@/components/game-icon/GameIcon'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
-import { xboxPlatformChip } from '@/utils/xboxTitles'
+import { xboxPlatformTone } from '@/utils/xboxTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { plural } from '@/utils/utils'
 import type { XboxGameProgress } from '@/types/xbox'
@@ -47,7 +47,7 @@ export default function XboxGameInfoHeader({
       title={game.title}
       chips={
         <>
-          <GameHeroChip tone="custom" className={xboxPlatformChip(game.consoleName)}>
+          <GameHeroChip tone={xboxPlatformTone(game.consoleName)}>
             <XboxLogo size={14} aria-hidden="true" />
             {game.consoleName}
           </GameHeroChip>

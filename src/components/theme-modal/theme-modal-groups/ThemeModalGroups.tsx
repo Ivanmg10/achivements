@@ -2,6 +2,7 @@ import type { MouseEvent } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { THEME_GROUPS, type Theme } from '@/types/types'
 import ThemeModalOption from '@/components/theme-modal/theme-modal-option/ThemeModalOption'
+import { kickerClass } from '@/components/ui/Kicker'
 
 /**
  * Every theme by family, as one radio group. One grid for every family, so the
@@ -23,7 +24,7 @@ export default function ThemeModalGroups({
     <div role="radiogroup" aria-label={T.userTheme.theme} className="flex flex-col gap-5">
       {THEME_GROUPS.map((group) => (
         <section key={group.id} aria-labelledby={`theme-group-${group.id}`} className="flex flex-col gap-2">
-          <h3 id={`theme-group-${group.id}`} className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+          <h3 id={`theme-group-${group.id}`} className={kickerClass('muted', 'md')}>
             {T.userTheme[`group_${group.id}`]}
           </h3>
           <div className={`grid ${columns} gap-2 sm:gap-3`}>

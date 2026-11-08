@@ -9,7 +9,7 @@ import Checkbox from '@/components/ui/Checkbox'
 import { tabClass } from '@/components/ui/Tabs'
 import { MENU_SURFACE } from '@/components/ui/menu'
 
-const MENU = 'h-9 px-3 rounded-button text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer bg-bg-main ring-1 ring-inset ring-ink/10 text-text-main hover:ring-ink/25 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+const MENU = 'h-9 px-3 rounded-button text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer bg-bg-main ring-1 ring-inset ring-ink/10 text-text-main hover:ring-ink/25 transition-colors focus-ring'
 
 /**
  * One bar over a group's games: progress (all / not started / started /
@@ -54,7 +54,7 @@ export default function GroupToolbar({
   ]
 
   return (
-    <div className="flex flex-wrap items-center gap-2 px-1 sm:px-4 pb-1.5 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]">
+    <div className="flex flex-wrap items-center gap-2 px-1 sm:px-4 pb-1.5 shadow-hairline-b">
       <div role="group" aria-label={T.groups.filterProgressLabel} className="flex flex-wrap gap-1 -mb-1.5">
         {states.map((s) => (
           <button
@@ -90,7 +90,7 @@ export default function GroupToolbar({
               )
             })}
             {picked > 0 && (
-              <button type="button" onClick={onClearConsoles} className="mt-1 px-2 py-1.5 rounded-box text-left text-xs text-accent hover:bg-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+              <button type="button" onClick={onClearConsoles} className="mt-1 px-2 py-1.5 rounded-box text-left text-xs text-accent hover:bg-ink/5 focus-ring">
                 {T.groups.allConsoles}
               </button>
             )}

@@ -95,7 +95,7 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
                   <button
                     type="button"
                     onClick={() => setGame(null)}
-                    className="self-start flex items-center gap-1 text-xs text-text-secondary hover:text-text-main rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    className="self-start flex items-center gap-1 text-xs text-text-secondary hover:text-text-main rounded focus-ring"
                   >
                     <IconArrowLeft size={14} aria-hidden="true" />
                     {T.showcase.back}
@@ -108,7 +108,7 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
                 type="button"
                 onClick={onClose}
                 aria-label={T.toast.close}
-                className="p-1 rounded-chip text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="p-1 rounded-chip text-text-secondary hover:text-text-main transition-colors focus-ring"
               >
                 <IconX size={18} aria-hidden="true" />
               </button>

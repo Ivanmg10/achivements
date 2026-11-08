@@ -8,7 +8,7 @@ import {
   xboxBackdrop,
   xboxHasAchievements,
   xboxNumericId,
-  xboxPlatformChip,
+  xboxPlatformTone,
   xboxTitleId,
 } from './xboxTitles'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
@@ -47,10 +47,10 @@ test('an achievement has an anchor on its game page', () => {
 })
 
 test('the chip says the platform in words and picks its colours by the first one', () => {
-  expect(xboxPlatformChip('Xbox Series · PC')).toContain('bg-zinc-100')
-  expect(xboxPlatformChip('Xbox One')).toContain('bg-[#107c10]')
-  expect(xboxPlatformChip('Xbox 360')).toContain('bg-black')
-  expect(xboxPlatformChip('PC')).toContain('bg-sky-300')
+  expect(xboxPlatformTone('Xbox Series · PC')).toBe('white')
+  expect(xboxPlatformTone('Xbox One')).toBe('xbox')
+  expect(xboxPlatformTone('Xbox 360')).toBe('black')
+  expect(xboxPlatformTone('PC')).toBe('sky')
 })
 
 test('the backdrop is the box art, the only art Xbox sends', () => {

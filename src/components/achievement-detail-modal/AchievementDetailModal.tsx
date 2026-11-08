@@ -1,7 +1,6 @@
 'use client'
 
 import { ReactNode, useId } from 'react'
-import { createPortal } from 'react-dom'
 import { IconBrandYoutube, IconBook2, IconCheck, IconLock, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { FadeImage } from '@/components/ui/FadeImage'
@@ -11,6 +10,7 @@ import type { ShowcaseEntry } from '@/utils/showcase'
 import { formatRarity } from '@/utils/steamFeed'
 import type { GuideLink } from '@/utils/guideLinks'
 import Modal from '@/components/ui/Modal'
+import Kicker from '@/components/ui/Kicker'
 
 const GUIDE_ICON = { youtube: IconBrandYoutube, steamGuides: IconBook2, psnProfiles: IconBook2, trueAchievements: IconBook2 }
 
@@ -62,8 +62,7 @@ export default function AchievementDetailModal({
     : null
   const guideLabel = { youtube: T.achievementDetail.youtube, steamGuides: T.achievementDetail.steamGuides, psnProfiles: T.achievementDetail.psnProfiles, trueAchievements: T.achievementDetail.trueAchievements }
 
-  // In body: a transformed ancestor (the home's sections) would otherwise trap it under later sections.
-  return createPortal(
+  return (
     <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="md" showClose={false} className="gap-4">
         <div className="flex items-start gap-4 p-5 sm:p-6 border-b border-bg-header">
           {iconUrl ? (
@@ -94,7 +93,7 @@ export default function AchievementDetailModal({
             type="button"
             onClick={onClose}
             aria-label={T.achievementDetail.close}
-            className="p-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-ring"
           >
             <IconX className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -116,7 +115,7 @@ export default function AchievementDetailModal({
 
         {guides.length > 0 && (
           <div className="flex flex-col gap-2 p-5 sm:p-6">
-            <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wide">{T.achievementDetail.findGuide}</h3>
+            <Kicker as="h3" size="md">{T.achievementDetail.findGuide}</Kicker>
             <ul className="flex flex-wrap gap-2">
               {guides.map((g) => {
                 const Icon = GUIDE_ICON[g.kind]
@@ -126,7 +125,7 @@ export default function AchievementDetailModal({
                       href={g.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-chip bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-chip bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-ring"
                     >
                       <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                       {guideLabel[g.kind]}
@@ -137,7 +136,6 @@ export default function AchievementDetailModal({
             </ul>
           </div>
         )}
-      </Modal>,
-    document.body,
+      </Modal>
   )
 }

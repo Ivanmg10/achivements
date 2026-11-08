@@ -34,7 +34,7 @@ export default function RankingsPageToolbar({
   const set = (change: Partial<RankingsView>) => onChange({ ...view, ...change })
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-end gap-3 lg:gap-3.5 lg:shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]">
+    <div className="flex flex-col lg:flex-row lg:items-end gap-3 lg:gap-3.5 lg:shadow-hairline-b">
       {scopes.length > 1 && (
         <Tabs
           id="rankings-scope"

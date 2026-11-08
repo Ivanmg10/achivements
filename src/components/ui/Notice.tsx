@@ -19,6 +19,8 @@ export default function Notice({
   title,
   children,
   action,
+  alert = false,
+  size = 'md',
   className = '',
 }: {
   tone?: Tone
@@ -27,13 +29,21 @@ export default function Notice({
   children?: React.ReactNode
   /** A button or link on the right. */
   action?: React.ReactNode
+  /** Announce it at once, as an error is: a warning the person has to act on (a key that stopped working). */
+  alert?: boolean
+  /** `sm` for a line inside a card. */
+  size?: 'md' | 'sm'
   /** Layout only. */
   className?: string
 }) {
   const { box, icon: Icon } = TONES[tone]
+  const small = size === 'sm'
   return (
-    <div role={tone === 'danger' ? 'alert' : 'status'} className={`flex items-start gap-2.5 rounded-control px-3.5 py-2.5 text-sm ring-1 ring-inset ${box} ${className}`}>
-      <Icon size={17} aria-hidden="true" className="shrink-0 mt-px" />
+    <div
+      role={tone === 'danger' || alert ? 'alert' : 'status'}
+      className={`flex items-start ${small ? 'gap-2 rounded-box px-2.5 py-1.5 text-xs' : 'gap-2.5 rounded-control px-3.5 py-2.5 text-sm'} ring-1 ring-inset ${box} ${className}`}
+    >
+      <Icon size={small ? 14 : 17} aria-hidden="true" className="shrink-0 mt-px" />
       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
         {title && <p className="font-semibold">{title}</p>}
         {children && <div className={title ? 'text-text-main/85' : ''}>{children}</div>}

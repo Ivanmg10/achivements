@@ -54,7 +54,7 @@ export default function LibraryDetailList({
               <Link
                 href={a.href}
                 title={a.description}
-                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-ring"
               >
                 {a.iconUrl ? (
                   <Image src={a.iconUrl} alt="" width={40} height={40} unoptimized className="w-10 h-10 rounded-box object-cover shrink-0" />

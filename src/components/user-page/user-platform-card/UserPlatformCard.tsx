@@ -4,10 +4,10 @@ import { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
 import { buttonClass } from '@/components/ui/Button'
-import { Skeleton } from '@/components/ui/Skeleton'
+import Figure, { type FigureTone } from '@/components/ui/Figure'
 import type { GameSource } from '@/types/game'
 
-export type PlatformStat = { label: string; value: string; accent?: string; loading?: boolean }
+export type PlatformStat = { label: string; value: string; tone?: FigureTone; loading?: boolean }
 
 /**
  * A figure of a platform card. While it is on its way it is `loading` (a skeleton in its place);
@@ -16,10 +16,10 @@ export type PlatformStat = { label: string; value: string; accent?: string; load
 export function platformStat(
   label: string,
   value: string | number | null | undefined,
-  { lang, loading = false, accent }: { lang: string; loading?: boolean; accent?: string },
+  { lang, loading = false, tone }: { lang: string; loading?: boolean; tone?: FigureTone },
 ): PlatformStat {
   const text = value === null || value === undefined || value === '' ? '—' : typeof value === 'number' ? value.toLocaleString(lang) : value
-  return { label, value: text, accent, loading }
+  return { label, value: text, tone, loading }
 }
 
 export const DISCONNECT_CLASS = buttonClass('danger', 'md', 'w-full')
@@ -55,7 +55,7 @@ export default function UserPlatformCard({
   logo: ReactNode
   /** The same logo, larger, for the disconnected state. */
   bigLogo?: ReactNode
-  /** Gradient stops for the card's outline, e.g. "from-[#66c0f4] to-[#1b2838]". */
+  /** Gradient stops for the card's outline, e.g. "from-steam to-steam-dark". */
   gradient: string
   connected: boolean
   /** A message about the last connection attempt. */
@@ -87,7 +87,7 @@ export default function UserPlatformCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${name} — ${T.userData.openProfile}`}
-                className="font-extrabold truncate hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="font-extrabold truncate hover:underline rounded focus-ring"
               >
                 {name}
               </a>
@@ -111,18 +111,15 @@ export default function UserPlatformCard({
             {stats.length > 0 && (
               <dl className="grid grid-cols-2 gap-1.5">
                 {stats.map((stat, i) => (
-                  <div
+                  <Figure
                     key={stat.label}
+                    look="card"
+                    compact
+                    term
+                    {...stat}
                     /* An odd count leaves the last one alone on its row: let it fill it. */
-                    className={`bg-bg-main rounded-tile px-3 py-2.5 flex flex-col min-w-0 ${
-                      stats.length % 2 === 1 && i === stats.length - 1 ? 'col-span-2' : ''
-                    }`}
-                  >
-                    <dt className="text-xs text-text-secondary truncate">{stat.label}</dt>
-                    <dd className={`text-xl font-extrabold tabular-nums truncate ${stat.accent ?? 'text-text-main'}`}>
-                      {stat.loading ? <Skeleton className="h-[1lh] w-2/3" /> : stat.value}
-                    </dd>
-                  </div>
+                    className={stats.length % 2 === 1 && i === stats.length - 1 ? 'col-span-2' : ''}
+                  />
                 ))}
               </dl>
             )}

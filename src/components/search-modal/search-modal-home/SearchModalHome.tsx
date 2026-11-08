@@ -1,4 +1,4 @@
-import { IconFlame, IconTrophy, IconUser } from '@tabler/icons-react'
+import { IconFlame, IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentFeed } from '@/hooks/useRecentFeed'
 import { useStreakSummary } from '@/hooks/useStreakSummary'
@@ -12,6 +12,7 @@ import { FadeImage } from '@/components/ui/FadeImage'
 import SearchModalGroup from '../search-modal-group/SearchModalGroup'
 import SearchModalRow from '../search-modal-row/SearchModalRow'
 import { relativeTime } from '@/utils/dates'
+import Avatar from '@/components/ui/Avatar'
 
 const SHOWN_GAMES = 2
 
@@ -65,7 +66,7 @@ export default function SearchModalHome({
         <SearchModalGroup
           title={T.search.recentSearches}
           aside={
-            <button type="button" onClick={onClearSearches} className="text-xs text-text-secondary hover:text-text-main rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+            <button type="button" onClick={onClearSearches} className="text-xs text-text-secondary hover:text-text-main rounded focus-ring">
               {T.search.clearRecent}
             </button>
           }
@@ -86,7 +87,7 @@ export default function SearchModalHome({
             {recentUsers.map((u) => (
               <li key={u.username}>
                 <SearchModalRow
-                  media={u.avatar ? <img src={u.avatar} alt="" className="w-full h-full object-cover rounded-full" /> : <IconUser className="w-4 h-4 text-text-secondary" aria-hidden="true" />}
+                  media={<Avatar src={u.avatar} name={u.username} size={40} fallback="icon" />}
                   title={u.username}
                   onSelect={() => onPickUser(u)}
                 />

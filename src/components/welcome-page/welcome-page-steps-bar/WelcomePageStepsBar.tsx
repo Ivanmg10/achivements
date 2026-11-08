@@ -11,8 +11,8 @@ export type WelcomeStepState = 'current' | 'done' | 'linked' | 'later' | 'pendin
 
 const PLATFORM_MARK: Partial<Record<WelcomeStep, ReactNode>> = {
   ra: <RaLogo height={10} />,
-  steam: <SteamLogo size={14} className="text-[#66c0f4]" aria-hidden="true" />,
-  psn: <PlaystationLogo size={14} className="text-[#0070d1]" aria-hidden="true" />,
+  steam: <SteamLogo size={14} className="text-steam" aria-hidden="true" />,
+  psn: <PlaystationLogo size={14} className="text-psn" aria-hidden="true" />,
 }
 
 /**
@@ -66,7 +66,7 @@ export default function WelcomePageStepsBar({
                         disabled={i > seen}
                         aria-current={state === 'current' ? 'step' : undefined}
                         aria-label={`${name}, ${T.welcome.state[state]}`}
-                        className={`inline-flex items-center gap-1.5 min-h-9 px-3 rounded-full text-[0.8125rem] whitespace-nowrap transition-colors disabled:opacity-45 disabled:cursor-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+                        className={`inline-flex items-center gap-1.5 min-h-9 px-3 rounded-full text-[0.8125rem] whitespace-nowrap transition-colors disabled:opacity-45 disabled:cursor-default focus-ring ${
                           state === 'current'
                             ? 'text-accent font-semibold bg-accent/10 ring-1 ring-inset ring-ink/15'
                             : state === 'done' || state === 'linked'
@@ -98,7 +98,7 @@ export default function WelcomePageStepsBar({
               onClick={onBack}
               disabled={index === 0}
               aria-label={T.welcome.back}
-              className="w-11 h-11 shrink-0 rounded-tile flex items-center justify-center disabled:opacity-30 hover:bg-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="w-11 h-11 shrink-0 rounded-tile flex items-center justify-center disabled:opacity-30 hover:bg-ink/5 focus-ring"
             >
               <IconChevronLeft size={20} aria-hidden="true" />
             </button>

@@ -7,13 +7,13 @@
 export const TABLE = 'w-full border-separate border-spacing-0'
 
 export const TH =
-  'px-3 py-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-text-secondary whitespace-nowrap shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]'
+  'px-3 py-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-text-secondary whitespace-nowrap shadow-hairline-b'
 
 /** A row: `group` so its cells tint together on hover. */
 export const ROW = 'group relative'
 
 export const TD =
-  'px-3 py-2.5 align-middle text-sm shadow-[inset_0_-1px_0_rgb(var(--ink)/0.05)] transition-colors duration-(--motion-hover) group-hover:bg-accent/[0.06]'
+  'px-3 py-2.5 align-middle text-sm shadow-hairline-b-soft transition-colors duration-(--motion-hover) group-hover:bg-accent/[0.06]'
 
 /** The first cell also draws the accent's edge on hover. */
 export const TD_FIRST = `${TD} group-hover:shadow-[inset_2px_0_0_rgb(var(--accent)),inset_0_-1px_0_rgb(var(--ink)/0.05)]`

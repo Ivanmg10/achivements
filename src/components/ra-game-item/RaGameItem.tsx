@@ -5,7 +5,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { RecentlyPlayedGame } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { formatDate } from '@/utils/dates'
@@ -15,6 +14,7 @@ import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import { raImageUrl } from '@/utils/raAssets'
+import Tag from '@/components/ui/Tag'
 
 const CONSOLE_BY_NAME = new Map(CONSOLES.map((c) => [c.name, c.icon]))
 
@@ -46,7 +46,6 @@ export default function RaGameItem({
 }) {
   const subject = useSubject()
   const { T, lang } = useLanguage()
-  const onPointerMove = useSpotlight()
   const panelId = useId()
 
   const href = gameHref('ra', game.GameID, subject)
@@ -60,8 +59,7 @@ export default function RaGameItem({
 
   return (
     <div
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={art} />
 
@@ -93,11 +91,11 @@ export default function RaGameItem({
           <span className="flex items-center gap-2 min-w-0">
             <Link
               href={href}
-              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 rounded focus-ring"
             >
               <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.Title}</span>
             </Link>
-            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate">{game.ConsoleName}</span>
+            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate">{game.ConsoleName}</Tag>
           </span>
 
           <button
@@ -105,7 +103,7 @@ export default function RaGameItem({
             aria-expanded={expanded}
             aria-controls={panelId}
             aria-label={`${expanded ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.Title}`}
-            className="flex flex-col gap-1 w-full text-left rounded group cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="flex flex-col gap-1 w-full text-left rounded group cursor-pointer before:absolute before:inset-0 before:content-[''] focus-ring"
           >
             <span className="flex items-center gap-2 w-full">
               {total > 0 && (

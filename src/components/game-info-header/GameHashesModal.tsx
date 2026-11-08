@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { AnimatePresence } from 'framer-motion'
 import { IconX, IconHash, IconCopy, IconCheck } from '@tabler/icons-react'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
@@ -24,9 +23,9 @@ type Props = {
 }
 
 const LABEL_COLORS: Record<string, string> = {
-  REDUMP: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+  REDUMP: 'bg-redump/20 text-redump-ink border-redump/30',
   'NO-INTRO': 'bg-success/20 text-success border-success/30',
-  TOSEC: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+  TOSEC: 'bg-tosec/20 text-tosec-ink border-tosec/30',
   'NOINTRO': 'bg-success/20 text-success border-success/30',
 }
 
@@ -88,7 +87,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
 
   if (!mounted) return null
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {isOpen && (
         <Modal isOpen={isOpen} onClose={onClose} size="md" showClose={false} className="gap-4">
@@ -174,7 +173,6 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
             </div>
           </Modal>
       )}
-    </AnimatePresence>,
-    document.body,
+    </AnimatePresence>
   )
 }

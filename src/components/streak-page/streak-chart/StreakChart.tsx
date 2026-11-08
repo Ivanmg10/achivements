@@ -3,7 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { Streak } from '@/types/types'
 import { decimal, plural } from '@/utils/utils'
-import StreakSectionHead from '../streak-section-head/StreakSectionHead'
+import SectionHead from '@/components/ui/SectionHead'
 import { slantStyle } from '@/components/ui/shape'
 import { streakInk, streakTier } from '@/utils/streakTier'
 import { formatDay } from '@/utils/dates'
@@ -36,7 +36,8 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
 
   return (
     <section aria-labelledby="streak-best-title" className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-3 h-full">
-      <StreakSectionHead
+      <SectionHead
+        size="lg"
         id="streak-best-title"
         title={T.streak.chartTitle}
         aside={T.streak.bestSub.replace('{n}', String(streaks.length)).replace('{avg}', `${decimal(avgStreak, lang)} ${T.streak.daysUnit}`)}
@@ -54,7 +55,7 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
                 onClick={() => onSelect(streak)}
                 aria-label={`${plural(streak.days, T.plurals.days, lang)}, ${short(streak.start)} – ${short(streak.end)}${live ? `, ${T.streak.ongoing}` : ''}`}
                 aria-pressed={on}
-                className={`w-full grid grid-cols-[2rem_minmax(0,1fr)_3.5rem] items-center gap-3 px-2 py-1.5 rounded-control text-left transition-colors duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+                className={`w-full grid grid-cols-[2rem_minmax(0,1fr)_3.5rem] items-center gap-3 px-2 py-1.5 rounded-control text-left transition-colors duration-(--motion-hover) focus-ring ${
                   on ? 'bg-ink/[0.06] ring-1 ring-inset ring-ink/20' : 'hover:bg-ink/[0.04]'
                 }`}
               >

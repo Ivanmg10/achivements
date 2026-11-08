@@ -6,8 +6,9 @@ import { IconExternalLink, IconKey, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRaSignupCheck, type RaSignupAccount } from '@/hooks/useRaSignupCheck'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
-import Spinner from '@/components/main-spinner/Spinner'
 import RaLogo from '@/components/ra-logo/RaLogo'
+import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
 
 const RA_SETTINGS = 'https://retroachievements.org/settings'
 
@@ -59,7 +60,7 @@ export default function RegisterUserFormRa({
             type="button"
             onClick={() => onChange(null)}
             disabled={disabled}
-            className="text-sm text-accent underline underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="text-sm text-accent underline underline-offset-2 rounded focus-ring"
           >
             {t.raChange}
           </button>
@@ -68,9 +69,7 @@ export default function RegisterUserFormRa({
         <form onSubmit={handleCheck} noValidate className="flex flex-col gap-3">
           <p className="text-xs text-text-secondary">{t.raLead}</p>
           {error && (
-            <p role="alert" className="text-sm text-danger bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-2.5">
-              {error}
-            </p>
+            <Notice tone="danger">{error}</Notice>
           )}
           <AuthFormField
             label={t.raUsername}
@@ -97,7 +96,7 @@ export default function RegisterUserFormRa({
             disabled={checking || disabled}
           />
           <details className="text-xs text-text-secondary">
-            <summary className="cursor-pointer text-accent rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+            <summary className="cursor-pointer text-accent rounded focus-ring">
               {t.raWhere}
             </summary>
             <ol className="mt-2 list-decimal pl-5 flex flex-col gap-1">
@@ -115,20 +114,9 @@ export default function RegisterUserFormRa({
               <IconExternalLink size={12} aria-hidden="true" />
             </a>
           </details>
-          <button
-            type="submit"
-            disabled={checking || disabled || !username.trim() || !apiKey.trim()}
-            className="w-full py-2.5 rounded-tile font-semibold text-sm flex items-center justify-center gap-2 bg-bg-main border border-ink/15 hover:border-accent transition-colors disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            {checking ? (
-              <>
-                <Spinner size={14} />
-                {t.raChecking}
-              </>
-            ) : (
-              t.raCheck
-            )}
-          </button>
+          <Button type="submit" variant="secondary" loading={checking} disabled={disabled || !username.trim() || !apiKey.trim()} className="w-full">
+              {checking ? t.raChecking : t.raCheck}
+            </Button>
         </form>
       )}
 
@@ -136,7 +124,7 @@ export default function RegisterUserFormRa({
         type="button"
         onClick={onClose}
         disabled={disabled}
-        className="self-center text-xs text-text-secondary hover:text-text-main underline underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="self-center text-xs text-text-secondary hover:text-text-main underline underline-offset-2 rounded focus-ring"
       >
         {t.raOff}
       </button>

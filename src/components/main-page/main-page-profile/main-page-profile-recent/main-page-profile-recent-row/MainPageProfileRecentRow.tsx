@@ -19,7 +19,7 @@ export default function MainPageProfileRecentRow({
 }) {
   return (
     <li>
-    <Link href={href} className="group flex gap-3 items-center py-1.5 rounded-box focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+    <Link href={href} className="group flex gap-3 items-center py-1.5 rounded-box focus-ring">
       {badge ? (
         <img
           src={badge}

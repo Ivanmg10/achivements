@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { fieldClass } from '@/components/ui/Input'
+import Kicker from '@/components/ui/Kicker'
 
 /** The icons offered in one tap, by category. Anything else goes in the field below them. */
 export const ICON_CATEGORIES = {
@@ -14,8 +15,8 @@ type Category = keyof typeof ICON_CATEGORIES
 const CATEGORIES = Object.keys(ICON_CATEGORIES) as Category[]
 const ALL: readonly string[] = Object.values(ICON_CATEGORIES).flat()
 
-const SWATCH = 'w-10 h-10 rounded-tile flex items-center justify-center text-xl transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
-const TAB = 'h-8 px-3 rounded-full text-xs font-medium whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+const SWATCH = 'w-10 h-10 rounded-tile flex items-center justify-center text-xl transition-all cursor-pointer focus-ring'
+const TAB = 'h-8 px-3 rounded-full text-xs font-medium whitespace-nowrap transition-colors cursor-pointer focus-ring'
 
 /**
  * A group's icon: a category of common ones to pick in one tap, none, or the
@@ -29,7 +30,7 @@ export default function GroupModalIconPicker({ value, onChange }: { value: strin
 
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="text-[10px] uppercase tracking-widest text-text-secondary mb-2">{T.groups.icon}</legend>
+      <Kicker as="legend" className="mb-2">{T.groups.icon}</Kicker>
 
       <div role="group" aria-label={T.groups.icon} className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
         {CATEGORIES.map((c) => (

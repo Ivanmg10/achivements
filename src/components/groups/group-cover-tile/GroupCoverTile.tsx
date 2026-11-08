@@ -80,7 +80,7 @@ export default function GroupCoverTile({
       </div>
 
       {item.console_name && <span className="-mb-1.5 text-[0.6875rem] text-text-secondary truncate">{item.console_name}</span>}
-      <Link href={href} title={item.title} className="text-[0.9375rem] font-bold truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+      <Link href={href} title={item.title} className="text-[0.9375rem] font-bold truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-ring">
         {item.title}
       </Link>
       {/* No bar under the cover (the user's choice, 2026-10-24): the percentage and what is left. */}

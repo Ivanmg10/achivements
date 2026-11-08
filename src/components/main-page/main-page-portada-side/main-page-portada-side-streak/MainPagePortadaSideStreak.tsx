@@ -6,12 +6,11 @@ import { useStreakData } from '@/hooks/useStreakData'
 import { groupByDays, plural } from '@/utils/utils'
 import { SURFACE } from '@/components/ui/surface'
 import { streakInk, streakTier } from '@/utils/streakTier'
-import { slantStyle } from '@/components/ui/shape'
 import { PortadaStreakSkeleton } from '../../main-page-portada-skeleton/MainPagePortadaSkeleton'
+import DataBar from '@/components/ui/DataBar'
 
 /** How many days the bars show. */
 const DAYS = 21
-const SLANT = slantStyle(3)
 
 /**
  * Your streak beside the cover: how long it is, the last three weeks as
@@ -34,7 +33,7 @@ export default function MainPagePortadaSideStreak() {
   return (
     <Link
       href="/racha"
-      className={`${SURFACE} p-5 flex flex-col gap-3 hover:ring-accent/40 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+      className={`${SURFACE} p-5 flex flex-col gap-3 hover:ring-accent/40 transition-shadow focus-ring`}
     >
       <span className="flex items-baseline justify-between gap-3">
         <span className="font-bold" style={{ color: streakInk(tier) }}>{plural(activeStreak.days, T.plurals.streakOf, lang)}</span>
@@ -42,10 +41,15 @@ export default function MainPagePortadaSideStreak() {
       </span>
       <span aria-hidden="true" className="flex gap-1 h-6">
         {counts.map((c, i) => (
-          <span
+          <DataBar
             key={i}
-            style={{ ...SLANT, opacity: c > 0 ? 0.45 + 0.55 * (c / max) : 1, ...(c > 0 ? { backgroundColor: `rgb(${tier.color})` } : {}) }}
-            className={`flex-1 ${c > 0 ? '' : 'bg-ink/10'}`}
+            axis="y"
+            share={1}
+            cut={3}
+            tone="muted"
+            color={c > 0 ? `rgb(${tier.color})` : undefined}
+            style={{ opacity: c > 0 ? 0.45 + 0.55 * (c / max) : 1 }}
+            className="flex-1"
           />
         ))}
       </span>

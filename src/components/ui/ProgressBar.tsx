@@ -46,9 +46,8 @@ export function ProgressBar({
       aria-valuemax={100}
       aria-valuenow={Math.round(shown)}
       data-complete={done || undefined}
-      className={`relative block w-full ${height} ${className}`}
       // Only a finished bar glows.
-      style={done ? { filter: 'drop-shadow(0 0 6px rgb(var(--progress) / 0.6))' } : undefined}
+      className={`relative block w-full ${height} ${done ? 'drop-shadow-done' : ''} ${className}`}
     >
       <span data-track className={`absolute inset-0 overflow-hidden ${trackClass}`} style={{ clipPath: BEVEL, borderRadius: 'var(--bar-radius)' }}>
         {soft > value && (

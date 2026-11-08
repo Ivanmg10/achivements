@@ -13,7 +13,7 @@ import MainPageFavoritesUnpinButton from '@/components/main-page/main-page-favor
 import { decimal } from '@/utils/utils'
 
 const TILE =
-  'flex gap-3 w-full h-full rounded-tile p-3 bg-bg-main ring-1 ring-ink/[0.06] hover:ring-accent/40 transition-shadow text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+  'flex gap-3 w-full h-full rounded-tile p-3 bg-bg-main ring-1 ring-ink/[0.06] hover:ring-accent/40 transition-shadow text-left focus-ring'
 
 /**
  * One pinned achievement as a tile: its badge large with the platform in the

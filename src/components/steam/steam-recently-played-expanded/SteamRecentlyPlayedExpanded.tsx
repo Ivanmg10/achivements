@@ -10,6 +10,7 @@ import SteamExpandedStats from './steam-expanded-stats/SteamExpandedStats'
 import SteamRarestAchievements from './steam-rarest-achievements/SteamRarestAchievements'
 import type { SteamGameProgress } from '@/types/steam'
 import { Skeleton } from '@/components/ui/Skeleton'
+import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const SKELETON_BADGES = 24
 
@@ -55,18 +56,7 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
             ))}
           </ul>
         ) : error ? (
-          <div className="flex flex-col items-start gap-2">
-            <p role="alert" className="text-sm text-danger">
-              {T.steam.achievementsError}
-            </p>
-            <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
-            <button
-              onClick={retry}
-              className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors"
-            >
-              {T.steam.retry}
-            </button>
-          </div>
+          <ErrorRetry message={T.steam.achievementsError} hint={T.steam.privateProfileHint} retryLabel={T.steam.retry} onRetry={retry} />
         ) : loaded ? (
           <SteamAchievementGrid appId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={40} />
         ) : (

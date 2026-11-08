@@ -3,7 +3,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useBackRegistry } from '@/context/BackInterceptContext'
@@ -12,6 +11,7 @@ import { useStreakSummary } from '@/hooks/useStreakSummary'
 import { IconHome, IconChevronLeft, IconSearch, IconMenu } from '@tabler/icons-react'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { Skeleton } from '@/components/ui/Skeleton'
+import Avatar from '@/components/ui/Avatar'
 
 // Downloaded the first time it is opened, not with the page.
 const SearchModal = dynamic(() => import('@/components/search-modal/SearchModal'), { loading: () => null })
@@ -28,7 +28,7 @@ function NavLink({ href, label, active }: { href: string; label: string; active:
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={`relative inline-flex items-center gap-1 h-10 px-3 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:rounded-chip after:content-[''] after:absolute after:left-2.5 after:right-2.5 after:bottom-0.5 after:h-[3px] after:bg-accent after:rounded-(--bar-radius) after:skew-x-(--slant-line) after:origin-left after:transition-transform after:duration-(--motion-open) ${active ? 'text-text-main after:scale-x-100' : 'text-text-secondary hover:text-text-main after:scale-x-0'}`}
+      className={`relative inline-flex items-center gap-1 h-10 px-3 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors cursor-pointer focus-ring focus-visible:rounded-chip after:content-[''] after:absolute after:left-2.5 after:right-2.5 after:bottom-0.5 after:h-[3px] after:bg-accent after:rounded-(--bar-radius) after:skew-x-(--slant-line) after:origin-left after:transition-transform after:duration-(--motion-open) ${active ? 'text-text-main after:scale-x-100' : 'text-text-secondary hover:text-text-main after:scale-x-0'}`}
     >
       {label}
     </Link>
@@ -45,7 +45,7 @@ function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
     <Link
       href="/racha"
       aria-label={`${T.streak.title}: ${plural(streak, T.plurals.days, lang)}`}
-      className={`rounded-tag transition-[filter] hover:brightness-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${glass ? 'backdrop-blur-sm' : ''}`}
+      className={`rounded-tag transition-[filter] hover:brightness-125 focus-ring ${glass ? 'backdrop-blur-sm' : ''}`}
     >
       <StreakTag days={streak} text={T.rankings.daysShort.replace('{n}', streak.toLocaleString(lang))} glow={false} />
     </Link>
@@ -132,7 +132,7 @@ export default function MainHeader() {
             href="/"
             aria-label="Home"
             aria-current={isHome ? 'page' : undefined}
-            className={`inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${isHome ? 'text-accent bg-accent/[0.14]' : 'text-text-secondary hover:text-text-main hover:bg-ink/[0.08]'}`}
+            className={`inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring ${isHome ? 'text-accent bg-accent/[0.14]' : 'text-text-secondary hover:text-text-main hover:bg-ink/[0.08]'}`}
           >
             <IconHome className="w-[1.125rem] h-[1.125rem]" aria-hidden="true" />
           </Link>
@@ -140,7 +140,7 @@ export default function MainHeader() {
             <button
               onClick={() => { if (!tryHandleBack()) router.back() }}
               aria-label="Go back"
-              className="inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
             >
               <IconChevronLeft className="w-[1.125rem] h-[1.125rem]" aria-hidden="true" />
             </button>
@@ -172,8 +172,8 @@ export default function MainHeader() {
           {hasPlatform && (
           <button
             onClick={() => setMobileMenuOpen(true)}
-            aria-label="Menu"
-            className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
+            aria-label={T.header.menu}
+            className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
           >
             <IconMenu className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -186,7 +186,7 @@ export default function MainHeader() {
           <button
             onClick={openSearch}
             aria-label="Search games"
-            className={`flex w-full h-11 rounded-field pl-3.5 pr-2 text-sm text-text-secondary text-left transition-[background-color,box-shadow] duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 items-center gap-2.5 cursor-text ring-1 ring-inset pointer-events-auto ${isGameInfo ? 'bg-ink/10 backdrop-blur-sm ring-ink/20 hover:bg-ink/20' : 'bg-bg-main shadow-[inset_0_2px_4px_rgb(0_0_0/0.22)] ring-ink/[0.08] hover:ring-accent/50'}`}
+            className={`flex w-full h-11 rounded-field pl-3.5 pr-2 text-sm text-text-secondary text-left transition-[background-color,box-shadow] duration-(--motion-hover) focus-ring items-center gap-2.5 cursor-text ring-1 ring-inset pointer-events-auto ${isGameInfo ? 'bg-ink/10 backdrop-blur-sm ring-ink/20 hover:bg-ink/20' : 'bg-bg-main shadow-sunken ring-ink/[0.08] hover:ring-accent/50'}`}
           >
             <span aria-hidden="true" className="w-1 h-5 shrink-0 bg-accent rounded-(--bar-radius) skew-x-(--slant-line)" />
             <IconSearch className="w-4 h-4 shrink-0" aria-hidden />
@@ -203,7 +203,7 @@ export default function MainHeader() {
           <button
             onClick={openSearch}
             aria-label="Search games"
-            className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
+            className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
           >
             <IconSearch className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -222,22 +222,7 @@ export default function MainHeader() {
                 <span className="text-[0.9375rem] font-bold hidden sm:block text-text-main leading-none">
                   {session.user?.name ?? session.user?.email}
                 </span>
-                {avatarSrc ? (
-                  <Image
-                    className="w-8 h-8 rounded-full object-cover shrink-0"
-                    width={64}
-                    height={64}
-                    src={avatarSrc}
-                    alt=""
-                    unoptimized
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
-                    <span className="text-xs font-bold text-accent">
-                      {(session.user?.name ?? session.user?.email ?? '?')[0].toUpperCase()}
-                    </span>
-                  </div>
-                )}
+                <Avatar src={avatarSrc} name={session.user?.name ?? session.user?.email ?? '?'} size={32} />
               </Link>
             </>
           ) : status === 'loading' ? (

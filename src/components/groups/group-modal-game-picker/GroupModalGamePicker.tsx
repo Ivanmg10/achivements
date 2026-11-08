@@ -11,6 +11,7 @@ import { gameKey } from '@/utils/gameRef'
 import GamePickerTile from '@/components/game-picker/game-picker-tile/GamePickerTile'
 import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
 import { fieldClass } from '@/components/ui/Input'
+import { kickerClass } from '@/components/ui/Kicker'
 
 const RESULTS_MAX = 24
 
@@ -69,7 +70,7 @@ export default function GroupModalGamePicker({
   return (
     <div className="flex flex-col gap-3 min-h-0">
       <div>
-        <label htmlFor="group-game-search" className="text-[10px] uppercase tracking-widest text-text-secondary">
+        <label htmlFor="group-game-search" className={kickerClass()}>
           {T.groups.gamesLabel}
         </label>
         <p className="text-xs text-text-secondary">{T.groups.gamesOptional}</p>
@@ -104,7 +105,7 @@ export default function GroupModalGamePicker({
           <button
             type="button"
             onClick={() => addById(directGameId)}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-tile ring-1 ring-ink/10 hover:bg-bg-main transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-tile ring-1 ring-ink/10 hover:bg-bg-main transition-colors text-left focus-ring"
           >
             <span aria-hidden="true" className="w-8 h-8 rounded-box bg-bg-main flex items-center justify-center shrink-0 text-[10px] font-bold text-text-secondary">ID</span>
             <span className="text-sm text-text-main">{T.search.openById} #{directGameId}</span>

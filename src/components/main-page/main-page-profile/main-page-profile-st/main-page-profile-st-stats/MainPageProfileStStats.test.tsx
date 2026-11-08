@@ -14,7 +14,7 @@ const LIBRARY = [
   game(0),
 ]
 
-/** StatCard puts its label first, the value under it. */
+/** A card-look Figure puts its label first, the value under it. */
 function value(label: string) {
   return screen.getByText(label).nextElementSibling?.textContent
 }

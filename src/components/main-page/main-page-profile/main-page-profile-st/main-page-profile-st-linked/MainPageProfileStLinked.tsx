@@ -65,21 +65,21 @@ export default function MainPageProfileStLinked({
   const country = profile.loccountrycode ? findCountry(profile.loccountrycode) : undefined
 
   let status: { text: string; dot: string }
-  if (profile.gameextrainfo) status = { text: `${T.steam.nowPlaying}: ${profile.gameextrainfo}`, dot: 'bg-[#a4d007]' }
-  else if ((profile.personastate ?? 0) > 0) status = { text: T.steam.online, dot: 'bg-[#66c0f4]' }
-  else status = { text: T.steam.offline, dot: 'bg-gray-500' }
+  if (profile.gameextrainfo) status = { text: `${T.steam.nowPlaying}: ${profile.gameextrainfo}`, dot: 'bg-steam-perfect' }
+  else if ((profile.personastate ?? 0) > 0) status = { text: T.steam.online, dot: 'bg-steam' }
+  else status = { text: T.steam.offline, dot: 'bg-offline' }
 
   return (
     // Fills the column like the RA card, so switching tabs does not resize it.
     <div className="flex flex-col gap-3.5 w-full h-full">
       <MainPageProfileCard
         avatarSrc={profile.avatarfull || null}
-        avatarFallback={<span className="w-full h-full bg-[#1b2838] flex items-center justify-center"><SteamLogo size={32} className="text-[#66c0f4]" /></span>}
-        ring="#66c0f4"
+        avatarFallback={<span className="w-full h-full bg-steam-dark flex items-center justify-center"><SteamLogo size={32} className="text-steam" /></span>}
+        ring="var(--color-steam)"
         name={profile.personaname}
         actions={
           profile.profileurl && (
-            <MainPageProfileActions href={profile.profileurl} linkLabel={T.steam.viewOnSteam} ringClass="focus:ring-[#66c0f4]" onRefresh={refresh} />
+            <MainPageProfileActions href={profile.profileurl} linkLabel={T.steam.viewOnSteam} ringClass="focus:ring-steam" onRefresh={refresh} />
           )
         }
         stats={<MainPageProfileStStats library={library} isLoading={libraryLoading} />}
@@ -88,7 +88,7 @@ export default function MainPageProfileStLinked({
           {profile.level !== null && (
             <span className="inline-flex items-center gap-1">
               {T.steam.level}
-              <span className="inline-flex items-center justify-center min-w-6 h-6 px-1 rounded-full border-2 border-[#66c0f4] text-text-main font-bold tabular-nums">
+              <span className="inline-flex items-center justify-center min-w-6 h-6 px-1 rounded-full border-2 border-steam text-text-main font-bold tabular-nums">
                 {profile.level}
               </span>
             </span>

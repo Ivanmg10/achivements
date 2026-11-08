@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { levelOf, tierOf, type TierId } from '@/utils/vaultLevel'
+import Tag from '@/components/ui/Tag'
 
 /** Each tier's own hue, for its badge only (progress bars stay in the theme's colour). */
 const COLORS: Record<TierId, string> = {
@@ -49,21 +50,23 @@ export default function VaultLevelBadge({
   const tierText = T.rankings.tiers[tier]
 
   return (
-    <span
+    <Tag
+      slant
+      tone="custom"
       title={`${T.rankings.level.replace('{n}', String(level))} · ${tierText}`}
       // Mixed with the theme's text colour, so the tier's hue stays readable on a light or a dark card.
       style={{ backgroundColor: `rgb(${COLORS[tier]} / 0.15)`, color: `color-mix(in oklab, rgb(${COLORS[tier]}) 72%, rgb(var(--text-main)))` }}
-      className={`inline-flex items-center gap-1.5 h-[1.375rem] rounded-tag px-2 text-xs font-bold whitespace-nowrap skew-x-(--slant-pill) ${className}`}
+      className={className}
     >
-      <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true" className="w-3 h-3 shrink-0 -skew-x-(--slant-pill)">
+      <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true" className="w-3 h-3 shrink-0">
         <path d={SHAPES[tier]} />
       </svg>
-      <span className="tabular-nums -skew-x-(--slant-pill)">{levelText}</span>
+      <span className="tabular-nums">{levelText}</span>
       {compact === true ? (
         <span className="sr-only">{tierText}</span>
       ) : (
-        <span className={`-skew-x-(--slant-pill) ${compact === 'phone' ? 'max-sm:sr-only' : ''}`}>· {tierText}</span>
+        <span className={compact === 'phone' ? 'max-sm:sr-only' : ''}>· {tierText}</span>
       )}
-    </span>
+    </Tag>
   )
 }

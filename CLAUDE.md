@@ -269,9 +269,14 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
 - **Never draw a control by hand**: `Button` / `IconButton` (or `buttonClass`), `Input`, `Textarea`,
   `SearchInput`, `PasswordInput` in `Field` (or `fieldClass`), `Select` (never a native `<select>`),
   `Switch` (state in words beside it), `Checkbox`, `ChoiceCards`, `Tabs`, `SegmentedControl`, `Pill`,
-  `Modal` (`CommonModal` wraps it; a `Modal` draws the frame, never a card inside it), `Notice`,
-  `TOOLTIP_SURFACE`, `MENU_SURFACE`, `SURFACE`, `Accordion`, `ShowMore`, `Shelf`, `DropSlot`, `ToggleButton`.
-  `className` on them is for layout only, never colours.
+  `Modal` (`CommonModal` wraps it; a `Modal` draws the frame, never a card inside it; `placement="top"` for a
+  command panel or a menu), `Notice`, `ErrorRetry` (a failed read with its retry), `Spinner` (or `Button loading`),
+  `TOOLTIP_SURFACE`, `MENU_SURFACE`, `SURFACE`, `Accordion`, `ShowMore`, `Shelf`, `SectionHead`, `DropSlot`,
+  `ToggleButton`, `Kicker` (the uppercase label), `Tag`, `Avatar` (with the presence dot), `ListRow`, `Figure`
+  (every labelled number) and `DataBar` (a chart bar with cut ends). `className` on them is for layout only,
+  never colours. **Tokens, not strings:** `focus-ring`, `shadow-hairline-t/-b`, `shadow-sunken`,
+  `drop-shadow-done`, and a platform's colour is `text-steam` / `bg-psn/10`…, never a hex. Rules added in #120
+  start with the files still to migrate (`ui/uiGuard.pending.json`): the list only shrinks, never add to it.
 - **A component never reads the look choice** (`data-shape`, `data-font`): it reads tokens. **Never a literal
   `polygon(...)` or `skew-*-[..]`** (`slantStyle(px)`, `skew-y-(--slant-mark)`, `skew-x-(--slant-button)`); no theme
   overrides a shape token. The welcome curtain's fixed clip paths are the documented exception.
@@ -279,8 +284,8 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
   is (`rounded-card`, `-sheet`, `-tile`, `-box`, `-cell`, `-button`, `-icon`, `-chip`, `-field`, `-area`);
   `rounded-control` is a soft surface (notices, menus, tooltips), never a pill. Outside `ui/` no `rounded-lg`…`-3xl`
   or arbitrary values.
-- **Colours with a meaning come from the theme** (danger, success, warning, `hardcore`, `softcore`); no red /
-  green / yellow / amber / orange palette classes. Tier and platform hues are the exception.
+- **Colours with a meaning come from the theme** (danger, success, warning, `hardcore`, `softcore`); no palette
+  class of any hue. Platform hues are tokens (`--color-steam`…, `platinum`); tier hues live in their util.
 - **Streaks are coloured by tier** (`streakTier`) wherever a streak is coloured.
 - **Every progress bar is `ProgressBar` or `CircularProgress`** in the theme's `--progress`; only a finished
   bar glows; **the green is only in the percentage beside it**, never on the bar (the user tried a green ring
@@ -288,7 +293,7 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
 - **A page title, a big figure or a rank is `font-display italic`.**
 - **Loading:** each screen, section and fetch brings its own composed skeleton from `Skeleton`, on the real
   boxes, in the same change; never a hand-made `animate-pulse`; a figure on its way is `loading` on
-  `StatPill` / `StatCard` / `PlatformStat`, never a `—`; spinners only inside a button. **A section lands
+  `Figure`, never a `—`; spinners only inside a button. **A section lands
   whole** (the user's preference): no row pops in, no timeout or progressive reveal without asking.
   **What a row or card may show is in it from the first frame.** A chart in a skeleton is the real chart with
   `isLoading`. A line of unlocks over time is `AchievementsLinePlot`, never a second drawing of it.

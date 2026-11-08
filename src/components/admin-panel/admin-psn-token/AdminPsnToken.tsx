@@ -44,7 +44,7 @@ export default function AdminPsnToken() {
   return (
     <section aria-labelledby="admin-psn-title" className="bg-bg-card rounded-card p-4 flex flex-col gap-3">
       <h3 id="admin-psn-title" className="flex items-center gap-2 text-sm font-semibold">
-        <PlaystationLogo size={16} className="text-[#0070d1]" aria-hidden="true" />
+        <PlaystationLogo size={16} className="text-psn" aria-hidden="true" />
         PlayStation sign-in
       </h3>
 

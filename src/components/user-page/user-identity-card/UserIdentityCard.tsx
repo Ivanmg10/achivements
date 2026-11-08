@@ -2,9 +2,8 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import Image from 'next/image'
 import { signOut, useSession } from 'next-auth/react'
-import { IconAlertTriangle, IconPencil } from '@tabler/icons-react'
+import { IconPencil } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
 import UserVaultStat from '@/components/user-page/user-vault-stat/UserVaultStat'
@@ -22,6 +21,9 @@ import { useGroups } from '@/hooks/useGroups'
 import { summarizeSteamLibrary } from '@/utils/steamFeed'
 import { codeToFlag, countryName, findCountry } from '@/utils/countries'
 import Button from '@/components/ui/Button'
+import Tag from '@/components/ui/Tag'
+import Avatar from '@/components/ui/Avatar'
+import Notice from '@/components/ui/Notice'
 
 // Modals are downloaded the first time they are wanted, not with the page — the admin panel above all.
 const AdminPanelModal = dynamic(() => import('@/components/admin-panel/admin-panel-modal/AdminPanelModal'), { loading: () => null })
@@ -79,22 +81,9 @@ export default function UserIdentityCard() {
           <button
             onClick={() => setAvatarOpen(true)}
             aria-label={T.userPage.editAvatar}
-            className="relative group shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="relative group shrink-0 rounded-full focus-ring"
           >
-            {user?.avatar ? (
-              <Image
-                src={user.avatar}
-                alt=""
-                width={112}
-                height={112}
-                className="rounded-full w-24 h-24 sm:w-28 sm:h-28 object-cover ring-4 ring-bg-card shadow-[0_14px_30px_rgb(0_0_0/0.5)]"
-                unoptimized
-              />
-            ) : (
-              <span className="rounded-full w-24 h-24 sm:w-28 sm:h-28 bg-bg-main ring-4 ring-bg-card flex items-center justify-center">
-                <IconPencil size={24} className="text-text-secondary" aria-hidden="true" />
-              </span>
-            )}
+            <Avatar src={user?.avatar} name={user?.name ?? ''} size={96} sizeSm={112} fallback="icon" ring="ring-4 ring-bg-card shadow-[0_14px_30px_rgb(0_0_0/0.5)]" />
             <span
               aria-hidden="true"
               className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"
@@ -107,9 +96,9 @@ export default function UserIdentityCard() {
             <div className="flex items-center gap-2.5 flex-wrap">
               <h1 className="font-display italic font-extrabold text-[2.75rem] sm:text-[4rem] leading-[0.9] pr-1 truncate">{user?.name}</h1>
               {user?.admin && (
-                <span className="inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-warning/20 text-warning">
+                <Tag tone="warning">
                   {T.userData.admin}
-                </span>
+                </Tag>
               )}
             </div>
             <p className="text-[0.8125rem] text-text-secondary">
@@ -148,19 +137,18 @@ export default function UserIdentityCard() {
       <EmailVerificationNotice />
 
       {missingEmail && (
-        <div role="alert" className="flex items-start gap-3 bg-warning/10 ring-1 ring-inset ring-warning/30 rounded-control p-4">
-          <IconAlertTriangle size={18} className="text-warning shrink-0 mt-0.5" aria-hidden="true" />
-          <div className="flex flex-col gap-1 min-w-0">
-            <p className="text-sm font-semibold text-warning">{T.passwordReset.missingEmailTitle}</p>
-            <p className="text-xs text-text-secondary">{T.passwordReset.missingEmailText}</p>
-            <button
-              onClick={() => setEdit({ field: 'email', value: '' })}
-              className="self-start mt-1 text-xs font-medium text-warning underline underline-offset-2 hover:text-warning transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning/70"
-            >
+        <Notice
+          tone="warning"
+          alert
+          title={T.passwordReset.missingEmailTitle}
+          action={
+            <Button variant="quiet" size="sm" onClick={() => setEdit({ field: 'email', value: '' })}>
               {T.passwordReset.addEmail}
-            </button>
-          </div>
-        </div>
+            </Button>
+          }
+        >
+          {T.passwordReset.missingEmailText}
+        </Notice>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

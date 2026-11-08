@@ -6,6 +6,7 @@ import { useStreakData } from '@/hooks/useStreakData'
 import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
+import Kicker from '@/components/ui/Kicker'
 
 const SHOWN = 8
 
@@ -18,7 +19,7 @@ export default function PublicUserRecentUnlocks() {
 
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="text-[10px] uppercase tracking-widest text-text-secondary">{T.userProfile.recentUnlocks}</h2>
+      <Kicker as="h2">{T.userProfile.recentUnlocks}</Kicker>
       {isLoading ? (
         <SkeletonGameList count={4} />
       ) : achievements.length === 0 ? (

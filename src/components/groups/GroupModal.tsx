@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useId, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { AnimatePresence } from 'framer-motion'
 import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -18,8 +17,8 @@ import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosai
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
+import { kickerClass } from '@/components/ui/Kicker'
 
-const LABEL = 'text-[10px] uppercase tracking-widest text-text-secondary'
 
 type Props = {
   isOpen: boolean
@@ -38,7 +37,7 @@ type Props = {
 function Counter({ htmlFor, label, length, max }: { htmlFor: string; label: string; length: number; max: number }) {
   return (
     <div className="flex items-center justify-between">
-      <label htmlFor={htmlFor} className={LABEL}>{label}</label>
+      <label htmlFor={htmlFor} className={kickerClass()}>{label}</label>
       <span aria-hidden="true" className={`text-[10px] tabular-nums ${length >= max ? 'text-danger' : 'text-text-secondary'}`}>{length}/{max}</span>
     </div>
   )
@@ -119,7 +118,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
   // On <body>, so an animated (transformed) page wrapper does not become its frame.
   if (typeof document === 'undefined') return null
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {isOpen && (
         <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={headingId} size={isEditing ? 'md' : 'xl'} showClose={false} className="gap-4">
@@ -130,7 +129,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
               <button
                 type="button"
                 onClick={onClose}
-                className="p-2 -m-1 rounded-chip hover:bg-ink/5 transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="p-2 -m-1 rounded-chip hover:bg-ink/5 transition-colors text-text-secondary hover:text-text-main focus-ring"
                 aria-label={T.groups.close}
               >
                 <IconX className="w-5 h-5" aria-hidden />
@@ -210,7 +209,6 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
             </form>
           </Modal>
       )}
-    </AnimatePresence>,
-    document.body,
+    </AnimatePresence>
   )
 }

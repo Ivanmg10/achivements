@@ -45,7 +45,7 @@ export default function LibraryListRow({ entry, current, category, onSelect }: {
           <Link
             href={href}
             title={T.libraryLayout.openGame}
-            className="relative z-10 min-w-0 font-bold truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="relative z-10 min-w-0 font-bold truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-ring"
           >
             {entry.title}
           </Link>
@@ -64,7 +64,7 @@ export default function LibraryListRow({ entry, current, category, onSelect }: {
         aria-current={current ? 'true' : undefined}
         onClick={() => onSelect(entry)}
         aria-label={entry.title}
-        className="absolute inset-0 z-[1] rounded-tile cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 z-[1] rounded-tile cursor-pointer focus-ring"
       />
     </div>
   )

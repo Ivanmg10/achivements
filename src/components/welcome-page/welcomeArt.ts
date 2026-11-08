@@ -10,12 +10,12 @@ import { buttonClass } from '@/components/ui/Button'
  */
 export const STEP_SKY: Record<WelcomeStep, string> = {
   intro: 'linear-gradient(135deg, color-mix(in oklab, rgb(var(--accent)) 70%, #000), rgb(var(--accent)))',
-  ra: 'linear-gradient(135deg, #2a80c7 10%, #e5b53f 95%)',
-  steam: 'linear-gradient(135deg, #0e1726 0%, #1b2838 55%, #2f7fae 100%)',
-  psn: 'linear-gradient(135deg, #00246b, #0070d1)',
+  ra: 'linear-gradient(135deg, var(--color-ra) 10%, var(--color-ra-gold) 95%)',
+  steam: 'linear-gradient(135deg, var(--color-steam-night) 0%, var(--color-steam-dark) 55%, var(--color-steam-sky) 100%)',
+  psn: 'linear-gradient(135deg, var(--color-psn-night), var(--color-psn))',
   profile: 'linear-gradient(135deg, rgb(var(--accent)), color-mix(in oklab, rgb(var(--accent)) 40%, #fff))',
-  prefs: 'linear-gradient(135deg, rgb(var(--accent)), #f0abfc)',
-  privacy: 'linear-gradient(135deg, rgb(var(--accent)), #67e8f9)',
+  prefs: 'linear-gradient(135deg, rgb(var(--accent)), var(--color-art-pink))',
+  privacy: 'linear-gradient(135deg, rgb(var(--accent)), var(--color-art-cyan))',
   done: 'linear-gradient(135deg, rgb(var(--accent)), #fff)',
 }
 
@@ -34,6 +34,4 @@ export const QUIET_BUTTON = buttonClass('quiet', 'sm')
 
 /** The arrows that go through the opened points and choices. */
 export const ICON_BUTTON =
-  'w-11 h-11 rounded-tile flex items-center justify-center ring-1 ring-inset ring-ink/15 text-text-main hover:bg-ink/5 disabled:opacity-30 disabled:cursor-default transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
-
-export const SECTION_LABEL = 'text-xs font-bold uppercase tracking-[0.12em] text-text-secondary'
+  'w-11 h-11 rounded-tile flex items-center justify-center ring-1 ring-inset ring-ink/15 text-text-main hover:bg-ink/5 disabled:opacity-30 disabled:cursor-default transition-colors focus-ring'

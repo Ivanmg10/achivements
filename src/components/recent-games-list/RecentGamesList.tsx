@@ -13,6 +13,7 @@ import XboxGameItem from '@/components/xbox/xbox-game-item/XboxGameItem'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
+import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const MAX_GAMES = 7
 
@@ -43,22 +44,16 @@ export default function RecentGamesList() {
           ))}
         </div>
       ) : failed ? (
-        <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-danger">
-            {recentError ? T.steam.gamesError : psnError ? T.psn.gamesError : T.xbox.gamesError}
-          </p>
-          <p className="text-xs text-text-secondary">{recentError ? T.steam.privateProfileHint : psnError ? T.psn.errors.private : T.xbox.errors.private}</p>
-          <button
-            onClick={() => {
+        <ErrorRetry
+          message={recentError ? T.steam.gamesError : psnError ? T.psn.gamesError : T.xbox.gamesError}
+          hint={recentError ? T.steam.privateProfileHint : psnError ? T.psn.errors.private : T.xbox.errors.private}
+          retryLabel={T.steam.retry}
+          onRetry={() => {
               if (recentError) refetch()
               if (psnError) refetchPsn()
               if (xboxError) refetchXbox()
             }}
-            className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors"
-          >
-            {T.steam.retry}
-          </button>
-        </div>
+        />
       ) : games.length === 0 ? (
         <EmptyState icon={<SteamLogo className="w-6 h-6" />} title={steamLinked ? T.steam.recentEmpty : T.cards.noGames} />
       ) : (

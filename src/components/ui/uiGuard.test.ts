@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import PENDING from './uiGuard.pending.json'
 
 /**
  * The library is the only way to draw its pieces: these fail when one is
@@ -22,6 +23,19 @@ const FILES = sources(SRC).map((file) => ({ file: path.relative(SRC, file), text
 
 function offenders(pattern: RegExp) {
   return FILES.filter(({ text }) => pattern.test(text)).map(({ file }) => file)
+}
+
+/**
+ * A rule added in #120 starts with the files still drawing the piece by hand (`uiGuard.pending.json`).
+ * The list only shrinks: a file that no longer offends must leave it, and no new file may join
+ * (docs/worklog.md, #120 → Open, says how to empty each list).
+ */
+function newOffenders(rule: string, pattern: RegExp, allowed: string[] = []) {
+  const found = offenders(pattern).map((f) => f.split(path.sep).join('/'))
+  // A rule whose list is empty has no entry in the file.
+  const pending: string[] = (PENDING as Record<string, string[]>)[rule] ?? []
+  expect({ rule, migrated: pending.filter((f) => !found.includes(f)) }).toEqual({ rule, migrated: [] })
+  return found.filter((f) => !pending.includes(f) && !allowed.includes(f))
 }
 
 test('primary buttons come from Button / buttonClass', () => {
@@ -64,12 +78,10 @@ test('checkboxes come from Checkbox', () => {
 })
 
 test('dialogs come from Modal', () => {
-  // Not dialogs: the sign-in backdrop, the welcome's curtain, the phone menu drawer, the search panel (PR 2 rebuilds it).
+  // Not dialogs: the sign-in backdrop, the welcome's curtain.
   const allowed = [
     path.join('app', '(auth)', 'authPage', 'page.tsx'),
     path.join('components', 'welcome-curtain', 'WelcomeCurtain.tsx'),
-    path.join('components', 'main-header', 'MobileNavModal.tsx'),
-    path.join('components', 'search-modal', 'SearchModal.tsx'),
   ]
   expect(offenders(/className="fixed inset-0[^"]*bg-black/).filter((f) => !allowed.includes(f))).toEqual([])
 })
@@ -134,4 +146,144 @@ test('an entrance is CSS (globals.css → .enter-*), never Framer', () => {
 
 test('a disclosure and a show-more button come from the library (Accordion, ShowMore)', () => {
   expect(offenders(/aria-expanded=\{[^}]*\}[\s\S]{0,400}IconPlus/)).toEqual([])
+})
+
+// The rules added with #120 (docs/audits/antislop-v17.md, X2 and T-05/T-06). Each pattern is also what the
+// next migration greps for.
+const NEW_RULES = {
+  kicker: /["'`][^"'`]*(?:\buppercase\b[^"'`]*\btracking-|\btracking-[^"'`]*\buppercase\b)/,
+  tag: /["'`](?=[^"'`]*\brounded-tag\b)(?=[^"'`]*(?:\bh-(?:5|6|\[1\.375rem\])|\bpy-0\.5)(?![\w-]))/,
+  avatar: /\brounded-full\b[^"'`]*\bobject-cover\b|\bobject-cover\b[^"'`]*\brounded-full\b|from '@\/components\/presence-dot\/PresenceDot'/,
+  listRow: /\bhover:bg-accent\/10 focus-visible:bg-accent\/10\b/,
+  figure: /\b(?:StatPill|StatCard)\b/,
+  dataBar: /\bslantStyle\(/,
+  spinner: /\banimate-spin\b|main-spinner\/Spinner/,
+  pillButton: /<button\b[^>]*?className=\{?["'`][^"'`]*\brounded-full\b|px-3 py-1 rounded-full hover:bg-ink\/10/,
+  notice: /bg-(?:danger|warning|success|info)\/\d+[^"'`]*ring-(?:1|inset)\b/,
+  dialogRole: /role="(?:alert)?dialog"|\baria-modal\b/,
+  portal: /\bcreatePortal\(/,
+  focusRing: /focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent\/70/,
+  hairline: /shadow-\[inset_0_-?1px_0_rgb\(var\(--ink\)\/0\.\d+\)\]/,
+  sunken: /shadow-\[inset_0_[12]px_[24]px_rgb\(0_0_0\/0\.2\d\)\]|drop-shadow\(0 0 6px rgb\(var\(--progress\)/,
+  hex: /#[0-9a-fA-F]{6}\b|-\[#[0-9a-fA-F]{3,8}\]/,
+  palette: /(?<![\w-])(?:text|bg|ring|border|fill|stroke|from|to|via|shadow|outline|divide|decoration)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-(?:50|[1-9]00|950)\b/,
+  sideRadius: /(?<![\w-])rounded-[tblrse]{1,2}-(?:xl|2xl)\b/,
+  variants: /\bvariants=\{/,
+}
+
+// Where a platform's or a tier's own hue, or a fixed colour, belongs: the tokens (globals.css), the logo, and the
+// pictures drawn on the server (no theme there). Never a component.
+// Also fixed on purpose: the RA guide draws RetroAchievements' own dark page (not ours, so no theme), the welcome curtain's
+// ink on its white badge, and the browser bar's colour (`THEME_COLOR`, read before any theme exists).
+const OWN_COLOURS = [
+  'utils/themeIcon.ts',
+  'app/apple-icon.tsx',
+  'app/(main)/user/[username]/opengraph-image.tsx',
+  'components/welcome-page/welcome-page-ra-guide/WelcomePageRaGuide.tsx',
+  'components/welcome-curtain/WelcomeCurtain.tsx',
+  'lib/siteUrl.ts',
+]
+
+test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
+  // A table's head is the table's own look (ui/dataTable.ts TH), not a kicker; the sortable head inherits it.
+  // PublicUserHero's is a pill (rounded-full is left so on purpose), not a label.
+  const tableHeads = [
+    'components/public-user-page/public-user-hero/PublicUserHero.tsx',
+    'components/game-info-table/SortableHeader.tsx',
+    'components/rankings-guide/RankingsGuide.tsx',
+    'components/rankings-guide/rankings-guide-table/RankingsGuideTable.tsx',
+    'components/rankings-page/rankings-page-table/RankingsPageTable.tsx',
+  ]
+  expect(newOffenders('kicker', NEW_RULES.kicker, tableHeads)).toEqual([])
+})
+
+test('a tag comes from Tag, never a tinted rounded-tag box by hand', () => {
+  expect(newOffenders('tag', NEW_RULES.tag)).toEqual([])
+})
+
+test('a person\'s picture comes from Avatar, which carries their presence dot', () => {
+  // AvatarModal previews the picture being chosen, not a person: it names it for a screen reader and reacts to its failing.
+  expect(newOffenders('avatar', NEW_RULES.avatar, ['components/avatar-modal/AvatarModal.tsx'])).toEqual([])
+})
+
+test('a row to pick from comes from ListRow / LIST_ROW', () => {
+  expect(newOffenders('listRow', NEW_RULES.listRow)).toEqual([])
+})
+
+test('a labelled number comes from Figure; StatPill and StatCard are gone', () => {
+  expect(newOffenders('figure', NEW_RULES.figure)).toEqual([])
+})
+
+test('a chart bar with cut ends comes from DataBar, never slantStyle on a hand-made bar', () => {
+  // Not chart bars: the podium's steps (and its skeleton and the Following teaser's), the heatmap's range mark, a bar that carries its
+  // own label (the streak chart's ongoing one), and the two files that draw the shape token itself (the catalogue and the shape preference).
+  const notBars = [
+    'components/design-catalog/design-catalog-foundations/DesignCatalogFoundations.tsx',
+    'components/following-page/following-rankings-teaser/FollowingRankingsTeaser.tsx',
+    'components/rankings-page/rankings-page-podium/RankingsPagePodium.tsx',
+    'components/rankings-page/rankings-page-skeleton/RankingsPageSkeleton.tsx',
+    'components/streak-page/streak-chart/StreakChart.tsx',
+    'components/streak-page/streak-year-heatmap/StreakYearHeatmap.tsx',
+    'components/user-page/user-shape-preference/user-shape-preference-preview/UserShapePreferencePreview.tsx',
+  ]
+  expect(newOffenders('dataBar', NEW_RULES.dataBar, notBars)).toEqual([])
+})
+
+test('a spinner comes from Spinner or Button loading, never a hand-made animate-spin', () => {
+  // Not spinners: the level ring that turns while the level is read (MainHeaderLevel), and the refresh icons that turn
+  // while they refresh: the icon is the button's name, a ring in its place would lose it.
+  const turning = [
+    'components/main-header/main-header-level/MainHeaderLevel.tsx',
+    'components/main-page/main-page-charts/MainPageHeatmap.tsx',
+    'components/main-page/main-page-profile/main-page-profile-actions/main-page-profile-actions-refresh/MainPageProfileActionsRefresh.tsx',
+  ]
+  expect(newOffenders('spinner', NEW_RULES.spinner, turning)).toEqual([])
+})
+
+test('a retry or any pill-shaped button comes from Button (ErrorRetry under a failed read), never a hand-made pill', () => {
+  expect(newOffenders('pillButton', NEW_RULES.pillButton)).toEqual([])
+})
+
+test('a tinted notice box comes from Notice (or ErrorRetry), never drawn by hand', () => {
+  expect(newOffenders('notice', NEW_RULES.notice)).toEqual([])
+})
+
+test('a dialog is a Modal (placement="top" for a panel or a menu): no hand-made role="dialog" or aria-modal', () => {
+  expect(newOffenders('dialogRole', NEW_RULES.dialogRole)).toEqual([])
+})
+
+test('only the library portals: Modal portals itself, so wrapping it in createPortal is never needed', () => {
+  // The welcome's curtain is decorative and covers the page, not a dialog.
+  expect(newOffenders('portal', NEW_RULES.portal, ['components/welcome-curtain/WelcomeCurtain.tsx'])).toEqual([])
+})
+
+test('the focus ring is the focus-ring utility, never its three classes typed out', () => {
+  expect(newOffenders('focusRing', NEW_RULES.focusRing)).toEqual([])
+})
+
+test('a hairline, the sunken shadow and the finished glow are tokens (shadow-hairline-t/-b, shadow-sunken, drop-shadow-done)', () => {
+  expect(newOffenders('hairline', NEW_RULES.hairline)).toEqual([])
+  expect(newOffenders('sunken', NEW_RULES.sunken)).toEqual([])
+})
+
+test('a fixed colour is a token (a platform: text-steam, bg-psn…), never a hex literal in a component', () => {
+  expect(newOffenders('hex', NEW_RULES.hex).filter((f) => !OWN_COLOURS.includes(f))).toEqual([])
+})
+
+test('no palette class of any hue: meaning comes from the theme, platforms and tiers from their tokens', () => {
+  expect(newOffenders('palette', NEW_RULES.palette)).toEqual([])
+})
+
+test('a side radius follows the design too (rounded-t-card, never rounded-t-2xl)', () => {
+  expect(newOffenders('sideRadius', NEW_RULES.sideRadius)).toEqual([])
+})
+
+test('Framer variants only on what opens on a click; an entrance is CSS', () => {
+  // The auth page swaps its forms on a click (AnimatePresence, mode="wait"), and the library's opened card brings its
+  // panels in one by one when it is opened: both are a click's, not a load's.
+  const onClick = [
+    'components/auth-page/AuthPage.tsx',
+    'components/library-game-detail/LibraryGameDetail.tsx',
+  ]
+  expect(newOffenders('variants', NEW_RULES.variants, onClick)).toEqual([])
 })

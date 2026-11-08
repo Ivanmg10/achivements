@@ -4,6 +4,7 @@ import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatUnlockDate, type Unlock } from '@/utils/gameCompare'
 import { Skeleton } from '@/components/ui/Skeleton'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * Whether one person has an achievement, and when: a tick and the day, or a
@@ -26,7 +27,7 @@ export default function GameCompareTableCell({
 
   return (
     <div className={`rounded-box px-2.5 py-1.5 ring-1 flex flex-col gap-0.5 min-w-0 ${earned ? 'bg-success/10 ring-success/20' : 'bg-ink/[0.04] ring-ink/5'}`}>
-      <span className="text-[10px] uppercase tracking-wider text-text-secondary truncate">{who}</span>
+      <Kicker as="span" className="truncate">{who}</Kicker>
       {loading ? (
         <Skeleton className="h-4 w-20" />
       ) : (
@@ -37,8 +38,8 @@ export default function GameCompareTableCell({
       )}
       {(unlock?.hardcore || first) && earned && (
         <span className="flex flex-wrap gap-1">
-          {unlock?.hardcore && <span className="text-[9px] font-bold uppercase tracking-wider text-warning">{T.userGame.hardcore}</span>}
-          {first && <span className="text-[9px] font-bold uppercase tracking-wider text-accent">{T.userGame.first}</span>}
+          {unlock?.hardcore && <Kicker as="span" tone="warning">{T.userGame.hardcore}</Kicker>}
+          {first && <Kicker as="span" tone="accent">{T.userGame.first}</Kicker>}
         </span>
       )}
     </div>
