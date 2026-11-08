@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { raUnavailable } from '@/lib/raFailure'
 import { NextRequest } from 'next/server'
 import { withCache } from '@/lib/raCache'
 import { cachedJson } from '@/lib/httpCache'
@@ -25,7 +26,9 @@ export async function GET(request: NextRequest) {
       (d) => d !== null && typeof d === 'object' && 'Results' in d,
     )
     return cachedJson(data, TTL)
-  } catch {
-    return NextResponse.json({ Results: [] })
+  } catch (err) {
+    // Not an empty list: the modal tells a failed read from a game with no hashes.
+    console.error('[getGameHashes]', err)
+    return raUnavailable(err)
   }
 }

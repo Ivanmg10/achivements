@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { raUnavailable } from '@/lib/raFailure'
 import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
       (d) => Array.isArray(d),
     )
 
-    if (!Array.isArray(raw)) return NextResponse.json([], { status: 200 })
+    if (!Array.isArray(raw)) throw new Error('RA game list is not a list')
 
     const list = raw as GameListEntry[]
     const subsets = list.filter((g) => {
@@ -43,7 +44,9 @@ export async function GET(request: NextRequest) {
     })
 
     return cachedJson(subsets, TTL, { sameForEveryone: true })
-  } catch {
-    return NextResponse.json([], { status: 200 })
+  } catch (err) {
+    // Not an empty list: a failed lookup is not a game without subsets. The page costs only its tabs.
+    console.error('[getGameSubsets]', err)
+    return raUnavailable(err)
   }
 }

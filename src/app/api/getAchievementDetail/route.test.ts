@@ -36,11 +36,20 @@ test('answers with unlocks and comments, cached per user', async () => {
   expect((withCache as jest.Mock).mock.calls[0][0]).toBe('achievementDetail:1:5')
 })
 
-test('one half failing still answers with the other', async () => {
+test('one half failing is a failure, so a pair with a hole is never cached for five minutes (AP-10)', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
   ;(getAchievementUnlocks as jest.Mock).mockRejectedValue(new Error('RA down'))
   ;(getAchievementComments as jest.Mock).mockResolvedValue({ Results: [] })
   const res = await GET(request('achievementId=5'))
-  expect((res as unknown as { data: { unlocks: unknown } }).data.unlocks).toBeNull()
+  expect(res.status).toBe(503)
+  expect(console.error).toHaveBeenCalled()
+})
+
+test('RA refusing the key is the key notice, not a generic failure', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  ;(getAchievementUnlocks as jest.Mock).mockRejectedValue(Object.assign(new Error('RA API error 401'), { status: 401 }))
+  ;(getAchievementComments as jest.Mock).mockResolvedValue({ Results: [] })
+  expect((await GET(request('achievementId=5'))).status).toBe(403)
 })
 
 test('503 when the cache itself fails', async () => {

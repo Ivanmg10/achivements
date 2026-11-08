@@ -35,9 +35,16 @@ test('answers with the hashes, cached per game', async () => {
   expect((withCache as jest.Mock).mock.calls[0][0]).toBe('gameHashes:42')
 })
 
-test('an empty list when RA fails: the hashes are an extra, not the page', async () => {
+test('a failed RA read is an error the modal can tell from a game with no hashes (AP-10)', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
   ;(getGameHashes as jest.Mock).mockRejectedValue(new Error('RA down'))
   const res = await GET(request('gameId=42'))
-  expect(res.status).toBe(200)
-  expect((res as unknown as { data: unknown }).data).toEqual({ Results: [] })
+  expect(res.status).toBe(503)
+  expect(console.error).toHaveBeenCalled()
+})
+
+test('a game RA does not know is a 404, which is not retried', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  ;(getGameHashes as jest.Mock).mockRejectedValue(Object.assign(new Error('RA API error 404'), { status: 404 }))
+  expect((await GET(request('gameId=42'))).status).toBe(404)
 })
