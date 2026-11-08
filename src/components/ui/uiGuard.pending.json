@@ -180,5 +180,38 @@
     "components/register-user-form/register-user-form-ra/RegisterUserFormRa.tsx",
     "components/reset-password-form/ResetPasswordForm.tsx",
     "components/steam-signup-form-fields/SteamSignupFormFields.tsx"
+  ],
+  "pillButton": [
+    "components/psn/psn-category-section/PsnCategorySection.tsx",
+    "components/psn/psn-collection-expanded/PsnCollectionExpanded.tsx",
+    "components/psn/psn-game-item-trophies/PsnGameItemTrophies.tsx",
+    "components/psn/psn-library-detail/PsnLibraryDetail.tsx",
+    "components/psn/psn-recently-played-expanded/PsnRecentlyPlayedExpanded.tsx",
+    "components/rankings-page/RankingsPage.tsx",
+    "components/recent-games-list/RecentGamesList.tsx",
+    "components/steam/steam-category-section/SteamCategorySection.tsx",
+    "components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements.tsx",
+    "components/steam/steam-library-detail/SteamLibraryDetail.tsx",
+    "components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded.tsx",
+    "components/user-page/user-consoles-preference/UserConsolesPreference.tsx",
+    "components/xbox/xbox-category-section/XboxCategorySection.tsx",
+    "components/xbox/xbox-library-detail/XboxLibraryDetail.tsx",
+    "components/xbox/xbox-recently-played-expanded/XboxRecentlyPlayedExpanded.tsx"
+  ],
+  "notice": [
+    "components/avatar-modal/AvatarModal.tsx",
+    "components/change-password-modal/ChangePasswordModal.tsx",
+    "components/edit-profile-modal/EditProfileModal.tsx",
+    "components/login-user-form/LoginUserForm.tsx",
+    "components/ra-key-invalid-notice/RaKeyInvalidNotice.tsx",
+    "components/register-user-form/RegisterUserForm.tsx",
+    "components/register-user-form/register-user-form-ra/RegisterUserFormRa.tsx",
+    "components/reset-password-form/ResetPasswordForm.tsx",
+    "components/steam-signup-form-fields/SteamSignupFormFields.tsx",
+    "components/steam-signup-form/SteamSignupForm.tsx",
+    "components/user-page/email-verification-notice/EmailVerificationNotice.tsx",
+    "components/user-page/user-identity-card/UserIdentityCard.tsx",
+    "components/vault-fill-line/VaultFillLine.tsx",
+    "components/vault-fill-progress/VaultFillProgress.tsx"
   ]
 }

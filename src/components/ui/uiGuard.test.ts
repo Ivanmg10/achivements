@@ -159,6 +159,8 @@ const NEW_RULES = {
   figure: /\b(?:StatPill|StatCard)\b/,
   dataBar: /\bslantStyle\(/,
   spinner: /\banimate-spin\b|main-spinner\/Spinner/,
+  pillButton: /<button\b[^>]*?className=\{?["'`][^"'`]*\brounded-full\b|px-3 py-1 rounded-full hover:bg-ink\/10/,
+  notice: /bg-(?:danger|warning|success|info)\/\d+[^"'`]*ring-(?:1|inset)\b/,
 }
 
 test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
@@ -187,4 +189,12 @@ test('a chart bar with cut ends comes from DataBar, never slantStyle on a hand-m
 
 test('a spinner comes from Spinner or Button loading, never a hand-made animate-spin', () => {
   expect(newOffenders('spinner', NEW_RULES.spinner)).toEqual([])
+})
+
+test('a retry or any pill-shaped button comes from Button (ErrorRetry under a failed read), never a hand-made pill', () => {
+  expect(newOffenders('pillButton', NEW_RULES.pillButton)).toEqual([])
+})
+
+test('a tinted notice box comes from Notice (or ErrorRetry), never drawn by hand', () => {
+  expect(newOffenders('notice', NEW_RULES.notice)).toEqual([])
 })

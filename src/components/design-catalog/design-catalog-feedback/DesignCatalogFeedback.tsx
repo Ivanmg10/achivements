@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import Notice from '@/components/ui/Notice'
 import Spinner from '@/components/ui/Spinner'
+import ErrorRetry from '@/components/ui/ErrorRetry'
 import { notify } from '@/lib/notify'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 import { MENU_SURFACE, menuItemClass } from '@/components/ui/menu'
@@ -30,6 +31,13 @@ export default function DesignCatalogFeedback() {
             <Notice tone="danger">That could not be saved.</Notice>
           </div>
         </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="error-retry">
+        <Compare>
+          <ErrorRetry message="Could not load the trophies." retryLabel="Retry" onRetry={() => {}} />
+          <ErrorRetry message="Could not load the trophies." hint="The profile is private: make the trophies public on PlayStation and try again." retryLabel="Retry" onRetry={() => {}} />
+        </Compare>
       </DesignCatalogPiece>
 
       <DesignCatalogPiece id="spinner">
