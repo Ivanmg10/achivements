@@ -28,10 +28,11 @@ import XboxPinnedGameRow from './xbox-pinned-game-row/XboxPinnedGameRow'
 import { gameKey, GameRef } from '@/utils/gameRef'
 import { notify } from '@/lib/notify'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 
 export default function MainPagePinnedGames() {
   const { T } = useLanguage()
-  const { pins, isLoading, reorder } = usePinnedGames()
+  const { pins, isLoading, error, retry, reorder } = usePinnedGames()
   const [localPins, setLocalPins] = useState<GameRef[] | null>(null)
   // Keys, not ids: an RA game and a Steam app can share an id.
   const [expandedKey, setExpandedKey] = useState<string | null>(null)
@@ -82,7 +83,11 @@ export default function MainPagePinnedGames() {
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {isLoading ? (
+        {error && !isLoading && pins.length === 0 ? (
+          <SectionFallback error onRefresh={retry}>
+            <div className="min-h-20" />
+          </SectionFallback>
+        ) : isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <GameRowSkeleton />
             <GameRowSkeleton />

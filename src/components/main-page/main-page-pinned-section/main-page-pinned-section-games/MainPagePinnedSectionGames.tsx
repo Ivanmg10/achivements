@@ -13,6 +13,7 @@ import MainPagePinnedSectionGameTile from '../main-page-pinned-section-game-tile
 import MainPagePinnedSectionSortable from '../main-page-pinned-section-sortable/MainPagePinnedSectionSortable'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { RememberedHeight } from '@/components/ui/RememberedHeight'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 
 const GRID = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2'
 
@@ -24,7 +25,7 @@ const GRID = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap
  */
 export default function MainPagePinnedSectionGames() {
   const { T } = useLanguage()
-  const { pins, isLoading: pinsLoading, reorder } = usePinnedGames()
+  const { pins, isLoading: pinsLoading, error, retry, reorder } = usePinnedGames()
   const { games, isLoading: libraryLoading } = useProfileLibrary()
   const pinned = useMemo(() => {
     const byKey = new Map(games.map((g) => [g.key, g]))
@@ -56,6 +57,10 @@ export default function MainPagePinnedSectionGames() {
             ))}
           </div>
         </RememberedHeight>
+      ) : error && pins.length === 0 ? (
+        <SectionFallback error onRefresh={retry}>
+          <div className="min-h-20" />
+        </SectionFallback>
       ) : pinned.length === 0 ? (
         <EmptyState icon={<IconPin className="w-6 h-6" />} title={T.pinnedGames.emptyTitle} subtitle={T.pinnedGames.empty} size="compact" />
       ) : (

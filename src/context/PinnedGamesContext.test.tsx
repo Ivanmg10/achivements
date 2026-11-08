@@ -68,12 +68,19 @@ test('treats rows without a source (older API) as RA', async () => {
   expect(result.current.isPinned(10, 'steam')).toBe(false)
 })
 
-test('empties the pins when the GET fails', async () => {
+test('a failed GET is an error with a retry, not an empty list that looks like having no pins (HK-09)', async () => {
   signedIn()
-  ;(fetch as jest.Mock).mockResolvedValue({ ok: false })
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: false })
   const { result } = renderHook(() => usePinnedGames(), { wrapper })
   await waitFor(() => expect(result.current.isLoading).toBe(false))
-  expect(result.current.pins).toEqual([])
+  expect(result.current.error).toBe(true)
+  expect(console.error).toHaveBeenCalled()
+
+  ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => [{ source: 'ra', game_id: 7, position: 0 }] })
+  act(() => result.current.retry())
+  await waitFor(() => expect(result.current.pins).toEqual([{ source: 'ra', id: 7 }]))
+  expect(result.current.error).toBe(false)
 })
 
 test('clears the pins on sign-out', async () => {

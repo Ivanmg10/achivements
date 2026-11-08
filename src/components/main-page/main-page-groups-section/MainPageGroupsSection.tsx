@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useGroups } from '@/hooks/useGroups'
 import { ChartCard } from '@/components/ui/ChartCard'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 import MainPageGroups from '@/components/main-page/main-page-charts/MainPageGroups'
 import MainPageGroupFeature from '@/components/main-page/main-page-group-feature/MainPageGroupFeature'
 import MainPageGroupsSectionSkeleton from './main-page-groups-section-skeleton/MainPageGroupsSectionSkeleton'
@@ -13,12 +14,23 @@ import MainPageGroupsSectionSkeleton from './main-page-groups-section-skeleton/M
  * create one; deleting is on the group's page). The groups are asked for once, here. It opens on the first group, in the user's order.
  */
 export default function MainPageGroupsSection() {
-  const { groups, isLoading, createGroup, updateGroup, fetchGroups } = useGroups()
+  const { groups, isLoading, error, createGroup, updateGroup, fetchGroups } = useGroups()
   const [picked, setPicked] = useState<number | null>(null)
   // The pick only counts while that group still exists (it may have just been deleted).
   const featured = groups.find((g) => g.id === picked) ?? groups[0] ?? null
 
   if (isLoading) return <MainPageGroupsSectionSkeleton />
+
+  // A failed read is not "no groups": offer to try again instead of the empty section.
+  if (error && groups.length === 0) {
+    return (
+      <ChartCard>
+        <SectionFallback error onRefresh={fetchGroups}>
+          <div className="min-h-24" />
+        </SectionFallback>
+      </ChartCard>
+    )
+  }
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
