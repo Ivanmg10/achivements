@@ -23,7 +23,7 @@ export default function MainPageProfilePsnStats({
 }) {
   const { T, lang } = useLanguage()
   const minutes = totalPlaytime(library)
-  const playtime = formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)
+  const playtime = formatPlaytime(minutes, T.steam, lang)
 
   return (
     <div className="grid grid-cols-2 gap-2">

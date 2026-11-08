@@ -22,13 +22,12 @@ export default function SteamExpandedStats({
   remaining: number
 }) {
   const { T, lang } = useLanguage()
-  const units = { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }
 
   return (
     <GameExpandedStatList
       stats={[
-        { label: T.steam.playtime, value: formatPlaytime(playtimeForever, units, lang), className: 'text-[#66c0f4]' },
-        { label: T.steam.last2Weeks, value: formatPlaytime(playtime2Weeks, units, lang), className: 'text-text-main' },
+        { label: T.steam.playtime, value: formatPlaytime(playtimeForever, T.steam, lang), className: 'text-[#66c0f4]' },
+        { label: T.steam.last2Weeks, value: formatPlaytime(playtime2Weeks, T.steam, lang), className: 'text-text-main' },
         { label: T.gameExpanded.completion, value: `${completionPct}%`, className: 'text-success', wide: false },
         { label: T.gameExpanded.remaining, value: String(remaining), className: 'text-info' },
       ]}

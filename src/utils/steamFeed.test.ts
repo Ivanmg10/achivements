@@ -93,7 +93,7 @@ describe('mergeRecentFeeds', () => {
 })
 
 describe('formatPlaytime', () => {
-  const units = { minutes: 'min', hours: 'h' }
+  const units = { minutesShort: 'min', hoursShort: 'h' }
 
   test('shows minutes under an hour', () => {
     expect(formatPlaytime(0, units)).toBe('0 min')
@@ -118,7 +118,7 @@ describe('formatPlaytime', () => {
   })
 
   test('uses the units it is given', () => {
-    expect(formatPlaytime(120, { minutes: 'мин', hours: 'ч' })).toBe('2 ч')
+    expect(formatPlaytime(120, { minutesShort: 'мин', hoursShort: 'ч' })).toBe('2 ч')
   })
 })
 

@@ -86,7 +86,7 @@ export default function XboxGameInfoHeader({
         { label: T.xbox.achievements, value: game.numAwarded, ...(game.totalKnown ? { of: game.maxPossible } : {}), done: isComplete },
         { label: T.xbox.gamerscore, value: game.earnedGamerscore, of: game.totalGamerscore, done: isComplete },
         ...(game.playtimeMinutes !== null
-          ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang) }]
+          ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, T.steam, lang) }]
           : []),
       ]}
       media={details && <GameHeroMedia shots={details.screenshots.map((s, i) => ({ src: s.thumb, full: s.full, caption: `${T.steam.screenshot} ${i + 1}` }))} />}

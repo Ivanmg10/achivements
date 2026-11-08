@@ -38,7 +38,7 @@ export default function UserXboxCard() {
     platformStat(T.xbox.achievements, summary?.achievementsUnlocked, summaryOpts),
     platformStat(T.xbox.tier, summary?.tier, summaryOpts),
     // No play time reads as absent, not as "0 min".
-    platformStat(T.steam.playtime, minutes === 0 ? null : formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang), { lang, loading: libraryLoading }),
+    platformStat(T.steam.playtime, minutes === 0 ? null : formatPlaytime(minutes, T.steam, lang), { lang, loading: libraryLoading }),
   ]
 
   const handleLink = async (tag: string) => {

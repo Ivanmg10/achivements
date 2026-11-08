@@ -25,7 +25,6 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
   const loaded = achievements.length > 0
   const total = loaded ? achievements.length : game.maxPossible
   const earned = loaded ? achievements.filter((a) => a.earned).length : game.numAwarded
-  const units = { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }
 
   return (
     <LibraryGameDetail
@@ -45,8 +44,8 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
       }
       ring={{ earned, total, label: T.gameExpanded.allAchievements }}
       facts={[
-        { label: T.steam.playtime, value: formatPlaytime(game.playtimeForever, units, lang), className: 'text-[#66c0f4]' },
-        ...(game.playtime2Weeks > 0 ? [{ label: T.steam.last2Weeks, value: formatPlaytime(game.playtime2Weeks, units, lang) }] : []),
+        { label: T.steam.playtime, value: formatPlaytime(game.playtimeForever, T.steam, lang), className: 'text-[#66c0f4]' },
+        ...(game.playtime2Weeks > 0 ? [{ label: T.steam.last2Weeks, value: formatPlaytime(game.playtime2Weeks, T.steam, lang) }] : []),
       ]}
       empty={T.steam.noAchievements}
       grid={<SteamAchievementGrid appId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={48} limit={60} />}

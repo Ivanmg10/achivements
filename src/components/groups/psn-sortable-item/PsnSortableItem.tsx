@@ -121,7 +121,7 @@ export default function PsnSortableItem({
             {game?.playtimeMinutes != null ? (
               <>
                 <IconClock size={12} aria-hidden="true" />
-                {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+                {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, T.steam, lang)}
               </>
             ) : (
               ' '

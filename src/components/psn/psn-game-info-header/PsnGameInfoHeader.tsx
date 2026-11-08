@@ -103,7 +103,7 @@ export default function PsnGameInfoHeader({
       tiles={[
         { label: T.psn.trophies, value: game.numAwarded, of: game.maxPossible, done: isComplete },
         ...(game.playtimeMinutes !== null
-          ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang) }]
+          ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, T.steam, lang) }]
           : hasPlatinum
             ? [{ label: T.psn.platinum, value: game.earned.platinum > 0 ? T.psn.earned : T.psn.locked, done: game.earned.platinum > 0 }]
             : []),

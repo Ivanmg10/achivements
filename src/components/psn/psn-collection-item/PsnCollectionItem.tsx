@@ -100,7 +100,7 @@ export default function PsnCollectionItem({
                 <span className="flex items-center gap-1">
                   <IconClock size={12} aria-hidden="true" />
                   <span className="sr-only">{T.steam.playtime}: </span>
-                  {formatPlaytime(collection.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+                  {formatPlaytime(collection.playtimeMinutes, T.steam, lang)}
                 </span>
               </>
             )}

@@ -118,7 +118,7 @@ export default function PsnGameItem({
                   <span className="flex items-center gap-1">
                     <IconClock size={12} aria-hidden="true" />
                     <span className="sr-only">{T.steam.playtime}: </span>
-                    {formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+                    {formatPlaytime(game.playtimeMinutes, T.steam, lang)}
                   </span>
                 </>
               )}

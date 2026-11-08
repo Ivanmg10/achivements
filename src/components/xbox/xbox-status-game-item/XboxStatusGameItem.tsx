@@ -89,7 +89,7 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
             {game.playtimeMinutes !== null && (
               <span className="flex items-center gap-1 text-xs text-text-secondary mt-1">
                 <IconClock size={12} aria-hidden="true" />
-                {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+                {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, T.steam, lang)}
               </span>
             )}
             {category === 'completed' && game.completedAt ? (

@@ -94,7 +94,7 @@ export default function SteamGameInfoHeader({
       }
       tiles={[
         ...(counts && counts.total > 0 ? [{ label: T.gameInfoPage.achievements, value: counts.earned, of: counts.total, done: isPerfect }] : []),
-        ...(game ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeForever, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang) }] : []),
+        ...(game ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeForever, T.steam, lang) }] : []),
       ]}
       media={details && <GameHeroMedia shots={details.screenshots.map((s, i) => ({ src: s.thumb, full: s.full, caption: `${T.steam.screenshot} ${i + 1}` }))} />}
     />

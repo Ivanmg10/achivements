@@ -62,7 +62,7 @@ test('a finished game is marked', () => {
 })
 
 const MINUTES = 3409
-const PLAYED = formatPlaytime(MINUTES, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en')
+const PLAYED = formatPlaytime(MINUTES, en.steam, 'en')
 
 test('the play time next to when it was last played', () => {
   ;(useXboxGamesData as jest.Mock).mockReturnValue({ fullLibrary: [xboxGameFixture({ id: 1738914043, playtimeMinutes: MINUTES })] })

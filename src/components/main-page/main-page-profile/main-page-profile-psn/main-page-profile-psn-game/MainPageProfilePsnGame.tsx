@@ -20,7 +20,7 @@ export default function MainPageProfilePsnGame({ game }: { game: PsnGameProgress
   const subject = useSubject()
 
   const when = game.lastPlayed ? new Date(game.lastPlayed).toLocaleDateString(lang, { day: 'numeric', month: 'short' }) : null
-  const playtime = game.playtimeMinutes !== null ? formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang) : null
+  const playtime = game.playtimeMinutes !== null ? formatPlaytime(game.playtimeMinutes, T.steam, lang) : null
 
   return (
     <MainPageProfileNowPlaying

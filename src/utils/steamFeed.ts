@@ -120,18 +120,18 @@ export function mergeRecentFeeds(
 }
 
 /**
- * Steam reports playtime in minutes. Units and locale both come in from the
- * caller so the number follows the app language, not the browser's locale.
+ * Steam reports playtime in minutes. The units (`T.steam`) and the locale come in from
+ * the caller so the number follows the app language, not the browser's locale.
  */
 export function formatPlaytime(
   minutes: number,
-  units: { minutes: string; hours: string },
+  units: { minutesShort: string; hoursShort: string },
   locale?: string,
 ): string {
-  if (minutes < 60) return `${Math.max(0, Math.round(minutes))} ${units.minutes}`
+  if (minutes < 60) return `${Math.max(0, Math.round(minutes))} ${units.minutesShort}`
   const hours = minutes / 60
   const rounded = hours < 10 ? Math.round(hours * 10) / 10 : Math.round(hours)
-  return `${rounded.toLocaleString(locale)} ${units.hours}`
+  return `${rounded.toLocaleString(locale)} ${units.hoursShort}`
 }
 
 /**

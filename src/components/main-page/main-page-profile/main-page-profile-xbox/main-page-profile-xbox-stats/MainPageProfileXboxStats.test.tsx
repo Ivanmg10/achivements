@@ -6,7 +6,7 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import type { XboxSummary } from '@/types/xbox'
 
 const SUMMARY: XboxSummary = { gamertag: 'T', avatarUrl: null, bio: '', tier: 'Gold', gamerscore: 10242, achievementsUnlocked: 593, games: 135 }
-const PLAYED = formatPlaytime(3409 + 60, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en')
+const PLAYED = formatPlaytime(3409 + 60, en.steam, 'en')
 
 test('games, play time, gamerscore and achievements', () => {
   const library = [xboxGameFixture({ playtimeMinutes: 3409 }), xboxGameFixture({ id: 2, playtimeMinutes: 60 }), xboxGameFixture({ id: 3, playtimeMinutes: null })]

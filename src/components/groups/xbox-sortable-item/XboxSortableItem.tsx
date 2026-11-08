@@ -124,7 +124,7 @@ export default function XboxSortableItem({
           {game ? <XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} className="mt-1" /> : <span aria-hidden="true" className="text-xs mt-1">{' '}</span>}
           <span className="text-xs text-text-secondary mt-1">
             {game?.lastPlayed ? T.groups.playedAgo.replace('{when}', relativeTime(game.lastPlayed, lang)) : T.groups.neverPlayed}
-            {game?.playtimeMinutes != null && ` · ${T.steam.playtime} ${formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}`}
+            {game?.playtimeMinutes != null && ` · ${T.steam.playtime} ${formatPlaytime(game.playtimeMinutes, T.steam, lang)}`}
             {' · '}
             {T.groups.addedAgo.replace('{when}', relativeTime(item.added_at, lang))}
           </span>

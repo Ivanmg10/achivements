@@ -26,7 +26,7 @@ export default function MainPageProfileStGame({
   const { T, lang } = useLanguage()
   const subject = useSubject()
   const hasCounts = game.achievementsLoaded && game.maxPossible > 0
-  const playtime = formatPlaytime(game.playtimeForever, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)
+  const playtime = formatPlaytime(game.playtimeForever, T.steam, lang)
 
   return (
     <MainPageProfileNowPlaying

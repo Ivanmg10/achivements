@@ -48,7 +48,7 @@ export default function SteamStatusGameItem({
   const isComplete = hasCounts && game.numAwarded >= game.maxPossible
   const playtime = formatPlaytime(
     game.playtimeForever,
-    { minutes: T.steam.minutesShort, hours: T.steam.hoursShort },
+    T.steam,
     lang,
   )
 

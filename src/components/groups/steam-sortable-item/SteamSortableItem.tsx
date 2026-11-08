@@ -133,7 +133,7 @@ export default function SteamSortableItem({
               <>
                 <IconClock size={12} aria-hidden="true" />
                 {T.steam.playtime} ·{' '}
-                {formatPlaytime(game.playtimeForever, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+                {formatPlaytime(game.playtimeForever, T.steam, lang)}
               </>
             ) : (
               '\u00a0'
