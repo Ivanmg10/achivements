@@ -2,10 +2,9 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import type { FriendOverview } from '@/utils/friends'
-import { PLATFORM_NAME } from '@/utils/gameRef'
+import { PLATFORM_NAME, GAME_SOURCES } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 
-const PLATFORMS = ['ra', 'steam', 'psn', 'xbox'] as const
 
 /**
  * Where someone plays: a chip per linked account with its logo and the name
@@ -14,7 +13,7 @@ const PLATFORMS = ['ra', 'steam', 'psn', 'xbox'] as const
  */
 export default function FollowingCardPlatforms({ friend }: { friend: FriendOverview }) {
   const { T } = useLanguage()
-  const linked = PLATFORMS.filter((p) => friend[p])
+  const linked = GAME_SOURCES.filter((p) => friend[p])
   if (linked.length === 0) return null
 
   return (

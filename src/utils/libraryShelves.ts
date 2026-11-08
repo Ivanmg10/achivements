@@ -1,5 +1,5 @@
 import { titleMatches } from '@/utils/gameCandidates'
-import { gameHref } from '@/utils/gameRef'
+import { gameHref, raGameId } from '@/utils/gameRef'
 import { matchesQuick, type LibraryEntry, type QuickFilter } from '@/utils/libraryInsights'
 import type { GameSource } from '@/types/steam'
 
@@ -20,7 +20,7 @@ export const SHELF_CAP = 9
 export const CONTINUE_DAYS = 7
 const DAY = 86_400_000
 
-export const entryId = (e: LibraryEntry): number => (e.kind === 'ra' ? ('GameID' in e.game && e.game.GameID ? e.game.GameID : (e.game as { ID: number }).ID) : e.game.id)
+export const entryId = (e: LibraryEntry): number => (e.kind === 'ra' ? raGameId(e.game) : e.game.id)
 export const entryHref = (e: LibraryEntry) => gameHref(e.kind, entryId(e))
 
 /** How many achievements the game has, for ordering a backlog; RA's want-to-play list reports it differently. */

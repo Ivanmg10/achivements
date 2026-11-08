@@ -8,8 +8,9 @@ import { CountUp } from '@/components/ui/CountUp'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import VaultFillProgress from '@/components/vault-fill-progress/VaultFillProgress'
 import VaultWeeksChart from '@/components/vault-weeks-chart/VaultWeeksChart'
-import VaultPlatformSplit, { PLATFORM_FILL, PLATFORM_NAMES, PLATFORM_ORDER } from '@/components/vault-platform-split/VaultPlatformSplit'
+import VaultPlatformSplit, { PLATFORM_FILL, PLATFORM_NAMES } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { levelProgress } from '@/utils/vaultLevel'
+import { GAME_SOURCES } from '@/utils/gameRef'
 
 /** A card of the rankings' side column. */
 export const CARD = 'bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 flex flex-col gap-3'
@@ -116,7 +117,7 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
           <h2 id="rankings-sources-title" className="font-bold">{T.rankings.sources}</h2>
           <VaultPlatformSplit split={me.split} className="h-2.5" />
           <dl className="grid grid-cols-[1fr_auto_auto] gap-x-2.5 gap-y-1 text-sm">
-            {PLATFORM_ORDER.filter((s) => (me.split[s] ?? 0) > 0).map((s) => (
+            {GAME_SOURCES.filter((s) => (me.split[s] ?? 0) > 0).map((s) => (
               <div key={s} className="contents">
                 <dt className="flex items-center gap-2">
                   <span aria-hidden="true" className={`w-2.5 h-2.5 rounded-cell ${PLATFORM_FILL[s]}`} />

@@ -5,7 +5,7 @@ import { IconDeviceGamepad2, IconSearch } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { filterLibrary, type LibraryGame, type LibraryStatus } from '@/utils/library'
-import { PLATFORM_NAME } from '@/utils/gameRef'
+import { PLATFORM_NAME, GAME_SOURCES } from '@/utils/gameRef'
 import type { GameSource } from '@/types/steam'
 import EmptyState from '@/components/empty-state/EmptyState'
 import PublicUserGameRow from '../public-user-game-row/PublicUserGameRow'
@@ -36,7 +36,7 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
   // Another filter starts the list from its top again.
   useWhenChanged([query, source, status, sort], () => setShown(PAGE))
 
-  const platforms = (['ra', 'steam', 'psn', 'xbox'] as const).filter((s) => games.some((g) => g.source === s))
+  const platforms = GAME_SOURCES.filter((s) => games.some((g) => g.source === s))
   const filtered = useMemo(() => {
     const list = filterLibrary(games, { query, source, status })
     return list.sort((a, b) => (sort === 'name' ? a.title.localeCompare(b.title, lang) : b.pct - a.pct || a.title.localeCompare(b.title, lang)))

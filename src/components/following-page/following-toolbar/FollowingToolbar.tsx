@@ -3,12 +3,11 @@
 import { IconCheck, IconSearch } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { GameSource } from '@/types/steam'
-import { PLATFORM_NAME } from '@/utils/gameRef'
+import { PLATFORM_NAME, GAME_SOURCES } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { fieldClass } from '@/components/ui/Input'
 import { pillClass } from '@/components/ui/Pill'
 
-const PLATFORMS = ['ra', 'steam', 'psn', 'xbox'] as const
 
 /**
  * Narrows the people you follow: by name, and by the platforms they play on.
@@ -34,7 +33,7 @@ export default function FollowingToolbar({
   const toggle = (p: GameSource) => onPlatforms(platforms.includes(p) ? platforms.filter((x) => x !== p) : [...platforms, p])
   const chips = [
     { key: 'all', on: platforms.length === 0, onClick: () => onPlatforms([]), logo: null, label: T.following.allPlatforms, count: total },
-    ...PLATFORMS.filter((p) => counts[p] > 0).map((p) => ({
+    ...GAME_SOURCES.filter((p) => counts[p] > 0).map((p) => ({
       key: p,
       on: platforms.includes(p),
       onClick: () => toggle(p),

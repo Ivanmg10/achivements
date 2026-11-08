@@ -12,7 +12,7 @@ import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { fetchRaCandidateById } from '@/utils/apiCallsUtils'
 import { candidateToGroupItemBody, searchCandidates, suggestCandidates, GameCandidate } from '@/utils/gameCandidates'
-import { gameKey } from '@/utils/gameRef'
+import { gameKey, GAME_SOURCES } from '@/utils/gameRef'
 import { plural } from '@/utils/utils'
 import GamePickerTile from '@/components/game-picker/game-picker-tile/GamePickerTile'
 import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
@@ -22,7 +22,6 @@ import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
 
-const SOURCES: GameSource[] = ['ra', 'steam', 'psn', 'xbox']
 const RESULTS_MAX = 40
 
 /**
@@ -94,7 +93,7 @@ export default function AddGameModal({
   }, [query, isHidden])
 
   const offered = useMemo(() => candidates.filter((c) => !existingKeys.has(c.key)), [candidates, existingKeys])
-  const sources = useMemo(() => SOURCES.filter((s) => offered.some((c) => c.source === s)), [offered])
+  const sources = useMemo(() => GAME_SOURCES.filter((s) => offered.some((c) => c.source === s)), [offered])
   const pool = useMemo(() => (source ? offered.filter((c) => c.source === source) : offered), [offered, source])
   const searching = query.trim() !== ''
   const shown = useMemo(

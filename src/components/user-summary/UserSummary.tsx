@@ -2,7 +2,7 @@ import Image from 'next/image'
 import { IconUser } from '@tabler/icons-react'
 import type { UserSearchResult } from '@/hooks/useUserSearch'
 import { codeToFlag, findCountry } from '@/utils/countries'
-import { PLATFORM_NAME } from '@/utils/gameRef'
+import { PLATFORM_NAME, GAME_SOURCES } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
 import PresenceLabel from '@/components/presence-label/PresenceLabel'
@@ -15,7 +15,7 @@ import PresenceLabel from '@/components/presence-label/PresenceLabel'
  */
 export default function UserSummary({ user, size = 36 }: { user: UserSearchResult; size?: number }) {
   const country = user.location ? findCountry(user.location) : null
-  const platforms = (['ra', 'steam', 'psn', 'xbox'] as const).filter((p) => user[p])
+  const platforms = GAME_SOURCES.filter((p) => user[p])
 
   return (
     <>

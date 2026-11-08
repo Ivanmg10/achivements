@@ -1,5 +1,5 @@
 import { classifySteamGame } from '@/utils/steamFeed'
-import { gameHref, gameKey } from '@/utils/gameRef'
+import { gameHref, gameKey, GAME_SOURCES } from '@/utils/gameRef'
 import { classifyPsnGame } from '@/utils/psnTitles'
 import { PSN_PLATFORM } from '@/utils/psnMappers'
 import type { PsnGameProgress } from '@/types/psn'
@@ -146,7 +146,7 @@ export type PlatformSummary = { source: GameSource; games: number; completed: nu
 
 /** Per platform with games, in the app's order: how many, at 100%, under way, and the average progress. */
 export function summarizeByPlatform(games: LibraryGame[]): PlatformSummary[] {
-  return (['ra', 'steam', 'psn', 'xbox'] as const)
+  return GAME_SOURCES
     .map((source) => {
       const own = games.filter((g) => g.source === source)
       return {

@@ -5,6 +5,7 @@ import { notify } from '@/lib/notify'
 import type { FillAnswer, FillStatus } from '@/lib/scoreRefresh'
 import type { GameSource } from '@/types/steam'
 import { levelOf, tierOf } from '@/utils/vaultLevel'
+import { PLATFORM_NAME } from '@/utils/gameRef'
 
 /** Polling while a pass runs, and the waits between passes. */
 const POLL_MS = 2_500
@@ -13,7 +14,6 @@ const BUSY_ELSEWHERE_MS = 5_000
 /** A ceiling on passes per page load; whatever is left goes on at the next visit. */
 const MAX_PASSES = 30
 
-const NAMES: Record<GameSource, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PlayStation', xbox: 'Xbox' }
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 async function call(method: 'GET' | 'POST'): Promise<FillAnswer | FillStatus | null | undefined> {
@@ -57,7 +57,7 @@ export function useVaultFill() {
       const t = textRef.current
       if (!answer.ran) return
       for (const [source, p] of Object.entries(answer.platforms)) {
-        if (p?.state === 'error') notify.error(t.toast.vaultFailed.replace('{platform}', NAMES[source as GameSource]))
+        if (p?.state === 'error') notify.error(t.toast.vaultFailed.replace('{platform}', PLATFORM_NAME[source as GameSource]))
       }
       if (answer.finished) {
         const level = levelOf(answer.points)

@@ -5,6 +5,7 @@ import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useRaLinked } from '@/hooks/useRaLinked'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
+import { raGameId } from '@/utils/gameRef'
 
 type ValidCategory = 'wantToPlay' | 'playing' | 'completed'
 
@@ -70,7 +71,7 @@ export function useGamesByCategory(category: string, consoleId?: string) {
   // Games the user hid from their lists stay out of every list.
   const { isHidden } = useHiddenGames()
   const visible = useMemo(
-    () => games.filter((g) => !isHidden('GameID' in g && g.GameID ? g.GameID : (g as WantToPlayGame).ID, 'ra')),
+    () => games.filter((g) => !isHidden(raGameId(g), 'ra')),
     [games, isHidden],
   )
 

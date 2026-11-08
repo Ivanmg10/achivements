@@ -48,6 +48,7 @@ import LibraryLayoutToggle, { type LibraryLayout } from '@/components/library-la
 import LibraryPlatformTabs, { PLATFORM_TABS_ID, type PlatformChoice } from '@/components/library-platform-tabs/LibraryPlatformTabs'
 import { tabIds } from '@/components/ui/Tabs'
 import { countBySource } from '@/utils/libraryShelves'
+import { raGameId } from '@/utils/gameRef'
 
 export default function CategoryPage() {
   const { category } = useParams()
@@ -142,7 +143,7 @@ export default function CategoryPage() {
         mixed
           ? mixedEntries
           : [
-              ...searchedGames.map((g) => raProgress(g, extraData.get('GameID' in g && g.GameID ? g.GameID : (g as { ID: number }).ID))),
+              ...searchedGames.map((g) => raProgress(g, extraData.get(raGameId(g)))),
               ...searchedSteam.map(steamProgress),
               ...searchedPsn.map(psnProgress),
               ...searchedXbox.map(xboxProgress),
@@ -151,7 +152,7 @@ export default function CategoryPage() {
     [mixed, mixedEntries, searchedGames, searchedSteam, searchedPsn, searchedXbox, extraData],
   )
   const visibleGames = useMemo(
-    () => searchedGames.filter((g) => matchesQuick(raProgress(g, extraData.get('GameID' in g && g.GameID ? g.GameID : (g as { ID: number }).ID)), quick)),
+    () => searchedGames.filter((g) => matchesQuick(raProgress(g, extraData.get(raGameId(g))), quick)),
     [searchedGames, extraData, quick],
   )
   const steamGames = useMemo(() => searchedSteam.filter((g) => matchesQuick(steamProgress(g), quick)), [searchedSteam, quick])

@@ -6,7 +6,7 @@ import { IconFolders, IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { FriendOverview } from '@/utils/friends'
 import { candidateIconUrl } from '@/utils/gameCandidates'
-import { gameHref } from '@/utils/gameRef'
+import { gameHref, GAME_SOURCES } from '@/utils/gameRef'
 import UserSummary from '@/components/user-summary/UserSummary'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 
@@ -17,7 +17,7 @@ import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
  */
 export default function MainPageFriendsCard({ friend, week }: { friend: FriendOverview; week: number | null }) {
   const { T, lang } = useLanguage()
-  const favorites = (['ra', 'steam', 'psn', 'xbox'] as const)
+  const favorites = GAME_SOURCES
     .map((source) => ({ source, game: friend.favorites?.[source] ?? null }))
     .filter((f) => f.game !== null)
 

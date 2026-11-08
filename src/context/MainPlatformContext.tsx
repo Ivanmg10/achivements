@@ -7,9 +7,9 @@ import { useSubject } from '@/context/SubjectContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
+import { GAME_SOURCES } from '@/utils/gameRef'
 
 export type MainPlatform = 'ra' | 'steam' | 'psn' | 'xbox'
-const PLATFORMS: readonly MainPlatform[] = ['ra', 'steam', 'psn', 'xbox']
 
 const MainPlatformContext = createContext<{
   platform: MainPlatform
@@ -30,14 +30,14 @@ const MainPlatformContext = createContext<{
 export function MainPlatformProvider({ children }: { children: React.ReactNode }) {
   // On someone else's page the tab is its own choice: it must not change the viewer's.
   const subject = useSubject()
-  const [stored, setPlatform] = useStoredChoice<MainPlatform>(subject ? 'public-profile-tab' : 'main-profile-tab', PLATFORMS, 'ra')
+  const [stored, setPlatform] = useStoredChoice<MainPlatform>(subject ? 'public-profile-tab' : 'main-profile-tab', GAME_SOURCES, 'ra')
   const raLinked = useRaLinked()
   // Linked comes from the session: reading it must not load the libraries on every route.
   const { isLinked: steamLinked } = useSteamGamesData({ passive: true })
   const { isLinked: psnLinked } = usePsnGamesData({ passive: true })
   const { isLinked: xboxLinked } = useXboxGamesData({ passive: true })
   const linked = useMemo(
-    () => PLATFORMS.filter((p) => (p === 'ra' ? raLinked : p === 'steam' ? steamLinked : p === 'psn' ? psnLinked : xboxLinked)),
+    () => GAME_SOURCES.filter((p) => (p === 'ra' ? raLinked : p === 'steam' ? steamLinked : p === 'psn' ? psnLinked : xboxLinked)),
     [raLinked, steamLinked, psnLinked, xboxLinked],
   )
   const platform: MainPlatform = linked.includes(stored) ? stored : linked[0] ?? 'ra'
