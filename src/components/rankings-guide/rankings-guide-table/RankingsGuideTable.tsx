@@ -11,21 +11,21 @@ export default function RankingsGuideTable({ head, rows, weights }: { head: [str
       <table className="w-full text-sm border-separate border-spacing-0">
         <thead>
           <tr>
-            <th scope="col" className="px-4 py-2.5 text-left text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]">{head[0]}</th>
-            {weights && <th scope="col" aria-hidden="true" className="shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)] w-1/3" />}
-            <th scope="col" className="px-4 py-2.5 text-right text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]">{head[1]}</th>
+            <th scope="col" className="px-4 py-2.5 text-left text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary shadow-hairline-b">{head[0]}</th>
+            {weights && <th scope="col" aria-hidden="true" className="shadow-hairline-b w-1/3" />}
+            <th scope="col" className="px-4 py-2.5 text-right text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary shadow-hairline-b">{head[1]}</th>
           </tr>
         </thead>
         <tbody>
           {rows.map(([label, value], i) => (
             <tr key={label}>
-              <td className="px-4 py-2.5 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.05)]">{label}</td>
+              <td className="px-4 py-2.5 shadow-hairline-b-soft">{label}</td>
               {weights && (
-                <td aria-hidden="true" className="px-2 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.05)]">
+                <td aria-hidden="true" className="px-2 shadow-hairline-b-soft">
                   <DataBar track share={Math.max(0.04, weights[i] ?? 0)} className="h-2" />
                 </td>
               )}
-              <td className="px-4 py-2.5 text-right text-base font-extrabold tabular-nums shadow-[inset_0_-1px_0_rgb(var(--ink)/0.05)]">{value}</td>
+              <td className="px-4 py-2.5 text-right text-base font-extrabold tabular-nums shadow-hairline-b-soft">{value}</td>
             </tr>
           ))}
         </tbody>

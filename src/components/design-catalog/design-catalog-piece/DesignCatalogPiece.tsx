@@ -24,7 +24,7 @@ export default function DesignCatalogPiece({ id, children }: { id: string; child
       {children}
 
       {(piece.props || piece.rules) && (
-        <footer className="grid gap-5 lg:grid-cols-2 pt-4 shadow-[inset_0_1px_0_rgb(var(--ink)/0.08)]">
+        <footer className="grid gap-5 lg:grid-cols-2 pt-4 shadow-hairline-t">
           {piece.props && (
             <dl className="flex flex-col gap-2">
               <Kicker as="dt" size="sm">Props and options</Kicker>

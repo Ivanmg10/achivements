@@ -143,7 +143,7 @@ function CommentRow({ comment, last }: { comment: GameComment; last: boolean }) 
   })
 
   return (
-    <div className={`flex items-start gap-3 py-3 ${last ? '' : 'shadow-[inset_0_-1px_0_rgb(var(--ink)/0.06)]'}`}>
+    <div className={`flex items-start gap-3 py-3 ${last ? '' : 'shadow-hairline-b-soft'}`}>
       <Link
         href={`https://retroachievements.org/user/${encodeURIComponent(comment.User)}`}
         target="_blank"

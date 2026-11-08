@@ -21,7 +21,7 @@ export default function RankingsRouteSkeleton() {
           <p className="text-sm sm:text-[0.9375rem] text-text-secondary">{T.rankings.intro}</p>
         </header>
 
-        <div aria-hidden="true" className="flex flex-col lg:flex-row lg:items-end gap-3 lg:gap-3.5 lg:shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]">
+        <div aria-hidden="true" className="flex flex-col lg:flex-row lg:items-end gap-3 lg:gap-3.5 lg:shadow-hairline-b">
           <Skeleton className="if-signed-in h-11 lg:h-[50px] w-56 max-w-full" />
           <span className="if-signed-out hidden lg:block h-[50px]" />
           <div className="flex flex-wrap items-center content-start gap-x-2 gap-y-1 lg:ml-auto lg:mb-1.5 min-h-[136px] lg:min-h-0">

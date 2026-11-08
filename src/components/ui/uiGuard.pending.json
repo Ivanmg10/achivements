@@ -11,23 +11,6 @@
     "components/route-error/route-error-card/RouteErrorCard.tsx",
     "components/statusGameList/StatusGameItem.tsx"
   ],
-  "hairline": [
-    "components/design-catalog/design-catalog-piece/DesignCatalogPiece.tsx",
-    "components/game-info-comments/GameInfoComments.tsx",
-    "components/game-info-skeleton/game-info-skeleton-table/GameInfoSkeletonTable.tsx",
-    "components/groups/group-toolbar/GroupToolbar.tsx",
-    "components/main-page/main-page-profile/main-page-profile-tabs/MainPageProfileTabs.tsx",
-    "components/rankings-guide/rankings-guide-table/RankingsGuideTable.tsx",
-    "components/rankings-page/rankings-page-skeleton/RankingsPageSkeleton.tsx",
-    "components/rankings-page/rankings-page-skeleton/RankingsRouteSkeleton.tsx",
-    "components/rankings-page/rankings-page-table/RankingsPageTable.tsx",
-    "components/rankings-page/rankings-page-toolbar/RankingsPageToolbar.tsx",
-    "components/search-modal/SearchModal.tsx"
-  ],
-  "sunken": [
-    "components/main-header/MainHeader.tsx",
-    "components/user-page/profile-field/ProfileField.tsx"
-  ],
   "hex": [
     "components/achivements-line-chart/achivements-line-chart-tooltip/AchivementsLineChartTooltip.tsx",
     "components/admin-panel/admin-linked-accounts/AdminLinkedAccounts.tsx",

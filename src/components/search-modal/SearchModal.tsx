@@ -129,7 +129,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   return (
     <Modal isOpen={isOpen} onClose={onClose} placement="top" size="lg" flush showClose={false} aria-label={T.search.placeholder} className="gap-0">
       {/* The box */}
-      <div className="flex items-center gap-3 h-[3.75rem] px-[1.125rem] shadow-[inset_0_-1px_0_rgb(var(--ink)/0.08)]">
+      <div className="flex items-center gap-3 h-[3.75rem] px-[1.125rem] shadow-hairline-b">
         <IconSearch className="w-5 h-5 text-accent shrink-0" aria-hidden />
         <input
           ref={inputRef}
@@ -210,7 +210,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
         )}
       </div>
 
-      <div className="flex items-center px-[1.125rem] py-2.5 shadow-[inset_0_1px_0_rgb(var(--ink)/0.08)] text-xs text-text-secondary">
+      <div className="flex items-center px-[1.125rem] py-2.5 shadow-hairline-t text-xs text-text-secondary">
         {T.search.searchesIn.replace('{platforms}', platformList)}
       </div>
     </Modal>

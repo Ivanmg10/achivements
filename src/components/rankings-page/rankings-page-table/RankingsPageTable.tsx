@@ -9,8 +9,8 @@ import RankingsPageUser from '../rankings-page-user/RankingsPageUser'
 import RankingsPageDelta from '../rankings-page-delta/RankingsPageDelta'
 import RankingsPageStreak from '../rankings-page-streak/RankingsPageStreak'
 
-const TH = 'px-3 py-2.5 text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary text-left shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)] whitespace-nowrap'
-const TD = 'px-3 py-3 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.05)] align-middle'
+const TH = 'px-3 py-2.5 text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary text-left shadow-hairline-b whitespace-nowrap'
+const TD = 'px-3 py-3 shadow-hairline-b-soft align-middle'
 
 /**
  * The rankings as a table (from md up): place, who with their level, then their
