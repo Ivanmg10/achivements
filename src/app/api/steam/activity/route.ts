@@ -5,6 +5,7 @@ import { withSteamCache, TTL } from '@/lib/steamCache'
 import { loadActivityAchievements } from '@/lib/steamRecentAchievements'
 import { parseSteamLanguage } from '@/utils/steamLanguage'
 import { cachedJson } from '@/lib/httpCache'
+import { visibleGamesForUser } from '@/lib/gameVisibility'
 import type { SteamRecentAchievement } from '@/types/steam'
 
 /** Every Steam unlock of the last 60 days — the main page's activity charts in Steam mode. */
@@ -22,7 +23,8 @@ export async function GET(req: NextRequest) {
       { userId: id },
     )
     // Not browser-cached, like the other Steam lists; the DB cache keeps it cheap.
-    return cachedJson(achievements, 0)
+    const visible = await visibleGamesForUser(id, achievements, 'steam', (achievement) => achievement.appId)
+    return cachedJson(visible, 0)
   } catch (err) {
     console.error('[steam/activity]', err)
     return steamFailure(err)
