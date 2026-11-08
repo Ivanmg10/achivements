@@ -1,4 +1,5 @@
 import { slantStyle } from '@/components/ui/shape'
+import Kicker from '@/components/ui/Kicker'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
 import DesignCatalogEntrances from '../design-catalog-entrances/DesignCatalogEntrances'
 
@@ -53,13 +54,25 @@ export default function DesignCatalogFoundations() {
         <Panel>
           <p className="font-display italic font-extrabold text-6xl leading-[0.9] pr-2">Display 72</p>
           <p className="font-display italic font-extrabold text-4xl leading-[0.95] pr-2">Display 40 — a section title</p>
-          <p className="text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-accent">Kicker, uppercase, tracked</p>
+          <Kicker tone="accent" size="md">Kicker, uppercase, tracked</Kicker>
           <div className="grid gap-1 sm:grid-cols-2">
             {([400, 500, 600, 700, 800] as const).map((w) => (
               <p key={w} style={{ fontWeight: w }} className="text-lg">Barlow {w} — Ultimate Spider-Man</p>
             ))}
             <p className="text-2xl font-extrabold tabular-nums">143.820 <span className="text-sm font-normal text-text-secondary">tabular figures</span></p>
           </div>
+        </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="kicker">
+        <Panel>
+          {(['xs', 'sm', 'md'] as const).map((size) => (
+            <Specimen key={size} name={`size ${size} · muted · accent · danger`}>
+              <Kicker as="span" size={size}>Last 7 days</Kicker>
+              <Kicker as="span" size={size} tone="accent">Step 2 of 8</Kicker>
+              <Kicker as="span" size={size} tone="danger">Failed to load</Kicker>
+            </Specimen>
+          ))}
         </Panel>
       </DesignCatalogPiece>
 

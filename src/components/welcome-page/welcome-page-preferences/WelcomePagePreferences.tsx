@@ -14,7 +14,8 @@ import WelcomePageStep from '@/components/welcome-page/welcome-page-step/Welcome
 import WelcomePageIntroPerk from '@/components/welcome-page/welcome-page-intro-perk/WelcomePageIntroPerk'
 import WelcomePagePreferencesDetail from '@/components/welcome-page/welcome-page-preferences-detail/WelcomePagePreferencesDetail'
 import WelcomePagePreferencesChoice from '@/components/welcome-page/welcome-page-preferences-choice/WelcomePagePreferencesChoice'
-import { PRIMARY_BUTTON, SECONDARY_BUTTON, SECTION_LABEL } from '@/components/welcome-page/welcomeArt'
+import { PRIMARY_BUTTON, SECONDARY_BUTTON } from '@/components/welcome-page/welcomeArt'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * How the app reads and looks, each choice shown on the spot on the same sample
@@ -89,7 +90,7 @@ export default function WelcomePagePreferences({
           focusTitle={focusTitle && !settled}
           stage={
             <>
-              <span className={`${SECTION_LABEL} hidden lg:block mb-2`}>{t.preview}</span>
+              <Kicker as="span" size="md" className="hidden lg:block mb-2">{t.preview}</Kicker>
               <div className="h-56 lg:h-[clamp(13rem,calc(100dvh-27.5rem),34rem)] shadow-2xl shadow-black/30 rounded-card">{sample}</div>
             </>
           }

@@ -2,6 +2,7 @@
 
 import { IconRefresh } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import Kicker from './Kicker'
 
 export function SectionFallback({
   error,
@@ -21,7 +22,7 @@ export function SectionFallback({
         {children}
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary" role="alert">{T.charts.failedToLoad}</p>
+        <Kicker role="alert">{T.charts.failedToLoad}</Kicker>
         <button
           onClick={onRefresh}
           className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-bg-main border border-accent/30 text-text-main rounded-chip hover:bg-accent/10 transition-colors focus-ring"

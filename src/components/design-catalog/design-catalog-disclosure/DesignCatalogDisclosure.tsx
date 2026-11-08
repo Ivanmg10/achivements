@@ -6,6 +6,7 @@ import AccordionItem from '@/components/ui/Accordion'
 import ShowMore from '@/components/ui/ShowMore'
 import ToggleButton from '@/components/ui/ToggleButton'
 import Shelf from '@/components/ui/Shelf'
+import SectionHead from '@/components/ui/SectionHead'
 import DropSlot from '@/components/ui/DropSlot'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
 
@@ -56,6 +57,12 @@ export default function DesignCatalogDisclosure() {
       </DesignCatalogPiece>
       <DesignCatalogPiece id="show-more"><Compare><ShowMoreDemo /></Compare></DesignCatalogPiece>
       <DesignCatalogPiece id="toggle-button"><Panel><ToggleDemo /></Panel></DesignCatalogPiece>
+      <DesignCatalogPiece id="section-head">
+        <Panel>
+          <SectionHead title="Keep playing" hint="The games with something left" aside="12 games" />
+          <SectionHead size="lg" as="h3" title="Best streaks" aside="5 streaks · 8 days on average" />
+        </Panel>
+      </DesignCatalogPiece>
       <DesignCatalogPiece id="shelf">
         <Panel>
           <Shelf title="Keep playing" hint="The games with something left">

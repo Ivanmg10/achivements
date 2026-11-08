@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { plural } from '@/utils/utils'
-import StreakSectionHead from '../streak-section-head/StreakSectionHead'
+import SectionHead from '@/components/ui/SectionHead'
 import { slantStyle } from '@/components/ui/shape'
 import { formatDay } from '@/utils/dates'
 
@@ -18,7 +18,7 @@ export default function StreakWeekdays({ counts }: { counts: number[] }) {
 
   return (
     <section aria-labelledby="streak-weekdays-title" className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-4 h-full">
-      <StreakSectionHead id="streak-weekdays-title" title={T.streak.weekdaysTitle} aside={T.streak.weekdaysSub} />
+      <SectionHead size="lg" id="streak-weekdays-title" title={T.streak.weekdaysTitle} aside={T.streak.weekdaysSub} />
       <ul className="flex items-end gap-2 flex-1" style={{ minHeight: BAR_HEIGHT + 40 }}>
         {counts.map((n, i) => (
           <li key={WEEK[i]} className="flex-1 flex flex-col items-center gap-1.5 min-w-0">

@@ -3,7 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { Streak } from '@/types/types'
 import { decimal, plural } from '@/utils/utils'
-import StreakSectionHead from '../streak-section-head/StreakSectionHead'
+import SectionHead from '@/components/ui/SectionHead'
 import { slantStyle } from '@/components/ui/shape'
 import { streakInk, streakTier } from '@/utils/streakTier'
 import { formatDay } from '@/utils/dates'
@@ -36,7 +36,8 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
 
   return (
     <section aria-labelledby="streak-best-title" className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-3 h-full">
-      <StreakSectionHead
+      <SectionHead
+        size="lg"
         id="streak-best-title"
         title={T.streak.chartTitle}
         aside={T.streak.bestSub.replace('{n}', String(streaks.length)).replace('{avg}', `${decimal(avgStreak, lang)} ${T.streak.daysUnit}`)}

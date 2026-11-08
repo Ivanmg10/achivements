@@ -3,7 +3,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { slantStyle } from '@/components/ui/shape'
 import type { Streak } from '@/types/types'
 import { plural } from '@/utils/utils'
-import StreakSectionHead from '../streak-section-head/StreakSectionHead'
+import SectionHead from '@/components/ui/SectionHead'
 import { localDay, daysBetween, formatDay } from '@/utils/dates'
 
 const WEEKS = 53
@@ -57,7 +57,8 @@ export default function StreakYearHeatmap({
 
   return (
     <section aria-labelledby="streak-year-title" className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-3 min-w-0">
-      <StreakSectionHead
+      <SectionHead
+        size="lg"
         id="streak-year-title"
         title={T.streak.yearTitle}
         aside={T.streak.yearSub.replace('{n}', Object.values(byDay).filter((n) => n > 0).length.toLocaleString(lang))}

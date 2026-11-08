@@ -7,7 +7,7 @@ import { useUserAwards } from '@/hooks/useUserAwards'
 import { plural } from '@/utils/utils'
 import StreakDayRow from '../streak-day-row/StreakDayRow'
 import StreakDayStrip from '../streak-day-strip/StreakDayStrip'
-import StreakSectionHead from '../streak-section-head/StreakSectionHead'
+import SectionHead from '@/components/ui/SectionHead'
 import { utcDay } from '@/utils/dates'
 
 const COMPLETION_TYPES = new Set(['Mastery/Completion', 'Game Beaten'])
@@ -63,7 +63,8 @@ export default function StreakList({ selectedStreak, today }: { selectedStreak: 
 
   return (
     <section aria-labelledby="streak-days-title" className="flex-1 bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-4">
-      <StreakSectionHead
+      <SectionHead
+        size="lg"
         id="streak-days-title"
         title={T.streak.listTitle}
         aside={`${plural(selectedStreak.days, T.plurals.days, lang)} · ${T.streak.calendarHint}`}

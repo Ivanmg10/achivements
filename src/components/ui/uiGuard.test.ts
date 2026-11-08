@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import PENDING from './uiGuard.pending.json'
 
 /**
  * The library is the only way to draw its pieces: these fail when one is
@@ -22,6 +23,18 @@ const FILES = sources(SRC).map((file) => ({ file: path.relative(SRC, file), text
 
 function offenders(pattern: RegExp) {
   return FILES.filter(({ text }) => pattern.test(text)).map(({ file }) => file)
+}
+
+/**
+ * A rule added in #120 starts with the files still drawing the piece by hand (`uiGuard.pending.json`).
+ * The list only shrinks: a file that no longer offends must leave it, and no new file may join
+ * (docs/worklog.md, #120 → Open, says how to empty each list).
+ */
+function newOffenders(rule: keyof typeof PENDING, pattern: RegExp) {
+  const found = offenders(pattern).map((f) => f.split(path.sep).join('/'))
+  const pending: string[] = PENDING[rule]
+  expect({ rule, migrated: pending.filter((f) => !found.includes(f)) }).toEqual({ rule, migrated: [] })
+  return found.filter((f) => !pending.includes(f))
 }
 
 test('primary buttons come from Button / buttonClass', () => {
@@ -134,4 +147,14 @@ test('an entrance is CSS (globals.css → .enter-*), never Framer', () => {
 
 test('a disclosure and a show-more button come from the library (Accordion, ShowMore)', () => {
   expect(offenders(/aria-expanded=\{[^}]*\}[\s\S]{0,400}IconPlus/)).toEqual([])
+})
+
+// The rules added with #120 (docs/audits/antislop-v17.md, X2 and T-05/T-06). Each pattern is also what the
+// next migration greps for.
+const NEW_RULES = {
+  kicker: /["'`][^"'`]*(?:\buppercase\b[^"'`]*\btracking-|\btracking-[^"'`]*\buppercase\b)/,
+}
+
+test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
+  expect(newOffenders('kicker', NEW_RULES.kicker)).toEqual([])
 })
