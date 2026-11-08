@@ -57,8 +57,9 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   | `shadow-sunken` | what you type into, below the card | `shadow-[inset_0_2px_4px_rgb(0_0_0/0.22)]` |
   | `drop-shadow-done` | the one glow: a finished bar or ring | `filter: drop-shadow(0 0 6px …)` |
   | `text-/bg-/ring-` `ra`, `ra-gold`, `steam`, `steam-dark`, `steam-perfect`, `psn`, `psn-dark`, `xbox`, `platinum` | a platform's own colour, the same in every theme (`/10` and the rest work) | `#66c0f4`, `#0070d1`, `#107c10`… and `sky-300` for a platinum |
+  | `silver`, `silver-light`, `silver-ink`, `gold-ink`, `bronze-ink`, `hardcore-deep`, `offline`, `status-playing`, `status-want` (and `-bg`), `status-done-bg`, `redump`, `tosec` (and `-ink`), `best-period` (and `-soft`), `console-<name>` (and `-ink`), `award-*`, `steam-button`, `steam-slate`, `steam-night`, `steam-sky`, `psn-night`, `psn-light`, `xbox-dark`, `art-pink`, `art-cyan` | the hues that are not a theme's, in the exact values the palette classes gave them (2026-11-08) | `zinc-400`, `blue-900/50`, `violet-300`, `#171a21`… |
 
-  In an inline style (an SVG stroke, a ring colour passed as a value) use `var(--color-steam)`.
+  In an inline style (an SVG stroke, a ring colour passed as a value) use `var(--color-steam)`. What stays a literal hex, on the guard's `OWN_COLOURS` list with its reason in the test: the logo and the server-drawn pictures, the RA guide's drawing of RetroAchievements' own page, the welcome curtain's ink, and the browser bar's `THEME_COLOR`.
 - **Shapes come from tokens.** A bar's cut ends are `slantStyle(px)`
   (`ui/shape.ts`); a mark's lean is `skew-y-(--slant-mark)`; a control's slant is
   `skew-x-(--slant-button)`. Never a literal. The welcome curtain's fixed `polygon(...)`

@@ -73,8 +73,9 @@ list in `src/components/ui/uiGuard.pending.json` is the work. **Migrate a file, 
 fails while a migrated file is still listed. Empty every list, then delete `uiGuard.pending.json` and turn
 `newOffenders` back into plain `offenders`** (it takes a third argument, the files that stay on purpose, and tolerates a rule with no list). Never add a file to a list. Look at each screen in both designs
 (`/design` → the header's Slanted / Rounded) before and after.
-**Points 1–9 are done on `feat/120-library-pieces-2` (2026-11-08), one commit per rule; what is left of each is named. The
-lists for `focusRing`, `hairline`, `sunken`, `hex`, `palette`, `sideRadius` and `variants` (10–13) are the next agent's.**
+**Points 1–9 are done on `feat/120-library-pieces-2` and 10–13 on `feat/120-library-pieces-3` (2026-11-08), one commit per rule
+(10–13: per block); what is left of each is named. `uiGuard.pending.json` now holds only `kicker` (3) and `tag` (5), the
+leftovers named in points 1 and 2; the rest of the file's mechanism stays until those two are empty.**
 1. DONE `kicker` (86 files → 3): 81 moved to `Kicker` (or `kickerClass()` on a `label`, a link, a `motion.p`, a `const`).
    `Kicker` got the tones `warning` and `inherit` (the colour is the caller's: a tier, a label on a picture). The four
    table heads (`SortableHeader`, `RankingsGuide`, `RankingsGuideTable`, `RankingsPageTable`) and `PublicUserHero`'s "your
@@ -113,23 +114,28 @@ lists for `focusRing`, `hairline`, `sunken`, `hex`, `palette`, `sideRadius` and 
    `LayoutModal` was already a `Modal`: its `closest('[role="dialog"]')` is spelled `[role=dialog]`. The seven modals that wrapped
    `Modal` in `createPortal` dropped the wrapper. The four achievement grids use the new `ui/CursorTooltip`. `WelcomeCurtain` is
    `allowed`. `SearchModal` left the `variants` list on its own.
-10. `focusRing` (144): the three classes → `focus-ring`. Mechanical (sed), but keep any `ring-inset`,
-   `ring-offset-*` or `rounded` the string had beside it.
-11. `hairline` (11), `sunken` (2): `shadow-[inset_0_±1px_0_rgb(var(--ink)/…)]` → `shadow-hairline-t/-b` (0.08–0.1)
-   or `shadow-hairline-b-soft` (0.05); the sunken strings → `shadow-sunken`.
-12. `hex` (62), `palette` (17): platform hex → the tokens (`text-[#66c0f4]` → `text-steam`, `bg-[#0070d1]/40` →
-   `bg-psn/40`, `#a4d007` → `steam-perfect`, `#e5b53f` → `ra-gold`, `#2a80c7` → `ra`, `#003791` → `psn-dark`,
-   `#1b2838` → `steam-dark`), `sky-300` → `platinum`. *Traps:* in a `style` or an SVG attribute use
-   `var(--color-steam)`; `zinc-400` / `purple-*` / `blue-*` in the PSN trophy grades and the console colours of
-   `constants/index.ts`, `psnTitles.ts`, `xboxTitles.ts` are their own hues: give them tokens (`--color-silver`…)
-   rather than a theme colour; non-platform hexes (`#0f1014`, `#17181e`…) are usually theme colours
-   (`bg-bg-main`…): check the theme before replacing.
-13. `sideRadius` (1): `LibraryShelfCard`'s `rounded-t-2xl` → `rounded-t-card`. `variants` (3): `SearchModal`
-   (point 9), `AuthPage`, `LibraryGameDetail`: if it opens on a click, move it to an `allowed` list with the reason;
-   if it is an entrance, make it CSS (`.enter-*`).
+10. DONE `focusRing` (143 → 0): the three classes are `focus-ring` in 143 files (a plain replace; none had `ring-inset` or
+   `ring-offset-*` inside the string, so none moved).
+11. DONE `hairline` (11 → 0), `sunken` (2 → 0): 0.08, 0.1 → `shadow-hairline-t/-b`, 0.05 and the comments' 0.06 →
+   `-b-soft`, the two 0.22 insets → `shadow-sunken` (`MainHeader`, `ProfileField`). The tabs' and search modal's 0.08 moved up 2 %.
+12. DONE `hex` (58 → 0, three `allowed`) and `palette` (14 → 0), 70 files. Platform hexes → `steam`, `psn`,
+   `xbox`, `steam-perfect`, `ra-gold`, `ra`, `steam-dark`, `psn-dark`; a `ring="#0070d1"` prop → `ring="var(--color-psn)"`; the
+   welcome's gradients (`welcomeArt.ts`, `WelcomePageIntroArt`) use `var(--color-…)`. **Tokens added** (`globals.css`, all
+   in the exact value the palette class had, as oklch; in the catalogue's Colour section and `docs/design-system.md`):
+   `silver`, `silver-light`, `silver-ink`, `gold-ink`, `bronze-ink` (PSN silver, medals), `hardcore-deep`, `offline`,
+   `status-playing|want` (+ `-bg`), `status-done-bg`, `redump`/`tosec` (+ `-ink`), `best-period` (+ `-soft`), the 13 consoles
+   `console-<name>` (+ `-ink`; NDS and N64 keep `text-warning` / `text-hardcore`), `award-mastered|completed|beaten-hardcore|beaten-softcore`
+   (the four hexes of `MasteryMix`), `steam-button`, `steam-slate`, `steam-night`, `steam-sky`, `psn-night`, `psn-light`, `xbox-dark`,
+   `art-pink`, `art-cyan`. `sky-300` → `platinum`, `zinc-400` → `silver`. *`allowed` for `hex`* (the reason is in the test): the RA guide
+   (a drawing of RetroAchievements' own dark page), `WelcomeCurtain` (its ink on the white badge) and `lib/siteUrl.ts` (`THEME_COLOR`,
+   the browser bar, read before a theme exists). *Left:* `GameHashesModal` and `AchievementModal` are still on the `kicker` / `tag`
+   lists (their palette hues are tokens now).
+13. DONE `sideRadius` (1 → 0): `LibraryShelfCard`'s banner is `rounded-t-card` (1.25 rem, as its card; was 1 rem in the slanted
+   design). `variants` (2 → 0, two `allowed`): `AuthPage` swaps its forms on a click and `LibraryGameDetail`'s panels come in when a
+   card is opened: both are a click's (CLAUDE.md → Entrances), not a load's.
 14. Not in #120, seen on the way: `SURFACE` spelled out by hand (C-05, 38 files) and the hand-drawn icon buttons
    (C-06) have no rule yet.
-**Watch out** — There is no script to regenerate the lists, on purpose: they only shrink, by hand. A
+**Watch out** — A token used only as a utility is inlined by `@theme inline`; the `--color-*` variable is in the CSS only if something reads it with `var(...)` (checked in the build output). There is no script to regenerate the lists, on purpose: they only shrink, by hand. A
 rule's text in `catalogue.ts` must not match its own regex (two did, and were reworded). `Avatar`'s `ring` is a
 class on purpose (a highlight, like `PresenceDot`'s), the one exception to "className is layout". The phone menu
 keeps `router.push` buttons (its tests expect them); making them links is #121's dialog pass.
