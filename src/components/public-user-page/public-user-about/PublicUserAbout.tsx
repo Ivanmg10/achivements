@@ -7,16 +7,16 @@ import { IconFolders, IconGenderBigender, IconPalette } from '@tabler/icons-reac
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import type { CheevoUser } from '@/hooks/useCheevoUser'
-import type { GameSource } from '@/types/steam'
 import { isTheme } from '@/types/types'
 import { candidateIconUrl } from '@/utils/gameCandidates'
-import { gameHref } from '@/utils/gameRef'
+import { gameHref, GAME_SOURCES } from '@/utils/gameRef'
 import GroupCard from '@/components/groups/group-card/GroupCard'
 import EmptyState from '@/components/empty-state/EmptyState'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
+import type { GameSource } from '@/types/game'
 
 const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
 
@@ -48,7 +48,7 @@ function Fact({ icon, label, children }: { icon: ReactNode; label: string; child
 export default function PublicUserAbout({ user }: { user: CheevoUser }) {
   const { T } = useLanguage()
   const subject = useSubject()
-  const favorites = (['ra', 'steam', 'psn', 'xbox'] as const)
+  const favorites = GAME_SOURCES
     .map((source) => ({ source, game: user.favorites?.[source] ?? null }))
     .filter((f) => f.game !== null)
   // An account can still hold a theme that was removed: no row, never its raw id.

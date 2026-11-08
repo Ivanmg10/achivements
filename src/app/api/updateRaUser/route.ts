@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { requireSession } from '@/lib/apiAuth'
 import pool from "@/lib/db";
-import { authOptions } from "@/lib/authOptions";
 import { fetchRaProfile, validRaCredentials, type RaProfileResult } from "@/lib/raProfile";
 import { sealRaKey } from "@/lib/raKey";
 import { forgetUser } from "@/lib/userRecord";
@@ -13,10 +12,8 @@ function refused(result: Extract<RaProfileResult, { ok: false }>) {
 
 /** Links an RA account: { username, apiKey }. Answers with the profile RA returned. */
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = await requireSession({ error: 'Unauthorized' })
+  if (!auth.ok) return auth.response
 
   const body = await req.json().catch(() => null);
   const { username, apiKey } = (body ?? {}) as { username?: unknown; apiKey?: unknown };
@@ -32,7 +29,7 @@ export async function POST(req: Request) {
     const { sealed, hash } = sealRaKey((apiKey as string).trim());
     await pool.query(
       `UPDATE users SET "raUser" = $1, rausername = $2, raid = $3, raid_hash = $4 WHERE id = $5`,
-      [JSON.stringify(profile), profile.User, sealed, hash, session.user.id],
+      [JSON.stringify(profile), profile.User, sealed, hash, auth.id],
     );
   } catch (err) {
     // raid is unique: the same key already links another account here.
@@ -42,19 +39,17 @@ export async function POST(req: Request) {
     console.error("[updateRaUser POST]", err);
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
-  forgetUser(session.user.id);
-  await onPlatformLinked(Number(session.user.id), "ra");
+  forgetUser(auth.id);
+  await onPlatformLinked(Number(auth.id), "ra");
 
   return NextResponse.json(profile);
 }
 
 /** Refreshes the stored RA profile (points, picture…) with the linked username and key. */
 export async function PUT() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const { rausername, raid } = session.user;
+  const auth = await requireSession({ error: 'Unauthorized' })
+  if (!auth.ok) return auth.response
+  const { rausername, raid } = auth.user;
   if (!rausername || !raid) {
     return NextResponse.json({ error: "No RA account linked" }, { status: 400 });
   }
@@ -65,13 +60,13 @@ export async function PUT() {
   try {
     await pool.query(`UPDATE users SET "raUser" = $1 WHERE id = $2`, [
       JSON.stringify(fetched.profile),
-      session.user.id,
+      auth.id,
     ]);
   } catch (err) {
     console.error("[updateRaUser PUT]", err);
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
-  forgetUser(session.user.id);
+  forgetUser(auth.id);
 
   return NextResponse.json(fetched.profile);
 }

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
+import type { GameStatus } from '@/types/game'
 import { CategoryGame } from '@/hooks/useGamesByCategory'
 import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import StatusGameList from '@/components/statusGameList/StatusGameList'
@@ -12,9 +13,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
-type Category = 'wantToPlay' | 'playing' | 'completed'
-
-const CATEGORY_META: Record<Category, { icon: string; badge: string }> = {
+const CATEGORY_META: Record<GameStatus, { icon: string; badge: string }> = {
   wantToPlay: { icon: '🔖', badge: 'bg-purple-900/50 text-purple-300' },
   playing:    { icon: '🎮', badge: 'bg-blue-900/50   text-blue-300'   },
   completed:  { icon: '🏆', badge: 'bg-green-900/50  text-success'  },
@@ -26,7 +25,7 @@ export default function AllGamesSection({
   loading,
   extraData,
 }: {
-  category: Category
+  category: GameStatus
   games: CategoryGame[]
   loading: boolean
   extraData: Map<number, GameExtraData>

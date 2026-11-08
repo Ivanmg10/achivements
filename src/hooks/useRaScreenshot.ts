@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { raArt } from '@/lib/raArtStore'
+import { raImageUrl } from '@/utils/raAssets'
 
 /**
  * A screenshot of an RA game, wide like the art the other platforms give: its
@@ -16,7 +17,7 @@ export function useRaScreenshot(gameId: number | null): string | undefined {
     let cancelled = false
     raArt(gameId).then((art) => {
       const path = art?.title || art?.ingame
-      if (!cancelled) setShot({ id: gameId, url: path ? `https://retroachievements.org${path}` : undefined })
+      if (!cancelled) setShot({ id: gameId, url: raImageUrl(path) })
     })
     return () => {
       cancelled = true

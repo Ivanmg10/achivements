@@ -1,4 +1,4 @@
-import { daysBetween, formatDay } from './utils'
+import { daysBetween, formatDay } from './dates'
 
 test('every day of a range, both ends included, across a month boundary', () => {
   expect(daysBetween('2026-05-30', '2026-06-02')).toEqual(['2026-05-30', '2026-05-31', '2026-06-01', '2026-06-02'])

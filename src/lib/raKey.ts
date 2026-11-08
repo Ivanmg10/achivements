@@ -1,5 +1,5 @@
-import crypto from 'crypto'
 import { open, seal } from '@/lib/secretBox'
+import { appSecret, hmacHex } from '@/lib/secrets'
 
 /**
  * Users' RetroAchievements keys at rest: sealed, so the database alone does not
@@ -9,9 +9,7 @@ import { open, seal } from '@/lib/secretBox'
 const PURPOSE = 'ra-key'
 
 export function raKeyHash(key: string): string {
-  const secret = process.env.NEXTAUTH_SECRET
-  if (!secret) throw new Error('NEXTAUTH_SECRET is not configured')
-  return crypto.createHmac('sha256', `${secret}:${PURPOSE}:hash`).update(key).digest('hex')
+  return hmacHex(key, `${appSecret()}:${PURPOSE}:hash`)
 }
 
 export function sealRaKey(key: string): { sealed: string; hash: string } {

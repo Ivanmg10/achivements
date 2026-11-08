@@ -5,8 +5,8 @@ import { IconDeviceGamepad2 } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHiddenConsoles } from '@/hooks/useHiddenConsoles'
 import type { ConsoleOption } from '@/utils/consoleFilter'
-import type { GameSource } from '@/types/steam'
 import Checkbox from '@/components/ui/Checkbox'
+import type { GameSource } from '@/types/game'
 
 /**
  * Which consoles of one platform show up: a tick per console the library has,

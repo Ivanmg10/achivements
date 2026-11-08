@@ -7,11 +7,11 @@ import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
 import { RecentAchievement, UserAward } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { achievementBadgeUrl, formatDay, plural } from '@/utils/utils'
+import { achievementBadgeUrl, plural } from '@/utils/utils'
 import { gameHref } from '@/utils/gameRef'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import StreakCompletionCard from '../streak-completion-card/StreakCompletionCard'
-import { parseUnlockTime } from '@/utils/dates'
+import { parseUnlockTime, formatDay } from '@/utils/dates'
 
 // Downloaded the first time a day with more than fits is opened.
 const DayAchievementsModal = dynamic(() => import('@/components/day-achievements-modal/DayAchievementsModal'), { loading: () => null })

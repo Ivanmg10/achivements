@@ -6,7 +6,7 @@ import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import { useLanguage } from '@/context/LanguageContext'
 import { candidateIconUrl } from '@/utils/gameCandidates'
 import type { FavoriteGame } from '@/components/favorite-game-modal/FavoriteGameModal'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 function FavoriteValue({ game, source, empty }: { game: FavoriteGame | null; source: GameSource; empty: string }) {
   if (!game) return <span className="text-base text-text-secondary italic truncate">{empty}</span>

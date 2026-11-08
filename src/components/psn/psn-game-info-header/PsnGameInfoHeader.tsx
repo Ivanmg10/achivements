@@ -18,6 +18,7 @@ import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
+import { formatDate } from '@/utils/dates'
 
 /**
  * The top of a PSN game page, on the shared `GameHero` as RA's and Steam's.
@@ -42,7 +43,7 @@ export default function PsnGameInfoHeader({
   const hasPlatinum = game.defined.platinum > 0
 
   const date = (iso: string | null, utc = false) =>
-    iso ? new Date(iso).toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric', ...(utc && { timeZone: 'UTC' }) }) : null
+    iso ? formatDate(iso, lang, { day: 'numeric', month: 'short', year: 'numeric', ...(utc && { timeZone: 'UTC' }) }) : null
 
   return (
     <GameHero
@@ -103,7 +104,7 @@ export default function PsnGameInfoHeader({
       tiles={[
         { label: T.psn.trophies, value: game.numAwarded, of: game.maxPossible, done: isComplete },
         ...(game.playtimeMinutes !== null
-          ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang) }]
+          ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, T.steam, lang) }]
           : hasPlatinum
             ? [{ label: T.psn.platinum, value: game.earned.platinum > 0 ? T.psn.earned : T.psn.locked, done: game.earned.platinum > 0 }]
             : []),

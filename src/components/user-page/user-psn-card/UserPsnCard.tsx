@@ -34,7 +34,7 @@ export default function UserPsnCard() {
     platformStat(T.psn.level, summary?.trophyLevel, summaryOpts),
     platformStat(T.userStats.games, summary?.games, summaryOpts),
     platformStat(T.psn.platinum, earned?.platinum, { ...summaryOpts, accent: 'text-sky-300' }),
-    platformStat(T.steam.playtime, formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang), { lang, loading: libraryLoading }),
+    platformStat(T.steam.playtime, formatPlaytime(minutes, T.steam, lang), { lang, loading: libraryLoading }),
     platformStat(T.psn.trophies, earned ? countTrophies(earned) : undefined, summaryOpts),
   ]
 

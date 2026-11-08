@@ -22,7 +22,7 @@ export default function MainPageProfileXboxStats({
 }) {
   const { T, lang } = useLanguage()
   const minutes = totalXboxPlaytime(library)
-  const playtime = minutes === 0 ? '—' : formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)
+  const playtime = minutes === 0 ? '—' : formatPlaytime(minutes, T.steam, lang)
 
   return (
     <div className="grid grid-cols-2 gap-2">

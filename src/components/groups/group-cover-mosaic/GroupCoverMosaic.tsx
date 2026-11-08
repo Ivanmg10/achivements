@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import { IconFolder } from '@tabler/icons-react'
 import type { GameGroup } from '@/types/types'
-import type { GameSource } from '@/types/steam'
+import { raImageUrl } from '@/utils/raAssets'
+import type { GameSource } from '@/types/game'
 
 const isUrl = (s: string) => /^https?:\/\//i.test(s)
 
@@ -10,7 +11,7 @@ export function coverSrc(c: { source?: GameSource; image_icon: string | null }):
   if (!c.image_icon) return null
   return c.source === 'steam' || c.image_icon.startsWith('/api/') || isUrl(c.image_icon)
     ? c.image_icon
-    : `https://retroachievements.org${c.image_icon}`
+    : raImageUrl(c.image_icon) ?? null
 }
 
 // How the tile is split for 1 to 4 covers.

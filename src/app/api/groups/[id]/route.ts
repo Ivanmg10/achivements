@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { readGroupFields } from '@/utils/groupValidation'
 import { dbId } from '@/utils/dbId'
 import { canUseXbox } from '@/utils/xboxAccess'
+import { notHidden } from '@/lib/gameVisibility'
 
 async function ownsGroup(userId: string, groupId: number) {
   if (!Number.isInteger(groupId)) return false
@@ -44,7 +46,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       `SELECT i.id, i.source, i.game_id, i.title, i.image_icon, i.console_name, i.pct_won, i.num_awarded, i.max_possible, i.points_won, i.max_points, i.position, i.added_at, i.release_year
        FROM game_group_items i
        WHERE i.group_id = $1 AND ($2::boolean OR i.source <> 'xbox')
-         AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = $3 AND h.source = i.source AND h.game_id = i.game_id)
+         AND ${notHidden('i', '$3')}
        ORDER BY i.position ASC`,
       // Hidden items stay stored and return on unhide; public reads use the group owner's keys.
       [groupId, canUseXbox(session?.user?.admin), user_id],
@@ -62,12 +64,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id } = await params
     const groupId = dbId(id) ?? NaN
 
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    if (!(await ownsGroup(session.user.id, groupId))) {
+    if (!(await ownsGroup(auth.id, groupId))) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
     }
 
@@ -95,12 +95,10 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params
     const groupId = dbId(id) ?? NaN
 
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    if (!(await ownsGroup(session.user.id, groupId))) {
+    if (!(await ownsGroup(auth.id, groupId))) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
     }
 

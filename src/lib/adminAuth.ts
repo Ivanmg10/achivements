@@ -1,9 +1,9 @@
-import crypto from 'crypto'
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
 import { loadUser, passwordVersion } from '@/lib/userRecord'
+import { cookieFromHeader, hmacHex, sameHex } from '@/lib/secrets'
 
 /**
  * Admin access has two locks. Being admin is read from the database on every
@@ -20,19 +20,9 @@ export const ELEVATION_MS = 15 * 60 * 1000
 /** What the admin endpoints answer when the panel has to be unlocked again. */
 export const REAUTH_REQUIRED = 'reauth-required'
 
-function secret(): string {
-  const value = process.env.NEXTAUTH_SECRET
-  if (!value) throw new Error('NEXTAUTH_SECRET is not configured')
-  return value
-}
-
-function mac(payload: string): string {
-  return crypto.createHmac('sha256', secret()).update(payload).digest('hex')
-}
-
 export function signElevation(userId: string, pwv: string, expiresAt: number): string {
   const payload = `${userId}.${pwv}.${expiresAt}`
-  return `${payload}.${mac(payload)}`
+  return `${payload}.${hmacHex(payload)}`
 }
 
 /** Whether a cookie value is a live unlock for this admin and this password. */
@@ -42,22 +32,10 @@ export function verifyElevation(value: string | null, userId: string, pwv: strin
   if (parts.length !== 4) return false
   const [id, version, expiresRaw, signature] = parts
 
-  const given = Buffer.from(signature, 'hex')
-  const want = Buffer.from(mac(`${id}.${version}.${expiresRaw}`), 'hex')
-  if (given.length !== want.length || !crypto.timingSafeEqual(given, want)) return false
+  if (!sameHex(signature, hmacHex(`${id}.${version}.${expiresRaw}`))) return false
 
   const expiresAt = Number(expiresRaw)
   return id === userId && version === pwv && Number.isFinite(expiresAt) && expiresAt > now
-}
-
-/** One cookie out of a Cookie header. */
-export function readCookie(req: Request, name: string): string | null {
-  const header = req.headers.get('cookie') ?? ''
-  for (const part of header.split(';')) {
-    const [key, ...rest] = part.trim().split('=')
-    if (key === name) return decodeURIComponent(rest.join('='))
-  }
-  return null
 }
 
 /** Set-Cookie for an unlock (or, with no value, for ending it). Only the admin API ever sees it. */
@@ -89,7 +67,7 @@ export async function requireAdmin(req: Request): Promise<AdminResult> {
   const result = await requireAdminRole()
   if (!result.ok) return result
   const { admin } = result
-  if (!verifyElevation(readCookie(req, ELEVATION_COOKIE), admin.id, admin.pwv)) {
+  if (!verifyElevation(cookieFromHeader(req.headers.get('cookie'), ELEVATION_COOKIE), admin.id, admin.pwv)) {
     return { ok: false, response: NextResponse.json({ error: REAUTH_REQUIRED }, { status: 403 }) }
   }
   return result

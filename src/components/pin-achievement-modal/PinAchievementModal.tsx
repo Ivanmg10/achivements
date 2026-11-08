@@ -7,6 +7,7 @@ import { RetroAchievement } from '@/types/types'
 import { notify } from '@/lib/notify'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import Modal from '@/components/ui/Modal'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 export function PinAchievementModal({
   isOpen,
@@ -79,7 +80,7 @@ export function PinAchievementModal({
             >
               {a.BadgeName ? (
                 <Image
-                  src={`https://media.retroachievements.org/Badge/${a.BadgeName}.png`}
+                  src={raBadgeUrl(a.BadgeName)!}
                   alt={a.Title}
                   width={36}
                   height={36}

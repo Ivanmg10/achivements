@@ -1,5 +1,4 @@
 import {
-  cookieFromHeader,
   linkReturn,
   returnParams,
   stateCookie,
@@ -66,7 +65,6 @@ test('a link only returns to the pages it starts from', () => {
 
 test('the state cookie is only sent back to the callback', () => {
   expect(stateCookie('abc', true)).toBe('steam-state=abc; Path=/api/auth/steam/callback; HttpOnly; SameSite=Lax; Max-Age=600; Secure')
-  expect(cookieFromHeader('a=1; steam-state=abc', 'steam-state')).toBe('abc')
 })
 
 test('a confirmed answer gives the SteamID64, after asking Steam to check its signature', async () => {

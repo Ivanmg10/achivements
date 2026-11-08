@@ -6,6 +6,7 @@ import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { decimal } from '@/utils/utils'
 import { raTypeTag } from '@/components/ui/dataTable'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 export default function GameInfoAchievementCard({
   achievement,
@@ -50,7 +51,7 @@ export default function GameInfoAchievementCard({
       <div className="relative shrink-0">
         {achievement.BadgeName && (
           <FadeImage
-            src={`https://media.retroachievements.org/Badge/${achievement.BadgeName}.png`}
+            src={raBadgeUrl(achievement.BadgeName)!}
             alt=""
             width={56}
             height={56}

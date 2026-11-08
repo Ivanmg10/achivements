@@ -28,7 +28,7 @@ export default function UserSteamCard() {
     platformStat(T.steam.perfect, steam.perfect, { lang, loading, accent: 'text-success' }),
     platformStat(T.steam.achievements, steam.unlocked, { lang, loading }),
     platformStat(T.userStats.inProgress, steam.playing, { lang, loading }),
-    platformStat(T.steam.playtime, formatPlaytime(steam.totalMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang), { lang, loading }),
+    platformStat(T.steam.playtime, formatPlaytime(steam.totalMinutes, T.steam, lang), { lang, loading }),
   ]
 
   const handleUnlink = async () => {

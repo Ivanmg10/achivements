@@ -6,8 +6,9 @@ import { IconSparkles } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { FeedItem } from '@/utils/friends'
 import { gameHref } from '@/utils/gameRef'
-import { achievementBadgeUrl, relativeTime } from '@/utils/utils'
+import { achievementBadgeUrl } from '@/utils/utils'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { relativeTime } from '@/utils/dates'
 
 /** What the people you follow unlocked lately, all together and newest first; each opens their progress in that game. */
 export default function MainPageFriendsFeed({ items }: { items: FeedItem[] }) {

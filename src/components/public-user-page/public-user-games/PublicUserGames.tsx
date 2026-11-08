@@ -4,15 +4,16 @@ import { useId, useMemo, useState } from 'react'
 import { IconDeviceGamepad2, IconSearch } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
-import { filterLibrary, type LibraryGame, type LibraryStatus } from '@/utils/library'
-import { PLATFORM_NAME } from '@/utils/gameRef'
-import type { GameSource } from '@/types/steam'
+import { filterLibrary, type LibraryGame } from '@/utils/library'
+import { PLATFORM_NAME, GAME_SOURCES } from '@/utils/gameRef'
 import EmptyState from '@/components/empty-state/EmptyState'
 import PublicUserGameRow from '../public-user-game-row/PublicUserGameRow'
 import { fieldClass } from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { pillClass } from '@/components/ui/Pill'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
+import type { GameSource } from '@/types/game'
+import type { GameStatus } from '@/types/game'
 
 const PAGE = 30
 
@@ -29,14 +30,14 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
   const searchId = useId()
   const [query, setQuery] = useState('')
   const [source, setSource] = useState<GameSource | 'all'>('all')
-  const [status, setStatus] = useState<LibraryStatus | 'all'>('all')
+  const [status, setStatus] = useState<GameStatus | 'all'>('all')
   const [sort, setSort] = useState<Sort>('progress')
   const [shown, setShown] = useState(PAGE)
 
   // Another filter starts the list from its top again.
   useWhenChanged([query, source, status, sort], () => setShown(PAGE))
 
-  const platforms = (['ra', 'steam', 'psn', 'xbox'] as const).filter((s) => games.some((g) => g.source === s))
+  const platforms = GAME_SOURCES.filter((s) => games.some((g) => g.source === s))
   const filtered = useMemo(() => {
     const list = filterLibrary(games, { query, source, status })
     return list.sort((a, b) => (sort === 'name' ? a.title.localeCompare(b.title, lang) : b.pct - a.pct || a.title.localeCompare(b.title, lang)))

@@ -17,6 +17,7 @@ import AchievementTableToolbar from '@/components/achievement-table-toolbar/Achi
 import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
 import { TABLE, TH } from '@/components/ui/dataTable'
 import { parseUnlockTime } from '@/utils/dates'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 type Filter = 'all' | 'earned' | 'unearned' | 'missable'
 type SortDir = 'asc' | 'desc'
@@ -53,9 +54,7 @@ export default function GameInfoTable({
 
   const achievements = useMemo(() => {
     if (!gameData) return []
-    return Object.values(gameData.Achievements ?? {}).filter(
-      (a): a is RetroAchievement => a !== undefined
-    )
+    return raAchievementList(gameData)
   }, [gameData])
 
   const missableUnearned = useMemo(

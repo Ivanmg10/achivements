@@ -20,7 +20,14 @@ describe('requireSession', () => {
   test('returns the user id when signed in, regardless of RA linkage', async () => {
     ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1' } })
     const result = await requireSession()
-    expect(result).toEqual({ ok: true, id: '1' })
+    expect(result).toEqual({ ok: true, id: '1', user: { id: '1' } })
+  })
+
+  test('answers the 401 body a route asks for', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue(null)
+    const result = await requireSession({ error: 'unauthorized' })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect((result.response as unknown as { data: unknown }).data).toEqual({ error: 'unauthorized' })
   })
 })
 

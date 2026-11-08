@@ -4,6 +4,7 @@ import { FadeImage } from '@/components/ui/FadeImage'
 import { useLanguage } from '@/context/LanguageContext'
 import RarityBadge from '@/components/ui/RarityBadge'
 import { badgeClass, badgeImgClass, MID, NUM, raTypeTag, ROW, TD, TD_FIRST, TYPE_TAG } from '@/components/ui/dataTable'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 /**
  * One achievement as a row of the RA game table. The title is the button that
@@ -46,7 +47,7 @@ export default function GameInfoAchivement({
       <td className={`${TD_FIRST} w-16`}>
         {achievement.BadgeName && (
           <FadeImage
-            src={`https://media.retroachievements.org/Badge/${achievement.BadgeName}.png`}
+            src={raBadgeUrl(achievement.BadgeName)!}
             alt=""
             width={52}
             height={52}

@@ -10,6 +10,7 @@ import DayAchievementsModal from '@/components/day-achievements-modal/DayAchieve
 import { LineChartSkeleton } from '@/components/ui/ChartSkeleton'
 import { Skeleton } from '@/components/ui/Skeleton'
 import AchivementsLineChartTooltip from './achivements-line-chart-tooltip/AchivementsLineChartTooltip'
+import { formatDay } from '@/utils/dates'
 
 // recharts is the heaviest thing on the page: it arrives after the page is up, in the room the chart keeps.
 const AchievementsLinePlot = dynamic(() => import('./achievements-line-plot/AchievementsLinePlot'), {
@@ -40,7 +41,7 @@ export default function AchievementsLineChart({
   const tick = (date: string) =>
     date === today
       ? T.lineChart.today
-      : new Date(date + 'T00:00:00').toLocaleDateString(lang, { weekday: 'short', day: 'numeric' })
+      : formatDay(date, lang, { weekday: 'short', day: 'numeric' })
 
   return (
     <div className="w-full flex flex-col gap-3">

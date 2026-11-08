@@ -7,6 +7,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import MainPageProfileNowPlaying from '../../main-page-profile-now-playing/MainPageProfileNowPlaying'
+import { raImageUrl } from '@/utils/raAssets'
 
 export default function MainPageProfileRaGame({
   game,
@@ -20,7 +21,7 @@ export default function MainPageProfileRaGame({
 
   const scPct = parseFloat(game.UserCompletion ?? '0') || 0
   const hcPct = parseFloat(game.UserCompletionHardcore ?? '0') || 0
-  const icon = game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null
+  const icon = raImageUrl(game.ImageIcon) ?? null
 
   return (
     <MainPageProfileNowPlaying

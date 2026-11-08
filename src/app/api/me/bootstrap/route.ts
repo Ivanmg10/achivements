@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
+import { requireSession } from '@/lib/apiAuth'
 import { loadBootstrap } from '@/lib/meBootstrap'
 import { canUseXbox } from '@/utils/xboxAccess'
 
@@ -10,9 +9,9 @@ import { canUseXbox } from '@/utils/xboxAccess'
  * A part that failed is null, and its reader asks its own route.
  */
 export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ error: 'unauthorized', retryable: false }, { status: 401 })
+  const auth = await requireSession({ error: 'unauthorized', retryable: false })
+  if (!auth.ok) return auth.response
 
-  const body = await loadBootstrap(String(session.user.id), canUseXbox(session.user.admin))
+  const body = await loadBootstrap(String(auth.id), canUseXbox(auth.user.admin))
   return NextResponse.json(body, { headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie' } })
 }

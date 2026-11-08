@@ -18,6 +18,7 @@ import { useExclusiveOpen } from '@/hooks/useExclusiveOpen'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import type { SteamGameProgress } from '@/types/steam'
 import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
+import { formatDate } from '@/utils/dates'
 
 /**
  * A Steam game on a category page, laid out like RA's StatusGameItem so the
@@ -48,7 +49,7 @@ export default function SteamStatusGameItem({
   const isComplete = hasCounts && game.numAwarded >= game.maxPossible
   const playtime = formatPlaytime(
     game.playtimeForever,
-    { minutes: T.steam.minutesShort, hours: T.steam.hoursShort },
+    T.steam,
     lang,
   )
 
@@ -109,11 +110,11 @@ export default function SteamStatusGameItem({
             </span>
             {category === 'completed' && validCompletionDate(game.lastUnlock) ? (
               <span className="text-xs text-text-secondary mt-1">
-                {T.libraryDetail.finished} · {new Date(game.lastUnlock!).toLocaleDateString(lang)}
+                {T.libraryDetail.finished} · {formatDate(game.lastUnlock, lang, {})}
               </span>
             ) : (
               <span className="text-xs text-text-secondary mt-1">
-                {T.steam.lastPlayed} · {game.lastPlayed ? new Date(game.lastPlayed).toLocaleDateString(lang) : T.steam.neverPlayed}
+                {T.steam.lastPlayed} · {game.lastPlayed ? formatDate(game.lastPlayed, lang, {}) : T.steam.neverPlayed}
               </span>
             )}
           </div>

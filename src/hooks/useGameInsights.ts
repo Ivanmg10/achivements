@@ -1,28 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { fetchShared } from '@/lib/fetchShared'
 import type { RetroAchievement } from '@/types/types'
-import type { GameSource, SteamAchievementUnified } from '@/types/steam'
-import type { PsnTrophy } from '@/types/psn'
-import type { XboxAchievement } from '@/types/xbox'
+import type { GameSource } from '@/types/game'
 import { fromPsn, fromRa, fromSteam, fromXbox, type InsightAchievement } from '@/utils/gameInsights'
-import { psnTitleId } from '@/utils/psnTitles'
-import { toSteamLanguage } from '@/utils/steamLanguage'
+import { fetchGameAchievements, readJson } from '@/utils/gameAchievements'
+import { raImageUrl } from '@/utils/raAssets'
 
 type Art = { art: string[]; poster: string | null }
 type Loaded = Art & { items: InsightAchievement[]; ra?: { items: RetroAchievement[]; players: number } }
 type Answer = ({ key: string } & Loaded) | { key: string; error: true }
 
-async function json(url: string): Promise<unknown> {
-  const res = await fetchShared(url)
-  if (!res.ok) throw new Error(`${url.split('?')[0]} ${res.status}`)
-  return res.json()
-}
-
 /** A game's pictures from IGDB, through the route that has them. A failure only means none. */
 async function igdbPictures(url: string): Promise<Art> {
   try {
-    const data = (await json(url)) as { heroUrl?: string | null; coverUrl?: string | null }
+    const data = (await readJson(url)) as { heroUrl?: string | null; coverUrl?: string | null }
     return { art: data.heroUrl ? [data.heroUrl] : [], poster: data.coverUrl ?? null }
   } catch (err) {
     console.error("Could not read the game's pictures:", err)
@@ -30,41 +21,26 @@ async function igdbPictures(url: string): Promise<Art> {
   }
 }
 
-const raImage = (path: string) => `https://retroachievements.org${path}`
-
-/** One game's achievements on any platform, read through the routes its page uses, in the shape the insights take; and the pictures those routes give. */
+/** One game's achievements in the shape the insights take, and the pictures its routes give. */
 async function load(source: GameSource, id: number, lang: string): Promise<Loaded> {
   if (source === 'ra') {
-    const [progress, igdb] = await Promise.all([json(`/api/getGameProgression?gameId=${id}`), igdbPictures(`/api/getGameArt?gameId=${id}`)])
-    const data = progress as {
-      Achievements?: Record<string, RetroAchievement | undefined>
-      NumDistinctPlayers?: number
-      ImageIngame?: string
-      ImageTitle?: string
-      ImageBoxArt?: string
-    }
-    const list = Object.values(data.Achievements ?? {}).filter((a): a is RetroAchievement => Boolean(a))
-    const own = [data.ImageIngame, data.ImageTitle].filter((path): path is string => Boolean(path)).map(raImage)
+    const [read, igdb] = await Promise.all([fetchGameAchievements('ra', id, lang), igdbPictures(`/api/getGameArt?gameId=${id}`)])
+    if (read.source !== 'ra') throw new Error('Unexpected RA answer')
+    const { list, game } = read
+    const players = game.NumDistinctPlayers ?? 0
+    const own = [game.ImageIngame, game.ImageTitle].map(raImageUrl).filter((url): url is string => Boolean(url))
     return {
-      items: fromRa(list, data.NumDistinctPlayers ?? 0, id),
+      items: fromRa(list, players, id),
       art: [...igdb.art, ...own],
-      poster: data.ImageBoxArt ? raImage(data.ImageBoxArt) : igdb.poster,
-      ra: { items: list, players: data.NumDistinctPlayers ?? 0 },
+      poster: raImageUrl(game.ImageBoxArt) ?? igdb.poster,
+      ra: { items: list, players },
     }
   }
-  if (source === 'steam') {
-    const data = await json(`/api/steam/achievements?appid=${id}&lang=${toSteamLanguage(lang)}`)
-    if (!Array.isArray(data)) throw new Error('Unexpected Steam answer')
-    return { items: fromSteam(data as SteamAchievementUnified[], id), art: [], poster: null }
-  }
-  if (source === 'psn') {
-    const data = (await json(`/api/psn/trophies?id=${encodeURIComponent(psnTitleId(id))}&lang=${lang}`)) as { trophies?: PsnTrophy[] }
-    if (!Array.isArray(data.trophies)) throw new Error('Unexpected PSN answer')
-    return { items: fromPsn(data.trophies, id), art: [], poster: null }
-  }
-  const data = (await json(`/api/xbox/achievements?id=${id}&lang=${lang}`)) as { achievements?: XboxAchievement[] }
-  if (!Array.isArray(data.achievements)) throw new Error('Unexpected Xbox answer')
-  return { items: fromXbox(data.achievements, id), ...(await igdbPictures(`/api/xbox/details?id=${id}`)) }
+  const read = await fetchGameAchievements(source, id, lang)
+  if (read.source === 'steam') return { items: fromSteam(read.list, id), art: [], poster: null }
+  if (read.source === 'psn') return { items: fromPsn(read.list, id), art: [], poster: null }
+  if (read.source === 'xbox') return { items: fromXbox(read.list, id), ...(await igdbPictures(`/api/xbox/details?id=${id}`)) }
+  throw new Error('Unexpected answer')
 }
 
 /**

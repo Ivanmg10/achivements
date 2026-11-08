@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
-import { RetroAchievementsGameWithAchievements, RetroAchievement } from '@/types/types'
+import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import { IconDeviceGamepad2 } from '@tabler/icons-react'
 import { notify } from '@/lib/notify'
 import RaGameItem from '@/components/ra-game-item/RaGameItem'
@@ -21,6 +21,7 @@ import { RecentFeedItem } from '@/utils/steamFeed'
 import { useRecentFeed } from '@/hooks/useRecentFeed'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 const MAX_GAMES = 6
 
@@ -162,8 +163,7 @@ export default function RARecentlyPlayed({ skipLatest = false }: { skipLatest?: 
               const g = item.game
               const data = gameDataMap.get(g.GameID)
               const achievements = data
-                ? Object.values(data.Achievements ?? {})
-                    .filter((a): a is RetroAchievement => !!a)
+                ? raAchievementList(data)
                     .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
                 : []
 

@@ -1,6 +1,6 @@
-import crypto from 'crypto'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { cronRefusal } from '@/lib/secrets'
 import { sweepExpired } from '@/lib/steamCache'
 
 /**
@@ -12,14 +12,8 @@ import { sweepExpired } from '@/lib/steamCache'
  * route refuses everyone rather than running open.
  */
 export async function GET(req: NextRequest) {
-  const secret = process.env.CRON_SECRET
-  if (!secret) return NextResponse.json({ error: 'cron-not-configured' }, { status: 503 })
-
-  const given = Buffer.from(req.headers.get('authorization') ?? '')
-  const want = Buffer.from(`Bearer ${secret}`)
-  if (given.length !== want.length || !crypto.timingSafeEqual(given, want)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const refused = cronRefusal(req)
+  if (refused) return refused
 
   try {
     const deleted = await sweepExpired()

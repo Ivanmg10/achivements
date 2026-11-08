@@ -5,8 +5,9 @@ import { useAdminRankings } from '@/hooks/useAdminRankings'
 import { notify } from '@/lib/notify'
 import type { FlaggedGame } from '@/app/api/admin/rankings/route'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { PLATFORM_NAME } from '@/utils/gameRef'
+import type { GameSource } from '@/types/game'
 
-const NAMES: Record<string, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PlayStation', xbox: 'Xbox' }
 const num = (x: number | null) => (x === null ? '—' : x.toLocaleString('en'))
 
 /**
@@ -56,7 +57,7 @@ export default function AdminRankings() {
             <tbody>
               {balance.map((b) => (
                 <tr key={b.source} className="border-t border-ink/5 tabular-nums">
-                  <th scope="row" className="text-left font-medium px-2 py-1.5">{NAMES[b.source] ?? b.source}</th>
+                  <th scope="row" className="text-left font-medium px-2 py-1.5">{PLATFORM_NAME[b.source as GameSource] ?? b.source}</th>
                   <td className="px-2 py-1.5">{num(b.users)}</td>
                   <td className="px-2 py-1.5">{num(b.games)}</td>
                   <td className="px-2 py-1.5">{num(b.completed)}</td>

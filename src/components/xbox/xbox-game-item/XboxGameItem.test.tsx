@@ -52,7 +52,7 @@ test('a finished game is marked, and the link goes to the page of whoever is bei
 })
 
 const MINUTES = 3409
-const PLAYED = formatPlaytime(MINUTES, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en')
+const PLAYED = formatPlaytime(MINUTES, en.steam, 'en')
 
 test('the play time, when Xbox gave it, and not otherwise', () => {
   const { rerender } = render(<XboxGameItem game={{ ...GAME, playtimeMinutes: MINUTES }} />)

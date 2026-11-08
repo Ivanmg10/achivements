@@ -8,7 +8,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { InsightAchievement } from '@/utils/gameInsights'
 import LibraryDetailList from '@/components/library-game-detail/library-detail-list/LibraryDetailList'
 import Modal from '@/components/ui/Modal'
-import { parseUnlockTime } from '@/utils/dates'
+import { formatDate } from '@/utils/dates'
 
 /**
  * What was unlocked in the week or month clicked on a game's chart, newest
@@ -61,7 +61,7 @@ export default function GameAchievementsProgressChartModal({
                 title={`${items.length} ${T.dayModal.achievements}`}
                 items={sorted}
                 empty={T.gameExpanded.noActivity}
-                meta={(a) => a.earnedAt && <span>{new Date(parseUnlockTime(a.earnedAt)).toLocaleDateString(lang)}</span>}
+                meta={(a) => a.earnedAt && <span>{formatDate(a.earnedAt, lang, {})}</span>}
               />
             </div>
           </Modal>

@@ -2,13 +2,13 @@ import type { RecentlyPlayedGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnCollection, PsnGameProgress } from '@/types/psn'
 import type { XboxGameProgress } from '@/types/xbox'
+import { formatDate, unlockIso } from '@/utils/dates'
+import type { GameStatus } from '@/types/game'
 
 /**
  * Pure helpers for putting Steam games next to RA ones: category rules, the
  * merged recent feed, and playtime formatting.
  */
-
-export type SteamCategory = 'wantToPlay' | 'playing' | 'completed'
 
 /**
  * Whether a Steam game has achievements at all. Steam lists every game owned,
@@ -34,7 +34,7 @@ export function hasSteamAchievements(game: SteamGameProgress): boolean {
  * played game whose counts have not loaded — progress unknown, so placing it
  * would be a guess.
  */
-export function classifySteamGame(game: SteamGameProgress): SteamCategory | null {
+export function classifySteamGame(game: SteamGameProgress): GameStatus | null {
   if (game.playtimeForever === 0) return 'wantToPlay'
   if (!game.achievementsLoaded || game.maxPossible === 0) return null
   if (game.numAwarded >= game.maxPossible) return 'completed'
@@ -46,11 +46,6 @@ export function classifySteamGame(game: SteamGameProgress): SteamCategory | null
  * RA reports LastPlayed as "YYYY-MM-DD HH:MM:SS" in UTC; Steam entries are ISO.
  * Both must be ISO to sort against each other as strings.
  */
-export function raDateToIso(raDate: string | null | undefined): string | null {
-  if (!raDate) return null
-  const d = new Date(`${raDate.replace(' ', 'T')}Z`)
-  return isNaN(d.getTime()) ? null : d.toISOString()
-}
 
 export type RecentFeedItem =
   | { source: 'ra'; key: string; lastPlayed: string | null; game: RecentlyPlayedGame }
@@ -95,7 +90,7 @@ export function mergeRecentFeeds(
     ...ra.map((game) => ({
       source: 'ra' as const,
       key: `ra:${game.GameID}`,
-      lastPlayed: raDateToIso(game.LastPlayed),
+      lastPlayed: unlockIso(game.LastPlayed),
       game,
     })),
     ...steam.map((game) => ({
@@ -124,18 +119,18 @@ export function mergeRecentFeeds(
 }
 
 /**
- * Steam reports playtime in minutes. Units and locale both come in from the
- * caller so the number follows the app language, not the browser's locale.
+ * Steam reports playtime in minutes. The units (`T.steam`) and the locale come in from
+ * the caller so the number follows the app language, not the browser's locale.
  */
 export function formatPlaytime(
   minutes: number,
-  units: { minutes: string; hours: string },
+  units: { minutesShort: string; hoursShort: string },
   locale?: string,
 ): string {
-  if (minutes < 60) return `${Math.max(0, Math.round(minutes))} ${units.minutes}`
+  if (minutes < 60) return `${Math.max(0, Math.round(minutes))} ${units.minutesShort}`
   const hours = minutes / 60
   const rounded = hours < 10 ? Math.round(hours * 10) / 10 : Math.round(hours)
-  return `${rounded.toLocaleString(locale)} ${units.hours}`
+  return `${rounded.toLocaleString(locale)} ${units.hoursShort}`
 }
 
 /**
@@ -187,13 +182,9 @@ export function formatRarity(pct: number, lang = 'en'): string {
   return pct.toLocaleString(lang, { minimumFractionDigits: digits, maximumFractionDigits: digits })
 }
 
+const UNLOCK_DATE_TIME: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }
+
 /** Unlock date and time, in the app language. */
 export function formatUnlock(iso: string, lang: string): string {
-  return new Date(iso).toLocaleString(lang, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return formatDate(iso, lang, UNLOCK_DATE_TIME)
 }

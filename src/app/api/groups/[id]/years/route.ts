@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { withCache } from '@/lib/raCache'
 import { getGame } from '@/lib/raClient'
@@ -16,7 +15,8 @@ import type { XboxGameProgress } from '@/types/xbox'
 import type { PsnGameProgress } from '@/types/psn'
 import { toSteamGameDetails } from '@/utils/steamMappers'
 import { mapLimit, parseReleaseYear } from '@/utils/utils'
-import type { GameSource, SteamAppDetailsResponse, SteamGameDetails } from '@/types/steam'
+import type { SteamAppDetailsResponse, SteamGameDetails } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 const RA_TTL = 4 * 60 * 60 * 1000
 /** Lookups at a time: RA and the Steam store both turn away bursts. */
@@ -36,11 +36,11 @@ async function post(_req: NextRequest, { params }: { params: Promise<{ id: strin
   try {
     const { id } = await params
     const groupId = dbId(id) ?? NaN
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
     if (!Number.isInteger(groupId)) return NextResponse.json({ message: 'Grupo no válido' }, { status: 400 })
 
-    const owner = await pool.query('SELECT id FROM game_groups WHERE id = $1 AND user_id = $2', [groupId, session.user.id])
+    const owner = await pool.query('SELECT id FROM game_groups WHERE id = $1 AND user_id = $2', [groupId, auth.id])
     if (!owner.rows.length) return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
 
     const pending = await pool.query(
@@ -49,24 +49,24 @@ async function post(_req: NextRequest, { params }: { params: Promise<{ id: strin
         ORDER BY position LIMIT $2`,
       [groupId, BATCH],
     )
-    const raKey = session.user.raid
+    const raKey = auth.user.raid
     const rows = (pending.rows as Row[]).filter((r) => r.source !== 'ra' || raKey)
     if (!rows.length) return NextResponse.json({ years: [] })
 
     // The owner's PSN games, for their Store concepts or titles; read once, and only if a PSN row needs it.
-    const accountId = session.user.psnaccountid
+    const accountId = auth.user.psnaccountid
     let psnGames: Promise<Map<number, PsnGameProgress> | null> | null = null
     const ownPsnGames = () =>
       (psnGames ??= accountId
-        ? psnTitles(accountId, session.user.id).then((games) => new Map(games.map((g) => [g.id, g])))
+        ? psnTitles(accountId, auth.id).then((games) => new Map(games.map((g) => [g.id, g])))
         : Promise.resolve(null))
 
     // The owner's Xbox games: Xbox's library has no release year, so it comes from IGDB by title.
-    const xuid = canUseXbox(session.user.admin) ? session.user.xboxxuid : undefined
+    const xuid = canUseXbox(auth.user.admin) ? auth.user.xboxxuid : undefined
     let xboxGames: Promise<Map<number, XboxGameProgress> | null> | null = null
     const ownXboxGames = () =>
       (xboxGames ??= xuid
-        ? xboxLibrary(xuid, session.user.id).then((games) => new Map(games.map((g) => [g.id, g])))
+        ? xboxLibrary(xuid, auth.id).then((games) => new Map(games.map((g) => [g.id, g])))
         : Promise.resolve(null))
 
     const results = await mapLimit(rows, CONCURRENCY, async (row) => {

@@ -6,10 +6,10 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { candidateIconUrl, searchCandidates } from '@/utils/gameCandidates'
 import GamePickerRow from '@/components/game-picker/game-picker-row/GamePickerRow'
-import type { GameSource } from '@/types/steam'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import Modal from '@/components/ui/Modal'
 import SearchInput from '@/components/ui/SearchInput'
+import type { GameSource } from '@/types/game'
 
 export type FavoriteGame = { id: number; title: string; imageIcon: string }
 

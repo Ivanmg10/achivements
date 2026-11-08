@@ -1,7 +1,6 @@
-import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
-import { authOptions } from '@/lib/authOptions'
 import { avatarPath, parseAvatarSegment } from '@/lib/avatarImage'
 
 /**
@@ -20,14 +19,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ file: s
     const ownerId = parseAvatarSegment(file)
     if (ownerId === null) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-    const session = await getServerSession(authOptions)
-    const viewerId = session?.user?.id
-    if (!viewerId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireSession({ error: 'Unauthorized' })
+    if (!auth.ok) return auth.response
 
     const { rows } = await pool.query(
       `SELECT a.image, a.mime FROM user_avatars a JOIN users u ON u.id = a.user_id
        WHERE a.user_id = $1 AND u.avatar = $2 AND (u.profile_public OR u.id = $3 OR $4::boolean)`,
-      [ownerId, avatarPath(file), viewerId, session.user.admin === true],
+      [ownerId, avatarPath(file), auth.id, auth.user.admin === true],
     )
     if (!rows[0]) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 

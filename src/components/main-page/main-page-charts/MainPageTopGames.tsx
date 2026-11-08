@@ -10,6 +10,7 @@ import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { useSubject } from '@/context/SubjectContext'
+import { utcDay } from '@/utils/dates'
 
 export default function MainPageTopGames({ achievements, isLoading }: { achievements: RecentAchievement[]; isLoading?: boolean }) {
   const { T } = useLanguage()
@@ -17,7 +18,7 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
   const data = useMemo(() => {
     const cutoff = new Date()
     cutoff.setDate(cutoff.getDate() - 30)
-    const cutoffStr = cutoff.toISOString().split('T')[0]
+    const cutoffStr = utcDay(cutoff)
 
     const byGame = achievements
       .filter((a) => a.Date.split(' ')[0] >= cutoffStr)

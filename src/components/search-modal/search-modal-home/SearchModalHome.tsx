@@ -6,11 +6,12 @@ import { useVaultMe } from '@/hooks/useVaultMe'
 import type { RecentUser } from '@/hooks/useRecentUsers'
 import { homeHeroOf } from '@/utils/homeHero'
 import { gameHref } from '@/utils/gameRef'
-import { plural, relativeTime } from '@/utils/utils'
+import { plural } from '@/utils/utils'
 import { pillClass } from '@/components/ui/Pill'
 import { FadeImage } from '@/components/ui/FadeImage'
 import SearchModalGroup from '../search-modal-group/SearchModalGroup'
 import SearchModalRow from '../search-modal-row/SearchModalRow'
+import { relativeTime } from '@/utils/dates'
 
 const SHOWN_GAMES = 2
 

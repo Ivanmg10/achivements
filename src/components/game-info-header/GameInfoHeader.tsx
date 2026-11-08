@@ -6,7 +6,7 @@ import { IconHash, IconExternalLink } from '@tabler/icons-react'
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { CONSOLES } from '@/constants'
-import { formatDay, plural, sumAchievementPoints } from '@/utils/utils'
+import { plural, sumAchievementPoints } from '@/utils/utils'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { buttonClass } from '@/components/ui/Button'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
@@ -15,6 +15,9 @@ import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
 import GameHashesModal from './GameHashesModal'
+import { formatDay } from '@/utils/dates'
+import { raImageUrl } from '@/utils/raAssets'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 type StatusKey = 'mastered' | 'completed' | 'beatenHC' | 'beaten' | 'inProgress'
 
@@ -54,7 +57,7 @@ export default function GameInfoHeader({
   const status = gameData ? deriveStatus(gameData) : null
   const points = useMemo(() => sumAchievementPoints(gameData?.Achievements ?? {}), [gameData])
   const missables = useMemo(
-    () => Object.values(gameData?.Achievements ?? {}).filter((a) => a && a.Type === 'missable' && !a.DateEarned && !a.DateEarnedHardcore).length,
+    () => raAchievementList(gameData).filter((a) => a.Type === 'missable' && !a.DateEarned && !a.DateEarnedHardcore).length,
     [gameData],
   )
   const earned = gameData?.NumAwardedToUser ?? 0
@@ -68,7 +71,7 @@ export default function GameInfoHeader({
 
   const cover = gameData?.ImageBoxArt ? (
     <FadeImage
-      src={`https://retroachievements.org${gameData.ImageBoxArt}`}
+      src={raImageUrl(gameData.ImageBoxArt)!}
       alt={gameData.Title ?? ''}
       width={216}
       height={306}
@@ -144,8 +147,8 @@ export default function GameInfoHeader({
         media={
           <GameHeroMedia
             shots={[
-              gameData?.ImageTitle ? { src: `https://retroachievements.org${gameData.ImageTitle}`, caption: T.gameInfoPage.titleScreen } : null,
-              gameData?.ImageIngame ? { src: `https://retroachievements.org${gameData.ImageIngame}`, caption: T.gameInfoPage.inGame } : null,
+              gameData?.ImageTitle ? { src: raImageUrl(gameData.ImageTitle)!, caption: T.gameInfoPage.titleScreen } : null,
+              gameData?.ImageIngame ? { src: raImageUrl(gameData.ImageIngame)!, caption: T.gameInfoPage.inGame } : null,
             ]}
           />
         }

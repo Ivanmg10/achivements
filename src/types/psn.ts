@@ -1,4 +1,4 @@
-import type { GameProgressBase } from '@/types/steam'
+import type { GameProgressBase } from '@/types/game'
 
 /**
  * Trophies by grade. psn-api types platinum as 0 | 1, which holds for one

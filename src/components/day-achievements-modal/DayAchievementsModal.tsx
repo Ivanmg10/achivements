@@ -11,6 +11,8 @@ import { IconX, IconStar, IconCheck } from '@tabler/icons-react'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import Modal from '@/components/ui/Modal'
+import { utcDay } from '@/utils/dates'
+import { raImageUrl } from '@/utils/raAssets'
 
 interface Props {
   date: string
@@ -21,7 +23,7 @@ interface Props {
 const COMPLETION_TYPES = new Set(['Mastery/Completion', 'Game Beaten'])
 
 function awardDate(awardedAt: string): string {
-  return new Date(awardedAt).toISOString().split('T')[0]
+  return utcDay(new Date(awardedAt))
 }
 
 export default function DayAchievementsModal({ date, achievements, onClose }: Props) {
@@ -74,7 +76,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                     <div className="relative shrink-0">
                       {award.ImageIcon ? (
                         <Image
-                          src={`https://retroachievements.org${award.ImageIcon}`}
+                          src={raImageUrl(award.ImageIcon)!}
                           alt={award.Title}
                           width={36}
                           height={36}

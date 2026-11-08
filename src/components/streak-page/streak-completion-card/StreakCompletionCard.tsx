@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { IconStar, IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { UserAward } from '@/types/types'
+import { raImageUrl } from '@/utils/raAssets'
 
 interface Props {
   award: UserAward
@@ -23,7 +24,7 @@ export default function StreakCompletionCard({ award }: Props) {
       <div className="relative shrink-0">
         {award.ImageIcon ? (
           <Image
-            src={`https://retroachievements.org${award.ImageIcon}`}
+            src={raImageUrl(award.ImageIcon)!}
             alt={award.Title}
             width={40}
             height={40}

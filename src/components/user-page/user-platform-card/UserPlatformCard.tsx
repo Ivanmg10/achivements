@@ -2,10 +2,10 @@
 
 import { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import type { GameSource } from '@/types/steam'
 import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
 import { buttonClass } from '@/components/ui/Button'
 import { Skeleton } from '@/components/ui/Skeleton'
+import type { GameSource } from '@/types/game'
 
 export type PlatformStat = { label: string; value: string; accent?: string; loading?: boolean }
 

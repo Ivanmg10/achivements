@@ -1,31 +1,25 @@
 import { parseUnlockTime } from '@/utils/dates'
-import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
+import type { RetroAchievementsGameWithAchievements } from '@/types/types'
+import type { GameAchievement } from '@/types/game'
 import type { SteamAchievementUnified } from '@/types/steam'
 import type { PsnTrophy, TrophyGrade } from '@/types/psn'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { raBadgeUrl } from '@/utils/raAssets'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 /** One achievement of a game as someone has it, the same for RA, Steam and PSN. */
-export type CompareAchievement = {
-  id: string
-  title: string
-  description: string
-  iconUrl: string | null
+export type CompareAchievement = GameAchievement & {
   /** RA's points. */
   points?: number
   /** PSN's grade. */
   grade?: TrophyGrade
   /** Xbox's gamerscore for it. */
   gamerscore?: number
-  /** Share of players who have it, 0–100; null when the platform does not say. */
-  rarity: number | null
-  /** Where a link to it lands on the page (Steam and PSN deep links use it). */
+  /** Where a link to it lands on the page (Steam and PSN deep links use it). `earnedAt` is RA's hardcore date when there is one. */
   anchor?: string
-  earned: boolean
-  /** When; RA's hardcore date when there is one. Null for an unlock with no date. */
-  earnedAt: string | null
   /** RA only: earned in hardcore. */
   hardcore?: boolean
 }
@@ -37,19 +31,16 @@ export type CompareRow = CompareAchievement & { mine: Unlock | null }
 
 export type CompareFilter = 'all' | 'both' | 'onlyThem' | 'onlyMe' | 'neither'
 
-const raBadge = (badge: string) => (badge ? `https://media.retroachievements.org/Badge/${badge}.png` : null)
-
 export function raCompareList(game: RetroAchievementsGameWithAchievements | null): CompareAchievement[] {
   if (!game) return []
   const players = game.NumDistinctPlayers || 0
-  return Object.values(game.Achievements ?? {})
-    .filter((a): a is RetroAchievement => a !== undefined)
+  return raAchievementList(game)
     .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
     .map((a) => ({
       id: String(a.ID),
       title: a.Title,
       description: a.Description,
-      iconUrl: raBadge(a.BadgeName),
+      iconUrl: raBadgeUrl(a.BadgeName) ?? null,
       points: a.Points,
       rarity: players > 0 ? Math.min(100, (a.NumAwarded / players) * 100) : null,
       earned: Boolean(a.DateEarned || a.DateEarnedHardcore),

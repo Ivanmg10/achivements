@@ -2,6 +2,7 @@ import pool from '@/lib/db'
 import { gameKey, isGameSource } from '@/utils/gameRef'
 import { presenceColumns } from '@/lib/presence'
 import { readRaKey } from '@/lib/raKey'
+import type { SavedGame } from '@/types/game'
 
 /** What another user may see of an account: no email, no keys, no hash. */
 export type PublicUserRow = {
@@ -19,8 +20,6 @@ export type PublicUserRow = {
   /** Whether other users may find and open their profile. */
   profilePublic: boolean
 }
-
-type SavedGame = { id: number; title: string; imageIcon: string } | null
 
 /** What their public page shows besides: names on each platform and their preferences. */
 export type PublicProfileRow = PublicUserRow & {

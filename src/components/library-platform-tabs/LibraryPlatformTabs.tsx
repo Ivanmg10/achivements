@@ -2,8 +2,8 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import Tabs from '@/components/ui/Tabs'
-import { PLATFORM_NAME } from '@/utils/gameRef'
-import type { GameSource } from '@/types/steam'
+import { PLATFORM_NAME, GAME_SOURCES } from '@/utils/gameRef'
+import type { GameSource } from '@/types/game'
 
 export type PlatformChoice = GameSource | 'all'
 
@@ -25,7 +25,7 @@ export default function LibraryPlatformTabs({
   onChange: (platform: PlatformChoice) => void
 }) {
   const { T } = useLanguage()
-  const platforms = (['ra', 'steam', 'psn', 'xbox'] as const).filter((s) => counts[s] > 0)
+  const platforms = GAME_SOURCES.filter((s) => counts[s] > 0)
   if (platforms.length < 2) return null
 
   const options: { value: PlatformChoice; label: string; n: number }[] = [

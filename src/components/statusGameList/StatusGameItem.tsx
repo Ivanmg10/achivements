@@ -16,6 +16,7 @@ import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
 import RaLibraryDetail from '@/components/ra-library-detail/RaLibraryDetail'
+import { raImageUrl } from '@/utils/raAssets'
 
 function getGameId(g: CategoryGame): number | string {
   return g.ID ?? g.GameID!
@@ -61,7 +62,7 @@ export default function StatusGameItem({
         onPointerMove={onPointerMove}
         className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
-        <GameCardBackdrop src={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null} surface="card" />
+        <GameCardBackdrop src={raImageUrl(game.ImageIcon) ?? null} surface="card" />
         {/* relative: the expand button stretches over this whole header (see the chevron). */}
         <div className="relative flex flex-row items-start gap-3 sm:gap-5 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">
           {/* Same destination as the title link, so it is kept out of the tab order. */}
@@ -73,7 +74,7 @@ export default function StatusGameItem({
                 }`}
               >
                 <Image
-                  src={`https://retroachievements.org${game.ImageIcon}`}
+                  src={raImageUrl(game.ImageIcon)!}
                   alt=""
                   width={96}
                   height={96}
@@ -167,7 +168,7 @@ export default function StatusGameItem({
               source="ra"
               gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
               title={game.Title}
-              image={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null}
+              image={raImageUrl(game.ImageIcon) ?? null}
               className="relative z-10"
             />
             <PinToggleButton gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId} className="relative z-10" />

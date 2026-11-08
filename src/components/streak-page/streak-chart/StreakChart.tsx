@@ -2,10 +2,11 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { Streak } from '@/types/types'
-import { decimal, formatDay, plural } from '@/utils/utils'
+import { decimal, plural } from '@/utils/utils'
 import StreakSectionHead from '../streak-section-head/StreakSectionHead'
 import { slantStyle } from '@/components/ui/shape'
 import { streakInk, streakTier } from '@/utils/streakTier'
+import { formatDay } from '@/utils/dates'
 
 const MAX_ROWS = 6
 const SLANT = slantStyle(6)

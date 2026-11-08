@@ -43,7 +43,7 @@ test('loaded, the ring counts the achievements; a failure is its own state', () 
 test('the play time is a fact when Xbox gave it, and nothing otherwise', () => {
   setup()
   const { unmount } = render(<XboxLibraryDetail game={{ ...GAME, playtimeMinutes: 3409 }} />)
-  const played = formatPlaytime(3409, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en')
+  const played = formatPlaytime(3409, en.steam, 'en')
   expect(screen.getByTestId('detail')).toHaveTextContent(`${en.steam.playtime}:${played}`)
   unmount()
   render(<XboxLibraryDetail game={GAME} />)

@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo, useState, type ReactNode } from 'react'
-import type { GameSource } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import type { FriendDetails } from '@/hooks/useFriendsData'
 import { filterFollowing, type FriendOverview } from '@/utils/friends'
@@ -10,6 +9,7 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import FollowingPageSkeleton from '../following-page-skeleton/FollowingPageSkeleton'
 import FollowingToolbar from '../following-toolbar/FollowingToolbar'
 import FollowingCard from '../following-card/FollowingCard'
+import type { GameSource } from '@/types/game'
 
 /**
  * A list of people as cards (whom you follow, or who follows you): searchable

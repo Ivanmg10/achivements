@@ -5,7 +5,7 @@ import { IconChevronDown, IconClock } from '@tabler/icons-react'
 import type { PsnCollection, PsnGameProgress } from '@/types/psn'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSpotlight } from '@/hooks/useSpotlight'
-import { formatDate } from '@/utils/utils'
+import { formatDate } from '@/utils/dates'
 import { psnBackdrop } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
@@ -100,14 +100,14 @@ export default function PsnCollectionItem({
                 <span className="flex items-center gap-1">
                   <IconClock size={12} aria-hidden="true" />
                   <span className="sr-only">{T.steam.playtime}: </span>
-                  {formatPlaytime(collection.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+                  {formatPlaytime(collection.playtimeMinutes, T.steam, lang)}
                 </span>
               </>
             )}
             {lastPlayed && (
               <>
                 <span className="opacity-40" aria-hidden="true">·</span>
-                <span>{formatDate(lastPlayed)}</span>
+                <span>{formatDate(lastPlayed, lang)}</span>
               </>
             )}
           </span>

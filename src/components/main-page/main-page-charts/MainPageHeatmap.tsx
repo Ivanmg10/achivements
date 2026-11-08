@@ -9,6 +9,7 @@ import DayAchievementsModal from '@/components/day-achievements-modal/DayAchieve
 import { useLanguage } from '@/context/LanguageContext'
 import { useHeatmapGrid, HEATMAP_GAP as GAP, HEATMAP_MAX_DAYS } from '@/hooks/useHeatmapGrid'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { utcDay, formatDay } from '@/utils/dates'
 
 /** Empty, then the theme's accent at rising strength: one hue per theme, so every theme reads the same way. */
 /*
@@ -105,7 +106,7 @@ export default function MainPageHeatmap({
     gap: `${GAP}px`,
   } as const
   const gridWidth = weeks * cellWidth + (weeks - 1) * GAP
-  const today = new Date().toISOString().split('T')[0]
+  const today = utcDay(new Date())
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const cellEl = (e.target as HTMLElement).closest('[data-date]') as HTMLElement | null
@@ -120,7 +121,7 @@ export default function MainPageHeatmap({
     const y = e.clientY - rect.top
     const date = cellEl.dataset.date ?? ''
     const count = cellEl.dataset.count ?? '0'
-    const formatted = new Date(date + 'T00:00:00').toLocaleDateString(lang, {
+    const formatted = formatDay(date, lang, {
       weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
     })
     tooltip.textContent = `${formatted}: ${count === '1' ? T.lineChart.oneAchievement : `${count} ${T.lineChart.achievements}`}`

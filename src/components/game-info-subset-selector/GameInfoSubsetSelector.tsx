@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { SubsetGame } from '@/types/types'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { raImageUrl } from '@/utils/raAssets'
 
 function extractSubsetLabel(title: string): string {
   const match = title.match(/\[Subset\s*-\s*(.+?)\]/)
@@ -53,7 +54,7 @@ export default function GameInfoSubsetSelector({
             }`}
           >
             {tab.icon ? (
-              <FadeImage src={`https://retroachievements.org${tab.icon}`} alt={tab.label} width={48} height={48} className="w-12 h-12" />
+              <FadeImage src={raImageUrl(tab.icon)!} alt={tab.label} width={48} height={48} className="w-12 h-12" />
             ) : (
               <span aria-hidden="true" className="block w-12 h-12 bg-ink/[0.06]" />
             )}

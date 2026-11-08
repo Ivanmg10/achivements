@@ -4,13 +4,14 @@ import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
 import { SteamAchievementGrid } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
-import LibraryGameDetail, { type LibraryCategory } from '@/components/library-game-detail/LibraryGameDetail'
+import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetail'
 import { fromSteam } from '@/utils/gameInsights'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
 import { latestFullSetCompletedAt } from '@/utils/completionDates'
+import type { GameStatus } from '@/types/game'
 
-const asCategory = (c?: string): LibraryCategory => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
+const asCategory = (c?: string): GameStatus => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * An opened Steam card in a status list. The achievements load when this
@@ -25,7 +26,6 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
   const loaded = achievements.length > 0
   const total = loaded ? achievements.length : game.maxPossible
   const earned = loaded ? achievements.filter((a) => a.earned).length : game.numAwarded
-  const units = { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }
 
   return (
     <LibraryGameDetail
@@ -45,8 +45,8 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
       }
       ring={{ earned, total, label: T.gameExpanded.allAchievements }}
       facts={[
-        { label: T.steam.playtime, value: formatPlaytime(game.playtimeForever, units, lang), className: 'text-[#66c0f4]' },
-        ...(game.playtime2Weeks > 0 ? [{ label: T.steam.last2Weeks, value: formatPlaytime(game.playtime2Weeks, units, lang) }] : []),
+        { label: T.steam.playtime, value: formatPlaytime(game.playtimeForever, T.steam, lang), className: 'text-[#66c0f4]' },
+        ...(game.playtime2Weeks > 0 ? [{ label: T.steam.last2Weeks, value: formatPlaytime(game.playtime2Weeks, T.steam, lang) }] : []),
       ]}
       empty={T.steam.noAchievements}
       grid={<SteamAchievementGrid appId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={48} limit={60} />}

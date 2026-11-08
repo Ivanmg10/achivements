@@ -1,5 +1,7 @@
-import { parseUnlockTime } from '@/utils/dates'
-import type { GameSource } from '@/types/steam'
+import { parseUnlockTime, unlockIso } from '@/utils/dates'
+import type { GameSource } from '@/types/game'
+import { GAME_SOURCES } from '@/utils/gameRef'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 /** How many achievements a showcase holds. */
 export const SHOWCASE_MAX = 5
@@ -23,7 +25,6 @@ export type ShowcaseEntry = {
 
 export type ShowcaseItem = ShowcaseEntry & { id: number }
 
-const SOURCES: GameSource[] = ['ra', 'steam', 'psn', 'xbox']
 const DAY = 86400000
 
 export const showcaseKey = (e: Pick<ShowcaseEntry, 'source' | 'gameId' | 'achievementKey'>) => `${e.source}:${e.gameId}:${e.achievementKey}`
@@ -39,7 +40,7 @@ const text = (v: unknown, max: number): string | null => (typeof v === 'string' 
 export function parseShowcaseEntry(v: unknown, now: number = Date.now()): ShowcaseEntry | null {
   if (!v || typeof v !== 'object') return null
   const o = v as Record<string, unknown>
-  const source = SOURCES.find((s) => s === o.source)
+  const source = GAME_SOURCES.find((s) => s === o.source)
   const gameId = o.gameId
   const achievementKey = text(o.achievementKey, 100)
   const gameTitle = text(o.gameTitle, 200)
@@ -72,7 +73,7 @@ export function raShowcaseEntry(
     gameTitle,
     title: a.Title,
     description: a.Description || null,
-    badge: a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : null,
+    badge: raBadgeUrl(a.BadgeName) ?? null,
     earnedAt: new Date(at).toISOString(),
   }
 }
@@ -92,7 +93,7 @@ export type ShowcaseChoice = {
   entry: ShowcaseEntry | null
 }
 
-type ChoiceInput = {
+export type ChoiceInput = {
   key: string
   title: string
   description?: string | null
@@ -101,16 +102,10 @@ type ChoiceInput = {
   hidden?: boolean
 }
 
-const isoOf = (d: string | null | undefined) => {
-  if (!d) return null
-  const t = parseUnlockTime(d)
-  return Number.isNaN(t) ? null : new Date(t).toISOString()
-}
-
 /** A game's achievements as picker choices, earned first (newest first), then the rest in the game's order. */
 export function showcaseChoices(source: ShowcaseEntry['source'], gameId: number, gameTitle: string, list: ChoiceInput[]): ShowcaseChoice[] {
   const choices = list.map((a) => {
-    const earnedAt = isoOf(a.earnedAt)
+    const earnedAt = unlockIso(a.earnedAt)
     const concealed = Boolean(a.hidden) && !earnedAt
     return {
       key: a.key,

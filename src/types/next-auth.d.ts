@@ -1,8 +1,7 @@
 import { DefaultSession } from "next-auth";
 import { JWT as DefaultJWT } from "next-auth/jwt";
 import { RetroAchievementsUserProfile } from "./types";
-
-type SavedGame = { id: number; title: string; imageIcon: string } | null;
+import type { SavedGame } from "./game";
 
 /** What a session knows about its user. */
 type SessionUserFields = {

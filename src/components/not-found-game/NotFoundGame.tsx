@@ -2,13 +2,13 @@
 
 import Link from 'next/link'
 import { IconArrowLeft, IconBooks, IconDeviceGamepad2 } from '@tabler/icons-react'
-import type { GameSource } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGoBack } from '@/hooks/useGoBack'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { STATUS_BUTTON, STATUS_SCREEN } from '@/components/status-badge/statusScreen'
+import { PLATFORM_NAME } from '@/utils/gameRef'
+import type { GameSource } from '@/types/game'
 
-const PLATFORM_NAMES: Record<GameSource, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PlayStation', xbox: 'Xbox' }
 
 /**
  * The 404 of a game page, inside the app: an empty cover with the platform's
@@ -33,7 +33,7 @@ export default function NotFoundGame({ source }: { source: GameSource }) {
         <p className="text-xs font-semibold tracking-[0.14em] uppercase text-accent">{T.notFound.gameEyebrow}</p>
         <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 text-balance">{T.notFound.gameTitle}</h1>
         <p className="text-sm text-text-secondary max-w-sm">
-          {T.notFound.gameSubtitle.replace('{platform}', PLATFORM_NAMES[source])}
+          {T.notFound.gameSubtitle.replace('{platform}', PLATFORM_NAME[source])}
         </p>
       </div>
       <div className="mt-1 flex flex-wrap justify-center gap-2.5">

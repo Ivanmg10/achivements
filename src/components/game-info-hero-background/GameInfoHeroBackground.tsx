@@ -1,5 +1,6 @@
 'use client'
 
+import { raImageUrl } from '@/utils/raAssets'
 /**
  * The blurred artwork behind an RA game page, as the Steam page does with its
  * library banner. Takes the game's title/in-game screenshot path already
@@ -17,7 +18,7 @@ export default function GameInfoHeroBackground({ imagePath }: { imagePath: strin
       style={{ top: '-64px', left: '50%', transform: 'translateX(-50%)', width: '100vw', height: '684px' }}
     >
       <img
-        src={`https://retroachievements.org${imagePath}`}
+        src={raImageUrl(imagePath)}
         alt=""
         decoding="async"
         fetchPriority="low"

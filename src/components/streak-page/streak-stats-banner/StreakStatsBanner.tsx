@@ -2,9 +2,10 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { Streak } from '@/types/types'
-import { formatDay, plural } from '@/utils/utils'
+import { plural } from '@/utils/utils'
 import { streakInk, streakTier } from '@/utils/streakTier'
 import { CountUp } from '@/components/ui/CountUp'
+import { formatDay } from '@/utils/dates'
 
 interface Props {
   activeStreak: Streak | null

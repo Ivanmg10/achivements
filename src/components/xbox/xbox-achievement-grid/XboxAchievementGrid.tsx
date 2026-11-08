@@ -6,7 +6,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { createPortal } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
-import { capList, formatDate } from '@/utils/utils'
+import { capList } from '@/utils/utils'
+import { formatDate } from '@/utils/dates'
 import { gameHref } from '@/utils/gameRef'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import ConcealedBadge from '@/components/concealed-badge/ConcealedBadge'
@@ -159,7 +160,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
                 <span className="text-xs text-text-secondary">{T.achievement.notEarned}</span>
               )}
             </div>
-            {tooltip.achievement.unlockedAt && <p className="text-xs text-text-secondary mt-1">{formatDate(tooltip.achievement.unlockedAt)}</p>}
+            {tooltip.achievement.unlockedAt && <p className="text-xs text-text-secondary mt-1">{formatDate(tooltip.achievement.unlockedAt, lang)}</p>}
           </div>,
           document.body,
         )}

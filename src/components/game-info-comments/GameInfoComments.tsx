@@ -12,6 +12,7 @@ import IconButton from '@/components/ui/IconButton'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
+import { raAvatarUrl } from '@/utils/raAssets'
 
 const PREVIEW_COUNT = 2
 
@@ -151,7 +152,7 @@ function CommentRow({ comment, last }: { comment: GameComment; last: boolean }) 
         aria-hidden="true"
       >
         <Image
-          src={`https://media.retroachievements.org/UserPic/${comment.User}.png`}
+          src={raAvatarUrl(comment.User)}
           alt={comment.User}
           width={32}
           height={32}

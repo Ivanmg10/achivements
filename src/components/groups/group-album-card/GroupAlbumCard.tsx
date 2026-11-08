@@ -3,11 +3,12 @@ import Link from 'next/link'
 import { IconLock, IconPlus, IconWorld } from '@tabler/icons-react'
 import { GameGroup } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { relativeTime, plural } from '@/utils/utils'
+import { plural } from '@/utils/utils'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
 import GroupPlatformLogos from '@/components/groups/group-platform-logos/GroupPlatformLogos'
+import { relativeTime } from '@/utils/dates'
 
 /**
  * A group as an album: its first games' covers as a banner, a ring with how far

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { IconInfoCircle } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { PLATFORM_NAME } from '@/utils/gameRef'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 /**
  * Why your side of the comparison is empty: no account on that platform (with

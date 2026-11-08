@@ -36,7 +36,7 @@ export default function PsnGameInfoTrophyCard({
 }) {
   const { T, lang } = useLanguage()
   const concealed = t.hidden && !t.earned && !revealed
-  const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }[t.type]
+  const grade = T.psn[t.type]
 
   return (
     <li

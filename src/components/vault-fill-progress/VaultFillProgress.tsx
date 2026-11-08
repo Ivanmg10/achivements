@@ -3,10 +3,11 @@
 import { IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useVaultFillState } from '@/context/VaultFillContext'
-import type { GameSource } from '@/types/steam'
 import { ProgressBar } from '@/components/ui/ProgressBar'
-import { PLATFORM_FILL, PLATFORM_NAMES, PLATFORM_ORDER } from '@/components/vault-platform-split/VaultPlatformSplit'
+import { PLATFORM_FILL, PLATFORM_NAMES } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { fillMessage } from '@/utils/vaultFill'
+import { GAME_SOURCES } from '@/utils/gameRef'
+import type { GameSource } from '@/types/game'
 
 /**
  * How the Vault Points fill is getting on, one small card per platform: games
@@ -20,7 +21,7 @@ export default function VaultFillProgress({ wide = false, className = '' }: { wi
   const { T, lang } = useLanguage()
   const fill = useVaultFillState()
   const platforms = fill?.status?.platforms ?? {}
-  const sources = PLATFORM_ORDER.filter((s) => platforms[s])
+  const sources = GAME_SOURCES.filter((s) => platforms[s])
   const messages = sources.map((s) => [s, fillMessage(s, platforms[s]!, T.rankings)] as const).filter((m): m is readonly [GameSource, string] => m[1] !== null)
   if (!fill || (!fill.active && messages.every(([s]) => platforms[s]?.state !== 'error'))) return null
   const n = (x: number) => x.toLocaleString(lang)

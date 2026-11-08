@@ -16,6 +16,7 @@ import MainPageProfileGameSkeleton from '../main-page-profile-game-skeleton/Main
 import MainPageProfileCard from '../main-page-profile-card/MainPageProfileCard'
 import { SURFACE } from '@/components/ui/surface'
 import { StatCard } from '@/components/ui/StatPill'
+import { raImageUrl } from '@/utils/raAssets'
 
 export default function MainPageProfileRa({
   user,
@@ -51,7 +52,7 @@ export default function MainPageProfileRa({
       {user?.User ? (
         <>
           <MainPageProfileCard
-            avatarSrc={user.UserPic ? `https://retroachievements.org${user.UserPic}` : null}
+            avatarSrc={raImageUrl(user.UserPic) ?? null}
             avatarFallback={<span className="w-full h-full bg-bg-main" />}
             ring={ring}
             name={user.User}

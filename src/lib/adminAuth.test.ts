@@ -11,7 +11,6 @@ import {
   REAUTH_REQUIRED,
   elevationCookie,
   logAdminAction,
-  readCookie,
   requireAdmin,
   requireAdminRole,
   signElevation,
@@ -63,11 +62,6 @@ test('the cookie is httpOnly, strict, only sent to the admin API, and lasts the 
   expect(cookie).toContain('SameSite=Strict')
   expect(cookie).toContain(`Max-Age=${ELEVATION_MS / 1000}`)
   expect(elevationCookie(null)).toContain('Max-Age=0')
-})
-
-test('readCookie finds one cookie among several', () => {
-  expect(readCookie(withCookie('a=1; admin-elevation=x%2Ey; b=2'), ELEVATION_COOKIE)).toBe('x.y')
-  expect(readCookie(withCookie(), ELEVATION_COOKIE)).toBeNull()
 })
 
 describe('requireAdminRole', () => {

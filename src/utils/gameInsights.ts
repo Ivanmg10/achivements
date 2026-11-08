@@ -1,26 +1,20 @@
 import type { RecentAchievement, RetroAchievement } from '@/types/types'
-import type { GameSource, SteamAchievementUnified } from '@/types/steam'
+import type { SteamAchievementUnified } from '@/types/steam'
+import type { GameAchievement, GameSource } from '@/types/game'
 import type { PsnTrophy } from '@/types/psn'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
 import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 /** An achievement or trophy of any platform, reduced to what a library card tells. */
-export type InsightAchievement = {
-  id: string
-  title: string
-  description: string
-  earned: boolean
-  earnedAt: string | null
-  /** Share of players who have it, 0–100; null when the platform does not say. */
-  rarity: number | null
+export type InsightAchievement = GameAchievement & {
   /** RA points; the other platforms have none. */
   points: number | null
   /** RA tags: what the game needs to be beaten, and what can be missed for good. */
   kind: 'progression' | 'win_condition' | 'missable' | null
-  iconUrl: string | null
   href: string
 }
 
@@ -39,7 +33,7 @@ export function fromRa(list: RetroAchievement[], players: number, gameId: number
       rarity: players > 0 ? Math.min(100, (a.NumAwarded / players) * 100) : null,
       points: a.Points,
       kind,
-      iconUrl: a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : null,
+      iconUrl: raBadgeUrl(a.BadgeName) ?? null,
       href: `/gameInfo/${gameId}`,
     }
   })

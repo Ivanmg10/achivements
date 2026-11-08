@@ -6,7 +6,8 @@ import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import MainPageProfileRecent from '../../main-page-profile-recent/MainPageProfileRecent'
 import MainPageProfileRecentRow from '../../main-page-profile-recent/main-page-profile-recent-row/MainPageProfileRecentRow'
-import { parseUnlockTime } from '@/utils/dates'
+import { formatDate } from '@/utils/dates'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 export default function MainPageProfileRaAchievements({
   achievements,
@@ -24,10 +25,10 @@ export default function MainPageProfileRaAchievements({
         <MainPageProfileRecentRow
           key={ach.AchievementID}
           href={gameHref('ra', ach.GameID, subject)}
-          badge={`https://media.retroachievements.org/Badge/${ach.BadgeName}.png`}
+          badge={raBadgeUrl(ach.BadgeName) ?? null}
           hardcore={ach.HardcoreMode === '1'}
           title={ach.Title}
-          sub={<>{ach.GameTitle} · <time dateTime={ach.Date}>{new Date(parseUnlockTime(ach.Date)).toLocaleDateString(lang, { day: 'numeric', month: 'short' })}</time></>}
+          sub={<>{ach.GameTitle} · <time dateTime={ach.Date}>{formatDate(ach.Date, lang, { day: 'numeric', month: 'short' })}</time></>}
           right={ach.Points}
         />
       ))}

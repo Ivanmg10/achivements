@@ -16,8 +16,8 @@ import { useSpotlight } from '@/hooks/useSpotlight'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { gameHref } from '@/utils/gameRef'
 import { psnBackdrop, psnTitleId, psnPlatformChip } from '@/utils/psnTitles'
-import { relativeTime } from '@/utils/utils'
 import type { GameGroupItem } from '@/types/types'
+import { relativeTime } from '@/utils/dates'
 
 /**
  * A PSN game in a group — SteamSortableItem's counterpart: drag handle, icon,
@@ -121,7 +121,7 @@ export default function PsnSortableItem({
             {game?.playtimeMinutes != null ? (
               <>
                 <IconClock size={12} aria-hidden="true" />
-                {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+                {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, T.steam, lang)}
               </>
             ) : (
               ' '

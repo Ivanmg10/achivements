@@ -8,10 +8,9 @@ import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
 import { buttonClass } from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
+import type { GameSource } from '@/types/game'
 
-type Platform = 'ra' | 'steam' | 'psn' | 'xbox'
-
-const PLATFORM_NAMES: Record<Platform, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
+const PLATFORM_NAMES: Record<GameSource, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
 
 const BUTTON = 'shrink-0 text-xs font-bold px-3 py-2 rounded-tile disabled:opacity-40'
 
@@ -32,10 +31,10 @@ export default function AdminLinkedAccounts({
   const [steamId, setSteamId] = useState('')
   const [psnName, setPsnName] = useState('')
   const [xboxName, setXboxName] = useState('')
-  const [busy, setBusy] = useState<Platform | null>(null)
-  const [errors, setErrors] = useState<Partial<Record<Platform, string>>>({})
+  const [busy, setBusy] = useState<GameSource | null>(null)
+  const [errors, setErrors] = useState<Partial<Record<GameSource, string>>>({})
 
-  const run = async (platform: Platform, request: () => Promise<Response>, onDone: (data: Record<string, unknown>) => void) => {
+  const run = async (platform: GameSource, request: () => Promise<Response>, onDone: (data: Record<string, unknown>) => void) => {
     setBusy(platform)
     setErrors((e) => ({ ...e, [platform]: undefined }))
     try {
@@ -61,14 +60,14 @@ export default function AdminLinkedAccounts({
     }
   }
 
-  const link = (platform: Platform, body: Record<string, unknown>, onDone: (data: Record<string, unknown>) => void) =>
+  const link = (platform: GameSource, body: Record<string, unknown>, onDone: (data: Record<string, unknown>) => void) =>
     run(platform, () => adminFetch('/api/admin/users/accounts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: user.id, platform, ...body }),
     }), onDone)
 
-  const unlink = (platform: Platform, changes: Partial<AdminUser>) =>
+  const unlink = (platform: GameSource, changes: Partial<AdminUser>) =>
     run(platform, () => adminFetch(`/api/admin/users/accounts?id=${user.id}&platform=${platform}`, { method: 'DELETE' }), () =>
       onUpdated(user.id, changes))
 

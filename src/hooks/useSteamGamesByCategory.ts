@@ -2,10 +2,11 @@ import { useMemo } from 'react'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { byCompletedDesc } from '@/utils/completionDates'
-import { classifySteamGame, hasUnloadedProgress, SteamCategory } from '@/utils/steamFeed'
+import { classifySteamGame, hasUnloadedProgress } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
+import type { GameStatus } from '@/types/game'
 
-function isSteamCategory(cat: string): cat is SteamCategory {
+function isSteamCategory(cat: string): cat is GameStatus {
   return cat === 'wantToPlay' || cat === 'playing' || cat === 'completed'
 }
 

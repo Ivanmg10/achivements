@@ -1,6 +1,6 @@
 import { gameKey } from '@/utils/gameRef'
-import type { GameSource } from '@/types/steam'
 import type { UserAwards } from '@/types/types'
+import type { GameSource } from '@/types/game'
 
 export type HiddenGameKeys = ReadonlySet<string> | readonly string[]
 

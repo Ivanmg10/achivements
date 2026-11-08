@@ -5,13 +5,14 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { XboxAchievementGrid } from '@/components/xbox/xbox-achievement-grid/XboxAchievementGrid'
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
-import LibraryGameDetail, { type LibraryCategory } from '@/components/library-game-detail/LibraryGameDetail'
+import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetail'
 import { fromXbox } from '@/utils/gameInsights'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { XboxGameProgress } from '@/types/xbox'
 import { latestFullSetCompletedAt } from '@/utils/completionDates'
+import type { GameStatus } from '@/types/game'
 
-const asCategory = (c?: string): LibraryCategory => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
+const asCategory = (c?: string): GameStatus => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * An opened Xbox card in a status list: PsnLibraryDetail's counterpart.
@@ -47,7 +48,7 @@ export default function XboxLibraryDetail({ game, category }: { game: XboxGamePr
       }
       ring={{ earned, total, label: T.xbox.achievements }}
       ringExtra={<XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} />}
-      facts={game.playtimeMinutes ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang), className: 'text-[#107c10]' }] : []}
+      facts={game.playtimeMinutes ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, T.steam, lang), className: 'text-[#107c10]' }] : []}
       empty={T.xbox.noAchievements}
       grid={<XboxAchievementGrid gameId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={48} limit={60} />}
     />

@@ -5,7 +5,6 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { LibraryGame } from '@/utils/library'
 import { summarizeByPlatform } from '@/utils/library'
 import { PLATFORM_NAME } from '@/utils/gameRef'
-import type { GameSource } from '@/types/steam'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import EmptyState from '@/components/empty-state/EmptyState'
 import RaLogo from '@/components/ra-logo/RaLogo'
@@ -13,6 +12,7 @@ import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { Skeleton } from '@/components/ui/Skeleton'
+import type { GameSource } from '@/types/game'
 
 const LOGOS: Record<GameSource, ReactNode> = {
   ra: <RaLogo height={11} />,

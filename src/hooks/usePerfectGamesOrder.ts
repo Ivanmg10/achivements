@@ -3,8 +3,8 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { gameKey } from '@/utils/gameRef'
-import type { GameSource } from '@/types/steam'
 import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
+import type { GameSource } from '@/types/game'
 
 /**
  * The user's own order for the "Mastered & Completed" card, as game keys

@@ -1,6 +1,5 @@
 import type { PsnGameProgress, TrophyCounts } from '@/types/psn'
-
-export type PsnCategory = 'wantToPlay' | 'playing' | 'completed'
+import type { GameStatus } from '@/types/game'
 
 const TITLE_ID = /^NPWR(\d{5})_(\d{2})$/
 
@@ -31,7 +30,7 @@ export function isPsnTitleId(value: string): boolean {
  * too when the user chose that: see `platinumCompletes`), and "no achievements" when it was launched
  * but nothing earned yet.
  */
-export function classifyPsnGame(game: Pick<PsnGameProgress, 'pctWon' | 'platinumCompletes'>): PsnCategory {
+export function classifyPsnGame(game: Pick<PsnGameProgress, 'pctWon' | 'platinumCompletes'>): GameStatus {
   if (game.pctWon >= 100 || game.platinumCompletes) return 'completed'
   if (game.pctWon > 0) return 'playing'
   return 'wantToPlay'

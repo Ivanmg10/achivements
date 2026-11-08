@@ -1,4 +1,4 @@
-import type { GameProgressBase } from '@/types/steam'
+import type { GameProgressBase } from '@/types/game'
 
 /** An Xbox Live profile, as the app shows it. */
 export type XboxProfile = {

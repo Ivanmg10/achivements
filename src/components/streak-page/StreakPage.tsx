@@ -15,6 +15,7 @@ import StreakPageSkeleton from './streak-page-skeleton/StreakPageSkeleton'
 import StreakQuickStats from './streak-quick-stats/StreakQuickStats'
 import StreakWeekdays from './streak-weekdays/StreakWeekdays'
 import StreakYearHeatmap from './streak-year-heatmap/StreakYearHeatmap'
+import { localDay } from '@/utils/dates'
 
 /**
  * The streak page: the streak going now and the record, the longest streaks
@@ -27,7 +28,7 @@ export default function StreakPage() {
   const [picked, setPicked] = useState<Streak | null>(null)
   // Nothing is picked until the person picks; the day by day starts on the streak going now, or the best.
   const shownStreak = picked ?? activeStreak ?? bestStreak
-  const today = useMemo(() => { const d = new Date(now); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }, [now])
+  const today = useMemo(() => localDay(now), [now])
   const byDay = useMemo(() => countByDay(achievements), [achievements])
   const insights = useMemo(() => streakInsights(byDay, streaks, today), [byDay, streaks, today])
   const lastActiveDay = useMemo(() => streaks.reduce<string | null>((last, s) => (!last || s.end > last ? s.end : last), null), [streaks])

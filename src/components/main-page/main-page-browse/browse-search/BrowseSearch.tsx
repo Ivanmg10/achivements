@@ -6,10 +6,11 @@ import Link from 'next/link'
 import { IconSearch } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
-import { filterLibrary, LibraryFilter, LibraryGame, LibraryStatus } from '@/utils/library'
-import type { GameSource } from '@/types/steam'
+import { filterLibrary, LibraryFilter, LibraryGame } from '@/utils/library'
 import BrowseSearchChips from '../browse-search-chips/BrowseSearchChips'
 import { fieldClass } from '@/components/ui/Input'
+import type { GameSource } from '@/types/game'
+import type { GameStatus } from '@/types/game'
 
 const SHOWN = 4
 
@@ -53,7 +54,7 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
             ...(xboxEnabled ? [{ value: 'xbox' as const, label: 'Xbox' }] : []),
           ]}
         />
-        <BrowseSearchChips<LibraryStatus | 'all'>
+        <BrowseSearchChips<GameStatus | 'all'>
           label={T.cards.filterStatus}
           value={filter.status}
           onChange={(status) => setFilter((f) => ({ ...f, status }))}

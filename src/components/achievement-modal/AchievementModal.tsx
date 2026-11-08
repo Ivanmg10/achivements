@@ -16,6 +16,7 @@ import { decimal } from '@/utils/utils'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { parseUnlockTime } from '@/utils/dates'
 import { raTypeTag } from '@/components/ui/dataTable'
+import { raBadgeUrl, raAvatarUrl } from '@/utils/raAssets'
 
 interface AchievementUnlock {
   User: string
@@ -117,7 +118,7 @@ export default function AchievementModal({
         <div className="flex items-start gap-4 p-6 border-b border-bg-header">
           {achievement.BadgeName && (
             <Image
-              src={`https://media.retroachievements.org/Badge/${achievement.BadgeName}.png`}
+              src={raBadgeUrl(achievement.BadgeName)!}
               alt=""
               width={80}
               height={80}
@@ -250,7 +251,7 @@ export default function AchievementModal({
                             <div className="flex items-center gap-2">
                               {u.User ? (
                                 <Image
-                                  src={`https://media.retroachievements.org/UserPic/${u.User}.png`}
+                                  src={raAvatarUrl(u.User)}
                                   alt={u.User}
                                   width={28}
                                   height={28}
@@ -310,7 +311,7 @@ export default function AchievementModal({
                         <div key={i} className="flex gap-3">
                           {c.User ? (
                             <Image
-                              src={`https://media.retroachievements.org/UserPic/${c.User}.png`}
+                              src={raAvatarUrl(c.User)}
                               alt={c.User}
                               width={32}
                               height={32}

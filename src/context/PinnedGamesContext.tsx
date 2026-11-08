@@ -3,9 +3,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { gameKey, isGameSource, GameRef } from '@/utils/gameRef'
-import type { GameSource } from '@/types/steam'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
+import type { GameSource } from '@/types/game'
 
 type CtxType = {
   /** Pinned games in display order, RA and Steam mixed. */

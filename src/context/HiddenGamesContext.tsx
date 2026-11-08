@@ -7,7 +7,7 @@ import { gameKey, isGameSource, parseGameKey } from '@/utils/gameRef'
 import { notify } from '@/lib/notify'
 import { bootstrapPart } from '@/lib/bootstrapParts'
 import type { HiddenGameRow } from '@/lib/meBootstrap'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 export type HiddenGame = { source: GameSource; id: number; title: string; image: string | null }
 

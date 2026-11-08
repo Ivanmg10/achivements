@@ -9,7 +9,7 @@ import XboxLogo from '@/components/xbox-logo/XboxLogo'
 
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
-import { useMainPlatform, MainPlatform } from '@/context/MainPlatformContext'
+import { useMainPlatform } from '@/context/MainPlatformContext'
 import { useSubject } from '@/context/SubjectContext'
 
 import MainPageProfileRa from './main-page-profile-ra/MainPageProfileRa'
@@ -18,10 +18,11 @@ import MainPageProfilePsn from './main-page-profile-psn/MainPageProfilePsn'
 import MainPageProfileXbox from './main-page-profile-xbox/MainPageProfileXbox'
 import MainPageProfileTabs, { ProfileTab, profilePanelId, profileTabId } from './main-page-profile-tabs/MainPageProfileTabs'
 import styles from './MainPageProfile.module.css'
+import type { GameSource } from '@/types/game'
 
 const ID_PREFIX = 'main-profile'
 
-const TABS: Record<MainPlatform, ProfileTab<MainPlatform>> = {
+const TABS: Record<GameSource, ProfileTab<GameSource>> = {
   ra: { id: 'ra', label: 'RetroAchievements', icon: <RaLogo height={11} /> },
   steam: { id: 'steam', label: 'Steam', icon: <SteamLogo size={13} aria-hidden="true" /> },
   psn: { id: 'psn', label: 'PlayStation', icon: <PlaystationLogo size={13} aria-hidden="true" /> },
@@ -50,7 +51,7 @@ export default function MainPageProfile() {
     await update()
   }
 
-  const profiles: Record<MainPlatform, ReactNode> = {
+  const profiles: Record<GameSource, ReactNode> = {
     ra: (
       <MainPageProfileRa
         user={session?.user?.raUser}
@@ -79,7 +80,7 @@ export default function MainPageProfile() {
   // Several: one profile at a time, switched by low-key tabs at the top.
   return (
     <section className="main-content text-text-main m-3 rounded-tile flex flex-col items-center gap-3 overflow-y-auto">
-      <MainPageProfileTabs<MainPlatform>
+      <MainPageProfileTabs<GameSource>
         idPrefix={ID_PREFIX}
         selected={tab}
         onSelect={setTab}

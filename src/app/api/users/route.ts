@@ -4,7 +4,8 @@ import bcrypt from "bcrypt";
 import { allowAttempt, clientAddress } from "@/lib/attemptLimit";
 import { BCRYPT_COST, PASSWORD_MIN, isEmail } from "@/utils/authValidation";
 import { sendVerificationEmail } from "@/lib/verificationEmail";
-import { fetchRaProfile, raAvatarUrl, validRaCredentials } from "@/lib/raProfile";
+import { fetchRaProfile, validRaCredentials } from "@/lib/raProfile";
+import { raAvatarUrl } from "@/utils/raAssets";
 import { onPlatformLinked } from "@/lib/scoreRefresh";
 import { sealRaKey } from "@/lib/raKey";
 

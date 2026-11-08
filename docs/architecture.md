@@ -8,13 +8,13 @@ a folder, a data path or a cache.
 
 ```
 page (src/app/(main)/…)            client component
-  └─ hook (src/hooks/useXxx.ts)    owns the fetch, the state, the hasFetched guard
+  └─ hook (src/hooks/useXxx.ts)    owns the fetch and the state (useRetryingRead retries it)
        └─ context (src/context/)   shared library data, so pages do not refetch
             └─ fetch /api/…        src/app/api/**/route.ts
                  ├─ apiAuth        who is asking, whose data, whose key
                  ├─ cache          memory → Postgres (steam_cache table)
                  └─ client         raClient / steamClient / psnClient / igdbClient
-                      └─ external API
+                      └─ external API  (RA and Steam through fetchUpstream: deadline, retries)
 ```
 
 - **Auth gate**: `src/proxy.ts` (Next 16's middleware) sends anyone without a
@@ -49,8 +49,9 @@ auth, 429 rate limited, 502/503 upstream).
 
 ## Whose data, whose key — `src/lib/apiAuth.ts`
 
-- `requireSession` / `requireRaSession` / `requireSteamSession` /
-  `requirePsnSession` — the signed-in user, with that platform linked.
+- `requireSession` — a signed-in user, and the session's user (`auth.user.admin`, `.raid`…);
+  every route that needs one starts with it (#119). `requireRaSession` / `requireSteamSession` /
+  `requirePsnSession` / `requireXboxSession` — the same, with that platform linked.
 - `requireViewerApiKey` — the viewer's own RA key; never a fallback.
 - `dataOwner(req)` — on someone else's page, whose library is being read.
 
@@ -139,10 +140,21 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
 - **Hooks** (`src/hooks/`): one per concern; fetches live here, not in
   components. `useWhenChanged`, `useStorageValue`, `useIsClient` are the
   building blocks the lint rule pushes towards (see `CLAUDE.md` → State and effects).
+  `useRetryingRead` is the GET that retries in the background (`scheduleRetry`) and paints the
+  last answer (`lastAnswers`); the RA providers and hooks, pins and the showcase read through it.
 - **Components** (`src/components/`): one folder each, sub-components in
   `parent-sub/ParentSub.tsx`. Shared UI primitives in `components/ui/`.
 - **Utils** (`src/utils/`): pure functions — mappers per platform
-  (`steamMappers`, `psnMappers`), library shelves and insights, `aiExport`.
+  (`steamMappers`, `psnMappers`), library shelves and insights, `aiExport`. The shared helpers
+  (#119): `dates.ts` (the platforms' UTC dates, day keys, dates in the reader's language),
+  `raAssets.ts` (RA's picture URLs, as `lib/steamAssets.ts` is Steam's), `gameRef.ts`
+  (`GAME_SOURCES`, `PLATFORM_NAME`, `raGameId`, game keys and pages), `gameAchievements.ts`
+  (one game's achievements on any platform, through the routes its page uses). The types
+  every platform shares are in `src/types/game.ts`.
+- **Server helpers** (`src/lib/`, #119): `secrets.ts` (the app secret, HMAC, constant-time
+  compares, the cookie reader, the cron check; each caller's key derivation is pinned by its
+  test), `upstreamFetch.ts` (RA's and Steam's deadline and retries), `notHidden()` in
+  `gameVisibility.ts` (the SQL that leaves hidden games out).
 - **i18n**: `useLanguage()` gives `T`; strings in `src/translations/<lang>.ts`.
   The public comparison/how-to pages keep their prose apart, in
   `src/translations/seoPages.ts` (English and Spanish, others fall back to

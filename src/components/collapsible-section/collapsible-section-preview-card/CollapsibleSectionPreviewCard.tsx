@@ -10,6 +10,7 @@ import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import type { PreviewGame } from '@/utils/sectionPreview'
 import { ProgressBar } from '@/components/ui/ProgressBar'
+import { raImageUrl } from '@/utils/raAssets'
 
 /**
  * One game in a folded section's preview: art, title, platform line and a
@@ -24,7 +25,7 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
       : game.source === 'psn' || game.source === 'xbox'
         ? game.imageRef || null
         : game.imageRef
-          ? `https://retroachievements.org${game.imageRef}`
+          ? raImageUrl(game.imageRef)
           : null
 
   return (
@@ -40,7 +41,7 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
         <GameIcon source={game.source} id={game.id} imageUrl={game.imageRef} size={56} className="w-14 h-14 rounded-box shrink-0" />
       ) : game.imageRef ? (
         <Image
-          src={`https://retroachievements.org${game.imageRef}`}
+          src={raImageUrl(game.imageRef)!}
           alt=""
           width={56}
           height={56}

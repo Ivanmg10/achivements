@@ -22,6 +22,7 @@ import { useUserAwards } from '@/hooks/useUserAwards'
 import { unlinkRaUser } from '@/utils/apiCallsUtils'
 import { RetroAchievementsUserProfile } from '@/types/types'
 import { notify } from '@/lib/notify'
+import { raImageUrl } from '@/utils/raAssets'
 
 /**
  * The platforms CheevoVault can track, side by side: who you are on
@@ -75,7 +76,7 @@ export default function UserPlatforms() {
             <div className="flex items-center gap-3 min-w-0">
               {raUser.UserPic && (
                 <Image
-                  src={`https://retroachievements.org${raUser.UserPic}`}
+                  src={raImageUrl(raUser.UserPic)!}
                   alt=""
                   width={44}
                   height={44}

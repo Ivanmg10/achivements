@@ -9,7 +9,7 @@ import { calcAvgPerDay, decimal } from '@/utils/utils'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
-import { parseUnlockTime } from '@/utils/dates'
+import { parseUnlockTime, utcDay } from '@/utils/dates'
 
 const DAY_MS = 86_400_000
 
@@ -39,7 +39,7 @@ export default function MainPageXboxStats({
 
   const stats = useMemo(() => {
     const now = new Date()
-    const todayKey = now.toISOString().split('T')[0]
+    const todayKey = utcDay(now)
     const monthKey = now.toISOString().slice(0, 7)
     const weekAgo = now.getTime() - 7 * DAY_MS
     return {

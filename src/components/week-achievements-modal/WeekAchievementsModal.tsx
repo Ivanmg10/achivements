@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { IconX } from '@tabler/icons-react'
 import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
 import Modal from '@/components/ui/Modal'
+import { utcDay } from '@/utils/dates'
 
 interface Props {
   startDate: string
@@ -25,7 +26,7 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
     for (let i = 0; i < 7; i++) {
       const d = new Date(monday)
       d.setDate(monday.getDate() + i)
-      const dateKey = d.toISOString().split('T')[0]
+      const dateKey = utcDay(d)
       const dayAchs = achievements.filter(a => a.Date.split(' ')[0] === dateKey)
       if (dayAchs.length > 0) {
         days.push({

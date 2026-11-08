@@ -4,6 +4,8 @@ import type { PsnGameProgress, PsnTrophy, PsnTrophyGroup } from '@/types/psn'
 import type { XboxAchievement, XboxGameProgress } from '@/types/xbox'
 import type { IgdbDetails } from '@/lib/igdbClient'
 import { BASE_GROUP } from '@/utils/psnTitles'
+import type { GameSource } from '@/types/game'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 /**
  * A game's achievements as a file for a chat AI (ChatGPT, Claude, Gemini…),
@@ -16,8 +18,6 @@ import { BASE_GROUP } from '@/utils/psnTitles'
  * asking for the answer in the player's language. Nothing about the account
  * goes in: no username, no ids — only the game and its achievements.
  */
-
-type Platform = 'ra' | 'steam' | 'psn' | 'xbox'
 
 /** One achievement, the same for every platform; platform-only fields are left out when absent. */
 export type AiAchievement = {
@@ -42,7 +42,7 @@ export type AiAchievement = {
 }
 
 export type AiExportSource = {
-  platform: Platform
+  platform: GameSource
   game: {
     title: string
     console: string
@@ -62,8 +62,8 @@ export type AiExportSource = {
   gamerscore?: { earned: number; total: number }
 }
 
-const PLATFORM_NAME: Record<Platform, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PlayStation Network', xbox: 'Xbox' }
-const NOUN: Record<Platform, string> = { ra: 'achievements', steam: 'achievements', psn: 'trophies', xbox: 'achievements' }
+const PLATFORM_NAME: Record<GameSource, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PlayStation Network', xbox: 'Xbox' }
+const NOUN: Record<GameSource, string> = { ra: 'achievements', steam: 'achievements', psn: 'trophies', xbox: 'achievements' }
 
 const round1 = (n: number) => Math.round(n * 10) / 10
 /** Drops empty fields so the file holds only what is known. */
@@ -79,8 +79,7 @@ const RA_TYPES = new Set(['progression', 'win_condition', 'missable'])
 
 export function raAiSource(game: RetroAchievementsGameWithAchievements): AiExportSource {
   const players = game.NumDistinctPlayers ?? 0
-  const achievements = Object.values(game.Achievements ?? {})
-    .filter((a) => !!a)
+  const achievements = raAchievementList(game)
     .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
     .map(
       (a): AiAchievement => ({
@@ -383,7 +382,7 @@ export function aiExportText(file: AiExport): string {
 }
 
 /** "call-of-duty-black-ops-ii-psn-ai.json". */
-export function aiExportFileName(title: string, platform: Platform): string {
+export function aiExportFileName(title: string, platform: GameSource): string {
   const slug = title
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')

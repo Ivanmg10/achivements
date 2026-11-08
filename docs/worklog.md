@@ -33,6 +33,101 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-08 — Shared helpers for dates, RA assets, platforms, types and sessions (`refactor/119-shared-helpers`, #119)
+
+**Did** — One commit per helper (antislop audit X4 / plan S3; ids are the audit's, `docs/audits/antislop-v17/code/`):
+- *Secrets (LB-07):* `src/lib/secrets.ts` — `appSecret()`, `hmacHex(payload, key?)`, `sameHex`, `sameText`,
+  `cookieFromHeader(header, name)`, `cronRefusal(req)`. `secretBox`, `raKey`, `adminAuth` (its `readCookie` is gone),
+  `emailVerification`, `steamLogin` and the three cron routes use them. Every derivation is unchanged:
+  `secrets.test.ts` opens values sealed and checks hashes, links, tickets and unlock cookies **made with the code from
+  before**, under a fixed `NEXTAUTH_SECRET`.
+- *Sessions (AP-01):* `requireSession(unauthorized?)` returns `{ ok, id, user }` (the session's user, server side, with
+  `raid`). Every hand-rolled check (the audit counted 39, in 25 route files) uses it, each with **its own 401 body as before** (`{ message: 'No
+  autorizado' }` is the default; `{ error: 'Unauthorized' }`, `{ error: 'unauthorized' }` and `{ error: 'unauthorized',
+  retryable: false }` are passed where a route answered them). `follows/overview`, `users/search`, `favorites` GET and
+  `avatar/[file]` no longer read the session twice; `me/streak` passes the session's user instead of rebuilding it.
+  `requireViewerApiKey` and `requireXboxUser` sit on it.
+- *`useRetryingRead(url, { parse, keepFor?, attempts? })` (HK-01)* replaces the attempt/timer/`hasFetched` loop in
+  `GamesDataContext`, `RecentAchievementsContext`, `RecentlyPlayedGamesContext`, `ActivityHeatmapYearContext` (RA part),
+  `useUserRank`, `useUserAwards`, `useAllGamesGlobal`, `useGameProgression`, `usePinnedAchievements`, `useShowcase` and
+  `MainPageAbandoned`. Only `useRetryingRead` calls `scheduleRetry` now.
+- *Dates (UT-04):* `src/utils/dates.ts` adds `unlockIso`, `utcDay`, `localDay` and `formatDate(s, lang, options?)` next to
+  `parseUnlockTime`. `formatDate` moved out of `utils.tsx` and its ten callers pass the reader's language.
+- *`src/utils/raAssets.ts` (UT-01, D2-05):* `raImageUrl(path)`, `raBadgeUrl(name)`, `raAvatarUrl(user)` (moved from
+  `lib/raProfile`, which reaches RA's client and so could not be imported by components).
+- *Types (UT-03, UT-09):* `src/types/game.ts` — `GameSource`, `GameStatus`, `SavedGame`, `GameProgressBase`,
+  `GameAchievement` (the core `InsightAchievement` and `CompareAchievement` now extend). `GameSource` and `GameProgressBase` are imported from here (the old re-export in `types/steam.ts` is gone).
+- *Platforms (UT-02):* `isGameSource` reads `GAME_SOURCES`; `raGameId(g)` (UT-08) in `gameRef.ts`.
+- *Hidden games in SQL (LB-01):* `notHidden(row, user?)` in `src/lib/gameVisibility.ts`.
+- *One game's achievements on any platform (HK-05):* `src/utils/gameAchievements.ts` — `fetchGameAchievements(source,
+  id, lang)`, `raAchievementList(game)`, `readJson(url)`; `useShowcaseGameChoices` and `useGameInsights` only map.
+- *PSN grade labels (UT-07):* no helper: `T.psn` is already keyed by grade, so it is `T.psn[t.type]`.
+- *Play-time units (D1-13):* `formatPlaytime(minutes, T.steam, lang)` — its units are `T.steam`'s own keys; all 27
+  callers moved (the signature forced it).
+- *Upstream fetch (LB-05):* `src/lib/upstreamFetch.ts` — `fetchUpstream(url, { platform, before?, wait429? })`;
+  `fetchRA` (pacing, 429 wait) and `fetchSteam` are one line each.
+**Why** — #119: each copy had drifted on its own (time zones, resets, error shapes), and the per-platform shells (#125)
+need these first.
+**Decisions** — API kept to what the real uses need. The 401 bodies were kept per route, as asked ("same responses"),
+though no client reads them; unifying them is a one-line change per route later. `T.psn[grade]` instead of a
+`trophyGradeLabel`. `raGameId` keeps the library lists' priority (`GameID`, then `ID`). The re-export in `types/steam.ts`
+was dropped in the second round.
+**Visible changes (drifts fixed, on purpose)** — *Dates:* `formatDate` was fixed to `en-GB`; it now uses the reader's
+language, so an English reader sees "Sep 07, 2026" instead of "07 Sept 2026", and a Spanish one "07 sept 2026" (lists,
+cards and trophy/achievement tooltips). *Loaders:* the copies disagreed, the hook keeps one behaviour: a new URL, account
+(`keepFor`) or sign-out is a new read and drops the old data. So `useUserRank`, `useUserAwards` and the RA year now reset on
+sign-out or another RA account (they never did); the RA library and want-to-play now empty when RA is unlinked (they kept
+the old list); `useAllGamesGlobal` now asks for want-to-play when RA is linked after the page opened (it never did); a game's
+progression shows nothing (skeleton) instead of the previous game while another one loads; `MainPageAbandoned` stops
+waiting when the dates answer is malformed (it used to wait forever). `RecentAchievementsContext` is loading while the
+session is read, as the other providers are (it said "not loading, nothing" for that moment). A final failure logs
+`[useRetryingRead] <url>`; per-attempt logs of pins and the showcase are gone. *Upstream:* a Steam error now carries
+`retryAfter` too (nothing reads it).
+**Done in the second round (`refactor/119-shared-helpers-2`, one commit per point):** the day keys (every `toISOString()` split/slice
+→ `utcDay`, 2 hand-built local ones → `localDay`), `relativeTime`/`formatDay`/`daysBetween`/`unlockSpan` moved to `dates.ts`, 16 platform
+`toLocaleDateString` sites and the three calendar-day tooltips → `formatDate`/`formatDay`; ~40 files of RA picture URLs → `raAssets`; the
+platform list (`GAME_SOURCES`, 13 sites), names (`PLATFORM_NAME`, 4) and `raGameId` (4 files, 5 sites); `GameSource`/`GameProgressBase`
+imports (59 files) and the re-export in `types/steam.ts` is gone; the 7 status aliases → `GameStatus`; the `SavedGame` and
+`MainPlatform`/`Platform`/`parseSource` copies; `notHidden` (9 SQL sites, 5 files); `raAchievementList` (9 files); `T.psn[grade]` (7
+files); `api/users/[username]` GET on `requireSession`. Things a reader may see: a platform date that cannot be read now shows "—"
+instead of "Invalid Date" (`formatDate`), and `formatUnlock` (date and time) is `formatDate` with its options.
+**Open — what really is left (same rules: one commit per helper; `npx tsc --noEmit`, lint and `npx jest --ci` after each).**
+1. **Dates.** Left on purpose, each differs from the helper:
+   - `toLocaleDateString(undefined, …)` / no argument, i.e. the **browser's** locale, not the app's language (`AchievementGrid`,
+     `AchievementModal` ×3, `GameInfoComments`, `AdminPsnToken`, `AdminXboxGame`): moving them to `formatDate(s, lang)` changes
+     what the reader sees. Do it only if the owner agrees the app's language should win there.
+   - `'default'` locale on calendar days (`DayAchievementsModal`, `PeriodAchievementsModal`, `WeekAchievementsModal`): same reason.
+   - RA strings that may carry no zone and are read by `new Date(x)` as **local** time (`LibraryListRow`, `LibraryDetailMilestones`,
+     `LibraryGameDetail:112` `completedAt`, `ShowcaseTile`, `StatusGameItem` ×3 on RA's `AwardedAt` and `lastPlayed`): `formatDate` would read them as UTC. Check what each really holds, and fix as a
+     bug if they are zone-less (a day near midnight shifts), not as a refactor.
+   - `formatUnlockDate` (`gameCompare.ts`) answers `null` for "no date" (the caller shows "earned, no date"), `formatDate` answers
+     "—"; `lastPlayedAgo` (`libraryShelves.ts`) counts calendar days with `numeric: 'auto'`, `relativeTime` uses short units. Not the
+     same thing, so both stay. `VaultWeeksChart` formats a UTC day (`timeZone: 'UTC'`), `formatDay` reads local.
+   - `raIso` (`vaultScoreInputs.ts`): do not touch (stored unlock data). `unlockTime` in `activityInsights.ts` is already on `parseUnlockTime`.
+2. **RA URLs.** Left: `AuthCollagePanel` and `LandingBento` (constant lists of `media.retroachievements.org/Images/…` pictures, not
+   built from a path); links to RA **pages** (`/user/…`, `/game/…`, `/settings`); the image proxy's host list. Where the field was
+   unguarded in an `<Image src>` the call is `raImageUrl(x)!` (its JSX is already inside a `x ? … : …` / `x && …` guard).
+3. **Platforms.** `PLATFORM_STEPS` (Xbox out on purpose), `aiExport.ts` ("PlayStation Network"), `AdminLinkedAccounts.tsx` ("PSN") and
+   `VaultPlatformSplit`'s short names ("RA", "PSN") stay. The want-to-play reads that put `ID` before `GameID` (`library.ts:60`,
+   `gameCandidates.ts:87`, `useAllGamesGlobal`) stay as they are (opposite priority to `raGameId`); the OG card
+   (`user/[username]/opengraph-image.tsx`) keeps its own three-platform list (no Xbox) and takes only the names.
+4. **Types.** Not done, and not mechanical (UT-09/UT-10, better in #125): merging the `fromRa…fromXbox` and `*CompareList` mappers.
+   *Traps:* RA's date is `DateEarnedHardcore ?? DateEarned` in insights but `||` in compare (an empty string differs), compare
+   sorts RA by `DisplayOrder` and insights do not.
+5. **Sessions, left on purpose:** `groups/[id]` GET and `rankings` GET read an optional session (signed out is allowed);
+   `perfectGamesOrder` GET and `showcase` GET read the **viewer's** admin flag after `dataOwner(req)` named someone else.
+6. **`notHidden` — kept by hand:** the overview's four favourites (literal source, id from JSON), its `"hiddenGames"` list, and the
+   `JOIN hidden_games` in `follows/playing`.
+7. Optional, judgement needed: `usePsnSummary`, `useXboxSummary`, `useSteamProfile`, `usePsnTrophies`, `useXboxAchievements` keep a
+   `hasFetched` ref with no background retry; `useRetryingRead` could replace them only if retrying their platforms is wanted
+   (Xbox has a 150-calls-an-hour budget: ask first). Not touched.
+**Watch out** — Never change a key derivation in `secretBox`, `raKey`, `adminAuth`, `emailVerification` or `steamLogin`:
+`secrets.test.ts` fails, and so would every sealed key and link in production. `useRetryingRead`'s `parse` must be made
+once (module level): a new function per render starts a new read every render. A route test that mocks `@/lib/apiAuth`
+whole must give `requireSession` a `user`, or use `jest.requireActual` for it.
+
+---
+
 ## 2026-11-08 — Probable bugs from the antislop audit, checked and fixed (`fix/118-audit-bugs`, #118)
 
 **Did** — Each line of #118 was checked in the current code first; one commit per point (ids are the audit's, in

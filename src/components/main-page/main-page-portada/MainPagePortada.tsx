@@ -12,7 +12,7 @@ import { artVerdict, homeHeroOf, type ArtVerdict } from '@/utils/homeHero'
 import { gameHref } from '@/utils/gameRef'
 import { nextTargets, type InsightAchievement } from '@/utils/gameInsights'
 import { guideLinks } from '@/utils/guideLinks'
-import { decimal, relativeTime } from '@/utils/utils'
+import { decimal } from '@/utils/utils'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import Button from '@/components/ui/Button'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
@@ -20,6 +20,7 @@ import AchievementDetailModal from '@/components/achievement-detail-modal/Achiev
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 import MainPagePortadaSkeleton from '../main-page-portada-skeleton/MainPagePortadaSkeleton'
+import { relativeTime } from '@/utils/dates'
 
 /**
  * The top of the home in its "cover" layout (Preferences → General): the game

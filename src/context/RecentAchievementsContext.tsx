@@ -1,11 +1,10 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState, useMemo } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, useMemo } from 'react'
 import { RecentAchievement } from '@/types/types'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
-import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useRetryingRead } from '@/hooks/useRetryingRead'
 import { withSubject } from '@/utils/withSubject'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { parseUnlockTime } from '@/utils/dates'
@@ -21,6 +20,10 @@ type ProviderValue = CtxType & { request: () => void }
 
 const Ctx = createContext<ProviderValue>({ achievements: [], isLoading: true, error: false, refetch: () => {}, request: () => {} })
 
+const NONE: RecentAchievement[] = []
+const newestFirst = (data: unknown) =>
+  Array.isArray(data) ? [...(data as RecentAchievement[])].sort((a, b) => parseUnlockTime(b.Date) - parseUnlockTime(a.Date)) : null
+
 /**
  * The latest unlocks, shared by the home page and the account page. Loaded on
  * first use rather than on every route: a game or status page never reads it,
@@ -32,72 +35,11 @@ export function RecentAchievementsProvider({ children }: { children: React.React
   const { isHidden } = useHiddenGames()
   const [wanted, setWanted] = useState(false)
   const request = useCallback(() => setWanted(true), [])
-  const [achievements, setAchievements] = useState<RecentAchievement[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const hasFetched = useRef(false)
-  const attemptRef = useRef(0)
-  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
-
-  const doFetch = useCallback(() => {
-    // Named, so a retry can call it again.
-    const run = () => {
-      if (!session?.user?.rausername) return
-      const onFail = (err?: unknown) => {
-        if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
-      }
-      fetchWithRetry(withSubject('/api/getRecentAchievements', subject))
-        .then((data) => {
-          if (!Array.isArray(data)) return onFail()
-          setAchievements([...data].sort(
-            (a, b) => parseUnlockTime(b.Date) - parseUnlockTime(a.Date)
-          ))
-          setIsLoading(false)
-          attemptRef.current = 0
-        })
-        .catch(onFail)
-    }
-    run()
-  }, [session?.user?.rausername, subject])
-
-  const signedOut = status === 'unauthenticated'
-  const rausername = session?.user?.rausername
-
-  // Starting over is state, so it happens while rendering; the refs and the fetch stay in the effect.
-  useWhenChanged([signedOut, rausername], () => {
-    if (signedOut) {
-      setAchievements([])
-      setIsLoading(false)
-    } else if (!rausername) {
-      setIsLoading(false)
-    } else {
-      setIsLoading(true)
-      setError(false)
-    }
-  })
-
-  useEffect(() => {
-    if (signedOut) {
-      hasFetched.current = false
-      clearTimeout(retryTimer.current)
-      attemptRef.current = 0
-      return
-    }
-    if (!rausername || !wanted || hasFetched.current) return
-    hasFetched.current = true
-    doFetch()
-  }, [rausername, signedOut, doFetch, wanted])
-
-  useEffect(() => () => clearTimeout(retryTimer.current), [])
-
-  const refetch = useCallback(() => {
-    clearTimeout(retryTimer.current)
-    attemptRef.current = 0
-    setAchievements([])
-    setIsLoading(true)
-    setError(false)
-    doFetch()
-  }, [doFetch])
+  const canFetch = status === 'authenticated' && Boolean(session?.user?.rausername)
+  const read = useRetryingRead(canFetch && wanted ? withSubject('/api/getRecentAchievements', subject) : null, { parse: newestFirst })
+  const achievements = read.data ?? NONE
+  const isLoading = status === 'loading' || (canFetch && (!wanted || read.isLoading))
+  const { error, refetch } = read
 
   // One object per change of what it holds, so a re-render of the provider (the session updating)
   // does not re-render everything that reads it.

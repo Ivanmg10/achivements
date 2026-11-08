@@ -15,8 +15,8 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { relativeTime } from '@/utils/utils'
 import type { GameGroupItem } from '@/types/types'
+import { relativeTime } from '@/utils/dates'
 
 /**
  * A Steam game in a group — SortableItem's counterpart: drag handle, cover,
@@ -133,7 +133,7 @@ export default function SteamSortableItem({
               <>
                 <IconClock size={12} aria-hidden="true" />
                 {T.steam.playtime} ·{' '}
-                {formatPlaytime(game.playtimeForever, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+                {formatPlaytime(game.playtimeForever, T.steam, lang)}
               </>
             ) : (
               '\u00a0'

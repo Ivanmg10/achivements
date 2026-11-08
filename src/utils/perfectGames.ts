@@ -1,12 +1,15 @@
-import { classifySteamGame, raDateToIso } from '@/utils/steamFeed'
+import { classifySteamGame } from '@/utils/steamFeed'
 import { classifyPsnGame } from '@/utils/psnTitles'
 import type { PsnGameProgress } from '@/types/psn'
 import { classifyXboxGame } from '@/utils/xboxTitles'
 import type { XboxGameProgress } from '@/types/xbox'
 import { gameKey } from '@/utils/gameRef'
 import type { RetroAchievementsGameCompleted, UserAward } from '@/types/types'
-import type { GameSource, SteamGameProgress } from '@/types/steam'
+import type { SteamGameProgress } from '@/types/steam'
 import { validCompletionDate } from '@/utils/completionDates'
+import { parseUnlockTime } from '@/utils/dates'
+import { raImageUrl } from '@/utils/raAssets'
+import type { GameSource } from '@/types/game'
 
 /**
  * A game with every achievement, from either platform, in one shape — what
@@ -44,7 +47,7 @@ export function buildPerfectGames(
       source: 'ra',
       id: g.GameID,
       title: g.Title,
-      imageUrl: g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : undefined,
+      imageUrl: raImageUrl(g.ImageIcon),
       subtitle: g.ConsoleName,
       hardcore,
     })
@@ -160,7 +163,7 @@ export function latestPerfects(
       id: a.AwardData,
       title: a.Title,
       subtitle: a.ConsoleName,
-      iconUrl: a.ImageIcon ? `https://retroachievements.org${a.ImageIcon}` : undefined,
+      iconUrl: raImageUrl(a.ImageIcon),
       date: a.AwardedAt,
       hardcore: a.AwardDataExtra === 1,
     })
@@ -254,10 +257,7 @@ export function groupPerfectsByYear(
 ): { year: number | null; games: PerfectGame[] }[] {
   const byYear = new Map<number | null, PerfectGame[]>()
   // RA dates are "YYYY-MM-DD HH:MM:SS" in UTC; the others are ISO with a zone.
-  const time = (g: PerfectGame) => {
-    const date = dates.get(g.key)
-    return date ? Date.parse(raDateToIso(date) ?? date) : NaN
-  }
+  const time = (g: PerfectGame) => parseUnlockTime(dates.get(g.key))
   for (const g of games) {
     const t = time(g)
     const key = isNaN(t) ? null : new Date(t).getFullYear()

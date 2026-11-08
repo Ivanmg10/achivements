@@ -6,17 +6,19 @@ import Image from 'next/image'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { IconGripVertical, IconX } from '@tabler/icons-react'
-import { relativeTime } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { useSpotlight } from '@/hooks/useSpotlight'
-import { RetroAchievement, GameGroupItem } from '@/types/types'
+import { GameGroupItem } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { relativeTime } from '@/utils/dates'
+import { raImageUrl } from '@/utils/raAssets'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 // About three rows on a wide card; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
@@ -51,7 +53,7 @@ export default function SortableItem({
 
   const consoleDef = CONSOLES.find((c) => c.name === item.console_name)
   const href = `/gameInfo/${item.game_id}`
-  const cover = item.image_icon ? `https://retroachievements.org${item.image_icon}` : null
+  const cover = raImageUrl(item.image_icon) ?? null
 
   const achTotal = achStats?.total || item.max_possible
   const scEarned = achStats?.scEarned ?? item.num_awarded
@@ -67,8 +69,7 @@ export default function SortableItem({
   const { game: gameData, isLoading, error: achError, refetch: refetchAch } = useGameProgression(open ? String(item.game_id) : null)
   const loadingAch = isLoading || (open && !gameData && !achError)
   const achievements = gameData
-    ? Object.values(gameData.Achievements ?? {})
-        .filter((a): a is RetroAchievement => !!a)
+    ? raAchievementList(gameData)
         .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
     : []
 

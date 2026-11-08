@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { presenceOf } from '@/utils/friends'
-import { relativeTime } from '@/utils/utils'
+import { relativeTime } from '@/utils/dates'
 
 /**
  * Whether someone is around, in words: "Now playing: Hades" (green, from

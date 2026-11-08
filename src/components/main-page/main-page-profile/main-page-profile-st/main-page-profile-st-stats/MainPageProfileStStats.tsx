@@ -30,7 +30,7 @@ export default function MainPageProfileStStats({
       <StatCard label={T.steam.statGames} value={library.length.toLocaleString(lang)} loading={isLoading} />
       <StatCard
         label={T.steam.totalPlaytime}
-        value={formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+        value={formatPlaytime(minutes, T.steam, lang)}
         loading={isLoading}
       />
       <StatCard label={T.steam.statPerfect} value={`${perfect.toLocaleString(lang)}${partial}`} accent="text-success" loading={isLoading} />

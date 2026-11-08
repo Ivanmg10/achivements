@@ -1,3 +1,5 @@
+import type { GameProgressBase, GameSource } from '@/types/game'
+
 /**
  * Steam Web API response shapes, plus the unified game/achievement model the
  * UI renders once RA and Steam feeds are mixed.
@@ -162,19 +164,6 @@ export type SteamSchemaResponse = {
 
 /* ---------- Unified model ---------- */
 
-export type GameSource = 'ra' | 'steam' | 'psn' | 'xbox'
-
-export type GameProgressBase = {
-  _source: GameSource
-  id: number
-  title: string
-  imageIcon: string
-  consoleName: string
-  maxPossible: number
-  numAwarded: number
-  pctWon: number
-  lastPlayed: string | null
-}
 
 export type SteamGameProgress = GameProgressBase & {
   _source: 'steam'

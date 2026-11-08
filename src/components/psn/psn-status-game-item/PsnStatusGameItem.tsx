@@ -19,6 +19,7 @@ import { gameHref } from '@/utils/gameRef'
 import { psnBackdrop, psnPlatformChip } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
+import { formatDate } from '@/utils/dates'
 
 /**
  * A PSN game on a category page, laid out like SteamStatusGameItem so the
@@ -89,16 +90,16 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
             {game.playtimeMinutes !== null && (
               <span className="flex items-center gap-1 text-xs text-text-secondary mt-1">
                 <IconClock size={12} aria-hidden="true" />
-                {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+                {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, T.steam, lang)}
               </span>
             )}
             {category === 'completed' && game.completedAt ? (
               <span className="text-xs text-text-secondary mt-1">
-                {T.libraryDetail.finished} · {new Date(game.completedAt).toLocaleDateString(lang)}
+                {T.libraryDetail.finished} · {formatDate(game.completedAt, lang, {})}
               </span>
             ) : game.lastPlayed && (
               <span className="text-xs text-text-secondary mt-1">
-                {T.steam.lastPlayed} · {new Date(game.lastPlayed).toLocaleDateString(lang)}
+                {T.steam.lastPlayed} · {formatDate(game.lastPlayed, lang, {})}
               </span>
             )}
           </div>

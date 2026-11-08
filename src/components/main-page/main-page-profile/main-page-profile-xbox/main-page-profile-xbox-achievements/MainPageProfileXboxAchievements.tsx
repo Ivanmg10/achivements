@@ -8,6 +8,7 @@ import type { XboxRecentAchievement } from '@/types/xbox'
 import { useSubject } from '@/context/SubjectContext'
 import MainPageProfileRecent from '../../main-page-profile-recent/MainPageProfileRecent'
 import MainPageProfileRecentRow from '../../main-page-profile-recent/main-page-profile-recent-row/MainPageProfileRecentRow'
+import { formatDate } from '@/utils/dates'
 
 /**
  * The player's latest achievements — the PSN list's counterpart, same layout,
@@ -42,7 +43,7 @@ export default function MainPageProfileXboxAchievements({
           href={`${gameHref('xbox', a.gameId, subject)}#${xboxAchievementAnchor(a.achievementId)}`}
           badge={a.iconUrl}
           title={a.name}
-          sub={<>{a.gameTitle} · <time dateTime={a.earnedAt}>{new Date(a.earnedAt).toLocaleDateString(lang, { day: 'numeric', month: 'short' })}</time></>}
+          sub={<>{a.gameTitle} · <time dateTime={a.earnedAt}>{formatDate(a.earnedAt, lang, { day: 'numeric', month: 'short' })}</time></>}
           right={`${a.gamerscore} G`}
         />
       ))}

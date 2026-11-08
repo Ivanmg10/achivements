@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import type { DayBySource } from '@/utils/utils'
+import { formatDay } from '@/utils/dates'
 
 /** The box of a tooltip over the unlocks' line. */
 export const LINE_TOOLTIP = 'rounded-tile bg-bg-header ring-1 ring-ink/10 shadow-xl shadow-black/40 px-3 py-2 text-xs flex flex-col gap-1'
@@ -21,7 +22,7 @@ export default function AchivementsLineChartTooltip({
   const day = active ? payload?.[0]?.payload : undefined
   if (!day) return null
 
-  const date = new Date(day.date + 'T00:00:00').toLocaleDateString(lang, { weekday: 'long', day: 'numeric', month: 'short' })
+  const date = formatDay(day.date, lang, { weekday: 'long', day: 'numeric', month: 'short' })
   const count = (n: number) => (n === 1 ? T.lineChart.oneAchievement : `${n} ${T.lineChart.achievements}`)
   const rows = [
     { name: 'RetroAchievements', value: day.ra, swatch: 'bg-chart-2' },

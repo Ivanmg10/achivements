@@ -1,5 +1,6 @@
 import { withSteamCache } from '@/lib/steamCache'
 import { isWideEnough } from '@/utils/homeHero'
+import { utcDay } from '@/utils/dates'
 
 const TIMEOUT_MS = 8_000
 
@@ -266,7 +267,7 @@ export function toIgdbDetails(title: string, games: IgdbGame[]): IgdbDetails | n
     developers: companies('developer'),
     publishers: companies('publisher'),
     genres: (game.genres ?? []).map((g) => g.name),
-    releaseDate: game.first_release_date ? new Date(game.first_release_date * 1000).toISOString().slice(0, 10) : null,
+    releaseDate: game.first_release_date ? utcDay(game.first_release_date * 1000) : null,
     screenshots: (game.screenshots ?? []).map((s) => ({
       thumb: `${IMAGE_URL}/t_screenshot_med/${s.image_id}.jpg`,
       full: `${IMAGE_URL}/t_1080p/${s.image_id}.jpg`,

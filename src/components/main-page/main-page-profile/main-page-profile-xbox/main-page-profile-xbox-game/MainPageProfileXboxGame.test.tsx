@@ -24,7 +24,7 @@ test('a finished game is marked in the "done" colour', () => {
 })
 
 const MINUTES = 3409
-const PLAYED = formatPlaytime(MINUTES, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en')
+const PLAYED = formatPlaytime(MINUTES, en.steam, 'en')
 
 test('the play time beside the console', () => {
   render(<MainPageProfileXboxGame game={{ ...GAME, playtimeMinutes: MINUTES }} />)

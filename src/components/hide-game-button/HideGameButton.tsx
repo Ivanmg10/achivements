@@ -6,9 +6,9 @@ import { IconEyeOff } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useSubject } from '@/context/SubjectContext'
-import type { GameSource } from '@/types/steam'
 import CommonModal from '@/components/common-modal/CommonModal'
 import Button from '@/components/ui/Button'
+import type { GameSource } from '@/types/game'
 
 /**
  * The eye next to a game in a status list. It asks first, in a small popup

@@ -8,11 +8,12 @@ import { plural } from '@/utils/utils'
 import StreakDayRow from '../streak-day-row/StreakDayRow'
 import StreakDayStrip from '../streak-day-strip/StreakDayStrip'
 import StreakSectionHead from '../streak-section-head/StreakSectionHead'
+import { utcDay } from '@/utils/dates'
 
 const COMPLETION_TYPES = new Set(['Mastery/Completion', 'Game Beaten'])
 
 function awardDate(awardedAt: string): string {
-  return new Date(awardedAt).toISOString().split('T')[0]
+  return utcDay(new Date(awardedAt))
 }
 
 /**

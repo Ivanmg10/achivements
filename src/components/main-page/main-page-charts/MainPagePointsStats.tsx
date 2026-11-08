@@ -9,7 +9,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
-import { parseUnlockTime } from '@/utils/dates'
+import { parseUnlockTime, utcDay } from '@/utils/dates'
 
 export default function MainPagePointsStats({
   achievements,
@@ -50,7 +50,7 @@ export default function MainPagePointsStats({
   const safeList = Array.isArray(achievements) ? achievements : []
   const safeHeatmap = Array.isArray(heatmapAchievements) ? heatmapAchievements : []
   const now = new Date()
-  const todayKey = now.toISOString().split('T')[0]
+  const todayKey = utcDay(now)
   const monthKey = now.toISOString().slice(0, 7)
   const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7)
 

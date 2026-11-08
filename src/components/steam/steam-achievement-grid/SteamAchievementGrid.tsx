@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { createPortal } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
-import { formatDate } from '@/utils/utils'
+import { formatDate } from '@/utils/dates'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import type { SteamAchievementUnified } from '@/types/steam'
@@ -157,7 +157,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
               {tooltip.achievement.likelyOnline && <SteamOnlineBadge />}
             </div>
             {tooltip.achievement.dateEarned && (
-              <p className="text-xs text-text-secondary mt-1">{formatDate(tooltip.achievement.dateEarned)}</p>
+              <p className="text-xs text-text-secondary mt-1">{formatDate(tooltip.achievement.dateEarned, lang)}</p>
             )}
           </div>,
           document.body,
