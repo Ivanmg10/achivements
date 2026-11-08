@@ -5,6 +5,7 @@ export const en = {
   header: {
     signIn: 'Sign in',
     status: 'Library',
+    menu: 'Menu',
   },
   sidePanel: {
     userSettings: 'User settings',

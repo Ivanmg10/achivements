@@ -4,6 +4,7 @@ export const fr: Translations = {
   header: {
     signIn: 'Se connecter',
     status: 'Bibliothèque',
+    menu: 'Menu',
   },
   sidePanel: {
     userSettings: 'Paramètres utilisateur',

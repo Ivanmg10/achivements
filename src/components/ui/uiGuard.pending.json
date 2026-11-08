@@ -213,5 +213,23 @@
     "components/user-page/user-identity-card/UserIdentityCard.tsx",
     "components/vault-fill-line/VaultFillLine.tsx",
     "components/vault-fill-progress/VaultFillProgress.tsx"
+  ],
+  "dialogRole": [
+    "components/layout-modal/LayoutModal.tsx",
+    "components/search-modal/SearchModal.tsx"
+  ],
+  "portal": [
+    "components/achievement-detail-modal/AchievementDetailModal.tsx",
+    "components/achievement-grid/AchievementGrid.tsx",
+    "components/achievement-modal/AchievementModal.tsx",
+    "components/admin-panel/admin-panel-modal/AdminPanelModal.tsx",
+    "components/game-achievements-progress-chart/game-achievements-progress-chart-modal/GameAchievementsProgressChartModal.tsx",
+    "components/game-info-header/GameHashesModal.tsx",
+    "components/groups/GroupModal.tsx",
+    "components/groups/add-game-modal/AddGameModal.tsx",
+    "components/psn/psn-trophy-grid/PsnTrophyGrid.tsx",
+    "components/steam/steam-achievement-grid/SteamAchievementGrid.tsx",
+    "components/welcome-curtain/WelcomeCurtain.tsx",
+    "components/xbox/xbox-achievement-grid/XboxAchievementGrid.tsx"
   ]
 }

@@ -6,6 +6,12 @@ import { useLanguage } from '@/context/LanguageContext'
 
 const SIZES = { sm: 'sm:max-w-[27.5rem]', md: 'sm:max-w-[33.75rem]', lg: 'sm:max-w-[47.5rem]', xl: 'sm:max-w-5xl', '2xl': 'sm:max-w-[77.5rem]' } as const
 const BACKDROPS = { default: 'bg-black/60 backdrop-blur-[2px]', opaque: 'bg-black/80 backdrop-blur-sm', dim: 'bg-black/60' } as const
+// center: a card in the middle from sm, a sheet from the bottom on a phone. top: a panel near the top on
+// every screen, for a command panel or a menu (the search, the phone menu).
+const PLACEMENTS = {
+  center: { overlay: 'items-end sm:items-center sm:p-4', panel: 'max-h-[92dvh] rounded-t-card sm:rounded-card', from: 24, to: 16 },
+  top: { overlay: 'items-start px-4 pt-[12vh]', panel: 'max-h-[80dvh] rounded-sheet', from: -14, to: -8 },
+} as const
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 export type ModalProps = {
@@ -23,6 +29,8 @@ export type ModalProps = {
   tone?: 'default' | 'danger'
   /** How much of the page behind shows through; `opaque` is for an immersive chooser, `dim` has no blur, for a dialog whose page takes part in a view transition (Firefox drops the blur from its capture). */
   backdrop?: keyof typeof BACKDROPS
+  /** Where it opens: `top` for a command panel or a menu. */
+  placement?: keyof typeof PLACEMENTS
   /** The quiet ✕ in the corner; on unless the content has its own way out. */
   showClose?: boolean
   /** Names the dialog when there is no `title` (otherwise its first heading does). */
@@ -49,6 +57,7 @@ export default function Modal({
   size = 'sm',
   tone = 'default',
   backdrop = 'default',
+  placement = 'center',
   showClose = true,
   'aria-label': ariaLabel,
   'aria-labelledby': labelledBy,
@@ -115,12 +124,13 @@ export default function Modal({
   if (typeof document === 'undefined') return null
 
   const fade = { duration: reduce ? 0 : 0.2 }
+  const place = PLACEMENTS[placement]
 
   return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center ${BACKDROPS[backdrop]} sm:p-4`}
+          className={`fixed inset-0 z-50 flex justify-center ${place.overlay} ${BACKDROPS[backdrop]}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -135,10 +145,10 @@ export default function Modal({
             aria-labelledby={title ? titleId : labelledBy}
             aria-describedby={hint ? hintId : undefined}
             tabIndex={-1}
-            className={`relative w-full ${SIZES[size]} max-h-[92dvh] flex flex-col bg-bg-header text-text-main rounded-t-card sm:rounded-card ring-1 ring-ink/[0.08] shadow-2xl shadow-black/50 outline-none`}
-            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.98 }}
+            className={`relative w-full ${SIZES[size]} flex flex-col bg-bg-header text-text-main ${place.panel} ring-1 ring-ink/[0.08] shadow-2xl shadow-black/50 outline-none`}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: place.from, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.98 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: place.to, scale: 0.98 }}
             transition={{ duration: reduce ? 0 : 0.22, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
           >

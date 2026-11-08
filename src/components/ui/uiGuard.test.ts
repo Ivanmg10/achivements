@@ -77,11 +77,10 @@ test('checkboxes come from Checkbox', () => {
 })
 
 test('dialogs come from Modal', () => {
-  // Not dialogs: the sign-in backdrop, the welcome's curtain, the phone menu drawer, the search panel (PR 2 rebuilds it).
+  // Not dialogs: the sign-in backdrop, the welcome's curtain. The search panel still moves to Modal placement="top" (#120 → Open).
   const allowed = [
     path.join('app', '(auth)', 'authPage', 'page.tsx'),
     path.join('components', 'welcome-curtain', 'WelcomeCurtain.tsx'),
-    path.join('components', 'main-header', 'MobileNavModal.tsx'),
     path.join('components', 'search-modal', 'SearchModal.tsx'),
   ]
   expect(offenders(/className="fixed inset-0[^"]*bg-black/).filter((f) => !allowed.includes(f))).toEqual([])
@@ -161,6 +160,8 @@ const NEW_RULES = {
   spinner: /\banimate-spin\b|main-spinner\/Spinner/,
   pillButton: /<button\b[^>]*?className=\{?["'`][^"'`]*\brounded-full\b|px-3 py-1 rounded-full hover:bg-ink\/10/,
   notice: /bg-(?:danger|warning|success|info)\/\d+[^"'`]*ring-(?:1|inset)\b/,
+  dialogRole: /role="(?:alert)?dialog"|\baria-modal\b/,
+  portal: /\bcreatePortal\(/,
 }
 
 test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
@@ -197,4 +198,12 @@ test('a retry or any pill-shaped button comes from Button (ErrorRetry under a fa
 
 test('a tinted notice box comes from Notice (or ErrorRetry), never drawn by hand', () => {
   expect(newOffenders('notice', NEW_RULES.notice)).toEqual([])
+})
+
+test('a dialog is a Modal (placement="top" for a panel or a menu): no hand-made role="dialog" or aria-modal', () => {
+  expect(newOffenders('dialogRole', NEW_RULES.dialogRole)).toEqual([])
+})
+
+test('only the library portals: Modal portals itself, so wrapping it in createPortal is never needed', () => {
+  expect(newOffenders('portal', NEW_RULES.portal)).toEqual([])
 })

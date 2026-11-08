@@ -58,6 +58,14 @@ test('collapses the Status group again when isOpen becomes false and reopens', (
   expect(screen.queryByText('In progress')).not.toBeInTheDocument()
 })
 
+test('it is a dialog named by its title, near the top, that Escape closes', () => {
+  const onClose = jest.fn()
+  render(<MobileNavModal isOpen={true} onClose={onClose} />)
+  expect(screen.getByRole('dialog', { name: 'Menu' })).toHaveClass('rounded-sheet')
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(onClose).toHaveBeenCalled()
+})
+
 test('Following is a top-level item that opens who you follow', () => {
   const onClose = jest.fn()
   render(<MobileNavModal isOpen={true} onClose={onClose} />)

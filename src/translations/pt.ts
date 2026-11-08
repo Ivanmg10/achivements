@@ -4,6 +4,7 @@ export const pt: Translations = {
   header: {
     signIn: 'Entrar',
     status: 'Biblioteca',
+    menu: 'Menu',
   },
   sidePanel: {
     userSettings: 'Configurações do usuário',

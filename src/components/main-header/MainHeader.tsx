@@ -172,7 +172,7 @@ export default function MainHeader() {
           {hasPlatform && (
           <button
             onClick={() => setMobileMenuOpen(true)}
-            aria-label="Menu"
+            aria-label={T.header.menu}
             className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
           >
             <IconMenu className="w-5 h-5" aria-hidden="true" />
