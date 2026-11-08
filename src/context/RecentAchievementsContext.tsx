@@ -8,6 +8,7 @@ import { useSubject } from '@/context/SubjectContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { withSubject } from '@/utils/withSubject'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
+import { parseUnlockTime } from '@/utils/dates'
 
 type CtxType = {
   achievements: RecentAchievement[]
@@ -49,7 +50,7 @@ export function RecentAchievementsProvider({ children }: { children: React.React
         .then((data) => {
           if (!Array.isArray(data)) return onFail()
           setAchievements([...data].sort(
-            (a, b) => new Date(b.Date.replace(' ', 'T')).getTime() - new Date(a.Date.replace(' ', 'T')).getTime()
+            (a, b) => parseUnlockTime(b.Date) - parseUnlockTime(a.Date)
           ))
           setIsLoading(false)
           attemptRef.current = 0

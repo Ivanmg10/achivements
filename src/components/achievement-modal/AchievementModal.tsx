@@ -14,6 +14,7 @@ import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseTo
 import Modal from '@/components/ui/Modal'
 import { decimal } from '@/utils/utils'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
+import { parseUnlockTime } from '@/utils/dates'
 
 interface AchievementUnlock {
   User: string
@@ -107,7 +108,7 @@ export default function AchievementModal({
   }, [achievement.ID])
 
   const earnedDate = achievement.DateEarned
-    ? new Date(achievement.DateEarned).toLocaleString(lang, {
+    ? new Date(parseUnlockTime(achievement.DateEarned)).toLocaleString(lang, {
         day: 'numeric', month: 'short', year: 'numeric',
         hour: '2-digit', minute: '2-digit',
       })

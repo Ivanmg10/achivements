@@ -18,6 +18,7 @@ import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useSubject } from '@/context/SubjectContext'
+import { parseUnlockTime } from '@/utils/dates'
 
 const ABANDONED_DAYS = 30
 const DAY_MS = 1000 * 60 * 60 * 24
@@ -114,7 +115,7 @@ export default function MainPageAbandoned({
     const ra: Row[] = playing.flatMap((g) => {
       const dateStr = lastPlayedMap.get(g.GameID) ?? lastAchDates[g.GameID]
       if (!dateStr) return []
-      const daysAgo = Math.floor((now - new Date(dateStr.replace(' ', 'T')).getTime()) / DAY_MS)
+      const daysAgo = Math.floor((now - parseUnlockTime(dateStr)) / DAY_MS)
       return [{
         key: `ra:${g.GameID}`,
         href: gameHref('ra', g.GameID, subject),

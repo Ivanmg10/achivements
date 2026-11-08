@@ -1,3 +1,4 @@
+import { parseUnlockTime } from '@/utils/dates'
 import type { GameSource } from '@/types/steam'
 
 /** How many achievements a showcase holds. */
@@ -62,7 +63,7 @@ export function raShowcaseEntry(
   gameTitle: string,
 ): ShowcaseEntry | null {
   const earned = a.DateEarnedHardcore || a.DateEarned
-  const at = earned ? Date.parse(earned.includes('T') ? earned : earned.replace(' ', 'T')) : NaN
+  const at = earned ? parseUnlockTime(earned) : NaN
   if (Number.isNaN(at)) return null
   return {
     source: 'ra',
@@ -102,7 +103,7 @@ type ChoiceInput = {
 
 const isoOf = (d: string | null | undefined) => {
   if (!d) return null
-  const t = Date.parse(d.includes('T') ? d : d.replace(' ', 'T'))
+  const t = parseUnlockTime(d)
   return Number.isNaN(t) ? null : new Date(t).toISOString()
 }
 

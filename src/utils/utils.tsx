@@ -3,10 +3,11 @@ import { CategoryGame } from '@/hooks/useGamesByCategory'
 import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
 import type { GameSource } from '@/types/steam'
+import { parseUnlockTime } from '@/utils/dates'
 
 export function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '—'
-  const d = new Date(dateStr.replace(' ', 'T'))
+  const d = new Date(parseUnlockTime(dateStr))
   if (isNaN(d.getTime())) return '—'
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 }
@@ -17,7 +18,7 @@ export function formatDate(dateStr: string | null | undefined): string {
  */
 export function relativeTime(dateStr: string | null | undefined, lang = 'en'): string {
   if (!dateStr) return '—'
-  const t = new Date(dateStr).getTime()
+  const t = parseUnlockTime(dateStr)
   if (isNaN(t)) return '—'
   const secs = Math.round((t - Date.now()) / 1000)
   const fmt = new Intl.RelativeTimeFormat(lang, { numeric: 'auto', style: 'short' })
@@ -62,7 +63,7 @@ export function groupGameAchievementsByPeriod<T extends DatedUnlock>(
   period: 'week' | 'month',
 ): { label: string; start: number; count: number; items: T[] }[] {
   const dated = achievements
-    .map((a) => ({ a, d: a.earnedAt ? new Date(a.earnedAt.replace(' ', 'T')) : null }))
+    .map((a) => ({ a, d: a.earnedAt ? new Date(parseUnlockTime(a.earnedAt)) : null }))
     .filter((x): x is { a: T; d: Date } => !!x.d && !isNaN(x.d.getTime()))
 
   const ranges =
@@ -150,7 +151,7 @@ export function calcThisMonth(achievements: RecentAchievement[]): { pts: number;
 export function calcAvgPerDay(achievements: RecentAchievement[], days: number = 30): number {
   if (!achievements.length) return 0
   const cutoff = Date.now() - days * 86400000
-  const count = achievements.filter((a) => new Date(a.Date.replace(' ', 'T')).getTime() >= cutoff).length
+  const count = achievements.filter((a) => parseUnlockTime(a.Date) >= cutoff).length
   return count / days
 }
 
@@ -167,7 +168,7 @@ export function activityKpis(achievements: RecentAchievement[], now: number = Da
   const monthAgo = now - 30 * 86400000
   let today = 0, week = 0, month = 0, last30 = 0
   for (const a of achievements) {
-    const t = Date.parse(a.Date.replace(' ', 'T'))
+    const t = parseUnlockTime(a.Date)
     if (a.Date.startsWith(todayKey)) today++
     if (a.Date.slice(0, 7) === monthKey) month++
     if (t >= weekAgo) week++

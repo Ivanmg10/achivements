@@ -7,14 +7,15 @@ import { getUserRecentAchievements } from '@/lib/raClient'
 import { visibleGamesForUser } from '@/lib/gameVisibility'
 import { slimUnlock } from '@/lib/raYear'
 import type { RecentAchievement } from '@/types/types'
+import { parseUnlockTime } from '@/utils/dates'
 
 const TTL = 60 * 1000
 
 function sortDesc(arr: RecentAchievement[]) {
   return [...arr].sort(
     (a, b) =>
-      new Date(b.Date.replace(' ', 'T')).getTime() -
-      new Date(a.Date.replace(' ', 'T')).getTime(),
+      parseUnlockTime(b.Date) -
+      parseUnlockTime(a.Date),
   )
 }
 

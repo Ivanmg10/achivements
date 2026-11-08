@@ -40,7 +40,7 @@ export default function MainPageFriendsFeed({ items }: { items: FeedItem[] }) {
                       <span className="text-text-main">{username}</span> · {a.GameTitle}
                     </span>
                   </span>
-                  <span className="text-[10px] text-text-secondary shrink-0">{relativeTime(a.Date.replace(' ', 'T') + 'Z', lang)}</span>
+                  <span className="text-[10px] text-text-secondary shrink-0">{relativeTime(a.Date, lang)}</span>
                 </Link>
               </li>
             )

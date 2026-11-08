@@ -11,6 +11,7 @@ import DayAchievementsModal from '@/components/day-achievements-modal/DayAchieve
 import WeekAchievementsModal from '@/components/week-achievements-modal/WeekAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
+import { parseUnlockTime } from '@/utils/dates'
 
 type Metric = 'pts' | 'ach'
 
@@ -28,10 +29,10 @@ function getBestDay(achievements: RecentAchievement[], by: Metric) {
 function getBestWeek(achievements: RecentAchievement[], by: Metric) {
   const byWeek: Record<string, { pts: number; ach: number }> = {}
   for (const a of achievements) {
-    const d = new Date(a.Date.replace(' ', 'T'))
-    const day = d.getDay() || 7
+    const d = new Date(parseUnlockTime(a.Date))
+    const day = d.getUTCDay() || 7
     const monday = new Date(d)
-    monday.setDate(d.getDate() - day + 1)
+    monday.setUTCDate(d.getUTCDate() - day + 1)
     const key = monday.toISOString().split('T')[0]
     if (!byWeek[key]) byWeek[key] = { pts: 0, ach: 0 }
     byWeek[key].pts += a.Points

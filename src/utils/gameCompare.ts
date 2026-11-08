@@ -1,3 +1,4 @@
+import { parseUnlockTime } from '@/utils/dates'
 import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import type { SteamAchievementUnified } from '@/types/steam'
 import type { PsnTrophy, TrophyGrade } from '@/types/psn'
@@ -144,8 +145,8 @@ export function compareSummary(rows: CompareRow[]): CompareSummary {
 /** Who unlocked it first, when both did and both dates are known. */
 export function firstToUnlock(row: CompareRow): 'them' | 'me' | null {
   if (!row.earned || !row.earnedAt || !row.mine?.earned || !row.mine.earnedAt) return null
-  const them = Date.parse(row.earnedAt.replace(' ', 'T'))
-  const me = Date.parse(row.mine.earnedAt.replace(' ', 'T'))
+  const them = parseUnlockTime(row.earnedAt)
+  const me = parseUnlockTime(row.mine.earnedAt)
   if (Number.isNaN(them) || Number.isNaN(me) || them === me) return null
   return them < me ? 'them' : 'me'
 }
@@ -153,6 +154,6 @@ export function firstToUnlock(row: CompareRow): 'them' | 'me' | null {
 /** An unlock's day in the given locale ("3 Oct 2026" in en-GB); null for a missing or unreadable date. */
 export function formatUnlockDate(date: string | null, lang: string): string | null {
   if (!date) return null
-  const d = new Date(date.replace(' ', 'T'))
+  const d = new Date(parseUnlockTime(date))
   return Number.isNaN(d.getTime()) ? null : d.toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' })
 }
