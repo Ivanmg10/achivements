@@ -1,13 +1,13 @@
 /**
  * The achievement tables' look (RA, Steam, PlayStation, Xbox), as agreed on the
- * canvas: small uppercase headers on a hairline, rows divided by a fainter one,
+ * canvas: small headers in sentence case on a hairline, rows divided by a fainter one,
  * and on hover a tint with the accent's edge on the first cell. Numbers right
  * aligned, rarity centred.
  */
 export const TABLE = 'w-full border-separate border-spacing-0'
 
 export const TH =
-  'px-3 py-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-text-secondary whitespace-nowrap shadow-hairline-b'
+  'px-3 py-2.5 text-[0.8125rem] font-semibold text-text-secondary whitespace-nowrap shadow-hairline-b'
 
 /** A row: `group` so its cells tint together on hover. */
 export const ROW = 'group relative'

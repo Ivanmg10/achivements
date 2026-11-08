@@ -43,7 +43,7 @@ export function SortableHeader<K extends string = SortKey>({
       <button
         type="button"
         onClick={() => onSort(sortKey)}
-        className={`inline-flex items-center gap-1 uppercase tracking-[inherit] select-none transition-colors hover:text-text-main rounded focus-ring ${
+        className={`inline-flex items-center gap-1 select-none transition-colors hover:text-text-main rounded focus-ring ${
           active ? 'text-text-main' : 'text-text-secondary'
         }`}
       >

@@ -4,9 +4,9 @@ type Tone = 'muted' | 'accent' | 'danger' | 'warning' | 'inherit'
 type Size = 'xs' | 'sm' | 'md'
 
 const SIZES: Record<Size, string> = {
-  xs: 'text-[10px] tracking-widest',
-  sm: 'text-[0.6875rem] font-bold tracking-[0.12em]',
-  md: 'text-xs font-bold tracking-[0.14em]',
+  xs: 'text-[0.8125rem] font-semibold',
+  sm: 'text-[0.8125rem] font-bold',
+  md: 'text-sm font-bold',
 }
 
 const TONES: Record<Tone, string> = {
@@ -20,12 +20,13 @@ const TONES: Record<Tone, string> = {
 
 /** The kicker's classes, for an element that cannot be a `Kicker` (a `<dt>`, a `<th>`). */
 export function kickerClass(tone: Tone = 'muted', size: Size = 'xs') {
-  return `uppercase ${SIZES[size]} ${TONES[tone]}`
+  return `${SIZES[size]} ${TONES[tone]}`
 }
 
 /**
- * The small uppercase, tracked label over a title or a figure. `xs` is the
- * home's chart heads, `sm` a panel's or a group's, `md` the welcome's.
+ * The small label over a title or a figure, in sentence case (identity B,
+ * #127: "This week", never "THIS WEEK"). `xs` is the home's chart heads and a
+ * figure's label, `sm` a panel's or a group's, `md` the welcome's.
  */
 export default function Kicker({
   as: Tag = 'p',

@@ -81,7 +81,7 @@ export default function RankingsGuide() {
         <div className="bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] rounded-pane overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="border-b border-ink/[0.1] text-[0.6875rem] uppercase tracking-[0.08em] text-text-secondary">
+              <tr className="border-b border-ink/[0.1] text-[0.8125rem] font-semibold text-text-secondary">
                 <th scope="col" className="px-4 py-2.5 text-left font-bold">{g.levels.colTier}</th>
                 <th scope="col" className="px-4 py-2.5 text-left font-bold">{g.levels.colLevels}</th>
                 <th scope="col" className="px-4 py-2.5 text-right font-bold">{g.levels.colFrom}</th>

@@ -238,7 +238,7 @@ export default function AchievementModal({
                       onClick={() => setUnlocksOpen((o) => !o)}
                       className="flex items-center justify-between px-4 py-3 hover:bg-bg-header/40 transition-colors text-left"
                     >
-                      <span className="text-sm font-semibold text-text-secondary uppercase tracking-wide">
+                      <span className="text-sm font-semibold text-text-secondary">
                         Recent unlocks ({detail.unlocks.UnlocksCount.toLocaleString()} / {detail.unlocks.TotalPlayers.toLocaleString()})
                       </span>
                       <span className="text-text-secondary text-xs">{unlocksOpen ? '▲' : '▼'}</span>
@@ -274,7 +274,7 @@ export default function AchievementModal({
                 {sortedComments.length > 0 ? (
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">
+                      <h3 className="text-sm font-semibold text-text-secondary">
                         Comments ({detail.comments!.Total})
                       </h3>
                       {totalPages > 1 && (

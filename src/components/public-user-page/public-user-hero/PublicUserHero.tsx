@@ -40,7 +40,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
                   {user.username}
                 </h1>
                 {user.isSelf && (
-                  <span className="text-[10px] uppercase tracking-wider font-semibold bg-accent/15 text-accent px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-semibold bg-accent/15 text-accent px-2 py-0.5 rounded-full">
                     {T.userProfile.yourProfile}
                   </span>
                 )}
