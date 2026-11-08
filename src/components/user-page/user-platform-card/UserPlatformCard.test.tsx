@@ -1,6 +1,29 @@
 import { render, screen } from '@testing-library/react'
-import UserPlatformCard from './UserPlatformCard'
+import UserPlatformCard, { platformStat } from './UserPlatformCard'
 import { en } from '@/translations/en'
+
+describe('platformStat', () => {
+  test("a number is written in the reader's language, and is loading while it is on its way", () => {
+    expect(platformStat('Games', 1234, { lang: 'es' })).toEqual({ label: 'Games', value: (1234).toLocaleString('es'), accent: undefined, loading: false })
+    expect(platformStat('Games', undefined, { lang: 'en', loading: true })).toMatchObject({ value: '—', loading: true })
+  })
+
+  test('the dash is for a value that is truly absent, and a zero is a zero', () => {
+    expect(platformStat('Tier', null, { lang: 'en' })).toMatchObject({ value: '—', loading: false })
+    expect(platformStat('Platinum', 0, { lang: 'en' })).toMatchObject({ value: '0' })
+  })
+})
+
+test('a figure on its way is a skeleton in its place, not a dash', () => {
+  const { container } = render(
+    <UserPlatformCard
+      name="Steam" logo={null} gradient="" connected
+      stats={[platformStat('Games', undefined, { lang: 'en', loading: true }), platformStat('Perfect', 3, { lang: 'en' })]}
+    />,
+  )
+  expect(container.textContent).not.toContain('—')
+  expect(container.querySelector('.bg-skeleton')).not.toBeNull()
+})
 
 const STATS = [
   { label: 'Games', value: '120' },

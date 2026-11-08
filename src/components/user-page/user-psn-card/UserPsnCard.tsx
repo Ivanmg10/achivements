@@ -10,6 +10,7 @@ import { countTrophies, totalPlaytime } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import UserPlatformCard, {
   DISCONNECT_CLASS,
+  platformStat,
   PlatformStat,
 } from '@/components/user-page/user-platform-card/UserPlatformCard'
 import UserPsnCardForm from '@/components/user-page/user-psn-card/user-psn-card-form/UserPsnCardForm'
@@ -27,20 +28,14 @@ export default function UserPsnCard() {
   const minutes = totalPlaytime(library)
   const onlineId = summary?.onlineId || username
 
-  const value = (n: number | undefined) => (isLoading || n === undefined ? '—' : n.toLocaleString(lang))
   const earned = summary?.earned
+  const summaryOpts = { lang, loading: isLoading }
   const stats: PlatformStat[] = [
-    { label: T.psn.level, value: value(summary?.trophyLevel) },
-    { label: T.userStats.games, value: value(summary?.games) },
-    { label: T.psn.platinum, value: value(earned?.platinum), accent: 'text-sky-300' },
-    {
-      label: T.steam.playtime,
-      value: libraryLoading ? '—' : formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang),
-    },
-    {
-      label: T.psn.trophies,
-      value: value(earned ? countTrophies(earned) : undefined),
-    },
+    platformStat(T.psn.level, summary?.trophyLevel, summaryOpts),
+    platformStat(T.userStats.games, summary?.games, summaryOpts),
+    platformStat(T.psn.platinum, earned?.platinum, { ...summaryOpts, accent: 'text-sky-300' }),
+    platformStat(T.steam.playtime, formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang), { lang, loading: libraryLoading }),
+    platformStat(T.psn.trophies, earned ? countTrophies(earned) : undefined, summaryOpts),
   ]
 
   const handleLink = async (name: string) => {
