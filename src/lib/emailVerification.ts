@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import { hmacHex, sameHex } from '@/lib/secrets'
 
 /**
  * Email verification links, signed rather than stored.
@@ -14,19 +14,9 @@ import crypto from 'crypto'
  */
 const TTL_MS = 7 * 24 * 60 * 60 * 1000
 
-function secret(): string {
-  const value = process.env.NEXTAUTH_SECRET
-  if (!value) throw new Error('NEXTAUTH_SECRET is not configured')
-  return value
-}
-
-function mac(payload: string): string {
-  return crypto.createHmac('sha256', secret()).update(payload).digest('hex')
-}
-
 export function signVerification(userId: string | number, email: string, issuedAt = Date.now()): string {
   const payload = `${userId}.${email.toLowerCase()}.${issuedAt}`
-  return `${Buffer.from(payload).toString('base64url')}.${mac(payload)}`
+  return `${Buffer.from(payload).toString('base64url')}.${hmacHex(payload)}`
 }
 
 export type Verification = { userId: string; email: string }
@@ -44,10 +34,7 @@ export function readVerification(token: string | null, now = Date.now()): Verifi
     return null
   }
 
-  const expected = mac(payload)
-  const given = Buffer.from(signature, 'hex')
-  const want = Buffer.from(expected, 'hex')
-  if (given.length !== want.length || !crypto.timingSafeEqual(given, want)) return null
+  if (!sameHex(signature, hmacHex(payload))) return null
 
   // An address has dots of its own, so the payload is read from its ends in:
   // the id is the first field, the timestamp the last, the address the rest.

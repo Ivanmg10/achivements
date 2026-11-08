@@ -6,8 +6,8 @@ import { getPlayerSummaries } from '@/lib/steamClient'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
 import { sendSteamLinkNotice } from '@/lib/steamLinkNotice'
 import { forgetUser } from '@/lib/userRecord'
+import { cookieFromHeader } from '@/lib/secrets'
 import {
-  cookieFromHeader,
   expiredStateCookie,
   linkReturn,
   returnParams,

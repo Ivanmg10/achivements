@@ -1,5 +1,5 @@
-import crypto from 'crypto'
 import { suggestUsername } from '@/utils/authValidation'
+import { cookieFromHeader, hmacHex, sameHex } from '@/lib/secrets'
 
 /**
  * Sign in with Steam: Steam's OpenID 2.0, which proves a SteamID64 and nothing
@@ -65,24 +65,16 @@ export async function verifySteamLogin(query: URLSearchParams, base: string): Pr
   return /^is_valid\s*:\s*true$/m.test(await res.text()) ? match[1] : null
 }
 
-function mac(payload: string): string {
-  const secret = process.env.NEXTAUTH_SECRET
-  if (!secret) throw new Error('NEXTAUTH_SECRET is not configured')
-  return crypto.createHmac('sha256', secret).update(payload).digest('hex')
-}
-
 export function signTicket(steamid: string, issuedAt = Date.now()): string {
   const payload = `${steamid}.${issuedAt}`
-  return `${payload}.${mac(payload)}`
+  return `${payload}.${hmacHex(payload)}`
 }
 
 /** The SteamID64 a ticket carries, or null when it is missing, forged or stale. */
 export function readTicket(ticket: string | null | undefined, now = Date.now()): string | null {
   const [steamid, issuedAt, signature] = (ticket ?? '').split('.')
   if (!steamid || !issuedAt || !signature || !/^\d{17}$/.test(steamid)) return null
-  const given = Buffer.from(signature, 'hex')
-  const want = Buffer.from(mac(`${steamid}.${issuedAt}`), 'hex')
-  if (given.length !== want.length || !crypto.timingSafeEqual(given, want)) return null
+  if (!sameHex(signature, hmacHex(`${steamid}.${issuedAt}`))) return null
   const age = now - Number(issuedAt)
   return age >= 0 && age <= TICKET_TTL_MS ? steamid : null
 }
@@ -110,12 +102,6 @@ export function expiredStateCookie(secure: boolean): string {
  */
 export function stateCookie(state: string, secure: boolean): string {
   return `${STEAM_STATE_COOKIE}=${state}; Path=${CALLBACK_PATH}; HttpOnly; SameSite=Lax; Max-Age=${TICKET_TTL_MS / 1000}${secure ? '; Secure' : ''}`
-}
-
-/** One cookie from a raw Cookie header (NextAuth's authorize gets headers, not cookies). */
-export function cookieFromHeader(header: string | null | undefined, name: string): string | null {
-  const found = (header ?? '').split(/;\s*/).find((c) => c.startsWith(`${name}=`))
-  return found ? decodeURIComponent(found.slice(name.length + 1)) : null
 }
 
 export function ticketFromCookieHeader(header: string | null | undefined): string | null {
