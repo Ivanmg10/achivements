@@ -59,8 +59,7 @@ export default function RankingsPagePodium({ rows, linked, approx = false }: { r
               stacked
               nameClass="text-base sm:text-[1.1875rem] font-extrabold"
             >
-              <VaultLevelBadge points={r.totalPoints} compact className="sm:hidden" />
-              <VaultLevelBadge points={r.totalPoints} className="hidden sm:inline-flex" />
+              <VaultLevelBadge points={r.totalPoints} compact="phone" />
             </RankingsPageUser>
             <span className="text-lg sm:text-[1.875rem] leading-tight font-extrabold tabular-nums whitespace-nowrap">
               {r.isMe && approx && <span className="text-warning" title={T.rankings.fillApprox}>≈ </span>}
