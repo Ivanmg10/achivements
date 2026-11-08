@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import Figure from './Figure'
 
-test('bare: a kicker over the figure, in its tone, with the line under it', () => {
+test('bare: a label in sentence case over the figure, in its tone, with the line under it', () => {
   render(<Figure label="Vault Points" value="143,820" sub="this week +48" tone="hardcore" />)
-  expect(screen.getByText('Vault Points')).toHaveClass('uppercase')
+  expect(screen.getByText('Vault Points').className).not.toContain('uppercase')
   expect(screen.getByText('143,820')).toHaveClass('text-hardcore')
   expect(screen.getByText('this week +48')).toBeInTheDocument()
 })
@@ -33,10 +33,12 @@ test('a bare figure renders its label, value and sub line; a plain one is no lin
   expect(screen.queryByRole('button')).not.toBeInTheDocument()
 })
 
-test('a pressed bare figure leans its hover on the slant, and is a tile, never a chip', () => {
+test('a pressed bare figure hovers upright, is a tile, never a chip, and the mark stands between figures', () => {
   const { container } = render(<Figure label="Today" value="3" onClick={() => {}} />)
-  expect(screen.getByRole('button')).toHaveClass('after:skew-x-(--slant-pill)', 'hover:after:bg-ink/5')
-  expect(container.firstChild).toHaveClass('min-w-24', 'px-3', 'rounded-tile')
+  expect(screen.getByRole('button')).toHaveClass('hover:after:bg-ink/5')
+  expect(screen.getByRole('button').className).not.toContain('skew')
+  expect(container.firstChild).toHaveClass('min-w-24', 'rounded-tile')
+  expect(container.querySelector('[aria-hidden="true"]')).toHaveClass('before:content-(--mark)', 'group-first/figure:hidden')
   expect(container.firstChild).not.toHaveClass('rounded-chip')
 })
 

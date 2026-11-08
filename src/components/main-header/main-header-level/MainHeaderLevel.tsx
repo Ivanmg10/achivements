@@ -40,7 +40,7 @@ export default function MainHeaderLevel({ glass }: { glass?: boolean }) {
           <span className="sr-only">{T.rankings.fillA11y.replace('{pct}', String(fill.pct))}</span>
         </span>
       ) : (
-        me && <VaultLevelBadge points={me.points} compact />
+        me && <VaultLevelBadge points={me.points} compact size="lg" />
       )}
     </Link>
   )

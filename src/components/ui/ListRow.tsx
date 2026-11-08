@@ -3,11 +3,11 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 /**
  * The row's look, for an element that is not a `ListRow` (a person drawn by
- * `UserSummary`): the accent tint on hover and focus, and the accent's slanted
+ * `UserSummary`): the accent tint on hover and focus, and the accent's
  * mark on the left of the one with focus.
  */
 export const LIST_ROW =
-  "relative overflow-hidden w-full flex items-center gap-3 min-h-[3.375rem] px-2.5 py-1.5 rounded-tile text-left cursor-pointer transition-colors hover:bg-accent/10 focus-visible:bg-accent/10 focus-visible:outline-none before:content-[''] before:absolute before:left-0 before:top-2.5 before:bottom-2.5 before:w-[3px] before:bg-accent before:skew-y-(--slant-mark) before:opacity-0 focus-visible:before:opacity-100"
+  "relative overflow-hidden w-full flex items-center gap-3 min-h-[3.375rem] px-2.5 py-1.5 rounded-tile text-left cursor-pointer transition-colors hover:bg-accent/10 focus-visible:bg-accent/10 focus-visible:outline-none before:content-[''] before:absolute before:left-0 before:top-2.5 before:bottom-2.5 before:w-[3px] before:bg-accent before:opacity-0 focus-visible:before:opacity-100"
 
 type Props = {
   /** A picture or an icon, in a 40 px box. */

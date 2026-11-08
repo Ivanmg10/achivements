@@ -56,8 +56,9 @@ const SIZES = {
 
 /**
  * A small tinted label (Beta, You, a console, a state). Its tone says what it
- * means, so a word goes with it, never colour alone. `slant` leans it on the
- * design's slant, as the game page's chips do; the text stays upright.
+ * means, so a word goes with it, never colour alone. Upright, as every small
+ * piece is (#127); `slant` leans it on the one angle only for a mark of the
+ * player's own (their level, `VaultLevelBadge`), the text upright.
  */
 export default function Tag({
   tone = 'muted',
@@ -82,8 +83,8 @@ export default function Tag({
   const box = `inline-flex items-center font-sans not-italic whitespace-nowrap ${SIZES[size]} ${TONES[tone]}`
   if (!slant) return <span title={title} style={style} className={`${box} ${className}`}>{children}</span>
   return (
-    <span title={title} style={style} className={`${box} skew-x-(--slant-pill) ${className}`}>
-      <span className={`inline-flex items-center -skew-x-(--slant-pill) ${size === 'md' || size === 'lg' ? 'gap-1.5' : 'gap-1'}`}>{children}</span>
+    <span title={title} style={style} className={`${box} skew-x-(--slant) ${className}`}>
+      <span className={`inline-flex items-center -skew-x-(--slant) ${size === 'md' || size === 'lg' ? 'gap-1.5' : 'gap-1'}`}>{children}</span>
     </span>
   )
 }

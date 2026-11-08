@@ -29,18 +29,21 @@ const SHAPES: Record<TierId, string> = {
 }
 
 /**
- * A user's level and tier from their Vault Points, as a pill in the tier's
- * hue with its shape. `compact` shows the level alone (the tier stays in the
+ * A user's level and tier from their Vault Points, as a tag in the tier's
+ * hue with its shape, leaning on the one angle: a mark of the player's own (#127). `compact` shows the level alone (the tier stays in the
  * accessible name and the tooltip); `compact="phone"` does so below `sm` only,
  * so a caller never has to hide one badge and show another.
  */
 export default function VaultLevelBadge({
   points,
   compact = false,
+  size = 'md',
   className = '',
 }: {
   points: number
   compact?: boolean | 'phone'
+  /** `lg` (24 px) beside the streak in the top bar, so the player's two marks are one family. */
+  size?: 'md' | 'lg'
   className?: string
 }) {
   const { T } = useLanguage()
@@ -52,6 +55,7 @@ export default function VaultLevelBadge({
   return (
     <Tag
       slant
+      size={size}
       tone="custom"
       title={`${T.rankings.level.replace('{n}', String(level))} · ${tierText}`}
       // Mixed with the theme's text colour, so the tier's hue stays readable on a light or a dark card.

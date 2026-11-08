@@ -3,6 +3,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { CountUp } from './CountUp'
 import { Skeleton } from './Skeleton'
 import { kickerClass } from './Kicker'
+import { MARK } from './shape'
 
 export type FigureTone = 'main' | 'accent' | 'hardcore' | 'softcore' | 'success' | 'info' | 'warning' | 'danger' | 'platinum'
 export type FigureLook = 'bare' | 'tile' | 'card'
@@ -19,15 +20,15 @@ const TONES: Record<FigureTone, string> = {
   platinum: 'text-platinum',
 }
 
-// bare: figures side by side with a fine slanted rule between them (the agreed design); tile: a small centred box;
+// bare: figures side by side with the mark between them (identity B, #127: "/" slanted, "•" round); tile: a small centred box;
 // card: the label on top, the figure big under it (a profile or platform card). `compact` is the platform cards' size.
 const LOOKS = {
   bare: {
-    box: "relative px-3 py-1 flex flex-col gap-0.5 flex-1 min-w-24 rounded-tile before:content-[''] before:absolute before:left-0 before:top-1 before:bottom-1 before:w-px before:bg-ink/12 before:skew-x-(--slant-button) first:before:hidden",
+    box: 'group/figure relative pl-5.5 pr-3 py-1 flex flex-col gap-0.5 flex-1 min-w-24 rounded-tile',
     label: `${kickerClass()} font-semibold`,
     value: 'text-[1.75rem] leading-tight font-bold tabular-nums',
     skeleton: 'h-[1lh] w-16 max-w-full',
-    press: "text-left isolate after:content-[''] after:absolute after:inset-0 after:-z-10 after:rounded-tile after:skew-x-(--slant-pill) after:transition-colors hover:after:bg-ink/5 transition-colors focus-ring",
+    press: "text-left isolate after:content-[''] after:absolute after:inset-0 after:-z-10 after:rounded-tile after:transition-colors hover:after:bg-ink/5 transition-colors focus-ring",
   },
   tile: {
     box: 'bg-bg-main rounded-tile p-2 flex flex-col items-center gap-0.5',
@@ -82,6 +83,7 @@ export default function Figure({ label, value, sub, look = 'bare', tone = 'main'
   const Value = term ? 'dd' : 'span'
   const inner = (
     <>
+      {look === 'bare' && <span aria-hidden="true" className={`${MARK} absolute -left-0.5 top-1.5 text-[2.5rem] font-light leading-none text-accent/16 group-first/figure:hidden`} />}
       <Label className={text.label}>{label}</Label>
       <Value className={`${text.value} ${color ? '' : TONES[tone]}`} style={color ? { color } : undefined}>
         {loading ? <Skeleton className={l.skeleton} /> : shown}
