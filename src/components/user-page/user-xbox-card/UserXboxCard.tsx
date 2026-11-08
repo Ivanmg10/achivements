@@ -33,7 +33,7 @@ export default function UserXboxCard() {
   const summaryOpts = { lang, loading: isLoading }
   const minutes = totalXboxPlaytime(library)
   const stats: PlatformStat[] = [
-    platformStat(T.xbox.gamerscore, summary?.gamerscore, { ...summaryOpts, accent: 'text-success' }),
+    platformStat(T.xbox.gamerscore, summary?.gamerscore, { ...summaryOpts, tone: 'success' }),
     platformStat(T.userStats.games, summary?.games, summaryOpts),
     platformStat(T.xbox.achievements, summary?.achievementsUnlocked, summaryOpts),
     platformStat(T.xbox.tier, summary?.tier, summaryOpts),

@@ -1,7 +1,7 @@
 'use client'
 
 import { IconDeviceGamepad2 } from '@tabler/icons-react'
-import { StatPill, StatCard } from '@/components/ui/StatPill'
+import Figure from '@/components/ui/Figure'
 import RarityBadge from '@/components/ui/RarityBadge'
 import Tag, { type TagTone } from '@/components/ui/Tag'
 import Avatar from '@/components/ui/Avatar'
@@ -42,9 +42,10 @@ export default function DesignCatalogData() {
       <DesignCatalogPiece id="figures">
         <Panel>
           <div className="flex flex-wrap items-start gap-8">
-            <Specimen name="StatPill lg"><StatPill label="Vault Points" value="143.820" sub="this week +48" /></Specimen>
-            <Specimen name="StatPill sm"><StatPill size="sm" label="Games" value={273} /></Specimen>
-            <Specimen name="StatCard"><StatCard label="Hardcore points" value={8893} accent="text-hardcore" /></Specimen>
+            <Specimen name="bare"><Figure label="Vault Points" value="143.820" sub="this week +48" /></Specimen>
+            <Specimen name="tile"><Figure look="tile" label="Games" value={273} /></Specimen>
+            <Specimen name="card · tone hardcore"><Figure look="card" label="Hardcore points" value={8893} tone="hardcore" /></Specimen>
+            <Specimen name="card compact · tone platinum"><Figure look="card" compact label="Platinum" value={12} tone="platinum" /></Specimen>
             <Specimen name="RarityBadge: 62 · 24 · 6.1 · 0.8 · unknown">{[62, 24, 6.1, 0.8, null].map((p, i) => <RarityBadge key={i} pct={p} />)}</Specimen>
           </div>
         </Panel>

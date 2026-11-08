@@ -36,9 +36,9 @@ describe('StatPill', () => {
 })
 
 describe('StatCard', () => {
-  test('renders a numeric value through toLocaleString, and a string value as given', () => {
+  test('renders a numeric value in the language of the reader, and a string value as given', () => {
     render(<StatCard label="Games" value={1234} />)
-    expect(screen.getByText((1234).toLocaleString())).toBeInTheDocument()
+    expect(screen.getByText((1234).toLocaleString('en'))).toBeInTheDocument()
     expect(screen.getByText('Games')).toBeInTheDocument()
   })
 

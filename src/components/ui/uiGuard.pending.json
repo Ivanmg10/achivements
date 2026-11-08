@@ -139,5 +139,17 @@
     "components/user-summary/UserSummary.tsx",
     "components/welcome-page/welcome-page-profile-preview/WelcomePageProfilePreview.tsx"
   ],
-  "listRow": []
+  "listRow": [],
+  "figure": [
+    "components/layout-modal/layout-modal-preview/layout-modal-preview-sample-profile/LayoutModalPreviewSampleProfile.tsx",
+    "components/main-page/main-page-charts/MainPagePointsStats.tsx",
+    "components/main-page/main-page-charts/main-page-psn-stats/MainPagePsnStats.tsx",
+    "components/main-page/main-page-charts/main-page-steam-stats/MainPageSteamStats.tsx",
+    "components/main-page/main-page-charts/main-page-xbox-stats/MainPageXboxStats.tsx",
+    "components/main-page/main-page-profile/main-page-profile-psn/main-page-profile-psn-stats/MainPageProfilePsnStats.tsx",
+    "components/main-page/main-page-profile/main-page-profile-ra/MainPageProfileRa.tsx",
+    "components/main-page/main-page-profile/main-page-profile-ra/main-page-profile-ra-stats/MainPageProfileRaStats.tsx",
+    "components/main-page/main-page-profile/main-page-profile-st/main-page-profile-st-stats/MainPageProfileStStats.tsx",
+    "components/main-page/main-page-profile/main-page-profile-xbox/main-page-profile-xbox-stats/MainPageProfileXboxStats.tsx"
+  ]
 }

@@ -25,7 +25,7 @@ export default function UserSteamCard() {
   const loading = libraryLoading
   const stats: PlatformStat[] = [
     platformStat(T.userStats.games, steam.totalGames, { lang, loading }),
-    platformStat(T.steam.perfect, steam.perfect, { lang, loading, accent: 'text-success' }),
+    platformStat(T.steam.perfect, steam.perfect, { lang, loading, tone: 'success' }),
     platformStat(T.steam.achievements, steam.unlocked, { lang, loading }),
     platformStat(T.userStats.inProgress, steam.playing, { lang, loading }),
     platformStat(T.steam.playtime, formatPlaytime(steam.totalMinutes, T.steam, lang), { lang, loading }),

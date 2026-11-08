@@ -51,9 +51,9 @@ export default function UserPlatforms() {
     {
       label: T.profileStats.hardcorePoints,
       value: (raUser?.TotalPoints ?? 0).toLocaleString(lang),
-      accent: 'text-warning',
+      tone: 'warning',
     },
-    platformStat(T.userStats.masteries, awards?.MasteryAwardsCount, { lang, loading: awardsLoading, accent: 'text-success' }),
+    platformStat(T.userStats.masteries, awards?.MasteryAwardsCount, { lang, loading: awardsLoading, tone: 'success' }),
     { label: T.userStats.games, value: all.length.toLocaleString(lang) },
     { label: T.userStats.inProgress, value: inProgress.length.toLocaleString(lang) },
   ]
