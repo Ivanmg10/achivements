@@ -5,6 +5,7 @@ import { IconArrowLeft, IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { vaultGuideText } from '@/translations/vaultGuide'
 import FaqList from '@/components/faq-list/FaqList'
+import Tag from '@/components/ui/Tag'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import { TIERS, pointsForLevel } from '@/utils/vaultLevel'
 import { difficultyMultiplier, rarityMultiplier } from '@/utils/vaultScore'
@@ -44,7 +45,7 @@ export default function RankingsGuide() {
         </Link>
         <h1 className="relative flex items-center gap-3 flex-wrap font-display italic font-extrabold text-5xl sm:text-[4.5rem] leading-[0.9] pr-2">
           {g.heading}
-          <span className="not-italic font-sans inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-accent/15 text-accent">{T.rankings.beta}</span>
+          <Tag tone="accent">{T.rankings.beta}</Tag>
         </h1>
         <p className="relative max-w-2xl text-base sm:text-lg text-text-main/85 leading-relaxed">{g.intro}</p>
         <p className="relative self-start max-w-2xl text-[0.8125rem] text-text-secondary bg-black/25 rounded-tile px-3.5 py-2.5">{T.rankings.betaNote}</p>

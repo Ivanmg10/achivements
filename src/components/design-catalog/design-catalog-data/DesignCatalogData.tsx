@@ -2,6 +2,7 @@
 
 import { StatPill, StatCard } from '@/components/ui/StatPill'
 import RarityBadge from '@/components/ui/RarityBadge'
+import Tag, { type TagTone } from '@/components/ui/Tag'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import StreakTag from '@/components/ui/StreakTag'
@@ -13,6 +14,7 @@ import { pointsForLevel } from '@/utils/vaultLevel'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
 
+const TAG_TONES: TagTone[] = ['muted', 'neutral', 'accent', 'info', 'success', 'warning', 'danger', 'hardcore']
 const LEVELS = [1, 10, 20, 30, 45, 60, 75, 90]
 const GAME_ART = steamAssetUrl(1927720, 'cover')
 
@@ -62,6 +64,24 @@ export default function DesignCatalogData() {
             <CircularProgress earned={69} total={100} size={128} strokeWidth={10} ariaLabel="69 %" center={<span className="font-display italic font-extrabold text-[2.5rem] leading-none">69%</span>} label="With its own centre" />
           </div>
         </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="tag">
+        <Compare>
+          <Specimen name="tone · md">{TAG_TONES.map((t) => <Tag key={t} tone={t}>{t}</Tag>)}</Specimen>
+          <Specimen name="size sm · md · lg">
+            <Tag size="sm" tone="info">Progression</Tag>
+            <Tag tone="accent">Beta</Tag>
+            <Tag size="lg" tone="neutral">PS5</Tag>
+          </Specimen>
+          <Specimen name="slant · lg">
+            <Tag slant size="lg" tone="neutral">Nintendo 64</Tag>
+            <Tag slant size="lg" tone="danger">2 missable</Tag>
+          </Specimen>
+          <Specimen name="overlay, on a picture">
+            <span className="rounded-tile p-3 bg-accent/40"><Tag tone="overlay">Steam</Tag></span>
+          </Specimen>
+        </Compare>
       </DesignCatalogPiece>
 
       <DesignCatalogPiece id="streak-tag">

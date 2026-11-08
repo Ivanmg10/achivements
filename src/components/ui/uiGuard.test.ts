@@ -153,8 +153,13 @@ test('a disclosure and a show-more button come from the library (Accordion, Show
 // next migration greps for.
 const NEW_RULES = {
   kicker: /["'`][^"'`]*(?:\buppercase\b[^"'`]*\btracking-|\btracking-[^"'`]*\buppercase\b)/,
+  tag: /["'`](?=[^"'`]*\brounded-tag\b)(?=[^"'`]*(?:\bh-(?:5|6|\[1\.375rem\])|\bpy-0\.5)(?![\w-]))/,
 }
 
 test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
   expect(newOffenders('kicker', NEW_RULES.kicker)).toEqual([])
+})
+
+test('a tag comes from Tag, never a tinted rounded-tag box by hand', () => {
+  expect(newOffenders('tag', NEW_RULES.tag)).toEqual([])
 })

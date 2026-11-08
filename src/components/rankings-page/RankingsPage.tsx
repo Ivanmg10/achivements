@@ -9,6 +9,7 @@ import { useVaultMe } from '@/hooks/useVaultMe'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useVaultFillState } from '@/context/VaultFillContext'
 import EmptyState from '@/components/empty-state/EmptyState'
+import Tag from '@/components/ui/Tag'
 import RankingsPageToolbar from './rankings-page-toolbar/RankingsPageToolbar'
 import RankingsPagePodium from './rankings-page-podium/RankingsPagePodium'
 import RankingsPageTable from './rankings-page-table/RankingsPageTable'
@@ -61,7 +62,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
         <header className="flex flex-col gap-3 enter-rows">
           <h1 className="flex items-center gap-2.5 font-display italic font-extrabold text-5xl sm:text-[4.5rem] leading-[0.88] pr-1">
             {T.rankings.title}
-            <span className="not-italic font-sans inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-accent/15 text-accent">{T.rankings.beta}</span>
+            <Tag tone="accent">{T.rankings.beta}</Tag>
           </h1>
           <p className="text-sm sm:text-[0.9375rem] text-text-secondary">
             {T.rankings.intro}{' '}

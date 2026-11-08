@@ -6,6 +6,7 @@ import { IconChevronRight, IconTrophy, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRankings } from '@/hooks/useRankings'
 import { slantStyle } from '@/components/ui/shape'
+import Tag from '@/components/ui/Tag'
 
 /** Second, first and third, as a podium stands: the picture's size and ring, the step's height and colour. */
 const PODIUM = [
@@ -42,7 +43,7 @@ export default function FollowingRankingsTeaser({ className = '' }: { className?
             <IconTrophy size={16} />
           </span>
           {T.following.rankingsTitle}
-          <span className="inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-accent/15 text-accent">{T.rankings.beta}</span>
+          <Tag tone="accent">{T.rankings.beta}</Tag>
         </span>
         <span className="flex items-center gap-0.5 text-[0.8125rem] font-bold text-accent">
           {T.rankings.seeAll}
