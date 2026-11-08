@@ -733,6 +733,7 @@ export const es: Translations = {
   },
   gameInfoPage: {
     retry: 'Reintentar',
+    loadError: 'No se pudo cargar este juego. Inténtalo de nuevo en un momento.',
     publisher: 'Editor',
     developer: 'Desarrollador',
     genre: 'Género',

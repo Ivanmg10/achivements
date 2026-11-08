@@ -733,6 +733,7 @@ export const de: Translations = {
   },
   gameInfoPage: {
     retry: 'Erneut versuchen',
+    loadError: 'Dieses Spiel konnte nicht geladen werden. Versuche es gleich noch einmal.',
     publisher: 'Publisher',
     developer: 'Entwickler',
     genre: 'Genre',

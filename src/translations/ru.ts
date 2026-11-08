@@ -733,6 +733,7 @@ export const ru: Translations = {
   },
   gameInfoPage: {
     retry: 'Повторить',
+    loadError: 'Не удалось загрузить эту игру. Попробуйте ещё раз через минуту.',
     publisher: 'Издатель',
     developer: 'Разработчик',
     genre: 'Жанр',

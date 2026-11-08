@@ -733,6 +733,7 @@ export const pl: Translations = {
   },
   gameInfoPage: {
     retry: 'Spróbuj ponownie',
+    loadError: 'Nie udało się wczytać tej gry. Spróbuj ponownie za chwilę.',
     publisher: 'Wydawca',
     developer: 'Deweloper',
     genre: 'Gatunek',

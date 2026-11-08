@@ -734,6 +734,7 @@ export const en = {
   },
   gameInfoPage: {
     retry: 'Retry',
+    loadError: 'Could not load this game. Try again in a moment.',
     publisher: 'Publisher',
     developer: 'Developer',
     genre: 'Genre',

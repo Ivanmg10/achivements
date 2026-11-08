@@ -733,6 +733,7 @@ export const ja: Translations = {
   },
   gameInfoPage: {
     retry: '再試行',
+    loadError: 'このゲームを読み込めませんでした。しばらくしてからもう一度お試しください。',
     publisher: '発売元',
     developer: '開発元',
     genre: 'ジャンル',

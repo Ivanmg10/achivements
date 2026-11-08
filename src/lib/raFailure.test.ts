@@ -17,6 +17,14 @@ test('a rate limit stays one, with RA\'s own wait when it gave one', () => {
   expect(raUnavailable({ status: 429, retryAfter: null }).headers.get('Retry-After')).toBe('60')
 })
 
+test('a thing RA does not know is a 404 the client does not retry, not a 503', () => {
+  for (const status of [404, 422]) {
+    const res = raUnavailable(Object.assign(new Error(`RA API error ${status}`), { status }))
+    expect(res.status).toBe(404)
+    expect(data(res)).toEqual({ error: 'not-found' })
+  }
+})
+
 test('anything else is RA being unavailable, which the client may retry', () => {
   for (const err of [Object.assign(new Error('RA API error 500'), { status: 500 }), new Error('timeout'), null, undefined]) {
     const res = raUnavailable(err)
