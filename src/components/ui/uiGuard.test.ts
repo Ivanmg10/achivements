@@ -162,7 +162,18 @@ const NEW_RULES = {
   notice: /bg-(?:danger|warning|success|info)\/\d+[^"'`]*ring-(?:1|inset)\b/,
   dialogRole: /role="(?:alert)?dialog"|\baria-modal\b/,
   portal: /\bcreatePortal\(/,
+  focusRing: /focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent\/70/,
+  hairline: /shadow-\[inset_0_-?1px_0_rgb\(var\(--ink\)\/0\.\d+\)\]/,
+  sunken: /shadow-\[inset_0_[12]px_[24]px_rgb\(0_0_0\/0\.2\d\)\]|drop-shadow\(0 0 6px rgb\(var\(--progress\)/,
+  hex: /#[0-9a-fA-F]{6}\b|-\[#[0-9a-fA-F]{3,8}\]/,
+  palette: /(?<![\w-])(?:text|bg|ring|border|fill|stroke|from|to|via|shadow|outline|divide|decoration)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-(?:50|[1-9]00|950)\b/,
+  sideRadius: /(?<![\w-])rounded-[tblrse]{1,2}-(?:xl|2xl)\b/,
+  variants: /\bvariants=\{/,
 }
+
+// Where a platform's or a tier's own hue, or a fixed colour, belongs: the tokens (globals.css), the logo, and the
+// pictures drawn on the server (no theme there). Never a component.
+const OWN_COLOURS = ['utils/themeIcon.ts', 'app/apple-icon.tsx', 'app/(main)/user/[username]/opengraph-image.tsx']
 
 test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
   expect(newOffenders('kicker', NEW_RULES.kicker)).toEqual([])
@@ -206,4 +217,29 @@ test('a dialog is a Modal (placement="top" for a panel or a menu): no hand-made 
 
 test('only the library portals: Modal portals itself, so wrapping it in createPortal is never needed', () => {
   expect(newOffenders('portal', NEW_RULES.portal)).toEqual([])
+})
+
+test('the focus ring is the focus-ring utility, never its three classes typed out', () => {
+  expect(newOffenders('focusRing', NEW_RULES.focusRing)).toEqual([])
+})
+
+test('a hairline, the sunken shadow and the finished glow are tokens (shadow-hairline-t/-b, shadow-sunken, drop-shadow-done)', () => {
+  expect(newOffenders('hairline', NEW_RULES.hairline)).toEqual([])
+  expect(newOffenders('sunken', NEW_RULES.sunken)).toEqual([])
+})
+
+test('a fixed colour is a token (a platform: text-steam, bg-psn…), never a hex literal in a component', () => {
+  expect(newOffenders('hex', NEW_RULES.hex).filter((f) => !OWN_COLOURS.includes(f))).toEqual([])
+})
+
+test('no palette class of any hue: meaning comes from the theme, platforms and tiers from their tokens', () => {
+  expect(newOffenders('palette', NEW_RULES.palette)).toEqual([])
+})
+
+test('a side radius follows the design too (rounded-t-card, never rounded-t-2xl)', () => {
+  expect(newOffenders('sideRadius', NEW_RULES.sideRadius)).toEqual([])
+})
+
+test('Framer variants only on what opens on a click; an entrance is CSS', () => {
+  expect(newOffenders('variants', NEW_RULES.variants)).toEqual([])
 })
