@@ -71,49 +71,48 @@ no longer stagger in; `Figure`'s card numbers follow the reader's language. The 
 after each).** Each rule is `NEW_RULES.<key>` in `src/components/ui/uiGuard.test.ts`; its regex is the grep, its
 list in `src/components/ui/uiGuard.pending.json` is the work. **Migrate a file, take it off its list; the test
 fails while a migrated file is still listed. Empty every list, then delete `uiGuard.pending.json` and turn
-`newOffenders` back into plain `offenders`.** Never add a file to a list. Look at each screen in both designs
+`newOffenders` back into plain `offenders`** (it takes a third argument, the files that stay on purpose, and tolerates a rule with no list). Never add a file to a list. Look at each screen in both designs
 (`/design` → the header's Slanted / Rounded) before and after.
-1. `kicker` (86): `uppercase … tracking-*` → `<Kicker size tone as>` or `kickerClass()` on a `dt`/`th`/`label`.
-   Map: `text-[10px] … tracking-widest|wider` → `xs`; `text-[0.6875rem] font-bold … 0.08–0.12em` → `sm`;
-   `text-xs font-bold|semibold … 0.12–0.16em` → `md`. *Traps:* the tables' head (`TH` in `ui/dataTable.ts`, the
-   rankings guide) stays as it is (the table's own look); `text-xs … uppercase tracking-wider` in admin and form
-   modals is a field label: use `Field`, not a kicker; the catalogue's own heads (`DesignCatalogPiece`) are
-   kickers too. A `font-display italic` with `uppercase` is a title, not a kicker: check before replacing.
-2. `tag` (30): a tinted `rounded-tag` box → `<Tag tone size slant>`. *Traps:* `GameHeroChip` becomes
-   `<Tag slant size="lg">`, but its `tone="custom"` platform chips (`psnPlatformChip`, `xboxPlatformChip`, Steam's
-   `bg-[#1b2838] text-[#66c0f4]`) need platform tones on `Tag` first (`steam`, `psn`…, on the new tokens);
-   `RarityBadge`, `StreakTag` and `VaultLevelBadge` should sit on `Tag` (their tier/rarity hues as `style`), not
-   be replaced; `RankingsPageDelta`'s up/down tag is `success`/`danger`; on art (`GroupDetailHero`,
-   `LibraryPlatformBadge`) `tone="overlay"`.
-3. `avatar` (18): `rounded-full … object-cover` pictures and `PresenceDot` imports → `<Avatar src name size
-   fallback online announce surface ring>`. *Traps:* `fallback="icon"` where the copy drew `IconUser`; never
-   `online` on your own picture (`MainHeader`, `UserIdentityCard`, `AvatarModal`); a game's round icon with
-   `object-cover` is not a person: it stays, on an `allowed` list with the reason.
-4. `figure` (10): `StatPill` → `<Figure>` (`size="sm"` → `look="tile"`), `StatCard` → `<Figure look="card">`,
-   `accent="text-x"` → `tone="x"` (`text-sky-300` → `platinum`), `accentColor` → `color`. Then delete
-   `ui/StatPill.tsx` (move its two tests' cases to `Figure.test.tsx`). `UserVaultStat` takes a class `accent` too:
-   give it a `FigureTone`.
-5. `dataBar` (13): a hand-made bar with `slantStyle(px)` → `<DataBar share axis cut track min grow tone color>`.
-   *Traps:* keep each bar's own `cut` (px) and colour (tiers through `color`, the busiest day `accent`, the rest
-   `soft`); the podium steps and `StreakYearHeatmap`'s range mark are not chart bars: they may keep
-   `slantStyle` (move them to an `allowed` list with a comment, as the entrance test does); the Shape specimen in
-   the catalogue and `UserShapePreferencePreview` draw the token itself (allowed too).
-6. `spinner` (12): `main-spinner/Spinner` inside a button → `<Button loading>` with the "…ing" words; then delete
-   `src/components/main-spinner/`. *Traps:* `RaLoginModal`'s disabled box with only a spinner needs a word (an
-   icon-only loading button is unnamed); an icon that spins on refresh (`MainPageHeatmap`,
-   `MainPageProfileActionsRefresh`) is an action: `IconButton` + `Spinner` while busy, or keep the icon and add it
-   to an `allowed` list; `MainHeaderLevel`'s ring is a level loader, not a spinner (allowed, with a comment).
-7. `pillButton` (15): the retry pill under a failed read → `<ErrorRetry message hint retryLabel onRetry>` (the
-   pattern of `XboxGameItemAchievements`); other `rounded-full` buttons → `Button` / `IconButton` / `Pill`.
-   *Traps:* each platform keeps its own texts (`T.psn.trophiesError`, `T.psn.errors.private`, `T.xbox.retry`…);
-   `SectionFallback` (inside `ui/`) draws its own retry chip: give it `ErrorRetry`'s button too.
-8. `notice` (14): `bg-danger/10 … ring-1|ring-inset` boxes → `<Notice tone title action>`. *Traps:* a form's
-   error next to one field is `Field`'s error, not a Notice; never a toast and a notice for the same outcome.
-9. `dialogRole` (2) and `portal` (12): `SearchModal` → `Modal placement="top"` (`aria-label`, `size="lg"`, 47.5 rem
-   where it was 45.5, its own head inside, `showClose={false}`), drop its `variants`; `LayoutModal` → `Modal`. The
-   modals that wrap `Modal` in `createPortal` just drop the wrapper (#121 does the rest of the dialog pass); the
-   four achievement grids portal a copied tooltip: one tooltip piece in `ui/` first; `WelcomeCurtain` stays
-   (allowed, decorative).
+**Points 1–9 are done on `feat/120-library-pieces-2` (2026-11-08), one commit per rule; what is left of each is named. The
+lists for `focusRing`, `hairline`, `sunken`, `hex`, `palette`, `sideRadius` and `variants` (10–13) are the next agent's.**
+1. DONE `kicker` (86 files → 3): 81 moved to `Kicker` (or `kickerClass()` on a `label`, a link, a `motion.p`, a `const`).
+   `Kicker` got the tones `warning` and `inherit` (the colour is the caller's: a tier, a label on a picture). The four
+   table heads (`SortableHeader`, `RankingsGuide`, `RankingsGuideTable`, `RankingsPageTable`) and `PublicUserHero`'s "your
+   profile" pill (a `rounded-full` chip) are an `allowed` list in the test. The labels of the admin create modal and the profile edit
+   modal are `Field` now (sentence case, semibold, no longer capitals); the admin's rows and the "current value" label are `Kicker md`.
+   *Left:* `AchievementModal` and `ConnectAccounts` (headings at `text-sm`, 14 px: no `Kicker` size is that big, they are titles,
+   #127), `GameHashesModal` (a chip with its own palette hues, the palette rule's).
+2. DONE `tag` (30 → 5): 25 moved to `Tag`. `Tag` got a size `xs` (a row's console: `text-[10px]`, medium, `rounded-tag-sm`),
+   the tones `gold`, `surface`, `custom` (colours from `style`, a tier's hue) and the platforms (`steam`, `psn`, `xbox` and the
+   consoles' `white`, `black`, `sky`), and takes `title` and `style`; `overlay` is `bg-black/40` with the main text (the copies were
+   0.35 to 0.45). `psnPlatformChip`/`xboxPlatformChip` are `psnPlatformTone`/`xboxPlatformTone` now (they returned palette and
+   hex classes; their tests moved). `GameHeroChip` is a slanted large `Tag`; `VaultLevelBadge` sits on `Tag tone="custom"`.
+   *Left:* `AchievementModal` (the comments' pager buttons are not tags), `GameHashesModal` (palette hues),
+   `SortableItem` and `StatusGameItem` (RA's console colours are palette strings from `constants/index.ts`: tokens first,
+   then a `Tag` tone), `RouteErrorCard` (a monospace digest, not a label). `RarityBadge` and `StreakTag` do not sit on `Tag` yet.
+3. DONE `avatar` (18 → 0, one `allowed`): every person's picture is `Avatar`. It got `sizeSm` (the profile pictures that grow
+   from `sm`: two CSS variables) and the dot follows the bigger size up to `lg`. `AvatarModal` is `allowed`: it previews the draft
+   picture, names it for a screen reader and reacts to it failing (`Avatar`'s picture is decorative and has no `onError`).
+   Dots now follow the size (36 px: `sm`, was `xs`; 28 px: `xs`, was `sm`).
+4. DONE `figure` (10 → 0): the ten callers use `Figure`; `ui/StatPill.tsx` and its tests are gone (their cases are in
+   `Figure.test.tsx`). *Left:* `UserVaultStat` still takes a class `accent` (it is not `StatPill`; its icon and sub line are its own).
+5. DONE `dataBar` (13 → 0, seven `allowed`): the portada streak, the weekdays, the weeks, the platform split and the guide's example
+   are `DataBar`. `allowed` (with the reason in the test): the podium steps and their skeleton, the Following teaser's podium, the
+   heatmap's range mark, the streak chart's bars (they carry a label inside), the catalogue's and the shape preference's specimens.
+   `PLATFORM_FILL` uses the platform tokens now and `PLATFORM_COLOR` is its colour for a bar.
+6. DONE `spinner` (12 → 0, three `allowed`): the auth forms, the avatar save and the RA link modal use `Button loading`;
+   `src/components/main-spinner/` is deleted. The RA link modal's spinner-only box now says "Sign in" (a button with a word).
+   `allowed`: `MainHeaderLevel`'s ring and the two refresh icons that turn while they refresh.
+7. DONE `pillButton` (15 → 0): the retries are `ErrorRetry` (each platform keeps its texts; a Steam one always shows its
+   private-profile hint, PSN's and Xbox's only for `private`), the rankings' "more" and the consoles' "show all" are `Button`, and
+   `SectionFallback`'s retry is a `Button`. A visible change on purpose: the retries are a tinted danger box with a quiet button.
+8. DONE `notice` (14 → 0): `Notice` got `alert` (announce a warning at once: the RA key notice, the email notices keep their
+   `role="alert"`) and `size="sm"` (a line inside a card: the vault fill lines). The reset form's "done" box is a `Notice` too.
+9. DONE `dialogRole` (2 → 0) and `portal` (12 → 0, one `allowed`): `SearchModal` is `Modal placement="top"` (`size="lg"`, `flush`,
+   `showClose={false}`, no Framer variants, no Escape handler of its own); `Modal` got `flush` (no padding round the body).
+   `LayoutModal` was already a `Modal`: its `closest('[role="dialog"]')` is spelled `[role=dialog]`. The seven modals that wrapped
+   `Modal` in `createPortal` dropped the wrapper. The four achievement grids use the new `ui/CursorTooltip`. `WelcomeCurtain` is
+   `allowed`. `SearchModal` left the `variants` list on its own.
 10. `focusRing` (144): the three classes → `focus-ring`. Mechanical (sed), but keep any `ring-inset`,
    `ring-offset-*` or `rounded` the string had beside it.
 11. `hairline` (11), `sunken` (2): `shadow-[inset_0_±1px_0_rgb(var(--ink)/…)]` → `shadow-hairline-t/-b` (0.08–0.1)
@@ -129,7 +128,7 @@ fails while a migrated file is still listed. Empty every list, then delete `uiGu
    (point 9), `AuthPage`, `LibraryGameDetail`: if it opens on a click, move it to an `allowed` list with the reason;
    if it is an entrance, make it CSS (`.enter-*`).
 14. Not in #120, seen on the way: `SURFACE` spelled out by hand (C-05, 38 files) and the hand-drawn icon buttons
-   (C-06) have no rule yet; `SectionFallback` still draws its retry by hand.
+   (C-06) have no rule yet.
 **Watch out** — There is no script to regenerate the lists, on purpose: they only shrink, by hand. A
 rule's text in `catalogue.ts` must not match its own regex (two did, and were reworded). `Avatar`'s `ring` is a
 class on purpose (a highlight, like `PresenceDot`'s), the one exception to "className is layout". The phone menu

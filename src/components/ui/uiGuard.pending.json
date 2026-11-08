@@ -11,7 +11,6 @@
     "components/route-error/route-error-card/RouteErrorCard.tsx",
     "components/statusGameList/StatusGameItem.tsx"
   ],
-  "listRow": [],
   "focusRing": [
     "app/(main)/groups/(list)/page.tsx",
     "app/(main)/groups/[id]/page.tsx",
