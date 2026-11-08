@@ -17,6 +17,19 @@ const MEANING: [string, string, string][] = [
   ['hardcore', 'bg-hardcore', 'RA hardcore'],
   ['softcore', 'bg-softcore', 'RA softcore'],
 ]
+const PLATFORM: [string, string, string][] = [
+  ['ra · ra-gold', 'bg-ra', 'RetroAchievements'],
+  ['steam · steam-dark', 'bg-steam', 'Steam'],
+  ['steam-perfect', 'bg-steam-perfect', 'a Steam game at 100 %'],
+  ['psn · psn-dark', 'bg-psn', 'PlayStation'],
+  ['platinum', 'bg-platinum', 'a PlayStation platinum'],
+  ['xbox', 'bg-xbox', 'Xbox'],
+]
+const LINES: [string, string][] = [
+  ['shadow-hairline-t / -b', 'shadow-hairline-b'],
+  ['shadow-hairline-b-soft', 'shadow-hairline-b-soft'],
+  ['shadow-sunken', 'shadow-sunken'],
+]
 const INK: [string, string][] = [['ink/6', 'bg-ink/[0.06]'], ['ink/12', 'bg-ink/[0.12]'], ['ink/20', 'bg-ink/20']]
 const RADII = ['rounded-cell', 'rounded-box-sm', 'rounded-box-md', 'rounded-box', 'rounded-tag-sm', 'rounded-badge', 'rounded-tag', 'rounded-chip', 'rounded-icon', 'rounded-button', 'rounded-control', 'rounded-tile', 'rounded-area', 'rounded-pane', 'rounded-field', 'rounded-sheet', 'rounded-card']
 const MOTION: [string, string][] = [['--motion-hover', '150ms'], ['--motion-open', '250ms'], ['--motion-indicator', '450ms']]
@@ -47,6 +60,18 @@ export default function DesignCatalogFoundations() {
           </div>
           <div className="flex flex-wrap gap-4">{MEANING.map(([n, c, u]) => <Swatch key={n} name={n} cls={c} use={u} />)}</div>
           <div className="flex flex-wrap gap-4">{INK.map(([n, c]) => <Swatch key={n} name={n} cls={c} use="tints of the text colour: hairlines and washes" />)}</div>
+          <div className="flex flex-wrap gap-4">{PLATFORM.map(([n, c, u]) => <Swatch key={n} name={n} cls={c} use={u} />)}</div>
+          <div className="flex flex-wrap gap-4">
+            {LINES.map(([n, c]) => <Swatch key={n} name={n} cls={`bg-bg-main ${c}`} />)}
+            <div className="flex flex-col gap-1.5 w-28">
+              <button type="button" className="h-14 rounded-control bg-bg-main ring-1 ring-ink/15 text-xs text-text-secondary focus-ring">Tab here</button>
+              <code className="text-xs">focus-ring</code>
+            </div>
+            <div className="flex flex-col gap-1.5 w-28">
+              <span aria-hidden="true" className="h-14 grid place-items-center"><span className="block h-2 w-20 bg-progress drop-shadow-done" /></span>
+              <code className="text-xs">drop-shadow-done</code>
+            </div>
+          </div>
         </Panel>
       </DesignCatalogPiece>
 
