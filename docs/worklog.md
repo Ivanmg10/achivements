@@ -65,8 +65,21 @@ alike"), so the local readers were the bugs. Type-to-search stays (owner, 2026-1
 stays on the viewed profile like PSN and Xbox, the three components are not merged (#125). A page does not shrink: the pins
 and groups error states keep their section. The Xbox mark and Venom switch fixes keep every colour. E-15's SSR is unchanged
 (both layouts still render on the server).
-**Open** — Left out on purpose: the level ring stuck at 99 %, "Two Xbox game pages show game not found" and LB-02
-(`scoreRefresh.totalPoints`), by the owner's order (another agent). Not done, the owner has not decided: V1-01 ("Ratio
+**Did, second part (`fix/118-audit-bugs-2`, another agent, reasoned from code and tests; no OpenXBL call, no database)** —
+*Level ring at 99 %:* `fillProgress` leaves Xbox out of the ring's count, but `fillComplete` waited for Xbox to leave
+`reading`, which a refused Xbox read (OpenXBL's hourly quota, `busy`) never did; every other platform read, the ring sat at its
+99 cap until the page's 30 passes ran out, and again on every load. `refreshSource` now settles Xbox as `estimated` (with the
+busy reason) whenever its read stops, list included. *Xbox "game not found" (V2):* not a dead id (1480659447 is Minecraft:
+Xbox 360 Edition, the twin `foldTwinTitles` keeps) nor the quota: the page called `notFound()` while `useXboxEnabled` was still
+false because the session had not been read, so **every full load of `/xboxGame/<id>` was the not-found screen, admins
+included** (a client navigation worked). It now holds the skeleton while the session loads (PSN and Steam game pages too, which
+flashed "not connected"), and a failed library read shows `T.xbox.gamesError` + the error's own line + retry instead of a 404.
+*LB-02:* `totalPoints` is `vaultTotals([id], canUseXbox(admin))`, the header's total; no formula number changed, no
+`RULES_VERSION` bump.
+**Open** — `vaultMe`'s daily and provisional queries still skip `LINKED_ACCOUNT` (LB-02's second half; rows
+of an unlinked account are deleted by the next pass anyway). PSN's game page still 404s when its library read fails (Xbox's
+fix not copied). A page whose fill stops (failed POST, 30 passes) keeps its last ring until the next load. Check on the
+preview: a full load of an Xbox game page as an admin, and the header ring with Xbox linked. Not done, the owner has not decided: V1-01 ("Ratio
 hardcore 285 %": RetroRatio or the hardcore share; the avatar ring reads it too). Not done, the owner declined: V5-09 (cookie
 notice on phones stays, 2026-11-07). Unverified without an RA key: what RA answers for a game that does not exist (V2-09 handles
 a thrown 404/422 and an object without `ID`). The vault guide still says "gamerscore" as one of the native values

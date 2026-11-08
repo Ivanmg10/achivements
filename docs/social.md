@@ -63,7 +63,10 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   (`score:fill:<user>`; `FillStatus`, no migration); the header, the account page, each platform's
   card (`VaultFillLine`) and the rankings show it, the viewer's own points carry "≈" until read, a
   finished fill toasts "ready" (only a fill that was pending, never a routine refresh) and a
-  platform that failed says why (private profile, refused key) and how to fix it.
+  platform that failed says why (private profile, refused key) and how to fix it. **Xbox never holds
+  the fill up:** whenever its read stops (quota spent included) it settles as `estimated`, as the
+  header's ring leaves it out of its count (it sat at 99 % waiting on Xbox, #118). The total a pass
+  reports (`FillStatus.points`, the "ready" toast's level) is `vaultTotals`, the header's.
 - **"How Vault Points work" (`/rankings/how`, public)** explains it to users. Its prose is in
   `src/translations/vaultGuide.ts` (+ `vaultGuideMore.ts`), in all nine languages but outside `T`
   like the public pages (only this page loads it); every number
