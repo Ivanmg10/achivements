@@ -34,7 +34,7 @@ const en: VaultGuideText = {
   description: 'How CheevoVault scores achievements from RetroAchievements, Steam and PlayStation so that every platform is worth the same.',
   heading: 'How Vault Points work',
   intro:
-    'Each platform counts achievements its own way: Xbox in gamerscore, PlayStation in bronze, silver and gold, RetroAchievements in points, Steam not at all. Adding those up would make the platform you play on matter more than how you play. Vault Points measure every achievement the same way, wherever it was earned.',
+    'Each platform counts achievements its own way: PlayStation in bronze, silver and gold, RetroAchievements in points, Steam not at all. Adding those up would make the platform you play on matter more than how you play. Vault Points measure every achievement the same way, wherever it was earned.',
   back: 'Back to the rankings',
   bag: {
     heading: 'Every game is worth up to 1,000 points',
@@ -112,7 +112,7 @@ const es: VaultGuideText = {
   description: 'Cómo puntúa CheevoVault los logros de RetroAchievements, Steam y PlayStation para que todas las plataformas valgan lo mismo.',
   heading: 'Cómo funcionan los Puntos Vault',
   intro:
-    'Cada plataforma cuenta los logros a su manera: Xbox en gamerscore, PlayStation en bronce, plata y oro, RetroAchievements en puntos y Steam no los cuenta. Sumarlos haría que importara más la plataforma en la que juegas que cómo juegas. Los Puntos Vault miden todos los logros igual, los consigas donde los consigas.',
+    'Cada plataforma cuenta los logros a su manera: PlayStation en bronce, plata y oro, RetroAchievements en puntos y Steam no los cuenta. Sumarlos haría que importara más la plataforma en la que juegas que cómo juegas. Los Puntos Vault miden todos los logros igual, los consigas donde los consigas.',
   back: 'Volver a los rankings',
   bag: {
     heading: 'Cada juego vale hasta 1.000 puntos',
