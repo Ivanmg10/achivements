@@ -22,6 +22,7 @@ import { useGroups } from '@/hooks/useGroups'
 import { summarizeSteamLibrary } from '@/utils/steamFeed'
 import { codeToFlag, countryName, findCountry } from '@/utils/countries'
 import Button from '@/components/ui/Button'
+import Tag from '@/components/ui/Tag'
 
 // Modals are downloaded the first time they are wanted, not with the page — the admin panel above all.
 const AdminPanelModal = dynamic(() => import('@/components/admin-panel/admin-panel-modal/AdminPanelModal'), { loading: () => null })
@@ -107,9 +108,9 @@ export default function UserIdentityCard() {
             <div className="flex items-center gap-2.5 flex-wrap">
               <h1 className="font-display italic font-extrabold text-[2.75rem] sm:text-[4rem] leading-[0.9] pr-1 truncate">{user?.name}</h1>
               {user?.admin && (
-                <span className="inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-warning/20 text-warning">
+                <Tag tone="warning">
                   {T.userData.admin}
-                </span>
+                </Tag>
               )}
             </div>
             <p className="text-[0.8125rem] text-text-secondary">

@@ -17,6 +17,7 @@ import MainPageProfilePsnTrophies from '../main-page-profile-psn-trophies/MainPa
 import MainPageProfileSkeleton from '../../main-page-profile-skeleton/MainPageProfileSkeleton'
 import MainPageProfileGameSkeleton from '../../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
 import MainPageProfileCard from '../../main-page-profile-card/MainPageProfileCard'
+import Tag from '@/components/ui/Tag'
 
 /** Sony's trophy-level tiers in groups of three: bronze, silver, gold, then platinum at 10. */
 const TIER_RING = ['border-warning', 'border-zinc-400', 'border-hardcore', 'border-sky-300']
@@ -91,7 +92,7 @@ export default function MainPageProfilePsnLinked({
               {summary.trophyLevel}
             </span>
           </span>
-          {summary.isPlus && <span className="px-1.5 py-0.5 rounded-tag bg-hardcore/15 text-hardcore font-bold text-xs">PS Plus</span>}
+          {summary.isPlus && <Tag tone="hardcore">PS Plus</Tag>}
         </div>
         {summary.aboutMe && <p className="text-[0.8125rem] text-text-secondary line-clamp-2">{summary.aboutMe}</p>}
       </MainPageProfileCard>

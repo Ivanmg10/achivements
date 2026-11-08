@@ -178,7 +178,9 @@ const OWN_COLOURS = ['utils/themeIcon.ts', 'app/apple-icon.tsx', 'app/(main)/use
 
 test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
   // A table's head is the table's own look (ui/dataTable.ts TH), not a kicker; the sortable head inherits it.
+  // PublicUserHero's is a pill (rounded-full is left so on purpose), not a label.
   const tableHeads = [
+    'components/public-user-page/public-user-hero/PublicUserHero.tsx',
     'components/game-info-table/SortableHeader.tsx',
     'components/rankings-guide/RankingsGuide.tsx',
     'components/rankings-guide/rankings-guide-table/RankingsGuideTable.tsx',

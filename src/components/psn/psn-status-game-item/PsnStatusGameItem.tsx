@@ -15,10 +15,11 @@ import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
 import { useExclusiveOpen } from '@/hooks/useExclusiveOpen'
 import { gameHref } from '@/utils/gameRef'
-import { psnBackdrop, psnPlatformChip } from '@/utils/psnTitles'
+import { psnBackdrop, psnPlatformTone } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
 import { formatDate } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A PSN game on a category page, laid out like SteamStatusGameItem so the
@@ -68,10 +69,10 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
               </p>
             </Link>
             <span className="flex items-center gap-1.5 flex-wrap">
-              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${psnPlatformChip(game.consoleName)}`}>
+              <Tag size="xs" tone={psnPlatformTone(game.consoleName)}>
                 <PlaystationLogo size={12} aria-hidden="true" />
                 {game.consoleName}
-              </span>
+              </Tag>
               {game.earned.platinum > 0 && (
                 <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-sky-300/10 text-sky-300">
                   <span aria-hidden="true">★</span> {T.psn.platinum}

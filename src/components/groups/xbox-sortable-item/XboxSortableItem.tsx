@@ -14,10 +14,11 @@ import XboxGameItemAchievements from '@/components/xbox/xbox-game-item-achieveme
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { gameHref } from '@/utils/gameRef'
-import { xboxBackdrop, xboxPlatformChip, xboxTitleId } from '@/utils/xboxTitles'
+import { xboxBackdrop, xboxPlatformTone, xboxTitleId } from '@/utils/xboxTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { GameGroupItem } from '@/types/types'
 import { relativeTime } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * An Xbox game in a group — PsnSortableItem's counterpart: drag handle, icon,
@@ -100,10 +101,10 @@ export default function XboxSortableItem({
             </p>
           </Link>
           <span className="flex items-center gap-1.5 flex-wrap">
-            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${xboxPlatformChip(game?.consoleName ?? '')}`}>
+            <Tag size="xs" tone={xboxPlatformTone(game?.consoleName ?? '')}>
               <XboxLogo size={12} aria-hidden="true" />
               {game?.consoleName || 'Xbox'}
-            </span>
+            </Tag>
             {isComplete && (
               <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-success/10 text-success">
                 <span aria-hidden="true">★</span> {T.steam.perfect}

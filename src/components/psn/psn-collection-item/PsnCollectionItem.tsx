@@ -12,6 +12,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import GameIcon from '@/components/game-icon/GameIcon'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import PsnCollectionExpanded from '@/components/psn/psn-collection-expanded/PsnCollectionExpanded'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A collection (The Ezio Collection) in the recent feed: one card with the
@@ -69,8 +70,8 @@ export default function PsnCollectionItem({
         <span className="flex flex-col min-w-0 flex-1 gap-1">
           <span className="flex items-center gap-2 min-w-0">
             <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{collection.title}</span>
-            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><PlaystationLogo size={12} className="opacity-60" aria-hidden="true" />
-              {consoles}</span>
+            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate"><PlaystationLogo size={12} className="opacity-60" aria-hidden="true" />
+              {consoles}</Tag>
           </span>
 
           <span className="flex items-center gap-2 w-full">

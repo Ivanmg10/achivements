@@ -6,6 +6,7 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { STEP_SKY } from '@/components/welcome-page/welcomeArt'
+import Tag from '@/components/ui/Tag'
 
 /*
  * Drawn sketches of each of the intro's points, in the theme's colours: shapes
@@ -43,7 +44,7 @@ function Library() {
           <span className="flex-1 flex flex-col gap-2">
             <span className="flex items-center gap-2">
               <Bar w={row.w} strong />
-              {row.rare && <span className="text-[0.625rem] font-bold px-1.5 py-0.5 rounded-tag bg-[#e5b53f]/20 text-[#e5b53f]">0.8%</span>}
+              {row.rare && <Tag size="sm" tone="gold">0.8%</Tag>}
             </span>
             <ProgressBar pct={row.pct} label="" />
           </span>

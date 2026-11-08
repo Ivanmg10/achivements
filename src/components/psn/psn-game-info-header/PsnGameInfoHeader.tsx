@@ -9,7 +9,7 @@ import GameIcon from '@/components/game-icon/GameIcon'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
-import { psnPlatformChip } from '@/utils/psnTitles'
+import { psnPlatformTone } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
 import type { IgdbDetails } from '@/lib/igdbClient'
@@ -57,7 +57,7 @@ export default function PsnGameInfoHeader({
       title={game.title}
       chips={
         <>
-          <GameHeroChip tone="custom" className={psnPlatformChip(game.consoleName)}>
+          <GameHeroChip tone={psnPlatformTone(game.consoleName)}>
             <PlaystationLogo size={14} aria-hidden="true" />
             {game.consoleName}
           </GameHeroChip>

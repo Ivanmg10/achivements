@@ -1,5 +1,6 @@
 import type { XboxGameProgress } from '@/types/xbox'
 import type { GameStatus } from '@/types/game'
+import type { TagTone } from '@/components/ui/Tag'
 
 /** The largest id the INTEGER game_id columns hold. */
 const MAX_ID = 2_147_483_647
@@ -46,13 +47,13 @@ export function xboxAchievementAnchor(achievementId: string): string {
   return `achievement-${achievementId}`
 }
 
-/** The platform chip's colours: Series white, One green, 360 dark, PC blue. Always written in the chip too, so colour is never the only cue. */
-export function xboxPlatformChip(consoleName: string): string {
+/** The platform tag's tone: Series white, One green, 360 dark, PC blue. Always written in the tag too, so colour is never the only cue. */
+export function xboxPlatformTone(consoleName: string): TagTone {
   const first = consoleName.split('·')[0].trim()
-  if (first === 'Xbox Series') return 'bg-zinc-100 text-zinc-900'
-  if (first === 'Xbox One') return 'bg-[#107c10] text-white'
-  if (first === 'Xbox 360') return 'bg-black text-zinc-100 ring-1 ring-zinc-500'
-  return 'bg-sky-300 text-sky-950'
+  if (first === 'Xbox Series') return 'white'
+  if (first === 'Xbox One') return 'xbox'
+  if (first === 'Xbox 360') return 'black'
+  return 'sky'
 }
 
 /** The widest art there is for a game's backdrop: its box art (Xbox sends no wide art). */

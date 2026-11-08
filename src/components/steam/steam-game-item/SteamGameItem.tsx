@@ -16,6 +16,7 @@ import { formatDate } from '@/utils/dates'
 import type { SteamGameProgress } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
+import Tag from '@/components/ui/Tag'
 
 /**
  * One Steam game as a compact row card — the Steam counterpart of an RA card
@@ -91,8 +92,8 @@ export default function SteamGameItem({
             >
               <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.title}</span>
             </Link>
-            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><SteamLogo size={12} className="opacity-60" aria-hidden="true" />
-                Steam</span>
+            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate"><SteamLogo size={12} className="opacity-60" aria-hidden="true" />
+                Steam</Tag>
           </span>
 
           <button

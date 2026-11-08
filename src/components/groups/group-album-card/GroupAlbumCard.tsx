@@ -9,6 +9,7 @@ import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosai
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
 import GroupPlatformLogos from '@/components/groups/group-platform-logos/GroupPlatformLogos'
 import { relativeTime } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A group as an album: its first games' covers as a banner, a ring with how far
@@ -52,10 +53,10 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
       <div className="relative -mt-10 px-5 pb-5 flex flex-col gap-2.5 flex-1">
         <span className="flex items-center gap-2 min-w-0">
           <span className="text-2xl font-extrabold truncate group-hover:text-accent transition-colors">{group.title}</span>
-          <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-tag font-bold whitespace-nowrap bg-ink/10 text-text-secondary text-xs shrink-0">
+          <Tag className="shrink-0">
             <Privacy className="w-3 h-3" aria-hidden="true" />
             {group.is_public ? T.groups.public : T.groups.private}
-          </span>
+          </Tag>
           {group.total_possible > 0 && (
             <span className={`ml-auto text-xl font-extrabold tabular-nums shrink-0 ${pct >= 100 ? 'text-success' : ''}`}>{pct}%</span>
           )}
@@ -63,10 +64,10 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
         {group.total_possible > 0 && <ProgressBar pct={pct} label={group.title} />}
 
         <span className="flex flex-wrap items-center gap-1.5 text-xs mt-auto">
-          <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-tag font-bold whitespace-nowrap bg-ink/[0.07] text-text-secondary">
+          <Tag>
             {plural(group.game_count, T.plurals.games, lang)}
             <GroupPlatformLogos group={group} />
-          </span>
+          </Tag>
           {empty ? (
             <span className="ml-auto inline-flex items-center gap-1 text-accent font-semibold">
               <IconPlus className="w-3.5 h-3.5" aria-hidden="true" />
@@ -75,10 +76,10 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
           ) : (
             <>
               {(group.started_count ?? 0) > 0 && (
-                <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-tag font-bold whitespace-nowrap bg-info/[0.14] text-info">{T.groups.startedCount.replace('{n}', String(group.started_count))}</span>
+                <Tag tone="info">{T.groups.startedCount.replace('{n}', String(group.started_count))}</Tag>
               )}
               {(group.completed_count ?? 0) > 0 && (
-                <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-tag font-bold whitespace-nowrap bg-success/[0.14] text-success">{T.groups.completedCount.replace('{n}', String(group.completed_count))}</span>
+                <Tag tone="success">{T.groups.completedCount.replace('{n}', String(group.completed_count))}</Tag>
               )}
               <span className="ml-auto text-text-secondary truncate">
                 {group.total_possible > 0 &&

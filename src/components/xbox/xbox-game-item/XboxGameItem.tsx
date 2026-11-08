@@ -17,6 +17,7 @@ import { gameHref } from '@/utils/gameRef'
 import { xboxBackdrop } from '@/utils/xboxTitles'
 import type { XboxGameProgress } from '@/types/xbox'
 import { useSubject } from '@/context/SubjectContext'
+import Tag from '@/components/ui/Tag'
 
 /**
  * One Xbox game as a compact row card — PsnGameItem's counterpart in the
@@ -79,8 +80,8 @@ export default function XboxGameItem({
             >
               <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.title}</span>
             </Link>
-            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><XboxLogo size={12} className="opacity-60" aria-hidden="true" />
-                {game.consoleName}</span>
+            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate"><XboxLogo size={12} className="opacity-60" aria-hidden="true" />
+                {game.consoleName}</Tag>
           </span>
 
           <button

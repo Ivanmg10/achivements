@@ -16,9 +16,10 @@ import { useExclusiveOpen } from '@/hooks/useExclusiveOpen'
 import { gameHref } from '@/utils/gameRef'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { IconClock } from '@tabler/icons-react'
-import { xboxBackdrop, xboxPlatformChip } from '@/utils/xboxTitles'
+import { xboxBackdrop, xboxPlatformTone } from '@/utils/xboxTitles'
 import type { XboxGameProgress } from '@/types/xbox'
 import { formatDate } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * An Xbox game on a category page, laid out like PsnStatusGameItem so the
@@ -68,10 +69,10 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
               </p>
             </Link>
             <span className="flex items-center gap-1.5 flex-wrap">
-              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${xboxPlatformChip(game.consoleName)}`}>
+              <Tag size="xs" tone={xboxPlatformTone(game.consoleName)}>
                 <XboxLogo size={12} aria-hidden="true" />
                 {game.consoleName}
-              </span>
+              </Tag>
               {isComplete && (
                 <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-success/10 text-success">
                   <span aria-hidden="true">★</span> {T.steam.perfect}

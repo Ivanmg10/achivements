@@ -2,41 +2,14 @@
   "kicker": [
     "components/achievement-modal/AchievementModal.tsx",
     "components/connect-accounts/ConnectAccounts.tsx",
-    "components/game-info-header/GameHashesModal.tsx",
-    "components/public-user-page/public-user-hero/PublicUserHero.tsx",
-    "components/rankings-page/rankings-page-user/RankingsPageUser.tsx"
+    "components/game-info-header/GameHashesModal.tsx"
   ],
   "tag": [
     "components/achievement-modal/AchievementModal.tsx",
-    "components/game-hero/game-hero-chip/GameHeroChip.tsx",
-    "components/game-info-comments/GameInfoComments.tsx",
     "components/game-info-header/GameHashesModal.tsx",
-    "components/groups/group-album-card/GroupAlbumCard.tsx",
-    "components/groups/group-detail-hero/GroupDetailHero.tsx",
-    "components/groups/psn-sortable-item/PsnSortableItem.tsx",
     "components/groups/sortable-item/SortableItem.tsx",
-    "components/groups/steam-sortable-item/SteamSortableItem.tsx",
-    "components/groups/xbox-sortable-item/XboxSortableItem.tsx",
-    "components/library-platform-badge/LibraryPlatformBadge.tsx",
-    "components/main-page/main-page-profile/main-page-profile-psn/main-page-profile-psn-linked/MainPageProfilePsnLinked.tsx",
-    "components/main-page/main-page-profile/main-page-profile-xbox/main-page-profile-xbox-linked/MainPageProfileXboxLinked.tsx",
-    "components/psn/psn-collection-item/PsnCollectionItem.tsx",
-    "components/psn/psn-game-item/PsnGameItem.tsx",
-    "components/psn/psn-status-game-item/PsnStatusGameItem.tsx",
-    "components/ra-game-item/RaGameItem.tsx",
-    "components/rankings-page/rankings-page-delta/RankingsPageDelta.tsx",
-    "components/rankings-page/rankings-page-level-panel/RankingsPageLevelPanel.tsx",
-    "components/rankings-page/rankings-page-user/RankingsPageUser.tsx",
     "components/route-error/route-error-card/RouteErrorCard.tsx",
-    "components/search-modal/search-modal-game-result/SearchModalGameResult.tsx",
-    "components/statusGameList/StatusGameItem.tsx",
-    "components/steam/steam-game-item/SteamGameItem.tsx",
-    "components/steam/steam-status-game-item/SteamStatusGameItem.tsx",
-    "components/user-page/user-identity-card/UserIdentityCard.tsx",
-    "components/vault-level-badge/VaultLevelBadge.tsx",
-    "components/welcome-page/welcome-page-intro-art/WelcomePageIntroArt.tsx",
-    "components/xbox/xbox-game-item/XboxGameItem.tsx",
-    "components/xbox/xbox-status-game-item/XboxStatusGameItem.tsx"
+    "components/statusGameList/StatusGameItem.tsx"
   ],
   "avatar": [
     "components/achievement-modal/AchievementModal.tsx",
@@ -355,7 +328,6 @@
     "components/steam/steam-achievement-grid/SteamAchievementGrid.tsx",
     "components/steam/steam-category-section/SteamCategorySection.tsx",
     "components/steam/steam-game-image/SteamGameImage.tsx",
-    "components/steam/steam-game-info-header/SteamGameInfoHeader.tsx",
     "components/steam/steam-game-item/SteamGameItem.tsx",
     "components/steam/steam-library-detail/SteamLibraryDetail.tsx",
     "components/steam/steam-recently-played-expanded/steam-expanded-stats/SteamExpandedStats.tsx",
@@ -374,9 +346,7 @@
     "components/welcome-page/welcome-page-steps-bar/WelcomePageStepsBar.tsx",
     "components/welcome-page/welcomeArt.ts",
     "components/xbox/xbox-library-detail/XboxLibraryDetail.tsx",
-    "lib/siteUrl.ts",
-    "utils/psnTitles.ts",
-    "utils/xboxTitles.ts"
+    "lib/siteUrl.ts"
   ],
   "palette": [
     "components/achievement-modal/AchievementModal.tsx",
@@ -394,8 +364,7 @@
     "components/psn/psn-trophy-grid/PsnTrophyGrid.tsx",
     "components/status-page-header/StatusPageHeader.tsx",
     "constants/index.ts",
-    "utils/psnTitles.ts",
-    "utils/xboxTitles.ts"
+    "utils/psnTitles.ts"
   ],
   "sideRadius": [
     "components/library-shelf-card/LibraryShelfCard.tsx"

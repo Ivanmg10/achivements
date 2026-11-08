@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { RankRow } from '@/app/api/rankings/route'
 import { useLanguage } from '@/context/LanguageContext'
 import Avatar from '@/components/ui/Avatar'
+import Tag from '@/components/ui/Tag'
 
 const SIZES = { sm: 32, md: 40, lg: 56, xl: 72, p1: 84, p2: 64, p3: 60 }
 
@@ -39,7 +40,7 @@ export default function RankingsPageUser({
   const name = (
     <span className={`truncate ${nameClass}`}>
       {row.username}
-      {row.isMe && <span className="ml-1.5 align-middle text-[10px] uppercase tracking-wider font-bold text-accent bg-accent/15 px-1.5 py-0.5 rounded-tag">{T.rankings.you}</span>}
+      {row.isMe && <Tag size="sm" tone="accent" className="ml-1.5 align-middle">{T.rankings.you}</Tag>}
     </span>
   )
 

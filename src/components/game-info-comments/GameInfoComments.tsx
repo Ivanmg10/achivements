@@ -13,6 +13,7 @@ import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { raAvatarUrl } from '@/utils/raAssets'
+import Tag from '@/components/ui/Tag'
 
 const PREVIEW_COUNT = 2
 
@@ -93,7 +94,7 @@ export default function GameInfoComments({ gameId }: { gameId: number }) {
       <section aria-labelledby="game-comments-title" className={shell}>
         <div className="flex items-center gap-2.5">
           <h2 id="game-comments-title" className="text-xl font-bold">{T.gameComments.title}</h2>
-          <span className="inline-flex items-center h-6 px-2 rounded-tag text-xs font-bold tabular-nums bg-ink/[0.07] text-text-secondary">{total}</span>
+          <Tag size="lg" className="tabular-nums">{total}</Tag>
           <IconButton
             onClick={() => setOpen((o) => !o)}
             aria-expanded={open}

@@ -51,7 +51,7 @@ export default function SteamGameInfoHeader({
       title={title}
       chips={
         <>
-          <GameHeroChip tone="custom" className="bg-[#1b2838] text-[#66c0f4]">
+          <GameHeroChip tone="steam">
             <SteamLogo size={14} aria-hidden="true" />
             Steam
           </GameHeroChip>

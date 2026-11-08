@@ -14,9 +14,10 @@ import PsnGameItemTrophies from '@/components/psn/psn-game-item-trophies/PsnGame
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { gameHref } from '@/utils/gameRef'
-import { psnBackdrop, psnTitleId, psnPlatformChip } from '@/utils/psnTitles'
+import { psnBackdrop, psnTitleId, psnPlatformTone } from '@/utils/psnTitles'
 import type { GameGroupItem } from '@/types/types'
 import { relativeTime } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A PSN game in a group — SteamSortableItem's counterpart: drag handle, icon,
@@ -94,10 +95,10 @@ export default function PsnSortableItem({
             </p>
           </Link>
           <span className="flex items-center gap-1.5 flex-wrap">
-            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${psnPlatformChip(game?.consoleName ?? '')}`}>
+            <Tag size="xs" tone={psnPlatformTone(game?.consoleName ?? '')}>
               <PlaystationLogo size={12} aria-hidden="true" />
               {game?.consoleName ?? 'PlayStation'}
-            </span>
+            </Tag>
             {game && game.earned.platinum > 0 && (
               <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-sky-300/10 text-sky-300">
                 <span aria-hidden="true">★</span> {T.psn.platinum}

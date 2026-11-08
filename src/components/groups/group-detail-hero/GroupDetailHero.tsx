@@ -10,6 +10,7 @@ import { CircularProgress } from '@/components/ui/CircularProgress'
 import { CountUp } from '@/components/ui/CountUp'
 import Button from '@/components/ui/Button'
 import IconButton from '@/components/ui/IconButton'
+import Tag from '@/components/ui/Tag'
 
 /**
  * The top of a group's page: its games' covers as a faded banner, a ring with
@@ -84,10 +85,10 @@ export default function GroupDetailHero({
 
           <div className="flex flex-col gap-2 flex-1 min-w-0 enter-rows">
             <p className="flex items-center gap-2 flex-wrap text-[0.8125rem] text-text-main">
-              <span className="inline-flex items-center gap-1 h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-black/45">
+              <Tag tone="overlay">
                 <Privacy className="w-3 h-3" aria-hidden="true" />
                 {group.is_public ? T.groups.public : T.groups.private}
-              </span>
+              </Tag>
               {plural(gameCount, T.plurals.games, lang)}
               {summary.total > 0 && ` · ${T.groups.summary.replace('{earned}', String(summary.earned)).replace('{total}', String(summary.total))}`}
             </p>
@@ -102,9 +103,9 @@ export default function GroupDetailHero({
             {group.description && <p className="text-sm text-text-main/80">{group.description}</p>}
             {gameCount > 0 && (
               <ul className="flex flex-wrap gap-1.5 text-xs font-bold">
-                <li className="h-[1.375rem] inline-flex items-center px-2 rounded-tag bg-info/15 text-info">{T.groups.startedCount.replace('{n}', String(states.started))}</li>
-                <li className="h-[1.375rem] inline-flex items-center px-2 rounded-tag bg-success/15 text-success">{T.groups.completedCount.replace('{n}', String(states.done))}</li>
-                <li className="h-[1.375rem] inline-flex items-center px-2 rounded-tag bg-black/40 text-text-secondary">{T.groups.notStartedCount.replace('{n}', String(states.notStarted))}</li>
+                <li><Tag tone="info">{T.groups.startedCount.replace('{n}', String(states.started))}</Tag></li>
+                <li><Tag tone="success">{T.groups.completedCount.replace('{n}', String(states.done))}</Tag></li>
+                <li><Tag tone="overlay">{T.groups.notStartedCount.replace('{n}', String(states.notStarted))}</Tag></li>
               </ul>
             )}
           </div>

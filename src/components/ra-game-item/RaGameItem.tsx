@@ -14,6 +14,7 @@ import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import { raImageUrl } from '@/utils/raAssets'
+import Tag from '@/components/ui/Tag'
 
 const CONSOLE_BY_NAME = new Map(CONSOLES.map((c) => [c.name, c.icon]))
 
@@ -94,7 +95,7 @@ export default function RaGameItem({
             >
               <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.Title}</span>
             </Link>
-            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate">{game.ConsoleName}</span>
+            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate">{game.ConsoleName}</Tag>
           </span>
 
           <button

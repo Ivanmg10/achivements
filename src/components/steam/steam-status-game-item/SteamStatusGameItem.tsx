@@ -18,6 +18,7 @@ import { steamAssetUrl } from '@/lib/steamAssets'
 import type { SteamGameProgress } from '@/types/steam'
 import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
 import { formatDate } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A Steam game on a category page, laid out like RA's StatusGameItem so the
@@ -84,10 +85,10 @@ export default function SteamStatusGameItem({
               <p title={game.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game.title}</p>
             </Link>
             <span className="flex items-center gap-1.5 flex-wrap">
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium bg-[#1b2838] text-[#66c0f4]">
+              <Tag size="xs" tone="steam">
                 <SteamLogo size={12} aria-hidden="true" />
                 Steam
-              </span>
+              </Tag>
               {isComplete && (
                 <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[#a4d007]/10 text-[#a4d007]">
                   <span aria-hidden="true">★</span> {T.steam.perfect}

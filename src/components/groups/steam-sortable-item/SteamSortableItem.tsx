@@ -16,6 +16,7 @@ import { steamAssetUrl } from '@/lib/steamAssets'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import type { GameGroupItem } from '@/types/types'
 import { relativeTime } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A Steam game in a group — SortableItem's counterpart: drag handle, cover,
@@ -107,10 +108,10 @@ export default function SteamSortableItem({
             <p title={game?.title ?? item.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game?.title ?? item.title}</p>
           </Link>
           <span className="flex items-center gap-1.5 flex-wrap">
-            <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium bg-[#1b2838] text-[#66c0f4]">
+            <Tag size="xs" tone="steam">
               <SteamLogo size={12} aria-hidden="true" />
               Steam
-            </span>
+            </Tag>
             {isComplete && (
               <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[#a4d007]/10 text-[#a4d007]">
                 <span aria-hidden="true">★</span> {T.steam.perfect}

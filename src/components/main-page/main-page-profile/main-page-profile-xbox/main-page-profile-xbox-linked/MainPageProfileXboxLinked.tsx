@@ -18,6 +18,7 @@ import MainPageProfileXboxAchievements from '../main-page-profile-xbox-achieveme
 import MainPageProfileSkeleton from '../../main-page-profile-skeleton/MainPageProfileSkeleton'
 import MainPageProfileGameSkeleton from '../../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
 import MainPageProfileCard from '../../main-page-profile-card/MainPageProfileCard'
+import Tag from '@/components/ui/Tag'
 
 /**
  * A linked Xbox profile, built like the PSN one block for block: header
@@ -86,7 +87,7 @@ export default function MainPageProfileXboxLinked({
         {summary.tier && (
           <span className="inline-flex items-center gap-1 text-[0.8125rem] text-text-secondary">
             {T.xbox.tier}
-            <span className="px-1.5 py-0.5 rounded-tag bg-success/15 text-success font-bold text-xs">{summary.tier}</span>
+            <Tag tone="success">{summary.tier}</Tag>
           </span>
         )}
         {summary.bio && <p className="text-[0.8125rem] text-text-secondary line-clamp-2">{summary.bio}</p>}

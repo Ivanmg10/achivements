@@ -1,5 +1,6 @@
 import type { PsnGameProgress, TrophyCounts } from '@/types/psn'
 import type { GameStatus } from '@/types/game'
+import type { TagTone } from '@/components/ui/Tag'
 
 const TITLE_ID = /^NPWR(\d{5})_(\d{2})$/
 
@@ -73,17 +74,17 @@ export function psnPlatformName(raw: string): string {
 }
 
 /**
- * The platform chip's colours, after each console: PS5 white, PS4 the
+ * The platform tag's tone, after each console: PS5 white, PS4 the
  * PlayStation blue, PS3 piano black, Vita light blue. A cross-buy list takes
- * its first platform's. The name is always written in the chip too, so the
+ * its first platform's. The name is always written in the tag too, so the
  * colour is never the only cue.
  */
-export function psnPlatformChip(consoleName: string): string {
+export function psnPlatformTone(consoleName: string): TagTone {
   const first = consoleName.split('·')[0].trim().toUpperCase()
-  if (first === 'PS5') return 'bg-zinc-100 text-zinc-900'
-  if (first === 'PS3') return 'bg-black text-zinc-100 ring-1 ring-zinc-500'
-  if (first.includes('VITA')) return 'bg-sky-300 text-sky-950'
-  return 'bg-[#003791] text-white'
+  if (first === 'PS5') return 'white'
+  if (first === 'PS3') return 'black'
+  if (first.includes('VITA')) return 'sky'
+  return 'psn'
 }
 
 /** The id a trophy's row carries on its game page, so a link can jump to it. */

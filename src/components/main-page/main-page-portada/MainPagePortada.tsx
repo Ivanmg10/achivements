@@ -104,7 +104,7 @@ export default function MainPagePortada() {
           {hero.title}
         </h2>
         {hero.console && (
-          <GameHeroChip tone="custom" className="self-start bg-black/50 text-text-main">
+          <GameHeroChip tone="overlay" className="self-start">
             {hero.console}
           </GameHeroChip>
         )}
