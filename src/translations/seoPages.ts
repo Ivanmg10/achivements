@@ -269,7 +269,7 @@ export const SEO_PAGES: SeoPageEntry[] = [
   {
     section: 'track',
     slug: 'achievements-with-friends',
-    updated: '2026-10-17',
+    updated: '2026-11-08',
     text: {
       en: {
         link: 'Compare achievements with friends',
@@ -282,17 +282,17 @@ export const SEO_PAGES: SeoPageEntry[] = [
             heading: 'How it works',
             points: [
               'Follow anyone with a public profile; they appear in your Following section.',
-              'Open their profile: their platforms, favourite games, public groups, pinned achievements and recent activity.',
+              'Open their profile: their platforms, favourite games, public groups, achievement showcase and recent activity.',
               'Compare a game: open a game on their profile and see your progress next to theirs, achievement by achievement.',
             ],
           },
           {
             heading: 'Privacy',
-            text: 'Your profile can be made private at any time. A public profile shows signed-in users your progress, never your email or your keys. Nobody is told who follows them.',
+            text: 'Your profile can be made private at any time. A public profile shows signed-in users your progress, never your email or your keys. Only you see who follows you and who you follow.',
           },
         ],
         faq: [
-          { q: 'Can people outside CheevoVault see my profile?', a: 'No. Only signed-in users, and only while your profile is public.' },
+          { q: 'Can people outside CheevoVault see my profile?', a: 'Only a small card: your name, level and Vault Points, as the public rankings show them. Your games and activity are for signed-in users, and only while your profile is public. A private profile shows nothing.' },
           { q: 'Do my friends need the same platforms as me?', a: 'No. You compare on the games you both have.' },
         ],
       },
@@ -307,17 +307,17 @@ export const SEO_PAGES: SeoPageEntry[] = [
             heading: 'Cómo funciona',
             points: [
               'Sigue a cualquiera con perfil público; aparece en tu sección de Siguiendo.',
-              'Abre su perfil: sus plataformas, juegos favoritos, grupos públicos, logros fijados y actividad reciente.',
+              'Abre su perfil: sus plataformas, juegos favoritos, grupos públicos, vitrina de logros y actividad reciente.',
               'Compara un juego: ábrelo en su perfil y ve tu progreso junto al suyo, logro a logro.',
             ],
           },
           {
             heading: 'Privacidad',
-            text: 'Puedes hacer tu perfil privado cuando quieras. Un perfil público enseña tu progreso a los usuarios con sesión iniciada, nunca tu email ni tus claves. A nadie se le dice quién le sigue.',
+            text: 'Puedes hacer tu perfil privado cuando quieras. Un perfil público enseña tu progreso a los usuarios con sesión iniciada, nunca tu email ni tus claves. Solo tú ves quién te sigue y a quién sigues.',
           },
         ],
         faq: [
-          { q: '¿Puede ver mi perfil gente de fuera de CheevoVault?', a: 'No. Solo usuarios con sesión iniciada, y solo mientras tu perfil sea público.' },
+          { q: '¿Puede ver mi perfil gente de fuera de CheevoVault?', a: 'Solo una tarjeta: tu nombre, nivel y Puntos Vault, como en los rankings públicos. Tus juegos y tu actividad solo los ven usuarios con sesión, y solo si tu perfil es público. Un perfil privado no muestra nada.' },
           { q: '¿Mis amigos necesitan las mismas plataformas que yo?', a: 'No. Comparáis en los juegos que tengáis los dos.' },
         ],
       },

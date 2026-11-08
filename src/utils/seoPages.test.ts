@@ -39,6 +39,12 @@ test('no text can close the script tag it is written into', () => {
   expect(jsonLdString({ a: '</script>' })).toBe('{"a":"\\u003c/script>"}')
 })
 
+test('the friends page claims nothing the product no longer keeps (CP-01)', () => {
+  const friends = JSON.stringify(findSeoPage('track', 'achievements-with-friends')!.text)
+  expect(friends).not.toMatch(/pinned achievements|logros fijados|Nobody is told|A nadie se le dice/)
+  expect(friends).not.toMatch(/"a":"No\. Only signed-in|"a":"No\. Solo usuarios/)
+})
+
 describe('the copy', () => {
   const texts = SEO_PAGES.flatMap((p) => Object.values(p.text).map((t) => ({ path: seoPath(p), t: t! })))
 
