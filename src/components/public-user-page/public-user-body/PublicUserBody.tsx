@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useHashTab } from '@/hooks/useHashTab'
 import { useProfileLibrary } from '@/hooks/useProfileLibrary'
 import type { CheevoUser } from '@/hooks/useCheevoUser'
-import MainPageProfileTabs, { profilePanelId, profileTabId } from '@/components/main-page/main-page-profile/main-page-profile-tabs/MainPageProfileTabs'
+import Tabs, { tabIds } from '@/components/ui/Tabs'
 import PublicUserHero from '../public-user-hero/PublicUserHero'
 import PublicUserOverview from '../public-user-overview/PublicUserOverview'
 import PublicUserGames from '../public-user-games/PublicUserGames'
@@ -35,7 +35,7 @@ export default function PublicUserBody({ user, viewer }: { user: CheevoUser; vie
     activity: { label: T.userProfile.tabActivity, icon: <IconActivity size={16} aria-hidden="true" /> },
     compare: { label: T.userProfile.tabCompare, icon: <IconArrowsDiff size={16} aria-hidden="true" /> },
   }
-  const tabs = (user.isSelf ? OWN_TABS : ALL_TABS).map((id) => ({ id, ...labels[id] }))
+  const tabs = (user.isSelf ? OWN_TABS : ALL_TABS).map((value) => ({ value, ...labels[value] }))
 
   const panels: Record<Tab, ReactNode> = {
     overview: <PublicUserOverview user={user} games={games} gamesLoading={isLoading} />,
@@ -48,9 +48,9 @@ export default function PublicUserBody({ user, viewer }: { user: CheevoUser; vie
     <div className="flex flex-col gap-4">
       <PublicUserHero user={user} onCompare={() => setTab('compare')} />
 
-      <MainPageProfileTabs<Tab> idPrefix={ID_PREFIX} size="md" label={T.userProfile.sectionsLabel} selected={tab} onSelect={setTab} tabs={tabs} />
+      <Tabs<Tab> id={ID_PREFIX} aria-label={T.userProfile.sectionsLabel} value={tab} onChange={setTab} tabs={tabs} />
 
-      <div key={tab} role="tabpanel" id={profilePanelId(ID_PREFIX, tab)} aria-labelledby={profileTabId(ID_PREFIX, tab)} className="min-w-0">
+      <div key={tab} role="tabpanel" id={tabIds(ID_PREFIX, tab).panel} aria-labelledby={tabIds(ID_PREFIX, tab).tab} className="min-w-0">
         {panels[tab]}
       </div>
     </div>

@@ -6,7 +6,7 @@ import { DECADES, type DecadeFilter, type GroupFilters as Filters, type PctFilte
 import GroupViewToggle, { type GroupDetailView } from '@/components/groups/group-view-toggle/GroupViewToggle'
 import Select from '@/components/ui/Select'
 import Checkbox from '@/components/ui/Checkbox'
-import { tabClass } from '@/components/ui/Tabs'
+import { TabMark, tabClass } from '@/components/ui/Tabs'
 import { MENU_SURFACE } from '@/components/ui/menu'
 
 const MENU = 'h-9 px-3 rounded-button text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer bg-bg-main ring-1 ring-inset ring-ink/10 text-text-main hover:ring-ink/25 transition-colors focus-ring'
@@ -64,6 +64,7 @@ export default function GroupToolbar({
             onClick={() => onPct(s.value)}
             className={tabClass(filters.pct === s.value)}
           >
+            <TabMark on={filters.pct === s.value} />
             {s.label}
             {s.count !== undefined && <span className="text-xs font-bold tabular-nums opacity-70">{s.count}</span>}
           </button>

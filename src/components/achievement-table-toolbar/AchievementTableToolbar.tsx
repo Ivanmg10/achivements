@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { tabClass, TAB_ROW } from '@/components/ui/Tabs'
+import { TabMark, tabClass, TAB_ROW } from '@/components/ui/Tabs'
 import SearchInput from '@/components/ui/SearchInput'
 import Select from '@/components/ui/Select'
 
@@ -39,6 +39,7 @@ export default function AchievementTableToolbar<F extends string, S extends stri
       <div className={`${TAB_ROW} flex-1`} role="group" aria-label={label}>
         {tabs.map((t) => (
           <button key={t.value} type="button" onClick={() => onFilter(t.value)} aria-pressed={filter === t.value} className={tabClass(filter === t.value)}>
+            <TabMark on={filter === t.value} />
             {t.label}
             <span className="text-xs font-bold tabular-nums text-text-secondary">{t.count}</span>
           </button>

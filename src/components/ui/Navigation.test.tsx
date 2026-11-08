@@ -63,4 +63,25 @@ describe('Tabs', () => {
     fireEvent.keyDown(screen.getByRole('tab', { name: 'Three' }), { key: 'Home' })
     expect(first).toHaveAttribute('aria-selected', 'true')
   })
+
+  it('marks the tab you are on with the signature, hidden from a screen reader, and draws no underline', () => {
+    render(<Harness />)
+    const mark = screen.getByRole('tab', { name: 'One' }).querySelector('[aria-hidden="true"]')
+    expect(mark).toHaveClass('before:content-(--mark)', 'text-accent')
+    expect(screen.getByRole('tab', { name: 'Three' }).querySelector('[aria-hidden="true"]')).toBeNull()
+    expect(screen.getByRole('tablist').innerHTML).not.toContain('skew')
+  })
+
+  it('a rail keeps the mark\'s room on every tab, moves with up and down, and a switch with no panel points at none', () => {
+    function Rail() {
+      const [tab, setTab] = useState<'a' | 'b'>('a')
+      return <Tabs id="r" aria-label="Sections" orientation="rail" panels={false} value={tab} onChange={setTab} tabs={[{ value: 'a', label: 'One', icon: <svg /> }, { value: 'b', label: 'Two' }]} />
+    }
+    render(<Rail />)
+    expect(screen.getByRole('tablist')).toHaveAttribute('aria-orientation', 'vertical')
+    expect(screen.getByRole('tab', { name: 'Two' }).querySelector('[aria-hidden="true"]')).toHaveClass('invisible')
+    expect(screen.getByRole('tab', { name: 'One' })).not.toHaveAttribute('aria-controls')
+    fireEvent.keyDown(screen.getByRole('tab', { name: 'One' }), { key: 'ArrowDown' })
+    expect(screen.getByRole('tab', { name: 'Two' })).toHaveAttribute('aria-selected', 'true')
+  })
 })
