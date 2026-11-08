@@ -13,6 +13,18 @@ describe('Switch', () => {
     expect(onChange).toHaveBeenCalledWith(true)
   })
 
+  it('paints the knob in the ink the accent is read with when on, so it shows on a light accent too', () => {
+    const knob = (checked: boolean) => {
+      const { container, unmount } = render(<Switch checked={checked} onChange={jest.fn()} aria-label="x" />)
+      const cls = container.querySelectorAll('button > span')[1].className
+      unmount()
+      return cls
+    }
+    expect(knob(true)).toContain('bg-bg-main')
+    expect(knob(true)).not.toContain('bg-white')
+    expect(knob(false)).toContain('bg-white')
+  })
+
   it('does nothing while disabled', () => {
     const onChange = jest.fn()
     render(<Switch checked onChange={onChange} aria-label="Admin" disabled />)

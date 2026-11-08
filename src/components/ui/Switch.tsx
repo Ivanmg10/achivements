@@ -32,8 +32,8 @@ export default function Switch({ checked, onChange, disabled, className = '', ..
       />
       <span
         aria-hidden="true"
-        className={`absolute top-1 left-[7px] w-(--knob-w) h-(--knob-h) rounded-(--r-knob) bg-white shadow skew-x-(--slant-pill) transition-transform duration-(--motion-open) ease-(--ease-spring) motion-reduce:transition-none ${
-          checked ? 'translate-x-(--knob-shift)' : ''
+        className={`absolute top-1 left-[7px] w-(--knob-w) h-(--knob-h) rounded-(--r-knob) shadow skew-x-(--slant-pill) transition-[transform,background-color] duration-(--motion-open) ease-(--ease-spring) motion-reduce:transition-none ${
+          checked ? 'bg-bg-main translate-x-(--knob-shift)' : 'bg-white'
         }`}
       />
     </button>
