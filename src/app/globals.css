@@ -176,7 +176,7 @@
   --success: 34 197 94;
   --warning: 245 158 11;
   --info: 96 165 250;
-  --danger: 239 68 68;
+  --danger: 248 113 113;
   --chart-2: 245 158 11;
 
   /* Resolved on each element, so it follows the theme that element is in. */
@@ -429,7 +429,7 @@ html[data-font="fira"],
   --success: 34 197 94;
   --warning: 245 158 11;
   --info: 96 165 250;
-  --danger: 239 68 68;
+  --danger: 248 113 113;
   --chart-2: 245 158 11;
 }
 
@@ -542,7 +542,7 @@ html[data-font="fira"],
   --success: 34 197 94;
   --warning: 245 158 11;
   --info: 34 211 238;
-  --danger: 239 68 68;
+  --danger: 248 113 113;
   --chart-2: 245 158 11;
 }
 
