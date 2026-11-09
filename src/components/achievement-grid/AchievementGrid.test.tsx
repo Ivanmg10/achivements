@@ -97,7 +97,7 @@ test('opens the achievement modal on click', async () => {
   jest.useRealTimers()
 
   fireEvent.click(screen.getByRole('button', { name: /First blood/ }))
-  expect(screen.getByTestId('achievement-modal')).toBeInTheDocument()
+  expect(await screen.findByTestId('achievement-modal')).toBeInTheDocument()
 
   fireEvent.click(screen.getByText('close'))
   expect(screen.queryByTestId('achievement-modal')).not.toBeInTheDocument()

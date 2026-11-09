@@ -289,3 +289,15 @@ test('Framer variants only on what opens on a click; an entrance is CSS', () => 
   ]
   expect(newOffenders('variants', NEW_RULES.variants, onClick)).toEqual([])
 })
+
+// The dialog pass (#121, antislop audit X3): every dialog is a plain Modal, downloaded when first opened.
+test('a dialog is a plain Modal: no CommonModal, and no Escape listener of its own (only the top dialog answers Escape)', () => {
+  expect(offenders(/\bCommonModal\b|common-modal/)).toEqual([])
+  expect(FILES.filter(({ text }) => /<Modal\b/.test(text) && /['"]Escape['"]/.test(text)).map(({ file }) => file)).toEqual([])
+})
+
+test('a modal or dialog is a next/dynamic import with { loading }, never a static import in a page or the header', () => {
+  expect(offenders(/^import\s+\w+(?:Modal|Dialog)\b[^\n]*\sfrom\s+['"][^'"]+['"]/m)).toEqual([])
+  // Without `loading` the first download suspends up to the route's loading.tsx and the page flashes its skeleton.
+  expect(offenders(/dynamic\(\s*\(\)\s*=>\s*import\(\s*['"][^'"]*(?:Modal|Dialog)[^'"]*['"]\s*\)\s*\)/)).toEqual([])
+})

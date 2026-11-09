@@ -1,9 +1,9 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
 import GameInfoAchievementCard from '../game-info-achivement/GameInfoAchievementCard'
-import AchievementModal from '../achievement-modal/AchievementModal'
 import MissableNotice from '../missable-notice/MissableNotice'
 import { useState, useMemo, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
@@ -18,6 +18,9 @@ import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
 import { TABLE, TH } from '@/components/ui/dataTable'
 import { parseUnlockTime } from '@/utils/dates'
 import { raAchievementList } from '@/utils/gameAchievements'
+
+// Downloaded the first time it opens, not with the page.
+const AchievementModal = dynamic(() => import('../achievement-modal/AchievementModal'), { loading: () => null })
 
 type Filter = 'all' | 'earned' | 'unearned' | 'missable'
 type SortDir = 'asc' | 'desc'

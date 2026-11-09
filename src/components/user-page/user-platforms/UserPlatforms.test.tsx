@@ -63,12 +63,12 @@ test('disconnecting RA unlinks it', () => {
   expect(unlinkRaUser).toHaveBeenCalled()
 })
 
-test('RA disconnected offers to connect instead', () => {
+test('RA disconnected offers to connect instead', async () => {
   setRa(false)
   render(<UserPlatforms />)
 
   fireEvent.click(screen.getByRole('button', { name: en.userData.signInRA }))
-  expect(screen.getByTestId('ra-modal')).toBeInTheDocument()
+  expect(await screen.findByTestId('ra-modal')).toBeInTheDocument()
 })
 
 test('unlinking RA says whether it worked', async () => {

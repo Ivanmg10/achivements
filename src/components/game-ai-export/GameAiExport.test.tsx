@@ -26,12 +26,12 @@ function open() {
   return getSource
 }
 
-test('builds the export only when the window opens', () => {
+test('builds the export only when the window opens', async () => {
   const getSource = open()
   expect(getSource).not.toHaveBeenCalled()
   fireEvent.click(screen.getByRole('button', { name: en.aiExport.open }))
   expect(getSource).toHaveBeenCalledTimes(1)
-  const dialog = screen.getByRole('dialog', { name: en.aiExport.title })
+  const dialog = await screen.findByRole('dialog', { name: en.aiExport.title })
   expect(dialog).toHaveTextContent('Black Ops II')
   expect(dialog).toHaveTextContent(en.aiExport.privacy)
 })

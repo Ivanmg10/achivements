@@ -2,11 +2,15 @@
 
 import { useMemo, useState } from 'react'
 import { IconEdit } from '@tabler/icons-react'
+import dynamic from 'next/dynamic'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { useLanguage } from '@/context/LanguageContext'
 import { filterPerfects, groupPerfectsByYear, PerfectFilter, PerfectGame } from '@/utils/perfectGames'
 import BrowseSearchChips from '@/components/main-page/main-page-browse/browse-search-chips/BrowseSearchChips'
-import PerfectGamesOrderModal from '@/components/main-page/perfect-games-order-modal/PerfectGamesOrderModal'
 import CollectionTile from '../collection-tile/CollectionTile'
+
+// Downloaded the first time it opens, not with the page.
+const PerfectGamesOrderModal = dynamic(() => import('@/components/main-page/perfect-games-order-modal/PerfectGamesOrderModal'), { loading: () => null })
 
 type View = 'year' | 'order'
 
@@ -117,7 +121,9 @@ export default function CollectionGrid({
       )}
 
       {onSaveOrder && (
-        <PerfectGamesOrderModal isOpen={editOpen} onClose={() => setEditOpen(false)} games={allGames} order={order} onSaveOrder={onSaveOrder} />
+        <LazyWhenOpened open={editOpen}>
+          <PerfectGamesOrderModal isOpen={editOpen} onClose={() => setEditOpen(false)} games={allGames} order={order} onSaveOrder={onSaveOrder} />
+        </LazyWhenOpened>
       )}
     </div>
   )

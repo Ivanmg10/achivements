@@ -97,10 +97,10 @@ test('each secret achievement has its own eye, and the global switch follows the
   expect(names()).toContain(en.xbox.secretAchievement)
 })
 
-test('an achievement opens in a detail window with its gamerscore and guide links', () => {
+test('an achievement opens in a detail window with its gamerscore and guide links', async () => {
   render(<XboxGameInfoTable gameId={100} gameTitle="Halo Infinite" achievements={ACHIEVEMENTS} />)
   fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'Common' }))
-  const dialog = screen.getByRole('dialog', { name: 'Common' })
+  const dialog = await screen.findByRole('dialog', { name: 'Common' })
   expect(within(dialog).getByText('10 G')).toBeInTheDocument()
   expect(within(dialog).getByRole('link', { name: en.achievementDetail.trueAchievements })).toHaveAttribute(
     'href',

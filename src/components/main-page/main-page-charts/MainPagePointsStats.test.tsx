@@ -123,14 +123,14 @@ describe('MainPagePointsStats', () => {
     expect(screen.getByText('Streak').closest('a')).toHaveAttribute('href', '/racha')
   })
 
-  test('clicking Today opens the day achievements modal for today', () => {
+  test('clicking Today opens the day achievements modal for today', async () => {
     render(<MainPagePointsStats achievements={[]} heatmapAchievements={[]} rank={null} />)
     expect(screen.queryByTestId('day-modal')).not.toBeInTheDocument()
     fireEvent.click(screen.getByText('Today').closest('button')!)
-    expect(screen.getByTestId('day-modal')).toHaveTextContent(daysAgo(0))
+    expect(await screen.findByTestId('day-modal')).toHaveTextContent(daysAgo(0))
   })
 
-  test('clicking This week opens the period modal with the rolling 7-day achievements', () => {
+  test('clicking This week opens the period modal with the rolling 7-day achievements', async () => {
     const achievements = [
       { Date: `${daysAgo(0)} 10:00:00`, Points: 10, HardcoreMode: '1' } as unknown as RecentAchievement,
       { Date: `${daysAgo(3)} 10:00:00`, Points: 5, HardcoreMode: '0' } as unknown as RecentAchievement,
@@ -138,7 +138,7 @@ describe('MainPagePointsStats', () => {
     ]
     render(<MainPagePointsStats achievements={achievements} heatmapAchievements={[]} rank={null} />)
     fireEvent.click(screen.getByText('This week').closest('button')!)
-    expect(screen.getByTestId('period-modal')).toHaveTextContent('This week:2')
+    expect(await screen.findByTestId('period-modal')).toHaveTextContent('This week:2')
   })
 
   test('clicking This month opens the period modal with this-calendar-month achievements', () => {

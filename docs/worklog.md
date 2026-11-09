@@ -33,6 +33,45 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-09 — Every dialog a plain Modal, lazy-loaded (`refactor/121-plain-modals`, #121)
+
+**Did** — Antislop X3 / plan S5, one commit per group (ids are the audit's):
+- *`CommonModal` deleted* (its 13 users moved to `Modal`): delete-account (`tone="danger"`, trash icon, hint, footer),
+  change-password, edit-profile (username/email), avatar, gender, language, location, hidden games, hide-game
+  confirmation, mastered-games order, RA login, admin create/edit user. Heads that were an `<h2>` in the body or a hand-made
+  row with its own ✕ are `title` / `hint` / `icon`; Cancel / Save rows are `footer`. `Modal`'s `children` is optional now: a
+  confirmation can be only a head and a footer (no empty padded body).
+- *Own heads, ✕ and Escape out:* day / week / period achievements (the ✕ was `aria-label="Close"` in English or unnamed),
+  `AchievementModal` (a bare `✕` text with no name), `AchievementDetailModal`, forgot password (own Escape on `window`,
+  hard-coded "Close", a stray `AnimatePresence`), the game chart's period list (own Escape), AI export, hashes (its Spanish
+  title is `T.gameInfoPage.hashesCompatible` now, "Cerrar" gone), `GroupModal` and `AddGameModal` (rebuilt `AnimatePresence`,
+  hand head, own Escape; the group form's submit is in the `footer` through `form=`; AddGame's search is sticky in the body),
+  showcase picker (own Escape; its way back to the games stays in the body), `AdminPanelModal` (its ✕ and its "Admin panel"
+  heading are the Modal's; `AdminPanel` keeps only its sticky toolbar), `DeleteConfirmDialog` (`tone="danger"`, and it no
+  longer returns null when closed, so the exit animation plays).
+- *Lazy:* the static imports against the rule are `next/dynamic` + `{ loading: () => null }` (`LazyWhenOpened` where the
+  modal has an `isOpen`): day/period/week modals in 7 files, `AchievementModal` in 4, `AchievementDetailModal` in 4, RA login in 2,
+  AI export, hashes, mastered order, and the admin panel's own three.
+- *Guard (`uiGuard.test.ts`):* no `CommonModal`; no `'Escape'` in a file that renders a `<Modal`; no static `import XModal` /
+  `XDialog`; no `dynamic()` of a modal without `loading`. `createPortal` and `role="dialog"` already had rules (#120).
+- *Tests:* the ones that opened a modal now `await findBy…` (the dynamic import); Escape is fired on `document` (Modal's
+  listener); new checks for the danger dialog, AddGame, AI export (a new test file), `AchievementModal`'s named ✕, `Modal` with no children.
+**Why** — #121: ~20 dialogs wrapped `Modal` in a second portal, hid its head and drew five different ones, added Escape
+listeners that broke "only the top dialog answers", had an unnamed ✕ or were imported statically.
+**Decisions** — *The achievement windows keep their hero as content* (icon, title with pin / showcase toggles, description,
+stats): it is the content, not a head, and redesigning it is #132; they only take the corner ✕ (`T.cards.close`) in place of
+their own. *Data-conditional modals* (`{selected && <DayAchievementsModal …/>}`, in an `AnimatePresence` that did nothing, as
+`Modal` has its own) stay conditional: they are lazy by their condition, and giving them an `isOpen` would mean keeping the last
+value for the exit animation. *Search and the phone menu* were already plain `Modal placement="top"` (#120): nothing to do.
+**Open** — The welcome's `WelcomePageIntroDetail` / `WelcomePagePreferencesDetail` have their own Escape: they are cards
+that grow into their detail on the page (not dialogs: no role, no backdrop), left alone. `StatusSortControl` and `useClickAway`
+are menus. Some Spanish strings remain in `GameHashesModal`'s body (#122). Not looked at on a real phone or in Firefox: check
+the sticky search of "Add games" and the admin panel's sticky toolbar inside the Modal's scrolling body.
+**Watch out** — A footer is `flex-wrap justify-end`: a footer with a status line passes one child that is `w-full`
+(AddGame) or `mr-auto` (showcase). A test that opens a lazy modal must `await findBy…`; Escape goes to `document`, not `window`.
+
+---
+
 ## 2026-11-09 — The slant grammar of identity B v2 (`feat/127-slant-grammar-b2`, #127)
 
 **Did** — Built page 1 of the canvas (boards "SheetB2" and "Piezas", B v2 as the owner confirmed it on 2026-11-07), one

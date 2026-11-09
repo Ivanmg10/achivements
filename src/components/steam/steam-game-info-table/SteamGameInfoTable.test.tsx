@@ -228,11 +228,11 @@ describe('polish shared with RA', () => {
     expect(filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterEarned}`) })).toHaveTextContent('2')
   })
 
-  test('an achievement opens in a detail window with guide links, and closes', () => {
+  test('an achievement opens in a detail window with guide links, and closes', async () => {
     render(<SteamGameInfoTable achievements={[ach('WIN', { title: 'Victoria', titleEn: 'Win', globalPct: 12.5 })]} appId={620} gameTitle="Portal 2" />)
     fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'Victoria' }))
 
-    const dialog = screen.getByRole('dialog', { name: 'Victoria' })
+    const dialog = await screen.findByRole('dialog', { name: 'Victoria' })
     expect(within(dialog).getByText('12.5%')).toBeInTheDocument()
     // Guides are searched by the English name.
     expect(within(dialog).getByRole('link', { name: en.achievementDetail.steamGuides })).toHaveAttribute(

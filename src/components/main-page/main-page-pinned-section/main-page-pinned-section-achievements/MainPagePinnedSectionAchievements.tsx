@@ -3,11 +3,11 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { IconStar } from '@tabler/icons-react'
+import dynamic from 'next/dynamic'
 import type { PinnedAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePinnedAchievements } from '@/hooks/usePinnedAchievements'
 import { pinnedView } from '@/utils/pinnedView'
-import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SectionFallback } from '@/components/ui/SectionFallback'
@@ -15,6 +15,9 @@ import MainPagePinnedSectionAchievementTile from '../main-page-pinned-section-ac
 import MainPagePinnedSectionSortable from '../main-page-pinned-section-sortable/MainPagePinnedSectionSortable'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { RememberedHeight } from '@/components/ui/RememberedHeight'
+
+// Downloaded the first time it opens, not with the page.
+const AchievementModal = dynamic(() => import('@/components/achievement-modal/AchievementModal'), { loading: () => null })
 
 type RaPin = Extract<PinnedAchievement, { source: 'ra' }>
 

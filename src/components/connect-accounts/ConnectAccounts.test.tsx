@@ -36,11 +36,11 @@ test('never shows made-up games in place of a library', () => {
   expect(container.textContent).not.toMatch(/Super Mario 64|Pokémon FireRed|Crash Bandicoot/)
 })
 
-test('connects RetroAchievements without leaving the page', () => {
+test('connects RetroAchievements without leaving the page', async () => {
   render(<ConnectAccounts />)
   expect(screen.queryByTestId('ra-modal')).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userData.signInRA) }))
-  expect(screen.getByTestId('ra-modal')).toBeInTheDocument()
+  expect(await screen.findByTestId('ra-modal')).toBeInTheDocument()
 })
 
 test('Steam connects right there, with its own card — no Steam sign-in', () => {

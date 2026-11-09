@@ -9,11 +9,12 @@ import UserPlatformCard, {
   platformStat,
   PlatformStat,
 } from '@/components/user-page/user-platform-card/UserPlatformCard'
+import dynamic from 'next/dynamic'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
 import UserXboxCard from '@/components/user-page/user-xbox-card/UserXboxCard'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import UserSteamCard from '@/components/user-page/user-steam-card/UserSteamCard'
-import RaLoginModal from '@/components/ra-login-modal/RaLoginModal'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGamesData } from '@/context/GamesDataContext'
@@ -23,6 +24,9 @@ import { unlinkRaUser } from '@/utils/apiCallsUtils'
 import { RetroAchievementsUserProfile } from '@/types/types'
 import { notify } from '@/lib/notify'
 import { raImageUrl } from '@/utils/raAssets'
+
+// Downloaded the first time it opens, not with the page.
+const RaLoginModal = dynamic(() => import('@/components/ra-login-modal/RaLoginModal'), { loading: () => null })
 
 /**
  * The platforms CheevoVault can track, side by side: who you are on
@@ -118,7 +122,9 @@ export default function UserPlatforms() {
 
       <UserXboxCard />
 
-      <RaLoginModal isOpen={raModalOpen} setIsOpen={setRaModalOpen} />
+      <LazyWhenOpened open={raModalOpen}>
+        <RaLoginModal isOpen={raModalOpen} setIsOpen={setRaModalOpen} />
+      </LazyWhenOpened>
     </div>
   )
 }

@@ -2,16 +2,19 @@
 
 import { useMemo, useRef, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { RecentAchievement } from '@/types/types'
 import { groupByDays, heatLevel, HEAT_LEVELS } from '@/utils/utils'
 import { IconRefresh } from '@tabler/icons-react'
-import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHeatmapGrid, HEATMAP_GAP as GAP, HEATMAP_MAX_DAYS } from '@/hooks/useHeatmapGrid'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { utcDay, formatDay } from '@/utils/dates'
 import Kicker from '@/components/ui/Kicker'
 import Facts from '@/components/ui/Facts'
+
+// Downloaded the first time it opens, not with the page.
+const DayAchievementsModal = dynamic(() => import('@/components/day-achievements-modal/DayAchievementsModal'), { loading: () => null })
 
 /** Empty, then the theme's accent at rising strength: one hue per theme, so every theme reads the same way. */
 /*

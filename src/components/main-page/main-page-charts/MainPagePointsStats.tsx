@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { streakInk, streakTier } from '@/utils/streakTier'
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
@@ -7,9 +8,11 @@ import { RecentAchievement, UserRankAndScore } from '@/types/types'
 import { calcAvgPerDay, calcThisMonth, plural, decimal } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import Figure from '@/components/ui/Figure'
-import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
-import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
 import { parseUnlockTime, utcDay } from '@/utils/dates'
+
+// Downloaded the first time it opens, not with the page.
+const DayAchievementsModal = dynamic(() => import('@/components/day-achievements-modal/DayAchievementsModal'), { loading: () => null })
+const PeriodAchievementsModal = dynamic(() => import('@/components/period-achievements-modal/PeriodAchievementsModal'), { loading: () => null })
 
 export default function MainPagePointsStats({
   achievements,

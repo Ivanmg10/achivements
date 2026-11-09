@@ -3,16 +3,19 @@
 import { useState, useMemo, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { IconCalendarEvent, IconCalendarMonth, IconCalendarWeek } from '@tabler/icons-react'
+import dynamic from 'next/dynamic'
 import { RecentAchievement } from '@/types/types'
 import MainPageBestPeriodRow from './main-page-best-period-row/MainPageBestPeriodRow'
 import { getBestMonth } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
-import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
-import WeekAchievementsModal from '@/components/week-achievements-modal/WeekAchievementsModal'
-import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
 import { parseUnlockTime, utcDay } from '@/utils/dates'
 import Kicker from '@/components/ui/Kicker'
+
+// Downloaded the first time it opens, not with the page.
+const DayAchievementsModal = dynamic(() => import('@/components/day-achievements-modal/DayAchievementsModal'), { loading: () => null })
+const WeekAchievementsModal = dynamic(() => import('@/components/week-achievements-modal/WeekAchievementsModal'), { loading: () => null })
+const PeriodAchievementsModal = dynamic(() => import('@/components/period-achievements-modal/PeriodAchievementsModal'), { loading: () => null })
 
 type Metric = 'pts' | 'ach'
 

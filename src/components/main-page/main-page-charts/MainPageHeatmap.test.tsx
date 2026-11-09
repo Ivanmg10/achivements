@@ -62,7 +62,7 @@ test('counts the unlocks it was given', () => {
   expect(screen.getByText('2')).toBeInTheDocument()
 })
 
-test('a day with unlocks opens that day, an empty one does nothing', () => {
+test('a day with unlocks opens that day, an empty one does nothing', async () => {
   render(<MainPageHeatmap achievements={[unlock(today(), 'Win')]} />)
 
   const withUnlocks = document.querySelector(`[data-date="${today()}"]`) as HTMLElement
@@ -72,7 +72,7 @@ test('a day with unlocks opens that day, an empty one does nothing', () => {
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 
   fireEvent.click(withUnlocks)
-  expect(screen.getByText('Win')).toBeInTheDocument()
+  expect(await screen.findByText('Win')).toBeInTheDocument()
 })
 
 test('draws nothing at all until the card has been measured', () => {

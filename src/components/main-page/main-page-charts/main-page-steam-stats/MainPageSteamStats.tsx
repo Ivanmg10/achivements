@@ -2,15 +2,18 @@
 
 import { useMemo, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import type { RecentAchievement } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamProfile } from '@/hooks/useSteamProfile'
 import { calcAvgPerDay, decimal } from '@/utils/utils'
 import Figure from '@/components/ui/Figure'
-import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
-import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
 import { parseUnlockTime, utcDay } from '@/utils/dates'
+
+// Downloaded the first time it opens, not with the page.
+const DayAchievementsModal = dynamic(() => import('@/components/day-achievements-modal/DayAchievementsModal'), { loading: () => null })
+const PeriodAchievementsModal = dynamic(() => import('@/components/period-achievements-modal/PeriodAchievementsModal'), { loading: () => null })
 
 const DAY_MS = 86_400_000
 

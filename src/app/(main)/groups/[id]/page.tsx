@@ -15,8 +15,8 @@ import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
 // Downloaded the first time it is opened, not with the page.
 const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
+const DeleteConfirmDialog = dynamic(() => import('@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'), { loading: () => null })
 const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'), { loading: () => null })
-import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
 import GroupDetailHero from '@/components/groups/group-detail-hero/GroupDetailHero'
 import GroupToolbar from '@/components/groups/group-toolbar/GroupToolbar'
 import GroupCoverGrid from '@/components/groups/group-cover-grid/GroupCoverGrid'
@@ -143,7 +143,9 @@ export default function GroupDetailPage() {
           <GroupModal isOpen={editOpen} onClose={() => setEditOpen(false)} group={group} onSave={edit} />
         </LazyWhenOpened>
       )}
-      <DeleteConfirmDialog isOpen={confirmDelete} onClose={() => setConfirmDelete(false)} onConfirm={handleDelete} />
+      <LazyWhenOpened open={confirmDelete}>
+        <DeleteConfirmDialog isOpen={confirmDelete} onClose={() => setConfirmDelete(false)} onConfirm={handleDelete} />
+      </LazyWhenOpened>
     </div>
   )
 }

@@ -47,11 +47,11 @@ test('the title, how many are earned, and a tile per pin', () => {
   expect(screen.getAllByTestId('tile')).toHaveLength(2)
 })
 
-test('an RA pin opens its modal; any pin can be unpinned', () => {
+test('an RA pin opens its modal; any pin can be unpinned', async () => {
   setPins()
   render(<MainPagePinnedSectionAchievements />)
   fireEvent.click(screen.getByText('open Win'))
-  expect(screen.getByTestId('modal')).toHaveTextContent('Win')
+  expect(await screen.findByTestId('modal')).toHaveTextContent('Win')
   fireEvent.click(screen.getByText('unpin Lock'))
   expect(unpin).toHaveBeenCalledWith(STEAM)
 })

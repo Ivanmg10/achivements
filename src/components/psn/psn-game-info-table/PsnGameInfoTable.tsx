@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useMemo, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import {
   SteamSortableHeader,
@@ -19,12 +20,14 @@ import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
 import { useLocationHash } from '@/hooks/useLocationHash'
 import { guideLinks } from '@/utils/guideLinks'
 import { BASE_GROUP, dlcShortName, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
-import AchievementDetailModal from '@/components/achievement-detail-modal/AchievementDetailModal'
 import AchievementTableToolbar from '@/components/achievement-table-toolbar/AchievementTableToolbar'
 import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
 import { SURFACE } from '@/components/ui/surface'
 import { TABLE, TH } from '@/components/ui/dataTable'
 import { buttonClass } from '@/components/ui/Button'
+
+// Downloaded the first time it opens, not with the page.
+const AchievementDetailModal = dynamic(() => import('@/components/achievement-detail-modal/AchievementDetailModal'), { loading: () => null })
 
 type Filter = 'all' | 'earned' | 'unearned'
 
