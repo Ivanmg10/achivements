@@ -485,7 +485,7 @@ html[data-font="fira"],
 [data-theme="light-green"] {
   --accent: 22 101 52;
   --accent-hover: 20 83 45;
-  --success: 15 118 110;
+  --success: 15 116 108;
 }
 [data-theme="dark-blue"] {
   --accent: 123 150 255;
@@ -499,7 +499,7 @@ html[data-font="fira"],
 [data-theme="light-blue"] {
   --accent: 29 78 216;
   --accent-hover: 30 64 175;
-  --info: 15 118 110;
+  --info: 15 116 108;
 }
 [data-theme="light-black"] {
   --accent: 23 24 30;
@@ -787,9 +787,12 @@ html[data-font="fira"],
 
   --success: 74 222 128;
   --warning: 253 186 116;
-  --info: 147 197 253;
-  --danger: 252 165 165;
+  --info: 150 199 253;
+  --danger: 254 202 202;
   --chart-2: 147 197 253;
+
+  /* A lighter blue than the default, so RA's softcore reads on the olive card. */
+  --softcore: 147 197 253;
 }
 
 /* ============================================
