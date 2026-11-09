@@ -20,7 +20,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const groupId = dbId(id) ?? NaN
 
     if (!Number.isInteger(groupId)) {
-      return NextResponse.json({ message: 'No encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'not-found' }, { status: 404 })
     }
 
     const session = await getServerSession(authOptions)
@@ -32,14 +32,14 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       [groupId],
     )
     if (!groupRes.rows.length) {
-      return NextResponse.json({ message: 'No encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'not-found' }, { status: 404 })
     }
 
     const { user_id, owner_public, ...group } = groupRes.rows[0]
     // A public group is for signed-in users, and only while its owner's profile is public.
     const visible = session?.user?.id && group.is_public && owner_public
     if (!visible && String(session?.user?.id) !== String(user_id)) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
     }
 
     const itemsRes = await pool.query(
@@ -55,7 +55,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ ...group, items: itemsRes.rows })
   } catch (err) {
     console.error('[groups/[id] GET]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }
 
@@ -68,11 +68,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!auth.ok) return auth.response
 
     if (!(await ownsGroup(auth.id, groupId))) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
     const fields = readGroupFields(await req.json().catch(() => null))
-    if (!fields.ok) return NextResponse.json({ message: fields.message }, { status: 400 })
+    if (!fields.ok) return NextResponse.json({ error: fields.code }, { status: 400 })
     const { title, description, icon, is_public } = fields.value
 
     const result = await pool.query(
@@ -86,7 +86,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json(result.rows[0])
   } catch (err) {
     console.error('[groups/[id] PUT]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }
 
@@ -99,7 +99,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     if (!auth.ok) return auth.response
 
     if (!(await ownsGroup(auth.id, groupId))) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
     await pool.query('DELETE FROM game_groups WHERE id = $1', [groupId])
@@ -107,6 +107,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[groups/[id] DELETE]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }

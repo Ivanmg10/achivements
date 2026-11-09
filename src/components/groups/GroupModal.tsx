@@ -16,6 +16,7 @@ import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import Modal from '@/components/ui/Modal'
 import { kickerClass } from '@/components/ui/Kicker'
+import { groupError } from '@/utils/apiErrors'
 
 
 type Props = {
@@ -92,7 +93,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
       await onSave({ title: title.trim(), description, icon, is_public: isPublic, initialGames: isEditing ? undefined : selectedGames })
       onClose()
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error')
+      setError(groupError(err instanceof Error ? err.message : null, T))
     } finally {
       setSaving(false)
     }

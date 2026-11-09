@@ -254,6 +254,7 @@ export const ru: Translations = {
     errorNotImage: 'Этот файл не подходит как изображение',
     errorTooLarge: 'Изображение слишком большое',
     errorTooMany: 'Слишком много загрузок. Попробуйте через час.',
+    emailTaken: 'Этот адрес почты уже используется другим аккаунтом.',
   },
   userPage: {
     preferences: 'Настройки',
@@ -700,6 +701,7 @@ export const ru: Translations = {
     clearConsoles: 'Сбросить',
     completedMode: 'Режим прохождения',
     consoles: 'Консоли',
+    loadError: 'Не удалось загрузить эти игры. Попробуйте ещё раз через минуту.',
   },
   statusGameItem: {
     achievements: 'достижений',
@@ -1031,6 +1033,8 @@ export const ru: Translations = {
     iconMoods: 'Настроение',
     iconLists: 'Списки',
     iconNature: 'Природа',
+    maxGroups: 'Можно создать не более {n} групп. Удалите одну, чтобы создать новую.',
+    saveFailed: 'Не удалось сохранить группу. Попробуйте ещё раз через минуту.',
   },
   streak: {
     yourStreak: 'Ваша серия',

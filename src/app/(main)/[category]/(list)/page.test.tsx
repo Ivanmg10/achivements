@@ -136,10 +136,11 @@ test('renders empty state when no games', () => {
   expect(screen.getByTestId('empty-state')).toBeInTheDocument()
 })
 
-test('renders error message on fetch error', () => {
+test('a failed read says it in a sentence, not the error’s own text', () => {
   ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: 'Network error' })
   renderCards()
-  expect(screen.getByText('Network error')).toBeInTheDocument()
+  expect(screen.getByText(en.categoryPage.loadError)).toBeInTheDocument()
+  expect(screen.queryByText('Network error')).not.toBeInTheDocument()
 })
 
 test('a Steam profile that turned private says so, and any other Steam failure is the generic one', () => {

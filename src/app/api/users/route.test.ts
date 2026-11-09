@@ -187,3 +187,29 @@ describe('signing up with RetroAchievements', () => {
     expect((res as unknown as { data: unknown }).data).toEqual({ error: 'key-in-use' })
   })
 })
+
+describe('every refusal is a code the form can put in the reader’s language', () => {
+  const data = (res: unknown) => (res as { data: unknown }).data
+
+  test('closed, too many, missing fields', async () => {
+    process.env.REGISTRATION_OPEN = 'false'
+    expect(data(await POST(makeReq({ username: 'ivan', password: 'pass1234', email: 'ivan@test.com' })))).toEqual({ error: 'closed' })
+    delete process.env.REGISTRATION_OPEN
+    expect(data(await POST(makeReq({ password: 'pass1234' })))).toEqual({ error: 'missing-fields' })
+    ;(allowAttempt as jest.Mock).mockResolvedValue(false)
+    expect(data(await POST(makeReq({ username: 'ivan', password: 'pass1234', email: 'ivan@test.com' })))).toEqual({ error: 'too-many' })
+  })
+
+  test('the field rules', async () => {
+    expect(data(await POST(makeReq({ username: 'iv', password: 'pass1234', email: 'ivan@test.com' })))).toEqual({ error: 'username-invalid' })
+    expect(data(await POST(makeReq({ username: 'ivan', password: '1234567', email: 'ivan@test.com' })))).toEqual({ error: 'password-weak' })
+    expect(data(await POST(makeReq({ username: 'ivan', password: 'pass1234', email: 'nope' })))).toEqual({ error: 'email-invalid' })
+  })
+
+  test('a taken username', async () => {
+    ;(pool.query as jest.Mock).mockImplementation((sql: string) =>
+      Promise.resolve({ rows: sql.includes('LOWER(username)') ? [{ id: 2 }] : [] }),
+    )
+    expect(data(await POST(makeReq({ username: 'Ivan', password: 'pass1234', email: 'ivan@test.com' })))).toEqual({ error: 'username-taken' })
+  })
+})

@@ -62,11 +62,11 @@ test('choosing one saves it, refreshes the session, says so and closes', async (
   expect(notify.success).toHaveBeenCalledWith(en.toast.saved)
 })
 
-test('a refusal is shown inline, in an alert, and the modal stays open', async () => {
-  ;(fetch as jest.Mock).mockImplementation(() => answer({ error: 'Not a country' }, false))
+test('a refusal is shown inline, in an alert, in our words, and the modal stays open', async () => {
+  ;(fetch as jest.Mock).mockImplementation(() => answer({ error: 'location-invalid' }, false))
   const { onClose } = setup()
   fireEvent.click(screen.getByRole('button', { name: /France/ }))
-  expect(await screen.findByRole('alert')).toHaveTextContent('Not a country')
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.editProfileModal.errorGeneric)
   expect(onClose).not.toHaveBeenCalled()
   expect(update).not.toHaveBeenCalled()
   expect(notify.success).not.toHaveBeenCalled()

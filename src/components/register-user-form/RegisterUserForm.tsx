@@ -12,6 +12,7 @@ import RegisterUserFormRa from '@/components/register-user-form/register-user-fo
 import RaLogo from '@/components/ra-logo/RaLogo'
 import { useWelcomeEntry } from '@/hooks/useWelcomeEntry'
 import type { RaSignupAccount } from '@/hooks/useRaSignupCheck'
+import { signupError } from '@/utils/apiErrors'
 import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, suggestUsername, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
 import Notice from '@/components/ui/Notice'
@@ -80,13 +81,7 @@ export default function RegisterUserForm({
 
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        const byCode: Record<string, string> = {
-          'email-taken': T.registerForm.emailTaken,
-          'key-in-use': T.raLoginModal.keyInUse,
-          'ra-invalid': T.raLoginModal.invalid,
-          'ra-unavailable': T.registerForm.raUnavailable,
-        }
-        setError(byCode[data.error] ?? (data.error || T.registerForm.errorCreating))
+        setError(signupError(data.error, T))
         setSubmitting(false)
         return
       }

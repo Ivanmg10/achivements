@@ -254,6 +254,7 @@ export const ja: Translations = {
     errorNotImage: '使用できる画像ではありません',
     errorTooLarge: '画像が大きすぎます',
     errorTooMany: 'アップロードが多すぎます。1時間後にお試しください。',
+    emailTaken: 'このメールアドレスは別のアカウントで使われています。',
   },
   userPage: {
     preferences: '設定',
@@ -700,6 +701,7 @@ export const ja: Translations = {
     clearConsoles: 'クリア',
     completedMode: '達成モード',
     consoles: '機種',
+    loadError: 'これらのゲームを読み込めませんでした。しばらくしてからもう一度お試しください。',
   },
   statusGameItem: {
     achievements: '実績',
@@ -1031,6 +1033,8 @@ export const ja: Translations = {
     iconMoods: '気分',
     iconLists: 'リスト',
     iconNature: '自然',
+    maxGroups: 'グループは最大{n}個までです。新しく作るには、どれかを削除してください。',
+    saveFailed: 'グループを保存できませんでした。しばらくしてからもう一度お試しください。',
   },
   streak: {
     yourStreak: 'あなたの連続記録',

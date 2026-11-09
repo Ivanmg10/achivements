@@ -94,12 +94,12 @@ test('while creating the account the button says so and cannot be pressed again'
 })
 
 test('a refusal from the server is reported and the form stays usable', async () => {
-  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'Username ya en uso' }) })
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'username-taken' }) })
   const { setIsLogin } = renderForm()
   fill()
   submit()
 
-  expect(await screen.findByRole('alert')).toHaveTextContent('Username ya en uso')
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.steamAuth.usernameTaken)
   expect(setIsLogin).not.toHaveBeenCalled()
   expect(screen.getByRole('button', { name: en.registerForm.createAccount })).not.toBeDisabled()
 })

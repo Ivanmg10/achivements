@@ -38,10 +38,10 @@ async function post(_req: NextRequest, { params }: { params: Promise<{ id: strin
     const groupId = dbId(id) ?? NaN
     const auth = await requireSession()
     if (!auth.ok) return auth.response
-    if (!Number.isInteger(groupId)) return NextResponse.json({ message: 'Grupo no válido' }, { status: 400 })
+    if (!Number.isInteger(groupId)) return NextResponse.json({ error: 'invalid-group' }, { status: 400 })
 
     const owner = await pool.query('SELECT id FROM game_groups WHERE id = $1 AND user_id = $2', [groupId, auth.id])
-    if (!owner.rows.length) return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
+    if (!owner.rows.length) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 
     const pending = await pool.query(
       `SELECT id, source, game_id FROM game_group_items
@@ -115,7 +115,7 @@ async function post(_req: NextRequest, { params }: { params: Promise<{ id: strin
     return NextResponse.json({ years: found.map((f) => ({ id: f.id, release_year: f.year })) })
   } catch (err) {
     console.error('[groups/[id]/years POST]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }
 

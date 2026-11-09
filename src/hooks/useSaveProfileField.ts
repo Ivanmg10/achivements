@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
+import { profileFieldError } from '@/utils/apiErrors'
 
 /**
  * Saves one plain profile field (description, gender…) and refreshes the
@@ -25,7 +26,7 @@ export function useSaveProfileField() {
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        setError(data.error ?? T.editProfileModal.errorGeneric)
+        setError(profileFieldError(data.error, T))
         return false
       }
       await update()

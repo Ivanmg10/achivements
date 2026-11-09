@@ -13,12 +13,12 @@ export async function POST(req: NextRequest) {
   try {
     // Anyone can sign up. Set REGISTRATION_OPEN=false to close the door.
     if (process.env.REGISTRATION_OPEN === "false") {
-      return NextResponse.json({ error: "Registration is closed" }, { status: 403 });
+      return NextResponse.json({ error: "closed" }, { status: 403 });
     }
 
     if (!(await allowAttempt("signup", clientAddress(req.headers)))) {
       return NextResponse.json(
-        { error: "Demasiadas cuentas creadas desde aquí. Inténtalo más tarde." },
+        { error: "too-many" },
         { status: 429 },
       );
     }
@@ -34,21 +34,21 @@ export async function POST(req: NextRequest) {
 
     if (typeof username !== "string" || typeof password !== "string" || !username || !password) {
       return NextResponse.json(
-        { error: "username y password son obligatorios" },
+        { error: "missing-fields" },
         { status: 400 },
       );
     }
 
     if (username.length < 3 || username.length > 20 || !/^[a-zA-Z0-9_]+$/.test(username)) {
       return NextResponse.json(
-        { error: "Username: 3–20 caracteres, solo letras, números y guión bajo" },
+        { error: "username-invalid" },
         { status: 400 },
       );
     }
 
     if (password.length < PASSWORD_MIN) {
       return NextResponse.json(
-        { error: `La contraseña debe tener al menos ${PASSWORD_MIN} caracteres` },
+        { error: "password-weak" },
         { status: 400 },
       );
     }
@@ -56,13 +56,13 @@ export async function POST(req: NextRequest) {
     // Required: it is the only way to recover an account later.
     const trimmedEmail = typeof email === "string" ? email.trim() : "";
     if (!isEmail(trimmedEmail)) {
-      return NextResponse.json({ error: "Correo no válido" }, { status: 400 });
+      return NextResponse.json({ error: "email-invalid" }, { status: 400 });
     }
 
     // Case-insensitive, so nobody can sign up as "Ivan" next to "ivan".
     const existing = await pool.query("SELECT id FROM users WHERE LOWER(username) = LOWER($1)", [username]);
     if (existing.rows.length > 0) {
-      return NextResponse.json({ error: "Username ya en uso" }, { status: 409 });
+      return NextResponse.json({ error: "username-taken" }, { status: 409 });
     }
 
     // One account per address: recovery mails the address, so two accounts on
@@ -119,11 +119,11 @@ export async function POST(req: NextRequest) {
       if (constraint === "users_raid_hash_key" || constraint === "users_raId_key") return NextResponse.json({ error: "key-in-use" }, { status: 409 });
       return constraint === "users_email_lower_key"
         ? NextResponse.json({ error: "email-taken" }, { status: 409 })
-        : NextResponse.json({ error: "Username ya en uso" }, { status: 409 });
+        : NextResponse.json({ error: "username-taken" }, { status: 409 });
     }
     console.error("[users POST]", err);
     return NextResponse.json(
-      { error: "Error creando usuario" },
+      { error: "internal" },
       { status: 500 },
     );
   }

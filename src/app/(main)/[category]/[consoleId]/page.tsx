@@ -1,6 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
+import { useLanguage } from '@/context/LanguageContext'
 import { useState, useMemo } from 'react'
 import { useGamesByCategory } from '../../../../hooks/useGamesByCategory'
 import { useGameExtraData } from '../../../../hooks/useGameExtraData'
@@ -19,6 +20,7 @@ import StatusPageSkeleton from '@/components/status-page-skeleton/StatusPageSkel
 
 export default function CategoryConsolePage() {
   const { consoleId, category } = useParams()
+  const { T } = useLanguage()
   const { games, loading, error } = useGamesByCategory(category as string)
   const extraData = useGameExtraData()
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
@@ -46,7 +48,7 @@ export default function CategoryConsolePage() {
         {loading ? (
           <StatusPageSkeleton />
         ) : error ? (
-          <p className="text-danger text-sm text-center mt-10">{error}</p>
+          <p className="text-danger text-sm text-center mt-10">{T.categoryPage.loadError}</p>
         ) : games.length === 0 ? (
           <StatusEmptyState category={cat} className="min-h-[60vh]" />
         ) : (

@@ -35,10 +35,10 @@ test('not set clears it', async () => {
 })
 
 test('a failed save keeps the modal open and says why', async () => {
-  global.fetch = jest.fn().mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'Invalid gender' }) })
+  global.fetch = jest.fn().mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'gender-invalid' }) })
   const onClose = jest.fn()
   render(<GenderModal isOpen onClose={onClose} />)
   fireEvent.click(screen.getByRole('radio', { name: en.userData.genderMale }))
-  expect(await screen.findByRole('alert')).toHaveTextContent('Invalid gender')
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.editProfileModal.errorGeneric)
   expect(onClose).not.toHaveBeenCalled()
 })

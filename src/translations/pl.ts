@@ -254,6 +254,7 @@ export const pl: Translations = {
     errorNotImage: 'Ten plik nie jest obsługiwanym obrazem',
     errorTooLarge: 'Ten obraz jest za duży',
     errorTooMany: 'Za dużo przesłań. Spróbuj za godzinę.',
+    emailTaken: 'Ten adres e-mail jest już używany przez inne konto.',
   },
   userPage: {
     preferences: 'Preferencje',
@@ -700,6 +701,7 @@ export const pl: Translations = {
     clearConsoles: 'Wyczyść',
     completedMode: 'Tryb ukończenia',
     consoles: 'Konsole',
+    loadError: 'Nie udało się wczytać tych gier. Spróbuj ponownie za chwilę.',
   },
   statusGameItem: {
     achievements: 'osiągnięć',
@@ -1031,6 +1033,8 @@ export const pl: Translations = {
     iconMoods: 'Nastrój',
     iconLists: 'Listy',
     iconNature: 'Natura',
+    maxGroups: 'Możesz mieć najwyżej {n} grup. Usuń jedną, aby utworzyć nową.',
+    saveFailed: 'Nie udało się zapisać grupy. Spróbuj ponownie za chwilę.',
   },
   streak: {
     yourStreak: 'Twoja seria',

@@ -8,6 +8,7 @@ import { COUNTRIES, codeToFlag } from '@/utils/countries'
 import { notify } from '@/lib/notify'
 import { fieldClass } from '@/components/ui/Input'
 import Notice from '@/components/ui/Notice'
+import { profileFieldError } from '@/utils/apiErrors'
 
 interface Props {
   isOpen: boolean
@@ -38,8 +39,8 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
         body: JSON.stringify({ field: 'location', value: code }),
       })
       if (!res.ok) {
-        const data = await res.json()
-        setError(data.error ?? T.editProfileModal.errorGeneric)
+        const data = await res.json().catch(() => ({}))
+        setError(profileFieldError(data.error, T))
         return
       }
       await update()

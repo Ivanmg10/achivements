@@ -32,17 +32,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!auth.ok) return auth.response
 
     if (!(await ownsGroup(auth.id, groupId))) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
     const body = await req.json().catch(() => null)
     const source = readSource(body?.source)
     if (!source) {
-      return NextResponse.json({ message: 'source debe ser ra, steam, psn o xbox' }, { status: 400 })
+      return NextResponse.json({ error: 'invalid-source' }, { status: 400 })
     }
     if (!sourceAllowed(source, auth.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     const fields = readItemFields(body)
-    if (!fields.ok) return NextResponse.json({ message: fields.message }, { status: 400 })
+    if (!fields.ok) return NextResponse.json({ error: fields.code }, { status: 400 })
     const { game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points } = fields.value
 
     const posRes = await pool.query(
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       [groupId],
     )
     if (posRes.rows[0].count >= GROUP_ITEMS_MAX) {
-      return NextResponse.json({ message: `Máximo ${GROUP_ITEMS_MAX} juegos por grupo` }, { status: 400 })
+      return NextResponse.json({ error: 'items-max' }, { status: 400 })
     }
     const position = posRes.rows[0].next
 
@@ -64,13 +64,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     )
 
     if (!result.rows.length) {
-      return NextResponse.json({ message: 'El juego ya está en el grupo' }, { status: 409 })
+      return NextResponse.json({ error: 'already-in-group' }, { status: 409 })
     }
 
     return NextResponse.json(result.rows[0], { status: 201 })
   } catch (err) {
     console.error('[groups/[id]/games POST]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }
 
@@ -83,16 +83,16 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     if (!auth.ok) return auth.response
 
     if (!(await ownsGroup(auth.id, groupId))) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
     const gameId = req.nextUrl.searchParams.get('gameId')
     const source = readSource(req.nextUrl.searchParams.get('source'))
     if (dbId(gameId) === null) {
-      return NextResponse.json({ message: 'Falta gameId' }, { status: 400 })
+      return NextResponse.json({ error: 'game-required' }, { status: 400 })
     }
     if (!source) {
-      return NextResponse.json({ message: 'source debe ser ra, steam o psn' }, { status: 400 })
+      return NextResponse.json({ error: 'invalid-source' }, { status: 400 })
     }
 
     await pool.query(
@@ -103,7 +103,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[groups/[id]/games DELETE]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }
 
@@ -116,12 +116,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!auth.ok) return auth.response
 
     if (!(await ownsGroup(auth.id, groupId))) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
     const { order } = ((await req.json().catch(() => null)) ?? {}) as { order?: unknown }
     if (!Array.isArray(order) || order.length > GROUP_ITEMS_MAX || !order.every(Number.isInteger)) {
-      return NextResponse.json({ message: 'order debe ser un array de IDs' }, { status: 400 })
+      return NextResponse.json({ error: 'invalid-order' }, { status: 400 })
     }
 
     // One statement: every id gets its index in the array, and only this group's items move.
@@ -135,7 +135,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[groups/[id]/games PUT]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }
 
@@ -148,7 +148,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (!auth.ok) return auth.response
 
     if (!(await ownsGroup(auth.id, groupId))) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
     const updates = (await req.json().catch(() => null)) as ({ source?: GameSource; game_id: number } & Record<string, unknown>)[] | null
@@ -156,12 +156,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ ok: true })
     }
     if (updates.length > GROUP_ITEMS_MAX) {
-      return NextResponse.json({ message: `Máximo ${GROUP_ITEMS_MAX} juegos por petición` }, { status: 400 })
+      return NextResponse.json({ error: 'batch-too-large' }, { status: 400 })
     }
     const rows = []
     for (const u of updates) {
       const counts = u && Number.isInteger(u.game_id) ? readItemCounts(u) : null
-      if (!counts?.ok) return NextResponse.json({ message: 'Contadores no válidos' }, { status: 400 })
+      if (!counts?.ok) return NextResponse.json({ error: 'invalid-counts' }, { status: 400 })
       rows.push({ ...counts.value, game_id: u.game_id, source: readSource(u.source) ?? 'ra' })
     }
 
@@ -179,6 +179,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[groups/[id]/games PATCH]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }

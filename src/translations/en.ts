@@ -255,6 +255,7 @@ export const en = {
     errorNotImage: 'That file is not an image we can use',
     errorTooLarge: 'That image is too large',
     errorTooMany: 'Too many uploads. Try again in an hour.',
+    emailTaken: 'That email is already used by another account.',
   },
   userPage: {
     preferences: 'Preferences',
@@ -701,6 +702,7 @@ export const en = {
     clearConsoles: 'Clear',
     completedMode: 'Completion mode',
     consoles: 'Consoles',
+    loadError: 'Could not load these games. Try again in a moment.',
   },
   statusGameItem: {
     achievements: 'achievements',
@@ -1032,6 +1034,8 @@ export const en = {
     iconMoods: 'Mood',
     iconLists: 'Lists',
     iconNature: 'Nature',
+    maxGroups: 'You can have up to {n} groups. Delete one to make a new one.',
+    saveFailed: 'Could not save the group. Try again in a moment.',
   },
   streak: {
     yourStreak: 'Your streak',

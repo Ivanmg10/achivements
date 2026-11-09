@@ -75,11 +75,11 @@ test('creating adds the group the server returns', async () => {
   expect(JSON.parse(init.body)).toEqual({ title: 'New' })
 })
 
-test('a refused create throws the server message and changes nothing', async () => {
+test('a refused create throws the server’s code and changes nothing', async () => {
   const { result } = renderHook(() => useGroups())
   await waitFor(() => expect(result.current.isLoading).toBe(false))
-  ;(fetch as jest.Mock).mockResolvedValue(answer({ message: 'Title taken' }, false, 409))
-  await expect(result.current.createGroup({ title: 'New' })).rejects.toThrow('Title taken')
+  ;(fetch as jest.Mock).mockResolvedValue(answer({ error: 'groups-max' }, false, 400))
+  await expect(result.current.createGroup({ title: 'New' })).rejects.toThrow('groups-max')
   expect(result.current.groups).toHaveLength(1)
 })
 
