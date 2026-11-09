@@ -76,3 +76,10 @@ it('can have no padding round its body, for rows that reach the edges', () => {
   rerender(<Modal isOpen onClose={() => {}} aria-label="Search" flush><p>row</p></Modal>)
   expect(screen.getByText('row').parentElement).not.toHaveClass('px-6')
 })
+
+test('a confirmation can be only its head and footer: no empty body', () => {
+  render(<Modal isOpen onClose={jest.fn()} title="Delete it?" hint="Cannot be undone" footer={<button>Go</button>} />)
+  const dialog = screen.getByRole('dialog', { name: 'Delete it?' })
+  expect(dialog).toHaveAccessibleDescription('Cannot be undone')
+  expect(dialog.querySelector('.overflow-y-auto')).toBeNull()
+})

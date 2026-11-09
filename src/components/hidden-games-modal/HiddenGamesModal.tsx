@@ -1,10 +1,10 @@
 'use client'
 
 import Image from 'next/image'
-import { IconEye, IconEyeOff, IconX } from '@tabler/icons-react'
+import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
-import CommonModal from '@/components/common-modal/CommonModal'
+import Modal from '@/components/ui/Modal'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
@@ -20,23 +20,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
   const { hidden, showGame } = useHiddenGames()
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose} size="md">
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between gap-3">
-          <h2 id="hidden-games-title" className="flex items-center gap-2 text-lg font-semibold">
-            <IconEyeOff size={18} className="text-text-secondary" aria-hidden="true" />
-            {T.userPage.hiddenGames}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={T.userPage.close}
-            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-ring"
-          >
-            <IconX size={18} aria-hidden="true" />
-          </button>
-        </div>
-
+    <Modal isOpen={isOpen} onClose={onClose} size="md" icon={<IconEyeOff size={20} />} title={T.userPage.hiddenGames}>
         {hidden.length === 0 ? (
           <p className="text-sm text-text-secondary py-6 text-center">{T.userPage.hiddenEmpty}</p>
         ) : (
@@ -75,7 +59,6 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
             ))}
           </ul>
         )}
-      </div>
-    </CommonModal>
+    </Modal>
   )
 }

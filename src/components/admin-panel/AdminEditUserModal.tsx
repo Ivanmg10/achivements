@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import CommonModal from '../common-modal/CommonModal'
+import Modal from '@/components/ui/Modal'
 import AdminLinkedAccounts from './admin-linked-accounts/AdminLinkedAccounts'
 import { adminFetch } from '@/utils/adminFetch'
 import { codeToFlag, findCountry, COUNTRIES } from '@/utils/countries'
@@ -69,15 +69,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
   const currentLocation = values.location as string
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose}>
-      <div className="flex items-center gap-3 mb-1 pt-2">
-        <Avatar src={user.avatar} name={user.username} />
-        <div>
-          <h2 className="text-xl font-bold">{user.username}</h2>
-          <p className="text-xs text-text-secondary font-mono">ID: {user.id}</p>
-        </div>
-      </div>
-
+    <Modal isOpen={isOpen} onClose={onClose} icon={<Avatar src={user.avatar} name={user.username} />} title={user.username} hint={`ID: ${user.id}`}>
       <div className="flex flex-col gap-4">
 
         {/* Username */}
@@ -210,12 +202,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
 
         <AdminLinkedAccounts user={user} onUpdated={onChanged} />
       </div>
-
-      <button onClick={onClose}
-        className="w-full bg-bg-main text-text-secondary rounded-tile py-3 hover:text-text-main transition-colors text-sm mt-1">
-        Close
-      </button>
-    </CommonModal>
+    </Modal>
   )
 }
 

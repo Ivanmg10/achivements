@@ -18,7 +18,7 @@ import {
 } from '@dnd-kit/sortable'
 import { useLanguage } from '@/context/LanguageContext'
 import { applyPerfectOrder, type PerfectGame } from '@/utils/perfectGames'
-import CommonModal from '@/components/common-modal/CommonModal'
+import Modal from '@/components/ui/Modal'
 import PerfectGameOrderRow from './perfect-game-order-row/PerfectGameOrderRow'
 import { notify } from '@/lib/notify'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
@@ -70,8 +70,13 @@ export default function PerfectGamesOrderModal({
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={handleClose} size="md">
-      <h2 className="text-lg font-semibold">{T.cards.reorderMasteredTitle}</h2>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      size="md"
+      title={T.cards.reorderMasteredTitle}
+      footer={<Button onClick={handleClose}>{T.cards.close}</Button>}
+    >
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={localList.map((g) => g.key)} strategy={verticalListSortingStrategy}>
           <div className="flex flex-col gap-2">
@@ -81,12 +86,6 @@ export default function PerfectGamesOrderModal({
           </div>
         </SortableContext>
       </DndContext>
-      <Button
-        onClick={handleClose}
-        className="mt-4 self-end"
-      >
-        {T.cards.close}
-      </Button>
-    </CommonModal>
+    </Modal>
   )
 }

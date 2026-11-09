@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { signOut } from 'next-auth/react'
-import CommonModal from '../common-modal/CommonModal'
+import { IconLock } from '@tabler/icons-react'
+import Modal from '@/components/ui/Modal'
 import PasswordInput from '@/components/ui/PasswordInput'
 import { useLanguage } from '@/context/LanguageContext'
 import { PASSWORD_MIN } from '@/utils/authValidation'
@@ -67,9 +68,22 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={handleClose}>
-      <h2 className="text-xl font-bold">{T.userConfig.changePassword}</h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      icon={<IconLock size={20} />}
+      title={T.userConfig.changePassword}
+      footer={
+        <>
+          <Button onClick={handleClose} disabled={loading} variant="secondary">
+            {T.editProfileModal.cancel}
+          </Button>
+          <Button onClick={handleSubmit} disabled={!canSubmit || success}>
+            {loading ? T.editProfileModal.saving : T.editProfileModal.save}
+          </Button>
+        </>
+      }
+    >
       <PasswordInput
         label={T.changePassword.current}
         value={current}
@@ -99,23 +113,6 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
       {success && (
         <Notice tone="success">{T.changePassword.changedSignIn}</Notice>
       )}
-
-      <div className="flex gap-3 mt-2">
-        <Button
-          onClick={handleClose}
-          disabled={loading}
-          variant="secondary" size="lg" className="flex-1"
-        >
-          {T.editProfileModal.cancel}
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          disabled={!canSubmit || success}
-          size="lg" className="flex-1"
-        >
-          {loading ? T.editProfileModal.saving : T.editProfileModal.save}
-        </Button>
-      </div>
-    </CommonModal>
+    </Modal>
   )
 }

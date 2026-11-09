@@ -17,7 +17,8 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
 export type ModalProps = {
   isOpen: boolean
   onClose: () => void
-  children: React.ReactNode
+  /** Optional: a confirmation can be only its head (title, hint) and footer. */
+  children?: React.ReactNode
   /** The head: a title (it names the dialog), a line under it and an icon in a tile. */
   title?: React.ReactNode
   hint?: React.ReactNode
@@ -167,7 +168,7 @@ export default function Modal({
             )}
 
             {title && (
-              <div className="flex items-start gap-3 px-6 pt-6 pr-14">
+              <div className={`flex items-start gap-3 px-6 pt-6 pr-14 ${children != null ? '' : 'pb-5'}`}>
                 {icon && (
                   <span
                     aria-hidden="true"
@@ -183,7 +184,9 @@ export default function Modal({
               </div>
             )}
 
-            <div className={`flex flex-col overflow-y-auto ${flush ? '' : `px-6 ${title ? 'pt-5' : 'pt-6'} ${footer ? 'pb-5' : 'pb-6'}`} ${className}`}>{children}</div>
+            {children != null && (
+              <div className={`flex flex-col overflow-y-auto ${flush ? '' : `px-6 ${title ? 'pt-5' : 'pt-6'} ${footer ? 'pb-5' : 'pb-6'}`} ${className}`}>{children}</div>
+            )}
 
             {footer && (
               <div className="flex flex-wrap items-center justify-end gap-2 px-6 py-4 shadow-hairline-t">{footer}</div>

@@ -1,6 +1,6 @@
 'use client'
 
-import CommonModal from '../common-modal/CommonModal'
+import Modal from '@/components/ui/Modal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
 import { choiceClass } from '@/components/ui/ChoiceCards'
@@ -30,9 +30,8 @@ export default function GenderModal({ isOpen, onClose, current }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose}>
-      <h2 className="text-xl font-bold mb-4">{T.userData.gender}</h2>
-      {error && <Notice tone="danger" className="mb-3">{error}</Notice>}
+    <Modal isOpen={isOpen} onClose={onClose} title={T.userData.gender}>
+      {error && <Notice tone="danger">{error}</Notice>}
       <div role="radiogroup" aria-label={T.userData.gender} className="grid grid-cols-2 gap-3">
         {options.map(({ id, label }) => {
           const selected = (current ?? '') === id
@@ -50,6 +49,6 @@ export default function GenderModal({ isOpen, onClose, current }: Props) {
           )
         })}
       </div>
-    </CommonModal>
+    </Modal>
   )
 }

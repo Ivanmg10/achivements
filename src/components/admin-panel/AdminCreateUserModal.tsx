@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
-import CommonModal from '../common-modal/CommonModal'
+import Modal from '@/components/ui/Modal'
 import type { AdminUser } from '@/types/user'
 import { adminFetch } from '@/utils/adminFetch'
 import { notify } from '@/lib/notify'
@@ -54,9 +54,19 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={handleClose}>
-      <h2 className="text-xl font-bold">Create user</h2>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Create user"
+      footer={
+        <>
+          <Button onClick={handleClose} variant="secondary">Cancel</Button>
+          <Button onClick={handleSubmit} disabled={!canSubmit}>
+            {loading ? 'Creating...' : 'Create'}
+          </Button>
+        </>
+      }
+    >
       <div className="flex flex-col gap-3">
         <Field label="Username *">
           {(control) => (
@@ -93,16 +103,6 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
       </div>
 
       {error && <Notice tone="danger">{error}</Notice>}
-
-      <div className="flex gap-3 mt-2">
-        <button onClick={handleClose} className="flex-1 bg-bg-main text-text-secondary rounded-tile py-3 hover:text-text-main transition-colors">
-          Cancel
-        </button>
-        <Button onClick={handleSubmit} disabled={!canSubmit}
-          size="lg" className="flex-1">
-          {loading ? 'Creating...' : 'Create'}
-        </Button>
-      </div>
-    </CommonModal>
+    </Modal>
   )
 }

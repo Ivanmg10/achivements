@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import CommonModal from '../common-modal/CommonModal'
+import Modal from '@/components/ui/Modal'
 import { useLanguage } from '@/context/LanguageContext'
 import { COUNTRIES, codeToFlag } from '@/utils/countries'
 import { notify } from '@/lib/notify'
@@ -60,8 +60,7 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={handleClose} size="md">
-      <h2 className="text-xl font-bold mb-4">{T.userData.location}</h2>
+    <Modal isOpen={isOpen} onClose={handleClose} size="md" title={T.userData.location}>
 
       <input
         type="text"
@@ -69,12 +68,12 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
         onChange={(e) => setSearch(e.target.value)}
         placeholder={T.userData.searchCountry}
         aria-label={T.userData.searchCountry}
-        className={fieldClass({ size: 'sm' }, 'mb-3')}
+        className={fieldClass({ size: 'sm' })}
         autoFocus
       />
 
       {error && (
-        <Notice tone="danger" className="mb-3">{error}</Notice>
+        <Notice tone="danger">{error}</Notice>
       )}
 
       <div className="grid grid-cols-3 gap-2 overflow-y-auto max-h-80">
@@ -105,6 +104,6 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
           ))
         )}
       </div>
-    </CommonModal>
+    </Modal>
   )
 }
