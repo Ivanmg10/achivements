@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { AnimatePresence } from 'framer-motion'
-import { IconX, IconHash, IconCopy, IconCheck } from '@tabler/icons-react'
+import { IconHash, IconCopy, IconCheck } from '@tabler/icons-react'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
-import { useIsClient } from '@/hooks/useIsClient'
+import { useLanguage } from '@/context/LanguageContext'
 import Modal from '@/components/ui/Modal'
 import { Skeleton } from '@/components/ui/Skeleton'
 
@@ -57,8 +56,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
   const [hashes, setHashes] = useState<GameHash[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
-  // The portal goes into document.body, which the server does not have.
-  const mounted = useIsClient()
+  const { T } = useLanguage()
 
   // Opening (or another game) starts the load over; state, so while rendering. The fetch is the effect.
   useWhenChanged([isOpen, gameId], () => {
@@ -85,94 +83,67 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
     }
   }, [isOpen, gameId])
 
-  if (!mounted) return null
-
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <Modal isOpen={isOpen} onClose={onClose} size="md" showClose={false} className="gap-4">
-            {/* Header */}
-            <div className="flex items-center gap-3 p-5 border-b border-ink/8 shrink-0">
-              <div className="w-9 h-9 rounded-box bg-bg-main flex items-center justify-center shrink-0">
-                <IconHash className="w-4.5 h-4.5 text-accent" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold line-clamp-1">Hashes compatibles</p>
-                <p className="text-xs text-text-secondary line-clamp-1">{gameTitle}</p>
-              </div>
-              <button
-                onClick={onClose}
-                className="p-1.5 rounded-chip hover:bg-ink/8 text-text-secondary hover:text-text-main transition-colors"
-                aria-label="Cerrar"
-              >
-                <IconX className="w-4 h-4" />
-              </button>
+    <Modal isOpen={isOpen} onClose={onClose} size="md" icon={<IconHash size={20} />} title={T.gameInfoPage.hashesCompatible} hint={gameTitle}>
+      {loading ? (
+        <div className="flex flex-col gap-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="bg-bg-main rounded-tile p-4 flex flex-col gap-2">
+              <Skeleton className="h-3 w-48 max-w-full" />
+              <Skeleton className="h-2.5 w-64 max-w-full" />
             </div>
-
-            {/* Body */}
-            <div className="overflow-y-auto flex-1 p-5">
-              {loading ? (
-                <div className="flex flex-col gap-3">
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className="bg-bg-main rounded-tile p-4 flex flex-col gap-2">
-                      <Skeleton className="h-3 w-48 max-w-full" />
-                      <Skeleton className="h-2.5 w-64 max-w-full" />
-                    </div>
-                  ))}
-                </div>
-              ) : error ? (
-                <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
-                  <p className="text-sm text-danger" role="alert">Error al cargar hashes</p>
-                </div>
-              ) : hashes.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
-                  <IconHash className="w-8 h-8 text-text-secondary opacity-30" />
-                  <p className="text-sm text-text-secondary">Sin hashes registrados</p>
-                  <p className="text-xs text-text-secondary">No hay ROMs verificadas para este juego</p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  <p className="text-xs text-text-secondary">
-                    {hashes.length} {hashes.length === 1 ? 'hash registrado' : 'hashes registrados'}
-                  </p>
-                  {hashes.map((h) => (
-                    <div key={h.MD5} className="bg-bg-main rounded-tile p-4 flex flex-col gap-2">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-xs font-medium text-text-main leading-relaxed wrap-break-word min-w-0">{h.Name}</p>
-                        {h.Labels.length > 0 && (
-                          <div className="flex gap-1 shrink-0 flex-wrap justify-end">
-                            {h.Labels.map((label) => (
-                              <span
-                                key={label}
-                                className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-tag-sm border font-semibold ${LABEL_COLORS[label] ?? 'bg-ink/10 text-text-secondary border-ink/10'}`}
-                              >
-                                {label}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 bg-bg-card rounded-box px-2.5 py-1.5">
-                        <code className="text-[11px] text-text-secondary font-mono flex-1 select-all">{h.MD5}</code>
-                        <CopyButton text={h.MD5} />
-                      </div>
-                      {h.PatchUrl && (
-                        <a
-                          href={h.PatchUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[10px] text-accent hover:underline self-start"
-                        >
-                          Descargar parche
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                </div>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
+          <p className="text-sm text-danger" role="alert">Error al cargar hashes</p>
+        </div>
+      ) : hashes.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
+          <IconHash className="w-8 h-8 text-text-secondary opacity-30" />
+          <p className="text-sm text-text-secondary">Sin hashes registrados</p>
+          <p className="text-xs text-text-secondary">No hay ROMs verificadas para este juego</p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3">
+          <p className="text-xs text-text-secondary">
+            {hashes.length} {hashes.length === 1 ? 'hash registrado' : 'hashes registrados'}
+          </p>
+          {hashes.map((h) => (
+            <div key={h.MD5} className="bg-bg-main rounded-tile p-4 flex flex-col gap-2">
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-xs font-medium text-text-main leading-relaxed wrap-break-word min-w-0">{h.Name}</p>
+                {h.Labels.length > 0 && (
+                  <div className="flex gap-1 shrink-0 flex-wrap justify-end">
+                    {h.Labels.map((label) => (
+                      <span
+                        key={label}
+                        className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-tag-sm border font-semibold ${LABEL_COLORS[label] ?? 'bg-ink/10 text-text-secondary border-ink/10'}`}
+                      >
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-1 bg-bg-card rounded-box px-2.5 py-1.5">
+                <code className="text-[11px] text-text-secondary font-mono flex-1 select-all">{h.MD5}</code>
+                <CopyButton text={h.MD5} />
+              </div>
+              {h.PatchUrl && (
+                <a
+                  href={h.PatchUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-accent hover:underline self-start"
+                >
+                  Descargar parche
+                </a>
               )}
             </div>
-          </Modal>
+          ))}
+        </div>
       )}
-    </AnimatePresence>
+    </Modal>
   )
 }

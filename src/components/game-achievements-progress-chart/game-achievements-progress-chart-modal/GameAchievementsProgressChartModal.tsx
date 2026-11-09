@@ -1,8 +1,5 @@
 'use client'
 
-import { useEffect, useId } from 'react'
-import { AnimatePresence } from 'framer-motion'
-import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { InsightAchievement } from '@/utils/gameInsights'
 import LibraryDetailList from '@/components/library-game-detail/library-detail-list/LibraryDetailList'
@@ -26,45 +23,17 @@ export default function GameAchievementsProgressChartModal({
   onClose: () => void
 }) {
   const { T, lang } = useLanguage()
-  const titleId = useId()
-
-  useEffect(() => {
-    if (!isOpen) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [isOpen, onClose])
 
   const sorted = [...items].sort((a, b) => (b.earnedAt ?? '').localeCompare(a.earnedAt ?? ''))
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={titleId} size="md" showClose={false} className="gap-3">
-            <div className="flex items-start justify-between gap-2 shrink-0">
-              <p id={titleId} className="text-sm font-semibold text-text-main first-letter:uppercase">
-                {title}
-              </p>
-              <button
-                onClick={onClose}
-                aria-label={T.cards.close}
-                className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-ring"
-              >
-                <IconX size={16} aria-hidden="true" />
-              </button>
-            </div>
-            <div className="overflow-y-auto flex-1 min-h-0">
-              <LibraryDetailList
-                title={`${items.length} ${T.dayModal.achievements}`}
-                items={sorted}
-                empty={T.gameExpanded.noActivity}
-                meta={(a) => a.earnedAt && <span>{formatDate(a.earnedAt, lang, {})}</span>}
-              />
-            </div>
-          </Modal>
-      )}
-    </AnimatePresence>
+    <Modal isOpen={isOpen} onClose={onClose} size="md" title={title.charAt(0).toUpperCase() + title.slice(1)} className="gap-3">
+      <LibraryDetailList
+        title={`${items.length} ${T.dayModal.achievements}`}
+        items={sorted}
+        empty={T.gameExpanded.noActivity}
+        meta={(a) => a.earnedAt && <span>{formatDate(a.earnedAt, lang, {})}</span>}
+      />
+    </Modal>
   )
 }

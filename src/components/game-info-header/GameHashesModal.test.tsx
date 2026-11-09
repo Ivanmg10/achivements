@@ -81,7 +81,7 @@ test('an answer for a game that was closed in the meantime does not land', async
 test('closing with the X or the backdrop', async () => {
   const { onClose } = setup()
   await screen.findByText('Sonic (USA).md')
-  fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Close' }))
   fireEvent.click(screen.getByRole('dialog').parentElement!)
   expect(onClose).toHaveBeenCalledTimes(2)
 })

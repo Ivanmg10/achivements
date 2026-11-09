@@ -112,7 +112,7 @@ export default function AchievementModal({
     : null
 
   return (
-    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="xl" showClose={false} className="gap-4">
+    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="xl" className="gap-4">
         {/* Header */}
         <div className="flex items-start gap-4 p-6 border-b border-bg-header">
           {achievement.BadgeName && (
@@ -167,12 +167,6 @@ export default function AchievementModal({
               <p className="text-xs text-text-secondary mt-1">{T.achievement.earnedOn} {earnedDate}</p>
             )}
           </div>
-          <button
-            onClick={onClose}
-            className="text-text-secondary hover:text-text-main transition-colors text-xl shrink-0"
-          >
-            ✕
-          </button>
         </div>
 
         {/* Stats + Meta 3x3 grid */}

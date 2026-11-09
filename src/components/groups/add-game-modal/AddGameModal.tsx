@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useId, useRef, useMemo } from 'react'
-import { AnimatePresence } from 'framer-motion'
-import { IconSearch, IconX, IconCheck } from '@tabler/icons-react'
+import { IconSearch, IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import type { GameGroupItem } from '@/types/types'
@@ -55,7 +54,7 @@ export default function AddGameModal({
   // The id whose lookup failed: the notice is for that id only, so it goes when another is typed.
   const [failedId, setFailedId] = useState<number | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const titleId = useId()
+  const hintId = useId()
 
   // Opening starts it over; state, so while rendering. Focus is a side effect, so below.
   useWhenChanged([isOpen], () => {
@@ -73,15 +72,6 @@ export default function AddGameModal({
     const t = setTimeout(() => inputRef.current?.focus(), 50)
     return () => clearTimeout(t)
   }, [isOpen])
-
-  useEffect(() => {
-    if (!isOpen) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [isOpen, onClose])
 
   /** A pasted RA id or game URL opens that RA game directly. */
   const directGameId = useMemo(() => {
@@ -163,127 +153,113 @@ export default function AddGameModal({
 
   const directKey = directGameId ? gameKey('ra', directGameId) : null
 
-  // On <body>, so the page's animated (transformed) wrapper does not become its frame.
-  if (typeof document === 'undefined') return null
-
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={titleId} size="xl" showClose={false} className="gap-4">
-            <div className="flex flex-col gap-3 px-4 sm:px-6 pt-5 pb-4 border-b border-ink/5 shrink-0">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <h2 id={titleId} className="text-lg font-bold text-text-main">{T.groups.addGames}</h2>
-                  {groupTitle && <p className="text-sm text-text-secondary truncate">{T.groups.addTo.replace('{group}', groupTitle)}</p>}
-                </div>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="p-2 -m-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors shrink-0 focus-ring"
-                  aria-label={T.groups.close}
-                >
-                  <IconX className="w-5 h-5" aria-hidden />
-                </button>
-              </div>
-
-              <div className="relative">
-                <IconSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" aria-hidden />
-                <input
-                  ref={inputRef}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={T.groups.searchGames}
-                  aria-label={T.groups.searchGames}
-                  aria-describedby={`${titleId}-hint`}
-                  className={fieldClass({ size: 'sm', icon: true })}
-                />
-              </div>
-              <p id={`${titleId}-hint`} className="text-[11px] text-text-secondary -mt-1">{T.groups.searchHint}</p>
-
-              {sources.length > 1 && <AddGameModalPlatforms sources={sources} value={source} onChange={setSource} />}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="xl"
+      title={T.groups.addGames}
+      hint={groupTitle ? T.groups.addTo.replace('{group}', groupTitle) : undefined}
+      className="gap-4"
+      footer={
+        <div className="w-full flex flex-col gap-2">
+          {selected.size > 0 && (
+            <div className="flex gap-1.5 overflow-x-auto pb-1">
+              {Array.from(selected.values()).map((c) => (
+                <GamePickerChip key={c.key} candidate={c} removeLabel={`${T.groups.removeGame} ${c.title}`} onRemove={() => toggle(c)} />
+              ))}
             </div>
+          )}
+          {error && (
+            <p role="alert" className="text-xs text-danger">
+              {T.groups.addError}
+            </p>
+          )}
+          <div className="flex items-center gap-3">
+            <p role="status" className="text-xs text-text-secondary flex-1 min-w-0">
+              {selected.size > 0 ? T.groups.selectedCount.replace('{n}', String(selected.size)) : T.groups.pickToAdd}
+            </p>
+            {selected.size > 0 && (
+              <button
+                type="button"
+                onClick={() => setSelected(new Map())}
+                className="text-xs text-text-secondary hover:text-text-main rounded focus-ring"
+              >
+                {T.groups.clearSelection}
+              </button>
+            )}
+            <Button
+              type="button"
+              onClick={handleConfirm}
+              disabled={saving || selected.size === 0}
+            >
+              {saving ? '…' : selected.size > 0 ? T.groups.addSelected.replace('{games}', plural(selected.size, T.plurals.games, lang)) : T.groups.addGames}
+            </Button>
+          </div>
+        </div>
+      }
+    >
+      <div className="sticky top-0 z-10 -mt-1 pb-3 bg-bg-header flex flex-col gap-3">
+        <div className="relative">
+          <IconSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" aria-hidden />
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={T.groups.searchGames}
+            aria-label={T.groups.searchGames}
+            aria-describedby={hintId}
+            className={fieldClass({ size: 'sm', icon: true })}
+          />
+        </div>
+        <p id={hintId} className="text-[11px] text-text-secondary -mt-1">{T.groups.searchHint}</p>
 
-            <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4">
-              {directGameId && directKey && !existingKeys.has(directKey) ? (
-                <>
-                <button
-                  type="button"
-                  onClick={() => addDirectById(directGameId)}
-                  aria-pressed={selected.has(directKey)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-tile ring-1 transition-colors text-left focus-ring ${selected.has(directKey) ? 'ring-accent bg-accent/10' : 'ring-ink/10 hover:bg-bg-main'}`}
-                >
-                  <span aria-hidden="true" className="w-10 h-10 rounded-box bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">ID</span>
-                  <span className="flex-1 min-w-0 text-sm font-medium text-text-main">
-                    {T.search.openById} #{directGameId}
-                  </span>
-                  {selected.has(directKey) && <IconCheck className="w-4 h-4 text-accent" aria-hidden />}
-                </button>
-                {failedId === directGameId && (
-                  <p role="alert" className="text-xs text-danger mt-2">
-                    {T.search.noResults}
-                  </p>
-                )}
-                </>
-              ) : shown.length > 0 ? (
-                <>
-                  {!searching && (
-                    <div className="mb-3">
-                      <h3 className="text-sm font-semibold text-text-main">{T.groups.suggestions}</h3>
-                      <p className="text-xs text-text-secondary">{T.groups.suggestionsHint}</p>
-                    </div>
-                  )}
-                  <ul className="grid gap-x-3 gap-y-4 grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))]">
-                    {shown.map((c) => (
-                      <li key={c.key} className="min-w-0 flex">
-                        <GamePickerTile candidate={c} selected={selected.has(c.key)} onToggle={() => toggle(c)} />
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              ) : (
-                <p className="text-sm text-text-secondary text-center py-12">
-                  {searching ? T.groups.noMatches.replace('{q}', query.trim()) : T.groups.nothingToSuggest}
-                </p>
-              )}
-            </div>
+        {sources.length > 1 && <AddGameModalPlatforms sources={sources} value={source} onChange={setSource} />}
+      </div>
 
-            <div className="border-t border-ink/5 px-4 sm:px-6 py-3 flex flex-col gap-2 shrink-0 bg-bg-card">
-              {selected.size > 0 && (
-                <div className="flex gap-1.5 overflow-x-auto pb-1">
-                  {Array.from(selected.values()).map((c) => (
-                    <GamePickerChip key={c.key} candidate={c} removeLabel={`${T.groups.removeGame} ${c.title}`} onRemove={() => toggle(c)} />
-                  ))}
-                </div>
-              )}
-              {error && (
-                <p role="alert" className="text-xs text-danger">
-                  {T.groups.addError}
-                </p>
-              )}
-              <div className="flex items-center gap-3">
-                <p role="status" className="text-xs text-text-secondary flex-1 min-w-0">
-                  {selected.size > 0 ? T.groups.selectedCount.replace('{n}', String(selected.size)) : T.groups.pickToAdd}
-                </p>
-                {selected.size > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setSelected(new Map())}
-                    className="text-xs text-text-secondary hover:text-text-main rounded focus-ring"
-                  >
-                    {T.groups.clearSelection}
-                  </button>
-                )}
-                <Button
-                  type="button"
-                  onClick={handleConfirm}
-                  disabled={saving || selected.size === 0}
-                >
-                  {saving ? '…' : selected.size > 0 ? T.groups.addSelected.replace('{games}', plural(selected.size, T.plurals.games, lang)) : T.groups.addGames}
-                </Button>
+      <div>
+        {directGameId && directKey && !existingKeys.has(directKey) ? (
+          <>
+          <button
+            type="button"
+            onClick={() => addDirectById(directGameId)}
+            aria-pressed={selected.has(directKey)}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-tile ring-1 transition-colors text-left focus-ring ${selected.has(directKey) ? 'ring-accent bg-accent/10' : 'ring-ink/10 hover:bg-bg-main'}`}
+          >
+            <span aria-hidden="true" className="w-10 h-10 rounded-box bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">ID</span>
+            <span className="flex-1 min-w-0 text-sm font-medium text-text-main">
+              {T.search.openById} #{directGameId}
+            </span>
+            {selected.has(directKey) && <IconCheck className="w-4 h-4 text-accent" aria-hidden />}
+          </button>
+          {failedId === directGameId && (
+            <p role="alert" className="text-xs text-danger mt-2">
+              {T.search.noResults}
+            </p>
+          )}
+          </>
+        ) : shown.length > 0 ? (
+          <>
+            {!searching && (
+              <div className="mb-3">
+                <h3 className="text-sm font-semibold text-text-main">{T.groups.suggestions}</h3>
+                <p className="text-xs text-text-secondary">{T.groups.suggestionsHint}</p>
               </div>
-            </div>
-          </Modal>
-      )}
-    </AnimatePresence>
+            )}
+            <ul className="grid gap-x-3 gap-y-4 grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))]">
+              {shown.map((c) => (
+                <li key={c.key} className="min-w-0 flex">
+                  <GamePickerTile candidate={c} selected={selected.has(c.key)} onToggle={() => toggle(c)} />
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p className="text-sm text-text-secondary text-center py-12">
+            {searching ? T.groups.noMatches.replace('{q}', query.trim()) : T.groups.nothingToSuggest}
+          </p>
+        )}
+      </div>
+    </Modal>
   )
 }

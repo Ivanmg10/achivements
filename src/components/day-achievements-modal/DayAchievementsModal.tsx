@@ -7,13 +7,12 @@ import { useUserAwards } from '@/hooks/useUserAwards'
 import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
 import Image from 'next/image'
 import Link from 'next/link'
-import { IconX, IconStar, IconCheck } from '@tabler/icons-react'
+import { IconStar, IconCheck } from '@tabler/icons-react'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import Modal from '@/components/ui/Modal'
 import { utcDay } from '@/utils/dates'
 import { raImageUrl } from '@/utils/raAssets'
-import Kicker from '@/components/ui/Kicker'
 
 interface Props {
   date: string
@@ -45,21 +44,22 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
   }, [awards, date])
 
   return (
-    <Modal isOpen onClose={onClose} size="lg" showClose={false} aria-label={formatted} className="gap-3">
-        <div className="flex items-start justify-between gap-2 shrink-0">
-          <div>
-            <Kicker>{T.dayModal.title}</Kicker>
-            <p className="text-sm font-semibold text-text-main mt-0.5">{formatted}</p>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-ring"
-          >
-            <IconX size={16} />
-          </button>
-        </div>
-
+    <Modal
+      isOpen
+      onClose={onClose}
+      size="lg"
+      title={T.dayModal.title}
+      hint={formatted}
+      className="gap-3"
+      footer={
+        dayAchs.length > 0 || dayAwards.length > 0 ? (
+          <p className="text-xs text-text-secondary">
+            {dayAchs.length} {T.dayModal.achievements}
+            {dayAwards.length > 0 && ` · ${dayAwards.length} ${T.streak.completions.split(' ')[0].toLowerCase()}`}
+          </p>
+        ) : undefined
+      }
+    >
         <div className="flex flex-col gap-3 overflow-y-auto flex-1 min-h-0">
           {/* Completion awards */}
           {dayAwards.length > 0 && (
@@ -122,13 +122,6 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
             )}
           </div>
         </div>
-
-        {(dayAchs.length > 0 || dayAwards.length > 0) && (
-          <p className="text-xs text-text-secondary text-right pt-2 border-t border-ink/5 shrink-0">
-            {dayAchs.length} {T.dayModal.achievements}
-            {dayAwards.length > 0 && ` · ${dayAwards.length} ${T.streak.completions.split(' ')[0].toLowerCase()}`}
-          </p>
-        )}
     </Modal>
   )
 }
