@@ -96,7 +96,7 @@ export default function CollectionNumbers({
             logo={<RaLogo height={11} />}
             value={awards.MasteryAwardsCount ?? 0}
             valueClass="text-warning"
-            caption={`${T.cards.mastered}${awards.TotalAwardsCount !== null ? ` · ${awards.TotalAwardsCount.toLocaleString()} ${T.userStats.awards.toLowerCase()}` : ''}`}
+            caption={`${T.cards.mastered}${awards.TotalAwardsCount !== null ? ` · ${awards.TotalAwardsCount.toLocaleString(lang)} ${T.userStats.awards.toLowerCase()}` : ''}`}
           >
             <MasteryMix awards={awards} />
           </PlatformTile>

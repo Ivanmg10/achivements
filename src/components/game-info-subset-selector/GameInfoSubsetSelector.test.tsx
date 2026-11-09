@@ -28,7 +28,7 @@ test('a game with no subsets and no parent shows nothing', () => {
 
 test('a main game lists itself first, then each subset, named by the label in its title', () => {
   render(<GameInfoSubsetSelector currentId={7} parentId={7} parentIcon="/Images/7.png" subsets={SUBSETS} />)
-  expect(links().map((l) => l.getAttribute('title'))).toEqual(['Main Game', 'Bonus', 'Multi'])
+  expect(links().map((l) => l.getAttribute('title'))).toEqual(['Main game', 'Bonus', 'Multi'])
   expect(links().map((l) => l.getAttribute('href'))).toEqual(['/gameInfo/7', '/gameInfo/20', '/gameInfo/21'])
 })
 
@@ -39,7 +39,7 @@ test('on a subset, the first tab leads back to the main game', () => {
 
 test('icons come from RetroAchievements; a tab with none still gets a placeholder', () => {
   const { container } = render(<GameInfoSubsetSelector currentId={7} parentId={7} parentIcon="/Images/7.png" subsets={SUBSETS} />)
-  expect(screen.getByAltText('Main Game')).toHaveAttribute('src', 'https://retroachievements.org/Images/7.png')
+  expect(screen.getByAltText('Main game')).toHaveAttribute('src', 'https://retroachievements.org/Images/7.png')
   expect(screen.queryByAltText('Multi')).not.toBeInTheDocument()
   expect(container.querySelectorAll('span[aria-hidden="true"]')).toHaveLength(1)
 })

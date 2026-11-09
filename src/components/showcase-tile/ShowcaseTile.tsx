@@ -7,6 +7,7 @@ import { IconTrophy, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
 import type { ShowcaseItem } from '@/utils/showcase'
+import { formatDate } from '@/utils/dates'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 
 /**
@@ -27,7 +28,7 @@ export default function ShowcaseTile({
   handle?: ReactNode
 }) {
   const { T, lang } = useLanguage()
-  const date = new Date(item.earnedAt).toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' })
+  const date = formatDate(item.earnedAt, lang, { day: 'numeric', month: 'short', year: 'numeric' })
 
   return (
     <article className="relative h-full bg-bg-main rounded-tile p-3 flex flex-col items-center gap-2 text-center ring-1 ring-ink/5">

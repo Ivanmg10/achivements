@@ -84,7 +84,7 @@ export default function GameInfoAchievementCard({
           </div>
           {/* Points pill */}
           <span className="text-xs font-semibold text-text-main bg-bg-header px-2 py-0.5 rounded-full shrink-0">
-            {achievement.Points}pt
+            {achievement.Points} {T.libraryDetail.pointsShort}
           </span>
         </div>
 
@@ -95,7 +95,7 @@ export default function GameInfoAchievementCard({
           {rarityPct !== null && (
             <span>{rarityPct}{T.achievement.haveIt}</span>
           )}
-          <span>HC: {achievement.NumAwardedHardcore.toLocaleString()}</span>
+          <span>{T.achievement.hardcoreShort}: {achievement.NumAwardedHardcore.toLocaleString(lang)}</span>
           {earned && <span className="text-success font-medium">✓</span>}
         </div>
 

@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import AchievementModal from './AchievementModal'
+import { en } from '@/translations/en'
 
 const achievement = {
   ID: 7,
@@ -57,4 +58,17 @@ test('opens in the body, out of any section that could cover it', () => {
   render(<AchievementModal achievement={achievement} numDistinctPlayers={1000} onClose={jest.fn()} />, { container: host })
   expect(host).not.toContainElement(screen.getByRole('dialog'))
   expect(screen.getByRole('dialog').closest('.fixed')?.parentElement).toBe(document.body)
+})
+
+test('a failed read says so in a sentence, never the status code', async () => {
+  global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500, json: () => Promise.resolve({}) })
+  render(<AchievementModal achievement={achievement} numDistinctPlayers={1000} onClose={jest.fn()} />)
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.achievement.loadError)
+  expect(screen.queryByText(/Error 500/)).not.toBeInTheDocument()
+})
+
+test('its stat labels come from T', () => {
+  render(<AchievementModal achievement={achievement} numDistinctPlayers={1000} onClose={jest.fn()} />)
+  expect(screen.getByText(en.libraryDetail.pointsShort)).toBeInTheDocument()
+  expect(screen.getByText(en.achievement.rarity)).toBeInTheDocument()
 })

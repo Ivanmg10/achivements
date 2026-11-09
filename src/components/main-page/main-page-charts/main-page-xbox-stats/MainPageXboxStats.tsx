@@ -79,7 +79,7 @@ export default function MainPageXboxStats({
       {(summary || summaryWaiting) && <Figure label={T.xbox.gamerscore} value={summary?.gamerscore.toLocaleString(lang) ?? ''} sub="Xbox" tone="success" loading={summaryWaiting} />}
       <Figure
         label={T.streak.title}
-        value={`${streak}d`}
+        value={T.rankings.daysShort.replace('{n}', streak.toLocaleString(lang))}
         sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
         tone={streak > 0 ? 'accent' : undefined}
         href="/racha"

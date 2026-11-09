@@ -135,7 +135,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
                 <p className="text-sm font-medium text-text-main">
                   {T.search.openById} #{directGameId}
                 </p>
-                <p className="text-xs text-text-secondary">Game ID</p>
+                <p className="text-xs text-text-secondary">{T.search.gameId}</p>
               </div>
               <div
                 aria-hidden="true"

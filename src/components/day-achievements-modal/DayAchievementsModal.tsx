@@ -11,7 +11,7 @@ import { IconStar, IconCheck } from '@tabler/icons-react'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import Modal from '@/components/ui/Modal'
-import { utcDay } from '@/utils/dates'
+import { formatDay, utcDay } from '@/utils/dates'
 import { raImageUrl } from '@/utils/raAssets'
 
 interface Props {
@@ -27,11 +27,11 @@ function awardDate(awardedAt: string): string {
 }
 
 export default function DayAchievementsModal({ date, achievements, onClose }: Props) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   const { awards } = useUserAwards()
   const dayAchs = achievements.filter(a => a.Date.startsWith(date))
-  const formatted = new Date(date + 'T00:00:00').toLocaleDateString('default', {
+  const formatted = formatDay(date, lang, {
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
   })
 
@@ -55,7 +55,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
         dayAchs.length > 0 || dayAwards.length > 0 ? (
           <p className="text-xs text-text-secondary">
             {dayAchs.length} {T.dayModal.achievements}
-            {dayAwards.length > 0 && ` · ${dayAwards.length} ${T.streak.completions.split(' ')[0].toLowerCase()}`}
+            {dayAwards.length > 0 && ` · ${dayAwards.length} ${T.dayModal.completions}`}
           </p>
         ) : undefined
       }
@@ -102,7 +102,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                       <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isMastery ? 'bg-hardcore/15 text-hardcore' : 'bg-success/15 text-success'}`}>
                         {isMastery ? T.streak.mastery : T.streak.beaten}
                       </span>
-                      {isHardcore && <span className="text-[10px] text-warning font-semibold">HC</span>}
+                      {isHardcore && <span className="text-[10px] text-warning font-semibold">{T.achievement.hardcoreShort}</span>}
                     </div>
                   </Link>
                 )

@@ -3,6 +3,7 @@ import LibraryDetailMilestones from './library-detail-milestones/LibraryDetailMi
 import LibraryDetailInfo from './library-detail-info/LibraryDetailInfo'
 import LibraryDetailList from './library-detail-list/LibraryDetailList'
 import { en } from '@/translations/en'
+import { formatDate } from '@/utils/dates'
 import type { InsightAchievement } from '@/utils/gameInsights'
 
 const a = (id: string, o: Partial<InsightAchievement> = {}): InsightAchievement => ({
@@ -18,7 +19,7 @@ describe('LibraryDetailMilestones', () => {
     const { container } = render(<LibraryDetailMilestones steps={steps} />)
     expect(screen.getByText(en.libraryDetail.milestonesTitle)).toBeInTheDocument()
     expect(screen.getByText(en.libraryDetail.milestoneFirst)).toBeInTheDocument()
-    expect(screen.getByText(new Date('2024-03-02T10:00:00Z').toLocaleDateString('en'))).toBeInTheDocument()
+    expect(screen.getByText(formatDate('2024-03-02T10:00:00Z', 'en'))).toBeInTheDocument()
     expect(screen.getByText('50% completed')).toBeInTheDocument()
     expect(screen.getByText('4 to go')).toBeInTheDocument()
     expect(container.querySelectorAll('svg')).toHaveLength(1)

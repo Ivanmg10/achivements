@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import GameHashesModal from './GameHashesModal'
+import { en } from '@/translations/en'
 
 const HASHES = [
   { MD5: 'aaaa1111', Name: 'Sonic (USA).md', Labels: ['nointro'], PatchUrl: null },
@@ -29,19 +30,19 @@ test('opening it asks for the game hashes and lists them', async () => {
   expect(fetch).toHaveBeenCalledWith('/api/getGameHashes?gameId=7')
   expect(await screen.findByText('Sonic (USA).md')).toBeInTheDocument()
   expect(screen.getByText('Sonic (EU).md')).toBeInTheDocument()
-  expect(screen.getByText(/2 hashes registrados/)).toBeInTheDocument()
+  expect(screen.getByText('2 registered hashes')).toBeInTheDocument()
 })
 
 test('says when the game has none', async () => {
   ;(fetch as jest.Mock).mockResolvedValue(answer({ Results: [] }))
   setup()
-  expect(await screen.findByText('Sin hashes registrados')).toBeInTheDocument()
+  expect(await screen.findByText(en.gameInfoPage.hashesNone)).toBeInTheDocument()
 })
 
 test('says so when the request fails, and shows no stale list', async () => {
   ;(fetch as jest.Mock).mockResolvedValue(answer({}, false))
   setup()
-  expect(await screen.findByRole('alert')).toHaveTextContent('Error al cargar hashes')
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.gameInfoPage.hashesLoadError)
 })
 
 test('a network failure is the same message, not a crash', async () => {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { formatDate } from '@/utils/dates'
 import { GameComment } from '@/app/api/getGameComments/route'
 import Link from 'next/link'
 import { IconChevronUp } from '@tabler/icons-react'
@@ -136,11 +137,8 @@ function Wrap({ children }: { children: React.ReactNode }) {
 }
 
 function CommentRow({ comment, last }: { comment: GameComment; last: boolean }) {
-  const date = new Date(comment.Submitted).toLocaleDateString(undefined, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
+  const { lang } = useLanguage()
+  const date = formatDate(comment.Submitted, lang)
 
   return (
     <div className={`flex items-start gap-3 py-3 ${last ? '' : 'shadow-hairline-b-soft'}`}>

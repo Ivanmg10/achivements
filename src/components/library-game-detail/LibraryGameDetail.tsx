@@ -109,7 +109,7 @@ export default function LibraryGameDetail({
     }
 
     if (category === 'completed') {
-      if (completedAt) out.push({ label: L.finished, value: new Date(completedAt).toLocaleDateString(lang), className: 'text-success' })
+      if (completedAt) out.push({ label: L.finished, value: formatDate(completedAt, lang), className: 'text-success' })
       const span = unlockSpan(items.map((a) => a.earnedAt), {
         underMinute: T.statusGameItem.spanUnderMinute,
         minutes: T.statusGameItem.spanMinutes,

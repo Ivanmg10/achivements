@@ -91,7 +91,7 @@ export default function MainPageHeatmap({
     columns.forEach((week, wi) => {
       const firstReal = week.find((d) => d !== null)
       if (!firstReal) return
-      const m = new Date(firstReal.date + 'T00:00:00').toLocaleString('default', { month: 'short' })
+      const m = formatDay(firstReal.date, lang, { month: 'short' })
       if (m !== lastMonth) { starts.push({ label: m, col: wi }); lastMonth = m }
     })
 
@@ -103,7 +103,7 @@ export default function MainPageHeatmap({
     )
 
     return { totalAch, activeDays, best, columns, monthLabels }
-  }, [achievements, weeks, days, until])
+  }, [achievements, weeks, days, until, lang])
 
   const gridStyle = {
     display: 'grid',
@@ -161,7 +161,7 @@ export default function MainPageHeatmap({
             <button
               onClick={onRefresh}
               disabled={isLoading}
-              aria-label="Refresh heatmap"
+              aria-label={T.lineChart.refresh}
               className="text-text-secondary hover:text-text-main disabled:opacity-30 transition-colors focus-ring rounded"
             >
               <IconRefresh size={12} className={isLoading ? 'animate-spin' : ''} />

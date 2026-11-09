@@ -14,7 +14,7 @@ test('lists RA unlocks by day under the given title, with points', () => {
   render(<PeriodAchievementsModal title="This week" achievements={[ach('2024-01-16'), ach('2024-01-17')]} onClose={jest.fn()} />)
   expect(screen.getByText('This week')).toBeInTheDocument()
   expect(screen.getAllByText('Triforce')).toHaveLength(2)
-  expect(screen.getByText(`2 ${en.dayModal.achievements} · 50pts`)).toBeInTheDocument()
+  expect(screen.getByText(`2 ${en.dayModal.achievements} · 50 pts`)).toBeInTheDocument()
 })
 
 test('lists Steam unlocks as counts only', () => {

@@ -52,7 +52,7 @@ export default function MainPageBestPeriod({
   achievements: RecentAchievement[]
   isLoading?: boolean
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [selectedWeek, setSelectedWeek] = useState<string | null>(null)
@@ -71,8 +71,8 @@ export default function MainPageBestPeriod({
   /** The period's total: RA counts points, Steam counts unlocks. */
   const amount = (p: { pts: number; ach: number }) =>
     isSteam
-      ? { value: p.ach.toLocaleString(), unit: T.lineChart.achievements }
-      : { value: p.pts.toLocaleString(), unit: 'pts' }
+      ? { value: p.ach.toLocaleString(lang), unit: T.lineChart.achievements }
+      : { value: p.pts.toLocaleString(lang), unit: T.libraryDetail.pointsShort }
   /** The line under the period: when it was, with RA's unlock count alongside. */
   const when = (p: { pts: number; ach: number }, date: string) =>
     isSteam ? date : `${p.ach} ${T.lineChart.achievements} · ${date}`

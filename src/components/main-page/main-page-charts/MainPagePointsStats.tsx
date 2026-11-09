@@ -78,8 +78,8 @@ export default function MainPagePointsStats({
       <Figure label={T.pointsStats.thisWeek} value={valueMode === 'points' ? pts7d : weekAchievements.length} sub={valueMode === 'points' ? plural(weekAchievements.length, T.plurals.achievements, lang) : undefined} onClick={() => setWeekOpen(true)} />
       <Figure label={T.pointsStats.thisMonth} value={valueMode === 'points' ? thisMonth.pts : thisMonth.ach} sub={valueMode === 'points' ? plural(thisMonth.ach, T.plurals.achievements, lang) : undefined} onClick={() => setMonthOpen(true)} />
       <Figure label={T.pointsStats.avgPerDay} value={decimal(avgPerDay, lang)} sub={T.pointsStats.perDay} />
-      {showRank && rank?.Rank != null && <Figure label={T.userStats.globalRank} value={`#${rank.Rank.toLocaleString(lang)}`} sub={`${(rank.Score ?? 0).toLocaleString(lang)} pts`} />}
-      <Figure label={T.streak.title} value={`${streak}d`} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} color={streak > 0 ? streakInk(streakTier(streak)) : undefined} href="/racha" />
+      {showRank && rank?.Rank != null && <Figure label={T.userStats.globalRank} value={`#${rank.Rank.toLocaleString(lang)}`} sub={`${(rank.Score ?? 0).toLocaleString(lang)} ${T.libraryDetail.pointsShort}`} />}
+      <Figure label={T.streak.title} value={T.rankings.daysShort.replace('{n}', streak.toLocaleString(lang))} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} color={streak > 0 ? streakInk(streakTier(streak)) : undefined} href="/racha" />
 
       <AnimatePresence>
         {selectedDay && (

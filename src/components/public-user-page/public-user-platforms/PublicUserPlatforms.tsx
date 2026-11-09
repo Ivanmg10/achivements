@@ -24,7 +24,7 @@ const LOGOS: Record<GameSource, ReactNode> = {
 
 /** Games played on each platform: how many, at 100%, under way, and how far along on average. */
 export default function PublicUserPlatforms({ games, isLoading }: { games: LibraryGame[]; isLoading: boolean }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const platforms = summarizeByPlatform(games)
 
   return (
@@ -57,15 +57,15 @@ export default function PublicUserPlatforms({ games, isLoading }: { games: Libra
               <dl className="grid grid-cols-3 gap-2 text-center">
                 <div className="flex flex-col-reverse">
                   <dt className="text-[10px] text-text-secondary">{T.userProfile.games}</dt>
-                  <dd className="text-lg font-bold tabular-nums">{p.games.toLocaleString()}</dd>
+                  <dd className="text-lg font-bold tabular-nums">{p.games.toLocaleString(lang)}</dd>
                 </div>
                 <div className="flex flex-col-reverse">
                   <dt className="text-[10px] text-text-secondary">{T.userProfile.completed}</dt>
-                  <dd className="text-lg font-bold tabular-nums text-success">{p.completed.toLocaleString()}</dd>
+                  <dd className="text-lg font-bold tabular-nums text-success">{p.completed.toLocaleString(lang)}</dd>
                 </div>
                 <div className="flex flex-col-reverse">
                   <dt className="text-[10px] text-text-secondary">{T.userProfile.playing}</dt>
-                  <dd className="text-lg font-bold tabular-nums">{p.playing.toLocaleString()}</dd>
+                  <dd className="text-lg font-bold tabular-nums">{p.playing.toLocaleString(lang)}</dd>
                 </div>
               </dl>
               <div className="flex items-center gap-2">

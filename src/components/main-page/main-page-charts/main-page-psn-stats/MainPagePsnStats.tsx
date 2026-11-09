@@ -81,7 +81,7 @@ export default function MainPagePsnStats({
       {(summary || summaryWaiting) && <Figure label={T.psn.level} value={summary?.trophyLevel ?? ''} sub="PlayStation" loading={summaryWaiting} />}
       <Figure
         label={T.streak.title}
-        value={`${streak}d`}
+        value={T.rankings.daysShort.replace('{n}', streak.toLocaleString(lang))}
         sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
         tone={streak > 0 ? 'accent' : undefined}
         href="/racha"

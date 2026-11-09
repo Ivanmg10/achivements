@@ -5,7 +5,7 @@ import { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
 import Modal from '@/components/ui/Modal'
-import { utcDay } from '@/utils/dates'
+import { formatDay, utcDay } from '@/utils/dates'
 
 interface Props {
   startDate: string
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function WeekAchievementsModal({ startDate, achievements, onClose }: Props) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   // Steam unlocks have no points; a mixed list still totals the RA ones.
   const hasPoints = achievements.some(a => !a.Source || a.Source === 'ra')
 
@@ -30,7 +30,7 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
       if (dayAchs.length > 0) {
         days.push({
           date: dateKey,
-          label: d.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' }),
+          label: d.toLocaleDateString(lang, { weekday: 'long', month: 'short', day: 'numeric' }),
           achievements: dayAchs,
           pts: dayAchs.reduce((s, a) => s + a.Points, 0),
         })
@@ -48,12 +48,12 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
       onClose={onClose}
       size="lg"
       title={T.cards.bestWeek}
-      hint={T.cards.weekOf.replace('{date}', startDate)}
+      hint={T.cards.weekOf.replace('{date}', formatDay(startDate, lang, { day: 'numeric', month: 'short', year: 'numeric' }))}
       className="gap-3"
       footer={
         totalAch > 0 ? (
           <p className="text-xs text-text-secondary">
-            {totalAch} {T.dayModal.achievements}{hasPoints && ` · ${totalPts.toLocaleString()}pts`}
+            {totalAch} {T.dayModal.achievements}{hasPoints && ` · ${totalPts.toLocaleString(lang)} ${T.libraryDetail.pointsShort}`}
           </p>
         ) : undefined
       }
@@ -67,7 +67,7 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-text-main capitalize">{day.label}</span>
                   <span className="text-[10px] text-text-secondary">
-                    {hasPoints && `${day.pts.toLocaleString()}pts · `}{day.achievements.length} {T.dayModal.achievements}
+                    {hasPoints && `${day.pts.toLocaleString(lang)} ${T.libraryDetail.pointsShort} · `}{day.achievements.length} {T.dayModal.achievements}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

@@ -36,7 +36,7 @@ export default function CollectionTile({ game, date }: { game: PerfectGame; date
       <span className="w-full text-center text-[11px] leading-tight text-text-secondary group-hover:text-text-main line-clamp-2 transition-colors">
         {game.title}
       </span>
-      {when && <span className="sr-only">{`${game.source === 'ra' ? (game.hardcore ? 'Hardcore' : 'Softcore') : PLATFORM_NAME[game.source]}, ${when}`}</span>}
+      {when && <span className="sr-only">{`${game.source === 'ra' ? (game.hardcore ? T.achievement.hardcore : T.achievement.softcore) : PLATFORM_NAME[game.source]}, ${when}`}</span>}
     </Link>
   )
 }

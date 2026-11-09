@@ -27,6 +27,8 @@ const mockT = {
   },
   userStats: { globalRank: 'Global rank' },
   streak: { title: 'Streak' },
+  rankings: { daysShort: '{n} d' },
+  libraryDetail: { pointsShort: 'pts' },
   lineChart: { achievements: 'achievements' },
   plurals: { achievements: { one: '{n} achievement', other: '{n} achievements' } },
 }

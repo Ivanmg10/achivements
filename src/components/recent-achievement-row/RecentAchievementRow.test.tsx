@@ -11,7 +11,7 @@ test('an RA unlock links to the RA page, with its badge and points', () => {
   render(<RecentAchievementRow ach={RA} onNavigate={jest.fn()} />)
   expect(screen.getByRole('link').getAttribute('href')).toBe('/gameInfo/1')
   expect(screen.getByRole('img', { name: 'Triforce' }).getAttribute('src')).toBe('https://media.retroachievements.org/Badge/123.png')
-  expect(screen.getByText('25pts').className).toContain('text-warning')
+  expect(screen.getByText('25 pts').className).toContain('text-warning')
 })
 
 test('a Steam unlock links to the Steam page, with its full badge URL and no points', () => {

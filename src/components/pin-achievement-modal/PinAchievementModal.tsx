@@ -92,7 +92,7 @@ export function PinAchievementModal({
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-text-main truncate">{a.Title}</p>
-                <p className="text-xs text-text-secondary truncate">{a.Points} pts</p>
+                <p className="text-xs text-text-secondary truncate">{a.Points} {T.libraryDetail.pointsShort}</p>
               </div>
               {pinningId === a.ID && <span className="text-xs text-text-secondary">…</span>}
             </button>
