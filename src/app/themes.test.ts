@@ -49,7 +49,7 @@ test('steam retro takes the old client\'s own colours', () => {
   expect(toHex(t['--bg-card'])).toBe('#3e4637')
   expect(toHex(t['--bg-tertiary'])).toBe('#4c5844')
   expect(toHex(t['--text-main'])).toBe('#d8ded3')
-  expect(toHex(t['--accent'])).toBe('#c4b550')
+  expect(toHex(t['--accent'])).toBe('#e3d25d')
 })
 
 describe.each(['venom', 'midnight', 'crimson', 'steam-retro', 'snake-eater', 'dark-blue', 'dark-white', 'light-blue', 'light-black'] as Theme[])('%s reads', (theme) => {
