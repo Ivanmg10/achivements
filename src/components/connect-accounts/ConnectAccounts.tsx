@@ -64,7 +64,7 @@ export default function ConnectAccounts() {
               action={
                 <button onClick={() => setRaModalOpen(true)} className={ACTION}>
                   <RaLogo height={14} />
-                  {T.userData.signInRA}
+                  {T.userData.connectRA}
                 </button>
               }
             />

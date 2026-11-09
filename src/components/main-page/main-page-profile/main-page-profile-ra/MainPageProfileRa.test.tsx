@@ -31,7 +31,7 @@ test('renders user info when user present', () => {
 
 test('renders login link when no user', () => {
   render(<MainPageProfileRa user={null} game={null} recentAchievements={[]} />)
-  expect(screen.getByText('Sign in with RetroAchievements')).toBeInTheDocument()
+  expect(screen.getByText('Connect RetroAchievements')).toBeInTheDocument()
 })
 
 test('renders without UserPic', () => {

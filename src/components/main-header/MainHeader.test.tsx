@@ -59,7 +59,7 @@ test('renders the Status dropdown grouping the 3 status routes', () => {
   render(<MainHeader />)
   fireEvent.click(screen.getByRole('button', { name: 'Library' }))
   expect(screen.getByRole('menuitem', { name: 'In progress' })).toHaveAttribute('href', '/playing')
-  expect(screen.getByRole('menuitem', { name: 'No achievements' })).toHaveAttribute('href', '/wantToPlay')
+  expect(screen.getByRole('menuitem', { name: 'Not started' })).toHaveAttribute('href', '/wantToPlay')
   expect(screen.getByRole('menuitem', { name: 'Completed' })).toHaveAttribute('href', '/completed')
 })
 

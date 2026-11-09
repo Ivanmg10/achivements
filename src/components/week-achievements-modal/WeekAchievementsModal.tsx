@@ -37,7 +37,7 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
       }
     }
     return days
-  }, [achievements, monday])
+  }, [achievements, monday, lang])
 
   const totalPts = weekDays.reduce((s, d) => s + d.pts, 0)
   const totalAch = weekDays.reduce((s, d) => s + d.achievements.length, 0)

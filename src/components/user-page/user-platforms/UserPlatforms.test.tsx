@@ -59,7 +59,7 @@ test('each connected platform shows its headline numbers', () => {
 
 test('disconnecting RA unlinks it', () => {
   render(<UserPlatforms />)
-  fireEvent.click(screen.getByRole('button', { name: en.userConfig.signOutRA }))
+  fireEvent.click(screen.getByRole('button', { name: en.userConfig.disconnectRA }))
   expect(unlinkRaUser).toHaveBeenCalled()
 })
 
@@ -67,17 +67,17 @@ test('RA disconnected offers to connect instead', async () => {
   setRa(false)
   render(<UserPlatforms />)
 
-  fireEvent.click(screen.getByRole('button', { name: en.userData.signInRA }))
+  fireEvent.click(screen.getByRole('button', { name: en.userData.connectRA }))
   expect(await screen.findByTestId('ra-modal')).toBeInTheDocument()
 })
 
 test('unlinking RA says whether it worked', async () => {
   ;(unlinkRaUser as jest.Mock).mockResolvedValueOnce(true)
   render(<UserPlatforms />)
-  fireEvent.click(screen.getByRole('button', { name: en.userConfig.signOutRA }))
+  fireEvent.click(screen.getByRole('button', { name: en.userConfig.disconnectRA }))
   await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.raUnlinked))
 
   ;(unlinkRaUser as jest.Mock).mockResolvedValueOnce(false)
-  fireEvent.click(screen.getByRole('button', { name: en.userConfig.signOutRA }))
+  fireEvent.click(screen.getByRole('button', { name: en.userConfig.disconnectRA }))
   await waitFor(() => expect(notify.error).toHaveBeenCalledWith(en.toast.unlinkFailed))
 })

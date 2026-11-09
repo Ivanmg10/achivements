@@ -94,7 +94,7 @@ export default function MainPageProfileRa({
         </>
       ) : (
         <Link href="/user" className={`${SURFACE} p-5 font-semibold hover:ring-accent/50 transition-shadow`}>
-          {T.profileRa.signIn}
+          {T.profileRa.connect}
         </Link>
       )}
     </div>
