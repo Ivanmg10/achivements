@@ -198,7 +198,7 @@ flag is read from the database, never the session).
 - **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the best streaks' bars, the
   streak hero and its live bar, the cover's streak card, the home's stats tile, the rankings' streak column). Every streak
   colour comes from it; the older rule "streaks in the accent, amber only in the streak hero" is gone (#124 checked: the hero uses
-  `streakTier` too).
+  `streakTier` too). A tier's ink keeps `--streak-hue` of its hue (72 %, less on light themes and Steam Retro), so it reads in every theme.
 
 ### The Layout modal and look transitions
 
@@ -296,13 +296,24 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   tab's colour, so any ground clashes with some browser's theme. The same cost as any single logo: a browser whose scheme does not match its tab colour reads worse, and a mid grey tab is the weakest.
   Themes that share an accent share an icon (Midnight and Crimson): it goes with the theme, it does not name it. Venom is the one exception: bone white accent, purple logo (the user's call).
 - **A new theme needs its row in `THEME_ACCENT`:** the types refuse a missing one, `src/app/themes.test.ts` refuses one that differs from `globals.css`
-  (and checks contrast for the themes added in #84). A new light theme also joins the light selector lists in `globals.css`.
+  and holds every theme to WCAG AA (#123, see Contrast below). A new light theme also joins the light selector lists in `globals.css`.
 - **One `<link id="theme-icon">`, in the root layout, before the script.** Not `src/app/icon.svg`: Next's link can land after the script. Both the script
   and `ThemeContext` set its `href`; a data URL has nothing to cache. Measured 2026-11-02 on real tabs, Chromium and Firefox change with no reload and follow the
   scheme. Safari is not tested (no Windows build): if it refuses, it keeps `/icon.svg`, the default theme's logo. A browser with a custom theme is not measured either.
 - **A theme that no longer exists lands on `dark`** in the head script, `ThemeContext` and the public profile (no row, never its raw id). `users.theme` keeps
   the old value until the person picks another: no migration, nothing else reads it.
 - **`apple-icon.tsx` still says "CH"**: out of #84, left as it was.
+
+### Contrast — every theme, every tint (#123, 2026-11-09)
+
+`src/app/themes.test.ts` runs over **all** of `THEMES` (colour maths in `src/app/themeContrast.ts`, `color-mix` in oklab included)
+and holds each one to WCAG AA (4.5:1): text and secondary text on `bg-main`, `bg-card` and `bg-tertiary`; the accent as text
+and on its own 15 % tint (a chosen `Pill`, a pressed `IconButton`, a dialog's head icon); the primary button's label on the
+accent and its hover; success, warning, info and danger on a card and on their own 10 % `Notice` tint; hardcore and softcore on a
+card; every streak tier's ink on the page, a card and its own 16 % tag. Secondary text must also sit at least 1.3:1 from the body text.
+**A new theme, or a changed token, that fails one of these does not merge.** When a colour fails, move its lightness (same hue)
+in that theme's block, never the rule; the streak ink is lowered with `--streak-hue`, not by recolouring the tier. A new tint a component draws
+(another `bg-x/NN`) joins the test with its alpha. Changing an accent also changes its `THEME_ACCENT` row (the favicon).
 
 ### Progress bars — in the theme's colours
 
