@@ -133,6 +133,9 @@ Every API call added or modified must have its own error handling. No exceptions
 - Set appropriate error state so the UI can reflect failure (error message, empty state, retry)
 - Do not let errors propagate silently or swallow them with empty catch blocks
 - API route handlers (`route.ts`): always return structured error responses with correct HTTP status codes
+- **A route answers a code (`username-taken`, `too-many`), never a sentence**, and the client puts the code in the
+  reader's language through `src/utils/apiErrors.ts` (`signupError`, `profileFieldError`, `groupError`; any code it
+  does not know is the generic text). Never show `data.error`, `err.message` or a status code on screen (#122).
 - **A route that needs a signed-in user starts with `requireSession()`** (or a platform's `require*Session`),
   which also gives the session's user: never `getServerSession` plus a 401 of its own.
 - **An error that asking again will not fix is a 4xx**: the client retries 5xx (`fetchWithRetry`, then
@@ -200,6 +203,10 @@ Mobile-first. Tailwind sm/md/lg prefixes. No fixed widths that break mobile.
 - New strings → every file under `src/translations/` (nine languages; the `Translations` type refuses a
   missing key)
 - Admin panel exempt
+- **One name per thing, in the nine languages** (the words are in `docs/i18n.md` → Vocabulary): connect / disconnect
+  an account (RA is never "signed in to"), library, achievements to get, Vault Points, "not started". No em
+  dash in a live string (`src/translations/copy.test.ts` fails on one, Russian apart). Numbers and dates go through
+  `lang` (`formatDate`, `formatDay`, `toLocaleString(lang)`), never the browser's locale.
 - **The detected language is never saved**, only a person's pick. `LANGUAGES` (`src/utils/languages.ts`)
   is the one list. **Never import `es`, `pt`… into client code** (each language is its own chunk, plain
   data), and **never call `serverLanguage()`, `headers()` or `cookies()` in the root layout** (it would
