@@ -18,4 +18,5 @@ test('every tier has its own hue', () => {
 test('the ink mixes the hue with the theme text colour', () => {
   expect(streakInk(streakTier(5))).toContain('56 189 248')
   expect(streakInk(streakTier(5))).toContain('--text-main')
+  expect(streakInk(streakTier(5))).toContain('var(--streak-hue)')
 })

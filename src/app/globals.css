@@ -184,6 +184,9 @@
 
   --hardcore: 250 204 21;
   --softcore: 96 165 250;
+
+  /* How much of a streak tier's hue its ink keeps (the rest is the text colour): a light theme keeps less, so the hue still reads. */
+  --streak-hue: 72%;
 }
 
 /*
@@ -394,7 +397,7 @@ html[data-font="fira"],
   --knob-shift: 1.25rem;
 }
 
-/* Light surfaces: the RA marks a step darker, so they still read. */
+/* Light surfaces: the RA marks a step darker and a streak keeps less of its hue, so they still read. */
 [data-theme="light"],
 [data-theme="light-red"],
 [data-theme="light-green"],
@@ -404,6 +407,7 @@ html[data-font="fira"],
 [data-theme="arctic"] {
   --hardcore: 161 98 7;
   --softcore: 29 78 216;
+  --streak-hue: 42%;
 }
 
 /* ============================================
@@ -793,6 +797,8 @@ html[data-font="fira"],
 
   /* A lighter blue than the default, so RA's softcore reads on the olive card. */
   --softcore: 147 197 253;
+  /* The olive card is light for a dark theme: a streak keeps less of its hue to read on it. */
+  --streak-hue: 44%;
 }
 
 /* ============================================
