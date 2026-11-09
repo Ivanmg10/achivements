@@ -533,7 +533,7 @@ html[data-font="fira"],
   --bg-tertiary: 30 40 60;
 
   --text-main: 220 228 240;
-  --text-secondary: 128 142 168;
+  --text-secondary: 131 145 170;
 
   /* Cobalt, not sky: sky blue is Steam and True points. */
   --accent: 115 141 255;
@@ -691,7 +691,7 @@ html[data-font="fira"],
   --bg-tertiary: 50 60 127;
 
   --text-main: 225 225 225;
-  --text-secondary: 172 203 241;
+  --text-secondary: 158 187 222;
 
   --accent: 226 192 99;
   --accent-hover: 240 214 140;
@@ -713,7 +713,7 @@ html[data-font="fira"],
   --bg-tertiary: 104 15 17;
 
   --text-main: 240 228 222;
-  --text-secondary: 232 201 192;
+  --text-secondary: 193 167 159;
 
   --accent: 226 192 99;
   --accent-hover: 240 214 140;
@@ -779,7 +779,7 @@ html[data-font="fira"],
   --bg-card: 62 70 55;
   --bg-tertiary: 76 88 68;
 
-  --text-main: 216 222 211;
+  --text-main: 230 234 227;
   --text-secondary: 194 205 183;
 
   --accent: 227 210 93;
