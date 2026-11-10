@@ -102,7 +102,7 @@ the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform 
    `completedAt`, Steam's last unlock, RA's award; never `lastPlayed`), the `*LibraryDetail` panel, hide and pin. *Traps:* Steam builds
    `/steamGame/${id}` by hand where the others call `gameHref` (on someone's profile it leaves the subject: a behaviour change, ask);
    `isComplete` is recomputed inline; the "▼" glyph; the Completed lists order by completion date (#99); `useExclusiveOpen`.
-5. **Badge grids, feed rows, category cards and sections, expanded layout** (D1-02…06, with D1-09, D1-15, D1-16, D1-20; ~2,000 lines, do it
+5. DONE (2026-11-10, `refactor/125-platform-shells-4`; below, "Done — family 5", with what was left out: D1-15, D1-16) **Badge grids, feed rows, category cards and sections, expanded layout** (D1-02…06, with D1-09, D1-15, D1-16, D1-20; ~2,000 lines, do it
    as four PRs in this order): grids `psn-trophy-grid/PsnTrophyGrid` (207), `xbox-achievement-grid/` (168), `steam-achievement-grid/` (167),
    RA `achievement-grid/AchievementGrid` (243); feed rows `PsnGameItem`, `XboxGameItem`, `SteamGameItem`, `RaGameItem`, `PsnCollectionItem`;
    sections `{psn,xbox,steam}-category-section/` + `SteamStatusGameList`; expanded `{psn,xbox,steam}-recently-played-expanded/`,
@@ -208,6 +208,50 @@ the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform 
 - *Not looked at in a browser:* the home at 390 and 2560 px, both designs, Firefox: the pinned rows' stretched header (does the whole row
   still drag by its grip and open by a click elsewhere?), the profile column's height across tabs (`homeFit`, the min-height), and the stat
   pills' streak colours on each platform's tab.
+
+**Done — family 5, grids, feed rows, sections and the opened game** (`refactor/125-platform-shells-4`, one commit per part, 2026-11-10; shells follow `docs/platform-shells.md`):
+- *Badge grid (D1-02, D1-12 in part):* `badge-grid/BadgeGrid` (generic over the platform's item; the tooltip in `hooks/useBadgeTooltip`, one
+  badge in `badge-grid-badge/`, the tooltip's "x% have it" and "Earned" chip in `badge-tip-parts/`; the adapter's slots are `name`, `label`,
+  `href` or `onSelect`, `ring`, `icon`, `secret` + `reveal`, `pins`, `tip`, `corner`, `sections`). `AchievementGrid` (167 lines, was 231),
+  `SteamAchievementGrid` (67, was 155), `PsnTrophyGrid` (88, was 194; its DLC folds are the `sections` slot, its ring is `TROPHY_GRADE_RING`,
+  the `GRADE_RING` copy is gone) and `XboxAchievementGrid` (69, was 161) are adapters at their old paths. RA keeps its image preloading and
+  its window; the shell's `loading` prop holds skeletons for what is shown and the badges out of sight until then. 741 → 391 + 337 shared.
+  Contract: `BadgeGrid.contract.test.tsx` (4 platforms × 6, pins × 2 for three, secrets × 2 and the eye × 2 for the ones that have them, RA's
+  window). Checked by taking away `onBlur`: 4 tests failed.
+- *Feed row (D1-03):* `feed-game-card/FeedGameCard` (the controlled-or-local open state, the stretched expand button, links, chip, bar, facts,
+  pin; the view model is `FeedGameCardView` in `types/gameCard.ts`, the clock-and-hours fact is `feed-game-card-playtime/`) and five
+  adapters (`RaGameItem` 85, `SteamGameItem` 64, `PsnGameItem` 57, `XboxGameItem` 61, `PsnCollectionItem` 59). 693 → 326 + 144 shared.
+  `PLATFORM_LOGO` is now exported by `GameCardPlatformTag` (the section shell uses it too). Contract: `FeedGameCard.contract.test.tsx`
+  (5 platforms × 6, the link and pin ones for the four that have them, play time for the three that have it).
+- *Category section (D1-05):* `platform-category-section/PlatformCategorySection` (the hook's result, how to count and preview, the words) and
+  three adapters (`PsnCategorySection` 52, `XboxCategorySection` 52, `SteamCategorySection` 60 with its partial-progress note);
+  `SteamStatusGameList` (a one-caller wrapper) is gone. 292 → 164 + 112. Contract: `PlatformCategorySection.contract.test.tsx` (3 × 8).
+- *Opened game (D1-06, D1-09):* `game-expanded-layout/GameExpandedLayout` (ring, chart, grid, side panel: the four panel strings once, the
+  ring and the chart's `isLoading` inside it), `badge-grid/lazy-badge-grid/LazyBadgeGrid` (skeleton → failure with retry → "nothing" → the
+  grid) and `badge-grid-skeleton/`. `Psn-`, `Xbox-`, `SteamRecentlyPlayedExpanded` and `PsnCollectionExpanded` (50, 53, 57, 71) and
+  `RaRecentlyPlayedExpanded` (75; renamed from `RARecentlyPlayedExpanded`, now a default export like its siblings) use the layout; the
+  three `*GameItemTrophies` / `*GameItemAchievements` of the group cards use `LazyBadgeGrid` (46, 46, 43). 572 → 441 + 114 shared. Contract:
+  `GameExpandedLayout.contract.test.tsx` (PSN, Xbox, Steam × 7; the collection and RA keep their own tests).
+- *D1-20:* `asCategory` is one function in `utils/utils.tsx`, not four.
+- *Visible changes (drifted copies, fixed):* **(a)** the badge's focus ring is the library's accent (`focus-ring`) on all four grids; PSN, Xbox
+  and Steam used white (little contrast on a light theme), RA the accent. **(b)** RA's badges open their tooltip at once on keyboard focus, as the
+  other three did (RA waited 450 ms); and its hover timer no longer stacks. **(c)** A badge with no picture shows the "?" stand-in on Steam
+  and RA too (a blank grey square before). **(d)** RA's grid is a list (`ul` / `li`) like the others. **(e)** The focus ring on the feed row's
+  title and expand button is the accent on Steam, PSN, Xbox and the collection (their platform colour before); RA's already was. **(f)** The
+  PSN collection's row has its icon with the same shadow as the other rows, and the focus ring of its expand button is around the progress
+  block (it was around the whole card): its title and icon are plain text now but the whole row still opens (the button is stretched over it,
+  as in the other rows). **(g)** The category sections' loading skeleton reads `STATUS_GRID_COLS` like the list (adds `items-start` and
+  the dense flow, no change in columns).
+- *Left as it was, on purpose:* the feed row's chevron is inside its own stretched button, a 14 px `IconChevronDown`, not the 16 px
+  `GameCardExpandButton` of the status and group cards (the whole body is the button there, so a separate chevron button would nest); RA's
+  `SortableItemAchievements` keeps its own skeleton / failure / empty (it asks for the game on first open and shows `SectionFallback`); Steam's
+  tooltip chip colours stay literal per platform (D1-14, platform tokens are separate).
+- *Left out:* D1-15 (the user game page bodies, in family 7 with the routes' states) and D1-16 (the blurred hero backgrounds ×4: they were not
+  in this round's parts; the four tuned values would pass as props to one `GameHeroBackdrop`); D1-10 (the three "rarest earned" side panels, whose
+  Steam link still leaves the viewed profile: ask the owner before unifying).
+- *Not looked at in a browser:* the badge grids at 390 and 2560 px, both designs, Firefox (the focus ring on an earned badge, RA's `ul`
+  against the old `div`); the feed rows (does the PSN collection's focus ring look right, do the rows still stretch to the feed's height);
+  the category pages' loading skeleton; an opened game in the feed at 1280×800 and ~800×450.
 **Watch out** — `toRow` and `items` must be stable (a module-level mapper, or `useMemo`): the deep link's reset runs when `items` changes,
 and an inline sort would reset it every render. The deep link looks for `data-anchor` on rows and cards; `anchor` is unencoded and the
 fragment is decoded before comparing. `badgeClass` takes a ring colour, not a state.
