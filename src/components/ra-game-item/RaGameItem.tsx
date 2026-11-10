@@ -1,21 +1,15 @@
 'use client'
 
-import { useId } from 'react'
+import type { ReactNode } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
-import { IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSubject } from '@/context/SubjectContext'
 import { RecentlyPlayedGame } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { formatDate } from '@/utils/dates'
-import { ProgressBar } from '@/components/ui/ProgressBar'
-import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
-import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import { raImageUrl } from '@/utils/raAssets'
-import Tag from '@/components/ui/Tag'
-import Facts from '@/components/ui/Facts'
+import FeedGameCard from '@/components/feed-game-card/FeedGameCard'
 
 const CONSOLE_BY_NAME = new Map(CONSOLES.map((c) => [c.name, c.icon]))
 
@@ -24,130 +18,68 @@ function pct(achieved: number, total: number) {
 }
 
 /**
- * One RA game as a row card, the counterpart of SteamGameItem: the game's
- * blurred art behind it, cover and title opening the game page, and the rest
- * of the card a button that expands its achievements (`children`).
- *
- * A mastered game (every achievement in hardcore) gets a gold ring on the
- * cover, alongside the 100% — not by colour alone.
+ * One RA game as a row in the recent feed, its bar showing the hardcore share over the softcore one. A
+ * mastered game (every achievement in hardcore) gets a gold ring on the icon, alongside the 100%, so it
+ * is not told by colour alone. The opened achievements are `children`.
  */
 export default function RaGameItem({
   game,
   expanded,
   onToggle,
   children,
-  className = '',
+  className,
 }: {
   game: RecentlyPlayedGame
   expanded: boolean
   onToggle: () => void
   /** The expanded panel, rendered only while expanded. */
-  children?: React.ReactNode
+  children?: ReactNode
   className?: string
 }) {
   const subject = useSubject()
   const { T, lang } = useLanguage()
-  const panelId = useId()
-
-  const href = gameHref('ra', game.GameID, subject)
   const art = raImageUrl(game.ImageIcon) ?? null
   const consoleIcon = CONSOLE_BY_NAME.get(game.ConsoleName)
   const total = game.NumPossibleAchievements
   const earnedAch = game.NumAchievedHardcore || game.NumAchieved
   const earnedPts = game.ScoreAchievedHardcore || game.ScoreAchieved
-  const progress = Math.round(pct(earnedAch, total))
+  const percent = Math.round(pct(earnedAch, total))
   const mastered = total > 0 && game.NumAchievedHardcore >= total
 
   return (
-    <div
-      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
-    >
-      <GameCardBackdrop src={art} />
-
-      {/* relative: the expand button stretches over this whole row (see below). */}
-      <div className="relative flex items-center gap-3.5 px-3.5 py-2 shrink-0">
-        {/* Same destination as the title link, so it is kept out of the tab order. */}
-        <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
-          {art ? (
-            <Image
-              src={art}
-              alt=""
-              width={64}
-              height={64}
-              className={`rounded-tile object-cover w-14 h-14 sm:w-16 sm:h-16 shadow-[0_6px_18px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:scale-105 ${
-                mastered ? 'ring-2 ring-warning' : 'ring-1 ring-ink/10'
-              }`}
-            />
-          ) : (
-            <span className="block w-14 h-14 sm:w-16 sm:h-16 rounded-tile bg-ink/10" />
-          )}
-          {consoleIcon && (
-            <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-box-md bg-bg-card ring-1 ring-ink/10 flex items-center justify-center">
-              <Image src={consoleIcon} alt="" width={12} height={12} className="w-3 h-3 object-contain" />
-            </span>
-          )}
-        </Link>
-
-        <div className="flex flex-col min-w-0 flex-1 gap-1">
-          <span className="flex items-center gap-2 min-w-0">
-            <Link
-              href={href}
-              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 rounded focus-ring"
-            >
-              <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.Title}</span>
-            </Link>
-            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate">{game.ConsoleName}</Tag>
+    <FeedGameCard
+      href={gameHref('ra', game.GameID, subject)}
+      title={game.Title}
+      backdrop={art}
+      icon={(cls) =>
+        art ? (
+          <Image src={art} alt="" width={64} height={64} className={`object-cover ${cls}`} />
+        ) : (
+          <span className={`block bg-ink/10 ${cls}`} />
+        )
+      }
+      iconBadge={
+        consoleIcon && (
+          <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-box-md bg-bg-card ring-1 ring-ink/10 flex items-center justify-center">
+            <Image src={consoleIcon} alt="" width={12} height={12} className="w-3 h-3 object-contain" />
           </span>
-
-          <button
-            onClick={onToggle}
-            aria-expanded={expanded}
-            aria-controls={panelId}
-            aria-label={`${expanded ? T.cards.hideAchievements : T.cards.showAchievements}: ${game.Title}`}
-            className="flex flex-col gap-1 w-full text-left rounded group cursor-pointer before:absolute before:inset-0 before:content-[''] focus-ring"
-          >
-            <span className="flex items-center gap-2 w-full">
-              {total > 0 && (
-                <>
-                  <ProgressBar
-                    pct={pct(game.NumAchievedHardcore, total)}
-                    softPct={pct(game.NumAchieved, total)}
-                    label={game.Title}
-                    className="flex-1"
-                  />
-                  <span className={`text-base font-extrabold tabular-nums shrink-0 w-[2.625rem] text-right ${progress >= 100 ? 'text-success' : 'text-text-main'}`}>
-                    {progress}%
-                  </span>
-                </>
-              )}
-              <IconChevronDown
-                size={14}
-                aria-hidden="true"
-                className={`ml-auto shrink-0 text-text-secondary/40 group-hover:text-text-secondary transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
-              />
-            </span>
-
-            <span className="flex flex-wrap items-center text-[0.8125rem] text-text-secondary">
-              <Facts
-                items={[
-                  total > 0 && <span key="a" className="whitespace-nowrap">{earnedAch}/{total} {T.statusGameItem.achievements}</span>,
-                  total > 0 && <span key="p" className="whitespace-nowrap">{earnedPts}/{game.PossibleScore} {T.libraryDetail.pointsShort}</span>,
-                  <span key="d" className="whitespace-nowrap">{formatDate(game.LastPlayed, lang)}</span>,
-                ]}
-              />
-            </span>
-          </button>
-        </div>
-
-        {/* Outside the expand button (a button inside a button is invalid HTML), and above its stretched hit area. */}
-        <PinToggleButton gameId={game.GameID} className="self-center relative z-10" />
-      </div>
-
-      {expanded && (
-        <div id={panelId} className="flex-1 overflow-y-auto px-3 pb-3 pt-3 min-h-0 w-full">
-          {children}
-        </div>
-      )}
-    </div>
+        )
+      }
+      ring={mastered ? 'warning' : undefined}
+      platform={{ label: game.ConsoleName }}
+      progress={total > 0 ? { pct: pct(game.NumAchievedHardcore, total), softPct: pct(game.NumAchieved, total), percent, done: percent >= 100 } : null}
+      facts={[
+        total > 0 && <span key="a" className="whitespace-nowrap">{earnedAch}/{total} {T.statusGameItem.achievements}</span>,
+        total > 0 && <span key="p" className="whitespace-nowrap">{earnedPts}/{game.PossibleScore} {T.libraryDetail.pointsShort}</span>,
+        <span key="d" className="whitespace-nowrap">{formatDate(game.LastPlayed, lang)}</span>,
+      ]}
+      expand={{ show: T.cards.showAchievements, hide: T.cards.hideAchievements }}
+      pin={{ gameId: game.GameID }}
+      expanded={expanded}
+      onToggle={onToggle}
+      className={className}
+    >
+      {children}
+    </FeedGameCard>
   )
 }

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { GameGroupItem } from '@/types/types'
+import type { GameSource } from '@/types/game'
 
 /** The colour a cover's ring takes when the game is done (RA's is hardcore); none leaves only the hover ring. */
 export type CoverRing = 'hardcore' | 'steam-perfect' | 'platinum' | 'success'
@@ -82,4 +83,39 @@ export type PinnedGameCardView = {
   expand: ExpandLabels
   /** The opened achievements or trophies; only mounted while open. */
   panel: ReactNode
+}
+
+/** The colour of a feed row's icon ring when the game is done (a platinum, a perfect game, a mastery). */
+export type FeedRing = 'platinum' | 'success' | 'warning'
+
+/** The bar of a feed row and its percentage. `percent` is what is written; `done` turns the written one green. */
+export type FeedProgress = { pct: number; /** RA's softcore share, darker behind the bar. */ softPct?: number; percent: number; done: boolean }
+
+/** What a platform tells the recent feed's row; the row draws it and owns the open state, the links and the expand button. */
+export type FeedGameCardView = {
+  /** The game's page. None (a PSN collection): the title and icon are plain, the whole row opens. */
+  href?: string
+  title: string
+  backdrop: string | null
+  /** The icon, drawn with the class that sizes, shadows and rings it. */
+  icon: (className: string) => ReactNode
+  /** Over the icon's corner (RA's console). */
+  iconBadge?: ReactNode
+  /** The ring when the game is done. */
+  ring?: FeedRing
+  /** The platform's chip: its logo and name, or the console's. */
+  platform: { source?: 'steam' | 'psn' | 'xbox'; label: string }
+  /** The bar; none leaves the row with only its chevron (nothing to count yet). */
+  progress: FeedProgress | null
+  /** The line under the bar, joined by the site's mark; empty ones are left out. */
+  facts: ReactNode[]
+  expand: ExpandLabels
+  /** The game's pin, outside the expand button; none (a collection) leaves it out. */
+  pin?: { gameId: number; source?: GameSource }
+  /** Controlled by the feed (one row open at a time) when `expanded` and `onToggle` come; local otherwise. */
+  expanded?: boolean
+  onToggle?: () => void
+  className?: string
+  /** The opened achievements or trophies, only while open. */
+  children?: ReactNode
 }

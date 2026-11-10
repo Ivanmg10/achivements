@@ -1,33 +1,26 @@
 'use client'
 
-import { useId, useState } from 'react'
-import { IconChevronDown, IconClock } from '@tabler/icons-react'
 import type { PsnCollection, PsnGameProgress } from '@/types/psn'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatDate } from '@/utils/dates'
 import { psnBackdrop } from '@/utils/psnTitles'
-import { formatPlaytime } from '@/utils/steamFeed'
-import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
-import { ProgressBar } from '@/components/ui/ProgressBar'
+import FeedGameCard from '@/components/feed-game-card/FeedGameCard'
+import FeedGameCardPlaytime from '@/components/feed-game-card/feed-game-card-playtime/FeedGameCardPlaytime'
 import GameIcon from '@/components/game-icon/GameIcon'
-import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import PsnCollectionExpanded from '@/components/psn/psn-collection-expanded/PsnCollectionExpanded'
-import Tag from '@/components/ui/Tag'
-import Facts from '@/components/ui/Facts'
 
 /**
- * A collection (The Ezio Collection) in the recent feed: one card with the
- * collection's session, hours and icon, since Sony does not say which of its
- * games was played. Opened, it is laid out like an opened game, with each of
- * its games as a fold of trophies (as a game's DLC). It has no page or pin of
- * its own: those stay per game.
+ * A collection (The Ezio Collection) in the recent feed: one row with the collection's session, hours
+ * and icon, since Sony does not say which of its games was played. Opened, it is laid out like an
+ * opened game, with each of its games as a fold of trophies (as a game's DLC). It has no page or pin
+ * of its own, so the whole row opens: those stay per game.
  */
 export default function PsnCollectionItem({
   collection,
   games,
   expanded,
   onToggle,
-  className = '',
+  className,
 }: {
   collection: PsnCollection
   games: PsnGameProgress[]
@@ -36,11 +29,6 @@ export default function PsnCollectionItem({
   className?: string
 }) {
   const { T, lang } = useLanguage()
-  const [localExpanded, setLocalExpanded] = useState(false)
-  const panelId = useId()
-
-  const isExpanded = expanded ?? localExpanded
-  const toggle = onToggle ?? (() => setLocalExpanded((v) => !v))
   const awarded = games.reduce((sum, g) => sum + g.numAwarded, 0)
   const total = games.reduce((sum, g) => sum + g.maxPossible, 0)
   const pct = total > 0 ? Math.round((awarded / total) * 100) : 0
@@ -48,67 +36,24 @@ export default function PsnCollectionItem({
   const lastPlayed = [collection.lastPlayed, ...games.map((g) => g.lastPlayed)].filter((d): d is string => !!d).sort().at(-1)
 
   return (
-    <div
-      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+    <FeedGameCard
+      title={collection.title}
+      backdrop={collection.heroUrl ?? psnBackdrop(games[0])}
+      icon={(cls) => <GameIcon source="psn" id={games[0].id} imageUrl={collection.iconUrl ?? games[0].imageIcon} size={64} className={cls} />}
+      platform={{ source: 'psn', label: consoles }}
+      progress={{ pct, percent: pct, done: pct >= 100 }}
+      facts={[
+        <span key="g" className="whitespace-nowrap">{games.length} {T.psn.collectionGames}</span>,
+        <span key="t" className="whitespace-nowrap">{awarded}/{total} {T.psn.trophies.toLowerCase()}</span>,
+        collection.playtimeMinutes !== null && <FeedGameCardPlaytime key="h" minutes={collection.playtimeMinutes} />,
+        lastPlayed && <span key="d">{formatDate(lastPlayed, lang)}</span>,
+      ]}
+      expand={{ show: T.psn.showGames, hide: T.psn.hideGames }}
+      expanded={expanded}
+      onToggle={onToggle}
+      className={className}
     >
-      <GameCardBackdrop src={collection.heroUrl ?? psnBackdrop(games[0])} />
-
-      <button
-        onClick={toggle}
-        aria-expanded={isExpanded}
-        aria-controls={panelId}
-        aria-label={`${isExpanded ? T.psn.hideGames : T.psn.showGames}: ${collection.title}`}
-        className="relative flex items-center gap-3.5 px-3.5 py-2 shrink-0 w-full text-left cursor-pointer rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn group"
-      >
-        <GameIcon
-          source="psn"
-          id={games[0].id}
-          imageUrl={collection.iconUrl ?? games[0].imageIcon}
-          size={64}
-          className="rounded-tile w-14 h-14 sm:w-16 sm:h-16 shrink-0 shadow-md shadow-black/30 ring-1 ring-ink/10"
-        />
-
-        <span className="flex flex-col min-w-0 flex-1 gap-1">
-          <span className="flex items-center gap-2 min-w-0">
-            <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{collection.title}</span>
-            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate"><PlaystationLogo size={12} className="opacity-60" aria-hidden="true" />
-              {consoles}</Tag>
-          </span>
-
-          <span className="flex items-center gap-2 w-full">
-            <ProgressBar pct={pct} label={collection.title} className="flex-1" />
-            <span className={`text-base font-extrabold tabular-nums shrink-0 w-[2.625rem] text-right ${pct >= 100 ? 'text-success' : 'text-text-main'}`}>{pct}%</span>
-            <IconChevronDown
-              size={14}
-              aria-hidden="true"
-              className={`ml-auto shrink-0 text-text-secondary/40 group-hover:text-text-secondary transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-            />
-          </span>
-
-          <span className="flex flex-wrap items-center text-[0.8125rem] text-text-secondary">
-            <Facts
-              items={[
-                <span key="g" className="whitespace-nowrap">{games.length} {T.psn.collectionGames}</span>,
-                <span key="t" className="whitespace-nowrap">{awarded}/{total} {T.psn.trophies.toLowerCase()}</span>,
-                collection.playtimeMinutes !== null && (
-                  <span key="h" className="flex items-center gap-1">
-                    <IconClock size={12} aria-hidden="true" />
-                    <span className="sr-only">{T.steam.playtime}: </span>
-                    {formatPlaytime(collection.playtimeMinutes, T.steam, lang)}
-                  </span>
-                ),
-                lastPlayed && <span key="d">{formatDate(lastPlayed, lang)}</span>,
-              ]}
-            />
-          </span>
-        </span>
-      </button>
-
-      {isExpanded && (
-        <div id={panelId} className="relative flex-1 overflow-y-auto px-3 pb-3 pt-3 min-h-0 w-full">
-          <PsnCollectionExpanded games={games} />
-        </div>
-      )}
-    </div>
+      <PsnCollectionExpanded games={games} />
+    </FeedGameCard>
   )
 }
