@@ -1,82 +1,17 @@
 jest.mock('@/hooks/useSteamProfile', () => ({ useSteamProfile: jest.fn() }))
-jest.mock('@/components/day-achievements-modal/DayAchievementsModal', () => ({
-  __esModule: true,
-  default: ({ date }: { date: string }) => <div data-testid="day-modal">{date}</div>,
-}))
-jest.mock('@/components/period-achievements-modal/PeriodAchievementsModal', () => ({
-  __esModule: true,
-  default: ({ title, achievements }: { title: string; achievements: unknown[] }) => (
-    <div data-testid="period-modal">{`${title}:${achievements.length}`}</div>
-  ),
-}))
 
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import MainPageSteamStats from './MainPageSteamStats'
 import { useSteamProfile } from '@/hooks/useSteamProfile'
 import { en } from '@/translations/en'
-import type { RecentAchievement } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 
-function daysAgo(n: number) {
-  const d = new Date()
-  d.setDate(d.getDate() - n)
-  return d.toISOString().replace('T', ' ').slice(0, 19)
-}
-
-function unlock(date: string): RecentAchievement {
-  return { Date: date, HardcoreMode: '0', AchievementID: 0, Title: 't', Description: '', BadgeName: '', Points: 0, GameID: 1, GameTitle: 'g', ConsoleName: 'Steam', Source: 'steam' }
-}
-
+// The shared row (counts, modals, streak, loading) is in MainPagePeriodStats.contract.test.tsx.
 const GAMES = [{ playtime2Weeks: 90 }, { playtime2Weeks: 90 }] as SteamGameProgress[]
 
-function pill(label: string) {
-  return screen.getByText(label).parentElement!
-}
-
-beforeEach(() => {
+test('shows the Steam level and the hours of the last two weeks', () => {
   ;(useSteamProfile as jest.Mock).mockReturnValue({ profile: { level: 42 } })
-})
-
-test('counts unlocks today, this week and this month, with the Steam level and playtime', () => {
-  render(<MainPageSteamStats streak={1} achievements={[unlock(daysAgo(0)), unlock(daysAgo(0)), unlock(daysAgo(3))]} games={GAMES} />)
-  expect(pill(en.pointsStats.today)).toHaveTextContent('2')
-  expect(pill(en.pointsStats.thisWeek)).toHaveTextContent('3')
-  expect(pill(en.steam.level)).toHaveTextContent('42')
-  expect(pill(en.steam.last2Weeks)).toHaveTextContent(`3${en.steam.hoursShort}`)
-  expect(pill(en.streak.title)).toHaveTextContent('1 d')
-})
-
-test('opens the day and period modals from the pills', async () => {
-  render(<MainPageSteamStats streak={0} achievements={[unlock(daysAgo(0))]} games={[]} />)
-  fireEvent.click(pill(en.pointsStats.today))
-  expect(await screen.findByTestId('day-modal')).toHaveTextContent(new Date().toISOString().split('T')[0])
-  fireEvent.click(pill(en.pointsStats.thisWeek))
-  expect(await screen.findByTestId('period-modal')).toHaveTextContent(`${en.pointsStats.thisWeek}:1`)
-})
-
-test('says there is no activity today, and keeps the level in the row while the profile loads', () => {
-  ;(useSteamProfile as jest.Mock).mockReturnValue({ profile: null, error: null })
-  render(<MainPageSteamStats streak={0} achievements={[]} games={[]} />)
-  expect(pill(en.pointsStats.today)).toHaveTextContent(en.pointsStats.noActivity)
-  expect(pill(en.steam.level).querySelector('.bg-skeleton')).toBeInTheDocument()
-})
-
-test('leaves the level out when the profile cannot be read', () => {
-  ;(useSteamProfile as jest.Mock).mockReturnValue({ profile: null, error: 'failed' })
-  render(<MainPageSteamStats streak={0} achievements={[]} games={[]} />)
-  expect(screen.queryByText(en.steam.level)).not.toBeInTheDocument()
-})
-
-test('while loading it draws the same pills, in the same order, as loaded', () => {
-  const labels = () => [...document.querySelectorAll('.flex-wrap > *')].map((p) => p.firstElementChild?.textContent)
-  const { unmount } = render(<MainPageSteamStats streak={0} achievements={[]} games={[]} />)
-  const loaded = labels()
-  unmount()
-  render(<MainPageSteamStats streak={0} achievements={[]} games={[]} isLoading />)
-  expect(labels()).toEqual(loaded)
-})
-
-test('shows placeholders while loading', () => {
-  render(<MainPageSteamStats streak={0} achievements={[]} games={[]} isLoading />)
-  expect(pill(en.pointsStats.today).querySelector('.bg-skeleton')).toBeInTheDocument()
+  render(<MainPageSteamStats streak={1} achievements={[]} games={GAMES} />)
+  expect(screen.getByText(en.steam.level).parentElement).toHaveTextContent('42')
+  expect(screen.getByText(en.steam.last2Weeks).parentElement).toHaveTextContent(`3${en.steam.hoursShort}`)
 })

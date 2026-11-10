@@ -1,6 +1,6 @@
 {
   "name": "cheevovault",
-  "version": "1.7.169",
+  "version": "1.7.170",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
