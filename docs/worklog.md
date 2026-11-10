@@ -33,6 +33,114 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-10 — One shell for the game page achievement table, and the pattern for the other families (`refactor/125-platform-shells`, #125)
+
+**Did** — The first family of #125 (antislop D1-01, X1, §3.3), one commit per step, and the pattern written down:
+- *The eye:* `reveal-secret-button/RevealSecretButton` (labels passed in) replaces `PsnRevealTrophyButton` and `XboxRevealAchievementButton`
+  in the table and in both badge grids.
+- *The shell:* `achievement-table/AchievementTable.tsx` (toolbar, notice, scopes, empty and "nothing" states, fold, detail window),
+  `-row`, `-card`, `-desktop` (head + rows), `-detail` (the shared `AchievementDetailModal`, lazy, or the platform's own), `tableColumns.tsx`
+  (rarity and earned for everyone), `sortable-header/SortableHeader.tsx` (moved from `game-info-table/`). State in `hooks/useAchievementTable.ts`
+  (filter, DLC scope, search, order, fold, pins leading, deep link with its reset, scroll and 2.5 s light); pure rules in `utils/achievementTable.ts`
+  (`sortEntries`, `earnedRing`, `anchorOf`); the adapter's contract in `types/achievementTable.ts`.
+- *The adapters,* at their old paths so the pages did not change: `GameInfoTable` (RA, 92 lines), `SteamGameInfoTable` (61),
+  `PsnGameInfoTable` (85), `XboxGameInfoTable` (68). Deleted: the three platforms' row and card, RA's `game-info-achivement/` (row and
+  card), `SteamSortableHeader`, the two reveal buttons, and their tests.
+- *One shape:* the rows are `CompareAchievement` (`utils/gameCompare.ts`), with a new optional `secret`; each platform has a per-item
+  mapper (`raCompareItem(players)`, `steamCompareItem`, `psnCompareItem`, `xboxCompareItem`) and the `*CompareList` functions map with them.
+  `badgeClass(ring)` (`ui/dataTable.ts`) takes the ring colour (`earnedRing(row)`: grade, hardcore/softcore, accent).
+- *Tests:* `AchievementTable.contract.test.tsx`, 73 tests, `describe.each` over the four adapters built from one neutral spec (order,
+  filters and counts, words for earned/locked, the columns' order and `aria-sort`, search, fold, phone cards, detail window, pins and
+  leading, secrets, reveal, deep links, the notice line); each adapter's test keeps only its own (PSN DLC tabs and grade, Xbox gamerscore,
+  Steam's English guide name, secret picture and "Online?", RA's columns, modes, star and order menu); `utils/achievementTable.test.ts`;
+  `RevealSecretButton.test.tsx`. Checked by breaking the deep link's unfold by hand: 3 contract tests failed.
+- *Docs:* `docs/platform-shells.md` (where a shell lives, an adapter's props, the contract suite, what stays per platform, the steps),
+  linked from `CLAUDE.md` (index and "Look before writing") and `docs/README.md`; `docs/architecture.md` → Components.
+**Why** — #125: the table was written three times (four with RA's), 2,079 lines with RA (1,556 without, the audit's 1,554), and the copies
+had drifted. Now 1,163 lines for the four: 857 shared, 306 in adapters.
+**Decisions** — *Generic over the platform's item:* the shell reads `CompareAchievement` and hands the adapter's slots a `TableEntry<T>`
+(`{ item, row, order }`), so an adapter reads its own fields typed and the shell never switches on a platform for something an adapter can
+say. `InsightAchievement` was not used: it lacks grade, gamerscore, anchor and hardcore. *Data before flags:* the ring and RA's "Hardcore ·
+date" line come from `grade` / `hardcore`; the only flags are `keepSecretIcon` (Steam) and `pinInTitle` (RA's star beside the name, kept
+where it was). The favourites and reveal hooks were not merged (that is family 6, HK-02/HK-18): the adapters map them to `pins` / `reveal`.
+**Visible changes (drifted copies, fixed)** — *RA's order ran backwards:* its comparators were already descending and the default direction
+reversed them again, so the first click on Points, Players or Earned showed the fewest or the oldest (locked first) under a "descending"
+head; now most and newest first, locked last, as on the other three. *RA's star* is the shared pin button: its name says what it pins
+("Add to achievements to get: X", it said only "Add…"), and on the phone card it has a focus ring and sits on the right. *RA's phone card*
+is the shared card: 48 px badge ringed hardcore or softcore (only hardcore was, in the warning colour), "10 pts", the unlock date or "Not
+earned yet", "x% have it" and the type tag on one line; the author line and the hardcore count are no longer on the phone card (both are in
+the detail window). A filter that leaves nothing on RA shows the line without an empty table head. RA's locked rows say "Not earned yet" to
+a screen reader. *Xbox's phone card ring* is the accent (it was green while its row's was the accent). *The eye* uses the library's
+`focus-ring` (was a PSN-blue or green ring) and `rounded-icon` (a circle in the round design as before, a soft square in the slanted one: the
+guard refuses a hand-set round button). *Steam* rows carry their anchor as `id` like PSN's and Xbox's, and a malformed `#ach-%…` fragment no
+longer throws (it crashed the page). Rows and cards mark their anchor with `data-anchor` (was `data-trophy` / `data-achievement` / `data-ach`).
+**Open — this family** — *Rarity, descending:* the copies' comment said an unknown rarity sorts last "whichever way", but the code (and
+Steam's test) put it first when reversed; kept as the code did, ask the owner. Not looked at in a browser: RA's table and phone card (2560
+and 390 px, both designs, Firefox), and the eye's corner in the slanted design. If the owner wants the author or hardcore count back on
+RA's phone card, it is a `card` chip on its column. `useAchievementTable` is tested through the contract suite, not with `renderHook`.
+**Open — the other eight families of #125, in the issue's order** (one PR each, or smaller; read `docs/platform-shells.md` first; sizes are
+the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform hex, retries and kickers in these files):
+1. DONE The game page table (D1-01), above.
+2. **Group game cards** (B-01): `groups/sortable-item/SortableItem.tsx` (RA, 195), `steam-sortable-item/SteamSortableItem.tsx` (181),
+   `psn-sortable-item/PsnSortableItem.tsx` (165), `xbox-sortable-item/XboxSortableItem.tsx` (166). *Keep:* where each reads its data (its
+   context), RA's softcore/hardcore bar, the achievements grid in the panel. *Drifted:* RA's panel slides open (`inert` + grid rows), the
+   others mount with `{open && …}`: pick RA's and say so; the "▼" rotated by inline style → `IconChevronDown`; completion ring colours.
+   *Traps:* dnd-kit's sortable wrapper and grip must stay the drag handle; Steam's panel uses `steam-game-item/steam-game-item-achievements/`
+   (D1-08: it belongs to groups); RA's panel reads `useGameProgression`.
+3. **Home rows and profile pieces** (A-02, A-03, A-06, A-07; ~1,760 lines, split it): stat-pill rows `main-page-charts/MainPagePointsStats.tsx`
+   (RA) and `main-page-{steam,psn,xbox}-stats/`; pinned rows `main-page-pinned-games/{pinned,steam-pinned,psn-pinned,xbox-pinned}-game-row/`;
+   nav cards `main-page-charts/main-page-{steam,psn,xbox}-nav/` (+ `MainPageBrowse`'s ternary, `SECTIONS` copied in `MainPageConsoleNav`);
+   profile `main-page-profile/main-page-profile-{psn,st,xbox}/` (wrappers, `Linked`, `Game`, trophies/achievements, stats). *Keep:* each
+   platform's own pills (Steam level + two weeks, PSN level + platinum, Xbox gamerscore + total, RA global rank), RA's soft/hard bar.
+   *Drifted:* the streak pill is tier-coloured on RA only (`streakInk(streakTier(n))`); the rule says tier everywhere, so the other three
+   change colour (visible: say it). *Traps:* the profile wrappers' `!isLinked` branch is dead (`MainPlatformContext` only picks a linked
+   platform): delete it with `T.profileSt.signIn` and its guard exceptions; the home keeps its own keyframes and its profile column's
+   min-height (`homeFit`); sections land whole (skeleton until everything is in, `docs/performance.md`); pinned rows are dnd-kit sortables.
+4. **Status cards** (D2-01, D1-04): `statusGameList/StatusGameItem.tsx` (RA, 206), `steam/steam-status-game-item/` (148),
+   `psn/psn-status-game-item/` (129), `xbox/xbox-status-game-item/` (129). *Keep:* chips (RA's console colours from `constants/index.ts`,
+   still on the guard's `tag` pending list), progress lines (`PsnTrophyCounts`, `XboxGamerscore`), the completion date (`docs/library.md`:
+   `completedAt`, Steam's last unlock, RA's award; never `lastPlayed`), the `*LibraryDetail` panel, hide and pin. *Traps:* Steam builds
+   `/steamGame/${id}` by hand where the others call `gameHref` (on someone's profile it leaves the subject: a behaviour change, ask);
+   `isComplete` is recomputed inline; the "▼" glyph; the Completed lists order by completion date (#99); `useExclusiveOpen`.
+5. **Badge grids, feed rows, category cards and sections, expanded layout** (D1-02…06, with D1-09, D1-15, D1-16, D1-20; ~2,000 lines, do it
+   as four PRs in this order): grids `psn-trophy-grid/PsnTrophyGrid` (207), `xbox-achievement-grid/` (168), `steam-achievement-grid/` (167),
+   RA `achievement-grid/AchievementGrid` (243); feed rows `PsnGameItem`, `XboxGameItem`, `SteamGameItem`, `RaGameItem`, `PsnCollectionItem`;
+   sections `{psn,xbox,steam}-category-section/` + `SteamStatusGameList`; expanded `{psn,xbox,steam}-recently-played-expanded/`,
+   `PsnCollectionExpanded`, `RARecentlyPlayedExpanded`. *Reuse:* the per-item `*CompareItem` mappers, `TableEntry`, `earnedRing`,
+   `RevealSecretButton` (already in both grids). *Keep:* grade rings, PSN's groups inside the grid (`trophiesByGroup`, `PsnTrophyGridGroup`),
+   collections fold only in the feed (`docs/platforms/psn.md`), `XboxPartialListNote`, RA's soft bar. *Traps:* `achievementAnchor` lives in
+   `SteamAchievementGrid` and three utils import it (move it first, D1-08); `PsnTrophyGrid`'s `GRADE_RING` copies `TROPHY_GRADE_RING`; no Xbox
+   read may be added per card (150 calls an hour for the app).
+6. **Favourite hooks and the PSN/Xbox providers** (HK-02, HK-04, with HK-18): `hooks/usePsnFavoriteTrophies` (96), `useXboxFavoriteAchievements`
+   (96), `useSteamFavoriteAchievements` (117), `useRaFavoriteIds` (86); `context/PsnGamesDataContext`, `XboxGamesDataContext`;
+   `useRevealedTrophies` / `useRevealedAchievements`. *Keep:* RA's providers (retry loop, `useRetryingRead`) and Steam's two-step library stay
+   as they are (only the PSN/Xbox twins merge); each source's id column (`psn_trophy_id`, `xbox_achievement_id`, `steam_apiname`,
+   `achievement_id`) and RA's POST body; the reveal hooks' stored keys (synced preferences). *Drifted:* Steam resets its stars on another game
+   (`useWhenChanged`), the others show the old game's until the answer; RA has no `canPin`/`error` and does not wait for `authenticated`.
+   *Then:* the table adapters' `pins` / `reveal` lines become one call each. Providers load on their first reader and memoize their value
+   (`docs/performance.md`, HK-03).
+7. **Game page routes' states** (AP-03): `app/(main)/psnGame/[id]/page.tsx`, `steamGame/[appId]/page.tsx`, `xboxGame/[id]/page.tsx` (304 lines),
+   the retry in `gameInfo/[gameId]/page.tsx`; with D1-15 (`user-game-page/*` bodies, the width trio ×12). *Keep:* each platform's failure words
+   (`docs/platforms/README.md`: private vs refused vs busy), Xbox for admins only. *Traps:* the pages hold their skeleton while the session is
+   read (#118: a full load of an Xbox page was a 404 before); a game 404 answers HTTP 200 (streaming, `notFound()` on the client); the empty
+   case is handled by the page before the table (the table's own empty state only fires for RA).
+8. **Link and unlink** (AP-02, B-06, E-10): routes `api/updateRaUser`, `api/psn/link`, `api/xbox/link`, the four unlink routes ↔
+   `api/admin/users/accounts/route.ts` → `lib/platformLinks.ts`; account `user-psn-card-form` / `user-xbox-card-form` (one form), the identity
+   block in `UserPlatforms`, `UserSteamCard`, `UserPsnCard`, `UserXboxCard`, RA's card inline in `UserPlatforms` and copied in
+   `ConnectAccounts`; admin `AdminLinkedAccounts` (the 36-line block ×4) and `AdminUserCard`. *Keep:* user and admin routes keep their own
+   auth, validation, logging (`logAdminAction`) and answers; users link Steam only through Steam (admins type); RA keys sealed (`readRaKey`,
+   `raid_hash`); PSN/Xbox ids not unique on purpose; link mails; `onPlatformLinked`. *Traps:* the housekeeping differed (the audit found the admin PSN/Xbox
+   link clearing the cache and the user one not; #118 fixed only the admin unlink): check again, the owner picks; Steam unlink clears `steam_login_id` and forgets `steam_unlocks`. No migration.
+9. **Renames** (D1-08), alone because it touches many imports: `steam/steam-pin-achievement-button/SteamPinAchievementButton` →
+   `pin-achievement-button/PinAchievementButton` (the table shell, the grids, `AchievementDetailModal`), `achievementAnchor` → `utils/steamTitles.ts`
+   `steamAchievementAnchor`, `RARecentlyPlayed` → `RecentlyPlayedFeed`, `steam-game-item-achievements/` out of `steam-game-item/`, the
+   show/hide-achievements keys RA reads from `T.steam` into a neutral namespace (nine languages). `SteamSortableHeader` is already gone.
+**Watch out** — `toRow` and `items` must be stable (a module-level mapper, or `useMemo`): the deep link's reset runs when `items` changes,
+and an inline sort would reset it every render. The deep link looks for `data-anchor` on rows and cards; `anchor` is unencoded and the
+fragment is decoded before comparing. `badgeClass` takes a ring colour, not a state.
+
+---
+
 ## 2026-11-09 — Every text through T, one name per thing, copy fixes (`fix/122-texts-i18n`, #122)
 
 **Did** — Antislop D2-03 / C-08 / E / AP-12 / A-18 and CP, plan S8, one commit per block:

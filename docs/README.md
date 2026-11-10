@@ -9,6 +9,7 @@ What to read, and when.
 | [`architecture.md`](architecture.md) | When you need to find where something lives, or how a request travels from a page to RA/Steam/PSN/Xbox and back. |
 | [`accounts.md`](accounts.md) | Before touching sign-up, sign-in (form, Steam, RetroAchievements), sessions, email or the admin panel. |
 | [`platforms/`](platforms) | Before touching a platform's calls: [`ra.md`](platforms/ra.md), [`steam.md`](platforms/steam.md), [`psn.md`](platforms/psn.md), [`xbox.md`](platforms/xbox.md), and how each one fails ([`README.md`](platforms/README.md)). |
+| [`platform-shells.md`](platform-shells.md) | Before touching or adding a component that exists once per platform (a table, a card, a row, a hook): the shell and adapter pattern, its contract tests, what stays different per platform. |
 | [`87-xbox-quota-hardening-spec.md`](87-xbox-quota-hardening-spec.md) | Before changing OpenXBL quota, timeout, stale/cache, telemetry, activity scans or Following/score limits; the approved #87 contract. |
 | [`performance.md`](performance.md) | Before adding a fetch, a provider, a modal, a chart or a cached route: the performance rules and what each page loads. |
 | [`library.md`](library.md) | Before touching a list of games: synced preferences, consoles to show, hidden games, completion dates. |
