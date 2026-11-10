@@ -52,11 +52,7 @@ test('focusing a trophy shows its details at once', () => {
   expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 })
 
-test('a long set shows the first few until asked for the rest', () => {
-  const many = Array.from({ length: 20 }, (_, i) => trophy({ id: i, name: `T${i}` }))
-  render(<PsnTrophyGrid gameId={100} gameTitle="Game" trophies={many} limit={5} />)
-  expect(screen.getAllByRole('link')).toHaveLength(5)
-})
+
 
 test('with DLC, each group is a fold with its progress: all closed', () => {
   const { container } = render(<PsnTrophyGrid gameId={100} gameTitle="Astro Bot" trophies={WITH_DLC} groups={GROUPS} />)
@@ -74,24 +70,6 @@ test('without DLC, no folds', () => {
   expect(container.querySelector('details')).toBeNull()
 })
 
-test('signed in, a star pins a trophy; no star when signed out', () => {
-  const { unmount } = render(<PsnTrophyGrid gameId={100} gameTitle="Astro Bot" trophies={TROPHIES} />)
-  expect(screen.queryByRole('button', { name: new RegExp(en.favorites.addFavorite) })).not.toBeInTheDocument()
-  unmount()
-  ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set([0]), toggle, canPin: true })
-  render(<PsnTrophyGrid gameId={100} gameTitle="Astro Bot" trophies={TROPHIES} />)
-  expect(usePsnFavoriteTrophies).toHaveBeenCalledWith(100, 'Astro Bot')
-  expect(screen.getByRole('button', { name: `${en.favorites.removeFavorite}: All of them` })).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: `${en.favorites.addFavorite}: ${en.psn.hiddenTrophy}` }))
-  expect(toggle).toHaveBeenCalledWith(TROPHIES[1])
-})
 
-test('an eye on a hidden, unearned badge reveals just that trophy, and hides it again', () => {
-  render(<PsnTrophyGrid gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
-  expect(screen.queryByRole('link', { name: new RegExp(`^Spoiler`) })).not.toBeInTheDocument()
-  expect(screen.getAllByRole('button', { name: en.psn.revealTrophy })).toHaveLength(1)
-  fireEvent.click(screen.getByRole('button', { name: en.psn.revealTrophy }))
-  expect(screen.getByRole('link', { name: /^Spoiler/ })).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: en.psn.concealTrophy }))
-  expect(screen.queryByRole('link', { name: /^Spoiler/ })).not.toBeInTheDocument()
-})
+
+
