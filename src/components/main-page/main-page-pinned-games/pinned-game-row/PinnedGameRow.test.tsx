@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import PinnedGameRow from './PinnedGameRow'
 import { useGameProgression } from '@/hooks/useGameProgression'
@@ -6,32 +5,20 @@ import { useGameProgression } from '@/hooks/useGameProgression'
 jest.mock('@/hooks/useGameProgression', () => ({
   useGameProgression: jest.fn(),
 }))
-
 jest.mock('@/context/PinnedGamesContext', () => ({
   usePinnedGames: () => ({ isPinned: () => true, pinGame: jest.fn(), unpinGame: jest.fn() }),
 }))
-
 jest.mock('@/components/recently-played-feed/ra-recently-played-expanded/RARecentlyPlayedExpanded', () => ({
   RARecentlyPlayedExpanded: ({ achievements }: { achievements: unknown[] }) => (
     <div data-testid="achievement-grid">{achievements.length} achievements</div>
   ),
 }))
-
 jest.mock('@dnd-kit/sortable', () => ({
-  useSortable: () => ({
-    attributes: {},
-    listeners: {},
-    setNodeRef: () => {},
-    transform: null,
-    transition: null,
-    isDragging: false,
-  }),
+  useSortable: () => ({ attributes: {}, listeners: {}, setNodeRef: () => {}, transform: null, transition: null, isDragging: false }),
 }))
+jest.mock('@dnd-kit/utilities', () => ({ CSS: { Transform: { toString: () => '' } } }))
 
-jest.mock('@dnd-kit/utilities', () => ({
-  CSS: { Transform: { toString: () => '' } },
-}))
-
+// What every platform's row does is in PinnedGameCard.contract.test.tsx; this is RA's own.
 const game = {
   ID: 10,
   Title: 'Sly Cooper',
@@ -43,57 +30,38 @@ const game = {
   NumAwardedToUserHardcore: 5,
   NumDistinctPlayers: 100,
   Achievements: {
-    1: { ID: 1, DisplayOrder: 0 },
     2: { ID: 2, DisplayOrder: 1 },
+    1: { ID: 1, DisplayOrder: 0 },
   },
 } as never
 
-// Uncontrolled wrapper so tests can exercise open/close via clicks like before.
-function UncontrolledPinnedGameRow({ gameId }: { gameId: number }) {
-  const [isOpen, setIsOpen] = useState(false)
-  return <PinnedGameRow gameId={gameId} isOpen={isOpen} onToggle={() => setIsOpen((o) => !o)} />
-}
-
-beforeEach(() => {
-  jest.clearAllMocks()
-})
-
-test('renders a skeleton while loading', () => {
-  ;(useGameProgression as jest.Mock).mockReturnValue({ game: null, isLoading: true })
-  const { container } = render(<UncontrolledPinnedGameRow gameId={10} />)
-  expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
-  expect(screen.queryByText('Sly Cooper')).not.toBeInTheDocument()
-})
-
-test('renders the game title, console and achievement count once loaded', () => {
+test('the bar shows the softcore share with the hardcore one over it, and the console is named', () => {
   ;(useGameProgression as jest.Mock).mockReturnValue({ game, isLoading: false })
-  render(<UncontrolledPinnedGameRow gameId={10} />)
-  expect(screen.getByText('Sly Cooper')).toBeInTheDocument()
+  const { container } = render(<PinnedGameRow gameId={10} isOpen={false} onToggle={jest.fn()} />)
+  expect(screen.getByRole('progressbar', { name: 'Sly Cooper' })).toHaveAttribute('aria-valuenow', '50')
+  expect(container.querySelector('[data-fill="main"]')).toHaveStyle({ width: '12.5%' })
+  expect(container.querySelector('[data-fill="soft"]')).toHaveStyle({ width: '50%' })
   expect(screen.getByText('PlayStation 2')).toBeInTheDocument()
   expect(screen.getByText(/20\/40/)).toBeInTheDocument()
 })
 
-test('expands to show the achievement grid on click, and collapses again', () => {
-  ;(useGameProgression as jest.Mock).mockReturnValue({ game, isLoading: false })
-  render(<UncontrolledPinnedGameRow gameId={10} />)
-  expect(screen.queryByTestId('achievement-grid')).not.toBeInTheDocument()
+test('a game with no achievements shows no bar and no count', () => {
+  ;(useGameProgression as jest.Mock).mockReturnValue({ game: { ...(game as object), NumAchievements: 0 }, isLoading: false })
+  render(<PinnedGameRow gameId={10} isOpen={false} onToggle={jest.fn()} />)
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+  expect(screen.queryByText(/\/0/)).not.toBeInTheDocument()
+})
 
-  fireEvent.click(screen.getByText('Sly Cooper').closest('[role="button"]')!)
+test('a failed read says so and can be retried', () => {
+  const refetch = jest.fn()
+  ;(useGameProgression as jest.Mock).mockReturnValue({ game: null, isLoading: false, error: 'failed', refetch })
+  render(<PinnedGameRow gameId={10} isOpen={false} onToggle={jest.fn()} />)
+  fireEvent.click(screen.getByRole('button'))
+  expect(refetch).toHaveBeenCalled()
+})
+
+test('opens the achievements in their order', () => {
+  ;(useGameProgression as jest.Mock).mockReturnValue({ game, isLoading: false })
+  render(<PinnedGameRow gameId={10} isOpen onToggle={jest.fn()} />)
   expect(screen.getByTestId('achievement-grid')).toHaveTextContent('2 achievements')
-
-  fireEvent.click(screen.getByText('Sly Cooper').closest('[role="button"]')!)
-  expect(screen.queryByTestId('achievement-grid')).not.toBeInTheDocument()
-})
-
-test('has an accessible drag handle', () => {
-  ;(useGameProgression as jest.Mock).mockReturnValue({ game, isLoading: false })
-  render(<UncontrolledPinnedGameRow gameId={10} />)
-  expect(screen.getByLabelText('Drag to reorder')).toBeInTheDocument()
-})
-
-test('clicking the pin toggle does not expand the row', () => {
-  ;(useGameProgression as jest.Mock).mockReturnValue({ game, isLoading: false })
-  render(<UncontrolledPinnedGameRow gameId={10} />)
-  fireEvent.click(screen.getByRole('button', { name: 'Unpin game' }))
-  expect(screen.queryByTestId('achievement-grid')).not.toBeInTheDocument()
 })

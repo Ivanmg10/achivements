@@ -65,3 +65,21 @@ export type StatusGameCardView = {
   /** The lines under the bar. */
   children?: ReactNode
 }
+
+/** What a platform tells the home's pinned row; the row draws it and owns dragging, the pin and opening. */
+export type PinnedGameCardView = {
+  href: string
+  title: string
+  backdrop: string | null
+  /** The picture, sized by `COVER_ROW_IMAGE`. */
+  cover: ReactNode
+  /** The platform's logo and name (or the console's), small, before the bar. */
+  platform: ReactNode
+  /** The bar; none leaves the row without one (nothing to count yet). */
+  progress: { pct: number; softPct?: number } | null
+  /** The line under the bar (how many, gamerscore); none leaves it out. */
+  counts?: ReactNode
+  expand: ExpandLabels
+  /** The opened achievements or trophies; only mounted while open. */
+  panel: ReactNode
+}
