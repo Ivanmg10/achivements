@@ -1,24 +1,12 @@
 import { IconArrowDown, IconArrowUp } from '@tabler/icons-react'
 import { TH } from '@/components/ui/dataTable'
-
-export type SortKey = 'default' | 'points' | 'rarity' | 'players' | 'hc' | 'earned'
-export type SortDir = 'asc' | 'desc'
-export type SortState = { key: SortKey; dir: SortDir }
-
-export const DEFAULT_DIRS: Record<SortKey, SortDir> = {
-  default: 'asc',
-  points: 'desc',
-  rarity: 'asc',
-  players: 'desc',
-  hc: 'desc',
-  earned: 'desc',
-}
+import type { SortDir } from '@/utils/achievementTable'
 
 /**
  * A sortable column header: the control is a real button, and the column
- * reports its order through aria-sort (as the Steam table's does).
+ * reports its order through aria-sort.
  */
-export function SortableHeader<K extends string = SortKey>({
+export function SortableHeader<K extends string>({
   sortKey,
   sortState,
   onSort,

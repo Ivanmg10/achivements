@@ -103,11 +103,11 @@ describe('xboxCompareList', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { xboxAchievementFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
 
-  test('maps an Xbox achievement: gamerscore, rarity, its anchor and when it was earned', () => {
+  test('maps an Xbox achievement: gamerscore, rarity, its anchor, when it was earned and whether it is secret', () => {
     expect(xboxCompareList([xboxAchievementFixture({ id: '7', name: 'Seven', gamerscore: 25, rarity: 3.2 })])).toEqual([
       {
         id: '7', title: 'Seven', description: 'Complete the Prologue', iconUrl: null, gamerscore: 25, rarity: 3.2,
-        anchor: 'achievement-7', earned: true, earnedAt: '2026-01-06T18:20:22.7030000Z',
+        anchor: 'achievement-7', earned: true, earnedAt: '2026-01-06T18:20:22.7030000Z', secret: false,
       },
     ])
   })

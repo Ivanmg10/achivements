@@ -21,15 +21,9 @@ export const TD_FIRST = `${TD} group-hover:shadow-[inset_2px_0_0_rgb(var(--accen
 export const NUM = 'text-right tabular-nums whitespace-nowrap'
 export const MID = 'text-center'
 
-/** An achievement's badge: 52 px; earned in hardcore ringed in its colour, softcore in its own, earned elsewhere in the accent, locked greyed. */
-export function badgeClass(state: 'hardcore' | 'softcore' | 'earned' | 'locked') {
-  const RING = {
-    hardcore: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--hardcore))]',
-    earned: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--accent))]',
-    softcore: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--softcore))]',
-    locked: '',
-  }
-  return `block w-[3.25rem] h-[3.25rem] rounded-tile ${RING[state]}`
+/** An achievement's badge: 52 px; an earned one ringed in `ring` (its grade's, hardcore, softcore or the accent: `earnedRing`), a locked one plain. */
+export function badgeClass(ring: string | null) {
+  return `block w-[3.25rem] h-[3.25rem] rounded-tile ${ring ? `ring-2 ring-offset-2 ring-offset-bg-card ${ring}` : ''}`
 }
 
 /** The picture inside a badge: a locked one grey and faint. */

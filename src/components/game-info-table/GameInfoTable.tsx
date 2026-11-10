@@ -1,250 +1,92 @@
 'use client'
 
+import { useMemo } from 'react'
 import dynamic from 'next/dynamic'
-import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
-import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
-import GameInfoAchievementCard from '../game-info-achivement/GameInfoAchievementCard'
-import MissableNotice from '../missable-notice/MissableNotice'
-import { useState, useMemo, useCallback } from 'react'
-import { AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
+import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
+import type { AchievementColumn } from '@/types/achievementTable'
 import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
-import { SortableHeader, SortState, SortKey, DEFAULT_DIRS } from './SortableHeader'
-import { SURFACE } from '@/components/ui/surface'
-import EmptyState from '@/components/empty-state/EmptyState'
-import { IconTrophyOff } from '@tabler/icons-react'
-import AchievementTableToolbar from '@/components/achievement-table-toolbar/AchievementTableToolbar'
-import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
-import { TABLE, TH } from '@/components/ui/dataTable'
-import { parseUnlockTime } from '@/utils/dates'
 import { raAchievementList } from '@/utils/gameAchievements'
+import { raCompareItem } from '@/utils/gameCompare'
+import AchievementTable from '@/components/achievement-table/AchievementTable'
+import { raTypeTag, TYPE_TAG } from '@/components/ui/dataTable'
 
 // Downloaded the first time it opens, not with the page.
 const AchievementModal = dynamic(() => import('../achievement-modal/AchievementModal'), { loading: () => null })
 
-type Filter = 'all' | 'earned' | 'unearned' | 'missable'
-type SortDir = 'asc' | 'desc'
-
-/** Rows shown before "show the other N". */
-const FIRST_ROWS = 8
-
 /**
- * An RA game's achievements, as agreed on the canvas: the missables in one
- * line on top, the filters as tabs with their counts beside a search and the
- * order, then the table (cards on a phone), its first rows and a button for
- * the rest.
+ * An RA game's achievements on the shared table: players, hardcore players and
+ * points as columns, each one's type beside its name (missable in red), the
+ * missables still to earn in a line on top, the star beside the name, and RA's
+ * own detail window.
  */
-export default function GameInfoTable({
-  gameData,
-}: {
-  gameData?: RetroAchievementsGameWithAchievements | null
-}) {
-  const [filter, setFilter] = useState<Filter>('all')
-  const [query, setQuery] = useState('')
-  const [sortState, setSortState] = useState<SortState>({ key: 'default', dir: 'asc' })
-  const [selectedAchievement, setSelectedAchievement] = useState<RetroAchievement | null>(null)
-  const [showAll, setShowAll] = useState(false)
-  const { T } = useLanguage()
-
-  const numDistinctPlayers = gameData?.NumDistinctPlayers ?? 1
-
+export default function GameInfoTable({ gameData }: { gameData?: RetroAchievementsGameWithAchievements | null }) {
+  const { T, lang } = useLanguage()
+  const players = gameData?.NumDistinctPlayers ?? 1
   const { favoritedIds, leadingIds, toggleFavorite } = useRaFavoriteIds(gameData?.ID)
-  const handleToggleFavorite = useCallback(
-    (achievement: RetroAchievement) =>
-      toggleFavorite(achievement, { gameTitle: gameData?.Title, numDistinctPlayers }),
-    [toggleFavorite, gameData?.Title, numDistinctPlayers]
-  )
-
-  const achievements = useMemo(() => {
-    if (!gameData) return []
-    return raAchievementList(gameData)
-  }, [gameData])
-
-  const missableUnearned = useMemo(
-    () =>
-      achievements
-        .filter((a) => a.Type === 'missable' && !a.DateEarned)
-        .sort((a, b) => a.DisplayOrder - b.DisplayOrder),
-    [achievements]
-  )
-  const earnedCount = achievements.filter((a) => !!a.DateEarned).length
-
-  const filtered = useMemo(() => {
-    let list: RetroAchievement[]
-    if (filter === 'earned') list = achievements.filter((a) => !!a.DateEarned)
-    else if (filter === 'unearned') list = achievements.filter((a) => !a.DateEarned)
-    else if (filter === 'missable') list = missableUnearned
-    else list = achievements
-    const q = query.trim().toLowerCase()
-    if (q) list = list.filter((a) => a.Title.toLowerCase().includes(q) || a.Description.toLowerCase().includes(q))
-
-    const { key, dir } = sortState
-
-    const sortFn = (a: RetroAchievement, b: RetroAchievement): number => {
-      if (key === 'points') return b.Points - a.Points
-      if (key === 'rarity')
-        return a.NumAwarded / numDistinctPlayers - b.NumAwarded / numDistinctPlayers
-      if (key === 'players') return b.NumAwarded - a.NumAwarded
-      if (key === 'hc') return b.NumAwardedHardcore - a.NumAwardedHardcore
-      if (key === 'earned') {
-        if (!a.DateEarned && !b.DateEarned) return 0
-        if (!a.DateEarned) return 1
-        if (!b.DateEarned) return -1
-        return parseUnlockTime(b.DateEarned) - parseUnlockTime(a.DateEarned)
-      }
-      return a.DisplayOrder - b.DisplayOrder
-    }
-
-    const sortGroup = (group: RetroAchievement[]) => {
-      const sorted = [...group].sort(sortFn)
-      return dir === 'desc' ? sorted.reverse() : sorted
-    }
-
-    // By the pins as they loaded: a row pinned now stays put instead of dragging the page up with it.
-    const favGroup = list.filter((a) => leadingIds.has(a.ID))
-    const restGroup = list.filter((a) => !leadingIds.has(a.ID))
-
-    return [...sortGroup(favGroup), ...sortGroup(restGroup)]
-  }, [achievements, missableUnearned, filter, query, sortState, numDistinctPlayers, leadingIds])
-
-  function handleSort(key: SortKey) {
-    setSortState((prev) =>
-      prev.key === key
-        ? { key, dir: (prev.dir === 'asc' ? 'desc' : 'asc') as SortDir }
-        : { key, dir: DEFAULT_DIRS[key] }
-    )
+  const items = useMemo(() => (gameData ? raAchievementList(gameData).sort((a, b) => a.DisplayOrder - b.DisplayOrder) : []), [gameData])
+  const toRow = useMemo(() => raCompareItem(players), [players])
+  const toggle = (a: RetroAchievement) => toggleFavorite(a, { gameTitle: gameData?.Title, numDistinctPlayers: players })
+  const count = (key: string, label: string, value: (a: RetroAchievement) => number, className = ''): AchievementColumn<RetroAchievement> => ({
+    key,
+    label,
+    align: 'right',
+    width: 'w-32',
+    sort: { first: 'desc', value: ({ item }) => value(item) },
+    cell: ({ item }) => <span className={className}>{value(item).toLocaleString(lang)}</span>,
+  })
+  const points: AchievementColumn<RetroAchievement> = {
+    key: 'points',
+    label: T.gameInfoTable.headerPoints,
+    align: 'right',
+    width: 'w-24',
+    end: true,
+    sort: { first: 'desc', value: ({ item }) => item.Points },
+    cell: ({ item }) => <span className="text-base font-extrabold">{item.Points}</span>,
+    card: ({ item }) => <span className="font-semibold text-text-main">{item.Points} {T.libraryDetail.pointsShort}</span>,
   }
-
-  // A search shows every match; otherwise the first rows, then a button for the rest.
-  const folded = !showAll && !query.trim() && filtered.length > FIRST_ROWS
-  const shown = folded ? filtered.slice(0, FIRST_ROWS) : filtered
-
-  const tabs: { value: Filter; label: string; count: number }[] = [
-    { value: 'all', label: T.gameInfoTable.filterAll, count: achievements.length },
-    { value: 'earned', label: T.gameInfoTable.filterEarned, count: earnedCount },
-    { value: 'unearned', label: T.gameInfoTable.filterUnearned, count: achievements.length - earnedCount },
-  ]
-  const sortOptions: { value: SortKey; label: string }[] = [
-    { value: 'default', label: T.gameInfoTable.sortGameOrder },
-    { value: 'points', label: T.gameInfoTable.headerPoints },
-    { value: 'rarity', label: T.gameInfoTable.headerRarity },
-    { value: 'players', label: T.gameInfoTable.headerPlayers },
-    { value: 'earned', label: T.gameInfoTable.headerEarned },
-  ]
-
-  // A game with nothing published says so, rather than an empty table that "nothing matches".
-  if (achievements.length === 0) {
-    return (
-      <div className="w-full px-4 sm:px-8 lg:px-14 mt-7 mb-7">
-        <section aria-label={T.gameInfoPage.achievements} className={SURFACE}>
-          <EmptyState icon={<IconTrophyOff className="w-6 h-6" />} title={T.statusGameItem.noPublishedAchievements} className="py-12" />
-        </section>
-      </div>
-    )
+  const typeTag = ({ item }: { item: RetroAchievement }) => {
+    const tag = raTypeTag(item.Type, T.achievement)
+    return tag && <span className={`${TYPE_TAG} ${tag.className}`}>{tag.label}</span>
   }
 
   return (
-    <div className="w-full px-4 sm:px-8 lg:px-14 mt-7 mb-7">
-    <section aria-label={T.gameInfoPage.achievements} className={`${SURFACE} p-4 sm:p-6 flex flex-col gap-4`}>
-      <MissableNotice
-        names={missableUnearned.map((a) => a.Title)}
-        only={filter === 'missable'}
-        onToggleOnly={() => setFilter((f) => (f === 'missable' ? 'all' : 'missable'))}
-      />
-
-      <AchievementTableToolbar<Filter, SortKey>
-        label={T.gameInfoPage.achievements}
-        tabs={tabs}
-        filter={filter}
-        onFilter={setFilter}
-        query={query}
-        onQuery={setQuery}
-        sortOptions={sortOptions}
-        sort={sortState.key}
-        onSort={(key) => setSortState({ key, dir: DEFAULT_DIRS[key] })}
-      />
-
-      {gameData && (
-        <>
-          {/* Desktop table */}
-          <div className="hidden sm:block w-full">
-            <table className={TABLE}>
-              <thead>
-                <tr>
-                  <th scope="col" className={`${TH} w-16`}>
-                    <span className="sr-only">{T.gameInfoTable.headerIcon}</span>
-                  </th>
-                  <SortableHeader sortKey="default" sortState={sortState} onSort={handleSort}>
-                    {T.gameInfoTable.headerAchievement}
-                  </SortableHeader>
-                  <SortableHeader sortKey="players" sortState={sortState} onSort={handleSort} align="right" className="w-32">
-                    {T.gameInfoTable.headerPlayers}
-                  </SortableHeader>
-                  <SortableHeader sortKey="hc" sortState={sortState} onSort={handleSort} align="right" className="w-32">
-                    {T.gameInfoTable.headerHC}
-                  </SortableHeader>
-                  <SortableHeader sortKey="rarity" sortState={sortState} onSort={handleSort} align="center" className="w-28">
-                    {T.gameInfoTable.headerRarity}
-                  </SortableHeader>
-                  <SortableHeader sortKey="earned" sortState={sortState} onSort={handleSort} align="right" className="w-28">
-                    {T.gameInfoTable.headerEarned}
-                  </SortableHeader>
-                  <SortableHeader sortKey="points" sortState={sortState} onSort={handleSort} align="right" className="w-24">
-                    {T.gameInfoTable.headerPoints}
-                  </SortableHeader>
-                </tr>
-              </thead>
-              <tbody className="enter-rows">
-                {shown.map((achievement) => (
-                  <GameInfoAchivement
-                    achievement={achievement}
-                    numDistinctPlayers={numDistinctPlayers}
-                    key={achievement.ID}
-                    isFavorited={favoritedIds.has(achievement.ID)}
-                    onToggleFavorite={handleToggleFavorite}
-                    onClick={() => setSelectedAchievement(achievement)}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile card list */}
-          <div className="sm:hidden w-full flex flex-col gap-2 enter-rows">
-            {shown.map((achievement) => (
-              <GameInfoAchievementCard
-                key={achievement.ID}
-                achievement={achievement}
-                numDistinctPlayers={numDistinctPlayers}
-                isFavorited={favoritedIds.has(achievement.ID)}
-                onToggleFavorite={handleToggleFavorite}
-                onClick={() => setSelectedAchievement(achievement)}
-              />
-            ))}
-          </div>
-
-          {filtered.length === 0 && <p className="text-sm text-text-secondary text-center py-6">{T.gameInfoTable.noMatches}</p>}
-
-          {(folded || (showAll && filtered.length > FIRST_ROWS && !query.trim())) && (
-            <ShowRestButton folded={folded} rest={filtered.length - FIRST_ROWS} onToggle={() => setShowAll((v) => !v)} />
-          )}
-        </>
-      )}
-
-      <AnimatePresence>
-        {selectedAchievement && (
+    <AchievementTable
+      source="ra"
+      gameId={gameData?.ID ?? 0}
+      gameTitle={gameData?.Title ?? ''}
+      items={items}
+      toRow={toRow}
+      texts={{
+        label: T.gameInfoPage.achievements,
+        name: T.gameInfoTable.headerAchievement,
+        none: T.gameInfoTable.noMatches,
+        earned: T.gameInfoTable.headerEarned,
+        locked: T.achievementDetail.notEarned,
+      }}
+      pins={{ canPin: true, isPinned: (a) => favoritedIds.has(a.ID), leads: (a) => leadingIds.has(a.ID), toggle }}
+      columns={[
+        count('players', T.gameInfoTable.headerPlayers, (a) => a.NumAwarded),
+        count('hc', T.gameInfoTable.headerHC, (a) => a.NumAwardedHardcore, 'text-text-secondary'),
+        points,
+      ]}
+      sortMenu={['points', 'rarity', 'players', 'earned']}
+      tags={typeTag}
+      notice={{ match: ({ item, row }) => item.Type === 'missable' && !row.earned }}
+      detail={{
+        render: (a, { pinned, onTogglePin, onClose }) => (
           <AchievementModal
-            achievement={selectedAchievement}
-            numDistinctPlayers={numDistinctPlayers}
-            onClose={() => setSelectedAchievement(null)}
+            achievement={a}
+            numDistinctPlayers={players}
+            onClose={onClose}
             gameId={gameData?.ID}
             gameTitle={gameData?.Title}
-            isFavorited={favoritedIds.has(selectedAchievement.ID)}
-            onToggleFavorite={() => handleToggleFavorite(selectedAchievement)}
+            isFavorited={pinned}
+            onToggleFavorite={onTogglePin}
           />
-        )}
-      </AnimatePresence>
-    </section>
-    </div>
+        ),
+      }}
+      pinInTitle
+    />
   )
 }

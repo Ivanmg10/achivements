@@ -1,266 +1,49 @@
 jest.mock('@/hooks/useSteamFavoriteAchievements', () => ({ useSteamFavoriteAchievements: jest.fn() }))
 
-import { render, screen, fireEvent, within, act } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import SteamGameInfoTable from './SteamGameInfoTable'
 import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
 import { en } from '@/translations/en'
 import type { SteamAchievementUnified } from '@/types/steam'
 
+// What every platform's table does is in AchievementTable.contract.test.tsx; this is Steam's own.
+
 function ach(apiname: string, overrides: Partial<SteamAchievementUnified> = {}): SteamAchievementUnified {
   return {
-    _source: 'steam',
-    id: apiname,
-    apiname,
-    title: apiname,
-    description: `${apiname} desc`,
-    earned: false,
-    dateEarned: null,
-    badgeUrl: `${apiname}.jpg`,
-    displayOrder: 0,
-    hidden: false,
-    globalPct: null, likelyOnline: false,
-    ...overrides,
+    _source: 'steam', id: apiname, apiname, title: apiname, description: `${apiname} desc`, earned: false, dateEarned: null,
+    badgeUrl: `${apiname}.jpg`, displayOrder: 0, hidden: false, globalPct: null, likelyOnline: false, ...overrides,
   }
 }
 
-const LIST = [
-  ach('FIRST', { displayOrder: 0, globalPct: 80, earned: true, dateEarned: '2024-01-01T12:00:00.000Z' }),
-  ach('SECOND', { displayOrder: 1, globalPct: 5 }),
-  ach('THIRD', { displayOrder: 2, globalPct: 40, earned: true, dateEarned: '2024-06-01T12:00:00.000Z' }),
-  ach('FOURTH', { displayOrder: 3 }),
-]
-
-/** The filter buttons, apart from the column headers that can share a name ("Earned"). */
-const filters = () => within(screen.getByRole('group'))
-const header = () => within(screen.getByRole('table').querySelector('thead')!)
-
-/** Titles in the desktop table's row order. */
-function rowOrder() {
-  const table = screen.getByRole('table')
-  return within(table).getAllByRole('row').slice(1).map((r) => within(r).getByRole('heading').textContent)
-}
-
-const mockToggle = jest.fn()
-/** `leading`: the pins when the page loaded, what the list orders by; the pins now by default. */
-function pins(canPin: boolean, pinned: string[] = [], leading: string[] = pinned) {
-  ;(useSteamFavoriteAchievements as jest.Mock).mockReturnValue({
-    pinned: new Set(pinned), leading: new Set(leading), toggle: mockToggle, canPin, error: null,
-  })
-}
+const names = () => within(screen.getByRole('table')).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)
 
 beforeEach(() => {
-  jest.clearAllMocks()
-  pins(false)
+  ;(useSteamFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set(), leading: new Set(), toggle: jest.fn(), canPin: false })
 })
 
-afterEach(() => {
-  window.history.replaceState(null, '', '/')
+test("in Steam's order, whatever order they came in", () => {
+  render(<SteamGameInfoTable achievements={[ach('B', { displayOrder: 1 }), ach('A', { displayOrder: 0 })]} appId={620} gameTitle="Portal 2" />)
+  expect(names()).toEqual(['A', 'B'])
 })
 
-test('lists every achievement in Steam order by default', () => {
-  render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-  expect(rowOrder()).toEqual(['FIRST', 'SECOND', 'THIRD', 'FOURTH'])
+test('guides are searched by the English name', async () => {
+  render(<SteamGameInfoTable achievements={[ach('WIN', { title: 'Victoria', titleEn: 'Win', globalPct: 12.5 })]} appId={620} gameTitle="Portal 2" />)
+  fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'Victoria' }))
+  const dialog = await screen.findByRole('dialog', { name: 'Victoria' })
+  expect(within(dialog).getByRole('link', { name: en.achievementDetail.steamGuides })).toHaveAttribute(
+    'href',
+    'https://steamcommunity.com/app/620/guides/?searchText=Win',
+  )
 })
 
-test('renders a card list for phones alongside the desktop table', () => {
-  render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-  const cards = screen.getAllByRole('listitem')
-  expect(cards).toHaveLength(4)
+test('a secret one keeps its text but shows its picture', () => {
+  render(<SteamGameInfoTable achievements={[ach('SECRET', { hidden: true })]} appId={620} gameTitle="Portal 2" />)
+  expect(within(screen.getByRole('row', { name: new RegExp(en.steam.hiddenAchievement) })).getByRole('presentation')).toHaveAttribute('src', 'SECRET.jpg')
 })
 
-describe('filter', () => {
-  test('shows earned or unearned only, marking the active choice without colour alone', () => {
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    const earnedButton = filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterEarned}`) })
-
-    fireEvent.click(earnedButton)
-    expect(earnedButton.getAttribute('aria-pressed')).toBe('true')
-    expect(rowOrder()).toEqual(['FIRST', 'THIRD'])
-
-    fireEvent.click(filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterUnearned}`) }))
-    expect(rowOrder()).toEqual(['SECOND', 'FOURTH'])
-
-    fireEvent.click(filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterAll}`) }))
-    expect(rowOrder()).toHaveLength(4)
-  })
-
-  test('says so when a filter leaves nothing', () => {
-    render(<SteamGameInfoTable appId={730} gameTitle="Game" achievements={[ach('A')]} />)
-    fireEvent.click(filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterEarned}`) }))
-    expect(screen.getByText(en.steam.noAchievements)).toBeInTheDocument()
-    expect(screen.queryByRole('table')).not.toBeInTheDocument()
-  })
-})
-
-describe('sorting', () => {
-  test('by rarity puts the rarest first, unknown rarity last, and reverses on a second click', () => {
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    const rarity = header().getByRole('button', { name: en.gameInfoTable.headerRarity })
-
-    fireEvent.click(rarity)
-    expect(rowOrder()).toEqual(['SECOND', 'THIRD', 'FIRST', 'FOURTH'])
-    expect(rarity.closest('th')?.getAttribute('aria-sort')).toBe('ascending')
-
-    fireEvent.click(rarity)
-    expect(rarity.closest('th')?.getAttribute('aria-sort')).toBe('descending')
-    expect(rowOrder()[0]).toBe('FOURTH')
-  })
-
-  test('by unlock date puts the newest first and keeps locked ones last', () => {
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    const earned = header().getByRole('button', { name: en.gameInfoTable.headerEarned })
-
-    fireEvent.click(earned)
-    expect(rowOrder()).toEqual(['THIRD', 'FIRST', 'SECOND', 'FOURTH'])
-
-    fireEvent.click(earned)
-    expect(rowOrder().slice(0, 2)).toEqual(['FIRST', 'THIRD'])
-  })
-
-  test('only the active column reports an order', () => {
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    fireEvent.click(header().getByRole('button', { name: en.gameInfoTable.headerRarity }))
-    const order = header().getByRole('button', { name: en.gameInfoTable.headerAchievement })
-    expect(order.closest('th')?.getAttribute('aria-sort')).toBe('none')
-  })
-
-  test('back to Steam order from the achievement column', () => {
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    fireEvent.click(header().getByRole('button', { name: en.gameInfoTable.headerRarity }))
-    fireEvent.click(header().getByRole('button', { name: en.gameInfoTable.headerAchievement }))
-    expect(rowOrder()).toEqual(['FIRST', 'SECOND', 'THIRD', 'FOURTH'])
-  })
-})
-
-const LONG = Array.from({ length: 10 }, (_, i) => ach(`A${i + 1}`, { displayOrder: i }))
-
-test('shows the first rows, then a button for the rest, and folds again', () => {
-  render(<SteamGameInfoTable achievements={LONG} appId={620} gameTitle="Portal 2" />)
-  expect(rowOrder()).toHaveLength(8)
-  fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showRest.replace('{n}', '2') }))
-  expect(rowOrder()).toHaveLength(10)
-  fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showLess }))
-  expect(rowOrder()).toHaveLength(8)
-})
-
-test('offers no "show the rest" for a short list', () => {
-  render(<SteamGameInfoTable appId={730} gameTitle="Game" achievements={LIST} />)
-  expect(screen.queryByRole('button', { name: /show the other/i })).not.toBeInTheDocument()
-})
-
-test('a search shows every match, and says when there is none', () => {
-  render(<SteamGameInfoTable achievements={LONG} appId={620} gameTitle="Portal 2" />)
-  fireEvent.change(screen.getByRole('searchbox', { name: en.gameInfoTable.searchPlaceholder }), { target: { value: 'A10' } })
-  expect(rowOrder()).toEqual(['A10'])
-  fireEvent.change(screen.getByRole('searchbox', { name: en.gameInfoTable.searchPlaceholder }), { target: { value: 'zzz' } })
-  expect(screen.getByText(en.gameInfoTable.noMatches)).toBeInTheDocument()
-})
-
-describe('opened from a badge link', () => {
-  beforeEach(() => jest.useFakeTimers())
-  afterEach(() => jest.useRealTimers())
-
-  test('highlights the linked achievement, then lets it fade', () => {
-    window.history.replaceState(null, '', '/steamGame/620#ach-THIRD')
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-
-    const row = screen.getByRole('table').querySelector('[data-ach="THIRD"]')!
-    expect(row.className).toContain('bg-accent/15')
-
-    act(() => { jest.advanceTimersByTime(2500) })
-    expect(row.className).not.toContain('bg-accent/15')
-  })
-
-  test('unfolds and clears the filter so the achievement is visible', () => {
-    window.history.replaceState(null, '', '/steamGame/620#ach-FOURTH')
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    expect(rowOrder()).toContain('FOURTH')
-  })
-
-  test('ignores a link to an achievement the game does not have', () => {
-    window.history.replaceState(null, '', '/steamGame/620#ach-NOPE')
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    expect(screen.getByRole('table').querySelector('tr.bg-accent\\/15')).toBeNull()
-  })
-
-  test('ignores unrelated hashes', () => {
-    window.history.replaceState(null, '', '/steamGame/620#comments')
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    expect(screen.getByRole('table').querySelector('tr.bg-accent\\/15')).toBeNull()
-  })
-})
-
-describe('pinning', () => {
-  test('has no pin column for someone who cannot pin', () => {
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    expect(screen.queryByRole('button', { name: new RegExp(en.favorites.addFavorite) })).not.toBeInTheDocument()
-    expect(useSteamFavoriteAchievements).toHaveBeenCalledWith(620, 'Portal 2')
-  })
-
-  test('pins an achievement from its row', () => {
-    pins(true)
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    const star = screen.getAllByRole('button', { name: new RegExp(en.favorites.addFavorite) })[0]
-    expect(star.getAttribute('aria-pressed')).toBe('false')
-    fireEvent.click(star)
-    expect(mockToggle).toHaveBeenCalledWith(expect.objectContaining({ apiname: 'FIRST' }))
-  })
-
-  test('shows a pinned achievement as checked, labelled to unpin', () => {
-    pins(true, ['FIRST'])
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    const star = screen.getAllByRole('button', { name: new RegExp(en.favorites.removeFavorite) })[0]
-    expect(star.getAttribute('aria-pressed')).toBe('true')
-  })
-})
-
-describe('polish shared with RA', () => {
-  test('pinned achievements lead the list, highlighted', () => {
-    pins(true, ['THIRD'])
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    expect(rowOrder()).toEqual(['THIRD', 'FIRST', 'SECOND', 'FOURTH'])
-    expect(screen.getByRole('table').querySelector('[data-ach="THIRD"]')!.className).toContain('bg-accent/[0.05]')
-  })
-
-  test('each tab says how many it holds', () => {
-    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    expect(filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterAll}`) })).toHaveTextContent('4')
-    expect(filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterEarned}`) })).toHaveTextContent('2')
-  })
-
-  test('an achievement opens in a detail window with guide links, and closes', async () => {
-    render(<SteamGameInfoTable achievements={[ach('WIN', { title: 'Victoria', titleEn: 'Win', globalPct: 12.5 })]} appId={620} gameTitle="Portal 2" />)
-    fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'Victoria' }))
-
-    const dialog = await screen.findByRole('dialog', { name: 'Victoria' })
-    expect(within(dialog).getByText('12.5%')).toBeInTheDocument()
-    // Guides are searched by the English name.
-    expect(within(dialog).getByRole('link', { name: en.achievementDetail.steamGuides })).toHaveAttribute(
-      'href',
-      'https://steamcommunity.com/app/620/guides/?searchText=Win',
-    )
-    fireEvent.click(within(dialog).getByRole('button', { name: en.achievementDetail.close }))
-  })
-
-  test('a secret one still locked gets no guide links: a search would give it away', () => {
-    render(<SteamGameInfoTable achievements={[ach('SECRET', { hidden: true })]} appId={620} gameTitle="Portal 2" />)
-    fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: en.steam.hiddenAchievement }))
-    expect(within(screen.getByRole('dialog')).queryByRole('link')).toBeNull()
-  })
-
-  test('locked ones that may need online play are named in a line, which can keep only them', () => {
-    render(
-      <SteamGameInfoTable
-        achievements={[ach('MP', { title: 'Win online', likelyOnline: true }), ach('DONE', { likelyOnline: true, earned: true }), ach('SP')]}
-        appId={620}
-        gameTitle="Portal 2"
-      />,
-    )
-    expect(screen.getByRole('status')).toHaveTextContent('1 achievement may need online play')
-    expect(screen.getByRole('status')).toHaveTextContent('«Win online»')
-    fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showOnlyThese }))
-    expect(rowOrder()).toEqual(['Win online'])
-    fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'Win online' }))
-    expect(screen.getByRole('dialog', { name: 'Win online' })).toBeInTheDocument()
-  })
+test('one that likely needs online play says so beside its name and in its window', async () => {
+  render(<SteamGameInfoTable achievements={[ach('MP', { title: 'Win online', likelyOnline: true })]} appId={620} gameTitle="Portal 2" />)
+  expect(within(screen.getByRole('table')).getByText(en.steam.likelyOnline)).toBeInTheDocument()
+  fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'Win online' }))
+  expect(within(await screen.findByRole('dialog')).getByText(en.steam.likelyOnline)).toBeInTheDocument()
 })

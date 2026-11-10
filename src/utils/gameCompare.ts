@@ -1,5 +1,5 @@
 import { parseUnlockTime } from '@/utils/dates'
-import type { RetroAchievementsGameWithAchievements } from '@/types/types'
+import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import type { GameAchievement } from '@/types/game'
 import type { SteamAchievementUnified } from '@/types/steam'
 import type { PsnTrophy, TrophyGrade } from '@/types/psn'
@@ -10,7 +10,7 @@ import { achievementAnchor } from '@/components/steam/steam-achievement-grid/Ste
 import { raBadgeUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
 
-/** One achievement of a game as someone has it, the same for RA, Steam and PSN. */
+/** One achievement of a game as someone has it, the same on every platform: the compare table's and the game page table's row. */
 export type CompareAchievement = GameAchievement & {
   /** RA's points. */
   points?: number
@@ -18,10 +18,12 @@ export type CompareAchievement = GameAchievement & {
   grade?: TrophyGrade
   /** Xbox's gamerscore for it. */
   gamerscore?: number
-  /** Where a link to it lands on the page (Steam and PSN deep links use it). `earnedAt` is RA's hardcore date when there is one. */
+  /** Where a link to it lands on the page (Steam, PSN and Xbox deep links use it). `earnedAt` is RA's hardcore date when there is one. */
   anchor?: string
   /** RA only: earned in hardcore. */
   hardcore?: boolean
+  /** Its name and text are kept back until it is earned (PSN's hidden trophies, Xbox's and Steam's secret achievements). */
+  secret?: boolean
 }
 
 export type Unlock = Pick<CompareAchievement, 'earned' | 'earnedAt' | 'hardcore'>
@@ -31,66 +33,72 @@ export type CompareRow = CompareAchievement & { mine: Unlock | null }
 
 export type CompareFilter = 'all' | 'both' | 'onlyThem' | 'onlyMe' | 'neither'
 
+/** RA's achievement as a row; `players` is the game's distinct players, what its rarity is a share of. */
+export const raCompareItem =
+  (players: number) =>
+  (a: RetroAchievement): CompareAchievement => ({
+    id: String(a.ID),
+    title: a.Title,
+    description: a.Description,
+    iconUrl: raBadgeUrl(a.BadgeName) ?? null,
+    points: a.Points,
+    rarity: players > 0 ? Math.min(100, (a.NumAwarded / players) * 100) : null,
+    earned: Boolean(a.DateEarned || a.DateEarnedHardcore),
+    earnedAt: a.DateEarnedHardcore || a.DateEarned || null,
+    hardcore: Boolean(a.DateEarnedHardcore),
+  })
+
 export function raCompareList(game: RetroAchievementsGameWithAchievements | null): CompareAchievement[] {
   if (!game) return []
-  const players = game.NumDistinctPlayers || 0
   return raAchievementList(game)
     .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
-    .map((a) => ({
-      id: String(a.ID),
-      title: a.Title,
-      description: a.Description,
-      iconUrl: raBadgeUrl(a.BadgeName) ?? null,
-      points: a.Points,
-      rarity: players > 0 ? Math.min(100, (a.NumAwarded / players) * 100) : null,
-      earned: Boolean(a.DateEarned || a.DateEarnedHardcore),
-      earnedAt: a.DateEarnedHardcore || a.DateEarned || null,
-      hardcore: Boolean(a.DateEarnedHardcore),
-    }))
+    .map(raCompareItem(game.NumDistinctPlayers || 0))
 }
 
-export function steamCompareList(achievements: SteamAchievementUnified[]): CompareAchievement[] {
-  return [...achievements]
-    .sort((a, b) => a.displayOrder - b.displayOrder)
-    .map((a) => ({
-      id: a.apiname,
-      title: a.title,
-      description: a.description,
-      iconUrl: a.badgeUrl || null,
-      rarity: a.globalPct,
-      anchor: achievementAnchor(a.apiname),
-      earned: a.earned,
-      earnedAt: a.dateEarned,
-    }))
-}
+export const steamCompareItem = (a: SteamAchievementUnified): CompareAchievement => ({
+  id: a.apiname,
+  title: a.title,
+  description: a.description,
+  iconUrl: a.badgeUrl || null,
+  rarity: a.globalPct,
+  anchor: achievementAnchor(a.apiname),
+  earned: a.earned,
+  earnedAt: a.dateEarned,
+  secret: a.hidden,
+})
 
-export function psnCompareList(trophies: PsnTrophy[]): CompareAchievement[] {
-  return trophies.map((t) => ({
-    id: String(t.id),
-    title: t.name,
-    description: t.detail,
-    iconUrl: t.iconUrl,
-    grade: t.type,
-    rarity: t.rarity,
-    anchor: psnTrophyAnchor(t.id),
-    earned: t.earned,
-    earnedAt: t.earnedAt,
-  }))
-}
+export const steamCompareList = (achievements: SteamAchievementUnified[]): CompareAchievement[] =>
+  [...achievements].sort((a, b) => a.displayOrder - b.displayOrder).map(steamCompareItem)
 
-export function xboxCompareList(achievements: XboxAchievement[]): CompareAchievement[] {
-  return achievements.map((a) => ({
-    id: a.id,
-    title: a.name,
-    description: a.description,
-    iconUrl: a.iconUrl,
-    gamerscore: a.gamerscore,
-    rarity: a.rarity,
-    anchor: xboxAchievementAnchor(a.id),
-    earned: a.unlocked,
-    earnedAt: a.unlockedAt,
-  }))
-}
+export const psnCompareItem = (t: PsnTrophy): CompareAchievement => ({
+  id: String(t.id),
+  title: t.name,
+  description: t.detail,
+  iconUrl: t.iconUrl,
+  grade: t.type,
+  rarity: t.rarity,
+  anchor: psnTrophyAnchor(t.id),
+  earned: t.earned,
+  earnedAt: t.earnedAt,
+  secret: t.hidden,
+})
+
+export const psnCompareList = (trophies: PsnTrophy[]): CompareAchievement[] => trophies.map(psnCompareItem)
+
+export const xboxCompareItem = (a: XboxAchievement): CompareAchievement => ({
+  id: a.id,
+  title: a.name,
+  description: a.description,
+  iconUrl: a.iconUrl,
+  gamerscore: a.gamerscore,
+  rarity: a.rarity,
+  anchor: xboxAchievementAnchor(a.id),
+  earned: a.unlocked,
+  earnedAt: a.unlockedAt,
+  secret: a.secret,
+})
+
+export const xboxCompareList = (achievements: XboxAchievement[]): CompareAchievement[] => achievements.map(xboxCompareItem)
 
 /** Their list with the viewer's unlock beside each achievement; `mine` null leaves every row without one. */
 export function mergeCompare(theirs: CompareAchievement[], mine: CompareAchievement[] | null): CompareRow[] {
