@@ -6,15 +6,9 @@ import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import type { PsnError } from '@/hooks/usePsnLink'
 import type { PsnRecentTrophy } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
-import MainPageProfileRecent from '../../main-page-profile-recent/MainPageProfileRecent'
-import MainPageProfileRecentRow from '../../main-page-profile-recent/main-page-profile-recent-row/MainPageProfileRecentRow'
-import { formatDate } from '@/utils/dates'
+import MainPageProfileRecentList from '../../main-page-profile-recent/MainPageProfileRecentList'
 
-/**
- * The player's latest trophies — the Steam list's counterpart, same layout,
- * with the trophy's grade under its name. Each opens that trophy on its game
- * page.
- */
+/** The player's latest trophies, with the trophy's grade on the right. Each opens that trophy on its game page. */
 export default function MainPageProfilePsnTrophies({
   trophies,
   isLoading,
@@ -26,27 +20,25 @@ export default function MainPageProfilePsnTrophies({
   error: PsnError | null
   onRetry: () => void
 }) {
-  const { T, lang } = useLanguage()
+  const { T } = useLanguage()
   const subject = useSubject()
 
   return (
-    <MainPageProfileRecent
+    <MainPageProfileRecentList
       title={T.psn.recentTrophies}
       loading={isLoading && trophies.length === 0}
       error={error ? T.psn.trophiesError : null}
       onRetry={onRetry}
       retryLabel={T.psn.retry}
-    >
-      {trophies.slice(0, 3).map((t) => (
-        <MainPageProfileRecentRow
-          key={`${t.gameId}:${t.trophyId}`}
-          href={`${gameHref('psn', t.gameId, subject)}#${psnTrophyAnchor(t.trophyId)}`}
-          badge={t.iconUrl}
-          title={t.name}
-          sub={<>{t.gameTitle} · <time dateTime={t.earnedAt}>{formatDate(t.earnedAt, lang, { day: 'numeric', month: 'short' })}</time></>}
-          right={<span className={`text-xs ${TROPHY_GRADE_COLOR[t.type]}`}>{T.psn[t.type]}</span>}
-        />
-      ))}
-    </MainPageProfileRecent>
+      items={trophies.map((t) => ({
+        key: `${t.gameId}:${t.trophyId}`,
+        href: `${gameHref('psn', t.gameId, subject)}#${psnTrophyAnchor(t.trophyId)}`,
+        badge: t.iconUrl,
+        title: t.name,
+        gameTitle: t.gameTitle,
+        at: t.earnedAt,
+        right: <span className={`text-xs ${TROPHY_GRADE_COLOR[t.type]}`}>{T.psn[t.type]}</span>,
+      }))}
+    />
   )
 }

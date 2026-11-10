@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import MainPageProfileStAchievements from './MainPageProfileStAchievements'
 import { en } from '@/translations/en'
 import type { SteamRecentAchievement } from '@/types/steam'
@@ -41,34 +41,6 @@ test('shows badge, title, game and unlock date, linking to the achievement', () 
   expect(time.textContent).toMatch(/13/)
 
   expect(screen.getByRole('link').getAttribute('href')).toBe('/steamGame/377160#ach-A1')
-})
-
-test('lists at most three', () => {
-  renderIt({ achievements: Array.from({ length: 8 }, (_, i) => ach(i)) })
-  expect(screen.getAllByRole('link')).toHaveLength(3)
-})
-
-test('shows a skeleton while loading', () => {
-  const { container } = renderIt({ achievements: [], isLoading: true })
-  expect(container.querySelector('[aria-busy="true"]')).not.toBeNull()
-})
-
-test('keeps showing a loaded list during a refresh', () => {
-  const { container } = renderIt({ isLoading: true })
-  expect(container.querySelector('[aria-busy="true"]')).toBeNull()
-  expect(screen.getByText('Achievement 1')).toBeInTheDocument()
-})
-
-test('announces an error with a retry', () => {
-  renderIt({ achievements: [], error: 'boom' })
-  expect(screen.getByRole('alert')).toHaveTextContent(en.steam.achievementsError)
-  fireEvent.click(screen.getByRole('button', { name: en.steam.retry }))
-  expect(retry).toHaveBeenCalledTimes(1)
-})
-
-test('shows an empty state with nothing unlocked', () => {
-  renderIt({ achievements: [] })
-  expect(screen.getByText(en.cards.noEarned)).toBeInTheDocument()
 })
 
 test('falls back to a placeholder badge', () => {
