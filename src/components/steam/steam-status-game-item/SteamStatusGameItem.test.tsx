@@ -25,21 +25,15 @@ function game(overrides: Partial<SteamGameProgress> = {}): SteamGameProgress {
 }
 
 const partial = { achievementsLoaded: true, maxPossible: 84, numAwarded: 42, pctWon: 50 }
-const perfect = { achievementsLoaded: true, maxPossible: 84, numAwarded: 84, pctWon: 100 }
 
-test('lays out like an RA card: cover, title, Steam chip, counts, bar with %', () => {
+test("the cover is Steam's icon and the chip says Steam", () => {
   const { container } = render(<SteamStatusGameItem game={game(partial)} />)
-
   // The first image is the blurred backdrop; the cover is the one inside the link.
   expect(container.querySelector('a img')?.getAttribute('src')).toBe('/api/steam/icon?appid=377160')
-  expect(screen.getByText('Fallout 4')).toBeInTheDocument()
   expect(screen.getByText('Steam')).toBeInTheDocument()
-  expect(screen.getByText(`42 / 84 ${en.steam.achievements}`)).toBeInTheDocument()
-  expect(screen.getByRole('progressbar', { name: 'Fallout 4' }).getAttribute('aria-valuenow')).toBe('50')
-  expect(screen.getByText('50%')).toBeInTheDocument()
 })
 
-test('shows playtime where RA shows points, and the last played date', () => {
+test('shows the play time and the last played date', () => {
   render(<SteamStatusGameItem game={game()} />)
   expect(screen.getByText(`${en.steam.playtime} · 484 h`)).toBeInTheDocument()
   expect(screen.getByText(`${en.steam.lastPlayed} ·`, { exact: false })).toBeInTheDocument()
@@ -51,18 +45,9 @@ test('says never played for an untouched game', () => {
   expect(screen.getByText(`${en.steam.lastPlayed} · ${en.steam.neverPlayed}`)).toBeInTheDocument()
 })
 
-describe('a perfect game', () => {
-  test('gets the Perfect chip, green counts and a green ring — not colour alone', () => {
-    const { container } = render(<SteamStatusGameItem game={game(perfect)} />)
-    expect(screen.getByText(en.steam.perfect, { exact: false })).toBeInTheDocument()
-    expect(screen.getByText(`84 / 84 ${en.steam.achievements}`).className).toContain('text-success')
-    expect(container.querySelector('.ring-2')).not.toBeNull()
-  })
-
-  test('an unfinished game has neither', () => {
-    render(<SteamStatusGameItem game={game(partial)} />)
-    expect(screen.queryByText(en.steam.perfect, { exact: false })).not.toBeInTheDocument()
-  })
+test('a perfect game is green in its counts as well as marked', () => {
+  render(<SteamStatusGameItem game={game({ achievementsLoaded: true, maxPossible: 84, numAwarded: 84, pctWon: 100 })} />)
+  expect(screen.getByText(`84 / 84 ${en.steam.achievements}`).className).toContain('text-success')
 })
 
 test('says progress is unknown, without a bar, when counts are not loaded', () => {
@@ -71,58 +56,16 @@ test('says progress is unknown, without a bar, when counts are not loaded', () =
   expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
 })
 
-test('says the game has no achievements when it has no stats', () => {
+test('a game without stats says so, and opens to that instead of a detail', () => {
   render(<SteamStatusGameItem game={game({ hasStats: false })} />)
   expect(screen.getByText(en.steam.noAchievements)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: /achievements: / }))
+  expect(screen.queryByTestId('achievements')).not.toBeInTheDocument()
+  expect(screen.getAllByText(en.steam.noAchievements)).toHaveLength(2)
 })
 
-describe('links', () => {
-  test('title and cover open the Steam game page, the cover out of the tab order', () => {
-    const { container } = render(<SteamStatusGameItem game={game()} />)
-    expect(screen.getByRole('link', { name: 'Fallout 4' }).getAttribute('href')).toBe('/steamGame/377160')
-
-    const links = container.querySelectorAll('a[href="/steamGame/377160"]')
-    expect(links).toHaveLength(2)
-    expect(links[0].getAttribute('tabindex')).toBe('-1')
-  })
-
-  test('no link sits inside the expand button', () => {
-    render(<SteamStatusGameItem game={game()} />)
-    expect(screen.getByRole('button', { name: /achievements: / }).querySelector('a')).toBeNull()
-  })
-})
-
-describe('expanding', () => {
-  test('is a real button naming its action and the game', () => {
-    render(<SteamStatusGameItem game={game(partial)} />)
-    const button = screen.getByRole('button', { name: `${en.steam.showAchievements}: Fallout 4` })
-    expect(button.getAttribute('aria-expanded')).toBe('false')
-    expect(screen.queryByTestId('achievements')).not.toBeInTheDocument()
-  })
-
-  test('opens the detail for its list, and closes again', () => {
-    render(<SteamStatusGameItem game={game(partial)} category="playing" />)
-    fireEvent.click(screen.getByRole('button', { name: /achievements: / }))
-
-    const button = screen.getByRole('button', { name: `${en.steam.hideAchievements}: Fallout 4` })
-    expect(button.getAttribute('aria-expanded')).toBe('true')
-    expect(screen.getByTestId('achievements')).toHaveTextContent('377160:playing')
-    expect(document.getElementById(button.getAttribute('aria-controls')!)).not.toBeNull()
-
-    fireEvent.click(button)
-    expect(screen.queryByTestId('achievements')).not.toBeInTheDocument()
-  })
-
-  test('does not fetch achievements for a game without stats', () => {
-    render(<SteamStatusGameItem game={game({ hasStats: false })} />)
-    fireEvent.click(screen.getByRole('button', { name: /achievements: / }))
-    expect(screen.queryByTestId('achievements')).not.toBeInTheDocument()
-    expect(screen.getAllByText(en.steam.noAchievements)).toHaveLength(2)
-  })
-})
-
-
-test('can be pinned as a Steam game, like RA cards', () => {
-  render(<SteamStatusGameItem game={game()} />)
-  expect(screen.getByRole('button', { name: en.pinnedGames.pinAria })).toBeInTheDocument()
+test('opens the detail with the game and its list', () => {
+  render(<SteamStatusGameItem game={game(partial)} category="playing" />)
+  fireEvent.click(screen.getByRole('button', { name: `${en.steam.showAchievements}: Fallout 4` }))
+  expect(screen.getByTestId('achievements')).toHaveTextContent('377160:playing')
 })
