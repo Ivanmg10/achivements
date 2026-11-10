@@ -81,7 +81,7 @@ RA's phone card, it is a `card` chip on its column. `useAchievementTable` is tes
 **Open — the other eight families of #125, in the issue's order** (one PR each, or smaller; read `docs/platform-shells.md` first; sizes are
 the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform hex, retries and kickers in these files):
 1. DONE The game page table (D1-01), above.
-2. **Group game cards** (B-01): `groups/sortable-item/SortableItem.tsx` (RA, 195), `steam-sortable-item/SteamSortableItem.tsx` (181),
+2. DONE (2026-11-10, `refactor/125-platform-shells-2`; below, "Done — families 2, 4 and 9") **Group game cards** (B-01): `groups/sortable-item/SortableItem.tsx` (RA, 195), `steam-sortable-item/SteamSortableItem.tsx` (181),
    `psn-sortable-item/PsnSortableItem.tsx` (165), `xbox-sortable-item/XboxSortableItem.tsx` (166). *Keep:* where each reads its data (its
    context), RA's softcore/hardcore bar, the achievements grid in the panel. *Drifted:* RA's panel slides open (`inert` + grid rows), the
    others mount with `{open && …}`: pick RA's and say so; the "▼" rotated by inline style → `IconChevronDown`; completion ring colours.
@@ -96,7 +96,7 @@ the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform 
    change colour (visible: say it). *Traps:* the profile wrappers' `!isLinked` branch is dead (`MainPlatformContext` only picks a linked
    platform): delete it with `T.profileSt.signIn` and its guard exceptions; the home keeps its own keyframes and its profile column's
    min-height (`homeFit`); sections land whole (skeleton until everything is in, `docs/performance.md`); pinned rows are dnd-kit sortables.
-4. **Status cards** (D2-01, D1-04): `statusGameList/StatusGameItem.tsx` (RA, 206), `steam/steam-status-game-item/` (148),
+4. DONE (see "Done — families 2, 4 and 9") **Status cards** (D2-01, D1-04): `statusGameList/StatusGameItem.tsx` (RA, 206), `steam/steam-status-game-item/` (148),
    `psn/psn-status-game-item/` (129), `xbox/xbox-status-game-item/` (129). *Keep:* chips (RA's console colours from `constants/index.ts`,
    still on the guard's `tag` pending list), progress lines (`PsnTrophyCounts`, `XboxGamerscore`), the completion date (`docs/library.md`:
    `completedAt`, Steam's last unlock, RA's award; never `lastPlayed`), the `*LibraryDetail` panel, hide and pin. *Traps:* Steam builds
@@ -131,10 +131,44 @@ the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform 
    auth, validation, logging (`logAdminAction`) and answers; users link Steam only through Steam (admins type); RA keys sealed (`readRaKey`,
    `raid_hash`); PSN/Xbox ids not unique on purpose; link mails; `onPlatformLinked`. *Traps:* the housekeeping differed (the audit found the admin PSN/Xbox
    link clearing the cache and the user one not; #118 fixed only the admin unlink): check again, the owner picks; Steam unlink clears `steam_login_id` and forgets `steam_unlocks`. No migration.
-9. **Renames** (D1-08), alone because it touches many imports: `steam/steam-pin-achievement-button/SteamPinAchievementButton` →
+9. DONE (see "Done — families 2, 4 and 9") **Renames** (D1-08), alone because it touches many imports: `steam/steam-pin-achievement-button/SteamPinAchievementButton` →
    `pin-achievement-button/PinAchievementButton` (the table shell, the grids, `AchievementDetailModal`), `achievementAnchor` → `utils/steamTitles.ts`
    `steamAchievementAnchor`, `RARecentlyPlayed` → `RecentlyPlayedFeed`, `steam-game-item-achievements/` out of `steam-game-item/`, the
    show/hide-achievements keys RA reads from `T.steam` into a neutral namespace (nine languages). `SteamSortableHeader` is already gone.
+
+**Done — families 2, 4 and 9** (`refactor/125-platform-shells-2`, one commit each, 2026-11-10; the shells follow `docs/platform-shells.md`):
+- *Family 2, group cards:* `groups/group-game-card/GroupGameCard` (dnd-kit sortable, grip, remove, the sliding panel; its view model is
+  `GroupGameCardView` in `types/gameCard.ts`) and the four adapters at their old paths (`SortableItem` 79 lines, `SteamSortableItem` 74,
+  `PsnSortableItem` 68, `XboxSortableItem` 75; RA's panel, which reads `useGameProgression`, is `sortable-item-achievements/`). 707 lines
+  → 464, plus the shared pieces below. Contract: `GroupGameCard.contract.test.tsx` (4 platforms × 8, finished-mark × 3); each adapter's test
+  keeps only its own (live vs stored numbers, Xbox's unknown total and play time, RA's two modes and points).
+- *Family 4, status cards:* `status-game-card/StatusGameCard` (open state through `useExclusiveOpen`, hide, pin, `LibraryDetailRow`,
+  `StatusGameCardView`) and the four adapters (`StatusGameItem` 73, `SteamStatusGameItem` 68, `PsnStatusGameItem` 55, `XboxStatusGameItem`
+  57; RA's awards, lines and detail are `statusGameList/status-game-item-{awards,lines,detail}/`). 612 lines → 449 plus the shared pieces.
+  Contract: `StatusGameCard.contract.test.tsx` (links, progress, hide/pin as the right source, detail row per list, exclusive open,
+  finished mark, play time, finished-vs-last-played date). Checked by breaking `inert` and the exclusive-open key by hand: both suites fail.
+- *Shared by both (`game-card-*/`, 166 lines):* cover (`COVER_IMAGE`, ring by `CoverRing`), title, mark (the ★ chip), progress (text + bar +
+  %, green only in the text and the %), line, playtime, dates (`validCompletionDate` → "Finished" in Completed else "Last played"),
+  platform tag, expand button; `ra-console-tag/RaConsoleTag` (a `Tag` now, so the two `tag` entries for these files left
+  `uiGuard.pending.json`).
+- *Family 9, renames:* `SteamPinAchievementButton` → `pin-achievement-button/PinAchievementButton`; `achievementAnchor` →
+  `utils/steamTitles.ts` `steamAchievementAnchor` (`gameCompare`, `gameInsights` and `pinnedView` no longer import a component);
+  `RARecentlyPlayed` → `recently-played-feed/RecentlyPlayedFeed` (its `ra-recently-played-expanded/` moved in with it, name kept: family 5);
+  `steam-game-item-achievements/` up to `steam/`; `T.steam.showAchievements` / `hideAchievements` → `T.cards.*` in all nine languages
+  (Xbox keeps its own).
+- *Visible changes (drifted copies, fixed):* **(a)** the focus ring on the grip, the title and the expand button is the accent (`focus-ring`) on
+  all eight cards; Steam, PSN and Xbox used their platform colour. **(b)** Steam, PSN and Xbox group cards slide their panel open like RA's
+  (`inert` + grid rows) instead of popping in; it is built the first time it opens and kept, so closing slides. **(c)** The "▼" glyph is an
+  `IconChevronDown` (16 px, was a 12 px glyph) on all eight cards. **(d)** The Xbox group card's empty detail line was a plain space, so
+  it collapsed and the card was shorter than the others; it keeps its room now. **(e)** PSN and Xbox status cards read the finish date through
+  `validCompletionDate` like Steam's: an unparseable one falls back to "Last played" instead of "Finished · —". **(f)** RA's group title link
+  takes `min-w-0` like the others. Everything else (ring colours, chips, texts, order of lines) is as before.
+- *Left as it was, on purpose:* RA's group card has no done ring or chip (the status card has the hardcore ring; the group never had either);
+  `GameCardProgress` is one more "bar + %" next to D2-04's 22 copies: moving it (with `LibraryEntryProgress`) into `ui/` and replacing the
+  copies in `main-page/*`, `RaGameItem`, `PsnCollectionItem`… is still open, as is giving the pinned rows and the feed rows (`RaGameItem`,
+  `SteamGameItem`, `XboxGameItem`) the same expand button and cover (families 3 and 5; they still draw "▼" by hand).
+- *Not looked at in a browser:* the group page and the category lists at 390 and 2560 px, both designs, Firefox; the chevron and the slide
+  on Steam, PSN and Xbox group cards in particular.
 **Watch out** — `toRow` and `items` must be stable (a module-level mapper, or `useMemo`): the deep link's reset runs when `items` changes,
 and an inline sort would reset it every render. The deep link looks for `data-anchor` on rows and cards; `anchor` is unencoded and the
 fragment is decoded before comparing. `badgeClass` takes a ring colour, not a state.

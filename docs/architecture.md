@@ -147,7 +147,12 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   A family of per-platform components is one shell plus an adapter per platform
   (`docs/platform-shells.md`, #125): the game page table is `achievement-table/` (with
   `hooks/useAchievementTable`, `utils/achievementTable`, `types/achievementTable`), and RA's,
-  Steam's, PSN's and Xbox's `*GameInfoTable` are its adapters at their old paths.
+  Steam's, PSN's and Xbox's `*GameInfoTable` are its adapters at their old paths. A game card in a
+  group is `groups/group-game-card/GroupGameCard` (adapters `SortableItem`, `Steam-`, `Psn-`,
+  `XboxSortableItem`), and a game on a category page is `status-game-card/StatusGameCard` (adapters
+  `StatusGameItem`, `Steam-`, `Psn-`, `XboxStatusGameItem`); the two share their pieces in
+  `game-card-*/` (cover, title, mark, progress, line, dates, playtime, platform tag, expand button)
+  and `types/gameCard.ts`.
 - **Utils** (`src/utils/`): pure functions — mappers per platform
   (`steamMappers`, `psnMappers`), library shelves and insights, `aiExport`. The shared helpers
   (#119): `dates.ts` (the platforms' UTC dates, day keys, dates in the reader's language),
