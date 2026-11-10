@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, type ComponentType } from 'react'
 import { useAllGamesGlobal } from '@/hooks/useAllGamesGlobal'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -10,14 +10,17 @@ import { xboxHasAchievements } from '@/utils/xboxTitles'
 import { useMainPlatform } from '@/context/MainPlatformContext'
 import { buildLibrary, summarizeConsoles } from '@/utils/library'
 import { ChartCard } from '@/components/ui/ChartCard'
-import MainPageConsoleNav from '@/components/main-page/main-page-charts/MainPageConsoleNav'
-import MainPageSteamNav from '@/components/main-page/main-page-charts/main-page-steam-nav/MainPageSteamNav'
-import MainPagePsnNav from '@/components/main-page/main-page-charts/main-page-psn-nav/MainPagePsnNav'
-import MainPageXboxNav from '@/components/main-page/main-page-charts/main-page-xbox-nav/MainPageXboxNav'
+import type { GameSource } from '@/types/game'
+import MainPageConsoleNav from './main-page-console-nav/MainPageConsoleNav'
+import MainPageSteamNav from './main-page-steam-nav/MainPageSteamNav'
+import MainPagePsnNav from './main-page-psn-nav/MainPagePsnNav'
+import MainPageXboxNav from './main-page-xbox-nav/MainPageXboxNav'
 import BrowseSearch from './browse-search/BrowseSearch'
 import BrowseConsoles from './browse-consoles/BrowseConsoles'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { RememberedHeight } from '@/components/ui/RememberedHeight'
+
+const NAV: Record<GameSource, ComponentType> = { ra: MainPageConsoleNav, steam: MainPageSteamNav, psn: MainPagePsnNav, xbox: MainPageXboxNav }
 
 /**
  * The Browse section: the way into each list (by status, and by console on
@@ -39,11 +42,12 @@ export default function MainPageBrowse() {
   )
   const consoles = useMemo(() => summarizeConsoles(all), [all])
   const showConsoles = platform === 'ra' && consoles.length > 0
+  const Nav = NAV[platform]
 
   return (
     <RememberedHeight id="browse" loading={loading || isLoading} className="flex flex-col gap-4">
       <ChartCard>
-        {platform === 'steam' ? <MainPageSteamNav /> : platform === 'psn' ? <MainPagePsnNav /> : platform === 'xbox' ? <MainPageXboxNav /> : <MainPageConsoleNav />}
+        <Nav />
       </ChartCard>
 
       <ChartCard>

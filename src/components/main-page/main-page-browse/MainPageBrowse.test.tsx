@@ -13,8 +13,8 @@ jest.mock('@/context/GamesDataContext', () => ({
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: () => ({ library: [] }) }))
 jest.mock('@/context/PsnGamesDataContext', () => ({ usePsnGamesData: () => ({ library: [] }) }))
 jest.mock('@/context/MainPlatformContext', () => ({ useMainPlatform: jest.fn() }))
-jest.mock('@/components/main-page/main-page-charts/MainPageConsoleNav', () => ({ __esModule: true, default: () => <div data-testid="nav" /> }))
-jest.mock('@/components/main-page/main-page-charts/main-page-steam-nav/MainPageSteamNav', () => ({
+jest.mock('./main-page-console-nav/MainPageConsoleNav', () => ({ __esModule: true, default: () => <div data-testid="nav" /> }))
+jest.mock('./main-page-steam-nav/MainPageSteamNav', () => ({
   __esModule: true,
   default: () => <div data-testid="steam-nav" />,
 }))

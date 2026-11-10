@@ -8,16 +8,10 @@ import { CONSOLES } from '@/constants'
 import { useLanguage } from '@/context/LanguageContext'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import { Skeleton } from '@/components/ui/Skeleton'
-import type { GameStatus } from '@/types/game'
 import { kickerClass } from '@/components/ui/Kicker'
+import { BROWSE_SECTIONS } from '../browseSections'
 
 const CONSOLE_MAP = new Map(CONSOLES.map((c) => [c.id, c]))
-
-const SECTION_SLUGS = [
-  { slug: 'wantToPlay', emoji: '🔖', key: 'wantToPlay' as const },
-  { slug: 'playing',    emoji: '🎮', key: 'playing'    as const },
-  { slug: 'completed',  emoji: '🏆', key: 'completed'  as const },
-] satisfies { slug: string; emoji: string; key: GameStatus }[]
 
 function hasGamesForConsole(
   games: { ConsoleID: number }[],
@@ -66,9 +60,9 @@ export default function MainPageConsoleNav() {
         {T.cards.navigation}
       </Link>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {SECTION_SLUGS.map(({ slug, emoji, key }) => {
-          const label = T.categories[key]
-          const sectionGames = gamesBySection[key]
+        {BROWSE_SECTIONS.map(({ slug, emoji }) => {
+          const label = T.categories[slug]
+          const sectionGames = gamesBySection[slug]
           return (
             <div key={slug} className="bg-bg-main rounded-box p-3 flex flex-col gap-2.5">
               <Link

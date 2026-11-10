@@ -35,7 +35,7 @@ jest.mock('./MainPageBestPeriod', () => mockProbe('best'))
 jest.mock('./main-page-month-compare/MainPageMonthCompare', () => mockProbe('month'))
 jest.mock('./main-page-habits/MainPageHabits', () => mockProbe('habits'))
 jest.mock('./main-page-journal/MainPageJournal', () => mockProbe('journal'))
-jest.mock('./MainPageConsoleNav', () => mockProbe('nav'))
+jest.mock('../main-page-browse/main-page-console-nav/MainPageConsoleNav', () => mockProbe('nav'))
 jest.mock('../main-page-groups-section/MainPageGroupsSection', () => mockProbe('groups'))
 jest.mock('../main-page-pinned-section/MainPagePinnedSection', () => mockProbe('favorites'))
 jest.mock('../main-page-friends/MainPageFriends', () => ({
@@ -43,7 +43,7 @@ jest.mock('../main-page-friends/MainPageFriends', () => ({
   default: ({ active }: { active: boolean }) => <div data-testid="friends" data-active={String(active)} />,
 }))
 jest.mock('./main-page-steam-stats/MainPageSteamStats', () => mockProbe('steam-stats'))
-jest.mock('./main-page-steam-nav/MainPageSteamNav', () => mockProbe('steam-nav'))
+jest.mock('../main-page-browse/main-page-steam-nav/MainPageSteamNav', () => mockProbe('steam-nav'))
 
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import MainPageCharts from './MainPageCharts'
