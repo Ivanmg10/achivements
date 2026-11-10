@@ -12,7 +12,7 @@ import { gameHref } from '@/utils/gameRef'
 import { BASE_GROUP, psnTrophyAnchor, trophiesByGroup, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import PsnTrophyGridGroup from './psn-trophy-grid-group/PsnTrophyGridGroup'
-import PsnRevealTrophyButton from '@/components/psn/psn-reveal-trophy-button/PsnRevealTrophyButton'
+import RevealSecretButton from '@/components/reveal-secret-button/RevealSecretButton'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
 import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
@@ -128,11 +128,11 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
                   )}
                 </Link>
                 {t.hidden && !t.earned && (
-                  <PsnRevealTrophyButton
+                  <RevealSecretButton
                     revealed={isRevealed(t.id)}
                     onToggle={() => toggleReveal(t.id)}
-                    size={20}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-bg-card/90 text-text-main flex items-center justify-center opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100"
+                    labels={{ reveal: T.psn.revealTrophy, conceal: T.psn.concealTrophy }}
+                    className="z-20 w-8 h-8 opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100"
                   />
                 )}
                 {canPin && (

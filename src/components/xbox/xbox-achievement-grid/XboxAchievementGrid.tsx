@@ -11,7 +11,7 @@ import { gameHref } from '@/utils/gameRef'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import ConcealedBadge from '@/components/concealed-badge/ConcealedBadge'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
-import XboxRevealAchievementButton from '@/components/xbox/xbox-reveal-achievement-button/XboxRevealAchievementButton'
+import RevealSecretButton from '@/components/reveal-secret-button/RevealSecretButton'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import { useRevealedAchievements } from '@/hooks/useRevealedAchievements'
 import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements'
@@ -109,11 +109,11 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
               )}
             </Link>
             {a.secret && !a.unlocked && (
-              <XboxRevealAchievementButton
+              <RevealSecretButton
                 revealed={isRevealed(a.id)}
                 onToggle={() => toggleReveal(a.id)}
-                size={20}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-bg-card/90 text-text-main flex items-center justify-center opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100"
+                labels={{ reveal: T.xbox.revealAchievement, conceal: T.xbox.concealAchievement }}
+                className="z-20 w-8 h-8 opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100"
               />
             )}
             {canPin && (
