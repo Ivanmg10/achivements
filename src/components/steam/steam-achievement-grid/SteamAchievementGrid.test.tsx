@@ -1,7 +1,7 @@
 jest.mock('@/hooks/useSteamFavoriteAchievements', () => ({ useSteamFavoriteAchievements: jest.fn() }))
 
 import { render, screen, fireEvent, act } from '@testing-library/react'
-import { SteamAchievementGrid, achievementAnchor } from './SteamAchievementGrid'
+import { SteamAchievementGrid } from './SteamAchievementGrid'
 import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
 import { en } from '@/translations/en'
 import type { SteamAchievementUnified } from '@/types/steam'
@@ -64,8 +64,7 @@ describe('pin star', () => {
 test('each badge links to its achievement on the game page', () => {
   render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
   const link = screen.getByRole('link')
-  expect(link.getAttribute('href')).toBe(`/steamGame/620#${achievementAnchor('WIN')}`)
-  expect(achievementAnchor('WIN')).toBe('ach-WIN')
+  expect(link.getAttribute('href')).toBe('/steamGame/620#ach-WIN')
 })
 
 test('an earned badge is in colour with a ring, and says so in its name', () => {

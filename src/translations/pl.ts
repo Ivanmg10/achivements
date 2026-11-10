@@ -856,6 +856,8 @@ export const pl: Translations = {
     completions: 'ukończenia',
   },
   cards: {
+    showAchievements: 'Pokaż osiągnięcia',
+    hideAchievements: 'Ukryj osiągnięcia',
     sectionFriends: 'Obserwowani',
     statsActivity: 'Statystyki & Aktywność',
     dailyAchievements: 'Dzienne osiągnięcia · ostatnie 7 dni',
@@ -1299,8 +1301,6 @@ export const pl: Translations = {
     locked: 'Zablokowane',
     achievementsError: 'Nie udało się wczytać osiągnięć',
     retry: 'Spróbuj ponownie',
-    showAchievements: 'Pokaż osiągnięcia',
-    hideAchievements: 'Ukryj osiągnięcia',
     nowPlaying: 'Teraz gra',
     gamesSection: 'Steam',
     gamesError: 'Nie udało się wczytać twoich gier Steam',

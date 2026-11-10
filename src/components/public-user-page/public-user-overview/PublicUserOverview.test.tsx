@@ -4,7 +4,7 @@ import { useRaLinked } from '@/hooks/useRaLinked'
 
 jest.mock('@/hooks/useRaLinked', () => ({ useRaLinked: jest.fn() }))
 const stub = (id: string) => ({ __esModule: true, default: () => <div data-testid={id} /> })
-jest.mock('@/components/ra-recently-played/RARecentlyPlayed', () => stub('ra-recent'))
+jest.mock('@/components/recently-played-feed/RecentlyPlayedFeed', () => stub('ra-recent'))
 jest.mock('@/components/recent-games-list/RecentGamesList', () => stub('recent'))
 jest.mock('@/components/main-page/main-page-profile/MainPageProfile', () => stub('profile'))
 jest.mock('../public-user-recent-unlocks/PublicUserRecentUnlocks', () => stub('unlocks'))

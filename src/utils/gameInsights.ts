@@ -2,7 +2,7 @@ import type { RecentAchievement, RetroAchievement } from '@/types/types'
 import type { SteamAchievementUnified } from '@/types/steam'
 import type { GameAchievement, GameSource } from '@/types/game'
 import type { PsnTrophy } from '@/types/psn'
-import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { steamAchievementAnchor } from '@/utils/steamTitles'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
@@ -50,7 +50,7 @@ export const fromSteam = (list: SteamAchievementUnified[], appId: number): Insig
     points: null,
     kind: null,
     iconUrl: a.badgeUrl || null,
-    href: `/steamGame/${appId}#${achievementAnchor(a.apiname)}`,
+    href: `/steamGame/${appId}#${steamAchievementAnchor(a.apiname)}`,
   }))
 
 export const fromPsn = (list: PsnTrophy[], gameId: number): InsightAchievement[] =>

@@ -856,6 +856,8 @@ export const fr: Translations = {
     completions: 'complétions',
   },
   cards: {
+    showAchievements: 'Voir les succès',
+    hideAchievements: 'Masquer les succès',
     sectionFriends: 'Abonnements',
     statsActivity: 'Statistiques & Activité',
     dailyAchievements: 'Succès quotidiens · 7 derniers jours',
@@ -1299,8 +1301,6 @@ export const fr: Translations = {
     locked: 'Verrouillé',
     achievementsError: 'Impossible de charger les succès',
     retry: 'Réessayer',
-    showAchievements: 'Voir les succès',
-    hideAchievements: 'Masquer les succès',
     nowPlaying: 'En jeu',
     gamesSection: 'Steam',
     gamesError: 'Impossible de charger vos jeux Steam',

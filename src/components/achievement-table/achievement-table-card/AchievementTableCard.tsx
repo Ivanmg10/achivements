@@ -5,7 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { AchievementColumn, AchievementView, TableTexts } from '@/types/achievementTable'
 import { earnedRing, type TableEntry } from '@/utils/achievementTable'
 import { formatRarity, formatUnlock } from '@/utils/steamFeed'
-import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
+import PinAchievementButton from '@/components/pin-achievement-button/PinAchievementButton'
 import RevealSecretButton from '@/components/reveal-secret-button/RevealSecretButton'
 
 /**
@@ -82,7 +82,7 @@ export default function AchievementTableCard<T>({
       </div>
 
       {view.pinned !== undefined && (
-        <SteamPinAchievementButton pinned={view.pinned} title={view.title} onToggle={view.onTogglePin} className="relative z-10 shrink-0 mt-0.5" />
+        <PinAchievementButton pinned={view.pinned} title={view.title} onToggle={view.onTogglePin} className="relative z-10 shrink-0 mt-0.5" />
       )}
     </li>
   )

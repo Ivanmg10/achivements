@@ -9,7 +9,7 @@ import ConnectAccounts from '@/components/connect-accounts/ConnectAccounts'
 import MainPageWithoutRa from './main-page-without-ra/MainPageWithoutRa'
 import MainPageCharts from './main-page-charts/MainPageCharts'
 import RaKeyInvalidNotice from '@/components/ra-key-invalid-notice/RaKeyInvalidNotice'
-import RARecentlyPlayed from '@/components/ra-recently-played/RARecentlyPlayed'
+import RecentlyPlayedFeed from '@/components/recently-played-feed/RecentlyPlayedFeed'
 import { useMainView } from '@/context/MainViewContext'
 import { useSubject } from '@/context/SubjectContext'
 import { useRaLinked } from '@/hooks/useRaLinked'
@@ -70,7 +70,7 @@ export function MainPageBody() {
             <MainPagePinnedGames />
           ) : (
             <div className="m-3 bg-bg-card rounded-tile p-4 flex flex-col flex-1 min-h-0">
-              <RARecentlyPlayed skipLatest={layout === 'cover' && !visitor} />
+              <RecentlyPlayedFeed skipLatest={layout === 'cover' && !visitor} />
             </div>
           )}
         </div>

@@ -856,6 +856,8 @@ export const de: Translations = {
     completions: 'Abschlüsse',
   },
   cards: {
+    showAchievements: 'Erfolge anzeigen',
+    hideAchievements: 'Erfolge ausblenden',
     sectionFriends: 'Folge ich',
     statsActivity: 'Statistiken & Aktivität',
     dailyAchievements: 'Tägliche Errungenschaften · letzte 7 Tage',
@@ -1299,8 +1301,6 @@ export const de: Translations = {
     locked: 'Gesperrt',
     achievementsError: 'Erfolge konnten nicht geladen werden',
     retry: 'Erneut versuchen',
-    showAchievements: 'Erfolge anzeigen',
-    hideAchievements: 'Erfolge ausblenden',
     nowPlaying: 'Spielt gerade',
     gamesSection: 'Steam',
     gamesError: 'Deine Steam-Spiele konnten nicht geladen werden',

@@ -17,7 +17,6 @@ jest.mock('@/components/game-achievements-progress-chart/GameAchievementsProgres
   ),
 }))
 jest.mock('@/components/steam/steam-achievement-grid/SteamAchievementGrid', () => ({
-  achievementAnchor: (apiname: string) => `ach-${apiname}`,
   SteamAchievementGrid: ({ achievements, badgeSize }: { achievements: unknown[]; badgeSize: number }) => (
     <div data-testid="grid">{achievements.length}:{badgeSize}</div>
   ),

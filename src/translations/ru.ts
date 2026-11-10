@@ -856,6 +856,8 @@ export const ru: Translations = {
     completions: 'прохождения',
   },
   cards: {
+    showAchievements: 'Показать достижения',
+    hideAchievements: 'Скрыть достижения',
     sectionFriends: 'Подписки',
     statsActivity: 'Статистика & Активность',
     dailyAchievements: 'Ежедневные достижения · последние 7 дней',
@@ -1299,8 +1301,6 @@ export const ru: Translations = {
     locked: 'Не получено',
     achievementsError: 'Не удалось загрузить достижения',
     retry: 'Повторить',
-    showAchievements: 'Показать достижения',
-    hideAchievements: 'Скрыть достижения',
     nowPlaying: 'Сейчас играет',
     gamesSection: 'Steam',
     gamesError: 'Не удалось загрузить ваши игры Steam',

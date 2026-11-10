@@ -3,7 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
-import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
+import SteamGameItemAchievements from '@/components/steam/steam-game-item-achievements/SteamGameItemAchievements'
 import GameCardMark from '@/components/game-card-mark/GameCardMark'
 import GameCardPlatformTag from '@/components/game-card-platform-tag/GameCardPlatformTag'
 import GameCardPlaytime from '@/components/game-card-playtime/GameCardPlaytime'
@@ -61,7 +61,7 @@ export default function SteamSortableItem({
       progress={{ text, done, pct: hasCounts ? Math.min((earned / total) * 100, 100) : null }}
       detail={game ? <GameCardPlaytime minutes={game.playtimeForever} /> : null}
       lastPlayed={game?.lastPlayed}
-      expand={{ show: T.steam.showAchievements, hide: T.steam.hideAchievements }}
+      expand={{ show: T.cards.showAchievements, hide: T.cards.hideAchievements }}
       panel={() =>
         hasStats ? (
           <SteamGameItemAchievements appId={item.game_id} gameTitle={item.title} expectedCount={hasCounts ? total : undefined} badgeSize={48} limit={60} />

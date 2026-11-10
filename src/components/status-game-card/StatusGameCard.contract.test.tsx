@@ -65,7 +65,7 @@ const PLATFORMS: Platform[] = [
     href: '/gameInfo/1',
     source: 'ra',
     progress: `5 / 10 ${en.statusGameItem.achievements}`,
-    expand: { show: en.steam.showAchievements, hide: en.steam.hideAchievements },
+    expand: { show: en.cards.showAchievements, hide: en.cards.hideAchievements },
   },
   {
     name: 'Steam',
@@ -80,7 +80,7 @@ const PLATFORMS: Platform[] = [
     href: '/steamGame/620',
     source: 'steam',
     progress: `50 / 100 ${en.steam.achievements}`,
-    expand: { show: en.steam.showAchievements, hide: en.steam.hideAchievements },
+    expand: { show: en.cards.showAchievements, hide: en.cards.hideAchievements },
     mark: en.steam.perfect,
     lines: true,
   },

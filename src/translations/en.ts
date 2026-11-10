@@ -857,6 +857,8 @@ export const en = {
     completions: 'completions',
   },
   cards: {
+    showAchievements: 'Show achievements',
+    hideAchievements: 'Hide achievements',
     sectionFriends: 'Following',
     statsActivity: 'Stats & Activity',
     dailyAchievements: 'Daily achievements · last 7 days',
@@ -1300,8 +1302,6 @@ export const en = {
     locked: 'Locked',
     achievementsError: 'Could not load achievements',
     retry: 'Retry',
-    showAchievements: 'Show achievements',
-    hideAchievements: 'Hide achievements',
     nowPlaying: 'Now playing',
     gamesSection: 'Steam',
     gamesError: 'Could not load your Steam games',

@@ -7,7 +7,7 @@ jest.mock('@dnd-kit/sortable', () => ({
 jest.mock('@dnd-kit/utilities', () => ({ CSS: { Transform: { toString: () => '' } } }))
 // The panels fetch; the card only decides when they appear.
 jest.mock('../sortable-item/sortable-item-achievements/SortableItemAchievements', () => ({ __esModule: true, default: () => <div data-testid="panel" /> }))
-jest.mock('@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements', () => ({ __esModule: true, default: () => <div data-testid="panel" /> }))
+jest.mock('@/components/steam/steam-game-item-achievements/SteamGameItemAchievements', () => ({ __esModule: true, default: () => <div data-testid="panel" /> }))
 jest.mock('@/components/psn/psn-game-item-trophies/PsnGameItemTrophies', () => ({ __esModule: true, default: () => <div data-testid="panel" /> }))
 jest.mock('@/components/xbox/xbox-game-item-achievements/XboxGameItemAchievements', () => ({ __esModule: true, default: () => <div data-testid="panel" /> }))
 
@@ -53,7 +53,7 @@ const PLATFORMS: Platform[] = [
     item: { ...base, source: 'ra', game_id: 100 },
     href: '/gameInfo/100',
     stored: `2 / 10 ${en.statusGameItem.achievements}`,
-    expand: { show: en.steam.showAchievements, hide: en.steam.hideAchievements },
+    expand: { show: en.cards.showAchievements, hide: en.cards.hideAchievements },
     finished: () => {},
     nothing: () => {},
   },
@@ -63,7 +63,7 @@ const PLATFORMS: Platform[] = [
     item: { ...base, source: 'steam', game_id: 620, console_name: 'Steam' },
     href: '/steamGame/620',
     stored: `2 / 10 ${en.steam.achievements}`,
-    expand: { show: en.steam.showAchievements, hide: en.steam.hideAchievements },
+    expand: { show: en.cards.showAchievements, hide: en.cards.hideAchievements },
     finished: () => {
       const game = { ...toSteamGameProgress({ appid: 620, name: 'Halo', playtime_forever: 120, has_community_visible_stats: true }), achievementsLoaded: true, maxPossible: 10, numAwarded: 10, pctWon: 100 }
       ;(useSteamGamesData as jest.Mock).mockReturnValue({ library: [game], recent: [] })

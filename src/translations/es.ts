@@ -856,6 +856,8 @@ export const es: Translations = {
     completions: 'completados',
   },
   cards: {
+    showAchievements: 'Ver logros',
+    hideAchievements: 'Ocultar logros',
     sectionFriends: 'Siguiendo',
     statsActivity: 'Estadísticas y actividad',
     dailyAchievements: 'Logros diarios · últimos 7 días',
@@ -1299,8 +1301,6 @@ export const es: Translations = {
     locked: 'Bloqueado',
     achievementsError: 'No se pudieron cargar los logros',
     retry: 'Reintentar',
-    showAchievements: 'Ver logros',
-    hideAchievements: 'Ocultar logros',
     nowPlaying: 'Jugando ahora',
     gamesSection: 'Steam',
     gamesError: 'No se pudieron cargar tus juegos de Steam',

@@ -6,7 +6,7 @@ import type { PsnTrophy, TrophyGrade } from '@/types/psn'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
-import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { steamAchievementAnchor } from '@/utils/steamTitles'
 import { raBadgeUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
 
@@ -61,7 +61,7 @@ export const steamCompareItem = (a: SteamAchievementUnified): CompareAchievement
   description: a.description,
   iconUrl: a.badgeUrl || null,
   rarity: a.globalPct,
-  anchor: achievementAnchor(a.apiname),
+  anchor: steamAchievementAnchor(a.apiname),
   earned: a.earned,
   earnedAt: a.dateEarned,
   secret: a.hidden,

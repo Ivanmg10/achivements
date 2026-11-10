@@ -72,7 +72,7 @@ export default function SortableItem({
       }}
       detail={ptsTotal > 0 ? <GameCardLine>{`${ptsEarned} / ${ptsTotal} ${T.statusGameItem.pointsEarned}`}</GameCardLine> : null}
       lastPlayed={lastPlayed}
-      expand={{ show: T.steam.showAchievements, hide: T.steam.hideAchievements }}
+      expand={{ show: T.cards.showAchievements, hide: T.cards.hideAchievements }}
       panel={(open) => <SortableItemAchievements gameId={item.game_id} title={item.title} total={total} open={open} />}
     />
   )

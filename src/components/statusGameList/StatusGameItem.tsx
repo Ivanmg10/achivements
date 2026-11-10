@@ -64,7 +64,7 @@ export default function StatusGameItem({
         pct: pct === null ? null : isHardcore ? pct : 0,
         softPct: pct !== null && !isHardcore ? pct : 0,
       }}
-      expand={{ show: T.steam.showAchievements, hide: T.steam.hideAchievements }}
+      expand={{ show: T.cards.showAchievements, hide: T.cards.hideAchievements }}
       detail={<StatusGameItemDetail game={game} gameId={game.ID ?? game.GameID!} category={category} />}
     >
       <StatusGameItemLines game={game} extra={extra} category={category} />

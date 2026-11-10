@@ -6,7 +6,7 @@ import { earnedRing, type TableEntry } from '@/utils/achievementTable'
 import { formatUnlock } from '@/utils/steamFeed'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { badgeClass, badgeImgClass, MID, NUM, ROW, TD, TD_FIRST } from '@/components/ui/dataTable'
-import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
+import PinAchievementButton from '@/components/pin-achievement-button/PinAchievementButton'
 import RevealSecretButton from '@/components/reveal-secret-button/RevealSecretButton'
 
 /** When it was earned: RA says in which mode, in its colour. */
@@ -44,7 +44,7 @@ export default function AchievementTableRow<T>({
 }) {
   const { entry: e, eye } = view
   const pin = view.pinned !== undefined && (
-    <SteamPinAchievementButton pinned={view.pinned} title={view.title} onToggle={view.onTogglePin} size={pinInTitle ? 16 : 18} className="relative z-10 shrink-0" />
+    <PinAchievementButton pinned={view.pinned} title={view.title} onToggle={view.onTogglePin} size={pinInTitle ? 16 : 18} className="relative z-10 shrink-0" />
   )
 
   return (

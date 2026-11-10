@@ -856,6 +856,8 @@ export const it: Translations = {
     completions: 'completamenti',
   },
   cards: {
+    showAchievements: 'Mostra obiettivi',
+    hideAchievements: 'Nascondi obiettivi',
     sectionFriends: 'Seguiti',
     statsActivity: 'Statistiche & Attività',
     dailyAchievements: 'Obiettivi giornalieri · ultimi 7 giorni',
@@ -1299,8 +1301,6 @@ export const it: Translations = {
     locked: 'Bloccato',
     achievementsError: 'Impossibile caricare gli obiettivi',
     retry: 'Riprova',
-    showAchievements: 'Mostra obiettivi',
-    hideAchievements: 'Nascondi obiettivi',
     nowPlaying: 'Sta giocando',
     gamesSection: 'Steam',
     gamesError: 'Impossibile caricare i tuoi giochi Steam',

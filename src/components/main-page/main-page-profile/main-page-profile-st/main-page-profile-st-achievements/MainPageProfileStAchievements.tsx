@@ -1,7 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
-import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { steamAchievementAnchor } from '@/utils/steamTitles'
 import type { SteamRecentAchievement } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
@@ -39,7 +39,7 @@ export default function MainPageProfileStAchievements({
       {achievements.slice(0, 3).map((a) => (
         <MainPageProfileRecentRow
           key={`${a.appId}:${a.apiname}`}
-          href={`${gameHref('steam', a.appId, subject)}#${achievementAnchor(a.apiname)}`}
+          href={`${gameHref('steam', a.appId, subject)}#${steamAchievementAnchor(a.apiname)}`}
           badge={a.badgeUrl || null}
           title={a.title}
           sub={<>{a.gameTitle} · <time dateTime={a.unlockedAt}>{formatDate(a.unlockedAt, lang, { day: 'numeric', month: 'short' })}</time></>}

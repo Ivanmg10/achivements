@@ -13,7 +13,7 @@ import { BASE_GROUP, psnTrophyAnchor, trophiesByGroup, TROPHY_GRADE_COLOR } from
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import PsnTrophyGridGroup from './psn-trophy-grid-group/PsnTrophyGridGroup'
 import RevealSecretButton from '@/components/reveal-secret-button/RevealSecretButton'
-import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
+import PinAchievementButton from '@/components/pin-achievement-button/PinAchievementButton'
 import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
 import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy, PsnTrophyGroup, TrophyGrade } from '@/types/psn'
@@ -136,7 +136,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
                   />
                 )}
                 {canPin && (
-                  <SteamPinAchievementButton
+                  <PinAchievementButton
                     pinned={pinned.has(t.id)}
                     title={nameOf(t)}
                     onToggle={() => toggle(t)}

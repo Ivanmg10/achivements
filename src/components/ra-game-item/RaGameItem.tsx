@@ -103,7 +103,7 @@ export default function RaGameItem({
             onClick={onToggle}
             aria-expanded={expanded}
             aria-controls={panelId}
-            aria-label={`${expanded ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.Title}`}
+            aria-label={`${expanded ? T.cards.hideAchievements : T.cards.showAchievements}: ${game.Title}`}
             className="flex flex-col gap-1 w-full text-left rounded group cursor-pointer before:absolute before:inset-0 before:content-[''] focus-ring"
           >
             <span className="flex items-center gap-2 w-full">

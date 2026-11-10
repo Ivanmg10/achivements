@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import RARecentlyPlayed from './RARecentlyPlayed'
+import RecentlyPlayedFeed from './RecentlyPlayedFeed'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { MainViewProvider } from '@/context/MainViewContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -14,7 +14,7 @@ jest.mock('@/context/SteamGamesDataContext', () => ({
 function renderWithProviders(skipLatest = false) {
   return render(
     <MainViewProvider>
-      <RARecentlyPlayed skipLatest={skipLatest} />
+      <RecentlyPlayedFeed skipLatest={skipLatest} />
     </MainViewProvider>
   )
 }

@@ -66,6 +66,6 @@ test('a game without stats says so, and opens to that instead of a detail', () =
 
 test('opens the detail with the game and its list', () => {
   render(<SteamStatusGameItem game={game(partial)} category="playing" />)
-  fireEvent.click(screen.getByRole('button', { name: `${en.steam.showAchievements}: Fallout 4` }))
+  fireEvent.click(screen.getByRole('button', { name: `${en.cards.showAchievements}: Fallout 4` }))
   expect(screen.getByTestId('achievements')).toHaveTextContent('377160:playing')
 })

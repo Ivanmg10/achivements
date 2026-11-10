@@ -52,7 +52,7 @@ export default function SteamStatusGameItem({
         </>
       }
       progress={{ text, done, pct: hasCounts ? game.pctWon : null }}
-      expand={{ show: T.steam.showAchievements, hide: T.steam.hideAchievements }}
+      expand={{ show: T.cards.showAchievements, hide: T.cards.hideAchievements }}
       detail={
         game.hasStats ? (
           <SteamLibraryDetail game={game} category={category} />

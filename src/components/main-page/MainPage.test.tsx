@@ -28,7 +28,7 @@ jest.mock('@/components/main-page/main-page-charts/MainPageCharts', () => ({
   default: () => null,
 }))
 
-jest.mock('@/components/ra-recently-played/RARecentlyPlayed', () => ({
+jest.mock('@/components/recently-played-feed/RecentlyPlayedFeed', () => ({
   __esModule: true,
   default: () => null,
 }))

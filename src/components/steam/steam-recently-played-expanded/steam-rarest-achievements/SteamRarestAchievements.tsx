@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
-import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { steamAchievementAnchor } from '@/utils/steamTitles'
 import { formatRarity } from '@/utils/steamFeed'
 import type { SteamAchievementUnified } from '@/types/steam'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
@@ -54,7 +54,7 @@ export default function SteamRarestAchievements({
           {rarest.map((a) => (
             <li key={a.apiname}>
               <Link
-                href={`${gameHref('steam', appId, subject)}#${achievementAnchor(a.apiname)}`}
+                href={`${gameHref('steam', appId, subject)}#${steamAchievementAnchor(a.apiname)}`}
                 className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam"
               >
                 {a.badgeUrl ? (

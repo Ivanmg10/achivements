@@ -53,6 +53,6 @@ test('with no counts anywhere it writes the total alone and draws no bar', () =>
 
 test('hands its panel the game, its total and whether it is open', () => {
   card()
-  fireEvent.click(screen.getByRole('button', { name: `${en.steam.showAchievements}: Test Game` }))
+  fireEvent.click(screen.getByRole('button', { name: `${en.cards.showAchievements}: Test Game` }))
   expect(screen.getByTestId('panel')).toHaveTextContent('100:100:true')
 })

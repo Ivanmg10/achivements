@@ -99,7 +99,7 @@ describe('links to the game page', () => {
 describe('expansion', () => {
   test('is a real button that reports its state and names the game', () => {
     render(<SteamGameItem game={game()} />)
-    const button = screen.getByRole('button', { name: `${en.steam.showAchievements}: Portal 2` })
+    const button = screen.getByRole('button', { name: `${en.cards.showAchievements}: Portal 2` })
     expect(button.getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByTestId('achievements')).not.toBeInTheDocument()
   })
@@ -148,7 +148,7 @@ test('accepts extra root classes so it can fill a layout slot', () => {
 test('the expand button names the action it will take', () => {
   render(<SteamGameItem game={game()} />)
   fireEvent.click(screen.getByRole('button', { name: /achievements: / }))
-  expect(screen.getByRole('button', { name: `${en.steam.hideAchievements}: Portal 2` })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: `${en.cards.hideAchievements}: Portal 2` })).toBeInTheDocument()
 })
 
 test('opens the same dashboard RA games open into, for this game', () => {

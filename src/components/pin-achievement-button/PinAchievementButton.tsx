@@ -3,10 +3,10 @@ import { useLanguage } from '@/context/LanguageContext'
 import ToggleButton from '@/components/ui/ToggleButton'
 
 /**
- * Pins a Steam achievement to the main page's pinned card, or unpins it: the
+ * Pins an achievement (any platform's) to the main page's pinned card, or unpins it: the
  * library's toggle button, which reports its state and fills the star when pinned.
  */
-export default function SteamPinAchievementButton({
+export default function PinAchievementButton({
   pinned,
   title,
   onToggle,

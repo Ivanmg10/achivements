@@ -8,13 +8,14 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
 import { formatDate } from '@/utils/dates'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
-import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
+import PinAchievementButton from '@/components/pin-achievement-button/PinAchievementButton'
 import type { SteamAchievementUnified } from '@/types/steam'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import { capList } from '@/utils/utils'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import CursorTooltip from '@/components/ui/CursorTooltip'
+import { steamAchievementAnchor } from '@/utils/steamTitles'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -24,11 +25,6 @@ const SIZE_CLASSES = {
 const TOOLTIP_DELAY_MS = 450
 
 type Tooltip = { achievement: SteamAchievementUnified; x: number; y: number }
-
-/** Anchor id for an achievement row on the Steam game page. */
-export function achievementAnchor(apiname: string): string {
-  return `ach-${apiname}`
-}
 
 /**
  * A Steam game's achievements as a badge grid, matching RA's AchievementGrid:
@@ -84,7 +80,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
         {shown.map((a) => (
           <li key={a.apiname} className="relative group/badge">
             <Link
-              href={`${gameHref('steam', appId, subject)}#${achievementAnchor(a.apiname)}`}
+              href={`${gameHref('steam', appId, subject)}#${steamAchievementAnchor(a.apiname)}`}
               aria-label={`${titleOf(a)} — ${a.earned ? T.steam.earned : T.steam.locked}`}
               onMouseEnter={(e) => show(a, e.clientX, e.clientY)}
               onMouseLeave={hide}
@@ -111,7 +107,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
               )}
             </Link>
             {canPin && (
-              <SteamPinAchievementButton
+              <PinAchievementButton
                 pinned={pinned.has(a.apiname)}
                 title={titleOf(a)}
                 onToggle={() => toggle(a)}

@@ -9,7 +9,7 @@ import { notify } from '@/lib/notify'
 import RaGameItem from '@/components/ra-game-item/RaGameItem'
 import { MainViewToggle } from '@/components/main-view-toggle/MainViewToggle'
 import ViewEntrance from '@/components/view-entrance/ViewEntrance'
-import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-recently-played-expanded/RARecentlyPlayedExpanded'
+import { RARecentlyPlayedExpanded } from '@/components/recently-played-feed/ra-recently-played-expanded/RARecentlyPlayedExpanded'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 import { SectionFallback } from '@/components/ui/SectionFallback'
@@ -37,7 +37,7 @@ const VIEW_EASE = [0.4, 0, 0.2, 1] as const
 const ROW_STYLE = { flex: '1 1 0%' }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-export default function RARecentlyPlayed({ skipLatest = false }: { skipLatest?: boolean }) {
+export default function RecentlyPlayedFeed({ skipLatest = false }: { skipLatest?: boolean }) {
   const { T } = useLanguage()
   const subject = useSubject()
   const reduce = useReducedMotion()
@@ -74,7 +74,7 @@ export default function RARecentlyPlayed({ skipLatest = false }: { skipLatest?: 
         const data: RetroAchievementsGameWithAchievements = await res.json()
         setGameDataMap((prev) => new Map(prev).set(gameId, data))
       } catch (err) {
-        console.error('[RARecentlyPlayed]', err)
+        console.error('[RecentlyPlayedFeed]', err)
         notify.error(T.toast.loadAchievementsFailed)
       } finally {
         setLoadingId(null)

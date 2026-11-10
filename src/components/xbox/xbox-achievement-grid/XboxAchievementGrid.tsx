@@ -12,7 +12,7 @@ import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import ConcealedBadge from '@/components/concealed-badge/ConcealedBadge'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import RevealSecretButton from '@/components/reveal-secret-button/RevealSecretButton'
-import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
+import PinAchievementButton from '@/components/pin-achievement-button/PinAchievementButton'
 import { useRevealedAchievements } from '@/hooks/useRevealedAchievements'
 import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements'
 import { useSubject } from '@/context/SubjectContext'
@@ -117,7 +117,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
               />
             )}
             {canPin && (
-              <SteamPinAchievementButton
+              <PinAchievementButton
                 pinned={pinned.has(a.id)}
                 title={nameOf(a)}
                 onToggle={() => toggle(a)}

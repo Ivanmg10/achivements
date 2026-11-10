@@ -79,14 +79,14 @@ test('has a labelled drag handle', () => {
 test('expands into the same dashboard as the recent feed', () => {
   const onToggle = jest.fn()
   const { rerender } = render(<SteamPinnedGameRow appId={620} isOpen={false} onToggle={onToggle} />)
-  const expand = screen.getByRole('button', { name: `${en.steam.showAchievements}: Portal 2` })
+  const expand = screen.getByRole('button', { name: `${en.cards.showAchievements}: Portal 2` })
   expect(expand.getAttribute('aria-expanded')).toBe('false')
   fireEvent.click(expand)
   expect(onToggle).toHaveBeenCalledTimes(1)
 
   rerender(<SteamPinnedGameRow appId={620} isOpen onToggle={onToggle} />)
   expect(screen.getByTestId('dashboard')).toHaveTextContent('Portal 2')
-  expect(screen.getByRole('button', { name: `${en.steam.hideAchievements}: Portal 2` })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: `${en.cards.hideAchievements}: Portal 2` })).toBeInTheDocument()
 })
 
 test('says so instead of loading achievements for a game without any', () => {

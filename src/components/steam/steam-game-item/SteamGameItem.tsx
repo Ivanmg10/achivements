@@ -101,7 +101,7 @@ export default function SteamGameItem({
             onClick={toggle}
             aria-expanded={isExpanded}
             aria-controls={panelId}
-            aria-label={`${isExpanded ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.title}`}
+            aria-label={`${isExpanded ? T.cards.hideAchievements : T.cards.showAchievements}: ${game.title}`}
             className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam group"
           >
             <span className="flex items-center gap-2 w-full">

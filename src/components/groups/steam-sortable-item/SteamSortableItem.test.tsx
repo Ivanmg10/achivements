@@ -3,7 +3,7 @@ jest.mock('@dnd-kit/sortable', () => ({
   useSortable: () => ({ attributes: {}, listeners: {}, setNodeRef: () => {}, transform: null, transition: undefined, isDragging: false }),
 }))
 jest.mock('@dnd-kit/utilities', () => ({ CSS: { Transform: { toString: () => '' } } }))
-jest.mock('@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements', () => ({
+jest.mock('@/components/steam/steam-game-item-achievements/SteamGameItemAchievements', () => ({
   __esModule: true,
   default: ({ appId, expectedCount }: { appId: number; expectedCount?: number }) => (
     <div data-testid="achievements">{appId}:{String(expectedCount)}</div>
@@ -63,7 +63,7 @@ test('says progress is unknown when nothing is known yet', () => {
 
 test('opens into the badge grid with the total it expects', () => {
   render(<SteamSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
-  fireEvent.click(screen.getByRole('button', { name: `${en.steam.showAchievements}: Portal 2` }))
+  fireEvent.click(screen.getByRole('button', { name: `${en.cards.showAchievements}: Portal 2` }))
   expect(screen.getByTestId('achievements')).toHaveTextContent('620:51')
 })
 
