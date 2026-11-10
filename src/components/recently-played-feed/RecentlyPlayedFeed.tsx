@@ -9,7 +9,7 @@ import { notify } from '@/lib/notify'
 import RaGameItem from '@/components/ra-game-item/RaGameItem'
 import { MainViewToggle } from '@/components/main-view-toggle/MainViewToggle'
 import ViewEntrance from '@/components/view-entrance/ViewEntrance'
-import { RARecentlyPlayedExpanded } from '@/components/recently-played-feed/ra-recently-played-expanded/RARecentlyPlayedExpanded'
+import RaRecentlyPlayedExpanded from '@/components/recently-played-feed/ra-recently-played-expanded/RaRecentlyPlayedExpanded'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 import { SectionFallback } from '@/components/ui/SectionFallback'
@@ -171,7 +171,7 @@ export default function RecentlyPlayedFeed({ skipLatest = false }: { skipLatest?
                 <ViewEntrance key={item.key} kind="feed" index={i} play={!entered} onStart={i === 0 ? () => setEntered(true) : undefined} style={ROW_STYLE} className="flex flex-col min-h-0">
                   <RaGameItem game={g} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1">
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? 0 : 0.25, delay: reduce ? 0 : 0.1 }}>
-                      <RARecentlyPlayedExpanded
+                      <RaRecentlyPlayedExpanded
                         game={g}
                         achievements={achievements}
                         numDistinctPlayers={data?.NumDistinctPlayers ?? 1}

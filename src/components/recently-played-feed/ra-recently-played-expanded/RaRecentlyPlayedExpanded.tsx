@@ -3,13 +3,16 @@
 import { RecentlyPlayedGame, RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
-import { CircularProgress } from '@/components/ui/CircularProgress'
 import { fromRa } from '@/utils/gameInsights'
-import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
+import GameExpandedLayout from '@/components/game-expanded-layout/GameExpandedLayout'
 import { GamePinnedAchievements } from '@/components/game-pinned-achievements/GamePinnedAchievements'
 import { GameExpandedMobileStats } from './game-expanded-mobile-stats/GameExpandedMobileStats'
 
-export function RARecentlyPlayedExpanded({
+/**
+ * An opened RA game in the recent feed: the ring with its points on small screens, the chart and the
+ * pinned achievements, the full grid below, which holds its own skeleton until the pictures are in.
+ */
+export default function RaRecentlyPlayedExpanded({
   game,
   achievements,
   numDistinctPlayers,
@@ -35,14 +38,11 @@ export function RARecentlyPlayedExpanded({
       : 0
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
-        <CircularProgress
-          earned={game.NumAchieved}
-          total={game.NumPossibleAchievements}
-          label={T.gameExpanded.allAchievements}
-          size={130}
-        />
+    <GameExpandedLayout
+      earned={game.NumAchieved}
+      total={game.NumPossibleAchievements}
+      ringLabel={T.gameExpanded.allAchievements}
+      ringExtra={
         <GameExpandedMobileStats
           points={earnedPoints}
           totalPoints={totalPoints}
@@ -50,28 +50,26 @@ export function RARecentlyPlayedExpanded({
           completionPct={completionPct}
           remaining={remaining}
         />
-      </div>
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
-        <p className="text-sm font-bold text-text-main mb-2.5">{T.gameExpanded.allAchievements}</p>
-        <AchievementGrid
-          achievements={isLoading ? [] : achievements}
-          total={game.NumPossibleAchievements}
-          gameId={game.GameID}
-          gameTitle={game.Title}
-          numDistinctPlayers={numDistinctPlayers}
-        />
-      </div>
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-2 lg:row-start-1">
-        <GameAchievementsProgressChart achievements={fromRa(achievements, numDistinctPlayers, game.GameID)} isLoading={isLoading} />
-      </div>
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-3 lg:row-start-1">
+      }
+      gridTitle={T.gameExpanded.allAchievements}
+      unlocks={fromRa(achievements, numDistinctPlayers, game.GameID)}
+      isLoading={isLoading}
+      side={
         <GamePinnedAchievements
           gameId={game.GameID}
           gameTitle={game.Title}
           numDistinctPlayers={numDistinctPlayers}
           achievements={achievements}
         />
-      </div>
-    </div>
+      }
+    >
+      <AchievementGrid
+        achievements={isLoading ? [] : achievements}
+        total={game.NumPossibleAchievements}
+        gameId={game.GameID}
+        gameTitle={game.Title}
+        numDistinctPlayers={numDistinctPlayers}
+      />
+    </GameExpandedLayout>
   )
 }

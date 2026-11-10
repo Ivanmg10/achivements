@@ -3,26 +3,19 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
 import { fromSteam } from '@/utils/gameInsights'
-import { CircularProgress } from '@/components/ui/CircularProgress'
-import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
+import GameExpandedLayout from '@/components/game-expanded-layout/GameExpandedLayout'
+import LazyBadgeGrid from '@/components/badge-grid/lazy-badge-grid/LazyBadgeGrid'
 import { SteamAchievementGrid } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import SteamExpandedStats from './steam-expanded-stats/SteamExpandedStats'
 import SteamRarestAchievements from './steam-rarest-achievements/SteamRarestAchievements'
 import type { SteamGameProgress } from '@/types/steam'
-import { Skeleton } from '@/components/ui/Skeleton'
-import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const SKELETON_BADGES = 24
 
 /**
- * An expanded Steam game in the recent feed, laid out exactly like RA's
- * RARecentlyPlayedExpanded: progress ring (+ stats on small screens), the
- * achievements-over-time chart and a side panel on top, the full badge grid
- * across the card below —
- * the player's rarest unlocks where RA shows pinned achievements.
- *
- * Achievements load when this mounts, i.e. when the card is opened. Until
- * then the ring uses the counts the feed already has.
+ * An opened Steam game in the recent feed: the ring with its stats on small screens, the chart and the
+ * player's rarest unlocks, the full grid below. Achievements load when this mounts, i.e. when the card is
+ * opened. Until then the ring uses the counts the feed already has.
  */
 export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameProgress }) {
   const { T } = useLanguage()
@@ -33,44 +26,32 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
   const earned = loaded ? achievements.filter((a) => a.earned).length : game.numAwarded
   const completionPct = total > 0 ? Math.round((earned / total) * 100) : 0
 
-  const unlocks = fromSteam(achievements, game.id)
-
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
-        <CircularProgress earned={earned} total={total} label={T.gameExpanded.allAchievements} size={130} />
+    <GameExpandedLayout
+      earned={earned}
+      total={total}
+      ringLabel={T.gameExpanded.allAchievements}
+      ringExtra={
         <SteamExpandedStats
           playtimeForever={game.playtimeForever}
           playtime2Weeks={game.playtime2Weeks}
           completionPct={completionPct}
           remaining={Math.max(0, total - earned)}
         />
-      </div>
-
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
-        <p className="text-sm font-bold text-text-main mb-2.5">{T.gameExpanded.allAchievements}</p>
-        {isLoading ? (
-          <ul aria-busy="true" className="flex flex-wrap gap-1">
-            {Array.from({ length: Math.min(total || SKELETON_BADGES, 60) }).map((_, i) => (
-              <li key={i}><Skeleton radius="tile" className="w-10 h-10" /></li>
-            ))}
-          </ul>
-        ) : error ? (
-          <ErrorRetry message={T.steam.achievementsError} hint={T.steam.privateProfileHint} retryLabel={T.steam.retry} onRetry={retry} />
-        ) : loaded ? (
-          <SteamAchievementGrid appId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={40} />
-        ) : (
-          <p className="text-sm text-text-secondary">{T.steam.noAchievements}</p>
-        )}
-      </div>
-
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-2 lg:row-start-1">
-        <GameAchievementsProgressChart achievements={unlocks} isLoading={isLoading} />
-      </div>
-
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-3 lg:row-start-1">
-        <SteamRarestAchievements appId={game.id} achievements={achievements} isLoading={isLoading} />
-      </div>
-    </div>
+      }
+      gridTitle={T.gameExpanded.allAchievements}
+      unlocks={fromSteam(achievements, game.id)}
+      isLoading={isLoading}
+      side={<SteamRarestAchievements appId={game.id} achievements={achievements} isLoading={isLoading} />}
+    >
+      <LazyBadgeGrid
+        loading={isLoading}
+        count={total || SKELETON_BADGES}
+        error={error ? { message: T.steam.achievementsError, hint: T.steam.privateProfileHint, retryLabel: T.steam.retry, onRetry: retry } : null}
+        empty={loaded ? null : T.steam.noAchievements}
+      >
+        <SteamAchievementGrid appId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={40} />
+      </LazyBadgeGrid>
+    </GameExpandedLayout>
   )
 }

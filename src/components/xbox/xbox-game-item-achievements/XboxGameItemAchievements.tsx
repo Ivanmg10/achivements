@@ -3,15 +3,13 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { XboxAchievementGrid } from '@/components/xbox/xbox-achievement-grid/XboxAchievementGrid'
-import { Skeleton } from '@/components/ui/Skeleton'
-import ErrorRetry from '@/components/ui/ErrorRetry'
+import LazyBadgeGrid from '@/components/badge-grid/lazy-badge-grid/LazyBadgeGrid'
 
 const SKELETON_BADGES = 12
 
 /**
- * An Xbox game's achievements inside an expanded card, fetched when this
- * mounts — i.e. when the card is opened — not for every game in a list. Shown
- * as a badge grid, like PsnGameItemTrophies.
+ * An Xbox game's achievements inside an expanded card, fetched when this mounts, i.e. when the card is
+ * opened, not for every game in a list.
  */
 export default function XboxGameItemAchievements({
   gameId,
@@ -33,31 +31,16 @@ export default function XboxGameItemAchievements({
   const { T } = useLanguage()
   const { achievements, isLoading, error, retry } = useXboxAchievements(titleId)
 
-  if (isLoading) {
-    const badge = badgeSize === 40 ? 'w-10 h-10' : 'w-12 h-12'
-    return (
-      <ul aria-busy="true" className="flex flex-wrap gap-1">
-        {Array.from({ length: Math.min(expectedCount || SKELETON_BADGES, 60) }).map((_, i) => (
-          <li key={i}><Skeleton radius="tile" className={badge} /></li>
-        ))}
-      </ul>
-    )
-  }
-
-  if (error) {
-    return (
-      <ErrorRetry
-        message={T.xbox.achievementsError}
-        hint={error === 'private' ? T.xbox.errors.private : undefined}
-        retryLabel={T.xbox.retry}
-        onRetry={retry}
-      />
-    )
-  }
-
-  if (achievements.length === 0) {
-    return <p className="text-sm text-text-secondary text-center py-2">{T.xbox.noAchievements}</p>
-  }
-
-  return <XboxAchievementGrid gameId={gameId} gameTitle={gameTitle} achievements={achievements} badgeSize={badgeSize} limit={limit} />
+  return (
+    <LazyBadgeGrid
+      loading={isLoading}
+      count={expectedCount || SKELETON_BADGES}
+      size={badgeSize}
+      error={error ? { message: T.xbox.achievementsError, hint: error === 'private' ? T.xbox.errors.private : undefined, retryLabel: T.xbox.retry, onRetry: retry } : null}
+      empty={achievements.length === 0 ? T.xbox.noAchievements : null}
+      centered
+    >
+      <XboxAchievementGrid gameId={gameId} gameTitle={gameTitle} achievements={achievements} badgeSize={badgeSize} limit={limit} />
+    </LazyBadgeGrid>
+  )
 }

@@ -3,15 +3,13 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
 import { SteamAchievementGrid } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
-import { Skeleton } from '@/components/ui/Skeleton'
-import ErrorRetry from '@/components/ui/ErrorRetry'
+import LazyBadgeGrid from '@/components/badge-grid/lazy-badge-grid/LazyBadgeGrid'
 
 const SKELETON_BADGES = 12
 
 /**
- * A Steam game's achievements inside an expanded card, fetched when this
- * mounts — i.e. when the card is opened — not for every game in a list.
- * Shows them as a badge grid, like RA cards do.
+ * A Steam game's achievements inside an expanded card, fetched when this mounts, i.e. when the card is
+ * opened, not for every game in a list.
  */
 export default function SteamGameItemAchievements({
   appId,
@@ -30,26 +28,16 @@ export default function SteamGameItemAchievements({
   const { T } = useLanguage()
   const { achievements, isLoading, error, retry } = useSteamAchievements(appId)
 
-  if (isLoading) {
-    const badge = badgeSize === 40 ? 'w-10 h-10' : 'w-12 h-12'
-    return (
-      <ul aria-busy="true" className="flex flex-wrap gap-1">
-        {Array.from({ length: Math.min(expectedCount || SKELETON_BADGES, 60) }).map((_, i) => (
-          <li key={i}><Skeleton radius="tile" className={badge} /></li>
-        ))}
-      </ul>
-    )
-  }
-
-  if (error) {
-    return (
-      <ErrorRetry message={T.steam.achievementsError} hint={T.steam.privateProfileHint} retryLabel={T.steam.retry} onRetry={retry} />
-    )
-  }
-
-  if (achievements.length === 0) {
-    return <p className="text-sm text-text-secondary text-center py-2">{T.steam.noAchievements}</p>
-  }
-
-  return <SteamAchievementGrid appId={appId} gameTitle={gameTitle} achievements={achievements} badgeSize={badgeSize} limit={limit} />
+  return (
+    <LazyBadgeGrid
+      loading={isLoading}
+      count={expectedCount || SKELETON_BADGES}
+      size={badgeSize}
+      error={error ? { message: T.steam.achievementsError, hint: T.steam.privateProfileHint, retryLabel: T.steam.retry, onRetry: retry } : null}
+      empty={achievements.length === 0 ? T.steam.noAchievements : null}
+      centered
+    >
+      <SteamAchievementGrid appId={appId} gameTitle={gameTitle} achievements={achievements} badgeSize={badgeSize} limit={limit} />
+    </LazyBadgeGrid>
+  )
 }

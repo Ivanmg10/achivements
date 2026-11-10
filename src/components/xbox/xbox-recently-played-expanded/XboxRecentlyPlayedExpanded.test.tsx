@@ -38,19 +38,9 @@ test("loads the game's achievements and lays out the dashboard", () => {
   expect(screen.getByText('G', { selector: 'abbr span' })).toBeInTheDocument()
 })
 
-test('a failed load can be retried', () => {
-  setAchievements({ achievements: [], error: 'failed' })
-  render(<XboxRecentlyPlayedExpanded game={GAME} />)
-  expect(screen.getByRole('alert')).toHaveTextContent(en.xbox.achievementsError)
-  fireEvent.click(screen.getByRole('button', { name: en.xbox.retry }))
-  expect(retry).toHaveBeenCalled()
-})
 
-test('while loading, a skeleton the size of the set', () => {
-  setAchievements({ achievements: [], isLoading: true })
-  const { container } = render(<XboxRecentlyPlayedExpanded game={GAME} />)
-  expect(container.querySelectorAll('[aria-busy="true"] li')).toHaveLength(10)
-})
+
+
 
 test('a game whose count the list does not know still has a skeleton, and the loaded count takes over', () => {
   const unknown = xboxGameFixture({ maxPossible: 0, totalKnown: false, numAwarded: 15 })
@@ -62,8 +52,12 @@ test('a game whose count the list does not know still has a skeleton, and the lo
   expect(screen.getByText('1/2', { exact: false })).toBeInTheDocument()
 })
 
-test('a loaded game with no achievements says so', () => {
-  setAchievements({ achievements: [] })
+
+
+test('a private library says so under the failure', () => {
+  setAchievements({ achievements: [], error: 'private' })
   render(<XboxRecentlyPlayedExpanded game={GAME} />)
-  expect(screen.getByText(en.xbox.noAchievements)).toBeInTheDocument()
+  expect(screen.getByText(en.xbox.errors.private)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: en.xbox.retry }))
+  expect(retry).toHaveBeenCalled()
 })

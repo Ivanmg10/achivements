@@ -10,8 +10,9 @@ jest.mock('@dnd-kit/sortable', () => ({
 }))
 jest.mock('@dnd-kit/utilities', () => ({ CSS: { Transform: { toString: () => '' } } }))
 jest.mock('@/components/steam/steam-game-image/SteamGameImage', () => ({ __esModule: true, default: () => <span /> }))
-jest.mock('@/components/recently-played-feed/ra-recently-played-expanded/RARecentlyPlayedExpanded', () => ({
-  RARecentlyPlayedExpanded: () => <div data-testid="panel" />,
+jest.mock('@/components/recently-played-feed/ra-recently-played-expanded/RaRecentlyPlayedExpanded', () => ({
+  __esModule: true,
+  default: () => <div data-testid="panel" />,
 }))
 jest.mock('@/components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded', () => ({ __esModule: true, default: () => <div data-testid="panel" /> }))
 jest.mock('@/components/psn/psn-recently-played-expanded/PsnRecentlyPlayedExpanded', () => ({ __esModule: true, default: () => <div data-testid="panel" /> }))

@@ -3,24 +3,21 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { fromXbox } from '@/utils/gameInsights'
-import { CircularProgress } from '@/components/ui/CircularProgress'
-import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
+import GameExpandedLayout from '@/components/game-expanded-layout/GameExpandedLayout'
+import LazyBadgeGrid from '@/components/badge-grid/lazy-badge-grid/LazyBadgeGrid'
 import { XboxAchievementGrid } from '@/components/xbox/xbox-achievement-grid/XboxAchievementGrid'
 import XboxRarestAchievements from '@/components/xbox/xbox-rarest-achievements/XboxRarestAchievements'
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPartialListNote'
 import type { XboxGameProgress } from '@/types/xbox'
-import { Skeleton } from '@/components/ui/Skeleton'
-import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const SKELETON_BADGES = 24
 
 /**
- * An expanded Xbox game in the recent feed and the pinned list, laid out like
- * PSN's: progress ring (with the gamerscore), the achievements-over-time chart
- * and the rarest earned on top, the full badge grid across the card below.
- * Achievements load when this mounts, i.e. when the card is opened; until then
- * the ring uses the counts the list already has.
+ * An opened Xbox game in the recent feed and the pinned list: the ring with the gamerscore, the chart
+ * and the rarest earned, the full grid below. Achievements load when this mounts, i.e. when the card is
+ * opened; until then the ring uses the counts the list already has. Xbox 360 lists only what was
+ * unlocked, and the note under the grid says when the list is short.
  */
 export default function XboxRecentlyPlayedExpanded({ game }: { game: XboxGameProgress }) {
   const { T } = useLanguage()
@@ -31,42 +28,26 @@ export default function XboxRecentlyPlayedExpanded({ game }: { game: XboxGamePro
   const total = loaded && !game.totalKnown ? achievements.length : Math.max(game.maxPossible, achievements.length)
   const earned = loaded ? achievements.filter((a) => a.unlocked).length : game.numAwarded
 
-  const unlocks = fromXbox(achievements, game.id)
-
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
-        <CircularProgress earned={earned} total={total} label={T.xbox.achievements} size={130} />
-        <XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} className="text-sm" />
-      </div>
-
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
-        <p className="text-sm font-bold text-text-main mb-2.5">{T.xbox.achievements}</p>
-        {isLoading ? (
-          <ul aria-busy="true" className="flex flex-wrap gap-1">
-            {Array.from({ length: Math.min(total || SKELETON_BADGES, 60) }).map((_, i) => (
-              <li key={i}><Skeleton radius="tile" className="w-10 h-10" /></li>
-            ))}
-          </ul>
-        ) : error ? (
-          <ErrorRetry message={T.xbox.achievementsError} hint={error === 'private' ? T.xbox.errors.private : undefined} retryLabel={T.xbox.retry} onRetry={retry} />
-        ) : loaded ? (
-          <>
-            <XboxAchievementGrid gameId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={40} />
-            <XboxPartialListNote game={game} listed={achievements.length} />
-          </>
-        ) : (
-          <p className="text-sm text-text-secondary">{T.xbox.noAchievements}</p>
-        )}
-      </div>
-
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-2 lg:row-start-1">
-        <GameAchievementsProgressChart achievements={unlocks} isLoading={isLoading} />
-      </div>
-
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-3 lg:row-start-1">
-        <XboxRarestAchievements gameId={game.id} achievements={achievements} isLoading={isLoading} />
-      </div>
-    </div>
+    <GameExpandedLayout
+      earned={earned}
+      total={total}
+      ringLabel={T.xbox.achievements}
+      ringExtra={<XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} className="text-sm" />}
+      gridTitle={T.xbox.achievements}
+      unlocks={fromXbox(achievements, game.id)}
+      isLoading={isLoading}
+      side={<XboxRarestAchievements gameId={game.id} achievements={achievements} isLoading={isLoading} />}
+    >
+      <LazyBadgeGrid
+        loading={isLoading}
+        count={total || SKELETON_BADGES}
+        error={error ? { message: T.xbox.achievementsError, hint: error === 'private' ? T.xbox.errors.private : undefined, retryLabel: T.xbox.retry, onRetry: retry } : null}
+        empty={loaded ? null : T.xbox.noAchievements}
+      >
+        <XboxAchievementGrid gameId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={40} />
+        <XboxPartialListNote game={game} listed={achievements.length} />
+      </LazyBadgeGrid>
+    </GameExpandedLayout>
   )
 }

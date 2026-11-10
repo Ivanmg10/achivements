@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { CONSOLES } from '@/constants'
 import { COVER_ROW_IMAGE } from '@/components/game-card-cover/GameCardCover'
 import { SectionFallback } from '@/components/ui/SectionFallback'
-import { RARecentlyPlayedExpanded } from '@/components/recently-played-feed/ra-recently-played-expanded/RARecentlyPlayedExpanded'
+import RaRecentlyPlayedExpanded from '@/components/recently-played-feed/ra-recently-played-expanded/RaRecentlyPlayedExpanded'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 import { raImageUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
@@ -68,7 +68,7 @@ export default function PinnedGameRow({
         counts: total > 0 && <span>{earned}/{total} {T.statusGameItem.achievements}</span>,
         expand: { show: T.cards.showAchievements, hide: T.cards.hideAchievements },
         panel: (
-          <RARecentlyPlayedExpanded
+          <RaRecentlyPlayedExpanded
             game={{ GameID: gameId, Title: game.Title ?? '', NumAchieved: earned, NumPossibleAchievements: total }}
             achievements={achievements}
             numDistinctPlayers={game.NumDistinctPlayers ?? 1}

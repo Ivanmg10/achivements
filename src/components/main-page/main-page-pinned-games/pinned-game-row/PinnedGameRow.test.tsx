@@ -8,8 +8,9 @@ jest.mock('@/hooks/useGameProgression', () => ({
 jest.mock('@/context/PinnedGamesContext', () => ({
   usePinnedGames: () => ({ isPinned: () => true, pinGame: jest.fn(), unpinGame: jest.fn() }),
 }))
-jest.mock('@/components/recently-played-feed/ra-recently-played-expanded/RARecentlyPlayedExpanded', () => ({
-  RARecentlyPlayedExpanded: ({ achievements }: { achievements: unknown[] }) => (
+jest.mock('@/components/recently-played-feed/ra-recently-played-expanded/RaRecentlyPlayedExpanded', () => ({
+  __esModule: true,
+  default: ({ achievements }: { achievements: unknown[] }) => (
     <div data-testid="achievement-grid">{achievements.length} achievements</div>
   ),
 }))

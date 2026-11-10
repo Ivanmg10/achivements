@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { RARecentlyPlayedExpanded } from './RARecentlyPlayedExpanded'
+import RaRecentlyPlayedExpanded from './RaRecentlyPlayedExpanded'
 import { RecentlyPlayedGame, RetroAchievement } from '@/types/types'
 
 global.fetch = jest.fn()
@@ -47,7 +47,7 @@ beforeEach(() => {
 
 test('renders the circular ring, progress chart and achievement grid for the game', async () => {
   render(
-    <RARecentlyPlayedExpanded
+    <RaRecentlyPlayedExpanded
       game={game}
       achievements={[achievement]}
       numDistinctPlayers={5}
@@ -62,7 +62,7 @@ test('renders the circular ring, progress chart and achievement grid for the gam
 
 test('passes an empty achievement list to the grid while loading', () => {
   const { container } = render(
-    <RARecentlyPlayedExpanded game={game} achievements={[achievement]} numDistinctPlayers={5} isLoading />,
+    <RaRecentlyPlayedExpanded game={game} achievements={[achievement]} numDistinctPlayers={5} isLoading />,
   )
   expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
 })
