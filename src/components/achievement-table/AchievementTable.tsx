@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion'
 import { IconTrophyOff } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { GameSource } from '@/types/game'
-import type { AchievementColumn, AchievementView, DetailBase, PinControl, RevealControl, TableTexts } from '@/types/achievementTable'
+import type { AchievementColumn, AchievementView, DetailOptions, PinControl, RevealControl, TableTexts } from '@/types/achievementTable'
 import { useAchievementTable } from '@/hooks/useAchievementTable'
 import type { CompareAchievement } from '@/utils/gameCompare'
 import type { TableEntry } from '@/utils/achievementTable'
@@ -44,8 +44,7 @@ export type AchievementTableProps<T> = {
   notice?: { match: (e: TableEntry<T>) => boolean; tone?: 'danger' | 'warning'; lead?: (n: number) => string; text?: string }
   /** Tabs over the table that show one part of the game (PSN's DLC). */
   scopes?: { of: (t: T) => string; tabs: (scope: string, onSelect: (scope: string) => void, panelId: string) => ReactNode }
-  /** The detail window: its tags and the name guides search by, or a window of the platform's own (RA). */
-  detail?: { tags?: (t: T) => ReactNode; guideTitle?: (t: T) => string; render?: (t: T, base: DetailBase) => ReactNode }
+  detail?: DetailOptions<T>
   /** Steam shows a secret one's picture; PSN and Xbox hide it with its name. */
   keepSecretIcon?: boolean
   pinInTitle?: boolean
@@ -68,7 +67,6 @@ export default function AchievementTable<T>(props: AchievementTableProps<T>) {
   const concealed = (e: TableEntry<T>) => !!e.row.secret && !e.row.earned && !reveal?.isRevealed(e.item)
   const titleOf = (e: TableEntry<T>) => (concealed(e) ? texts.secret ?? e.row.title : e.row.title)
   const textOf = (e: TableEntry<T>) => (concealed(e) ? texts.secretText ?? e.row.description : e.row.description)
-  const iconOf = (e: TableEntry<T>) => (concealed(e) && !keepSecretIcon ? null : e.row.iconUrl)
 
   const table = useAchievementTable({
     items,
@@ -85,7 +83,8 @@ export default function AchievementTable<T>(props: AchievementTableProps<T>) {
     entry: e,
     title: titleOf(e),
     text: textOf(e),
-    iconUrl: iconOf(e),
+    iconUrl: concealed(e) && !keepSecretIcon ? null : e.row.iconUrl,
+    concealed: concealed(e),
     highlighted: table.highlighted === e.row.id,
     pinned: pins.canPin ? pins.isPinned(e.item) : undefined,
     onTogglePin: () => pins.toggle(e.item),
@@ -94,19 +93,6 @@ export default function AchievementTable<T>(props: AchievementTableProps<T>) {
       reveal && e.row.secret && !e.row.earned
         ? { revealed: reveal.isRevealed(e.item), onToggle: () => reveal.toggle(e.item), labels: { reveal: texts.reveal ?? '', conceal: texts.conceal ?? '' } }
         : undefined,
-  })
-
-  const detailBase = (e: TableEntry<T>): DetailBase => ({
-    title: titleOf(e),
-    description: textOf(e),
-    iconUrl: iconOf(e),
-    earned: e.row.earned,
-    earnedAt: e.row.earnedAt,
-    rarity: e.row.rarity,
-    concealed: concealed(e),
-    pinned: pins.canPin ? pins.isPinned(e.item) : undefined,
-    onTogglePin: () => pins.toggle(e.item),
-    onClose: () => setSelectedId(null),
   })
 
   if (items.length === 0) {
@@ -190,17 +176,15 @@ export default function AchievementTable<T>(props: AchievementTableProps<T>) {
         )}
 
         <AnimatePresence>
-          {selected && detail?.render?.(selected.item, detailBase(selected))}
-          {selected && source !== 'ra' && !detail?.render && (
+          {selected && (
             <AchievementTableDetail
               key={selected.row.id}
-              base={detailBase(selected)}
-              row={selected.row}
+              view={view(selected)}
+              onClose={() => setSelectedId(null)}
               source={source}
               gameId={gameId}
               gameTitle={gameTitle}
-              tags={detail?.tags?.(selected.item)}
-              guideTitle={detail?.guideTitle?.(selected.item) ?? selected.row.title}
+              detail={detail}
             />
           )}
         </AnimatePresence>

@@ -59,6 +59,8 @@ export type AchievementView<T> = {
   text: string
   /** Null for a secret one still hidden (Steam keeps its picture). */
   iconUrl: string | null
+  /** Secret, not earned, not revealed: its stand-ins are showing. */
+  concealed: boolean
   highlighted: boolean
   /** Undefined when the viewer cannot pin. */
   pinned?: boolean
@@ -68,16 +70,9 @@ export type AchievementView<T> = {
   eye?: { revealed: boolean; onToggle: () => void; labels: { reveal: string; conceal: string } }
 }
 
-/** What the detail window starts from; the platform adds its tags, guides and showcase, or draws its own (RA). */
-export type DetailBase = {
-  title: string
-  description: string
-  iconUrl: string | null
-  earned: boolean
-  earnedAt: string | null
-  rarity: number | null
-  concealed: boolean
-  pinned?: boolean
-  onTogglePin: () => void
-  onClose: () => void
+/** The detail window: its tags and the name guides are searched by, or a window of the platform's own (RA). */
+export type DetailOptions<T> = {
+  tags?: (t: T) => ReactNode
+  guideTitle?: (t: T) => string
+  render?: (t: T, pin: { pinned?: boolean; onTogglePin: () => void; onClose: () => void }) => ReactNode
 }

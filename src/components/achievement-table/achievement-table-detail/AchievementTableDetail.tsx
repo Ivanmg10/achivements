@@ -1,48 +1,54 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 import type { GameSource } from '@/types/game'
-import type { DetailBase } from '@/types/achievementTable'
-import type { CompareAchievement } from '@/utils/gameCompare'
+import type { AchievementView, DetailOptions } from '@/types/achievementTable'
 import { guideLinks } from '@/utils/guideLinks'
 
 // Downloaded the first time it opens, not with the page.
 const AchievementDetailModal = dynamic(() => import('@/components/achievement-detail-modal/AchievementDetailModal'), { loading: () => null })
 
 /**
- * Steam's, PSN's and Xbox's detail window for a row: guide links (none for a
- * secret one still hidden: a search would give it away) and, once earned with
- * a date, the way into the showcase.
+ * The detail window of a row: the platform's own when it draws one (RA's), or
+ * the shared one with guide links (none for a secret one still hidden: a search
+ * would give it away) and, once earned with a date, the way into the showcase.
  */
-export default function AchievementTableDetail({
-  base: { concealed, ...base },
-  row,
+export default function AchievementTableDetail<T>({
+  view,
+  onClose,
   source,
   gameId,
   gameTitle,
-  tags,
-  guideTitle,
+  detail,
 }: {
-  base: DetailBase
-  row: CompareAchievement
-  source: Exclude<GameSource, 'ra'>
+  view: AchievementView<T>
+  onClose: () => void
+  source: GameSource
   gameId: number
   gameTitle: string
-  tags?: ReactNode
-  /** The name guides are searched by (Steam's English one). */
-  guideTitle: string
+  detail?: DetailOptions<T>
 }) {
+  const { item, row } = view.entry
+  if (detail?.render) return detail.render(item, { pinned: view.pinned, onTogglePin: view.onTogglePin, onClose })
+  if (source === 'ra') return null
   return (
     <AchievementDetailModal
-      {...base}
-      tags={tags}
-      guides={concealed ? [] : guideLinks(source, { gameTitle, title: guideTitle, appId: gameId })}
+      title={view.title}
+      description={view.text}
+      iconUrl={view.iconUrl}
+      earned={row.earned}
+      earnedAt={row.earnedAt}
+      rarity={row.rarity}
+      tags={detail?.tags?.(item)}
+      guides={view.concealed ? [] : guideLinks(source, { gameTitle, title: detail?.guideTitle?.(item) ?? row.title, appId: gameId })}
+      pinned={view.pinned}
+      onTogglePin={view.onTogglePin}
       showcase={
         row.earned && row.earnedAt
           ? { source, gameId, achievementKey: row.id, gameTitle, title: row.title, description: row.description || null, badge: row.iconUrl, earnedAt: row.earnedAt }
           : null
       }
+      onClose={onClose}
     />
   )
 }
