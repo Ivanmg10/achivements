@@ -2,7 +2,6 @@
   "tag": [
     "components/achievement-modal/AchievementModal.tsx",
     "components/game-info-header/GameHashesModal.tsx",
-    "components/groups/sortable-item/SortableItem.tsx",
     "components/route-error/route-error-card/RouteErrorCard.tsx",
     "components/statusGameList/StatusGameItem.tsx"
   ]

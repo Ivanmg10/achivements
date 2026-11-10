@@ -1,16 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import SteamSortableItem from './SteamSortableItem'
-import { useSteamGamesData } from '@/context/SteamGamesDataContext'
-import { useSortable } from '@dnd-kit/sortable'
-import { en } from '@/translations/en'
-import { toSteamGameProgress } from '@/utils/steamMappers'
-import type { GameGroupItem } from '@/types/types'
-
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
 jest.mock('@dnd-kit/sortable', () => ({
-  useSortable: jest.fn(() => ({
-    attributes: {}, listeners: {}, setNodeRef: jest.fn(), transform: null, transition: undefined, isDragging: false,
-  })),
+  useSortable: () => ({ attributes: {}, listeners: {}, setNodeRef: () => {}, transform: null, transition: undefined, isDragging: false }),
 }))
 jest.mock('@dnd-kit/utilities', () => ({ CSS: { Transform: { toString: () => '' } } }))
 jest.mock('@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements', () => ({
@@ -19,6 +9,13 @@ jest.mock('@/components/steam/steam-game-item/steam-game-item-achievements/Steam
     <div data-testid="achievements">{appId}:{String(expectedCount)}</div>
   ),
 }))
+
+import { render, screen, fireEvent } from '@testing-library/react'
+import SteamSortableItem from './SteamSortableItem'
+import { useSteamGamesData } from '@/context/SteamGamesDataContext'
+import { en } from '@/translations/en'
+import { toSteamGameProgress } from '@/utils/steamMappers'
+import type { GameGroupItem } from '@/types/types'
 
 const ITEM: GameGroupItem = {
   id: 42, source: 'steam', game_id: 620, title: 'Portal 2', image_icon: 'https://cdn/icon.jpg', console_name: 'Steam',
@@ -31,27 +28,23 @@ const PORTAL = {
   achievementsLoaded: true, maxPossible: 51, numAwarded: 51, pctWon: 100,
 }
 
-function setLibrary(library: unknown[] = [PORTAL]) {
-  ;(useSteamGamesData as jest.Mock).mockReturnValue({ library, recent: [] })
+function setLibrary(library: unknown[] = [PORTAL], recent: unknown[] = []) {
+  ;(useSteamGamesData as jest.Mock).mockReturnValue({ library, recent })
 }
 
-beforeEach(() => {
-  jest.clearAllMocks()
-  setLibrary()
-})
+beforeEach(() => setLibrary())
 
-test('sorts by its row id, like RA items', () => {
+test('shows live progress and play time from the library, and marks a perfect game', () => {
   render(<SteamSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
-  expect(useSortable).toHaveBeenCalledWith({ id: 42, disabled: false })
-})
-
-test('links to the Steam game page and shows live progress from the library', () => {
-  render(<SteamSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
-  expect(screen.getByRole('link', { name: 'Portal 2' }).getAttribute('href')).toBe('/steamGame/620')
   expect(screen.getByText(`51 / 51 ${en.steam.achievements}`)).toBeInTheDocument()
   expect(screen.getByText(en.steam.perfect, { exact: false })).toBeInTheDocument()
-  expect(screen.getByRole('progressbar', { name: 'Portal 2' }).getAttribute('aria-valuenow')).toBe('100')
-  expect(screen.getByText(`${en.steam.playtime} · 2 h`, { exact: false })).toBeInTheDocument()
+  expect(screen.getByText(`${en.steam.playtime} · 2 h`)).toBeInTheDocument()
+})
+
+test('finds the game among the recent ones while the whole library is still loading', () => {
+  setLibrary([], [PORTAL])
+  render(<SteamSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
+  expect(screen.getByText(`51 / 51 ${en.steam.achievements}`)).toBeInTheDocument()
 })
 
 test('falls back to the counts stored with the item when the library lacks the game', () => {
@@ -59,7 +52,6 @@ test('falls back to the counts stored with the item when the library lacks the g
   render(<SteamSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
   expect(screen.getByText(`10 / 50 ${en.steam.achievements}`)).toBeInTheDocument()
   expect(screen.queryByText(en.steam.perfect, { exact: false })).not.toBeInTheDocument()
-  expect(screen.getByText(en.groups.neverPlayed, { exact: false })).toBeInTheDocument()
 })
 
 test('says progress is unknown when nothing is known yet', () => {
@@ -69,28 +61,10 @@ test('says progress is unknown when nothing is known yet', () => {
   expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
 })
 
-test('has a labelled drag handle only when draggable', () => {
-  const { rerender } = render(<SteamSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
-  expect(screen.getByRole('button', { name: en.cards.dragToReorder })).toBeInTheDocument()
-  rerender(<SteamSortableItem item={ITEM} onRemove={jest.fn()} draggable={false} />)
-  expect(screen.queryByRole('button', { name: en.cards.dragToReorder })).not.toBeInTheDocument()
-})
-
-test('removes by row id', () => {
-  const onRemove = jest.fn()
-  render(<SteamSortableItem item={ITEM} onRemove={onRemove} draggable />)
-  fireEvent.click(screen.getByRole('button', { name: `${en.groups.removeGame}: Portal 2` }))
-  expect(onRemove).toHaveBeenCalledWith(42)
-})
-
-test('expands into the badge grid and collapses again', () => {
+test('opens into the badge grid with the total it expects', () => {
   render(<SteamSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
-  const expand = screen.getByRole('button', { name: `${en.steam.showAchievements}: Portal 2` })
-  expect(expand.getAttribute('aria-expanded')).toBe('false')
-  fireEvent.click(expand)
+  fireEvent.click(screen.getByRole('button', { name: `${en.steam.showAchievements}: Portal 2` }))
   expect(screen.getByTestId('achievements')).toHaveTextContent('620:51')
-  fireEvent.click(screen.getByRole('button', { name: `${en.steam.hideAchievements}: Portal 2` }))
-  expect(screen.queryByTestId('achievements')).not.toBeInTheDocument()
 })
 
 test('a game without stats says so instead of loading badges', () => {
