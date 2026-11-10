@@ -87,7 +87,7 @@ the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform 
    others mount with `{open && …}`: pick RA's and say so; the "▼" rotated by inline style → `IconChevronDown`; completion ring colours.
    *Traps:* dnd-kit's sortable wrapper and grip must stay the drag handle; Steam's panel uses `steam-game-item/steam-game-item-achievements/`
    (D1-08: it belongs to groups); RA's panel reads `useGameProgression`.
-3. **Home rows and profile pieces** (A-02, A-03, A-06, A-07; ~1,760 lines, split it): stat-pill rows `main-page-charts/MainPagePointsStats.tsx`
+3. DONE (2026-11-10, `refactor/125-platform-shells-3`; below, "Done — family 3") **Home rows and profile pieces** (A-02, A-03, A-06, A-07; ~1,760 lines, split it): stat-pill rows `main-page-charts/MainPagePointsStats.tsx`
    (RA) and `main-page-{steam,psn,xbox}-stats/`; pinned rows `main-page-pinned-games/{pinned,steam-pinned,psn-pinned,xbox-pinned}-game-row/`;
    nav cards `main-page-charts/main-page-{steam,psn,xbox}-nav/` (+ `MainPageBrowse`'s ternary, `SECTIONS` copied in `MainPageConsoleNav`);
    profile `main-page-profile/main-page-profile-{psn,st,xbox}/` (wrappers, `Linked`, `Game`, trophies/achievements, stats). *Keep:* each
@@ -169,6 +169,45 @@ the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform 
   `SteamGameItem`, `XboxGameItem`) the same expand button and cover (families 3 and 5; they still draw "▼" by hand).
 - *Not looked at in a browser:* the group page and the category lists at 390 and 2560 px, both designs, Firefox; the chevron and the slide
   on Steam, PSN and Xbox group cards in particular.
+
+**Done — family 3, the home's pieces** (`refactor/125-platform-shells-3`, one commit per sub-family, 2026-11-10; shells follow `docs/platform-shells.md`):
+- *Stat pills (A-02):* `main-page-period-stats/MainPagePeriodStats` (today / week / month / average / streak, the period maths, the three
+  lazy modals, the skeleton; `measure` points or unlocks, `unit`, `before` / `after` for the platform's own pills, which keep their room
+  while they load) and four adapters (`MainPagePointsStats` 49 lines, Steam 50, PSN 48, Xbox 47). 411 → 313. Contract:
+  `MainPagePeriodStats.contract.test.tsx` (4 platforms × 5, own-pills × 3).
+- *Nav cards (A-06):* `main-page-browse/main-page-platform-nav/MainPagePlatformNav` + `main-page-platform-nav-section/`, the three adapters
+  (21 lines each) and `browseSections.ts` (`BROWSE_SECTIONS`, the lists' emoji and slug, shared with the RA console nav). The nav cards and
+  `MainPageConsoleNav` moved from `main-page-charts/` into `main-page-browse/`, their only user; `MainPageBrowse` picks by a map, not a ternary.
+  270 → 187. Contract: `MainPagePlatformNav.contract.test.tsx` (3 × 4).
+- *Pinned rows (A-03, A-05):* `main-page-pinned-games/pinned-game-card/PinnedGameCard` (the sortable wrapper, handle, cover, title, bar, unpin,
+  opening; the view model is `PinnedGameCardView` in `types/gameCard.ts`; `placeholder` keeps the sortable slot while loading, on error or for a
+  pin whose game is gone) and four adapters; `pinned-game-missing/` is the PSN / Xbox "unlinked" row. `GameCardCover` got `compact`
+  (`COVER_ROW_IMAGE`, 56 px). 517 → 376. Contract: `PinnedGameCard.contract.test.tsx` (4 × 5, gone × 2). Checked by breaking the open
+  panel by hand: 4 tests failed.
+- *Profile column (A-07):* `main-page-profile-linked/MainPageProfileLinked` (skeleton, error card, refresh on the own page only, order of
+  card / game / recent), `main-page-profile-library-game/` (the PSN and Xbox last-game card), `main-page-profile-recent/MainPageProfileRecentList`
+  (one mapping per platform, RA included). 625 → 619 only: the shells took the glue, but the platform's own headers, stats and hooks are the
+  bulk and stay. Contracts: `MainPageProfileLinked.contract.test.tsx` (3 × 5) and `MainPageProfileRecentList.contract.test.tsx` (4 × 3, 3 × 1);
+  the adapters' tests keep only their own (level, status, country, grade, gamerscore, featured game).
+- *Visible changes (drifted copies, fixed):* **(a)** the streak pill is tier-coloured (`streakInk(streakTier(n))`) on Steam, PSN and Xbox, as
+  RA's was; they were `text-accent`. **(b)** RA's pinned row opened from a `div role="button"` with a button inside it (no Space, a "▼" with no
+  label); it is a real expand button now, like the others. **(c)** On every pinned row the whole header opens the achievements (a button
+  stretched over it, as the group and status cards do); Steam, PSN and Xbox opened only from the chevron. The grip, title, cover link and
+  unpin sit above it. **(d)** The chevron is the shared 16 px `GameCardExpandButton` (was a 14 px one, or a "▼" glyph on RA). **(e)** The focus
+  ring on the pinned rows' grip, title and chevron is the accent (`focus-ring`); Steam, PSN and Xbox used their platform colour. **(f)** The
+  pinned cover is the shared `GameCardCover`: it takes the hover ring of the other cards, and RA's is out of the tab order and hidden from a
+  screen reader like the others (it duplicated the title link). RA's console icon has no alt (the name follows it). **(g)** The Steam nav
+  icons go through `GameIcon` (Steam's own fallbacks) like PSN's and Xbox's, and the nav counts hold a placeholder while loading instead of
+  a "—". **(h)** The aria-busy skeleton of the stat pills is on RA's row too.
+- *Left as it was, on purpose:* the stats figures of the profile (`MainPageProfile*Stats`, 4 files of one grid of `Figure`s each: the figures are
+  each platform's own); `MainPageProfileStGame` and `MainPageProfileRaGame` (Steam's running game and RA's hardcore bar differ from the
+  library games); `MainPageProfileRa` (it has no loading / failure of its own: its page does); A-04 (static modal imports) is already done in
+  the stats shell; `MainPageCharts`' per-platform ternaries (A-20) and the dead wrappers' `!isLinked` branch and `T.profileSt.signIn` (A-07,
+  A-23) were already gone when this started. The pinned rows keep mounting their panel only while open (the group cards slide theirs): the
+  pinned section shows one open row alone, so there is nothing to slide to.
+- *Not looked at in a browser:* the home at 390 and 2560 px, both designs, Firefox: the pinned rows' stretched header (does the whole row
+  still drag by its grip and open by a click elsewhere?), the profile column's height across tabs (`homeFit`, the min-height), and the stat
+  pills' streak colours on each platform's tab.
 **Watch out** — `toRow` and `items` must be stable (a module-level mapper, or `useMemo`): the deep link's reset runs when `items` changes,
 and an inline sort would reset it every render. The deep link looks for `data-anchor` on rows and cards; `anchor` is unencoded and the
 fragment is decoded before comparing. `badgeClass` takes a ring colour, not a state.

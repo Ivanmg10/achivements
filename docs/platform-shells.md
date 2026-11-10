@@ -7,7 +7,9 @@ copy only (antislop audit #77, X1 and §3.3; issue #125). A **family** is one of
 **adapter** per platform. The first family done is the game page achievement table (#125,
 2026-11-10); it is the example below. The group game cards (`GroupGameCard`) and the status cards
 (`StatusGameCard`) followed, the same way, with a view-model type (`types/gameCard.ts`) instead of a
-hook: they hold no state beyond open/closed. The families still to do are listed in
+hook: they hold no state beyond open/closed. The home's pieces (family 3) are the same: the stat pills
+(`MainPagePeriodStats`), the nav cards (`MainPagePlatformNav`), the pinned rows (`PinnedGameCard`) and the profile
+column's glue (`MainPageProfileLinked`, `MainPageProfileRecentList`). The families still to do are listed in
 `docs/worklog.md` (entry of #125 → Open).
 
 ## Where things live
