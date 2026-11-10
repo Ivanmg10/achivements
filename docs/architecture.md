@@ -152,7 +152,13 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   `XboxSortableItem`), and a game on a category page is `status-game-card/StatusGameCard` (adapters
   `StatusGameItem`, `Steam-`, `Psn-`, `XboxStatusGameItem`); the two share their pieces in
   `game-card-*/` (cover, title, mark, progress, line, dates, playtime, platform tag, expand button)
-  and `types/gameCard.ts`.
+  and `types/gameCard.ts`. The grid of an achievement's badges is `badge-grid/BadgeGrid` (adapters
+  `AchievementGrid`, `Steam-`, `Psn-`, `XboxAchievementGrid`; `useBadgeTooltip`, `types/badgeGrid`), a
+  game in the recent feed is `feed-game-card/FeedGameCard` (adapters `RaGameItem`, `Steam-`, `Psn-`,
+  `XboxGameItem`, `PsnCollectionItem`), a platform's category section is
+  `platform-category-section/PlatformCategorySection`, and an opened game is
+  `game-expanded-layout/GameExpandedLayout` with `badge-grid/lazy-badge-grid/LazyBadgeGrid` for the
+  grid's loading, failure and empty states.
 - **Utils** (`src/utils/`): pure functions — mappers per platform
   (`steamMappers`, `psnMappers`), library shelves and insights, `aiExport`. The shared helpers
   (#119): `dates.ts` (the platforms' UTC dates, day keys, dates in the reader's language),

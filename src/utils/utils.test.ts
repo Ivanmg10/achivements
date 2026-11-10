@@ -1,4 +1,4 @@
-import { activityKpis, calcAvgPerDay, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, stripCap, matchParts, decimal } from "./utils";
+import { activityKpis, calcAvgPerDay, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, stripCap, matchParts, decimal, asCategory } from "./utils";
 import type { RecentAchievement } from '@/types/types'
 
 describe("getBestMonth", () => {
@@ -374,5 +374,15 @@ describe('decimal', () => {
     expect(decimal(0.8, 'es')).toBe('0,8')
     expect(decimal(2, 'en')).toBe('2.0')
     expect(decimal(1.234, 'de', 2)).toBe('1,23')
+  })
+})
+
+describe("asCategory", () => {
+  test("a page category is a status; anything else reads as playing", () => {
+    expect(asCategory("wantToPlay")).toBe("wantToPlay")
+    expect(asCategory("completed")).toBe("completed")
+    expect(asCategory("playing")).toBe("playing")
+    expect(asCategory(undefined)).toBe("playing")
+    expect(asCategory("something-else")).toBe("playing")
   })
 })

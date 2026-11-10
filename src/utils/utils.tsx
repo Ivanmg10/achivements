@@ -4,7 +4,7 @@ import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
 import { localDay, parseUnlockTime, utcDay } from '@/utils/dates'
 import { raBadgeUrl, raImageUrl } from '@/utils/raAssets'
-import type { GameSource } from '@/types/game'
+import type { GameSource, GameStatus } from '@/types/game'
 
 /** The last `totalDays` days up to `end` (today unless said otherwise), each with how many achievements fell on it. */
 export const groupByDays = (achievements: RecentAchievement[], totalDays: number, end: Date = new Date()) => {
@@ -274,6 +274,9 @@ export function heatLevel(count: number, max: number): number {
   if (count <= 0 || max <= 0) return 0
   return Math.min(HEAT_LEVELS, Math.max(1, Math.ceil(Math.sqrt(count / max) * HEAT_LEVELS)))
 }
+
+/** The list a game is on (a page's category) as a status; anything else reads as playing. */
+export const asCategory = (c?: string): GameStatus => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * The first `limit` items of a long list, unless it is only a little longer

@@ -7,18 +7,17 @@ import { useLanguage } from '@/context/LanguageContext'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetail'
+import { asCategory } from '@/utils/utils'
 import { fromRa } from '@/utils/gameInsights'
 import { parseReleaseYear } from '@/utils/utils'
 import type { InfoRow } from '@/components/library-game-detail/library-detail-info/LibraryDetailInfo'
 import { raAwardCompletedAt } from '@/utils/completionDates'
 import { raImageUrl } from '@/utils/raAssets'
-import type { GameStatus } from '@/types/game'
 import { raAchievementList } from '@/utils/gameAchievements'
 
 // About three rows at two columns on a wide screen; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
 
-const asCategory = (c?: string): GameStatus => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * An opened RA card in a status list. The card asks for the game and hands

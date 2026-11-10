@@ -9,8 +9,12 @@ copy only (antislop audit #77, X1 and §3.3; issue #125). A **family** is one of
 (`StatusGameCard`) followed, the same way, with a view-model type (`types/gameCard.ts`) instead of a
 hook: they hold no state beyond open/closed. The home's pieces (family 3) are the same: the stat pills
 (`MainPagePeriodStats`), the nav cards (`MainPagePlatformNav`), the pinned rows (`PinnedGameCard`) and the profile
-column's glue (`MainPageProfileLinked`, `MainPageProfileRecentList`). The families still to do are listed in
-`docs/worklog.md` (entry of #125 → Open).
+column's glue (`MainPageProfileLinked`, `MainPageProfileRecentList`). Family 5 has four shells, each with
+its contract suite: the badge grid (`BadgeGrid`, generic over the platform's item like the table, with
+slots for what a badge is called, where it goes, its ring and its tooltip, and `LazyBadgeGrid` for the
+grid's loading / failure / empty states), the feed row (`FeedGameCard`, a view model), the category
+section (`PlatformCategorySection`, the platform's hook result and its words) and the opened game
+(`GameExpandedLayout`). The families still to do are listed in `docs/worklog.md` (entry of #125 → Open).
 
 ## Where things live
 
