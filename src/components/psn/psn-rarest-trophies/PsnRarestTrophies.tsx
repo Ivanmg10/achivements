@@ -1,17 +1,12 @@
 'use client'
 
-import Image from 'next/image'
-import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { gameHref } from '@/utils/gameRef'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import type { PsnTrophy } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
 import { decimal } from '@/utils/utils'
-import { SkeletonRow } from '@/components/ui/SkeletonList'
-
-const SHOWN = 4
-const SKELETON_ROWS = 4
+import RarestEarned, { type RarestRow } from '@/components/rarest-earned/RarestEarned'
 
 /**
  * The player's rarest trophies in a game, rarest first — SteamRarestAchievements'
@@ -30,50 +25,21 @@ export default function PsnRarestTrophies({
   const { T, lang } = useLanguage()
   const subject = useSubject()
 
-  const rarest = trophies
+  const rows = trophies
     .filter((t): t is PsnTrophy & { gameId?: number; rarity: number } => t.earned && t.rarity !== null)
-    .sort((a, b) => a.rarity - b.rarity)
-    .slice(0, SHOWN)
+    .map((t): RarestRow => ({
+      key: `${t.gameId ?? gameId}:${t.id}`,
+      name: t.name,
+      icon: t.iconUrl || null,
+      href: `${gameHref('psn', t.gameId ?? gameId, subject)}#${psnTrophyAnchor(t.id)}`,
+      rarity: t.rarity,
+      subline: (
+        <>
+          <span className={TROPHY_GRADE_COLOR[t.type]}>{T.psn[t.type]}</span>
+          <span className="text-text-secondary"> · {T.psn.rarity.replace('{n}', decimal(t.rarity, lang))}</span>
+        </>
+      ),
+    }))
 
-  return (
-    <div className="flex flex-col gap-2 h-full">
-      <p className="text-text-secondary text-sm px-1">{T.psn.rarestEarned}</p>
-
-      {isLoading ? (
-        <ul aria-busy="true" className="flex flex-col gap-2">
-          {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-            <li key={i}><SkeletonRow className="h-12 px-1" /></li>
-          ))}
-        </ul>
-      ) : rarest.length === 0 ? (
-        <p className="flex-1 flex items-center justify-center text-center text-sm text-text-secondary px-4 py-6">
-          {T.psn.noneEarned}
-        </p>
-      ) : (
-        <ol className="flex flex-col gap-2">
-          {rarest.map((t) => (
-            <li key={`${t.gameId ?? gameId}:${t.id}`}>
-              <Link
-                href={`${gameHref('psn', t.gameId ?? gameId, subject)}#${psnTrophyAnchor(t.id)}`}
-                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-psn"
-              >
-                {t.iconUrl ? (
-                  <Image src={t.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-box object-cover ring-2 ring-psn shrink-0" unoptimized />
-                ) : (
-                  <div className="w-10 h-10 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
-                )}
-                <span className="flex flex-col min-w-0">
-                  <span className="text-sm font-semibold truncate">{t.name}</span>
-                  <span className="text-xs">
-                    <span className={TROPHY_GRADE_COLOR[t.type]}>{T.psn[t.type]}</span>
-                    <span className="text-text-secondary"> · {T.psn.rarity.replace('{n}', decimal(t.rarity, lang))}</span>
-                  </span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
-  )
+  return <RarestEarned title={T.psn.rarestEarned} empty={T.psn.noneEarned} isLoading={isLoading} rows={rows} ring="ring-psn" />
 }
