@@ -5,6 +5,7 @@ import { IconArrowLeft, IconArrowsDiff, IconExternalLink } from '@tabler/icons-r
 import { useLanguage } from '@/context/LanguageContext'
 import type { CheevoUser } from '@/hooks/useCheevoUser'
 import Avatar from '@/components/ui/Avatar'
+import { GAME_SECTION_WIDTH } from '@/components/game-page-states/gameSectionWidth'
 
 /**
  * Whose progress this is, with the way back to their profile; the game's own
@@ -26,7 +27,7 @@ export default function UserGamePageBanner({
   const action = 'flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-tile transition-colors focus-ring'
 
   return (
-    <div className="relative z-10 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-4 flex flex-wrap items-center justify-between gap-3 bg-bg-card/85 backdrop-blur rounded-tile px-3 py-2 ring-1 ring-ink/5">
+    <div className={`relative z-10 ${GAME_SECTION_WIDTH} mt-4 flex flex-wrap items-center justify-between gap-3 bg-bg-card/85 backdrop-blur rounded-tile px-3 py-2 ring-1 ring-ink/5`}>
       <Link
         href={`/user/${encodeURIComponent(user.username)}#games`}
         className="flex items-center gap-2 min-w-0 rounded-box pr-2 hover:text-accent transition-colors focus-ring"
