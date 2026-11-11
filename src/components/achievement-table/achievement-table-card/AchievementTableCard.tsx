@@ -17,12 +17,14 @@ export default function AchievementTableCard<T>({
   view,
   columns,
   tags,
+  note,
   texts,
   unoptimized,
 }: {
   view: AchievementView<T>
   columns: AchievementColumn<T>[]
   tags?: (e: TableEntry<T>) => ReactNode
+  note?: (e: TableEntry<T>) => ReactNode
   texts: Pick<TableTexts, 'earned' | 'locked'>
   unoptimized: boolean
 }) {
@@ -79,6 +81,7 @@ export default function AchievementTableCard<T>({
           )}
           {tags?.(e)}
         </div>
+        {note?.(e)}
       </div>
 
       {view.pinned !== undefined && (

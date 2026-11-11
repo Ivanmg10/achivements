@@ -33,6 +33,26 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-11 — Owner calls after the antislop round (`feat/153-owner-calls`, #153)
+
+**Did** — Five decisions the owner took after reviewing #122, #125 and #128, one commit each:
+- *Rank names* (`rankings.tiers` in the nine languages; ids and thresholds untouched): Padawan, Aspirante, Cazatrofeos,
+  Especialista, Eco oscuro, Élite, Maestría, Leyenda. Padawan is the same in all nine; Eco oscuro takes the game's name
+  (Dark Eco); the rest are gender-neutral (epicene words, compounds or abstract nouns). The guide reads `T.rankings.tiers`,
+  so it follows; `copy.test.ts` still refuses the old gendered nouns and now pins the Spanish list, Padawan everywhere and
+  no two tiers alike. `docs/i18n.md` updated. Cooper and Dark Soul were proposed first and rejected by the owner.
+- *RA's phone card:* "HC: 12,345" (`T.achievement.hardcoreShort`, `toLocaleString(lang)`) through the hardcore column's
+  `card`, and "by Author" under the data line through a new optional `cardNote` slot on `AchievementTable` / its card
+  (the desktop row has none; no other platform passes it).
+- *Rarity order:* `sortEntries` puts an unknown rarity last in both directions (it was first when descending).
+- *Link cache:* linking RA (user route and admin) clears the user's cache; Steam, PSN and Xbox links (admin; the user
+  routes never did) no longer do. Unlinks still clear it. `platformLinks.contract.test.ts` and `docs/accounts.md` follow.
+- *Admin Steam unlink mails the account* (`sendSteamLinkNotice`, after the answer, address read back by `unlinkPlatform`).
+**Watch out** — `/privacy` and `/terms` do not describe the link notices, so they were not changed. The Eco oscuro names in
+German, French, Italian, Polish, Portuguese and Russian were not checked against official localisations: confirm them.
+
+---
+
 ## 2026-11-11 — The streak lands whole (`fix/streak-lands-whole`, from `feat/128-home-improvements`)
 
 **Did** — The owner saw the streak show one number on opening the home and another a few seconds later (local, 2026-11-11).

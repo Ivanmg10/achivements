@@ -3,6 +3,7 @@ import { requireSession } from '@/lib/apiAuth'
 import pool from "@/lib/db";
 import { fetchRaProfile, validRaCredentials, type RaProfileResult } from "@/lib/raProfile";
 import { saveRaLink } from "@/lib/platformLinks";
+import { clearUserCache } from "@/lib/steamCache";
 import { forgetUser } from "@/lib/userRecord";
 import { onPlatformLinked } from "@/lib/scoreRefresh";
 
@@ -35,6 +36,8 @@ export async function POST(req: Request) {
     console.error("[updateRaUser POST]", err);
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
+  // RA's cache is kept per user: another RA account must not show the old one's data.
+  await clearUserCache(String(auth.id));
   forgetUser(auth.id);
   await onPlatformLinked(Number(auth.id), "ra");
 

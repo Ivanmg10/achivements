@@ -26,7 +26,7 @@ test('asks for pass after pass until complete, then says the points are ready', 
   await waitFor(() => expect(result.current.status?.complete).toBe(true), { timeout: 4000 })
   expect((global.fetch as jest.Mock).mock.calls.filter(([, init]) => init?.method === 'POST')).toHaveLength(2)
   expect(result.current.version).toBe(2)
-  expect(notify.success).toHaveBeenCalledWith('Your Vault Points are ready: Level 32 · Veteran')
+  expect(notify.success).toHaveBeenCalledWith('Your Vault Points are ready: Level 32 · Specialist')
 })
 
 test('a returning user with a fresh score: one quiet answer, no toast, nothing to reload', async () => {

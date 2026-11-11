@@ -105,7 +105,7 @@ describe('Steam', () => {
     expect(res.status).toBe(200)
     expect(getPlayerSummaries).toHaveBeenCalledWith(STEAM_ID, 'steam-key')
     expect(updates()[0][1]).toEqual([STEAM_ID, 'Bobby', 11])
-    expect(clearUserCache).toHaveBeenCalledWith('11')
+    expect(clearUserCache).not.toHaveBeenCalled()
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'link-steam', BOB, { steamid: STEAM_ID, steamusername: 'Bobby' })
   })
 
@@ -154,7 +154,7 @@ describe('PSN', () => {
     expect(res.status).toBe(200)
     expect(findPsnAccount).toHaveBeenCalledWith('BobPS')
     expect(updates()[0][1]).toEqual(['123', 'BobPS', 11])
-    expect(clearUserCache).toHaveBeenCalledWith('11')
+    expect(clearUserCache).not.toHaveBeenCalled()
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'link-psn', BOB, { psnaccountid: '123', psnusername: 'BobPS' })
   })
 
@@ -198,7 +198,7 @@ describe('Xbox', () => {
     expect(findXboxAccount).toHaveBeenCalledWith('testplayer')
     expect(xboxSummary).toHaveBeenCalledWith(PROFILE.xuid, 'TestPlayer', '11')
     expect(updates()[0][1]).toEqual([PROFILE.xuid, 'TestPlayer', 11])
-    expect(clearUserCache).toHaveBeenCalledWith('11')
+    expect(clearUserCache).not.toHaveBeenCalled()
     expect(forgetUser).toHaveBeenCalledWith(11)
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'link-xbox', BOB, { xboxxuid: PROFILE.xuid, xboxgamertag: 'TestPlayer' })
   })

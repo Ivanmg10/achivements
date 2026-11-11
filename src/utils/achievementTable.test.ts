@@ -20,8 +20,9 @@ test('game order, either way', () => {
   expect(ids(sortEntries(LIST, { key: 'default', dir: 'desc' }))).toEqual(['3', '2', '1', '0'])
 })
 
-test('rarest first, an unknown rarity after the known ones', () => {
+test('rarest first, an unknown rarity after the known ones, in both directions', () => {
   expect(ids(sortEntries(LIST, { key: 'rarity', dir: 'asc' }))).toEqual(['2', '3', '0', '1'])
+  expect(ids(sortEntries(LIST, { key: 'rarity', dir: 'desc' }))).toEqual(['0', '3', '2', '1'])
 })
 
 test('by unlock: newest first, the locked ones last either way', () => {

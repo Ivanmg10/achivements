@@ -66,7 +66,8 @@ reads that column, so the rest of the app works without it.
   by the user's choice; `steamid` stays not unique for them. **Unlinking clears both** (changed
   2026-10-30, audit SEC-01): a sign-in nobody can remove outlives a password change. Someone who
   signed up through Steam gets back in with "forgot password". Link and unlink mail the account's
-  address (`sendSteamLinkNotice`). Linking asks for no password, by the user's choice (2026-10-31,
+  address (`sendSteamLinkNotice`), and so does an admin's Steam unlink (#153, 2026-11-11: the route reads the
+  account's address back from the unlink and mails it after the answer, as the user's route does). Linking asks for no password, by the user's choice (2026-10-31,
   the most comfortable flow, here and in the welcome): the mail and the unlink are what answer a
   link nobody asked for. Admins still link by typing (logged).
 
@@ -170,8 +171,10 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   the columns, `clearUserCache`, Steam's `forgetUnlocks`, `forgetUser`), for `api/updateRaUser`, `api/psn/link`,
   `api/xbox/link`, the four unlink routes and `api/admin/users/accounts`. The routes keep their own auth
   (`requireSession`, `requireXboxUser`, `requireAdmin`), checks, answers, mails (`sendSteamLinkNotice` only on
-  the user's Steam unlink) and `logAdminAction`. Only Steam's OpenID callback writes `steam_login_id`.
-  `platformLinks.test.ts` pins the SQL text; `app/api/platformLinks.contract.test.ts` checks every route,
+  a Steam unlink, the user's or the admin's) and `logAdminAction`. Only Steam's OpenID callback writes `steam_login_id`.
+  **Linking clears the user's cache only for RA** (#153, 2026-11-11), in `api/updateRaUser` and the admin's RA link
+  (`clearUserCache`): RA's cache is keyed per user, so another RA account would show the old one's data. Steam,
+  PSN and Xbox links (user and admin) no longer clear it (the owner's call). An unlink still clears it, for every platform. `platformLinks.test.ts` pins the SQL text; `app/api/platformLinks.contract.test.ts` checks every route,
   user and admin. The panel's platform rows are `utils/adminPlatforms.ts`.
 - The privacy policy (`/privacy`) says all of this; `/terms` says when an
   account may be suspended or deleted. Change the policy if the panel changes.

@@ -156,8 +156,9 @@ describe.each([
     expect(updates()).toEqual([[LINK_SQL[platform], [...values, '7']]])
     expect(forgetUser).toHaveBeenCalledWith('7')
     expect(onPlatformLinked).toHaveBeenCalledWith(7, platform)
-    // As before: a user's link keeps the cache (the admin's PSN, Xbox and Steam links clear it).
-    expect(clearUserCache).not.toHaveBeenCalled()
+    // RA's cache is per user, so linking RA clears it; PSN and Xbox keep it.
+    if (platform === 'ra') expect(clearUserCache).toHaveBeenCalledWith('7')
+    else expect(clearUserCache).not.toHaveBeenCalled()
   })
 
   test('a failed write is a 500 with the same body, and nothing is scored', async () => {
@@ -190,17 +191,19 @@ describe.each(['ra', 'steam', 'psn', 'xbox'] as const)('an admin unlinking %s', 
     expect(pool.query).not.toHaveBeenCalled()
   })
 
-  test('clears the same columns and housekeeping as the user route, logs it, and mails no one', async () => {
+  test('clears the same columns and housekeeping as the user route, logs it, and mails the account only for Steam', async () => {
     const res = await del()
     expect(res.status).toBe(200)
     expect(bodyOf(res)).toEqual({ ok: true })
-    expect(updates()).toEqual([[UNLINK_SQL[platform], [11]]])
+    expect(updates().map(([sql, params]) => [sql.replace(/ RETURNING .*$/, ''), params])).toEqual([[UNLINK_SQL[platform], [11]]])
     expect(clearUserCache).toHaveBeenCalledWith('11')
     expect(forgetUser).toHaveBeenCalledWith(11)
     if (platform === 'steam') expect(forgetUnlocks).toHaveBeenCalledWith('11')
     else expect(forgetUnlocks).not.toHaveBeenCalled()
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, `unlink-${platform}`, BOB)
-    expect(sendSteamLinkNotice).not.toHaveBeenCalled()
+    await Promise.all((after as unknown as { pending: Promise<unknown>[] }).pending)
+    if (platform === 'steam') expect(sendSteamLinkNotice).toHaveBeenCalledWith({ to: 'ana@test.com', username: 'ana', linked: false })
+    else expect(sendSteamLinkNotice).not.toHaveBeenCalled()
   })
 
   test('a failed write is a 500 and nothing is logged', async () => {
@@ -214,10 +217,10 @@ describe.each(['ra', 'steam', 'psn', 'xbox'] as const)('an admin unlinking %s', 
 })
 
 describe.each([
-  { platform: 'ra', body: { username: 'bobra', apiKey: ' key ' }, values: [JSON.stringify({ User: 'BobRA' }), 'BobRA', 'sealed:key', 'hash:key'], clears: false, log: { rausername: 'BobRA' } },
-  { platform: 'steam', body: { steamid: STEAM_ID }, values: [STEAM_ID, 'Bobby'], clears: true, log: { steamid: STEAM_ID, steamusername: 'Bobby' } },
-  { platform: 'psn', body: { username: 'BobPS' }, values: ['42', 'BobPS'], clears: true, log: { psnaccountid: '42', psnusername: 'BobPS' } },
-  { platform: 'xbox', body: { gamertag: 'BobX' }, values: ['2535', 'BobX'], clears: true, log: { xboxxuid: '2535', xboxgamertag: 'BobX' } },
+  { platform: 'ra', body: { username: 'bobra', apiKey: ' key ' }, values: [JSON.stringify({ User: 'BobRA' }), 'BobRA', 'sealed:key', 'hash:key'], clears: true, log: { rausername: 'BobRA' } },
+  { platform: 'steam', body: { steamid: STEAM_ID }, values: [STEAM_ID, 'Bobby'], clears: false, log: { steamid: STEAM_ID, steamusername: 'Bobby' } },
+  { platform: 'psn', body: { username: 'BobPS' }, values: ['42', 'BobPS'], clears: false, log: { psnaccountid: '42', psnusername: 'BobPS' } },
+  { platform: 'xbox', body: { gamertag: 'BobX' }, values: ['2535', 'BobX'], clears: false, log: { xboxxuid: '2535', xboxgamertag: 'BobX' } },
 ] as const)('an admin linking $platform', ({ platform, body, values, clears, log }) => {
   const link = () => adminLink(json('/api/admin/users/accounts', { id: 11, platform, ...body }))
 

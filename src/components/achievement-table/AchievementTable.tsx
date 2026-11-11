@@ -40,6 +40,8 @@ export type AchievementTableProps<T> = {
   sortMenu?: string[]
   /** Beside the name in a row, at the end of a card's facts (RA's type, Steam's "online?"). */
   tags?: (e: TableEntry<T>) => ReactNode
+  /** A line under the phone card's data line (RA's author); the desktop row has none. */
+  cardNote?: (e: TableEntry<T>) => ReactNode
   /** The line above the table that names some of them and can keep only those (RA's missables, Steam's online ones). */
   notice?: { match: (e: TableEntry<T>) => boolean; tone?: 'danger' | 'warning'; lead?: (n: number) => string; text?: string }
   /** Tabs over the table that show one part of the game (PSN's DLC). */
@@ -58,7 +60,7 @@ export type AchievementTableProps<T> = {
  * Each platform is a small adapter around it: `docs/platform-shells.md`.
  */
 export default function AchievementTable<T>(props: AchievementTableProps<T>) {
-  const { source, gameId, gameTitle, items, toRow, texts, pins, reveal, sortMenu, tags, notice, scopes, detail, keepSecretIcon, pinInTitle } = props
+  const { source, gameId, gameTitle, items, toRow, texts, pins, reveal, sortMenu, tags, cardNote, notice, scopes, detail, keepSecretIcon, pinInTitle } = props
   const { T } = useLanguage()
   const panelId = useId()
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -168,7 +170,7 @@ export default function AchievementTable<T>(props: AchievementTableProps<T>) {
             />
             <ul className="sm:hidden w-full flex flex-col gap-2 enter-rows">
               {views.map((v) => (
-                <AchievementTableCard key={v.entry.row.id} view={v} columns={columns} tags={tags} texts={texts} unoptimized={source !== 'ra'} />
+                <AchievementTableCard key={v.entry.row.id} view={v} columns={columns} tags={tags} note={cardNote} texts={texts} unoptimized={source !== 'ra'} />
               ))}
             </ul>
             {table.rest > 0 && <ShowRestButton folded={table.folded} rest={table.rest} onToggle={table.toggleFold} />}

@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import pool from '@/lib/db'
 import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
 import { fetchRaProfile, validRaCredentials } from '@/lib/raProfile'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { clearUserCache } from '@/lib/steamCache'
+import { sendSteamLinkNotice } from '@/lib/steamLinkNotice'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { readSteamId } from '@/lib/steamAccount'
 import { findPsnAccount, psnConfigured, psnFailure, psnSummary } from '@/lib/psnClient'
@@ -58,6 +59,8 @@ export async function POST(req: Request) {
         }
         throw err
       }
+      // RA's cache is kept per user: another RA account must not show the old one's data.
+      await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-ra', target, { rausername: profile.User })
       return NextResponse.json({ ok: true, rausername: profile.User, ra_display: profile.User })
@@ -82,7 +85,6 @@ export async function POST(req: Request) {
 
       // One Steam account may be linked to several users, as users can do themselves.
       await saveLink(target.id, 'steam', steamid, persona)
-      await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-steam', target, { steamid, steamusername: persona })
       return NextResponse.json({ ok: true, steamid, steamusername: persona })
@@ -105,7 +107,6 @@ export async function POST(req: Request) {
       }
 
       await saveLink(target.id, 'psn', account.accountId, account.onlineId)
-      await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-psn', target, { psnaccountid: account.accountId, psnusername: account.onlineId })
       return NextResponse.json({ ok: true, psnaccountid: account.accountId, psnusername: account.onlineId })
@@ -126,7 +127,6 @@ export async function POST(req: Request) {
       }
 
       await saveLink(target.id, 'xbox', account.xuid, account.gamertag)
-      await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-xbox', target, { xboxxuid: account.xuid, xboxgamertag: account.gamertag })
       return NextResponse.json({ ok: true, xboxxuid: account.xuid, xboxgamertag: account.gamertag })
@@ -154,7 +154,10 @@ export async function DELETE(req: Request) {
     if (target === 'bad-id') return NextResponse.json({ error: 'A numeric id is required' }, { status: 400 })
     if (!target) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-    await unlinkPlatform(target.id, platform)
+    // Steam's unlink also removes a sign-in: the account's own address hears of it, as when the user does it.
+    const owner = await unlinkPlatform(target.id, platform, platform === 'steam')
+    const email = owner?.email
+    if (platform === 'steam' && owner && email) after(() => sendSteamLinkNotice({ to: email, username: owner.username, linked: false }))
     await logAdminAction(auth.admin, `unlink-${platform}`, target)
 
     return NextResponse.json({ ok: true })

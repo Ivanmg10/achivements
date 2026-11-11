@@ -51,6 +51,16 @@ describe('the copy rules that CLAUDE.md and the audit (#122) set', () => {
     for (const id of ids) expect(Object.values(all[id].rankings.tiers).filter((t) => banned.includes(t))).toEqual([])
   })
 
+  test('the rank names are the owner choice (2026-11-11): Padawan everywhere, Spanish as chosen, no two alike', () => {
+    const es = Object.values(all.es.rankings.tiers)
+    expect(es).toEqual(['Padawan', 'Aspirante', 'Cazatrofeos', 'Especialista', 'Eco oscuro', 'Élite', 'Maestría', 'Leyenda'])
+    for (const id of ids) {
+      const names = Object.values(all[id].rankings.tiers)
+      expect(names[0]).toBe('Padawan')
+      expect(new Set(names).size).toBe(names.length)
+    }
+  })
+
   test('the landing does not count accounts: it has three platforms', () => {
     for (const id of ids) expect(all[id].landing.progressText).not.toMatch(/both accounts|dos cuentas|beiden Konten|deux comptes|entrambi|両方|obu kontach|duas contas|обоих/)
   })
