@@ -423,7 +423,9 @@ with its tests; it is the part that decides whether the answers are any good.
 - **Code the browser loads must not reach `pg`**, not even through a dynamic import.
 - **A global data provider loads on its first reader; never fetch at mount.** A reader that only needs
   `isLinked` passes `{ passive: true }`.
-- **The header never reads the year** (its streak is `GET /api/me/streak`). `GET /api/me/bootstrap` is
+- **The header never reads the year** (its streak is `GET /api/me/streak`, `null` until it answers: a grey
+  tag, never a 0). **A streak is drawn only whole:** the year's `isLoading` covers every linked platform and the
+  library the console filter needs; nothing shows the streak from part of it. `GET /api/me/bootstrap` is
   database only, never a platform. `/api/follows/cards` calls the profile routes' own handlers: do not
   re-implement their rules there.
 - **Nothing in the browser makes a platform's data older than its server cache** (the user's rule): page reads
