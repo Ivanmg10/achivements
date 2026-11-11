@@ -1080,7 +1080,7 @@ export const en = {
   pointsStats: {
     today: 'Today',
     thisWeek: 'This week',
-    thisMonth: 'This month',
+    last30Days: 'Last 30 days',
     avgPerDay: 'Avg/day (30d)',
     perDay: 'ach/day',
     noActivity: 'no activity',
@@ -1553,11 +1553,12 @@ export const en = {
   plurals: {
     todayAchievements: { one: 'One achievement already today.', other: '{n} achievements already today.' } as PluralForms,
     streakOf: { one: 'A {n}-day streak', other: 'A {n}-day streak' } as PluralForms,
-    todaySome: { one: '{n} so far today.', other: '{n} so far today.' } as PluralForms,
+    todaySome: { one: '{n} achievement so far today.', other: '{n} achievements so far today.' } as PluralForms,
     following: { other: '{n} following' } as PluralForms,
     followers: { one: '{n} follower', other: '{n} followers' } as PluralForms,
     games: { one: '{n} game', other: '{n} games' } as PluralForms,
     achievements: { one: '{n} achievement', other: '{n} achievements' } as PluralForms,
+    achievementsWord: { one: 'achievement', other: 'achievements' } as PluralForms,
     days: { one: '{n} day', other: '{n} days' } as PluralForms,
     results: { one: '{n} result', other: '{n} results' } as PluralForms,
     missables: { one: '{n} missable', other: '{n} missable' } as PluralForms,

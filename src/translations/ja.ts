@@ -1079,7 +1079,7 @@ export const ja: Translations = {
   pointsStats: {
     today: '今日',
     thisWeek: '今週',
-    thisMonth: '今月',
+    last30Days: '過去30日',
     avgPerDay: '平均/日 (30日)',
     perDay: '実績/日',
     noActivity: '活動なし',
@@ -1552,11 +1552,12 @@ export const ja: Translations = {
   plurals: {
     todayAchievements: { other: '今日はすでに {n} 個。' },
     streakOf: { other: '{n} 日連続' },
-    todaySome: { other: '今日は {n} 個。' },
+    todaySome: { other: '今日は {n} 個の実績。' },
     following: { other: '{n} フォロー中' },
     followers: { other: '{n} フォロワー' },
     games: { other: '{n}本のゲーム' },
     achievements: { other: '{n}個の実績' },
+    achievementsWord: { other: '実績' },
     days: { other: '{n}日' },
     results: { other: '{n}件' },
     missables: { other: '取り逃し{n}件' },

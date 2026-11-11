@@ -1079,7 +1079,7 @@ export const ru: Translations = {
   pointsStats: {
     today: 'Сегодня',
     thisWeek: 'На этой неделе',
-    thisMonth: 'В этом месяце',
+    last30Days: 'Последние 30 дней',
     avgPerDay: 'Сред/день (30д)',
     perDay: 'достижений/день',
     noActivity: 'нет активности',
@@ -1552,11 +1552,12 @@ export const ru: Translations = {
   plurals: {
     todayAchievements: { one: 'Сегодня уже {n} достижение.', few: 'Сегодня уже {n} достижения.', many: 'Сегодня уже {n} достижений.', other: 'Сегодня уже {n} достижения.' },
     streakOf: { one: 'Серия {n} день', few: 'Серия {n} дня', many: 'Серия {n} дней', other: 'Серия {n} дня' },
-    todaySome: { one: 'Сегодня уже {n}.', few: 'Сегодня уже {n}.', many: 'Сегодня уже {n}.', other: 'Сегодня уже {n}.' },
+    todaySome: { one: 'Сегодня уже {n} достижение.', few: 'Сегодня уже {n} достижения.', many: 'Сегодня уже {n} достижений.', other: 'Сегодня уже {n} достижения.' },
     following: { one: '{n} подписка', few: '{n} подписки', many: '{n} подписок', other: '{n} подписки' },
     followers: { one: '{n} подписчик', few: '{n} подписчика', many: '{n} подписчиков', other: '{n} подписчика' },
     games: { one: '{n} игра', few: '{n} игры', many: '{n} игр', other: '{n} игры' },
     achievements: { one: '{n} достижение', few: '{n} достижения', many: '{n} достижений', other: '{n} достижения' },
+    achievementsWord: { one: 'достижение', few: 'достижения', many: 'достижений', other: 'достижения' },
     days: { one: '{n} день', few: '{n} дня', many: '{n} дней', other: '{n} дня' },
     results: { one: '{n} результат', few: '{n} результата', many: '{n} результатов', other: '{n} результата' },
     missables: { one: '{n} можно упустить', few: '{n} можно упустить', many: '{n} можно упустить', other: '{n} можно упустить' },

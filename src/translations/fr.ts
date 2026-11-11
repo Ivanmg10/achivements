@@ -1079,7 +1079,7 @@ export const fr: Translations = {
   pointsStats: {
     today: "Aujourd'hui",
     thisWeek: 'Cette semaine',
-    thisMonth: 'Ce mois-ci',
+    last30Days: '30 derniers jours',
     avgPerDay: 'Moy/jour (30j)',
     perDay: 'succès/jour',
     noActivity: 'aucune activité',
@@ -1552,11 +1552,12 @@ export const fr: Translations = {
   plurals: {
     todayAchievements: { one: "Déjà un succès aujourd'hui.", other: "Déjà {n} succès aujourd'hui." },
     streakOf: { one: 'Série de {n} jour', other: 'Série de {n} jours' },
-    todaySome: { one: "{n} aujourd'hui.", other: "{n} aujourd'hui." },
+    todaySome: { one: "{n} succès aujourd'hui.", other: "{n} succès aujourd'hui." },
     following: { one: '{n} abonnement', other: '{n} abonnements' },
     followers: { one: '{n} abonné·e', other: '{n} abonné·es' },
     games: { one: '{n} jeu', other: '{n} jeux' },
     achievements: { one: '{n} succès', other: '{n} succès' },
+    achievementsWord: { one: 'succès', other: 'succès' },
     days: { one: '{n} jour', other: '{n} jours' },
     results: { one: '{n} résultat', other: '{n} résultats' },
     missables: { one: '{n} manquable', other: '{n} manquables' },
