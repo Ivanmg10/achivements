@@ -39,9 +39,15 @@ there (`raCompareItem(players)`, `steamCompareItem`, `psnCompareItem`, `xboxComp
 achievement adds an optional field there; one that needs a fact only the platform has reads it from
 the platform's own item (below).
 
-`InsightAchievement` (`utils/gameInsights.ts`) is the library cards' reduced shape. Merging its
-`fromRa…fromXbox` into the per-item mappers is still open (#119's Open, UT-09); a family that touches
-both should do it.
+`InsightAchievement` (`utils/gameInsights.ts`) is the library cards' shape: a `CompareAchievement` plus
+points, kind and link. Its `fromRa…fromXbox` are the per-item mappers above plus those three.
+
+The viewer's pins and the secrets they reveal are one hook each for the four platforms
+(`useAchievementPins(PSN_PINS, …)` → `pins`, `useRevealed(byDefault, idOf)` → `reveal`: the table's
+`PinControl` and `RevealControl`, so an adapter passes them as they are). A new platform adds a
+`PinSpec` there. The PSN and Xbox libraries are `createConsoleLibrary` (`context/consoleLibrary.tsx`);
+a game page's states (not linked, library error, loading / error / empty table) are
+`components/game-page-states/`, and the width under a game header is `GAME_SECTION_WIDTH`.
 
 ## How a shell takes its platform
 

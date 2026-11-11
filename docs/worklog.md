@@ -111,7 +111,7 @@ the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform 
    collections fold only in the feed (`docs/platforms/psn.md`), `XboxPartialListNote`, RA's soft bar. *Traps:* `achievementAnchor` lives in
    `SteamAchievementGrid` and three utils import it (move it first, D1-08); `PsnTrophyGrid`'s `GRADE_RING` copies `TROPHY_GRADE_RING`; no Xbox
    read may be added per card (150 calls an hour for the app).
-6. **Favourite hooks and the PSN/Xbox providers** (HK-02, HK-04, with HK-18): `hooks/usePsnFavoriteTrophies` (96), `useXboxFavoriteAchievements`
+6. DONE (2026-11-11, `refactor/125-platform-shells-5`; below, "Done — families 6 and 7") **Favourite hooks and the PSN/Xbox providers** (HK-02, HK-04, with HK-18): `hooks/usePsnFavoriteTrophies` (96), `useXboxFavoriteAchievements`
    (96), `useSteamFavoriteAchievements` (117), `useRaFavoriteIds` (86); `context/PsnGamesDataContext`, `XboxGamesDataContext`;
    `useRevealedTrophies` / `useRevealedAchievements`. *Keep:* RA's providers (retry loop, `useRetryingRead`) and Steam's two-step library stay
    as they are (only the PSN/Xbox twins merge); each source's id column (`psn_trophy_id`, `xbox_achievement_id`, `steam_apiname`,
@@ -119,7 +119,7 @@ the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform 
    (`useWhenChanged`), the others show the old game's until the answer; RA has no `canPin`/`error` and does not wait for `authenticated`.
    *Then:* the table adapters' `pins` / `reveal` lines become one call each. Providers load on their first reader and memoize their value
    (`docs/performance.md`, HK-03).
-7. **Game page routes' states** (AP-03): `app/(main)/psnGame/[id]/page.tsx`, `steamGame/[appId]/page.tsx`, `xboxGame/[id]/page.tsx` (304 lines),
+7. DONE (2026-11-11, same branch; below, with D1-15 and D1-10) **Game page routes' states** (AP-03): `app/(main)/psnGame/[id]/page.tsx`, `steamGame/[appId]/page.tsx`, `xboxGame/[id]/page.tsx` (304 lines),
    the retry in `gameInfo/[gameId]/page.tsx`; with D1-15 (`user-game-page/*` bodies, the width trio ×12). *Keep:* each platform's failure words
    (`docs/platforms/README.md`: private vs refused vs busy), Xbox for admins only. *Traps:* the pages hold their skeleton while the session is
    read (#118: a full load of an Xbox page was a 404 before); a game 404 answers HTTP 200 (streaming, `notFound()` on the client); the empty
@@ -252,6 +252,48 @@ the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform 
 - *Not looked at in a browser:* the badge grids at 390 and 2560 px, both designs, Firefox (the focus ring on an earned badge, RA's `ul`
   against the old `div`); the feed rows (does the PSN collection's focus ring look right, do the rows still stretch to the feed's height);
   the category pages' loading skeleton; an opened game in the feed at 1280×800 and ~800×450.
+
+**Done — families 6 and 7, hooks, providers and game page states, plus D1-10** (`refactor/125-platform-shells-5`, one commit per part, 2026-11-11;
+shells follow `docs/platform-shells.md`). Non-test source 1,459 → 1,019 lines (−440), tests +692 −515:
+- *Pins (HK-02):* `hooks/useAchievementPins(spec, gameId, gameTitle, extra?)` replaces `usePsnFavoriteTrophies`, `useXboxFavoriteAchievements`,
+  `useSteamFavoriteAchievements` and `useRaFavoriteIds`. A `PinSpec` per platform (`RA_PINS`, `STEAM_PINS`, `PSN_PINS`, `XBOX_PINS`: source, the
+  row's id column, the id's name in the query and body, `idOf`) is all that differs; it answers `{ pins, error }` where `pins` is the table's
+  `PinControl`, so every adapter's pins line is `pins={pins}`. Contract: `useAchievementPins.test.ts` (4 platforms × 9). Checked by taking
+  away the rollback: 8 tests failed. RA's pin body now carries `source: 'ra'` and its list read is `source=ra&gameId=` (the route reads a missing
+  source as RA, so the same answer); its unpin is `?achievementId=&gameId=` (the route reads `achievementId` first).
+- *Reveal (HK-18):* `hooks/useRevealed(byDefault, idOf)` (returns the table's `RevealControl`) replaces `useRevealedTrophies` /
+  `useRevealedAchievements`; `hooks/useStoredSwitch(key, off, on)` is under `usePsnRevealHidden`, `useXboxRevealSecrets` and
+  `usePsnPlatinumCompletes` (the stored words `conceal`/`reveal`/`full`/`platinum` are the synced keys' values: unchanged).
+- *PSN and Xbox libraries (HK-04, HK-03):* `context/consoleLibrary.tsx` → `createConsoleLibrary({ source, url, errorFrom, always })` returns
+  `{ Provider, useData }`; the platform's provider is the session id plus (PSN) the platinum map, and `usePsnGamesData` / `useXboxGamesData`
+  are `useData`. Loads on its first reader (`request()`), never at mount, and the value is memoized now (a session update no longer
+  re-renders every reader). 293 → ~150 + the two adapters. RA's providers and Steam's two-step library are untouched.
+- *Platform reads (#119's Open, HK-06/07):* `hooks/usePlatformRead(url, spec)` (loading derived from "no answer for this url", the effect only
+  starts the fetch, retry is a handler, one fetch per url through `fetchShared`) replaces the `hasFetched` refs of `usePsnSummary`,
+  `useXboxSummary`, `useSteamProfile`, `usePsnTrophies` and `useXboxAchievements`. `fromRa…fromXbox` (`gameInsights.ts`) are the per-item
+  compare mappers plus points, kind and link.
+- *Game page states (AP-03, D1-15):* `components/game-page-states/` (`GamePageNotLinked`, `GamePageLibraryError`, `GameTableState` = skeleton /
+  error with hint and retry / empty / the table, `GameTableLoading`, `GAME_SECTION_WIDTH`) used by the PSN, Steam and Xbox routes;
+  `user-game-page/user-game-compare-body/UserGameCompareBody` and `user-game-not-in-list/` by the four user game bodies; the shared props type
+  moved to `types/userGamePage.ts`. Kept from #118: the session is waited for (`status === 'loading'` → skeleton) before a 404 or "not
+  connected", a game 404 is `notFound()` on the client, Xbox for admins only, an Xbox library that cannot be read says try later with a retry.
+- *D1-10:* `rarest-earned/RarestEarned` (rows from a 20-line adapter per platform, `ring` for the picture's colour); the link stays on the
+  viewed profile (`gameHref(source, id, subject)`, #118's decision). Contract: `RarestEarned.contract.test.tsx` (3 × 6).
+- *Xbox calls: the same.* `usePlatformRead` asks once per url (`fetchShared`, the same function the old hooks called) and no retry loop was
+  added; `createConsoleLibrary` still loads on the first reader and for an enabled account only. `usePlatformRead.test.ts` counts the calls of
+  `useXboxAchievements`, `useXboxSummary` (and none for a user who may not use Xbox) across re-renders. The pin read for Xbox is one GET per
+  game page as before (`/api/favorites` is our database, not OpenXBL).
+- *Visible changes (drifted copies, fixed):* **(a)** PSN's game page says "could not load your games" with the reason and a retry when its
+  library fails, instead of a 404 (pending from #118). **(b)** Pins reset on another game on every platform (Steam did; the rest showed the
+  old game's stars until the answer). **(c)** RA's star is only offered to a signed-in viewer on their own page, like the other three (it was
+  always shown; on a signed-out or someone else's page the read just failed); RA waits for the session before reading its pins. **(d)** The rarest
+  panels' link focus ring is the accent on all three (platform colour before). **(e)** On RA, `fromRa` reads an empty hardcore date as none
+  (`||`, as the compare table did; `??` before): only matters for a `''` that RA does not send.
+- *Left out:* the `hasFetched` hooks are not providers (each page reads its own; several readers of one url already share the request while
+  it is in flight), so "first reader" is the reader mounting; `usePsnCollectionTrophies` is a third copy of the trophy fetch (not in the list,
+  left); D1-16 (blurred hero backgrounds); the RA game route (`gameInfo/[gameId]`) keeps its own error screen (its retry already is `Button`).
+- *Not looked at in a browser:* the three game pages' error and empty cards (now `SURFACE` + `Button`, same classes), PSN's new library error,
+  the user game pages at 390 and 2560 px, the rarest panels' focus ring in both designs.
 **Watch out** — `toRow` and `items` must be stable (a module-level mapper, or `useMemo`): the deep link's reset runs when `items` changes,
 and an inline sort would reset it every render. The deep link looks for `data-anchor` on rows and cards; `anchor` is unencoded and the
 fragment is decoded before comparing. `badgeClass` takes a ring colour, not a state.
@@ -597,14 +639,14 @@ instead of "Invalid Date" (`formatDate`), and `formatUnlock` (date and time) is 
    `VaultPlatformSplit`'s short names ("RA", "PSN") stay. The want-to-play reads that put `ID` before `GameID` (`library.ts:60`,
    `gameCandidates.ts:87`, `useAllGamesGlobal`) stay as they are (opposite priority to `raGameId`); the OG card
    (`user/[username]/opengraph-image.tsx`) keeps its own three-platform list (no Xbox) and takes only the names.
-4. **Types.** Not done, and not mechanical (UT-09/UT-10, better in #125): merging the `fromRa…fromXbox` and `*CompareList` mappers.
+4. **Types.** DONE in #125 (2026-11-11, `fromRa…fromXbox` now build on the per-item compare mappers; the `*CompareList` stay, they only sort and map). Was not mechanical (UT-09/UT-10, better in #125): merging the `fromRa…fromXbox` and `*CompareList` mappers.
    *Traps:* RA's date is `DateEarnedHardcore ?? DateEarned` in insights but `||` in compare (an empty string differs), compare
    sorts RA by `DisplayOrder` and insights do not.
 5. **Sessions, left on purpose:** `groups/[id]` GET and `rankings` GET read an optional session (signed out is allowed);
    `perfectGamesOrder` GET and `showcase` GET read the **viewer's** admin flag after `dataOwner(req)` named someone else.
 6. **`notHidden` — kept by hand:** the overview's four favourites (literal source, id from JSON), its `"hiddenGames"` list, and the
    `JOIN hidden_games` in `follows/playing`.
-7. Optional, judgement needed: `usePsnSummary`, `useXboxSummary`, `useSteamProfile`, `usePsnTrophies`, `useXboxAchievements` keep a
+7. DONE in #125 (2026-11-11, `usePlatformRead`: no retry loop added, one fetch per url as before, so Xbox makes the same calls). Was: optional, judgement needed: `usePsnSummary`, `useXboxSummary`, `useSteamProfile`, `usePsnTrophies`, `useXboxAchievements` keep a
    `hasFetched` ref with no background retry; `useRetryingRead` could replace them only if retrying their platforms is wanted
    (Xbox has a 150-calls-an-hour budget: ask first). Not touched.
 **Watch out** — Never change a key derivation in `secretBox`, `raKey`, `adminAuth`, `emailVerification` or `steamLogin`:
