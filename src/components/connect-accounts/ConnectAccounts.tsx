@@ -1,23 +1,13 @@
 'use client'
 
-import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { IconChartHistogram, IconLayoutGrid, IconLibrary } from '@tabler/icons-react'
-import dynamic from 'next/dynamic'
-import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
-import UserPlatformCard from '@/components/user-page/user-platform-card/UserPlatformCard'
-import RaLogo from '@/components/ra-logo/RaLogo'
+import UserRaCard from '@/components/user-page/user-ra-card/UserRaCard'
 import UserSteamCard from '@/components/user-page/user-steam-card/UserSteamCard'
 import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
 import UserXboxCard from '@/components/user-page/user-xbox-card/UserXboxCard'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useLanguage } from '@/context/LanguageContext'
-import { buttonClass } from '@/components/ui/Button'
-
-// Downloaded the first time it opens, not with the page.
-const RaLoginModal = dynamic(() => import('@/components/ra-login-modal/RaLoginModal'), { loading: () => null })
-
-const ACTION = buttonClass('primary', 'md', 'w-full')
 
 /**
  * What a new account sees before linking anything: the platforms, what each
@@ -30,7 +20,6 @@ const ACTION = buttonClass('primary', 'md', 'w-full')
 export default function ConnectAccounts() {
   const { data: session } = useSession()
   const { T } = useLanguage()
-  const [raModalOpen, setRaModalOpen] = useState(false)
 
   const raLinked = Boolean(session?.user?.rausername)
   const steamLinked = Boolean(session?.user?.steamid)
@@ -53,27 +42,9 @@ export default function ConnectAccounts() {
         </header>
 
         <div className={`grid grid-cols-1 gap-4 enter-cards ${xboxEnabled ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
-          {!raLinked && (
-            <UserPlatformCard
-              name="RetroAchievements"
-              logo={<RaLogo height={18} />}
-              bigLogo={<RaLogo height={40} />}
-              gradient="from-ra via-ra/40 to-ra-gold"
-              connected={false}
-              hint={T.connect.raPitch}
-              action={
-                <button onClick={() => setRaModalOpen(true)} className={ACTION}>
-                  <RaLogo height={14} />
-                  {T.userData.connectRA}
-                </button>
-              }
-            />
-          )}
-
-          {/* The account page's own Steam card: the name is typed right here. */}
+          {/* The account page's own cards, so connecting looks the same wherever it is done. */}
+          {!raLinked && <UserRaCard hint={T.connect.raPitch} />}
           {!steamLinked && <UserSteamCard />}
-
-          {/* The account page's own PSN card: the online ID is typed right here. */}
           {!psnLinked && <UserPsnCard />}
 
           {/* Xbox, only for who may use it (an admin, for now): the card renders nothing for anyone else. */}
@@ -96,10 +67,6 @@ export default function ConnectAccounts() {
           </ul>
         </section>
       </div>
-
-      <LazyWhenOpened open={raModalOpen}>
-        <RaLoginModal isOpen={raModalOpen} setIsOpen={setRaModalOpen} />
-      </LazyWhenOpened>
     </main>
   )
 }

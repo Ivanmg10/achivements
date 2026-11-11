@@ -37,9 +37,10 @@ test('connected: the account, its numbers and the disconnect button', () => {
       logo={null}
       gradient="bg-blue-500"
       connected
-      identity={<p>ivanxmarine</p>}
+      identity={{ name: 'ivanxmarine', id: '7656' }}
       stats={STATS}
-      action={<button>Disconnect</button>}
+      disconnect={{ label: 'Disconnect', run: async () => true, done: 'Gone' }}
+      action={<button>Connect</button>}
     />,
   )
 
@@ -49,6 +50,7 @@ test('connected: the account, its numbers and the disconnect button', () => {
   expect(screen.getByText('Games')).toBeInTheDocument()
   expect(screen.getByText('120')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Disconnect' })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Connect' })).not.toBeInTheDocument()
 })
 
 test('disconnected: says so, and shows no numbers', () => {
@@ -58,13 +60,16 @@ test('disconnected: says so, and shows no numbers', () => {
       logo={null}
       gradient=""
       connected={false}
-      identity={<p>Connect Steam to…</p>}
+      identity={{ name: 'ivanxmarine' }}
+      disconnect={{ label: 'Disconnect', run: async () => true, done: 'Gone' }}
       action={<button>Connect</button>}
     />,
   )
   expect(screen.getByText(en.userData.notConnected)).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Connect' })).toBeInTheDocument()
   expect(document.querySelector('dl')).toBeNull()
+  expect(screen.queryByText('ivanxmarine')).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Disconnect' })).not.toBeInTheDocument()
 })
 
 test('shows a link status message', () => {

@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { useXboxLink } from '@/hooks/useXboxLink'
 import { useXboxSummary } from '@/hooks/useXboxSummary'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
@@ -8,12 +7,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { totalXboxPlaytime } from '@/utils/xboxTitles'
-import UserPlatformCard, {
-  DISCONNECT_CLASS,
-  platformStat,
-  PlatformStat,
-} from '@/components/user-page/user-platform-card/UserPlatformCard'
-import UserXboxCardForm from '@/components/user-page/user-xbox-card/user-xbox-card-form/UserXboxCardForm'
+import UserPlatformCard, { platformStat, PlatformStat } from '@/components/user-page/user-platform-card/UserPlatformCard'
+import UserPlatformLinkForm from '@/components/user-page/user-platform-link-form/UserPlatformLinkForm'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 
 /**
@@ -23,7 +18,7 @@ import XboxLogo from '@/components/xbox-logo/XboxLogo'
  */
 export default function UserXboxCard() {
   const { T, lang } = useLanguage()
-  const { enabled, xuid, gamertag, isLinked, link, isLinking, error: linkError, unlink, isUnlinking } = useXboxLink()
+  const { enabled, xuid, gamertag, isLinked, link, isLinking, error: linkError, unlink } = useXboxLink()
   const { summary, isLoading, error: summaryError } = useXboxSummary()
   const { library, libraryLoading } = useXboxGamesData()
 
@@ -45,11 +40,6 @@ export default function UserXboxCard() {
     if (await link(tag)) notify.success(T.toast.xboxLinked)
   }
 
-  const handleUnlink = async () => {
-    if (await unlink()) notify.success(T.toast.xboxUnlinked)
-    else notify.error(T.toast.unlinkFailed)
-  }
-
   return (
     <UserPlatformCard
       name="Xbox"
@@ -68,36 +58,28 @@ export default function UserXboxCard() {
           </p>
         )
       }
-      identity={
-        <div className="flex items-center gap-3 min-w-0">
-          {summary?.avatarUrl ? (
-            <Image
-              src={summary.avatarUrl}
-              alt=""
-              width={44}
-              height={44}
-              className="rounded-box w-10 h-10 object-cover shrink-0"
-              unoptimized
-            />
-          ) : (
-            <XboxLogo size={40} className="shrink-0 text-text-secondary" aria-hidden="true" />
-          )}
-          <div className="flex flex-col gap-0.5 min-w-0">
-            <span className="font-bold truncate">{name || '—'}</span>
-            <span className="text-[0.6875rem] text-text-secondary truncate">{xuid}</span>
-            <span className="text-[10px] text-text-secondary">{T.xbox.adminOnly}</span>
-          </div>
-        </div>
-      }
+      identity={{
+        avatar: summary?.avatarUrl,
+        fallback: <XboxLogo size={40} className="shrink-0 text-text-secondary" aria-hidden="true" />,
+        name: name || '—',
+        id: xuid,
+        note: T.xbox.adminOnly,
+      }}
       stats={isLinked ? stats : []}
+      disconnect={{ label: T.xbox.disconnect, busyLabel: T.xbox.disconnecting, run: unlink, done: T.toast.xboxUnlinked }}
       action={
-        isLinked ? (
-          <button onClick={handleUnlink} disabled={isUnlinking} className={DISCONNECT_CLASS}>
-            {isUnlinking ? T.xbox.disconnecting : T.xbox.disconnect}
-          </button>
-        ) : (
-          <UserXboxCardForm onSubmit={handleLink} isLinking={isLinking} error={linkError} />
-        )
+        <UserPlatformLinkForm
+          id="xbox-gamertag"
+          label={T.xbox.gamertagLabel}
+          placeholder={T.xbox.gamertagPlaceholder}
+          maxLength={20}
+          logo={<XboxLogo size={16} aria-hidden="true" />}
+          connect={T.xbox.connect}
+          connecting={T.xbox.connecting}
+          onSubmit={handleLink}
+          isLinking={isLinking}
+          error={linkError && T.xbox.errors[linkError]}
+        />
       }
     />
   )
