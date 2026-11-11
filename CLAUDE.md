@@ -65,7 +65,8 @@ stats, and personalization. Next.js 16 App Router + PostgreSQL + Tailwind v4.
 ### Shared helpers — use them, never a copy (#119)
 - **Platform dates** through `src/utils/dates.ts`: `parseUnlockTime` / `unlockIso` read the platforms'
   zone-less strings as UTC (never `.replace(' ', 'T')`), `utcDay` / `localDay` are the day keys, and
-  `formatDate(s, lang)` shows a date in the reader's language (never a fixed locale).
+  `formatDate(s, lang)` shows a date in the reader's language (never a fixed locale), in **the one date
+  format** ("22 oct 2026"; on screen `ui/DateText`); never a numeric one (`formatDate(…, {})`, the guard refuses it).
 - **RA picture URLs** through `src/utils/raAssets.ts` (`raImageUrl`, `raBadgeUrl`, `raAvatarUrl`), never a
   hand-written `retroachievements.org` host.
 - **The platform list and names** are `GAME_SOURCES` and `PLATFORM_NAME` (`src/utils/gameRef.ts`); the shared
