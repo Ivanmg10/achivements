@@ -16,7 +16,7 @@ import { guideLinks } from '@/utils/guideLinks'
 import { decimal } from '@/utils/utils'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import Button from '@/components/ui/Button'
-import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
+import Facts from '@/components/ui/Facts'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 import MainPagePortadaSkeleton from '../main-page-portada-skeleton/MainPagePortadaSkeleton'
 import { relativeTime } from '@/utils/dates'
@@ -55,6 +55,11 @@ export default function MainPagePortada() {
   // Not while its wide art may still come, or the poster would flash before it.
   const poster = art || reading ? null : [boxArt, hero.icon].find((src): src is string => Boolean(src) && !verdicts[src as string]) ?? null
   const when = hero.lastPlayed ? relativeTime(hero.lastPlayed, lang) : null
+  const count = hero.total > 0
+    ? (hero.source === 'psn' ? T.gameInfoPage.ofTrophies : T.gameInfoPage.ofAchievements)
+      .replace('{n}', hero.earned.toLocaleString(lang))
+      .replace('{total}', hero.total.toLocaleString(lang))
+    : null
   const upcoming = [...nextTargets(items, 5), ...items.filter((a) => !a.earned && a.rarity === null)].slice(0, 5)
   const next = upcoming[0]
   const left = hero.total - hero.earned
@@ -101,24 +106,15 @@ export default function MainPagePortada() {
       <div className="relative flex flex-col gap-3 p-6 sm:p-12 max-w-3xl justify-center enter-rows">
         <Kicker size="md" tone="accent">
           {T.homeLayout.continueKicker}
-          {when && <span className="text-text-secondary"> · {when}</span>}
         </Kicker>
         <h2 id="home-cover-title" className="font-display italic font-extrabold text-5xl sm:text-[5rem] leading-[0.9] text-text-main line-clamp-2 pr-2">
           {hero.title}
         </h2>
-        {hero.console && (
-          <GameHeroChip tone="overlay" className="self-start">
-            {hero.console}
-          </GameHeroChip>
-        )}
-        {hero.total > 0 && (
-          <div className="flex items-center gap-3.5 max-w-lg mt-2">
-            <ProgressBar pct={hero.pct} label={hero.title} className="flex-1" />
-            <span className={`text-lg font-extrabold tabular-nums ${hero.pct >= 100 ? 'text-success' : 'text-text-main'}`}>
-              {hero.earned} / {hero.total}
-            </span>
-          </div>
-        )}
+        {/* One line of facts, B's mark between them: "PS4 / 33 of 51 trophies / 11 h ago" (#128). */}
+        <p className="text-base font-semibold text-text-main">
+          <Facts items={[hero.console, count, when]} />
+        </p>
+        {hero.total > 0 && <ProgressBar pct={hero.pct} label={hero.title} className="max-w-lg mt-1" />}
         {/* Its line's room is kept while the game is read, so the hero does not jump when it comes. */}
         {reading && <span aria-hidden="true" className="h-5" />}
         {next && (

@@ -3,6 +3,7 @@
 import { useId, type ReactElement } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { DRAW_MS, dotDelay } from './drawTiming'
 
 /**
  * The one chart of unlocks over time: a line in the theme's accent with a soft
@@ -76,13 +77,24 @@ export default function AchievementsLinePlot({
           fill={`url(#${fillId})`}
           dot={/* istanbul ignore next */ (p: { cx?: number; cy?: number; payload?: Record<string, number>; index?: number }) =>
             p.payload?.[y] ? (
-              <circle key={p.index} cx={p.cx} cy={p.cy} r={4} fill="rgb(var(--accent))" stroke="rgb(var(--bg-card))" strokeWidth={2} />
+              <circle
+                key={p.index}
+                cx={p.cx}
+                cy={p.cy}
+                r={4}
+                fill="rgb(var(--accent))"
+                stroke="rgb(var(--bg-card))"
+                strokeWidth={2}
+                style={reduce ? undefined : { animation: `enter-card 160ms ${dotDelay(p.index ?? 0, data.length)}ms backwards`, transformBox: 'fill-box', transformOrigin: 'center' }}
+              />
             ) : (
               <g key={p.index} />
             )
           }
           activeDot={{ r: 6, fill: 'rgb(var(--accent))', stroke: 'rgb(var(--bg-card))', strokeWidth: 2 }}
           isAnimationActive={!reduce}
+          animationDuration={DRAW_MS}
+          animationEasing="linear"
         />
       </AreaChart>
     </ResponsiveContainer>

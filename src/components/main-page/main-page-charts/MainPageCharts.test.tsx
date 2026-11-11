@@ -22,10 +22,10 @@ function mockProbe(name: string) {
 jest.mock('./MainPageHeatmap', () => mockProbe('heatmap'))
 jest.mock('./MainPageTopGames', () => mockProbe('top-games'))
 jest.mock('@/components/achivements-line-chart/AchievementsLineChart', () => mockProbe('daily'))
-jest.mock('./MainPagePointsStats', () => ({
+jest.mock('../main-page-period-stats/MainPagePeriodStats', () => ({
   __esModule: true,
-  default: ({ achievements, heatmapAchievements, isLoading }: { achievements: { Title: string }[]; heatmapAchievements: { Title: string }[]; isLoading?: boolean }) => (
-    <div data-testid="points">{isLoading ? 'loading' : `${achievements.map((a) => a.Title).join(',')}|${heatmapAchievements.map((a) => a.Title).join(',')}`}</div>
+  default: ({ achievements, monthSource, streak, isLoading }: { achievements: { Title: string }[]; monthSource: { Title: string }[]; streak: number | null; isLoading?: boolean }) => (
+    <div data-testid="points" data-streak={String(streak)}>{isLoading ? 'loading' : `${achievements.map((a) => a.Title).join(',')}|${monthSource.map((a) => a.Title).join(',')}`}</div>
   ),
 }))
 jest.mock('./MainPageRarest', () => mockProbe('rarest'))
@@ -42,7 +42,6 @@ jest.mock('../main-page-friends/MainPageFriends', () => ({
   __esModule: true,
   default: ({ active }: { active: boolean }) => <div data-testid="friends" data-active={String(active)} />,
 }))
-jest.mock('./main-page-steam-stats/MainPageSteamStats', () => mockProbe('steam-stats'))
 jest.mock('../main-page-browse/main-page-steam-nav/MainPageSteamNav', () => mockProbe('steam-nav'))
 
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
@@ -130,12 +129,18 @@ test('loads nothing from Steam without a linked account', () => {
   expect(useSteamRecentAchievements).toHaveBeenCalledWith(null)
 })
 
-test('Portada activity figures use every platform and ignore the Classic platform tab', () => {
+test.each(['classic', 'cover'])('%s: the activity figures count every platform, whichever profile tab is open', (layout) => {
   platform('steam')
-  ;(useHomeLayout as jest.Mock).mockReturnValue(['cover', jest.fn()])
+  ;(useHomeLayout as jest.Mock).mockReturnValue([layout, jest.fn()])
   render(<MainPageCharts />)
   expect(screen.getByTestId('points')).toHaveTextContent('Recent RA,Win|Year RA,Heatmap RA')
-  expect(screen.queryByTestId('steam-stats')).not.toBeInTheDocument()
+})
+
+test('the cover leaves the streak out of the figures: it has its own card', () => {
+  platform('ra')
+  ;(useHomeLayout as jest.Mock).mockReturnValue(['cover', jest.fn()])
+  render(<MainPageCharts />)
+  expect(screen.getByTestId('points')).toHaveAttribute('data-streak', 'null')
 })
 
 /** Every card id the section rail can reach, visiting each section in turn. */
@@ -148,9 +153,9 @@ function cardsAcrossSections() {
   return seen
 }
 
-const RA_ONLY = ['points', 'nav']
-const STEAM_ONLY = ['steam-stats', 'steam-nav']
-const SHARED = ['heatmap', 'daily', 'top-games', 'rarest', 'abandoned', 'collection', 'groups', 'favorites', 'best', 'month', 'habits', 'journal']
+const RA_ONLY = ['nav']
+const STEAM_ONLY = ['steam-nav']
+const SHARED = ['points', 'heatmap', 'daily', 'top-games', 'rarest', 'abandoned', 'collection', 'groups', 'favorites', 'best', 'month', 'habits', 'journal']
 
 test('the shared cards are there whichever platform is selected', () => {
   platform('steam')

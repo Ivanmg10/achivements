@@ -10,7 +10,6 @@ import { useConsoleVisibility } from '@/hooks/useConsoleVisibility'
 import { useStreakData } from '@/hooks/useStreakData'
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useGamesData } from '@/context/GamesDataContext'
-import { useUserRank } from '@/hooks/useUserRank'
 import { useUserAwards } from '@/hooks/useUserAwards'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { useLanguage } from '@/context/LanguageContext'
@@ -29,7 +28,6 @@ import { useWhenIdle } from '@/hooks/useWhenIdle'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
 import MainPageHeatmap from './MainPageHeatmap'
-import MainPagePointsStats from './MainPagePointsStats'
 import MainPageRarest from './MainPageRarest'
 import MainPageAbandoned from './MainPageAbandoned'
 import MainPageTopGames from './MainPageTopGames'
@@ -37,9 +35,7 @@ import MainPageMonthCompare from './main-page-month-compare/MainPageMonthCompare
 import MainPageHabits from './main-page-habits/MainPageHabits'
 import MainPageJournal from './main-page-journal/MainPageJournal'
 import MainPageBestPeriod from './MainPageBestPeriod'
-import MainPageSteamStats from './main-page-steam-stats/MainPageSteamStats'
-import MainPagePsnStats from './main-page-psn-stats/MainPagePsnStats'
-import MainPageXboxStats from './main-page-xbox-stats/MainPageXboxStats'
+import MainPagePeriodStats from '../main-page-period-stats/MainPagePeriodStats'
 import MainPageStatsRail, { StatsSection } from '../main-page-stats-rail/MainPageStatsRail'
 import MainPageBrowse from '../main-page-browse/MainPageBrowse'
 import MainPagePinnedSection from '../main-page-pinned-section/MainPagePinnedSection'
@@ -91,7 +87,6 @@ export default function MainPageCharts() {
   const streak = activeStreak?.days ?? 0
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
   const { all, inProgress, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()
-  const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
   const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
   const { platform } = useMainPlatform()
   const [layout] = useHomeLayout()
@@ -118,10 +113,6 @@ export default function MainPageCharts() {
   const bestPeriodData = platform === 'steam' ? steamRecent : platform === 'psn' ? psnRecent : platform === 'xbox' ? xboxRecent : heatmapData
   const bestPeriodLoading = platform === 'steam' ? steamLoading : platform === 'psn' ? psnLoading : platform === 'xbox' ? xboxLoading : yearLoading
   const bestPeriodError = platform === 'ra' && yearError
-  const refetchStats = () => {
-    if (achError) refetchAch()
-    if (rankError) refetchRank()
-  }
 
   const sections: StatsSection[] = [
     { id: 'overview', label: T.cards.sectionOverview, icon: <IconLayoutDashboard size={18} /> },
@@ -140,35 +131,16 @@ export default function MainPageCharts() {
   const panels: Record<string, ReactNode> = {
     overview: (
       <>
-        {layout === 'cover' ? (
-          <SectionFallback error={achError || rankError} onRefresh={refetchStats}>
-            <MainPagePointsStats
-              streak={streak}
-              achievements={recent}
-              heatmapAchievements={year}
-              rank={rank}
-              showRank={false}
-              valueMode="achievements"
-              isLoading={achLoading || steamLoading || psnLoading || xboxLoading || yearLoading}
-            />
-          </SectionFallback>
-        ) : platform === 'steam' ? (
-          <MainPageSteamStats streak={streak} achievements={steamRecent} games={library} isLoading={steamLoading} />
-        ) : platform === 'psn' ? (
-          <MainPagePsnStats streak={streak} achievements={psnRecent} isLoading={psnLoading} />
-        ) : platform === 'xbox' ? (
-          <MainPageXboxStats streak={streak} achievements={xboxRecent} isLoading={xboxLoading} />
-        ) : (
-          <SectionFallback error={achError || rankError} onRefresh={refetchStats}>
-            <MainPagePointsStats
-              streak={streak}
-              achievements={achievements}
-              heatmapAchievements={heatmapData}
-              rank={rank}
-              isLoading={achLoading || rankLoading}
-            />
-          </SectionFallback>
-        )}
+        {/* Every platform together, whichever profile tab is open: per platform lives in the profile column (#128). */}
+        <SectionFallback error={achError} onRefresh={refetchAch}>
+          <MainPagePeriodStats
+            achievements={recent}
+            monthSource={year}
+            // The cover has its own streak card beside it.
+            streak={layout === 'cover' ? null : streak}
+            isLoading={achLoading || steamLoading || psnLoading || xboxLoading || yearLoading}
+          />
+        </SectionFallback>
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           <ChartCard className="xl:col-span-2">
             <SectionFallback error={yearError} onRefresh={refetchYear}>

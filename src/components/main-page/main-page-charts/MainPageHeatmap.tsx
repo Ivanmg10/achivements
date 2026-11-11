@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { RecentAchievement } from '@/types/types'
-import { groupByDays, heatLevel, HEAT_LEVELS } from '@/utils/utils'
+import { groupByDays, heatLevel, HEAT_LEVELS, plural } from '@/utils/utils'
 import { IconRefresh } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHeatmapGrid, HEATMAP_GAP as GAP, HEATMAP_MAX_DAYS } from '@/hooks/useHeatmapGrid'
@@ -156,7 +156,7 @@ export default function MainPageHeatmap({
               <Facts items={[T.cards.activeDays.replace('{n}', String(activeDays)), T.lineChart.bestDay.replace('{n}', String(best))]} />
             </p>
           )}
-          <p className="text-sm font-bold tabular-nums text-text-main">{isLoading ? <Skeleton className="h-[1lh] w-8" /> : totalAch}</p>
+          <p className="text-sm font-bold tabular-nums text-text-main">{isLoading ? <Skeleton className="h-[1lh] w-8" /> : plural(totalAch, T.plurals.achievements, lang)}</p>
           {onRefresh && (
             <button
               onClick={onRefresh}

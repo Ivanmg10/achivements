@@ -33,6 +33,50 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-11 — The home's improvements from the canvas (`feat/128-home-improvements`, #128)
+
+**Did** — Page 2 of the antislop canvas v2, boards "MejHome", "MejPortada" and "MejPlataformas", one commit per block (cut from
+`refactor/125-platform-shells-6`):
+- *RetroRatio (V1-01):* RA's card says "RetroRatio 2,85" (`decimal(n, lang, 2)`, `utils/raRatio.ts` `retroRatio`); the key is
+  `profileStats.retroRatio` (was `hardcoreRatio`, "Ratio hardcore 285 %"). The avatar's ring no longer reads that number as a percentage
+  (≥ 80 → gold, so nearly everyone): `raPlayRing` is the hardcore colour when hardcore points beat softcore, the softcore colour when not,
+  neutral with none. RA's global rank moved from the activity row to the card's line ("Member since 2023 / Global rank #16,535", `Facts`).
+- *One activity row (V1 "Esta semana" + MejPlataformas 1):* `MainPagePeriodStats` counts every platform's unlocks in both layouts, whichever
+  profile tab is open: today, this week, the last 30 days (`pointsStats.last30Days`, was the calendar month), the average and the streak
+  (left out on the cover, which has its own card: `streak={null}`). The unit under each figure follows plural rules (`plurals.achievementsWord`,
+  nine languages: no more "1 logros" / "1 trofeos"). The four adapters (`MainPagePointsStats`, `MainPageSteamStats`, `-Psn-`, `-Xbox-`) and
+  their contract suite are gone; `MainPagePeriodStats.test.tsx` replaces them.
+- *Texts:* the heatmap's total says "2133 achievements"; RA's rich presence is its own line under the game, two lines at most
+  (`MainPageProfileNowPlaying` `note`), the kicker just "Playing now"; `plurals.todaySome` says the noun ("Hoy llevas 2 logros."); Xbox's
+  `xbox.tier` reads "Account" ("Cuenta Silver"); Steam's "Offline" is not shown on your own card (someone else's still says it).
+- *The week's chart:* recharts draws the dots in a z-index layer outside the clip that wipes the line in, so they stood alone for 1.5 s.
+  `AchievementsLinePlot` draws in 0.6 s, linear, and each dot fades in as the line reaches it (`drawTiming.ts`).
+- *The cover:* one line of facts under the title (`Facts`: console / "33 of 51 trophies" / when), the chip and the "33 / 51" beside the bar gone,
+  the kicker without the time; the level card says the level once (the ring) with `VaultLevelBadge tierOnly` beside it; "+672 VP" in the text
+  colour; a day initial under each of the week's bars (`formatDay(…, { weekday: 'narrow' })`), its skeleton taller by that row.
+- *The 99 % ring (V1, MejPortada 1):* the header's level is a grey slot of the badge's size while the points are read, the progress only for a
+  screen reader. Why it never resolved: a platform that cannot move (busy PSN or Steam budget, a read that throws and stays `reading` with
+  total 0) keeps `complete` false, so `fillProgress` capped at 99 and the page asked 30 passes for nothing, and a failed POST left "calculating"
+  on screen. `useVaultFill` now stops (`stopped`) after a failed request, after the passes run out, or when a pass reads no more games than the
+  last; `VaultFillProvider` then reports `active: false`, so the header shows the level it has.
+**Already done, not touched** — "/" opens an empty search (#118); the heatmap's months in the site's language, one casing (#122, `formatDay`
+with `lang`); the streak in its tier colour on every tab (#125 family 3; now one row anyway); "what B brings" (#127: one `Tabs`, sentence-case
+card titles and kickers, level / streak / user one family in the header).
+**Decisions** — The row counts everything, so the platforms' own totals (Steam level, PSN level and platinum, Xbox gamerscore and achievements,
+Steam's two weeks of play) leave the home's row; all but Steam's two weeks and RA's rank were already on the profile cards; the rank went to
+RA's card, the two weeks are dropped (ask the owner if they want them on Steam's card). The ring rule is the default the owner was offered (the
+canvas draws nothing for it): **owner to confirm**. Not touched (owner): cards inside cards, the cover's order, the heatmap's entrance, the
+coloured "finished" figure.
+**Open** — Not looked at in a browser: the home is chosen on the server from the session, so it cannot be shown without a signed-in account (and
+the session is rebuilt from the database); a signed-out dev server only shows the landing. Check on the preview at 2560 and 390 px, both designs,
+Firefox: the cover's facts line and the week's initials, the dots arriving with the line, the header's grey slot, RA's card line with the rank.
+The server still records a thrown platform as `reading` with total 0 (`refreshScoreNow`); the client stops now, but the next visit tries again:
+making it `error` would toast a failure each pass, left as is. `T.rankings.fillShort` is still used by the account page and the rankings.
+**Watch out** — `MainPagePeriodStats` takes `streak: number | null`; the `PointsStats` and per-platform rows no longer exist. The guard's
+"no label in capitals" rule matches the word "uppercase" in a comment.
+
+---
+
 ## 2026-11-10 — One shell for the game page achievement table, and the pattern for the other families (`refactor/125-platform-shells`, #125)
 
 **Did** — The first family of #125 (antislop D1-01, X1, §3.3), one commit per step, and the pattern written down:

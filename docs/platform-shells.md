@@ -8,7 +8,7 @@ copy only (antislop audit #77, X1 and §3.3; issue #125). A **family** is one of
 2026-11-10); it is the example below. The group game cards (`GroupGameCard`) and the status cards
 (`StatusGameCard`) followed, the same way, with a view-model type (`types/gameCard.ts`) instead of a
 hook: they hold no state beyond open/closed. The home's pieces (family 3) are the same: the stat pills
-(`MainPagePeriodStats`), the nav cards (`MainPagePlatformNav`), the pinned rows (`PinnedGameCard`) and the profile
+(`MainPagePeriodStats`; since #128 one row for every platform, no adapters left), the nav cards (`MainPagePlatformNav`), the pinned rows (`PinnedGameCard`) and the profile
 column's glue (`MainPageProfileLinked`, `MainPageProfileRecentList`). Family 5 has four shells, each with
 its contract suite: the badge grid (`BadgeGrid`, generic over the platform's item like the table, with
 slots for what a badge is called, where it goes, its ring and its tooltip, and `LazyBadgeGrid` for the

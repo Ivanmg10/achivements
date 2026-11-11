@@ -5,9 +5,9 @@ import Kicker from '@/components/ui/Kicker'
 
 /**
  * The game being played (or played last) under the profile card, the same on
- * every platform: the game's tint under the neutral hairline, a small kicker (with what the
- * game says the player is doing, when it says), the game's icon, title and
- * console, its share on the right and the bar under it.
+ * every platform: the game's tint under the neutral hairline, a small kicker, the game's icon,
+ * title and console, its share on the right, what the game says the player is doing (RA's rich
+ * presence, up to two lines, as the game wrote it) and the bar under it.
  */
 export default function MainPageProfileNowPlaying({
   href,
@@ -16,6 +16,7 @@ export default function MainPageProfileNowPlaying({
   icon,
   title,
   sub,
+  note,
   share,
   done = false,
   bar,
@@ -27,6 +28,8 @@ export default function MainPageProfileNowPlaying({
   icon: ReactNode
   title: string
   sub: ReactNode
+  /** What the game says the player is doing; it was squeezed into the kicker and cut (#128). */
+  note?: string | null
   /** The share done, as shown on the right ("12,8 %"); nothing when unknown. */
   share?: string | null
   /** Finished: the share in the success colour (never the bar). */
@@ -48,6 +51,7 @@ export default function MainPageProfileNowPlaying({
         </span>
         {share && <strong className={`shrink-0 font-bold tabular-nums ${done ? 'text-success' : ''}`}>{share}</strong>}
       </span>
+      {note && <span className="text-[0.8125rem] text-text-secondary line-clamp-2">{note}</span>}
       {bar}
     </Link>
   )

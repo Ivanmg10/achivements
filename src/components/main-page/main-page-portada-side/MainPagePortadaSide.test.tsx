@@ -32,6 +32,17 @@ describe('level', () => {
     expect(screen.getByText(/#19/)).toBeInTheDocument()
   })
 
+  test('the level is said once, in the ring; beside it the tier alone; the week in the text colour, each bar over its day', () => {
+    ;(useVaultMe as jest.Mock).mockReturnValue({ me: { points: 116671, week: 461, rank: 19, rankDelta: 3, days: [10, 0, 20, 30, 0, 40, 50].map((points, i) => ({ start: `2026-10-${19 + i}`, points })) } })
+    const { container } = render(<MainPagePortadaSideLevel />)
+    // Only the screen reader hears "Lv." on the badge: the ring shows the number.
+    expect(container.querySelectorAll('.sr-only')).toHaveLength(1)
+    expect(screen.getByText('+461')).not.toHaveClass('text-success')
+    // 2026-10-19 was a Monday: M T W T F S S.
+    const initials = [...screen.getByRole('img', { name: /Points per day/ }).querySelectorAll('.text-center')].map((el) => el.textContent)
+    expect(initials).toEqual(['M', 'T', 'W', 'T', 'F', 'S', 'S'])
+  })
+
   test('nothing before anything is scored', () => {
     ;(useVaultMe as jest.Mock).mockReturnValue({ me: { points: 0, week: 0, rank: 0 } })
     const { container } = render(<MainPagePortadaSideLevel />)
@@ -52,7 +63,7 @@ describe('streak', () => {
   test('with something today, says how many; no record mark below the best', () => {
     ;(useStreakData as jest.Mock).mockReturnValue(streak([unlock('2026-10-25', 'A'), unlock('2026-10-25', 'B')], 10, 46))
     render(<MainPagePortadaSideStreak />)
-    expect(screen.getByText('2 so far today.')).toBeInTheDocument()
+    expect(screen.getByText('2 achievements so far today.')).toBeInTheDocument()
     expect(screen.queryByText(en.streak.newRecord)).not.toBeInTheDocument()
   })
 

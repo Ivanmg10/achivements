@@ -24,7 +24,7 @@ export default function MainPagePortadaSkeleton() {
 /** Your level beside the cover: the ring, the tier and points, the week's bars. */
 export function PortadaLevelSkeleton() {
   return (
-    <div aria-hidden="true" className={`${SURFACE} p-5 sm:px-6 flex flex-col gap-4 min-h-[249px]`}>
+    <div aria-hidden="true" className={`${SURFACE} p-5 sm:px-6 flex flex-col gap-4 min-h-[264px]`}>
       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5">
         <Skeleton radius="circle" className="w-28 h-28" />
         <div className="flex flex-col gap-2 min-w-0">
@@ -35,9 +35,13 @@ export function PortadaLevelSkeleton() {
       </div>
       <div className="flex flex-col gap-2 border-t border-ink/10 pt-3">
         <Skeleton className="h-4 w-24" />
-        <div className="flex items-end gap-4">
+        <div className="flex items-start gap-4">
           <Skeleton className="h-7 w-16 shrink-0" />
-          <Skeleton radius="tag" className="h-10 flex-1" />
+          {/* The week's bars and the row of day initials under them. */}
+          <div className="flex-1 flex flex-col gap-1">
+            <Skeleton radius="tag" className="h-10" />
+            <Skeleton className="h-[0.6875rem]" />
+          </div>
         </div>
       </div>
     </div>

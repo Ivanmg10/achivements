@@ -3,6 +3,7 @@ import MainPageProfileStLinked from './MainPageProfileStLinked'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { en } from '@/translations/en'
+import { SubjectContext } from '@/context/SubjectContext'
 import type { SteamProfile } from '@/types/steam'
 
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
@@ -112,8 +113,17 @@ describe('status, in words as well as a dot', () => {
     expect(screen.getByText(en.steam.online)).toBeInTheDocument()
   })
 
-  test('offline, including when Steam gives no state', () => {
-    renderIt({ profile: { ...PROFILE, personastate: undefined } })
+  test('offline says nothing on your own card: you are using the site', () => {
+    renderIt({ profile: { ...PROFILE, personastate: 0 } })
+    expect(screen.queryByText(en.steam.offline)).not.toBeInTheDocument()
+  })
+
+  test('offline on someone else’s card, including when Steam gives no state', () => {
+    render(
+      <SubjectContext.Provider value="someone">
+        <MainPageProfileStLinked profile={{ ...PROFILE, personastate: undefined }} isLoading={false} error={null} onRetry={retry} />
+      </SubjectContext.Provider>,
+    )
     expect(screen.getByText(en.steam.offline)).toBeInTheDocument()
   })
 })

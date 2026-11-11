@@ -10,6 +10,7 @@ import { CountUp } from '@/components/ui/CountUp'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import { PortadaLevelSkeleton } from '../../main-page-portada-skeleton/MainPagePortadaSkeleton'
 import Kicker from '@/components/ui/Kicker'
+import { formatDay } from '@/utils/dates'
 
 /** Your level beside the cover: the number in big, your tier, your points, what is left to the next and this week's gain. Opens the rankings. */
 export default function MainPagePortadaSideLevel() {
@@ -49,7 +50,7 @@ export default function MainPagePortadaSideLevel() {
           }
         />
         <span className="flex flex-col gap-1 min-w-0">
-          <VaultLevelBadge points={me.points} className="self-start" />
+          <VaultLevelBadge points={me.points} tierOnly className="self-start" />
           <span className="tabular-nums">
             <CountUp value={me.points} locale={lang} className="text-[1.625rem] font-extrabold" /> <span className="text-text-secondary">{T.rankings.vp}</span>
           </span>
@@ -64,23 +65,27 @@ export default function MainPagePortadaSideLevel() {
           <span className="text-sm font-bold">{T.homeLayout.yourWeek}</span>
           {deltaText && <span className={`text-xs font-bold ${delta! > 0 ? 'text-success' : delta! < 0 ? 'text-danger' : 'text-text-secondary'}`}>{deltaText}</span>}
         </span>
-        <span className="flex items-end gap-4">
+        <span className="flex items-start gap-4">
           <span className="shrink-0 tabular-nums">
-            <strong className="text-xl font-extrabold text-success">+{n(me.week)}</strong> <span className="text-xs text-text-secondary">{T.rankings.vp}</span>
+            <strong className="text-xl font-extrabold">+{n(me.week)}</strong> <span className="text-xs text-text-secondary">{T.rankings.vp}</span>
           </span>
           {days.length > 0 && (
             <span
               role="img"
               aria-label={T.homeLayout.weekDaysA11y.replace('{list}', days.map((d) => n(d.points)).join(', '))}
-              className="flex items-end gap-1 h-10 flex-1"
+              className="flex gap-1 flex-1"
             >
+              {/* Each bar over the initial of its day (#128): seven bars alone did not say which was which. */}
               {days.map((d) => (
-                <span
-                  key={d.start}
-                  aria-hidden="true"
-                  style={{ height: `${Math.max(8, (d.points / max) * 100)}%` }}
-                  className={`flex-1 ${d.points > 0 ? 'bg-accent' : 'bg-ink/10'}`}
-                />
+                <span key={d.start} aria-hidden="true" className="flex-1 flex flex-col items-stretch gap-1">
+                  <span className="h-10 flex items-end">
+                    <span
+                      style={{ height: `${Math.max(8, (d.points / max) * 100)}%` }}
+                      className={`w-full ${d.points > 0 ? 'bg-accent' : 'bg-ink/10'}`}
+                    />
+                  </span>
+                  <span className="text-[0.6875rem] leading-none text-center text-text-secondary">{formatDay(d.start, lang, { weekday: 'narrow' })}</span>
+                </span>
               ))}
             </span>
           )}

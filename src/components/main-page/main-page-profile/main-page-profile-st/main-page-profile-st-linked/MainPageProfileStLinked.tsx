@@ -4,6 +4,7 @@ import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
+import { useSubject } from '@/context/SubjectContext'
 import { codeToFlag, findCountry } from '@/utils/countries'
 import MainPageProfileLinked from '../../main-page-profile-linked/MainPageProfileLinked'
 import MainPageProfileStStats from '../main-page-profile-st-stats/MainPageProfileStStats'
@@ -29,6 +30,7 @@ export default function MainPageProfileStLinked({
   onRetry: () => void
 }) {
   const { T } = useLanguage()
+  const own = useSubject() === null
   const { library, libraryLoading, recent, refetch } = useSteamGamesData()
   const recentAchievements = useSteamRecentAchievements()
 
@@ -49,10 +51,11 @@ export default function MainPageProfileStLinked({
   const memberYear = profile.timecreated ? new Date(profile.timecreated * 1000).getFullYear() : null
   const country = profile.loccountrycode ? findCountry(profile.loccountrycode) : undefined
 
-  let status: { text: string; dot: string }
+  let status: { text: string; dot: string } | null
   if (profile.gameextrainfo) status = { text: `${T.steam.nowPlaying}: ${profile.gameextrainfo}`, dot: 'bg-steam-perfect' }
   else if ((profile.personastate ?? 0) > 0) status = { text: T.steam.online, dot: 'bg-steam' }
-  else status = { text: T.steam.offline, dot: 'bg-offline' }
+  // On your own card "Offline" while you use the site says nothing true (#128): only someone else's says it.
+  else status = own ? null : { text: T.steam.offline, dot: 'bg-offline' }
 
   return (
     <MainPageProfileLinked
@@ -80,10 +83,12 @@ export default function MainPageProfileStLinked({
                   </span>
                 </span>
               )}
-              <span className="inline-flex items-center gap-1.5 min-w-0">
-                <span aria-hidden="true" className={`inline-block w-2 h-2 rounded-full shrink-0 ${status.dot}`} />
-                <span className="truncate">{status.text}</span>
-              </span>
+              {status && (
+                <span className="inline-flex items-center gap-1.5 min-w-0">
+                  <span aria-hidden="true" className={`inline-block w-2 h-2 rounded-full shrink-0 ${status.dot}`} />
+                  <span className="truncate">{status.text}</span>
+                </span>
+              )}
             </div>
             {(memberYear || country) && (
               <p className="text-[0.8125rem] text-text-secondary">
