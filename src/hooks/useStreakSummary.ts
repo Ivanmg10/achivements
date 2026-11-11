@@ -42,6 +42,9 @@ async function request(url: string): Promise<StreakSummary | null> {
  * Asked again when what it counts changes: the language (the caches it shares),
  * a linked account, the consoles unticked in this browser, or a game hidden or
  * shown. Waits for the browser's lists, so the first read is the right one.
+ *
+ * `streak` is null until the first answer: a 0 meanwhile read as a real streak
+ * that became another number seconds later. A failed read is 0, with `error`.
  */
 export function useStreakSummary() {
   const { data: session, status } = useAuthSession()
@@ -76,5 +79,5 @@ export function useStreakSummary() {
   // The last answer stays shown while the next is on its way, so the badge does not blink.
   const summary = answer?.summary ?? null
   const isLoading = wanted !== null && answer?.for !== wanted
-  return { streak: summary?.active?.days ?? 0, best: summary?.best?.days ?? 0, isLoading, error: answer?.for === wanted && !summary, retry }
+  return { streak: answer ? (summary?.active?.days ?? 0) : null, best: summary?.best?.days ?? 0, isLoading, error: answer?.for === wanted && !summary, retry }
 }

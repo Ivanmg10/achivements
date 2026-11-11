@@ -112,7 +112,7 @@ export default function SearchModalHome({
             <SearchModalRow
               media={<IconFlame className="w-[1.125rem] h-[1.125rem] text-text-main" aria-hidden="true" />}
               title={T.streak.title}
-              right={<span className="text-[0.8125rem] text-text-secondary shrink-0">{plural(streak, T.plurals.days, lang)}</span>}
+              right={streak === null ? null : <span className="text-[0.8125rem] text-text-secondary shrink-0">{plural(streak, T.plurals.days, lang)}</span>}
               onSelect={() => onGo('/racha')}
             />
           </li>

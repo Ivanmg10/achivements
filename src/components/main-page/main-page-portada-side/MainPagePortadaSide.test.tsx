@@ -67,6 +67,13 @@ describe('streak', () => {
     expect(screen.queryByText(en.streak.newRecord)).not.toBeInTheDocument()
   })
 
+  test('while any platform is still on its way, the skeleton: not the streak of the ones that landed', () => {
+    ;(useStreakData as jest.Mock).mockReturnValue({ ...streak([unlock('2026-10-24', 'Yesterday')], 3, 46), isLoading: true })
+    const { container } = render(<MainPagePortadaSideStreak />)
+    expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
+  })
+
   test('nothing without a streak', () => {
     ;(useStreakData as jest.Mock).mockReturnValue({ ...streak([]), activeStreak: null })
     const { container } = render(<MainPagePortadaSideStreak />)

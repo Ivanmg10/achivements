@@ -41,16 +41,24 @@ function NavLink({ href, label, active }: { href: string; label: string; active:
 /**
  * The way to the streak page, always there: the current streak in days, or a
  * dimmed 0 when there is none, so the page can still be reached to look back.
+ * While it is first read (`null`), the tag's room in grey and no number.
  */
-function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
+function StreakBadge({ streak, glass }: { streak: number | null; glass?: boolean }) {
   const { T, lang } = useLanguage()
   return (
     <Link
       href="/racha"
-      aria-label={`${T.streak.title}: ${plural(streak, T.plurals.days, lang)}`}
+      aria-label={streak === null ? T.streak.title : `${T.streak.title}: ${plural(streak, T.plurals.days, lang)}`}
+      aria-busy={streak === null || undefined}
       className={`rounded-tag transition-[filter] hover:brightness-125 focus-ring ${glass ? 'backdrop-blur-sm' : ''}`}
     >
-      <StreakTag days={streak} text={T.rankings.daysShort.replace('{n}', streak.toLocaleString(lang))} glow={false} />
+      <StreakTag
+        days={streak ?? 0}
+        // While loading, the room of "00 d", unseen.
+        text={T.rankings.daysShort.replace('{n}', streak === null ? '00' : streak.toLocaleString(lang))}
+        loading={streak === null}
+        glow={false}
+      />
     </Link>
   )
 }

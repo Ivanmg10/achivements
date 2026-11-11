@@ -20,7 +20,8 @@ const DAYS = 21
 export default function MainPagePortadaSideStreak() {
   const { T, lang } = useLanguage()
   const { achievements, activeStreak, bestStreak, now, isLoading } = useStreakData()
-  if (isLoading && !activeStreak) return <PortadaStreakSkeleton />
+  // Not before every platform is in: the first one's streak alone is a number that changes when the rest land.
+  if (isLoading) return <PortadaStreakSkeleton />
   if (!activeStreak) return null
 
   const counts = groupByDays(achievements, DAYS, new Date(now)).map((d) => d.count)

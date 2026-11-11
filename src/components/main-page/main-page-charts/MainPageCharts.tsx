@@ -83,7 +83,8 @@ export default function MainPageCharts() {
     [year, activitySince],
   )
   const psnActivity = useMemo(() => psnYear.filter((t) => t.earnedAt >= activitySince), [psnYear, activitySince])
-  // The same streak the top bar shows: one source, so they cannot disagree.
+  // The top bar's streak is counted on the server from the same loaders and rules (useStreakSummary),
+  // so once both are whole they agree.
   const streak = activeStreak?.days ?? 0
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
   const { all, inProgress, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()

@@ -101,6 +101,7 @@ export default function DesignCatalogData() {
           <Specimen name="slant: only the player's own marks, the level and the streak">
             <VaultLevelBadge points={pointsForLevel(31)} compact size="lg" />
             <StreakTag days={56} text="56 d" glow={false} />
+            <StreakTag days={0} text="00 d" glow={false} loading />
           </Specimen>
           <Specimen name="overlay, on a picture">
             <span className="rounded-tile p-3 bg-accent/40"><Tag tone="overlay">Steam</Tag></span>
