@@ -18,7 +18,7 @@ export function streakTier(days: number): StreakTier {
   return tier
 }
 
-/** The tier's colour made readable on any theme: its hue mixed with the text colour, as the level badge does. */
+/** The tier's colour made readable on any theme: its hue mixed with the text colour, as the level badge does (`--streak-hue` says how much hue each theme keeps). */
 export function streakInk(tier: StreakTier): string {
-  return `color-mix(in oklab, rgb(${tier.color}) 72%, rgb(var(--text-main)))`
+  return `color-mix(in oklab, rgb(${tier.color}) var(--streak-hue), rgb(var(--text-main)))`
 }

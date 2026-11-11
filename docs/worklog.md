@@ -33,6 +33,24 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-09 — Every theme at WCAG AA, and a test that keeps it (`fix/123-theme-contrast`, #123)
+
+**Did** — Antislop V7-01 / T-04 / plan S7, one commit per group of tokens:
+- *Error colour:* `--danger` 239 68 68 → 248 113 113 (base, the dark block, Blue): 4.28 → 5.5:1 on the notice tint in dark, dark-green, dark-blue, dark-white, blue.
+  The missable badge in `AchievementGrid` (`bg-danger`) takes `text-bg-main`, not white, which a lighter red cannot carry.
+- *Accent text on its own tint (pill, pressed icon button, dialog head icon):* light 124 58 237 → 118 55 225, arctic 15 118 110 → 14 112 105, blue 96 125 255 → 115 141 255,
+  purple 150 110 250 → 162 126 251, red 236 84 102 → 238 101 117, steam-retro 196 181 80 → 227 210 93 (3.6–4.3 → ≥ 4.58:1). Same hue, only lightness; the dark themes' hovers moved a step to stay lighter than the accent. `THEME_ACCENT` (favicon) follows.
+- *Tints:* light-green `--success` and light-blue `--info` 15 118 110 → 15 116 108 (4.46 → 4.58); steam-retro `--danger` 252 165 165 → 254 202 202 (4.32 → 5.41), `--info` → 150 199 253 (4.49 → 4.57), `--softcore` (new in its block) 147 197 253 (3.87 → 5.45).
+- *Second text level:* midnight muted 172 203 241 → 158 187 222 (body:muted 1.28 → 1.51), crimson 232 201 192 → 193 167 159 (1.24 → 1.81), steam-retro body 216 222 211 → 230 234 227 (1.20 → 1.36); blue muted 128 142 168 → 131 145 170 (4.46 → 4.63 on tertiary).
+- *Streaks on light themes:* `streakInk` mixed 72 % of the tier's hue into the text colour everywhere; new token `--streak-hue` (72 % base, 42 % on the light themes incl. sakura and arctic, 44 % on steam-retro). The tiers' hues and the "coloured by tier" rule are untouched.
+- *Test:* `themes.test.ts` runs over all 22 `THEMES` (was 9) with `themeContrast.ts` (WCAG ratio, tint over a ground, oklab mix; its own small test): text and muted on the three grounds, body:muted ≥ 1.3, accent as text and on its 15 % tint, primary button and hover, the four meanings on a card and on their 10 % notice tint, hardcore/softcore on a card, every streak tier's ink on the page, a card and its own 16 % tag. Rules in `docs/design-system.md` → Contrast.
+**Why** — #123: the error notice, selected pills, light-theme streaks and three themes' muted text failed AA, and nothing could fail a test.
+**Decisions** — All 22 themes stay (owner, canvas 2026-11-07). Where a colour failed I moved the theme's value, never the rule or the tier. Steam Retro's grounds (the old client's header, card, tertiary) and Midnight's cream body text are untouched; its accent, body text, info/danger/softcore moved instead. Used V7's tested values where they existed (danger, steam-retro danger and softcore).
+**Open** — Not looked at in a browser: check Steam Retro (brighter gold accent and body text) and the light themes' streak tags (hue share 42 %) on the real screen and in Firefox; the owner may want another look at the steam-retro gold. The audit's colour-budget ideas (info = softcore, one glow, gold token) are not in this issue; steam-retro now has info ≈ softcore. The new base+accent picker is #135.
+**Watch out** — A test of a `color-mix` has to replicate it (`mixOklab`): if `streakInk` changes its formula, change that function too. `--streak-hue` is a percentage, the only non-triplet token the test reads.
+
+---
+
 ## 2026-11-09 — Every dialog a plain Modal, lazy-loaded (`refactor/121-plain-modals`, #121)
 
 **Did** — Antislop X3 / plan S5, one commit per group (ids are the audit's):
