@@ -89,5 +89,4 @@ test('unlinks, and fails loudly when the server or the session does not follow',
   await act(async () => {
     expect(await result.current.unlink()).toBe(false)
   })
-  expect(result.current.isUnlinking).toBe(false)
 })

@@ -24,7 +24,6 @@ export function useXboxLink() {
   const enabled = useXboxEnabled()
 
   const [isLinking, setIsLinking] = useState(false)
-  const [isUnlinking, setIsUnlinking] = useState(false)
   const [error, setError] = useState<XboxLinkError | null>(null)
 
   const link = useCallback(
@@ -58,7 +57,6 @@ export function useXboxLink() {
   )
 
   const unlink = useCallback(async (): Promise<boolean> => {
-    setIsUnlinking(true)
     try {
       const res = await fetch('/api/xbox/unlink', { method: 'POST' })
       if (!res.ok) throw new Error(`Failed to unlink Xbox (${res.status})`)
@@ -68,8 +66,6 @@ export function useXboxLink() {
     } catch (err) {
       console.error('[useXboxLink] unlink', err)
       return false
-    } finally {
-      setIsUnlinking(false)
     }
   }, [update])
 
@@ -82,6 +78,5 @@ export function useXboxLink() {
     isLinking,
     error,
     unlink,
-    isUnlinking,
   }
 }
