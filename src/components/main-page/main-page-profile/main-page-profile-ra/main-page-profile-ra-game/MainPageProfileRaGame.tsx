@@ -27,7 +27,8 @@ export default function MainPageProfileRaGame({
     <MainPageProfileNowPlaying
       href={gameHref('ra', game.ID ?? 0, subject)}
       tintSrc={icon}
-      kicker={richPresenceMsg ? `${T.profileRa.playingNow} · ${richPresenceMsg}` : T.profileRa.playingNow}
+      kicker={T.profileRa.playingNow}
+      note={richPresenceMsg}
       icon={icon ? <Image src={icon} alt="" width={52} height={52} className="w-full h-full object-cover" /> : null}
       title={game.Title ?? ''}
       sub={game.ConsoleName}

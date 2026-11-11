@@ -50,3 +50,9 @@ test('shows RA\'s RetroRatio as a plain figure, not a percentage', () => {
   expect(screen.getByText('RetroRatio').nextElementSibling?.textContent).toBe('3.50')
   expect(screen.queryByText(/%$/)).toBeNull()
 })
+
+test('what RA says the player is doing is its own line under the game, not part of the "Playing now" label', () => {
+  render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} />)
+  expect(screen.getByText('Playing now')).toBeInTheDocument()
+  expect(screen.getByText('Playing level 1')).toHaveClass('line-clamp-2')
+})

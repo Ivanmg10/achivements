@@ -57,9 +57,11 @@ test('loading draws the same grid, so nothing moves when it fills', () => {
   expect(cells()).toHaveLength(loading.length)
 })
 
-test('counts the unlocks it was given', () => {
-  render(<MainPageHeatmap achievements={[unlock(today(), 'A'), unlock(today(1), 'B')]} />)
-  expect(screen.getByText('2')).toBeInTheDocument()
+test('counts the unlocks it was given, with the word for them', () => {
+  const { rerender } = render(<MainPageHeatmap achievements={[unlock(today(), 'A'), unlock(today(1), 'B')]} />)
+  expect(screen.getByText('2 achievements')).toBeInTheDocument()
+  rerender(<MainPageHeatmap achievements={[unlock(today(), 'A')]} />)
+  expect(screen.getByText('1 achievement')).toBeInTheDocument()
 })
 
 test('a day with unlocks opens that day, an empty one does nothing', async () => {
