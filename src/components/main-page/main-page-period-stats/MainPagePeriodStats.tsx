@@ -42,8 +42,9 @@ export default function MainPagePeriodStats({
   const [monthOpen, setMonthOpen] = useState(false)
 
   const stats = useMemo(() => {
-    const now = Date.now()
-    const todayKey = utcDay(new Date(now))
+    const date = new Date()
+    const now = date.getTime()
+    const todayKey = utcDay(date)
     return {
       todayKey,
       today: achievements.filter((a) => a.Date.startsWith(todayKey)),
