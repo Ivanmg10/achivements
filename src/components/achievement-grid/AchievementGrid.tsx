@@ -6,7 +6,7 @@ import { IconAlertTriangle } from '@tabler/icons-react'
 import dynamic from 'next/dynamic'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
+import { useAchievementPins, RA_PINS } from '@/hooks/useAchievementPins'
 import { formatDate } from '@/utils/dates'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { raTypeTag } from '@/components/ui/dataTable'
@@ -62,8 +62,7 @@ export const AchievementGrid = memo(function AchievementGrid({
   const allLoaded = achievements.length === 0 || loadedKey === badgeKey
   const missables = achievements.filter(isMissable).length
 
-  const { favoritedIds, toggleFavorite } = useRaFavoriteIds(gameId)
-  const handleToggleFavorite = (achievement: RetroAchievement) => toggleFavorite(achievement, { gameTitle, numDistinctPlayers })
+  const { pins } = useAchievementPins(RA_PINS, gameId, gameTitle, { numDistinctPlayers })
 
   useEffect(() => {
     if (!badgeKey) return
@@ -157,8 +156,8 @@ export const AchievementGrid = memo(function AchievementGrid({
             onClose={() => setSelected(null)}
             gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
             gameTitle={gameTitle}
-            isFavorited={favoritedIds.has(selected.ID)}
-            onToggleFavorite={() => handleToggleFavorite(selected)}
+            isFavorited={pins.isPinned(selected)}
+            onToggleFavorite={() => pins.toggle(selected)}
           />
         )}
       </AnimatePresence>

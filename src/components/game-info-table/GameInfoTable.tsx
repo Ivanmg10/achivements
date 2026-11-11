@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import type { AchievementColumn } from '@/types/achievementTable'
-import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
+import { useAchievementPins, RA_PINS } from '@/hooks/useAchievementPins'
 import { raAchievementList } from '@/utils/gameAchievements'
 import { raCompareItem } from '@/utils/gameCompare'
 import AchievementTable from '@/components/achievement-table/AchievementTable'
@@ -23,10 +23,9 @@ const AchievementModal = dynamic(() => import('../achievement-modal/AchievementM
 export default function GameInfoTable({ gameData }: { gameData?: RetroAchievementsGameWithAchievements | null }) {
   const { T, lang } = useLanguage()
   const players = gameData?.NumDistinctPlayers ?? 1
-  const { favoritedIds, leadingIds, toggleFavorite } = useRaFavoriteIds(gameData?.ID)
+  const { pins } = useAchievementPins(RA_PINS, gameData?.ID, gameData?.Title ?? undefined, { numDistinctPlayers: players })
   const items = useMemo(() => (gameData ? raAchievementList(gameData).sort((a, b) => a.DisplayOrder - b.DisplayOrder) : []), [gameData])
   const toRow = useMemo(() => raCompareItem(players), [players])
-  const toggle = (a: RetroAchievement) => toggleFavorite(a, { gameTitle: gameData?.Title, numDistinctPlayers: players })
   const count = (key: string, label: string, value: (a: RetroAchievement) => number, className = ''): AchievementColumn<RetroAchievement> => ({
     key,
     label,
@@ -64,7 +63,7 @@ export default function GameInfoTable({ gameData }: { gameData?: RetroAchievemen
         earned: T.gameInfoTable.headerEarned,
         locked: T.achievementDetail.notEarned,
       }}
-      pins={{ canPin: true, isPinned: (a) => favoritedIds.has(a.ID), leads: (a) => leadingIds.has(a.ID), toggle }}
+      pins={pins}
       columns={[
         count('players', T.gameInfoTable.headerPlayers, (a) => a.NumAwarded),
         count('hc', T.gameInfoTable.headerHC, (a) => a.NumAwardedHardcore, 'text-text-secondary'),

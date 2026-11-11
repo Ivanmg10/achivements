@@ -1,8 +1,9 @@
-jest.mock('@/hooks/useSteamFavoriteAchievements', () => ({ useSteamFavoriteAchievements: jest.fn() }))
+jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { SteamAchievementGrid } from './SteamAchievementGrid'
-import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
+import { useAchievementPins, STEAM_PINS } from '@/hooks/useAchievementPins'
+import { mockPins } from '@/test-utils/pins'
 import { en } from '@/translations/en'
 import type { SteamAchievementUnified } from '@/types/steam'
 
@@ -32,14 +33,14 @@ const hover = () => {
 beforeEach(() => {
   jest.useFakeTimers()
   jest.clearAllMocks()
-  ;(useSteamFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set(), toggle: jest.fn(), canPin: false, error: null })
+  ;(useAchievementPins as jest.Mock).mockReturnValue(mockPins(STEAM_PINS.idOf, { canPin: false }).value)
 })
 afterEach(() => jest.useRealTimers())
 
 test('each badge links to its achievement on the game page, and pins against that game', () => {
   render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
   expect(screen.getByRole('link')).toHaveAttribute('href', '/steamGame/620#ach-WIN')
-  expect(useSteamFavoriteAchievements).toHaveBeenCalledWith(620, 'Portal 2')
+  expect(useAchievementPins).toHaveBeenCalledWith(STEAM_PINS, 620, 'Portal 2')
 })
 
 test('a badge with no image is a placeholder, not a broken picture', () => {

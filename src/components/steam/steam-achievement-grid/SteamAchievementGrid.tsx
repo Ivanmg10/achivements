@@ -3,7 +3,7 @@
 import { memo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
-import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
+import { useAchievementPins, STEAM_PINS } from '@/hooks/useAchievementPins'
 import { formatDate } from '@/utils/dates'
 import { gameHref } from '@/utils/gameRef'
 import { steamAchievementAnchor } from '@/utils/steamTitles'
@@ -34,7 +34,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
 }) {
   const { T, lang } = useLanguage()
   const subject = useSubject()
-  const { pinned, toggle, canPin } = useSteamFavoriteAchievements(appId, gameTitle)
+  const { pins } = useAchievementPins(STEAM_PINS, appId, gameTitle)
 
   return (
     <BadgeGrid<SteamAchievementUnified>
@@ -50,7 +50,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
       icon={(a) => a.badgeUrl || null}
       secret={(a) => a.hidden && !a.earned}
       keepSecretIcon
-      pins={{ canPin, isPinned: (a) => pinned.has(a.apiname), toggle }}
+      pins={pins}
       tip={(a, concealed) => ({
         description: concealed ? T.steam.hiddenAchievementDesc : a.description,
         chips: (

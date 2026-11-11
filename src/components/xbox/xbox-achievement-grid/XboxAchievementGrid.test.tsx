@@ -1,9 +1,9 @@
-jest.mock('@/hooks/useXboxFavoriteAchievements', () => ({ useXboxFavoriteAchievements: jest.fn() }))
+jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { XboxAchievementGrid } from './XboxAchievementGrid'
 import { en } from '@/translations/en'
-import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements'
+import { useAchievementPins } from '@/hooks/useAchievementPins'
 import { xboxAchievementFixture } from '@/test-utils/xboxFixtures'
 
 const ACHIEVEMENTS = [
@@ -15,7 +15,7 @@ const toggle = jest.fn()
 beforeEach(() => {
   jest.clearAllMocks()
   window.localStorage.clear()
-  ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set<string>(), toggle, canPin: false })
+  ;(useAchievementPins as jest.Mock).mockReturnValue({ pins: { canPin: false, isPinned: () => false, leads: () => false, toggle }, error: null })
 })
 
 test('each achievement links to its row on the game page, saying its gamerscore and state', () => {

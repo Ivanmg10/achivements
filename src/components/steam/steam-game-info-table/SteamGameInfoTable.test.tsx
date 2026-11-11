@@ -1,8 +1,9 @@
-jest.mock('@/hooks/useSteamFavoriteAchievements', () => ({ useSteamFavoriteAchievements: jest.fn() }))
+jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import SteamGameInfoTable from './SteamGameInfoTable'
-import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
+import { useAchievementPins, STEAM_PINS } from '@/hooks/useAchievementPins'
+import { mockPins } from '@/test-utils/pins'
 import { en } from '@/translations/en'
 import type { SteamAchievementUnified } from '@/types/steam'
 
@@ -18,7 +19,7 @@ function ach(apiname: string, overrides: Partial<SteamAchievementUnified> = {}):
 const names = () => within(screen.getByRole('table')).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)
 
 beforeEach(() => {
-  ;(useSteamFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set(), leading: new Set(), toggle: jest.fn(), canPin: false })
+  ;(useAchievementPins as jest.Mock).mockReturnValue(mockPins(STEAM_PINS.idOf, { canPin: false }).value)
 })
 
 test("in Steam's order, whatever order they came in", () => {

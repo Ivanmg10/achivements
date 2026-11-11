@@ -1,7 +1,4 @@
-jest.mock('@/hooks/useRaFavoriteIds', () => ({ useRaFavoriteIds: jest.fn() }))
-jest.mock('@/hooks/useSteamFavoriteAchievements', () => ({ useSteamFavoriteAchievements: jest.fn() }))
-jest.mock('@/hooks/usePsnFavoriteTrophies', () => ({ usePsnFavoriteTrophies: jest.fn() }))
-jest.mock('@/hooks/useXboxFavoriteAchievements', () => ({ useXboxFavoriteAchievements: jest.fn() }))
+jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 jest.mock('@/components/achievement-modal/AchievementModal', () => ({
   __esModule: true,
   default: ({ achievement, onClose }: { achievement: { Title: string }; onClose: () => void }) => (
@@ -13,10 +10,8 @@ jest.mock('@/components/achievement-modal/AchievementModal', () => ({
 
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { en } from '@/translations/en'
-import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
-import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
-import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
-import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements'
+import { useAchievementPins, RA_PINS, STEAM_PINS, PSN_PINS, XBOX_PINS } from '@/hooks/useAchievementPins'
+import { mockPins } from '@/test-utils/pins'
 import { xboxAchievementFixture } from '@/test-utils/xboxFixtures'
 import type { RetroAchievement } from '@/types/types'
 import type { SteamAchievementUnified } from '@/types/steam'
@@ -59,7 +54,7 @@ const RA: Platform = {
       NumAwarded: 1, NumAwardedHardcore: 1, Author: 'a', AuthorULID: 'u', DateModified: '', DateCreated: '', DisplayOrder: i + 1,
       MemAddr: '', Type: null, DateEarned: s.earned ? `${s.at ?? '2026-01-01'} 12:00:00` : null, DateEarnedHardcore: null,
     }))
-    ;(useRaFavoriteIds as jest.Mock).mockReturnValue({ favoritedIds: new Set(), toggleFavorite: jest.fn() })
+    ;(useAchievementPins as jest.Mock).mockReturnValue(mockPins(RA_PINS.idOf).value)
     render(<AchievementGrid achievements={list} total={list.length} gameId={9} gameTitle="Game" numDistinctPlayers={100} limit={opts?.limit} />)
     // The badges show once their pictures have loaded, or a moment has passed.
     act(() => { jest.advanceTimersByTime(1500) })
@@ -78,8 +73,8 @@ const STEAM: Platform = {
     render(<SteamAchievementGrid appId={620} gameTitle="Game" achievements={list} limit={opts?.limit} />)
   },
   pins: ({ canPin, pinned = [] }) => {
-    const toggle = jest.fn()
-    ;(useSteamFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set(pinned.map((i) => `A${i}`)), toggle, canPin, error: null })
+    const { toggle, value } = mockPins(STEAM_PINS.idOf, { canPin, pinned: pinned.map((i) => `A${i}`) })
+    ;(useAchievementPins as jest.Mock).mockReturnValue(value)
     return toggle
   },
   pinArg: (i) => expect.objectContaining({ apiname: `A${i}` }),
@@ -98,8 +93,8 @@ const PSN: Platform = {
     render(<PsnTrophyGrid gameId={100} gameTitle="Game" trophies={list} limit={opts?.limit} />)
   },
   pins: ({ canPin, pinned = [] }) => {
-    const toggle = jest.fn()
-    ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set(pinned), toggle, canPin })
+    const { toggle, value } = mockPins(PSN_PINS.idOf, { canPin, pinned })
+    ;(useAchievementPins as jest.Mock).mockReturnValue(value)
     return toggle
   },
   pinArg: (i) => expect.objectContaining({ id: i }),
@@ -120,8 +115,8 @@ const XBOX: Platform = {
     render(<XboxAchievementGrid gameId={100} gameTitle="Game" achievements={list} limit={opts?.limit} />)
   },
   pins: ({ canPin, pinned = [] }) => {
-    const toggle = jest.fn()
-    ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set(pinned.map(String)), toggle, canPin })
+    const { toggle, value } = mockPins(XBOX_PINS.idOf, { canPin, pinned: pinned.map(String) })
+    ;(useAchievementPins as jest.Mock).mockReturnValue(value)
     return toggle
   },
   pinArg: (i) => expect.objectContaining({ id: String(i) }),

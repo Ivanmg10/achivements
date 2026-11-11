@@ -1,9 +1,10 @@
-jest.mock('@/hooks/useRaFavoriteIds', () => ({ useRaFavoriteIds: jest.fn() }))
+jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import GameInfoTable from './GameInfoTable'
 import { en } from '@/translations/en'
-import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
+import { useAchievementPins, RA_PINS } from '@/hooks/useAchievementPins'
+import { mockPins } from '@/test-utils/pins'
 
 // What every platform's table does is in AchievementTable.contract.test.tsx; this is RA's own.
 
@@ -17,7 +18,7 @@ const game = (...list: ReturnType<typeof achievement>[]) => ({ ID: 1, Title: 'Ga
 const names = () => within(screen.getByRole('table')).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)
 
 beforeEach(() => {
-  ;(useRaFavoriteIds as jest.Mock).mockReturnValue({ favoritedIds: new Set(), leadingIds: new Set(), toggleFavorite: jest.fn() })
+  ;(useAchievementPins as jest.Mock).mockReturnValue(mockPins(RA_PINS.idOf).value)
 })
 
 test('a game with no achievements, or none read yet, says so, with no filters or table', () => {

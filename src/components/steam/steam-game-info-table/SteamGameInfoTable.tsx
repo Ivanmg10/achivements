@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { SteamAchievementUnified } from '@/types/steam'
-import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
+import { useAchievementPins, STEAM_PINS } from '@/hooks/useAchievementPins'
 import { steamCompareItem } from '@/utils/gameCompare'
 import { plural } from '@/utils/utils'
 import AchievementTable from '@/components/achievement-table/AchievementTable'
@@ -26,7 +26,7 @@ export default function SteamGameInfoTable({
   gameTitle: string
 }) {
   const { T, lang } = useLanguage()
-  const { pinned, leading, toggle, canPin } = useSteamFavoriteAchievements(appId, gameTitle)
+  const { pins } = useAchievementPins(STEAM_PINS, appId, gameTitle)
   const inOrder = useMemo(() => [...achievements].sort((a, b) => a.displayOrder - b.displayOrder), [achievements])
   const onlineBadge = (a: SteamAchievementUnified) => (a.likelyOnline ? <SteamOnlineBadge /> : undefined)
 
@@ -46,7 +46,7 @@ export default function SteamGameInfoTable({
         secret: T.steam.hiddenAchievement,
         secretText: T.steam.hiddenAchievementDesc,
       }}
-      pins={{ canPin, isPinned: (a) => pinned.has(a.apiname), leads: (a) => leading.has(a.apiname), toggle }}
+      pins={pins}
       tags={({ item }) => onlineBadge(item)}
       notice={{
         match: ({ item }) => item.likelyOnline && !item.earned,

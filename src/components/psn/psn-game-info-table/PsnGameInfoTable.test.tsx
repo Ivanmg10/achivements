@@ -1,9 +1,10 @@
-jest.mock('@/hooks/usePsnFavoriteTrophies', () => ({ usePsnFavoriteTrophies: jest.fn() }))
+jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import PsnGameInfoTable from './PsnGameInfoTable'
 import { en } from '@/translations/en'
-import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
+import { useAchievementPins, PSN_PINS } from '@/hooks/useAchievementPins'
+import { mockPins } from '@/test-utils/pins'
 import type { PsnTrophy } from '@/types/psn'
 
 // What every platform's table does is in AchievementTable.contract.test.tsx; this is PSN's own.
@@ -23,7 +24,7 @@ const WITH_DLC = [trophy({ id: 0, name: 'Base one', type: 'gold' }), trophy({ id
 const names = () => within(screen.getByRole('table')).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)
 
 beforeEach(() => {
-  ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set(), leading: new Set(), toggle: jest.fn(), canPin: false })
+  ;(useAchievementPins as jest.Mock).mockReturnValue(mockPins(PSN_PINS.idOf, { canPin: false }).value)
 })
 
 test('in the order of the trophy ids, whatever order Sony sent them in, each with its grade', () => {

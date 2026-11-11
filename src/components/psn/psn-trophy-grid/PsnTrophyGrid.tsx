@@ -10,8 +10,9 @@ import BadgeGrid from '@/components/badge-grid/BadgeGrid'
 import BadgeRarity from '@/components/badge-grid/badge-tip-parts/BadgeRarity'
 import BadgeEarnedChip from '@/components/badge-grid/badge-tip-parts/BadgeEarnedChip'
 import PsnTrophyGridGroup from './psn-trophy-grid-group/PsnTrophyGridGroup'
-import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
-import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
+import { useRevealed } from '@/hooks/useRevealed'
+import { usePsnRevealHidden } from '@/hooks/usePsnRevealHidden'
+import { useAchievementPins, PSN_PINS } from '@/hooks/useAchievementPins'
 import type { PsnTrophy, PsnTrophyGroup } from '@/types/psn'
 
 /**
@@ -41,8 +42,8 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
 }) {
   const { T, lang } = useLanguage()
   const subject = useSubject()
-  const { pinned, toggle, canPin } = usePsnFavoriteTrophies(gameId, gameTitle)
-  const { isRevealed, toggle: toggleReveal } = useRevealedTrophies()
+  const { pins } = useAchievementPins(PSN_PINS, gameId, gameTitle)
+  const reveal = useRevealed(usePsnRevealHidden()[0], PSN_PINS.idOf)
 
   const groupName = (id: string) => (id === BASE_GROUP ? T.psn.baseGame : (groups.find((g) => g.id === id)?.name ?? id))
 
@@ -59,8 +60,8 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
       ring={(t) => (t.earned ? TROPHY_GRADE_RING[t.type] : undefined)}
       icon={(t) => t.iconUrl || null}
       secret={(t) => t.hidden && !t.earned}
-      reveal={{ isRevealed: (t) => isRevealed(t.id), toggle: (t) => toggleReveal(t.id), labels: { reveal: T.psn.revealTrophy, conceal: T.psn.concealTrophy } }}
-      pins={{ canPin, isPinned: (t) => pinned.has(t.id), toggle }}
+      reveal={{ ...reveal, labels: { reveal: T.psn.revealTrophy, conceal: T.psn.concealTrophy } }}
+      pins={pins}
       tip={(t, concealed) => ({
         description: concealed ? T.psn.hiddenTrophyDesc : t.detail,
         chips: (

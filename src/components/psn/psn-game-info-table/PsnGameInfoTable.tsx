@@ -4,8 +4,9 @@ import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { PsnTrophy, PsnTrophyGroup } from '@/types/psn'
 import type { AchievementColumn } from '@/types/achievementTable'
-import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
-import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
+import { useAchievementPins, PSN_PINS } from '@/hooks/useAchievementPins'
+import { useRevealed } from '@/hooks/useRevealed'
+import { usePsnRevealHidden } from '@/hooks/usePsnRevealHidden'
 import { psnCompareItem } from '@/utils/gameCompare'
 import { BASE_GROUP, dlcShortName, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import AchievementTable from '@/components/achievement-table/AchievementTable'
@@ -24,8 +25,8 @@ export default function PsnGameInfoTable({
   gameTitle: string
 }) {
   const { T } = useLanguage()
-  const { pinned, leading, toggle, canPin } = usePsnFavoriteTrophies(gameId, gameTitle)
-  const { isRevealed, toggle: toggleOne, setAll } = useRevealedTrophies()
+  const { pins } = useAchievementPins(PSN_PINS, gameId, gameTitle)
+  const reveal = useRevealed(usePsnRevealHidden()[0], PSN_PINS.idOf)
   const inOrder = useMemo(() => [...trophies].sort((a, b) => a.id - b.id), [trophies])
   const gradeChip = (t: PsnTrophy) => <span className={`font-semibold ${TROPHY_GRADE_COLOR[t.type]}`}>{T.psn[t.type]}</span>
   const grade: AchievementColumn<PsnTrophy> = {
@@ -58,8 +59,8 @@ export default function PsnGameInfoTable({
         revealAll: T.psn.showHiddenTrophies,
         concealAll: T.psn.hideHiddenTrophies,
       }}
-      pins={{ canPin, isPinned: (t) => pinned.has(t.id), leads: (t) => leading.has(t.id), toggle }}
-      reveal={{ isRevealed: (t) => isRevealed(t.id), toggle: (t) => toggleOne(t.id), setAll: (ts, on) => setAll(ts.map((t) => t.id), on) }}
+      pins={pins}
+      reveal={reveal}
       columns={[grade]}
       scopes={
         groups.length > 1

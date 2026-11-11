@@ -9,8 +9,9 @@ import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import BadgeGrid from '@/components/badge-grid/BadgeGrid'
 import BadgeRarity from '@/components/badge-grid/badge-tip-parts/BadgeRarity'
 import BadgeEarnedChip from '@/components/badge-grid/badge-tip-parts/BadgeEarnedChip'
-import { useRevealedAchievements } from '@/hooks/useRevealedAchievements'
-import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements'
+import { useRevealed } from '@/hooks/useRevealed'
+import { useXboxRevealSecrets } from '@/hooks/useXboxRevealSecrets'
+import { useAchievementPins, XBOX_PINS } from '@/hooks/useAchievementPins'
 import type { XboxAchievement } from '@/types/xbox'
 
 /**
@@ -35,8 +36,8 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
 }) {
   const { T, lang } = useLanguage()
   const subject = useSubject()
-  const { pinned, toggle, canPin } = useXboxFavoriteAchievements(gameId, gameTitle)
-  const { isRevealed, toggle: toggleReveal } = useRevealedAchievements()
+  const { pins } = useAchievementPins(XBOX_PINS, gameId, gameTitle)
+  const reveal = useRevealed(useXboxRevealSecrets()[0], XBOX_PINS.idOf)
 
   return (
     <BadgeGrid<XboxAchievement>
@@ -51,8 +52,8 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
       ring={(a) => (a.unlocked ? 'ring-success' : undefined)}
       icon={(a) => a.iconUrl || null}
       secret={(a) => a.secret && !a.unlocked}
-      reveal={{ isRevealed: (a) => isRevealed(a.id), toggle: (a) => toggleReveal(a.id), labels: { reveal: T.xbox.revealAchievement, conceal: T.xbox.concealAchievement } }}
-      pins={{ canPin, isPinned: (a) => pinned.has(a.id), toggle }}
+      reveal={{ ...reveal, labels: { reveal: T.xbox.revealAchievement, conceal: T.xbox.concealAchievement } }}
+      pins={pins}
       tip={(a, concealed) => ({
         description: concealed ? T.xbox.secretAchievementDesc : a.description,
         chips: (

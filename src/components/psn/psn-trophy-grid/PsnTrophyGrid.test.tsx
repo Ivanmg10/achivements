@@ -1,9 +1,9 @@
-jest.mock('@/hooks/usePsnFavoriteTrophies', () => ({ usePsnFavoriteTrophies: jest.fn() }))
+jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { PsnTrophyGrid } from './PsnTrophyGrid'
 import { en } from '@/translations/en'
-import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
+import { useAchievementPins } from '@/hooks/useAchievementPins'
 import type { PsnTrophy } from '@/types/psn'
 
 const trophy = (overrides: Partial<PsnTrophy>): PsnTrophy => ({
@@ -19,7 +19,7 @@ const TROPHIES = [
 const toggle = jest.fn()
 beforeEach(() => {
   jest.clearAllMocks()
-  ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set<number>(), toggle, canPin: false })
+  ;(useAchievementPins as jest.Mock).mockReturnValue({ pins: { canPin: false, isPinned: () => false, leads: () => false, toggle }, error: null })
 })
 
 const counts = (bronze: number) => ({ bronze, silver: 0, gold: 0, platinum: 0 })

@@ -1,14 +1,9 @@
-jest.mock('@/hooks/useRaFavoriteIds', () => ({ useRaFavoriteIds: jest.fn() }))
-jest.mock('@/hooks/useSteamFavoriteAchievements', () => ({ useSteamFavoriteAchievements: jest.fn() }))
-jest.mock('@/hooks/usePsnFavoriteTrophies', () => ({ usePsnFavoriteTrophies: jest.fn() }))
-jest.mock('@/hooks/useXboxFavoriteAchievements', () => ({ useXboxFavoriteAchievements: jest.fn() }))
+jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { en } from '@/translations/en'
-import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
-import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
-import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
-import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements'
+import { useAchievementPins, RA_PINS, STEAM_PINS, PSN_PINS, XBOX_PINS } from '@/hooks/useAchievementPins'
+import { mockPins } from '@/test-utils/pins'
 import { xboxAchievementFixture } from '@/test-utils/xboxFixtures'
 import type { RetroAchievement } from '@/types/types'
 import type { SteamAchievementUnified } from '@/types/steam'
@@ -34,8 +29,6 @@ type Platform = {
   pins: (o: { canPin?: boolean; pinned?: number[]; leading?: number[] }) => jest.Mock
   /** What the toggle receives for the achievement with this title. */
   pinArg: (title: string) => unknown
-  /** RA's star is always there: its game page is signed in. */
-  hidesPins: boolean
   texts: { none: string; earned: string; locked: string }
   /** The words a still-secret one shows; absent where the platform has none (RA). */
   secret?: { title: string; reveal?: { one: string; all: string; allOff: string } }
@@ -59,13 +52,12 @@ const RA: Platform = {
     const gameData = { ID: 9, Title: 'Game', NumDistinctPlayers: 100, Achievements: Object.fromEntries(list.map((a) => [a.ID, a])) }
     render(<GameInfoTable gameData={gameData as never} />)
   },
-  pins: ({ pinned = [], leading = pinned }) => {
-    const toggleFavorite = jest.fn()
-    ;(useRaFavoriteIds as jest.Mock).mockReturnValue({ favoritedIds: new Set(pinned.map(order)), leadingIds: new Set(leading.map(order)), toggleFavorite })
-    return toggleFavorite
+  pins: ({ canPin = true, pinned = [], leading = pinned }) => {
+    const { toggle, value } = mockPins(RA_PINS.idOf, { canPin, pinned: pinned.map(order), leading: leading.map(order) })
+    ;(useAchievementPins as jest.Mock).mockReturnValue(value)
+    return toggle
   },
   pinArg: (title) => expect.objectContaining({ Title: title }),
-  hidesPins: false,
   texts: { none: en.gameInfoTable.noMatches, earned: en.gameInfoTable.headerEarned, locked: en.achievementDetail.notEarned },
   hasNotice: true,
 }
@@ -80,12 +72,11 @@ const STEAM: Platform = {
     render(<SteamGameInfoTable achievements={list} appId={620} gameTitle="Game" />)
   },
   pins: ({ canPin = true, pinned = [], leading = pinned }) => {
-    const toggle = jest.fn()
-    ;(useSteamFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set(pinned.map((i) => `K${i}`)), leading: new Set(leading.map((i) => `K${i}`)), toggle, canPin })
+    const { toggle, value } = mockPins(STEAM_PINS.idOf, { canPin, pinned: pinned.map((i) => `K${i}`), leading: leading.map((i) => `K${i}`) })
+    ;(useAchievementPins as jest.Mock).mockReturnValue(value)
     return toggle
   },
   pinArg: (title) => expect.objectContaining({ title }),
-  hidesPins: true,
   texts: { none: en.steam.noAchievements, earned: en.steam.earned, locked: en.steam.locked },
   secret: { title: en.steam.hiddenAchievement },
   anchor: (i) => `ach-K${i}`,
@@ -102,12 +93,11 @@ const PSN: Platform = {
     render(<PsnGameInfoTable trophies={list} gameId={100} gameTitle="Game" />)
   },
   pins: ({ canPin = true, pinned = [], leading = pinned }) => {
-    const toggle = jest.fn()
-    ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set(pinned), leading: new Set(leading), toggle, canPin })
+    const { toggle, value } = mockPins(PSN_PINS.idOf, { canPin, pinned, leading })
+    ;(useAchievementPins as jest.Mock).mockReturnValue(value)
     return toggle
   },
   pinArg: (title) => expect.objectContaining({ name: title }),
-  hidesPins: true,
   texts: { none: en.psn.noTrophies, earned: en.psn.earned, locked: en.psn.locked },
   secret: { title: en.psn.hiddenTrophy, reveal: { one: en.psn.revealTrophy, all: en.psn.showHiddenTrophies, allOff: en.psn.hideHiddenTrophies } },
   anchor: (i) => `trophy-${i}`,
@@ -126,12 +116,11 @@ const XBOX: Platform = {
     render(<XboxGameInfoTable achievements={list} gameId={100} gameTitle="Game" />)
   },
   pins: ({ canPin = true, pinned = [], leading = pinned }) => {
-    const toggle = jest.fn()
-    ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set(pinned.map((i) => String(100 + i))), leading: new Set(leading.map((i) => String(100 + i))), toggle, canPin })
+    const { toggle, value } = mockPins(XBOX_PINS.idOf, { canPin, pinned: pinned.map((i) => String(100 + i)), leading: leading.map((i) => String(100 + i)) })
+    ;(useAchievementPins as jest.Mock).mockReturnValue(value)
     return toggle
   },
   pinArg: (title) => expect.objectContaining({ name: title }),
-  hidesPins: true,
   texts: { none: en.xbox.noAchievements, earned: en.xbox.earned, locked: en.xbox.locked },
   secret: { title: en.xbox.secretAchievement, reveal: { one: en.xbox.revealAchievement, all: en.xbox.showSecretAchievements, allOff: en.xbox.hideSecretAchievements } },
   anchor: (i) => `achievement-${100 + i}`,
@@ -259,7 +248,7 @@ describe.each(PLATFORMS)('$name', (p) => {
   })
 })
 
-describe.each(PLATFORMS.filter((p) => p.hidesPins))('$name, for someone who cannot pin', (p) => {
+describe.each(PLATFORMS)('$name, for someone who cannot pin', (p) => {
   test('has no pin', () => {
     p.render(FOUR)
     expect(screen.queryByRole('button', { name: new RegExp(en.favorites.addFavorite) })).not.toBeInTheDocument()

@@ -1,9 +1,10 @@
-jest.mock('@/hooks/useXboxFavoriteAchievements', () => ({ useXboxFavoriteAchievements: jest.fn() }))
+jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import XboxGameInfoTable from './XboxGameInfoTable'
 import { en } from '@/translations/en'
-import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements'
+import { useAchievementPins, XBOX_PINS } from '@/hooks/useAchievementPins'
+import { mockPins } from '@/test-utils/pins'
 import { xboxAchievementFixture } from '@/test-utils/xboxFixtures'
 
 // What every platform's table does is in AchievementTable.contract.test.tsx; this is Xbox's own.
@@ -16,7 +17,7 @@ const ACHIEVEMENTS = [
 const names = () => within(screen.getByRole('table')).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)
 
 beforeEach(() => {
-  ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set(), leading: new Set(), toggle: jest.fn(), canPin: false })
+  ;(useAchievementPins as jest.Mock).mockReturnValue(mockPins(XBOX_PINS.idOf, { canPin: false }).value)
 })
 
 test('in the order Xbox sends them, each with its gamerscore', () => {

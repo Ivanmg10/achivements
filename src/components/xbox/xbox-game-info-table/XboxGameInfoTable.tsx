@@ -3,8 +3,9 @@
 import { useLanguage } from '@/context/LanguageContext'
 import type { XboxAchievement } from '@/types/xbox'
 import type { AchievementColumn } from '@/types/achievementTable'
-import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements'
-import { useRevealedAchievements } from '@/hooks/useRevealedAchievements'
+import { useAchievementPins, XBOX_PINS } from '@/hooks/useAchievementPins'
+import { useRevealed } from '@/hooks/useRevealed'
+import { useXboxRevealSecrets } from '@/hooks/useXboxRevealSecrets'
 import { xboxCompareItem } from '@/utils/gameCompare'
 import AchievementTable from '@/components/achievement-table/AchievementTable'
 
@@ -23,8 +24,8 @@ export default function XboxGameInfoTable({
   gameTitle: string
 }) {
   const { T } = useLanguage()
-  const { pinned, leading, toggle, canPin } = useXboxFavoriteAchievements(gameId, gameTitle)
-  const { isRevealed, toggle: toggleOne, setAll } = useRevealedAchievements()
+  const { pins } = useAchievementPins(XBOX_PINS, gameId, gameTitle)
+  const reveal = useRevealed(useXboxRevealSecrets()[0], XBOX_PINS.idOf)
   const score = (a: XboxAchievement) => <span className="font-semibold text-success">{a.gamerscore} G</span>
   const gamerscore: AchievementColumn<XboxAchievement> = {
     key: 'gamerscore',
@@ -59,8 +60,8 @@ export default function XboxGameInfoTable({
         revealAll: T.xbox.showSecretAchievements,
         concealAll: T.xbox.hideSecretAchievements,
       }}
-      pins={{ canPin, isPinned: (a) => pinned.has(a.id), leads: (a) => leading.has(a.id), toggle }}
-      reveal={{ isRevealed: (a) => isRevealed(a.id), toggle: (a) => toggleOne(a.id), setAll: (as, on) => setAll(as.map((a) => a.id), on) }}
+      pins={pins}
+      reveal={reveal}
       columns={[gamerscore]}
       detail={{ tags: score }}
     />
