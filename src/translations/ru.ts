@@ -775,7 +775,7 @@ export const ru: Translations = {
     hardcorePoints: 'Очки хардкора',
     truePoints: 'Настоящие очки',
     softcorePoints: 'Очки softcore',
-    hardcoreRatio: 'Соотношение хардкора',
+    retroRatio: 'RetroRatio',
   },
   profileRa: {
     memberSince: 'Участник с',

@@ -775,7 +775,7 @@ export const ja: Translations = {
     hardcorePoints: 'ハードコアポイント',
     truePoints: 'トゥーポイント',
     softcorePoints: 'ソフトコアポイント',
-    hardcoreRatio: 'ハードコア率',
+    retroRatio: 'RetroRatio',
   },
   profileRa: {
     memberSince: 'メンバー登録日',

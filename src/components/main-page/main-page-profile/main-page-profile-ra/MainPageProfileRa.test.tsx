@@ -44,3 +44,9 @@ test('keeps the recent achievements block visible with an empty state instead of
   expect(screen.getByText('Recent achievements')).toBeInTheDocument()
   expect(screen.getByText('No achievements earned yet')).toBeInTheDocument()
 })
+
+test('shows RA\'s RetroRatio as a plain figure, not a percentage', () => {
+  render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} />)
+  expect(screen.getByText('RetroRatio').nextElementSibling?.textContent).toBe('3.50')
+  expect(screen.queryByText(/%$/)).toBeNull()
+})

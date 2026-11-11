@@ -775,7 +775,7 @@ export const it: Translations = {
     hardcorePoints: 'Punti hardcore',
     truePoints: 'Punti veri',
     softcorePoints: 'Punti softcore',
-    hardcoreRatio: 'Rapporto hardcore',
+    retroRatio: 'RetroRatio',
   },
   profileRa: {
     memberSince: 'Membro dal',

@@ -7,6 +7,7 @@ import {
 } from '@/types/types'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
+import { useUserRank } from '@/hooks/useUserRank'
 
 import MainPageProfileActions from '../main-page-profile-actions/MainPageProfileActions'
 import MainPageProfileRaAchievements from './main-page-profile-ra-achievements/MainPageProfileRaAchievements'
@@ -17,6 +18,9 @@ import MainPageProfileCard from '../main-page-profile-card/MainPageProfileCard'
 import { SURFACE } from '@/components/ui/surface'
 import Figure from '@/components/ui/Figure'
 import { raImageUrl } from '@/utils/raAssets'
+import { raPlayRing } from '@/utils/raRatio'
+import Facts from '@/components/ui/Facts'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export default function MainPageProfileRa({
   user,
@@ -36,13 +40,7 @@ export default function MainPageProfileRa({
 }) {
   const { T, lang } = useLanguage()
 
-  const hardcoreRatio =
-    user && (user.TotalTruePoints ?? 0) > 0
-      ? Math.round(((user.TotalTruePoints ?? 0) / (user.TotalPoints || 1)) * 100)
-      : 0
-
-  // The picture's ring says how much of the account is played in hardcore.
-  const ring = hardcoreRatio >= 80 ? 'rgb(var(--hardcore))' : hardcoreRatio >= 50 ? 'rgb(var(--softcore))' : 'rgb(var(--ink) / 0.3)'
+  const { rank, isLoading: rankLoading } = useUserRank()
 
   const memberYear = user?.MemberSince ? new Date(user.MemberSince).getFullYear() : null
   const hasContribs = user && ((user.ContribCount ?? 0) > 0 || (user.ContribYield ?? 0) > 0)
@@ -54,7 +52,7 @@ export default function MainPageProfileRa({
           <MainPageProfileCard
             avatarSrc={raImageUrl(user.UserPic) ?? null}
             avatarFallback={<span className="w-full h-full bg-bg-main" />}
-            ring={ring}
+            ring={raPlayRing(user)}
             name={user.User}
             actions={
               <MainPageProfileActions
@@ -64,14 +62,18 @@ export default function MainPageProfileRa({
                 onRefresh={onRefresh}
               />
             }
-            stats={<MainPageProfileRaStats user={user} hardcoreRatio={hardcoreRatio} />}
+            stats={<MainPageProfileRaStats user={user} />}
           >
             {user.Motto && <p className="text-[0.8125rem] text-text-secondary italic line-clamp-2">&ldquo;{user.Motto}&rdquo;</p>}
-            {memberYear && (
-              <p className="text-[0.8125rem] text-text-secondary">
-                {T.profileRa.memberSince} {memberYear}
-              </p>
-            )}
+            {/* The global rank is an account total: it lives on the card, not in the activity row (#128). */}
+            <p className="text-[0.8125rem] text-text-secondary">
+              <Facts
+                items={[
+                  memberYear && `${T.profileRa.memberSince} ${memberYear}`,
+                  rankLoading && !rank ? <Skeleton key="rank" className="inline-block align-middle h-3 w-24" /> : rank?.Rank != null && `${T.userStats.globalRank} #${rank.Rank.toLocaleString(lang)}`,
+                ]}
+              />
+            </p>
           </MainPageProfileCard>
 
           {gameLoading && !game ? (

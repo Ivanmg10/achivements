@@ -776,7 +776,7 @@ export const en = {
     hardcorePoints: 'Hardcore points',
     truePoints: 'True points',
     softcorePoints: 'Softcore points',
-    hardcoreRatio: 'Hardcore ratio',
+    retroRatio: 'RetroRatio',
   },
   profileRa: {
     memberSince: 'Member since',
