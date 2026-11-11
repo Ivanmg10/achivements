@@ -81,7 +81,7 @@ What an adapter may pass, and nothing else:
 - **What differs**: `columns` (a column is its head, its cell, its sort and its chip on the phone card),
   `tags` (beside the name), `notice` (the line that keeps only some), `scopes` (tabs over the table),
   `detail` (tags and guide name, or `render` for a window of the platform's own), `sortMenu`,
-  `keepSecretIcon`, `pinInTitle`.
+  `keepSecretIcon`.
 
 A slot is a function of the entry that returns a node. A flag is only for a real, named difference
 (`keepSecretIcon`: Steam shows a secret one's picture). If a second platform would need a new flag,
@@ -92,10 +92,10 @@ from a flag).
 
 The shell must keep these; an adapter carries each one. From the audit (HK, LB) and `docs/platforms/`:
 
-- **RA:** hardcore and softcore (ring, date line "Hardcore · date"), points, players and hardcore
+- **RA:** hardcore and softcore (ring, the mode under the date in the earned column), points, players and hardcore
   players as columns, the type tags (missable in red, `win_condition` reads "Win"), missables named in a
-  line above, its own detail window (`AchievementModal`, with comments and unlocks), its star beside the
-  name. Its data hooks keep their retry loop (`useRetryingRead`). RA's pictures go through Next's image
+  line above, its own detail window (`AchievementModal`, with comments and unlocks). The pin is
+  last in the row on all four (#129). Its data hooks keep their retry loop (`useRetryingRead`). RA's pictures go through Next's image
   optimizer; the other hosts are `unoptimized`.
 - **Steam:** the library loads in two steps (the recent games first, then the whole library: `SteamGamesDataContext`), secret ones
   keep their picture and cannot be revealed (Steam gives no text), "Online?" and the online notice,

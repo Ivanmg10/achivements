@@ -36,10 +36,15 @@ test('in RA order, each with its type beside the name, the star beside it too', 
   expect(within(second).getByRole('button', { name: `${en.favorites.addFavorite}: Ach 2` })).toBeInTheDocument()
 })
 
-test('earned in hardcore or softcore, said beside the date', () => {
+test('earned in hardcore or softcore, said under the date in the earned column; the star is the last cell', () => {
   render(<GameInfoTable gameData={game(achievement(1, { DateEarned: '2026-01-01 10:00:00', DateEarnedHardcore: '2026-01-01 10:00:00' }), achievement(2, { DateEarned: '2026-01-02 10:00:00' }))} />)
-  expect(within(screen.getAllByRole('row')[1]).getByText(new RegExp(`^${en.categoryPage.hardcore} ·`))).toBeInTheDocument()
-  expect(within(screen.getAllByRole('row')[2]).getByText(new RegExp(`^${en.categoryPage.softcore} ·`))).toBeInTheDocument()
+  const [, first, second] = screen.getAllByRole('row')
+  const earnedCell = (row: HTMLElement) => row.querySelectorAll('td')[5]
+  expect(within(earnedCell(first)).getByText(en.categoryPage.hardcore)).toBeInTheDocument()
+  expect(within(earnedCell(first)).getByText('Jan 1, 2026')).toBeInTheDocument()
+  expect(within(earnedCell(second)).getByText(en.categoryPage.softcore)).toBeInTheDocument()
+  const cells = first.querySelectorAll('td')
+  expect(within(cells[cells.length - 1]).getByRole('button', { pressed: false })).toBeInTheDocument()
 })
 
 test('players, hardcore players and points are columns; points and players sort most first', () => {

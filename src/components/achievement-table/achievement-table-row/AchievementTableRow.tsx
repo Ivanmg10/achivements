@@ -1,50 +1,32 @@
 import type { ReactNode } from 'react'
-import { useLanguage } from '@/context/LanguageContext'
 import type { AchievementColumn, AchievementView } from '@/types/achievementTable'
-import type { CompareAchievement } from '@/utils/gameCompare'
 import { earnedRing, type TableEntry } from '@/utils/achievementTable'
-import { formatUnlock } from '@/utils/steamFeed'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { badgeClass, badgeImgClass, MID, NUM, ROW, TD, TD_FIRST } from '@/components/ui/dataTable'
 import PinAchievementButton from '@/components/pin-achievement-button/PinAchievementButton'
 import RevealSecretButton from '@/components/reveal-secret-button/RevealSecretButton'
 
-/** When it was earned: RA says in which mode, in its colour. */
-function UnlockLine({ row }: { row: CompareAchievement }) {
-  const { T, lang } = useLanguage()
-  if (!row.earned || !row.earnedAt) return null
-  const when = formatUnlock(row.earnedAt, lang)
-  if (row.hardcore === undefined) return <p className="mt-0.5 text-xs text-accent">{when}</p>
-  return (
-    <p className={`mt-0.5 text-xs ${row.hardcore ? 'text-hardcore' : 'text-text-secondary'}`}>
-      {row.hardcore ? T.categoryPage.hardcore : T.categoryPage.softcore} · {when}
-    </p>
-  )
-}
-
 /**
- * One achievement as a row of the game page table: the badge (ringed once
- * earned, grey while locked, with the eye over a secret one), the name, which
- * is the button that opens it, stretched over the row, its text and unlock,
- * then the columns and the pin. The row carries the anchor its links land on.
+ * One achievement as a row of the game page table, on two lines: the badge
+ * (ringed once earned, grey while locked, with the eye over a secret one), the
+ * name, which is the button that opens it, stretched over the row, and its
+ * text; then the columns (when it was earned is the earned column's) and, last
+ * on every platform, the pin. The row carries the anchor its links land on.
  */
 export default function AchievementTableRow<T>({
   view,
   columns,
   tags,
-  pinInTitle = false,
   unoptimized,
 }: {
   view: AchievementView<T>
   columns: AchievementColumn<T>[]
   tags?: (e: TableEntry<T>) => ReactNode
-  /** RA's star sits beside the name, not in a column of its own. */
-  pinInTitle?: boolean
   unoptimized: boolean
 }) {
   const { entry: e, eye } = view
   const pin = view.pinned !== undefined && (
-    <PinAchievementButton pinned={view.pinned} title={view.title} onToggle={view.onTogglePin} size={pinInTitle ? 16 : 18} className="relative z-10 shrink-0" />
+    <PinAchievementButton pinned={view.pinned} title={view.title} onToggle={view.onTogglePin} size={18} className="relative z-10 shrink-0" />
   )
 
   return (
@@ -80,10 +62,8 @@ export default function AchievementTableRow<T>({
             </button>
           </h3>
           {tags?.(e)}
-          {pinInTitle && pin}
         </div>
         <p className="mt-0.5 text-[0.8125rem] leading-normal text-text-secondary">{view.text}</p>
-        <UnlockLine row={e.row} />
       </td>
 
       {columns.map((c) => (
@@ -92,7 +72,7 @@ export default function AchievementTableRow<T>({
         </td>
       ))}
 
-      {!pinInTitle && pin && <td className={`${TD} ${MID} w-12`}>{pin}</td>}
+      {pin && <td className={`${TD} ${MID} w-12`}>{pin}</td>}
     </tr>
   )
 }

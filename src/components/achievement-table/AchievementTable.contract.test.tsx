@@ -166,8 +166,11 @@ describe.each(PLATFORMS)('$name', (p) => {
 
   test('earned and locked are said in words, not only shown', () => {
     p.render(FOUR)
-    expect(within(table()).getAllByLabelText(p.texts.earned)).toHaveLength(2)
-    expect(within(table()).getAllByText(p.texts.locked)).toHaveLength(2)
+    const body = within(table().querySelector('tbody')!)
+    expect(body.getAllByText(p.texts.earned)).toHaveLength(2)
+    expect(body.getAllByText(p.texts.locked)).toHaveLength(2)
+    // When it was earned is in the column, in the one date format; no tick beside a date.
+    expect(body.getAllByText(/\b20\d\d\b/).length).toBeGreaterThan(0)
   })
 
   test('a filter that leaves nothing says so, with no table', () => {

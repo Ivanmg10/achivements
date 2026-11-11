@@ -49,7 +49,6 @@ export type AchievementTableProps<T> = {
   detail?: DetailOptions<T>
   /** Steam shows a secret one's picture; PSN and Xbox hide it with its name. */
   keepSecretIcon?: boolean
-  pinInTitle?: boolean
 }
 
 /**
@@ -60,7 +59,7 @@ export type AchievementTableProps<T> = {
  * Each platform is a small adapter around it: `docs/platform-shells.md`.
  */
 export default function AchievementTable<T>(props: AchievementTableProps<T>) {
-  const { source, gameId, gameTitle, items, toRow, texts, pins, reveal, sortMenu, tags, cardNote, notice, scopes, detail, keepSecretIcon, pinInTitle } = props
+  const { source, gameId, gameTitle, items, toRow, texts, pins, reveal, sortMenu, tags, cardNote, notice, scopes, detail, keepSecretIcon } = props
   const { T } = useLanguage()
   const panelId = useId()
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -163,9 +162,8 @@ export default function AchievementTable<T>(props: AchievementTableProps<T>) {
               nameLabel={texts.name}
               sort={table.sort}
               onSort={table.sortColumn}
-              pinColumn={pins.canPin && !pinInTitle}
+              pinColumn={pins.canPin}
               tags={tags}
-              pinInTitle={pinInTitle}
               unoptimized={source !== 'ra'}
             />
             <ul className="sm:hidden w-full flex flex-col gap-2 enter-rows">

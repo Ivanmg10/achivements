@@ -17,7 +17,7 @@ const AchievementModal = dynamic(() => import('../achievement-modal/AchievementM
 /**
  * An RA game's achievements on the shared table: players, hardcore players and
  * points as columns, each one's type beside its name (missable in red), the
- * missables still to earn in a line on top, the star beside the name, and RA's
+ * missables still to earn in a line on top, and RA's
  * own detail window.
  */
 export default function GameInfoTable({ gameData }: { gameData?: RetroAchievementsGameWithAchievements | null }) {
@@ -89,7 +89,6 @@ export default function GameInfoTable({ gameData }: { gameData?: RetroAchievemen
           />
         ),
       }}
-      pinInTitle
     />
   )
 }
