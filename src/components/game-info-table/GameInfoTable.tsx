@@ -26,13 +26,14 @@ export default function GameInfoTable({ gameData }: { gameData?: RetroAchievemen
   const { pins } = useAchievementPins(RA_PINS, gameData?.ID, gameData?.Title ?? undefined, { numDistinctPlayers: players })
   const items = useMemo(() => (gameData ? raAchievementList(gameData).sort((a, b) => a.DisplayOrder - b.DisplayOrder) : []), [gameData])
   const toRow = useMemo(() => raCompareItem(players), [players])
-  const count = (key: string, label: string, value: (a: RetroAchievement) => number, className = ''): AchievementColumn<RetroAchievement> => ({
+  const count = (key: string, label: string, value: (a: RetroAchievement) => number, className = '', card?: AchievementColumn<RetroAchievement>['card']): AchievementColumn<RetroAchievement> => ({
     key,
     label,
     align: 'right',
     width: 'w-32',
     sort: { first: 'desc', value: ({ item }) => value(item) },
     cell: ({ item }) => <span className={className}>{value(item).toLocaleString(lang)}</span>,
+    card,
   })
   const points: AchievementColumn<RetroAchievement> = {
     key: 'points',
@@ -66,11 +67,14 @@ export default function GameInfoTable({ gameData }: { gameData?: RetroAchievemen
       pins={pins}
       columns={[
         count('players', T.gameInfoTable.headerPlayers, (a) => a.NumAwarded),
-        count('hc', T.gameInfoTable.headerHC, (a) => a.NumAwardedHardcore, 'text-text-secondary'),
+        count('hc', T.gameInfoTable.headerHC, (a) => a.NumAwardedHardcore, 'text-text-secondary', ({ item }) => (
+          <span className="text-text-secondary">{T.achievement.hardcoreShort}: {item.NumAwardedHardcore.toLocaleString(lang)}</span>
+        )),
         points,
       ]}
       sortMenu={['points', 'rarity', 'players', 'earned']}
       tags={typeTag}
+      cardNote={({ item }) => item.Author && <p className="mt-1 text-[10px] text-text-secondary">{T.achievement.by} {item.Author}</p>}
       notice={{ match: ({ item, row }) => item.Type === 'missable' && !row.earned }}
       detail={{
         render: (a, { pinned, onTogglePin, onClose }) => (

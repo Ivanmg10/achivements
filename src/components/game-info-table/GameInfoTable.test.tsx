@@ -59,3 +59,16 @@ test('the order menu offers points first, as RA reads them', () => {
     en.gameInfoTable.sortGameOrder, en.gameInfoTable.headerPoints, en.gameInfoTable.headerRarity, en.gameInfoTable.headerPlayers, en.gameInfoTable.headerEarned,
   ])
 })
+
+test('the phone card says the hardcore players in the reader\'s language, and who made it below', () => {
+  render(<GameInfoTable gameData={game(achievement(1, { NumAwardedHardcore: 12345, Author: 'Zed' }))} />)
+  const card = screen.getAllByRole('listitem').find((li) => li.textContent?.includes('Ach 1'))!
+  expect(within(card).getByText(`${en.achievement.hardcoreShort}: 12,345`)).toBeInTheDocument()
+  expect(within(card).getByText(`${en.achievement.by} Zed`)).toBeInTheDocument()
+  expect(within(screen.getByRole('table')).queryByText(`${en.achievement.by} Zed`)).not.toBeInTheDocument()
+})
+
+test('an achievement with no author has no "by" line', () => {
+  render(<GameInfoTable gameData={game(achievement(1, { Author: '' }))} />)
+  expect(screen.queryByText(new RegExp(`^${en.achievement.by} `))).not.toBeInTheDocument()
+})
