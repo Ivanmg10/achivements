@@ -9,17 +9,21 @@ export type TableEntry<T> = { item: T; row: CompareAchievement; order: number }
 
 /**
  * The game page table's order. `default` is the game's, `rarity` puts an unknown
- * rarity after the known ones, `earned` runs by date with the locked ones always
+ * rarity after the known ones, in both directions, `earned` runs by date with the locked ones always
  * last; any other key orders by `value`, smallest first. `desc` reverses it.
  */
 export function sortEntries<E extends TableEntry<unknown>>(list: E[], { key, dir }: TableSort, value?: (e: E) => number): E[] {
   const cmp = (a: E, b: E): number => {
-    if (key === 'rarity') return (a.row.rarity ?? Infinity) - (b.row.rarity ?? Infinity)
+    if (key === 'rarity') return (a.row.rarity ?? 0) - (b.row.rarity ?? 0)
     if (key === 'earned') {
       if (a.row.earned !== b.row.earned) return a.row.earned ? -1 : 1
       return (a.row.earnedAt ?? '').localeCompare(b.row.earnedAt ?? '')
     }
     return value ? value(a) - value(b) : a.order - b.order
+  }
+  if (key === 'rarity') {
+    const known = list.filter((e) => e.row.rarity !== null).sort(cmp)
+    return [...(dir === 'asc' ? known : known.reverse()), ...list.filter((e) => e.row.rarity === null)]
   }
   const sorted = [...list].sort(cmp)
   if (dir === 'asc') return sorted
