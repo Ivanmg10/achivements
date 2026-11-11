@@ -32,6 +32,11 @@ export async function GET(request: NextRequest) {
     }
     return cachedJson(data, TTL);
   } catch (err) {
+    // RA answers a game it does not have with a 200 and no game in it (no ID): asking again will not
+    // make it exist, so it is the "game not found" page, not a 503 the client retries (#129).
+    if ((err as { code?: string })?.code === 'RA_VALIDATION_FAILED') {
+      return NextResponse.json({ error: 'not-found' }, { status: 404 });
+    }
     return raUnavailable(err)
   }
 }

@@ -55,9 +55,11 @@ test('GET returns 503 when fetchRA throws', async () => {
   expect(res.status).toBe(503)
 })
 
-test('GET returns 503 when RA returns no ID field', async () => {
-  ;(fetchRA as jest.Mock).mockResolvedValueOnce({ Title: 'No ID' })
-  const req = new NextRequest('http://localhost/api/getGameProgression?gameId=123')
-  const res = await GET(req)
-  expect(res.status).toBe(503)
+test('GET returns 404 not-found when RA answers with no game in it (a game that does not exist)', async () => {
+  for (const answer of [{ Title: 'No ID' }, [], null]) {
+    ;(fetchRA as jest.Mock).mockResolvedValueOnce(answer)
+    const res = await GET(new NextRequest('http://localhost/api/getGameProgression?gameId=999999'))
+    expect(res.status).toBe(404)
+    expect((res as unknown as { data: unknown }).data).toEqual({ error: 'not-found' })
+  }
 })
