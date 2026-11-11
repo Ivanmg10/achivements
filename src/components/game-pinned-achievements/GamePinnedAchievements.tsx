@@ -134,7 +134,7 @@ export function GamePinnedAchievements({
                 <div className="flex items-center gap-2 shrink-0">
                   <div className="text-right">
                     <p className="text-xs font-semibold tabular-nums">{row.snapshot.Points}</p>
-                    <p className="text-[10px] text-text-secondary">pts</p>
+                    <p className="text-[10px] text-text-secondary">{T.libraryDetail.pointsShort}</p>
                   </div>
                   <button
                     onClick={() => handleUnpin(row.achievement_id)}

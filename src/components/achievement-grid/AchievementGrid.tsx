@@ -10,6 +10,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import { capList } from '@/utils/utils'
+import { formatDate } from '@/utils/dates'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { raTypeTag } from '@/components/ui/dataTable'
 import { raBadgeUrl } from '@/utils/raAssets'
@@ -44,7 +45,7 @@ export const AchievementGrid = memo(function AchievementGrid({
   /** Show only this many until asked for the rest (a card on a list page). */
   limit?: number
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const [tooltip, setTooltip] = useState<TooltipData | null>(null)
   const [selected, setSelected] = useState<RetroAchievement | null>(null)
   // The badge set whose images have loaded. Keyed by the badges, not the array:
@@ -186,18 +187,18 @@ export const AchievementGrid = memo(function AchievementGrid({
               {tooltip.achievement.Description}
             </p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="text-xs text-text-secondary">{tooltip.achievement.Points} pts</span>
+              <span className="text-xs text-text-secondary">{tooltip.achievement.Points} {T.libraryDetail.pointsShort}</span>
               {tooltipTag && (
                 <span className={`text-xs px-1.5 py-0.5 rounded-full ${tooltipTag.className}`}>{tooltipTag.label}</span>
               )}
               {tooltip.achievement.DateEarnedHardcore && (
                 <span className="text-xs px-1.5 py-0.5 rounded-full bg-warning/20 text-warning">
-                  Hardcore
+                  {T.achievement.hardcore}
                 </span>
               )}
               {tooltip.achievement.DateEarned && !tooltip.achievement.DateEarnedHardcore && (
                 <span className="text-xs px-1.5 py-0.5 rounded-full bg-info/20 text-info">
-                  Softcore
+                  {T.achievement.softcore}
                 </span>
               )}
               {!tooltip.achievement.DateEarned && !tooltip.achievement.DateEarnedHardcore && (
@@ -206,9 +207,7 @@ export const AchievementGrid = memo(function AchievementGrid({
             </div>
             {(tooltip.achievement.DateEarnedHardcore ?? tooltip.achievement.DateEarned) && (
               <p className="text-xs text-text-secondary mt-1">
-                {new Date(
-                  (tooltip.achievement.DateEarnedHardcore ?? tooltip.achievement.DateEarned)!,
-                ).toLocaleDateString()}
+                {formatDate(tooltip.achievement.DateEarnedHardcore ?? tooltip.achievement.DateEarned, lang)}
               </p>
             )}
           </CursorTooltip>

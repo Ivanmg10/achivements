@@ -268,7 +268,7 @@ export function useGroupPage(groupId: number, recentlyPlayed: RecentlyPlayedGame
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(err.message ?? 'Error')
+        throw new Error(err.error ?? 'error')
       }
       const updated = (await res.json()) as GameGroup
       setGroup((g) => (g ? { ...g, ...updated } : g))

@@ -8,6 +8,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { entryHref } from '@/utils/libraryShelves'
 import type { LibraryEntry } from '@/utils/libraryInsights'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import { formatDate } from '@/utils/dates'
 
 /**
  * One game in the list: icon, title and platform, progress, and when it was
@@ -22,7 +23,7 @@ export default function LibraryListRow({ entry, current, category, onSelect }: {
   // On Completed, when it was completed: playing a DLC later does not make it a recent one.
   const finished = category === 'completed' ? entry.completedAt ?? null : null
   const date = finished ?? entry.lastPlayed
-  const when = date ? new Date(date).toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' }) : null
+  const when = date ? formatDate(date, lang, { day: 'numeric', month: 'short', year: 'numeric' }) : null
   const href = entryHref(entry)
   const pct = entry.pct === null ? null : Math.min(100, Math.max(0, entry.pct))
 

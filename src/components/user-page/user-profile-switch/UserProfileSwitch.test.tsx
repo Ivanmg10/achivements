@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import UserProfileSwitch from './UserProfileSwitch'
+import { en } from '@/translations/en'
 
 jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 
@@ -45,5 +46,5 @@ test('a failed save shows the error next to the switch', async () => {
   global.fetch = jest.fn().mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'Nope' }) })
   renderSwitch(true)
   fireEvent.click(screen.getByRole('switch'))
-  expect(await screen.findByRole('alert')).toHaveTextContent('Nope')
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.editProfileModal.errorGeneric)
 })

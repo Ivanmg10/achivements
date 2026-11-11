@@ -50,7 +50,7 @@ export default function MainPageAbandoned({
   isLoading?: boolean
   now?: number
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   // Read once, when the page opens: render has to give the same answer every time.
   const [mountedAt] = useState(Date.now)
@@ -156,7 +156,7 @@ export default function MainPageAbandoned({
               imageUrl={g.imageUrl}
               title={g.title}
               subtitle={g.subtitle}
-              stat={`${g.daysAgo}d`}
+              stat={T.rankings.daysShort.replace('{n}', g.daysAgo.toLocaleString(lang))}
               statLabel={`${g.pct}%`}
               statClassName="text-warning"
               progress={g.pct}

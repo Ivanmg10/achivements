@@ -105,12 +105,12 @@ export default function UserPlatforms() {
               }}
               className={DISCONNECT_CLASS}
             >
-              {T.userConfig.signOutRA}
+              {T.userConfig.disconnectRA}
             </button>
           ) : (
             <button onClick={() => setRaModalOpen(true)} className={CONNECT_CLASS}>
               <RaLogo height={14} />
-              {T.userData.signInRA}
+              {T.userData.connectRA}
             </button>
           )
         }

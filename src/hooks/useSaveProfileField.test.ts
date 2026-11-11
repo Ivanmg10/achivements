@@ -24,13 +24,13 @@ test('posts the field, refreshes the session and toasts', async () => {
   expect(notify.success).toHaveBeenCalledWith(en.toast.saved)
 })
 
-test('a rejected save returns false and keeps the server message', async () => {
-  global.fetch = jest.fn().mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'Too long' }) })
+test('a rejected save returns false and says it in the reader’s words, never the server’s', async () => {
+  global.fetch = jest.fn().mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'description-too-long' }) })
   const { result } = renderHook(() => useSaveProfileField())
   let ok = true
   await act(async () => { ok = await result.current.save('description', 'x') })
   expect(ok).toBe(false)
-  expect(result.current.error).toBe('Too long')
+  expect(result.current.error).toBe(en.editProfileModal.errorGeneric)
   expect(update).not.toHaveBeenCalled()
 })
 

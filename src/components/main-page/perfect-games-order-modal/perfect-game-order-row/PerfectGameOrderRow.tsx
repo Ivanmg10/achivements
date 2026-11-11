@@ -50,7 +50,7 @@ export default function PerfectGameOrderRow({ game }: { game: PerfectGame }) {
       ) : game.source === 'xbox' ? (
         <XboxLogo size={12} className="text-xbox shrink-0" aria-label="Xbox" />
       ) : (
-        game.hardcore && <span className="w-2 h-2 bg-warning rounded-full shrink-0" title="Hardcore" />
+        game.hardcore && <span className="w-2 h-2 bg-warning rounded-full shrink-0" title={T.achievement.hardcore} />
       )}
     </div>
   )

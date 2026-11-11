@@ -67,7 +67,7 @@ export default function RaLoginModal({
           </p>
         )}
         <Button type="submit" variant="secondary" loading={isLoading}>
-          {T.raLoginModal.signIn}
+          {T.raLoginModal.connect}
         </Button>
       </form>
     </Modal>

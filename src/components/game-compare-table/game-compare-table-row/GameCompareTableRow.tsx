@@ -49,7 +49,7 @@ export default function GameCompareTableRow({
         <p className="text-sm font-semibold wrap-break-word">{row.title}</p>
         {row.description && <p className="text-xs text-text-secondary line-clamp-2">{row.description}</p>}
         <p className="flex flex-wrap gap-x-2 text-[11px] text-text-secondary">
-          {row.points !== undefined && <span>{row.points} pts</span>}
+          {row.points !== undefined && <span>{row.points} {T.libraryDetail.pointsShort}</span>}
           {row.grade && <span>{T.psn[row.grade]}</span>}
           {row.gamerscore !== undefined && <span>{row.gamerscore} G</span>}
           {row.rarity !== null && <span>{T.psn.rarity.replace('{n}', decimal(row.rarity, lang))}</span>}

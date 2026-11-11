@@ -3,6 +3,7 @@
 import { IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { Milestone } from '@/utils/gameInsights'
+import { formatDate } from '@/utils/dates'
 
 /**
  * The way to 100% in steps: the first achievement and each quarter, with the
@@ -31,7 +32,7 @@ export default function LibraryDetailMilestones({ steps }: { steps: Milestone[] 
                 {s.pct === 0 ? L.milestoneFirst : L.milestonePct.replace('{n}', String(s.pct))}
               </span>
               <span className="text-xs tabular-nums text-text-secondary">
-                {reached ? new Date(s.at!).toLocaleDateString(lang) : L.milestoneToGo.replace('{n}', String(s.left))}
+                {reached ? formatDate(s.at, lang) : L.milestoneToGo.replace('{n}', String(s.left))}
               </span>
             </li>
           )

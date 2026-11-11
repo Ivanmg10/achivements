@@ -43,7 +43,7 @@ test('counts unlocks today, this week and this month, with the Steam level and p
   expect(pill(en.pointsStats.thisWeek)).toHaveTextContent('3')
   expect(pill(en.steam.level)).toHaveTextContent('42')
   expect(pill(en.steam.last2Weeks)).toHaveTextContent(`3${en.steam.hoursShort}`)
-  expect(pill(en.streak.title)).toHaveTextContent('1d')
+  expect(pill(en.streak.title)).toHaveTextContent('1 d')
 })
 
 test('opens the day and period modals from the pills', async () => {

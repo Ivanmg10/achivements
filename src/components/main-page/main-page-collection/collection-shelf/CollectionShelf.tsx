@@ -41,8 +41,8 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
         <p className="flex items-center text-xs text-text-secondary">
           <Facts
             items={[
-              <span key="hc" className="text-warning font-semibold">{counts.hc} HC</span>,
-              <span key="sc">{counts.sc} SC</span>,
+              <span key="hc" className="text-warning font-semibold">{counts.hc} {T.achievement.hardcoreShort}</span>,
+              <span key="sc">{counts.sc} {T.achievement.softcoreShort}</span>,
               counts.steam > 0 && <span key="st" className="text-steam font-semibold">{counts.steam} Steam</span>,
               counts.psn > 0 && <span key="psn" className="text-psn font-semibold">{counts.psn} PlayStation</span>,
               counts.xbox > 0 && <span key="xb" className="text-success font-semibold">{counts.xbox} Xbox</span>,

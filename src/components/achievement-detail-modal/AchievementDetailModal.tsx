@@ -11,6 +11,7 @@ import { formatRarity } from '@/utils/steamFeed'
 import type { GuideLink } from '@/utils/guideLinks'
 import Modal from '@/components/ui/Modal'
 import Kicker from '@/components/ui/Kicker'
+import { formatUnlock } from '@/utils/steamFeed'
 
 const GUIDE_ICON = { youtube: IconBrandYoutube, steamGuides: IconBook2, psnProfiles: IconBook2, trueAchievements: IconBook2 }
 
@@ -57,9 +58,7 @@ export default function AchievementDetailModal({
   const { T, lang } = useLanguage()
   const titleId = useId()
 
-  const when = earnedAt
-    ? new Date(earnedAt).toLocaleString(lang, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-    : null
+  const when = earnedAt ? formatUnlock(earnedAt, lang) : null
   const guideLabel = { youtube: T.achievementDetail.youtube, steamGuides: T.achievementDetail.steamGuides, psnProfiles: T.achievementDetail.psnProfiles, trueAchievements: T.achievementDetail.trueAchievements }
 
   return (

@@ -33,7 +33,7 @@ test('renders form when open', () => {
 
 test('submitting with empty fields does nothing', async () => {
   render(<RaLoginModal isOpen={true} setIsOpen={jest.fn()} />)
-  fireEvent.click(screen.getByText('Sign in'))
+  fireEvent.click(screen.getByText('Connect'))
   expect(fetch).not.toHaveBeenCalled()
 })
 
@@ -42,7 +42,7 @@ test('successful login closes modal', async () => {
   render(<RaLoginModal isOpen={true} setIsOpen={setIsOpen} />)
   fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'ivan' } })
   fireEvent.change(screen.getByLabelText(en.raLoginModal.apiKey), { target: { value: 'apikey123' } })
-  fireEvent.click(screen.getByText('Sign in'))
+  fireEvent.click(screen.getByText('Connect'))
   await waitFor(() => expect(setIsOpen).toHaveBeenCalledWith(false))
 })
 
@@ -57,7 +57,7 @@ test('closes modal via backdrop (onClose)', () => {
 function submit(apiKey = 'apikey123') {
   fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'ivan' } })
   fireEvent.change(screen.getByLabelText(en.raLoginModal.apiKey), { target: { value: apiKey } })
-  fireEvent.click(screen.getByText('Sign in'))
+  fireEvent.click(screen.getByText('Connect'))
 }
 
 test('sends only the username and key, to the route that asks RA itself, then re-reads the session', async () => {
@@ -84,7 +84,7 @@ test.each([
   expect(await screen.findByRole('alert')).toHaveTextContent(message)
   expect(setIsOpen).not.toHaveBeenCalled()
   expect(mockUpdate).not.toHaveBeenCalled()
-  expect(screen.getByText('Sign in')).toBeInTheDocument()
+  expect(screen.getByText('Connect')).toBeInTheDocument()
 })
 
 test('says it failed when the network is down, and the button comes back', async () => {
@@ -93,7 +93,7 @@ test('says it failed when the network is down, and the button comes back', async
   render(<RaLoginModal isOpen={true} setIsOpen={jest.fn()} />)
   submit()
   expect(await screen.findByRole('alert')).toHaveTextContent(en.raLoginModal.error)
-  expect(screen.getByText('Sign in')).toBeInTheDocument()
+  expect(screen.getByText('Connect')).toBeInTheDocument()
 })
 
 test('says where the RetroAchievements key lives, with a link to it', () => {

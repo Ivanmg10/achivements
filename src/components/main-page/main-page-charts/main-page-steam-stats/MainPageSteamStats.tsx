@@ -85,7 +85,7 @@ export default function MainPageSteamStats({
       {(levelWaiting || profile?.level != null) && <Figure label={T.steam.level} value={profile?.level ?? ''} sub="Steam" loading={levelWaiting} />}
       <Figure
         label={T.streak.title}
-        value={`${streak}d`}
+        value={T.rankings.daysShort.replace('{n}', streak.toLocaleString(lang))}
         sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
         tone={streak > 0 ? 'accent' : undefined}
         href="/racha"

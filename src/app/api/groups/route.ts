@@ -13,7 +13,7 @@ export async function GET() {
     return NextResponse.json(await listGroups(auth.id, { xbox: canUseXbox(auth.user.admin) }))
   } catch (err) {
     console.error('[groups GET]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }
 
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     if (!auth.ok) return auth.response
 
     const fields = readGroupFields(await req.json().catch(() => null))
-    if (!fields.ok) return NextResponse.json({ message: fields.message }, { status: 400 })
+    if (!fields.ok) return NextResponse.json({ error: fields.code }, { status: 400 })
     const { title, description, icon, is_public } = fields.value
 
     const countRes = await pool.query(
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       [auth.id],
     )
     if (parseInt(countRes.rows[0].count) >= GROUPS_PER_USER_MAX) {
-      return NextResponse.json({ message: `Máximo ${GROUPS_PER_USER_MAX} grupos permitidos` }, { status: 400 })
+      return NextResponse.json({ error: 'groups-max' }, { status: 400 })
     }
 
     const posRes = await pool.query(
@@ -50,6 +50,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ...result.rows[0], game_count: 0, steam_count: 0, psn_count: 0, xbox_count: 0 }, { status: 201 })
   } catch (err) {
     console.error('[groups POST]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }

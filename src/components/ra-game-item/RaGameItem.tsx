@@ -131,7 +131,7 @@ export default function RaGameItem({
               <Facts
                 items={[
                   total > 0 && <span key="a" className="whitespace-nowrap">{earnedAch}/{total} {T.statusGameItem.achievements}</span>,
-                  total > 0 && <span key="p" className="whitespace-nowrap">{earnedPts}/{game.PossibleScore} pts</span>,
+                  total > 0 && <span key="p" className="whitespace-nowrap">{earnedPts}/{game.PossibleScore} {T.libraryDetail.pointsShort}</span>,
                   <span key="d" className="whitespace-nowrap">{formatDate(game.LastPlayed, lang)}</span>,
                 ]}
               />

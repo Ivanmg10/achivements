@@ -56,7 +56,7 @@ export function useGroups() {
     })
     if (!res.ok) {
       const err = await res.json()
-      throw new Error(err.message ?? 'Error')
+      throw new Error(err.error ?? 'error')
     }
     const group: GameGroup = await res.json()
     setGroups((prev) => [...prev, group])
@@ -76,7 +76,7 @@ export function useGroups() {
     })
     if (!res.ok) {
       const err = await res.json().catch(() => ({}))
-      throw new Error(err.message ?? 'Error')
+      throw new Error(err.error ?? 'error')
     }
     const updated: GameGroup = await res.json()
     setGroups((prev) => prev.map((g) => (g.id === id ? { ...g, ...updated } : g)))

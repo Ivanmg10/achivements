@@ -16,6 +16,7 @@ import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
 import RaLibraryDetail from '@/components/ra-library-detail/RaLibraryDetail'
 import { raImageUrl } from '@/utils/raAssets'
+import { formatDate } from '@/utils/dates'
 
 function getGameId(g: CategoryGame): number | string {
   return g.ID ?? g.GameID!
@@ -96,7 +97,7 @@ export default function StatusGameItem({
                 {game.ConsoleName}
               </span>
               {extra?.awards.map((award, i) => {
-                const date = new Date(award.AwardedAt).toLocaleDateString(lang)
+                const date = formatDate(award.AwardedAt, lang)
                 if (award.AwardType === 'Mastery/Completion') {
                   const isHC = award.AwardDataExtra === 1
                   return (
@@ -140,7 +141,7 @@ export default function StatusGameItem({
                 <p className="text-xs text-text-secondary mt-1">
                   {game.PointsTotal} {T.statusGameItem.pointsTotal}
                   {extra?.lastPlayed && (
-                    <> · {T.statusGameItem.lastPlayed} {new Date(extra.lastPlayed).toLocaleDateString(lang)}</>
+                    <> · {T.statusGameItem.lastPlayed} {formatDate(extra.lastPlayed, lang)}</>
                   )}
                 </p>
               )
@@ -155,7 +156,7 @@ export default function StatusGameItem({
               )}
             {!('AchievementsPublished' in game) && (extra || category === 'playing') && (
               <p className="text-xs text-text-secondary mt-1">
-                {T.statusGameItem.lastPlayed} · {extra?.lastPlayed ? new Date(extra.lastPlayed).toLocaleDateString(lang) : T.statusGameItem.longAgo}
+                {T.statusGameItem.lastPlayed} · {extra?.lastPlayed ? formatDate(extra.lastPlayed, lang) : T.statusGameItem.longAgo}
               </p>
             )}
           </div>

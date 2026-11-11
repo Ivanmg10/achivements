@@ -59,7 +59,7 @@ test('renders the Status dropdown grouping the 3 status routes', () => {
   render(<MainHeader />)
   fireEvent.click(screen.getByRole('button', { name: 'Library' }))
   expect(screen.getByRole('menuitem', { name: 'In progress' })).toHaveAttribute('href', '/playing')
-  expect(screen.getByRole('menuitem', { name: 'No achievements' })).toHaveAttribute('href', '/wantToPlay')
+  expect(screen.getByRole('menuitem', { name: 'Not started' })).toHaveAttribute('href', '/wantToPlay')
   expect(screen.getByRole('menuitem', { name: 'Completed' })).toHaveAttribute('href', '/completed')
 })
 
@@ -81,7 +81,7 @@ test('PSN alone is a platform: search and the sections are there', () => {
   render(<MainHeader />)
   expect(screen.getByRole('button', { name: 'Library' })).toBeInTheDocument()
   expect(screen.getByRole('link', { name: en.following.title })).toBeInTheDocument()
-  expect(screen.getAllByRole('button', { name: 'Search games' }).length).toBeGreaterThan(0)
+  expect(screen.getAllByRole('button', { name: /Search games/ }).length).toBeGreaterThan(0)
 })
 
 test('Xbox alone counts only for who may see Xbox', () => {
@@ -111,7 +111,7 @@ describe('with no platform linked', () => {
     render(<MainHeader />)
     expect(screen.queryByRole('button', { name: 'Library' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Groups' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Search games' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Search games/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Menu' })).not.toBeInTheDocument()
   })
 

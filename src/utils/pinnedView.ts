@@ -86,7 +86,7 @@ export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView 
     iconUrl: raBadgeUrl(a.BadgeName) ?? null,
     earned: Boolean(a.DateEarned || a.DateEarnedHardcore),
     anchor: null,
-    value: `${a.Points} pts`,
+    value: `${a.Points} ${T.libraryDetail.pointsShort}`,
     valueClass: 'text-accent',
     rarity: fav.num_distinct_players > 0 ? (a.NumAwarded / fav.num_distinct_players) * 100 : null,
   }

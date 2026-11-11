@@ -33,6 +33,51 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-09 — Every text through T, one name per thing, copy fixes (`fix/122-texts-i18n`, #122)
+
+**Did** — Antislop D2-03 / C-08 / E / AP-12 / A-18 and CP, plan S8, one commit per block:
+- *Texts into `T`, nine languages:* `GameHashesModal` (all Spanish: title, error, empty state, count as `plurals.hashes`, patch link, copy label),
+  `AchievementModal` (rarity, author, true ratio, created, recent unlocks, comments, a real load-error sentence in place of "Error 500"),
+  `AchievementGrid`'s tooltip (pts, Hardcore, Softcore), the header ("Home", "Go back", "Main navigation", the search button),
+  `NoMainHeader`, `PinGameModal` ("Game ID", "Remove"), `GameInfoSubsetSelector` ("Main game"), the heatmap's refresh label, `"pts"` in a dozen places
+  (`T.libraryDetail.pointsShort`), "HC"/"SC" (`achievement.hardcoreShort`/`softcoreShort`), "Hardcore"/"Softcore" in a tooltip and a screen-reader line,
+  `${n}d` in the streak figures (`rankings.daysShort`), and `DayAchievementsModal`'s "completions" word (it split `T.streak.completions`, which breaks in
+  any language whose noun is not first; now `dayModal.completions`). "Menú" / "Close menu" and the ✕ were already done by #121.
+- *Raw errors:* `src/utils/apiErrors.ts` (`signupError`, `profileFieldError`, `groupError`): `POST /api/users` (was Spanish sentences),
+  `POST /api/updateUserProfile` (English sentences) and the groups routes (`message` in Spanish, now `error` codes; `groupValidation` returns `code`) answer
+  codes, and the sign-up form, `EditProfileModal`, `LocationModal`, `useSaveProfileField` (so gender, description and avatar link) and `GroupModal`
+  say them in `T`; anything unknown is the generic text, never `data.error`. The two category pages showed the thrown error ("Unknown error", a status)
+  and now say `categoryPage.loadError`. Tests per code (route and util) and per form.
+- *Dates in the reader's language:* `AchievementGrid`, `AchievementModal` (created, unlocks, comments), `GameInfoComments`, `DayAchievementsModal`,
+  `Week`/`PeriodAchievementsModal` (also the week's hint, which printed a raw ISO date) and the heatmap's month names use `formatDate`/`formatDay`
+  with `lang`; `GameInfoAchivement` and `AchievementDetailModal` use `formatUnlock`. Numbers: `toLocaleString(lang)` in `AchievementModal`, `MainPageBestPeriod`,
+  `CollectionNumbers`, `PublicUserPlatforms`, `PublicUserDuelRow` (its default had none).
+- *RA strings with no zone:* `LibraryListRow`, `LibraryDetailMilestones`, `LibraryGameDetail`, `ShowcaseTile` and `StatusGameItem` (×3) moved to `formatDate`. Checked
+  first: RA's `LastPlayed`/`DateEarned`/`DateAwarded`/`Submitted`/`DateCreated` are "YYYY-MM-DD HH:MM:SS" in UTC (the fixtures and `docs`/#118 say so; `parseUnlockTime`
+  reads them as UTC), `AwardedAt`/`HighestAwardDate` come as ISO with an offset, and Steam, PSN and Xbox send ISO with `Z`. `formatDate` reads every one of those at its
+  real moment and shows the day in the reader's zone, which is the right day; `new Date(x)` read the zone-less ones as local, so a day near midnight shifted by the
+  viewer's offset (and `GameInfoAchivement` showed the hour shifted too). A date-only string ("2024-01-01") reads as UTC midnight in both, so nothing got worse.
+- *One name per thing (CP-05, 07, 11, 13):* see `docs/i18n.md` → Vocabulary. RA is connected, never signed in (keys `userData.connectRA`, `userConfig.disconnectRA`,
+  `raLoginModal.connect`, `profileRa.connect`); connect/disconnect, "PlayStation" on buttons, toasts say connected/disconnected in every language; Spanish
+  "biblioteca" (no "librería"), "Tu bóveda", "Puntos Vault", "Maestrías", "Correo", "Detalles del juego", "En progreso", "Editora/Desarrolladora" once; "Add to / Remove from
+  achievements to get" and its load error; "Not started" in place of the "No achievements" that read as "the game has none" (CP-08).
+- *Gender (CP-06):* rank names are abstract nouns in seven languages, `lastAdmin` and `yourRank` (es, pt) and `linkedAs` rephrased; in the same lines Polish "byłeś"/"zarejestrowałeś"/"zdobyłeś",
+  Italian "sei passato / iscritto" and French "venu / inscrit" are neutral too.
+- *Em dashes (CP-09) and the landing (CP-04):* no em dash in a live string in eight languages (a colon, comma, parentheses or a full stop; "·" in the cards' titles); the landing
+  says "on every platform" in nine. CP-14 (five keys left in English in seven languages) and `pinnedGames.error` (CP-12) translated.
+- *Test:* `src/translations/copy.test.ts` (no em dash but Russian, one RA name, one "not started", no "librería", no old masculine ranks, no "both accounts").
+**Why** — #122: text that broke the rules (literal Spanish/English, raw API sentences), dates and numbers that ignored the reader's language, and one thing under three or four names.
+**Decisions** — Codes, not sentences, from the routes; the two sign-up flows share `steamAuth`'s "username taken / closed / too many" texts. Reading a zone-less RA date as UTC is the
+rule already in `parseUnlockTime` (#118), so those callers moved. Russian keeps its dash where it is punctuation (copula, apposition) and loses it in the cards, hints and privacy text.
+Spanish "desvincular" stays for disconnect (CP-07's own proposal) while "conectar" is the verb for the action.
+**Open** — Left out on purpose: CP-03 (115 dead keys ×9, a change of its own that the `Translations` type will force), CP-10 (Xbox in `/rankings/how`: CP says ask the owner),
+CP-11's remaining pairs outside the lists above, CP-12 (the shape of every failure toast: only `pinnedGames.error` was reworded), CP-15/16/17/18/19 (low). The "G" after a gamerscore (Xbox's own mark), and the
+`AdminPsnToken`/`AdminXboxGame` dates (admin is exempt). The groups' item routes answer codes too, which no client reads. Not checked on a screen in each language: ask for a pass in es, pl and ru, where the most text moved.
+**Watch out** — A route that used to answer `message` (groups) now answers `error`. A test title with an apostrophe in a `'…'` string breaks the file (use ’). `tr`-style scripted edits of the
+nine files kept the CRLF the working tree has.
+
+---
+
 ## 2026-11-09 — Every theme at WCAG AA, and a test that keeps it (`fix/123-theme-contrast`, #123)
 
 **Did** — Antislop V7-01 / T-04 / plan S7, one commit per group of tokens:

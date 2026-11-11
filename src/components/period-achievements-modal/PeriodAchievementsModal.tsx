@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import { formatDay } from '@/utils/dates'
 import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
 import Modal from '@/components/ui/Modal'
 
@@ -13,7 +14,7 @@ interface Props {
 }
 
 export default function PeriodAchievementsModal({ title, achievements, onClose }: Props) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   // Steam unlocks have no points; a mixed list still totals the RA ones.
   const hasPoints = achievements.some(a => !a.Source || a.Source === 'ra')
 
@@ -28,11 +29,11 @@ export default function PeriodAchievementsModal({ title, achievements, onClose }
       .sort((a, b) => b[0].localeCompare(a[0]))
       .map(([date, dayAchs]) => ({
         date,
-        label: new Date(date + 'T00:00:00').toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' }),
+        label: formatDay(date, lang, { weekday: 'long', month: 'short', day: 'numeric' }),
         achievements: dayAchs,
         pts: dayAchs.reduce((s, a) => s + a.Points, 0),
       }))
-  }, [achievements])
+  }, [achievements, lang])
 
   const totalPts = days.reduce((s, d) => s + d.pts, 0)
   const totalAch = days.reduce((s, d) => s + d.achievements.length, 0)
@@ -47,7 +48,7 @@ export default function PeriodAchievementsModal({ title, achievements, onClose }
       footer={
         totalAch > 0 ? (
           <p className="text-xs text-text-secondary">
-            {totalAch} {T.dayModal.achievements}{hasPoints && ` · ${totalPts.toLocaleString()}pts`}
+            {totalAch} {T.dayModal.achievements}{hasPoints && ` · ${totalPts.toLocaleString(lang)} ${T.libraryDetail.pointsShort}`}
           </p>
         ) : undefined
       }
@@ -61,7 +62,7 @@ export default function PeriodAchievementsModal({ title, achievements, onClose }
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-text-main capitalize">{day.label}</span>
                   <span className="text-[10px] text-text-secondary">
-                    {hasPoints && `${day.pts.toLocaleString()}pts · `}{day.achievements.length} {T.dayModal.achievements}
+                    {hasPoints && `${day.pts.toLocaleString(lang)} ${T.libraryDetail.pointsShort} · `}{day.achievements.length} {T.dayModal.achievements}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

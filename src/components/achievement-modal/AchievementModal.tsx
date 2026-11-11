@@ -13,7 +13,7 @@ import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseTo
 import Modal from '@/components/ui/Modal'
 import { decimal } from '@/utils/utils'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
-import { parseUnlockTime } from '@/utils/dates'
+import { formatDate, parseUnlockTime } from '@/utils/dates'
 import { raTypeTag } from '@/components/ui/dataTable'
 import { raBadgeUrl, raAvatarUrl } from '@/utils/raAssets'
 import Avatar from '@/components/ui/Avatar'
@@ -56,6 +56,8 @@ interface AchievementDetail {
   } | null
 }
 
+const SHORT_DATE: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short', year: '2-digit' }
+
 export default function AchievementModal({
   achievement,
   numDistinctPlayers,
@@ -79,7 +81,7 @@ export default function AchievementModal({
   const titleId = useId()
   const [detail, setDetail] = useState<AchievementDetail | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState(false)
   const [unlocksOpen, setUnlocksOpen] = useState(false)
   const [commentsPage, setCommentsPage] = useState(0)
 
@@ -100,7 +102,7 @@ export default function AchievementModal({
         return r.json()
       })
       .then(setDetail)
-      .catch((e: unknown) => setError(e instanceof Error ? e.message : 'Error'))
+      .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [achievement.ID])
 
@@ -159,7 +161,7 @@ export default function AchievementModal({
                 </span>
               )}
               {earnedHardcore && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-warning/20 text-warning">HC</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-warning/20 text-warning">{T.achievement.hardcoreShort}</span>
               )}
             </div>
             <p className="text-sm text-text-secondary">{achievement.Description}</p>
@@ -173,28 +175,28 @@ export default function AchievementModal({
         <div className="grid grid-cols-3 divide-x divide-bg-header border-b border-bg-header">
           <div className="flex flex-col items-center gap-0.5 py-4">
             <p className="text-lg font-semibold tabular-nums">{achievement.Points}</p>
-            <p className="text-xs text-text-secondary">pts</p>
+            <p className="text-xs text-text-secondary">{T.libraryDetail.pointsShort}</p>
           </div>
           <div className="flex flex-col items-center gap-0.5 py-4">
-            <p className="text-lg font-semibold tabular-nums">{achievement.NumAwarded.toLocaleString()}</p>
+            <p className="text-lg font-semibold tabular-nums">{achievement.NumAwarded.toLocaleString(lang)}</p>
             <p className="text-xs text-text-secondary">{T.achievement.players}</p>
           </div>
           <div className="flex flex-col items-center gap-0.5 py-4">
             <p className="text-lg font-semibold tabular-nums">{rarityPct ?? '—'}<span className="text-sm">%</span></p>
-            <p className="text-xs text-text-secondary">rarity</p>
+            <p className="text-xs text-text-secondary">{T.achievement.rarity}</p>
           </div>
           {detail?.unlocks?.Achievement && <>
             <div className="flex flex-col items-center gap-0.5 py-4 px-2 border-t border-bg-header">
               <p className="text-sm font-semibold text-center line-clamp-1 w-full">{detail.unlocks.Achievement.Author}</p>
-              <p className="text-xs text-text-secondary">author</p>
+              <p className="text-xs text-text-secondary">{T.achievement.author}</p>
             </div>
             <div className="flex flex-col items-center gap-0.5 py-4 px-2 border-t border-bg-header">
               <p className="text-lg font-semibold tabular-nums">{detail.unlocks.Achievement.TrueRatio}</p>
-              <p className="text-xs text-text-secondary">true ratio</p>
+              <p className="text-xs text-text-secondary">{T.achievement.trueRatio}</p>
             </div>
             <div className="flex flex-col items-center gap-0.5 py-4 px-2 border-t border-bg-header">
-              <p className="text-sm font-semibold tabular-nums">{new Date(detail.unlocks.Achievement.DateCreated).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-              <p className="text-xs text-text-secondary">created</p>
+              <p className="text-sm font-semibold tabular-nums">{formatDate(detail.unlocks.Achievement.DateCreated, lang)}</p>
+              <p className="text-xs text-text-secondary">{T.achievement.created}</p>
             </div>
           </>}
         </div>
@@ -209,12 +211,12 @@ export default function AchievementModal({
             </div>
           )}
 
-          {error && <p className="text-sm text-danger text-center">{error}</p>}
+          {error && <p role="alert" className="text-sm text-danger text-center">{T.achievement.loadError}</p>}
 
           {!loading && detail && (() => {
             const sortedComments = detail.comments?.Results
               ? [...detail.comments.Results].sort(
-                  (a, b) => new Date(b.Submitted).getTime() - new Date(a.Submitted).getTime()
+                  (a, b) => parseUnlockTime(b.Submitted) - parseUnlockTime(a.Submitted)
                 )
               : []
             const totalPages = Math.ceil(sortedComments.length / COMMENTS_PER_PAGE)
@@ -233,7 +235,7 @@ export default function AchievementModal({
                       className="flex items-center justify-between px-4 py-3 hover:bg-bg-header/40 transition-colors text-left"
                     >
                       <span className="text-sm font-semibold text-text-secondary">
-                        Recent unlocks ({detail.unlocks.UnlocksCount.toLocaleString()} / {detail.unlocks.TotalPlayers.toLocaleString()})
+                        {T.achievement.recentUnlocks} ({detail.unlocks.UnlocksCount.toLocaleString(lang)} / {detail.unlocks.TotalPlayers.toLocaleString(lang)})
                       </span>
                       <span className="text-text-secondary text-xs">{unlocksOpen ? '▲' : '▼'}</span>
                     </button>
@@ -249,13 +251,11 @@ export default function AchievementModal({
                               )}
                               <p className="text-sm">{u.User}</p>
                               {u.HardcoreMode === '1' && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-hardcore-deep/60 text-hardcore">HC</span>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-hardcore-deep/60 text-hardcore">{T.achievement.hardcoreShort}</span>
                               )}
                             </div>
                             <p className="text-xs text-text-secondary tabular-nums">
-                              {new Date(u.DateAwarded).toLocaleDateString(undefined, {
-                                day: '2-digit', month: 'short', year: '2-digit',
-                              })}
+                              {formatDate(u.DateAwarded, lang, SHORT_DATE)}
                             </p>
                           </div>
                         ))}
@@ -269,7 +269,7 @@ export default function AchievementModal({
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold text-text-secondary">
-                        Comments ({detail.comments!.Total})
+                        {T.achievement.comments} ({detail.comments!.Total.toLocaleString(lang)})
                       </h3>
                       {totalPages > 1 && (
                         <div className="flex items-center gap-2">
@@ -305,9 +305,7 @@ export default function AchievementModal({
                             <div className="flex items-baseline gap-2">
                               <p className="text-sm font-medium">{c.User}</p>
                               <p className="text-xs text-text-secondary">
-                                {new Date(c.Submitted).toLocaleDateString(undefined, {
-                                  day: '2-digit', month: 'short', year: '2-digit',
-                                })}
+                                {formatDate(c.Submitted, lang, SHORT_DATE)}
                               </p>
                             </div>
                             <p className="text-sm text-text-secondary wrap-break-word">{c.CommentText}</p>

@@ -5,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import RarityBadge from '@/components/ui/RarityBadge'
 import { badgeClass, badgeImgClass, MID, NUM, raTypeTag, ROW, TD, TD_FIRST, TYPE_TAG } from '@/components/ui/dataTable'
 import { raBadgeUrl } from '@/utils/raAssets'
+import { formatUnlock } from '@/utils/steamFeed'
 
 /**
  * One achievement as a row of the RA game table. The title is the button that
@@ -38,9 +39,7 @@ export default function GameInfoAchivement({
   const typeBadge = raTypeTag(achievement.Type, T.achievement)
   const fmt = (n: number) => n.toLocaleString(lang)
   const when = achievement.DateEarnedHardcore ?? achievement.DateEarned
-  const earnedDate = when
-    ? new Date(when).toLocaleString(lang, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-    : null
+  const earnedDate = when ? formatUnlock(when, lang) : null
 
   return (
     <tr className={`${ROW} ${isFavorited ? '[&>td]:bg-accent/[0.05]' : ''}`}>

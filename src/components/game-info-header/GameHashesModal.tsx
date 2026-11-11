@@ -6,6 +6,7 @@ import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useLanguage } from '@/context/LanguageContext'
 import Modal from '@/components/ui/Modal'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { plural } from '@/utils/utils'
 
 type GameHash = {
   MD5: string
@@ -28,7 +29,7 @@ const LABEL_COLORS: Record<string, string> = {
   'NOINTRO': 'bg-success/20 text-success border-success/30',
 }
 
-function CopyButton({ text }: { text: string }) {
+function CopyButton({ text, label }: { text: string; label: string }) {
   const [copied, setCopied] = useState(false)
 
   function handleCopy() {
@@ -42,7 +43,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       onClick={handleCopy}
       className="p-1 rounded-box-sm text-text-secondary hover:text-text-main transition-colors shrink-0"
-      aria-label="Copy hash"
+      aria-label={label}
     >
       {copied
         ? <IconCheck className="w-3.5 h-3.5 text-success" />
@@ -56,7 +57,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
   const [hashes, setHashes] = useState<GameHash[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   // Opening (or another game) starts the load over; state, so while rendering. The fetch is the effect.
   useWhenChanged([isOpen, gameId], () => {
@@ -96,18 +97,18 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
         </div>
       ) : error ? (
         <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
-          <p className="text-sm text-danger" role="alert">Error al cargar hashes</p>
+          <p className="text-sm text-danger" role="alert">{T.gameInfoPage.hashesLoadError}</p>
         </div>
       ) : hashes.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
           <IconHash className="w-8 h-8 text-text-secondary opacity-30" />
-          <p className="text-sm text-text-secondary">Sin hashes registrados</p>
-          <p className="text-xs text-text-secondary">No hay ROMs verificadas para este juego</p>
+          <p className="text-sm text-text-secondary">{T.gameInfoPage.hashesNone}</p>
+          <p className="text-xs text-text-secondary">{T.gameInfoPage.hashesNoneHint}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
           <p className="text-xs text-text-secondary">
-            {hashes.length} {hashes.length === 1 ? 'hash registrado' : 'hashes registrados'}
+            {plural(hashes.length, T.plurals.hashes, lang)}
           </p>
           {hashes.map((h) => (
             <div key={h.MD5} className="bg-bg-main rounded-tile p-4 flex flex-col gap-2">
@@ -128,7 +129,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
               </div>
               <div className="flex items-center gap-1 bg-bg-card rounded-box px-2.5 py-1.5">
                 <code className="text-[11px] text-text-secondary font-mono flex-1 select-all">{h.MD5}</code>
-                <CopyButton text={h.MD5} />
+                <CopyButton text={h.MD5} label={T.gameInfoPage.hashesCopy} />
               </div>
               {h.PatchUrl && (
                 <a
@@ -137,7 +138,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                   rel="noopener noreferrer"
                   className="text-[10px] text-accent hover:underline self-start"
                 >
-                  Descargar parche
+                  {T.gameInfoPage.hashesPatch}
                 </a>
               )}
             </div>

@@ -15,7 +15,7 @@ What to read, and when.
 | [`social.md`](social.md) | Before touching presence, follows, the showcase, Vault Points or the rankings. |
 | [`rankings-plan.md`](rankings-plan.md) | Before changing the Vault Points formula, levels or account verification: the decisions and balance tests. |
 | [`welcome.md`](welcome.md) | Before touching `/welcome`, and whenever a change adds a platform, a feature, a profile field or a preference (the welcome follows the app). |
-| [`i18n.md`](i18n.md) | Before touching how a language is picked or loaded, or adding a language. |
+| [`i18n.md`](i18n.md) | Before touching how a language is picked or loaded, adding a language, or naming a thing in the UI (the vocabulary). |
 | [`releases.md`](releases.md) | Before a release, a migration or an environment change: milestones, release gates, environments, the migrations table. |
 | [`roadmap.md`](roadmap.md) | Before starting something new: what is pending and which ideas need the owner first. |
 | [`design-process.md`](design-process.md) | Before any new page, section or visual rework: how UI work is done here (idea → design canvas → iterations → development), with the welcome as the example. |

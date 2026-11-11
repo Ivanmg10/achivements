@@ -54,7 +54,7 @@ export default function StreakCompletionCard({ award }: Props) {
           {isMastery ? T.streak.mastery : T.streak.beaten}
         </span>
         {isHardcore && (
-          <span className="text-[10px] text-warning font-semibold">HC</span>
+          <span className="text-[10px] text-warning font-semibold">{T.achievement.hardcoreShort}</span>
         )}
       </div>
     </Link>

@@ -135,7 +135,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
                 <p className="text-sm font-medium text-text-main">
                   {T.search.openById} #{directGameId}
                 </p>
-                <p className="text-xs text-text-secondary">Game ID</p>
+                <p className="text-xs text-text-secondary">{T.search.gameId}</p>
               </div>
               <div
                 aria-hidden="true"
@@ -151,7 +151,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
       {selected.size > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {Array.from(selected.values()).map((c) => (
-            <GamePickerChip key={c.key} candidate={c} removeLabel={`Remove ${c.title}`} onRemove={() => toggle(c)} />
+            <GamePickerChip key={c.key} candidate={c} removeLabel={`${T.groups.removeGame} ${c.title}`} onRemove={() => toggle(c)} />
           ))}
         </div>
       )}

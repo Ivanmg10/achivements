@@ -26,7 +26,7 @@ test("today's achievements, the gamerscore and the total unlocked", () => {
 
 test('a running streak, in the theme colour', () => {
   render(<MainPageXboxStats streak={8} achievements={[]} />)
-  expect(screen.getByText('8d')).toHaveClass('text-accent')
+  expect(screen.getByText('8 d')).toHaveClass('text-accent')
 })
 
 test('without a summary yet, its pills wait in the row', () => {

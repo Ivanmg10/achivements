@@ -13,7 +13,7 @@ function ach(date: string, over: Partial<RecentAchievement> = {}): RecentAchieve
 test('lists the week’s RA unlocks by day, with points', () => {
   render(<WeekAchievementsModal startDate="2024-01-15" achievements={[ach('2024-01-16'), ach('2024-01-30')]} onClose={jest.fn()} />)
   expect(screen.getAllByText('Triforce')).toHaveLength(1)
-  expect(screen.getByText(`1 ${en.dayModal.achievements} · 25pts`)).toBeInTheDocument()
+  expect(screen.getByText(`1 ${en.dayModal.achievements} · 25 pts`)).toBeInTheDocument()
 })
 
 test('lists Steam unlocks as counts only', () => {

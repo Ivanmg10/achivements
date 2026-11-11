@@ -28,7 +28,7 @@ test('expands the Status group to reveal the 3 status links', () => {
   render(<MobileNavModal isOpen={true} onClose={jest.fn()} />)
   fireEvent.click(screen.getByText('Library'))
   expect(screen.getByText('In progress')).toBeInTheDocument()
-  expect(screen.getByText('No achievements')).toBeInTheDocument()
+  expect(screen.getByText('Not started')).toBeInTheDocument()
   expect(screen.getByText('Completed')).toBeInTheDocument()
 })
 

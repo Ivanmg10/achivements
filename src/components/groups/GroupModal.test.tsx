@@ -79,12 +79,12 @@ test('a title is required: nothing is saved and the field says so', () => {
   expect(onSave).not.toHaveBeenCalled()
 })
 
-test('a failed save keeps the modal open and says why', async () => {
+test('a failed save keeps the modal open and says why, in our words', async () => {
   const { onSave, onClose } = setup()
-  onSave.mockRejectedValue(new Error('Title taken'))
+  onSave.mockRejectedValue(new Error('groups-max'))
   fireEvent.change(title(), { target: { value: 'X' } })
   fireEvent.click(screen.getByRole('button', { name: en.groups.create }))
-  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Title taken'))
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(en.groups.maxGroups.replace('{n}', '10')))
   expect(onClose).not.toHaveBeenCalled()
   expect(screen.getByRole('button', { name: en.groups.create })).toBeEnabled()
 })

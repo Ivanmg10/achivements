@@ -133,7 +133,7 @@ export default function MainHeader() {
         <div className="flex items-center gap-1 shrink-0 z-10">
           <Link
             href="/"
-            aria-label="Home"
+            aria-label={T.header.home}
             aria-current={isHome ? 'page' : undefined}
             className={`inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring ${isHome ? 'text-accent bg-accent/[0.14]' : 'text-text-secondary hover:text-text-main hover:bg-ink/[0.08]'}`}
           >
@@ -142,7 +142,7 @@ export default function MainHeader() {
           {!isHome && (
             <button
               onClick={() => { if (!tryHandleBack()) router.back() }}
-              aria-label="Go back"
+              aria-label={T.header.goBack}
               className="inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
             >
               <IconChevronLeft className="w-[1.125rem] h-[1.125rem]" aria-hidden="true" />
@@ -151,7 +151,7 @@ export default function MainHeader() {
 
           {/* Desktop nav - visible on md+ */}
           {hasPlatform && (
-          <nav className="hidden md:flex items-center ml-1.5" aria-label="Main navigation">
+          <nav className="hidden md:flex items-center ml-1.5" aria-label={T.header.mainNav}>
             <StatusNavDropdown
               items={statusItems.map(({ href, label }) => ({
                 href: session ? href : '/authPage',
@@ -188,7 +188,6 @@ export default function MainHeader() {
         <div className="hidden lg:flex flex-[0_1_32.5rem] mx-auto min-w-0">
           <button
             onClick={openSearch}
-            aria-label="Search games"
             className={`flex w-full h-11 rounded-field pl-3.5 pr-2 text-sm text-text-secondary text-left transition-[background-color,box-shadow] duration-(--motion-hover) focus-ring items-center gap-2.5 cursor-text ring-1 ring-inset pointer-events-auto ${isGameInfo ? 'bg-ink/10 backdrop-blur-sm ring-ink/20 hover:bg-ink/20' : 'bg-bg-main shadow-sunken ring-ink/[0.08] hover:ring-accent/50'}`}
           >
             <span aria-hidden="true" className={`${MARK} shrink-0 text-xl font-extrabold leading-none text-accent`} />
@@ -205,7 +204,7 @@ export default function MainHeader() {
           {hasPlatform && (
           <button
             onClick={openSearch}
-            aria-label="Search games"
+            aria-label={T.search.placeholder}
             className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
           >
             <IconSearch className="w-5 h-5" aria-hidden="true" />

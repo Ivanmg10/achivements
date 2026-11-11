@@ -17,7 +17,7 @@ const COUNT_MAX = 1_000_000
 
 export type GroupFields = { title: string; description: string | null; icon: string | null; is_public: boolean }
 
-type Result<T> = { ok: true; value: T } | { ok: false; message: string }
+type Result<T> = { ok: true; value: T } | { ok: false; code: string }
 
 const isUrl = (s: string) => /^https?:\/\//i.test(s)
 
@@ -25,19 +25,19 @@ const isUrl = (s: string) => /^https?:\/\//i.test(s)
 export function readGroupFields(body: unknown): Result<GroupFields> {
   const { title, description, icon, is_public } = (body ?? {}) as Record<string, unknown>
 
-  if (typeof title !== 'string' || !title.trim()) return { ok: false, message: 'El título es obligatorio' }
-  if (title.trim().length > GROUP_TITLE_MAX) return { ok: false, message: `Título: máximo ${GROUP_TITLE_MAX} caracteres` }
+  if (typeof title !== 'string' || !title.trim()) return { ok: false, code: 'title-required' }
+  if (title.trim().length > GROUP_TITLE_MAX) return { ok: false, code: 'title-too-long' }
 
-  if (description != null && typeof description !== 'string') return { ok: false, message: 'Descripción no válida' }
+  if (description != null && typeof description !== 'string') return { ok: false, code: 'description-invalid' }
   if (typeof description === 'string' && description.length > GROUP_DESCRIPTION_MAX) {
-    return { ok: false, message: `Descripción: máximo ${GROUP_DESCRIPTION_MAX} caracteres` }
+    return { ok: false, code: 'description-too-long' }
   }
 
-  if (icon != null && typeof icon !== 'string') return { ok: false, message: 'Icono no válido' }
+  if (icon != null && typeof icon !== 'string') return { ok: false, code: 'icon-invalid' }
   const iconText = typeof icon === 'string' ? icon.trim() : ''
-  if (iconText.length > (isUrl(iconText) ? ICON_URL_MAX : ICON_TEXT_MAX)) return { ok: false, message: 'Icono no válido' }
+  if (iconText.length > (isUrl(iconText) ? ICON_URL_MAX : ICON_TEXT_MAX)) return { ok: false, code: 'icon-invalid' }
 
-  if (is_public != null && typeof is_public !== 'boolean') return { ok: false, message: 'is_public debe ser booleano' }
+  if (is_public != null && typeof is_public !== 'boolean') return { ok: false, code: 'visibility-invalid' }
 
   return {
     ok: true,
@@ -63,10 +63,10 @@ export function readItemCounts(body: Record<string, unknown>): Result<ItemCounts
     points_won: body.points_won ?? 0,
     max_points: body.max_points ?? 0,
   }
-  if (!Object.values(counts).every(isCount)) return { ok: false, message: 'Contadores no válidos' }
+  if (!Object.values(counts).every(isCount)) return { ok: false, code: 'invalid-counts' }
   const c = counts as ItemCounts
   if (c.num_awarded > c.max_possible || c.points_won > c.max_points) {
-    return { ok: false, message: 'Contadores no válidos' }
+    return { ok: false, code: 'invalid-counts' }
   }
   return { ok: true, value: c }
 }
@@ -86,13 +86,13 @@ export function readItemFields(body: unknown): Result<ItemFields> {
   const pct_won = b.pct_won ?? 0
 
   if (!Number.isInteger(game_id) || (game_id as number) <= 0 || typeof title !== 'string' || !title.trim()) {
-    return { ok: false, message: 'Datos incompletos' }
+    return { ok: false, code: 'incomplete' }
   }
   if (title.length > ITEM_TEXT_MAX || !optionalText(image_icon, ITEM_IMAGE_MAX) || !optionalText(console_name, ITEM_TEXT_MAX)) {
-    return { ok: false, message: 'Datos no válidos' }
+    return { ok: false, code: 'invalid-data' }
   }
   // A fraction: 1 is complete.
-  if (typeof pct_won !== 'number' || !(pct_won >= 0 && pct_won <= 1)) return { ok: false, message: 'Datos no válidos' }
+  if (typeof pct_won !== 'number' || !(pct_won >= 0 && pct_won <= 1)) return { ok: false, code: 'invalid-data' }
 
   const counts = readItemCounts(b)
   if (!counts.ok) return counts

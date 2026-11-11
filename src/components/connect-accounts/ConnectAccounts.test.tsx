@@ -39,7 +39,7 @@ test('never shows made-up games in place of a library', () => {
 test('connects RetroAchievements without leaving the page', async () => {
   render(<ConnectAccounts />)
   expect(screen.queryByTestId('ra-modal')).not.toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userData.signInRA) }))
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userData.connectRA) }))
   expect(await screen.findByTestId('ra-modal')).toBeInTheDocument()
 })
 

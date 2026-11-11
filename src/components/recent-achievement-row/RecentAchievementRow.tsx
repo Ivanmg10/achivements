@@ -4,6 +4,7 @@ import type { RecentAchievement } from '@/types/types'
 import { achievementBadgeUrl } from '@/utils/utils'
 import { gameHref } from '@/utils/gameRef'
 import { useSubject } from '@/context/SubjectContext'
+import { useLanguage } from '@/context/LanguageContext'
 
 /**
  * One unlock in the day / week / period modals: badge, title, game, and RA's
@@ -12,6 +13,7 @@ import { useSubject } from '@/context/SubjectContext'
  */
 export default function RecentAchievementRow({ ach, onNavigate }: { ach: RecentAchievement; onNavigate: () => void }) {
   const subject = useSubject()
+  const { T, lang } = useLanguage()
   const badge = achievementBadgeUrl(ach)
   // Steam, PSN and Xbox unlocks have no points.
   const isSteam = ach.Source === 'steam' || ach.Source === 'psn' || ach.Source === 'xbox'
@@ -34,7 +36,7 @@ export default function RecentAchievementRow({ ach, onNavigate }: { ach: RecentA
       </div>
       {!isSteam && (
         <span className={`text-xs shrink-0 ${ach.HardcoreMode === '1' ? 'text-warning font-semibold' : 'text-text-secondary'}`}>
-          {ach.Points}pts
+          {ach.Points.toLocaleString(lang)} {T.libraryDetail.pointsShort}
         </span>
       )}
     </Link>

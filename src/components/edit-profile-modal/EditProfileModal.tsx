@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button'
 import { Field, fieldClass } from '@/components/ui/Input'
 import Notice from '@/components/ui/Notice'
 import Kicker from '@/components/ui/Kicker'
+import { profileFieldError } from '@/utils/apiErrors'
 
 /** The avatar has its own modal (`AvatarModal`). */
 export type EditProfileField = 'name' | 'email'
@@ -70,11 +71,7 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
       const data = await res.json().catch(() => ({}))
 
       if (!res.ok) {
-        const byCode: Record<string, string> = {
-          'wrong-password': T.changePassword.wrongPassword,
-          'too-many-attempts': T.changePassword.tooManyAttempts,
-        }
-        setError(byCode[data.error] ?? data.error ?? T.editProfileModal.errorGeneric)
+        setError(profileFieldError(data.error, T))
         return
       }
 

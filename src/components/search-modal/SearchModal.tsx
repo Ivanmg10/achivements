@@ -178,7 +178,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                       <SearchModalRow
                         media={<span className="text-[0.625rem] font-bold text-text-secondary">#{directGameId}</span>}
                         title={T.search.openById}
-                        sub={`Game ID ${directGameId}`}
+                        sub={`${T.search.gameId} ${directGameId}`}
                         onSelect={() => handleSelect({ source: 'ra', id: directGameId })}
                       />
                     </li>
