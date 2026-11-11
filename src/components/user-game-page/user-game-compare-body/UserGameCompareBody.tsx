@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import Button from '@/components/ui/Button'
 import GameTableLoading from '@/components/game-page-states/game-table-loading/GameTableLoading'
-import { GAME_SECTION_WIDTH } from '@/components/game-page-states/gameSectionWidth'
+import { GAME_COLUMN, GAME_SECTION_WIDTH } from '@/components/game-page-states/gameSectionWidth'
 
 /**
  * A game as a user has it, the same on every platform: the blurred art, your banner on top, the
@@ -38,7 +38,7 @@ export default function UserGameCompareBody({
     <>
       {background}
       {banner}
-      <div className="relative w-full flex flex-col items-center">
+      <div className={GAME_COLUMN}>
         {header}
         <div className={`${GAME_SECTION_WIDTH} mt-7 mb-7`}>
           {isLoading ? (

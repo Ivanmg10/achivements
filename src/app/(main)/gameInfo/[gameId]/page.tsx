@@ -1,6 +1,7 @@
 'use client'
 
 import { notFound, useParams } from 'next/navigation'
+import { GAME_COLUMN } from '@/components/game-page-states/gameSectionWidth'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGameInfo } from '@/hooks/useGameInfo'
 import Button from '@/components/ui/Button'
@@ -46,7 +47,7 @@ export default function GameInfo() {
   return (
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <GameInfoHeroBackground imagePath={heroImage} />
-      <div className="relative w-full flex flex-col items-center">
+      <div className={GAME_COLUMN}>
         <GameInfoHeader gameData={game} actions={(game.NumAchievements ?? 0) > 0 && <GameAiExport getSource={() => raAiSource(game)} />}>
           {showSelector && (
             <GameInfoSubsetSelector
