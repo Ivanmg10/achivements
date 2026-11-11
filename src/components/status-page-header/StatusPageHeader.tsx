@@ -29,6 +29,7 @@ export default function StatusPageHeader({
     playing:    T.mainPage.playing,
     wantToPlay: T.mainPage.wantToPlay,
     completed:  T.mainPage.completed,
+    all:        T.mainPage.allGames,
   }
 
   const label = CATEGORY_LABELS[category] ?? category

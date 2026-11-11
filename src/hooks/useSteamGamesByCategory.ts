@@ -3,30 +3,25 @@ import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { byCompletedDesc } from '@/utils/completionDates'
 import { classifySteamGame, hasUnloadedProgress } from '@/utils/steamFeed'
+import { inCategory } from '@/utils/libraryCategory'
 import type { SteamGameProgress } from '@/types/steam'
-import type { GameStatus } from '@/types/game'
-
-function isSteamCategory(cat: string): cat is GameStatus {
-  return cat === 'wantToPlay' || cat === 'playing' || cat === 'completed'
-}
 
 function byLastPlayedDesc(a: SteamGameProgress, b: SteamGameProgress) {
   return (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? '')
 }
 
-/** Steam games for one category page, derived from the shared library. */
+/** Steam games for one category page ("all" for every status), derived from the shared library. */
 export function useSteamGamesByCategory(category: string) {
   const { isLinked, library, libraryLoading, libraryError, refetch } = useSteamGamesData()
   const { isHidden } = useHiddenGames()
 
   const games = useMemo(() => {
-    if (!isSteamCategory(category)) return []
     // Games the user hid from their lists stay out.
-    const inCategory = library.filter((g) => classifySteamGame(g) === category && !isHidden(g.id, 'steam'))
+    const listed = library.filter((g) => inCategory(classifySteamGame(g), category) && !isHidden(g.id, 'steam'))
     // The backlog has no play dates to sort by; alphabetical is the useful order.
     return category === 'wantToPlay'
-      ? inCategory.sort((a, b) => a.title.localeCompare(b.title))
-      : inCategory.sort(category === 'completed' ? byCompletedDesc((g) => g.lastUnlock) : byLastPlayedDesc)
+      ? listed.sort((a, b) => a.title.localeCompare(b.title))
+      : listed.sort(category === 'completed' ? byCompletedDesc((g) => g.lastUnlock) : byLastPlayedDesc)
   }, [category, library, isHidden])
 
   /**

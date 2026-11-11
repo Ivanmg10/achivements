@@ -103,6 +103,9 @@ export const ru: Translations = {
       older: { title: 'Раньше', hint: 'Ваш зал трофеев' },
       start: { title: 'Начните с этих', hint: 'Самые короткие игры в списке' },
       backlog: { title: 'Всё остальное', hint: 'Ещё ждут' },
+      playing: { title: 'В процессе', hint: 'Сначала недавние' },
+      completed: { title: 'Завершённые', hint: 'Ваши последние 100%' },
+      wantToPlay: { title: 'Не начаты', hint: 'Сначала самые короткие' },
     },
   },
   mainPage: {
@@ -110,6 +113,7 @@ export const ru: Translations = {
     noGamesInProgressSub: 'Начните игру на RetroAchievements, и она появится здесь',
     wantToPlay: 'Не начаты',
     completed: 'Завершённые',
+    allGames: 'Все игры',
   },
   pinnedGames: {
     title: 'Pinned games',
@@ -692,6 +696,8 @@ export const ru: Translations = {
     noWantToPlaySub: 'Здесь появляются игры, в которых вы ещё ничего не получили, и ваш список «Want to Play» на RetroAchievements',
     noPlaying: 'Здесь ничего в процессе',
     noPlayingSub: 'Начните игру, и она появится здесь',
+    noGames: 'Игр пока нет',
+    noGamesSub: 'Подключите аккаунт, и ваши игры появятся здесь',
     noCompleted: 'Нет завершённых игр на этой консоли',
     noCompletedSub: 'Завершите игру, и она появится здесь',
     showAllGames: 'Показать все игры ({n})',

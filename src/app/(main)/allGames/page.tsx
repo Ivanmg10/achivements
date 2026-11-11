@@ -1,45 +1,8 @@
 'use client'
 
-import NoMainHeader from '@/components/no-main-header/NoMainHeader'
-import AllGamesSection from '@/components/all-games-section/AllGamesSection'
-import SteamCategorySection from '@/components/steam/steam-category-section/SteamCategorySection'
-import { useAllGamesGlobal } from '@/hooks/useAllGamesGlobal'
-import { useGameExtraData } from '@/hooks/useGameExtraData'
-import { useLanguage } from '@/context/LanguageContext'
-import { SectionFallback } from '@/components/ui/SectionFallback'
+import LibraryPage from '@/components/library-page/LibraryPage'
 
-const CATEGORIES = ['wantToPlay', 'playing', 'completed'] as const
-
+/** Every game of every platform: the library page with "all" as one more status (#129, MejTodosRework). */
 export default function AllGamesPage() {
-  const { wantToPlay, playing, completed, loading, error, refetch } = useAllGamesGlobal()
-  const extraData = useGameExtraData()
-  const { T } = useLanguage()
-
-  const raGames = { wantToPlay, playing, completed }
-
-  return (
-    <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main">
-      <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
-        <NoMainHeader />
-
-        {CATEGORIES.map((category) => (
-          <div key={category} className="flex flex-col gap-4">
-            <SectionFallback error={error} onRefresh={refetch}>
-              <AllGamesSection
-                category={category}
-                games={raGames[category]}
-                loading={loading}
-                extraData={extraData}
-              />
-            </SectionFallback>
-            {/* Renders nothing unless Steam is linked, so no empty card for RA-only users. */}
-            <SteamCategorySection
-              category={category}
-              title={`Steam · ${T.categories[category]}`}
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+  return <LibraryPage category="all" />
 }

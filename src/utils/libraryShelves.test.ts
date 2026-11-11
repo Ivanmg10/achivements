@@ -69,6 +69,22 @@ test('want to play: the shortest games first, the rest by name', () => {
   expect(shelves(many, 'wantToPlay').backlog).toEqual(['g10', 'g9'])
 })
 
+test('all games: what was played this week, then one shelf per status, each opening its own filter', () => {
+  const list = [
+    steam('recent', 50, 2, {}),
+    steam('old-play', 30, 40),
+    steam('done', 100, 100),
+    steam('pending', null, null),
+  ]
+  const [recent, oldPlay, done, pending] = list
+  Object.assign(recent, { status: 'playing' })
+  Object.assign(oldPlay, { status: 'playing' })
+  Object.assign(done, { status: 'completed', completedAt: daysAgo(100) })
+  Object.assign(pending, { status: 'wantToPlay' })
+  expect(shelves(list, 'all')).toEqual({ continue: ['recent'], playing: ['old-play'], completed: ['done'], wantToPlay: ['pending'] })
+  expect(buildShelves(list, 'all', NOW).map((s) => s.quick)).toEqual(['all', 'playing', 'completed', 'wantToPlay'])
+})
+
 describe('entries of any platform', () => {
   const ra = { kind: 'ra', key: 'ra:5', title: 'Sonic', pct: 50, lastPlayed: null, game: { GameID: 5, MaxPossible: 24 } } as unknown as LibraryEntry
   const raWant = { kind: 'ra', key: 'ra:6', title: 'Zelda', pct: null, lastPlayed: null, game: { ID: 6, AchievementsPublished: 40 } } as unknown as LibraryEntry

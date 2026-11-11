@@ -56,6 +56,15 @@ test('only fetches getWantPlayGames for the wantToPlay category', async () => {
   expect((result.current.games as WantToPlayGame[]).map((g) => g.ID)).toEqual([99])
 })
 
+test('"all" is every game started, once each, then the want-to-play list (read for it too)', async () => {
+  ;(fetchWithRetry as jest.Mock).mockResolvedValue({ Results: [{ ID: 1, ConsoleName: 'PS2' }, { ID: 99, ConsoleName: 'PS2' }] })
+  const { result } = renderHook(() => useGamesByCategory('all'))
+  await waitFor(() => expect(result.current.loading).toBe(false))
+
+  expect(fetchWithRetry).toHaveBeenCalledWith('/api/getWantPlayGames')
+  expect(result.current.games.map((g) => ('GameID' in g && g.GameID) || (g as WantToPlayGame).ID)).toEqual([1, 2, 99])
+})
+
 test('filters by consoleId when provided', async () => {
   const { result } = renderHook(() => useGamesByCategory('completed', '21'))
   await waitFor(() => expect(result.current.loading).toBe(false))

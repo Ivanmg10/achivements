@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { IconPlayerPlay, IconHeart, IconCheck, IconFolder, IconUsers, IconListDetails, IconTrophy, IconChevronDown } from '@tabler/icons-react'
+import { IconPlayerPlay, IconHeart, IconCheck, IconLayoutGrid, IconFolder, IconUsers, IconListDetails, IconTrophy, IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import Modal from '@/components/ui/Modal'
@@ -30,6 +30,7 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
     { href: '/wantToPlay', label: T.mainPage.wantToPlay, icon: IconHeart },
     { href: '/playing', label: T.mainPage.playing, icon: IconPlayerPlay },
     { href: '/completed', label: T.mainPage.completed, icon: IconCheck },
+    { href: '/allGames', label: T.mainPage.allGames, icon: IconLayoutGrid },
   ]
   const navItems = [
     { href: '/groups', label: T.groups.title, icon: IconFolder },

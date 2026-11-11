@@ -3,6 +3,7 @@ import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { byCompletedDesc } from '@/utils/completionDates'
 import { classifyXboxGame, xboxHasAchievements } from '@/utils/xboxTitles'
+import { inCategory } from '@/utils/libraryCategory'
 
 /**
  * Xbox games for one category page, derived from the shared list — like
@@ -16,7 +17,7 @@ export function useXboxGamesByCategory(category: string) {
 
   const games = useMemo(
     () => {
-      const list = library.filter((g) => xboxHasAchievements(g) && classifyXboxGame(g) === category && !isHidden(g.id, 'xbox'))
+      const list = library.filter((g) => xboxHasAchievements(g) && inCategory(classifyXboxGame(g), category) && !isHidden(g.id, 'xbox'))
       return category === 'completed' ? list.sort(byCompletedDesc((g) => g.completedAt)) : list
     },
     [category, library, isHidden],

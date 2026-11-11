@@ -9,6 +9,7 @@ import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import { usePsnGamesByCategory } from '@/hooks/usePsnGamesByCategory'
 import { useXboxGamesByCategory } from '@/hooks/useXboxGamesByCategory'
 import { useRaLinked } from '@/hooks/useRaLinked'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { usePreviewLayout } from '@/hooks/usePreviewLayout'
 import { useLibraryPrefs } from '@/hooks/useLibraryPrefs'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
@@ -18,7 +19,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { titleMatches } from '@/utils/gameCandidates'
 import { raPreviewGames } from '@/utils/sectionPreview'
 import {
-  buildEntries, countQuick, matchesQuick, mixedSortKeys, psnProgress, raProgress, sortEntries, steamProgress, xboxProgress, type QuickFilter,
+  buildEntries, countQuick, matchesQuick, quickFiltersFor, mixedSortKeys, psnProgress, raProgress, sortEntries, steamProgress, xboxProgress, type QuickFilter,
 } from '@/utils/libraryInsights'
 import { countBySource } from '@/utils/libraryShelves'
 import { raGameId } from '@/utils/gameRef'
@@ -77,11 +78,15 @@ export default function LibraryPage({ category: cat }: { category: string }) {
     setSelectedKey(null)
     setPlatform('all')
   })
-  const quick = cat === 'playing' ? quickChoice : 'all'
+  // "All games" is the library with every status: its quick filters are the statuses (#129, MejTodosRework).
+  const isAll = cat === 'all'
+  const quickFilters = quickFiltersFor(cat)
+  const quick = quickFilters.includes(quickChoice) ? quickChoice : 'all'
   const { isLinked: steamLinked } = useSteamGamesData({ passive: true })
   // A Steam-only user has no RA list to show — its empty state would tell them
   // to go play on RetroAchievements. No RA account, no RA section — not even an empty one.
   const showRa = useRaLinked()
+  const { status: sessionStatus } = useAuthSession()
 
   const consolePills = useMemo(() => buildConsolePills(games), [games])
   const filteredGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
@@ -100,7 +105,8 @@ export default function LibraryPage({ category: cat }: { category: string }) {
 
   // Platforms beside each other, or every game in one list: the choice only exists with 2+ platforms.
   const platformCount = (showRa ? 1 : 0) + (steamLinked ? 1 : 0) + (psnShown ? 1 : 0) + (xboxShown ? 1 : 0)
-  const mixed = platformCount > 1 && view === 'all'
+  // On "all games" the cards are always together: a game's status, not its platform, is what the page sorts by.
+  const mixed = platformCount > 0 && (isAll || (platformCount > 1 && view === 'all'))
   const mixedLoading = (showRa && loading) || (steamLinked && steamLoading) || (psnShown && psnLoading) || (xboxShown && xboxLoading)
   // Shelves and the list read every platform together; only the cards view keeps them apart.
   const explorer = layout !== 'cards' && platformCount > 0
@@ -188,8 +194,8 @@ export default function LibraryPage({ category: cat }: { category: string }) {
   const errorLine = errors.length > 0 && <p role="alert" className="text-sm text-danger">{errors.join(' · ')}</p>
 
   const layoutToggle = platformCount > 0 && <LibraryLayoutToggle value={layout} onChange={setLayout} />
-  const quickRow = cat === 'playing' && <LibraryQuickFilters value={quick} counts={quickCounts} onChange={setQuick} />
-  const viewToggle = platformCount > 1 && <LibraryViewToggle value={view} onChange={setView} />
+  const quickRow = quickFilters.length > 0 && <LibraryQuickFilters value={quick} counts={quickCounts} filters={quickFilters} onChange={setQuick} />
+  const viewToggle = !isAll && platformCount > 1 && <LibraryViewToggle value={view} onChange={setView} />
   const gridControl = <StatusGridControl cols={gridCols} onChange={setGridCols} />
   const search = <CategorySearch value={query} onChange={explorer ? changeQuery : setQuery} />
   const completedFilter = cat === 'completed' && <CompletedFilter value={completedMode} onChange={setCompletedMode} />
@@ -227,7 +233,7 @@ export default function LibraryPage({ category: cat }: { category: string }) {
   function body() {
     if (explorer) {
       if (mixedLoading) return <LibraryExplorerSkeleton layout={layout === 'list' ? 'list' : 'shelves'} />
-      const quickShown = layout === 'list' && cat === 'playing'
+      const quickShown = layout === 'list' && quickFilters.length > 0
       return (
         <>
           <StatusPageHeader category={cat} gameCount={hasTabs || quickShown ? undefined : platformEntries.length}>
@@ -282,6 +288,18 @@ export default function LibraryPage({ category: cat }: { category: string }) {
       )
     }
 
+    // No platform connected at all: the title and what to do, never an empty toolbar. While the session
+    // is read nothing is known to be connected yet: the skeleton holds the room.
+    if (platformCount === 0) {
+      if (sessionStatus === 'loading') return <StatusPageSkeleton cols={gridCols} />
+      return (
+        <>
+          <StatusPageHeader category={cat} />
+          {/* Whatever the status, what is missing is an account: the "all" empty state says to connect one. */}
+          <StatusEmptyState category="all" className="min-h-[60vh]" />
+        </>
+      )
+    }
     // Steam, PSN or Xbox without RA: the sections alone, under the same title and controls.
     if (!showRa) {
       return (

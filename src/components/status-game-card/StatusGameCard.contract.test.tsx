@@ -208,7 +208,7 @@ describe.each(PLATFORMS.filter((p) => p.lines))('the lines under the bar: $name'
 
   test('on Completed it says when the game was finished, not when it was last played', () => {
     render(p.card({ category: 'completed', finishedAt: '2021-12-23T00:26:33Z', lastPlayed: '2026-10-25T14:18:57Z' }))
-    expect(screen.getByText(new RegExp(en.libraryDetail.finished))).toHaveTextContent(new Date('2021-12-23T00:26:33Z').toLocaleDateString('en'))
+    expect(screen.getByText(new RegExp(en.libraryDetail.finished))).toHaveTextContent('Dec 23, 2021')
     expect(screen.queryByText(new RegExp(en.steam.lastPlayed))).not.toBeInTheDocument()
   })
 

@@ -12,7 +12,7 @@ import LibraryToolbar from '@/components/library-toolbar/LibraryToolbar'
 import StatusSortControl, { type StatusSortState } from '@/components/status-sort-control/StatusSortControl'
 import type { LibraryLayout } from '@/components/library-layout-toggle/LibraryLayoutToggle'
 import type { PlatformChoice } from '@/components/library-platform-tabs/LibraryPlatformTabs'
-import { countQuick, mixedSortKeys, sortEntries, type LibraryEntry, type QuickFilter } from '@/utils/libraryInsights'
+import { countQuick, mixedSortKeys, quickFiltersFor, sortEntries, type LibraryEntry, type QuickFilter } from '@/utils/libraryInsights'
 import { filterEntries } from '@/utils/libraryShelves'
 
 export const SEARCH_ID = 'category-search'
@@ -68,6 +68,7 @@ export default function LibraryExplorer({
   const [seed] = useState(() => Math.floor(Math.random() * 2 ** 31))
 
   const searched = useMemo(() => filterEntries(entries, { query, source: 'all', quick: 'all' }), [entries, query])
+  const quickFilters = quickFiltersFor(category)
   const quickCounts = useMemo(() => countQuick(searched), [searched])
   const list = useMemo(() => sortEntries(filterEntries(entries, { query, source: 'all', quick }), sort), [entries, query, quick, sort])
 
@@ -105,7 +106,7 @@ export default function LibraryExplorer({
       <div className="flex flex-col gap-4">
         <LibraryToolbar
           search={search}
-          filters={layout === 'list' && category === 'playing' && <LibraryQuickFilters value={quick} counts={quickCounts} onChange={onQuick} />}
+          filters={layout === 'list' && quickFilters.length > 0 && <LibraryQuickFilters value={quick} counts={quickCounts} filters={quickFilters} onChange={onQuick} />}
           end={
             <>
               {layout === 'list' && <StatusSortControl cat={category} keys={mixedSortKeys(category)} sortState={sort} onChange={onSort} />}

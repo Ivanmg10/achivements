@@ -117,6 +117,7 @@ export default function MainHeader() {
     { href: '/wantToPlay', label: T.mainPage.wantToPlay },
     { href: '/playing', label: T.mainPage.playing },
     { href: '/completed', label: T.mainPage.completed },
+    { href: '/allGames', label: T.mainPage.allGames },
   ]
   const navItems = [
     { href: '/groups', label: T.groups.title },

@@ -59,7 +59,7 @@ export default function LibraryShelf({
       <div className={`${GRID} enter-cards`}>
         {shown.map((e, i) => (
           <div key={e.key} className={slot(cells[i], i)}>
-            <LibraryShelfCard entry={e} size={cells[i].size} completed={shelf.id === 'recent' || shelf.id === 'older'} onPick={onPick} />
+            <LibraryShelfCard entry={e} size={cells[i].size} completed={shelf.id === 'recent' || shelf.id === 'older' || shelf.id === 'completed'} onPick={onPick} />
           </div>
         ))}
       </div>

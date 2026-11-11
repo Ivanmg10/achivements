@@ -103,6 +103,9 @@ export const es: Translations = {
       older: { title: 'Anteriores', hint: 'Tu sala de trofeos' },
       start: { title: 'Para empezar ya', hint: 'Los más cortos de tu lista' },
       backlog: { title: 'El resto', hint: 'Pendientes' },
+      playing: { title: 'En progreso', hint: 'Por orden de última partida' },
+      completed: { title: 'Completados', hint: 'Tus últimos al 100%' },
+      wantToPlay: { title: 'Sin empezar', hint: 'Los más cortos primero' },
     },
   },
   mainPage: {
@@ -110,6 +113,7 @@ export const es: Translations = {
     noGamesInProgressSub: 'Empieza un juego en RetroAchievements y aparecerá aquí',
     wantToPlay: 'Sin empezar',
     completed: 'Completados',
+    allGames: 'Todos los juegos',
   },
   pinnedGames: {
     title: 'Juegos fijados',
@@ -692,6 +696,8 @@ export const es: Translations = {
     noWantToPlaySub: 'Aquí aparecen los juegos en los que aún no has conseguido nada, y tu lista de «Quiero jugar» de RetroAchievements',
     noPlaying: 'No hay nada en progreso aquí',
     noPlayingSub: 'Empieza un juego y aparecerá aquí',
+    noGames: 'Aún no hay juegos',
+    noGamesSub: 'Conecta una cuenta y tus juegos aparecerán aquí',
     noCompleted: 'Sin completados en esta consola',
     noCompletedSub: 'Completa un juego y aparecerá aquí',
     showAllGames: 'Ver los {n} juegos',

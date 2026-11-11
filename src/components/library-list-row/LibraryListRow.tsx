@@ -7,6 +7,7 @@ import LibraryPlatformBadge from '@/components/library-platform-badge/LibraryPla
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { entryHref } from '@/utils/libraryShelves'
 import type { LibraryEntry } from '@/utils/libraryInsights'
+import { detailCategory } from '@/utils/libraryCategory'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/dates'
 
@@ -21,9 +22,9 @@ import { formatDate } from '@/utils/dates'
 export default function LibraryListRow({ entry, current, category, onSelect }: { entry: LibraryEntry; current: boolean; category?: string; onSelect: (entry: LibraryEntry) => void }) {
   const { T, lang } = useLanguage()
   // On Completed, when it was completed: playing a DLC later does not make it a recent one.
-  const finished = category === 'completed' ? entry.completedAt ?? null : null
+  const finished = category && detailCategory(category, entry.status) === 'completed' ? entry.completedAt ?? null : null
   const date = finished ?? entry.lastPlayed
-  const when = date ? formatDate(date, lang, { day: 'numeric', month: 'short', year: 'numeric' }) : null
+  const when = date ? formatDate(date, lang) : null
   const href = entryHref(entry)
   const pct = entry.pct === null ? null : Math.min(100, Math.max(0, entry.pct))
 

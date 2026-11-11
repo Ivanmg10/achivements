@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import type { LibraryEntry } from '@/utils/libraryInsights'
+import { detailCategory } from '@/utils/libraryCategory'
 import { STATUS_GRID_COLS } from '@/components/status-grid-control/statusGridCols'
 import StatusGameItem from '@/components/statusGameList/StatusGameItem'
 import SteamStatusGameItem from '@/components/steam/steam-status-game-item/SteamStatusGameItem'
@@ -31,13 +32,13 @@ export default function LibraryAllList({
     <div className={`grid gap-3 items-start w-full enter-cards ${STATUS_GRID_COLS[gridCols]}`}>
       {entries.map((e) =>
         e.kind === 'ra' ? (
-          <StatusGameItem key={e.key} game={e.game} extra={e.extra} category={category} />
+          <StatusGameItem key={e.key} game={e.game} extra={e.extra} category={detailCategory(category, e.status)} />
         ) : e.kind === 'steam' ? (
-          <SteamStatusGameItem key={e.key} game={e.game} category={category} />
+          <SteamStatusGameItem key={e.key} game={e.game} category={detailCategory(category, e.status)} />
         ) : e.kind === 'psn' ? (
-          <PsnStatusGameItem key={e.key} game={e.game} category={category} />
+          <PsnStatusGameItem key={e.key} game={e.game} category={detailCategory(category, e.status)} />
         ) : (
-          <XboxStatusGameItem key={e.key} game={e.game} category={category} />
+          <XboxStatusGameItem key={e.key} game={e.game} category={detailCategory(category, e.status)} />
         ),
       )}
     </div>

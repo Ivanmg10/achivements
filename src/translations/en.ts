@@ -104,6 +104,9 @@ export const en = {
       older: { title: 'Earlier', hint: 'Your trophy room' },
       start: { title: 'Start with these', hint: 'The shortest games on your list' },
       backlog: { title: 'Everything else', hint: 'Still waiting' },
+      playing: { title: 'In progress', hint: 'Latest played first' },
+      completed: { title: 'Completed', hint: 'Your latest 100%s' },
+      wantToPlay: { title: 'Not started', hint: 'Shortest first' },
     },
   },
   mainPage: {
@@ -111,6 +114,7 @@ export const en = {
     noGamesInProgressSub: 'Start a game on RetroAchievements and it will appear here',
     wantToPlay: 'Not started',
     completed: 'Completed',
+    allGames: 'All games',
   },
   pinnedGames: {
     title: 'Pinned games',
@@ -693,6 +697,8 @@ export const en = {
     noWantToPlaySub: 'Games you have not earned anything in yet, and your Want to Play list on RetroAchievements, show up here',
     noPlaying: 'Nothing in progress here',
     noPlayingSub: 'Start a game and it will appear here',
+    noGames: 'No games yet',
+    noGamesSub: 'Connect an account and your games will appear here',
     noCompleted: 'No completions on this console yet',
     noCompletedSub: 'Complete a game and it will appear here',
     showAllGames: 'Show all {n} games',

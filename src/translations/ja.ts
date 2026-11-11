@@ -103,6 +103,9 @@ export const ja: Translations = {
       older: { title: 'それ以前', hint: 'トロフィールーム' },
       start: { title: 'まずはこれから', hint: 'リストの中で最も短いゲーム' },
       backlog: { title: '残りすべて', hint: 'まだ待っています' },
+      playing: { title: '進行中', hint: '最近プレイした順' },
+      completed: { title: 'コンプリート', hint: '直近の100%' },
+      wantToPlay: { title: '未着手', hint: '短い順' },
     },
   },
   mainPage: {
@@ -110,6 +113,7 @@ export const ja: Translations = {
     noGamesInProgressSub: 'RetroAchievementsでゲームを開始するとここに表示されます',
     wantToPlay: '未着手',
     completed: 'コンプリート',
+    allGames: 'すべてのゲーム',
   },
   pinnedGames: {
     title: 'Pinned games',
@@ -692,6 +696,8 @@ export const ja: Translations = {
     noWantToPlaySub: 'まだ実績を獲得していないゲームと、RetroAchievementsの「Want to Play」リストがここに表示されます',
     noPlaying: '進行中のゲームはありません',
     noPlayingSub: 'ゲームを開始するとここに表示されます',
+    noGames: 'まだゲームがありません',
+    noGamesSub: 'アカウントを連携するとゲームがここに表示されます',
     noCompleted: 'このコンソールで完了したゲームはまだありません',
     noCompletedSub: 'ゲームを完了するとここに表示されます',
     showAllGames: '{n}本のゲームをすべて表示',
