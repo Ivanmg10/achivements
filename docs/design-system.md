@@ -26,10 +26,16 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   text field, select, switch, checkbox, dialog, hard-coded palette colour, fixed
   `polygon(...)` or `skew-*-[..]`. If it fails, use the piece; if the piece is
   missing, add it (below).
-- **One date format** (#129, the owner on the canvas, 2026-11-07): day, short month and year in the reader's
-  language ("22 oct 2026", "Oct 22, 2026"). On screen it is `ui/DateText` (a `<time>`); where JSX cannot go,
-  `formatDate(s, lang)` with its default (`DATE_FORMAT` in `utils/dates.ts`). Never a numeric date: the guard
-  refuses `formatDate(…, lang, {})`. #130 takes it to the rest of the site.
+- **One date format** (#129, #130; the owner on the canvas, 2026-11-07): day and short month in the reader's
+  language, **the year only when it is not the current one** ("23 oct", "Oct 23", "3 oct 2025"; `dateFormat`
+  in `utils/dates.ts`). On screen it is `ui/DateText` (a `<time>`); where JSX cannot go, `formatDate(s, lang)`
+  or `formatDay(day, lang)` with no options. The guard refuses a numeric date (`formatDate(…, lang, {})`), the
+  format written by hand (`{ day: 'numeric', month: 'short' }`, with or without a year) and any
+  `toLocaleDateString` outside `utils/dates.ts` (the admin panel is exempt). What keeps its own options is
+  not "the date of something": a chart's month axis, a range of days (`MainPageMonthCompare`), a day with
+  its weekday (the journal, the streak page's rows, a day modal's title), a date with its time (the unlock
+  tooltip, RA's achievement modal). A test that pins a formatted date fixes the clock
+  (`jest.useFakeTimers({ now })`) or uses a past year, so it says the same next year.
 - **A rule that starts with offenders lists them** (#120, 2026-11-08): `NEW_RULES` in the guard, each with its
   list of files still drawing the piece by hand in `ui/uiGuard.pending.json`. A file not on its list fails; a
   file on it that no longer offends fails too, so the list only shrinks. Migrate a file, then take it off.

@@ -1,4 +1,4 @@
-import { formatDate, localDay, parseUnlockTime, unlockIso, utcDay } from './dates'
+import { dateFormat, formatDate, formatDay, localDay, parseUnlockTime, unlockIso, utcDay } from './dates'
 
 describe('parseUnlockTime', () => {
   test('a zone-less platform date is UTC, whatever the browser zone is', () => {
@@ -40,16 +40,29 @@ describe('utcDay and localDay', () => {
 })
 
 describe('formatDate', () => {
-  test('in the reader’s language', () => {
-    const en = formatDate('2026-10-03 12:00:00', 'en')
-    const es = formatDate('2026-10-03 12:00:00', 'es')
-    expect(en).toBe('Oct 3, 2026')
-    expect(es).not.toBe(en)
-    expect(es).toContain('2026')
+  // The year only when it is not this one: the clock is pinned, so the tests say the same every year.
+  beforeEach(() => jest.useFakeTimers({ now: Date.parse('2026-11-11T12:00:00Z') }))
+  afterEach(() => jest.useRealTimers())
+
+  test('day and short month in the reader’s language, no year this year', () => {
+    expect(formatDate('2026-10-03 12:00:00', 'en')).toBe('Oct 3')
+    expect(formatDate('2026-10-03 12:00:00', 'es')).toBe('3 oct')
   })
 
-  test('takes other options, and says "—" for nothing', () => {
+  test('the year when it is another one', () => {
+    expect(formatDate('2025-10-03 12:00:00', 'en')).toBe('Oct 3, 2025')
+    expect(formatDate('2027-01-01', 'es')).toBe('1 ene 2027')
+  })
+
+  test('a moment in ms, a calendar day, and the options of a date that is not one of something', () => {
+    expect(formatDate(Date.parse('2025-02-01T12:00:00Z'), 'en')).toBe('Feb 1, 2025')
+    expect(formatDay('2026-06-05', 'en')).toBe('Jun 5')
+    expect(formatDay('2024-06-05', 'en')).toBe('Jun 5, 2024')
     expect(formatDate('2026-10-03', 'en', { year: 'numeric' })).toBe('2026')
+    expect(dateFormat(new Date(2026, 0, 1), new Date(2026, 11, 31))).toEqual({ day: 'numeric', month: 'short' })
+  })
+
+  test('"—" for nothing', () => {
     expect(formatDate(null, 'en')).toBe('—')
     expect(formatDate('nope', 'es')).toBe('—')
   })

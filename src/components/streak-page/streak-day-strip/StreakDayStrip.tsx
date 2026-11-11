@@ -31,7 +31,7 @@ export default function StreakDayStrip({
   const { T, lang } = useLanguage()
   const days = daysBetween(start, end)
   const cap = stripCap(days.map((d) => counts[d] ?? 0))
-  const short = (d: string) => formatDay(d, lang, { day: 'numeric', month: 'short' })
+  const short = (d: string) => formatDay(d, lang)
 
   return (
     <div className="flex flex-col gap-2 min-w-0">

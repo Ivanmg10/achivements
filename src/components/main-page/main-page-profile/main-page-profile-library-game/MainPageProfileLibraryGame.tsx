@@ -28,7 +28,7 @@ export default function MainPageProfileLibraryGame({
   const { T, lang } = useLanguage()
   const subject = useSubject()
 
-  const when = game.lastPlayed ? formatDate(game.lastPlayed, lang, { day: 'numeric', month: 'short' }) : null
+  const when = game.lastPlayed ? formatDate(game.lastPlayed, lang) : null
   const playtime = game.playtimeMinutes !== null ? formatPlaytime(game.playtimeMinutes, T.steam, lang) : null
 
   return (

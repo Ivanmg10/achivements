@@ -28,7 +28,7 @@ export default function ShowcaseTile({
   handle?: ReactNode
 }) {
   const { T, lang } = useLanguage()
-  const date = formatDate(item.earnedAt, lang, { day: 'numeric', month: 'short', year: 'numeric' })
+  const date = formatDate(item.earnedAt, lang)
 
   return (
     <article className="relative h-full bg-bg-main rounded-tile p-3 flex flex-col items-center gap-2 text-center ring-1 ring-ink/5">

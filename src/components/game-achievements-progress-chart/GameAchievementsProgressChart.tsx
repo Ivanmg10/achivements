@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import type { InsightAchievement } from '@/utils/gameInsights'
 import { groupGameAchievementsByPeriod } from '@/utils/utils'
+import { formatDate } from '@/utils/dates'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import { LineChartSkeleton } from '@/components/ui/ChartSkeleton'
@@ -47,12 +48,12 @@ export function GameAchievementsProgressChart({
 
   const periodTitle = (start: number) =>
     period === 'week'
-      ? T.gameExpanded.weekOf.replace('{date}', new Date(start).toLocaleDateString(lang, { day: 'numeric', month: 'short' }))
-      : new Date(start).toLocaleDateString(lang, { month: 'long', year: 'numeric' })
+      ? T.gameExpanded.weekOf.replace('{date}', formatDate(start, lang))
+      : formatDate(start, lang, { month: 'long', year: 'numeric' })
 
   function tick(label: string) {
     const bucket = data.find((d) => d.label === label)
-    return bucket ? new Date(bucket.start).toLocaleDateString(lang, period === 'week' ? { day: 'numeric', month: 'short' } : { month: 'short' }) : label
+    return bucket ? (period === 'week' ? formatDate(bucket.start, lang) : formatDate(bucket.start, lang, { month: 'short' })) : label
   }
 
   function handleSelect(label: string) {

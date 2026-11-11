@@ -56,8 +56,6 @@ interface AchievementDetail {
   } | null
 }
 
-const SHORT_DATE: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short', year: '2-digit' }
-
 export default function AchievementModal({
   achievement,
   numDistinctPlayers,
@@ -255,7 +253,7 @@ export default function AchievementModal({
                               )}
                             </div>
                             <p className="text-xs text-text-secondary tabular-nums">
-                              {formatDate(u.DateAwarded, lang, SHORT_DATE)}
+                              {formatDate(u.DateAwarded, lang)}
                             </p>
                           </div>
                         ))}
@@ -305,7 +303,7 @@ export default function AchievementModal({
                             <div className="flex items-baseline gap-2">
                               <p className="text-sm font-medium">{c.User}</p>
                               <p className="text-xs text-text-secondary">
-                                {formatDate(c.Submitted, lang, SHORT_DATE)}
+                                {formatDate(c.Submitted, lang)}
                               </p>
                             </div>
                             <p className="text-sm text-text-secondary wrap-break-word">{c.CommentText}</p>

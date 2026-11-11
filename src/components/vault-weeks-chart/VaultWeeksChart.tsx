@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import DataBar from '@/components/ui/DataBar'
+import { formatDay } from '@/utils/dates'
 
 const HEIGHT = 70
 
@@ -15,8 +16,7 @@ export default function VaultWeeksChart({ weeks, className = '' }: { weeks: { st
   const { T, lang } = useLanguage()
   if (weeks.length === 0) return null
   const max = Math.max(1, ...weeks.map((w) => w.points))
-  const date = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString(lang, { day: 'numeric', month: 'short', timeZone: 'UTC' })
-  const label = (w: { start: string; points: number }) => T.rankings.weeksBar.replace('{date}', date(w.start)).replace('{n}', w.points.toLocaleString(lang))
+  const label = (w: { start: string; points: number }) => T.rankings.weeksBar.replace('{date}', formatDay(w.start, lang)).replace('{n}', w.points.toLocaleString(lang))
 
   return (
     <figure className={`flex flex-col gap-1.5 ${className}`}>

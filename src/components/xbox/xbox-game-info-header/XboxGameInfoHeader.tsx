@@ -15,7 +15,7 @@ import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
-import { formatDate } from '@/utils/dates'
+import { formatDate, formatDay } from '@/utils/dates'
 
 /**
  * The top of an Xbox game page, on the shared `GameHero` as the others: the
@@ -38,8 +38,8 @@ export default function XboxGameInfoHeader({
   const isComplete = game.pctWon >= 100
   const inProgress = game.numAwarded > 0 && !isComplete
 
-  const date = (iso: string | null, utc = false) =>
-    iso ? formatDate(iso, lang, { day: 'numeric', month: 'short', year: 'numeric', ...(utc && { timeZone: 'UTC' }) }) : null
+  // A release date is a calendar day, not a moment: read as the day it says, whatever the viewer's zone.
+  const date = (iso: string | null, day = false) => (iso ? (day ? formatDay(iso.slice(0, 10), lang) : formatDate(iso, lang)) : null)
 
   return (
     <GameHero

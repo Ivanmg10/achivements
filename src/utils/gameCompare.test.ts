@@ -92,7 +92,7 @@ describe('comparing', () => {
 })
 
 test('an unlock date reads in the given language, and nothing when there is none', () => {
-  expect(formatUnlockDate('2026-10-03 12:00:00', 'en-GB')).toBe('3 Oct 2026')
+  expect(formatUnlockDate('2025-10-03 12:00:00', 'en-GB')).toBe('3 Oct 2025')
   expect(formatUnlockDate(null, 'en')).toBeNull()
   expect(formatUnlockDate('garbage', 'en')).toBeNull()
 })

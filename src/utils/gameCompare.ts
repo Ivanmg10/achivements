@@ -1,4 +1,4 @@
-import { parseUnlockTime } from '@/utils/dates'
+import { formatDate, parseUnlockTime } from '@/utils/dates'
 import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import type { GameAchievement } from '@/types/game'
 import type { SteamAchievementUnified } from '@/types/steam'
@@ -150,9 +150,8 @@ export function firstToUnlock(row: CompareRow): 'them' | 'me' | null {
   return them < me ? 'them' : 'me'
 }
 
-/** An unlock's day in the given locale ("3 Oct 2026" in en-GB); null for a missing or unreadable date. */
+/** An unlock's day in the one format ("3 oct", "Oct 3, 2025"); null for a missing or unreadable date. */
 export function formatUnlockDate(date: string | null, lang: string): string | null {
-  if (!date) return null
-  const d = new Date(parseUnlockTime(date))
-  return Number.isNaN(d.getTime()) ? null : d.toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' })
+  const t = parseUnlockTime(date)
+  return Number.isNaN(t) ? null : formatDate(t, lang)
 }

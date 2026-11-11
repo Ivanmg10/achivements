@@ -158,14 +158,14 @@ describe.each(PLATFORMS)('$name badge grid', (p) => {
   })
 
   test('hovering shows its details after a moment, and leaving takes them away', () => {
-    p.render([{ title: 'First', earned: true, at: '2026-01-15', text: 'Do the thing' }])
+    p.render([{ title: 'First', earned: true, at: '2025-01-15', text: 'Do the thing' }])
     fireEvent.mouseEnter(badge('First'), { clientX: 10, clientY: 10 })
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
     act(() => { jest.advanceTimersByTime(450) })
     const tip = screen.getByRole('tooltip')
     expect(tip).toHaveTextContent('First')
     expect(tip).toHaveTextContent('Do the thing')
-    expect(tip).toHaveTextContent('Jan 15, 2026')
+    expect(tip).toHaveTextContent('Jan 15, 2025')
     fireEvent.mouseLeave(badge('First'))
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
