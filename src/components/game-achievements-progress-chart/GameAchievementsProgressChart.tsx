@@ -64,8 +64,9 @@ export function GameAchievementsProgressChart({
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <div className="flex items-center justify-between gap-2 px-1">
-        <p className="text-sm font-bold text-text-main">{T.gameExpanded.achievementsOverTime}</p>
+      {/* The title keeps its one line; the switch goes to the far right, or under it when the panel is narrow. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 px-1">
+        <p className="text-sm font-bold text-text-main whitespace-nowrap">{T.gameExpanded.achievementsOverTime}</p>
         <SegmentedControl
           aria-label={T.gameExpanded.achievementsOverTime}
           size="xs"

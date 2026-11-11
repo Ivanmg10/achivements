@@ -98,7 +98,11 @@ export default function LibraryGameDetail({
 
     if (category === 'playing') {
       const beaten = beatenProgress(items)
-      if (beaten) out.push({ label: L.beaten, value: `${beaten.done} / ${beaten.total}` })
+      if (beaten) {
+        const done = beaten.done >= beaten.total
+        const value = done ? L.storyDone : L.storyOf.replace('{n}', beaten.done.toLocaleString(lang)).replace('{total}', beaten.total.toLocaleString(lang))
+        out.push({ label: L.beaten, value, className: done ? 'text-success' : undefined })
+      }
       const missed = missablesLeft(items)
       if (missed > 0) out.push({ label: L.missable, value: String(missed), className: 'text-warning' })
       const pace = paceEstimate(items)

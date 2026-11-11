@@ -36,6 +36,15 @@ test('playing: the unlocks chart, the next targets easiest first, and what is le
   expect(screen.getByTestId('grid')).toBeInTheDocument()
 })
 
+test('playing: the story achievements are counted in words, and a beaten game says so', () => {
+  const story = [a('s1', { earned: true, earnedAt: daysAgo(3), kind: 'progression' }), a('s2', { kind: 'win_condition' })]
+  const { unmount } = render(<LibraryGameDetail {...base} category="playing" items={story} />)
+  expect(screen.getByText(L.beaten).nextSibling).toHaveTextContent('1 of 2')
+  unmount()
+  render(<LibraryGameDetail {...base} category="playing" items={[story[0], { ...story[1], earned: true, earnedAt: daysAgo(1) }, a('extra')]} />)
+  expect(screen.getByText(L.beaten).nextSibling).toHaveTextContent(L.storyDone)
+})
+
 test('completed: the rarest earned, when it was finished and how long it took', () => {
   const done = inProgress.slice(0, 3)
   render(<LibraryGameDetail {...base} category="completed" items={done} completedAt={daysAgo(2)} ring={{ ...base.ring, earned: 3 }} />)
