@@ -232,10 +232,8 @@ test('a labelled number comes from Figure; StatPill and StatCard are gone', () =
 })
 
 test('a spinner comes from Spinner or Button loading, never a hand-made animate-spin', () => {
-  // Not spinners: the level ring that turns while the level is read (MainHeaderLevel), and the refresh icons that turn
-  // while they refresh: the icon is the button's name, a ring in its place would lose it.
+  // Not spinners: the refresh icons that turn while they refresh: the icon is the button's name, a ring in its place would lose it.
   const turning = [
-    'components/main-header/main-header-level/MainHeaderLevel.tsx',
     'components/main-page/main-page-charts/MainPageHeatmap.tsx',
     'components/main-page/main-page-profile/main-page-profile-actions/main-page-profile-actions-refresh/MainPageProfileActionsRefresh.tsx',
   ]

@@ -28,7 +28,7 @@ export default function MainPageProfileNowPlaying({
   icon: ReactNode
   title: string
   sub: ReactNode
-  /** What the game says the player is doing; it was squeezed into the kicker, uppercase and cut (#128). */
+  /** What the game says the player is doing; it was squeezed into the kicker and cut (#128). */
   note?: string | null
   /** The share done, as shown on the right ("12,8 %"); nothing when unknown. */
   share?: string | null

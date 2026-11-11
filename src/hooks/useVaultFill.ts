@@ -5,6 +5,8 @@ import { notify } from '@/lib/notify'
 import type { FillAnswer, FillStatus } from '@/lib/scoreRefresh'
 import { levelOf, tierOf } from '@/utils/vaultLevel'
 import { PLATFORM_NAME } from '@/utils/gameRef'
+import { fillProgress } from '@/utils/vaultFill'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 import type { GameSource } from '@/types/game'
 
 /** Polling while a pass runs, and the waits between passes. */
@@ -33,12 +35,17 @@ async function call(method: 'GET' | 'POST'): Promise<FillAnswer | FillStatus | n
  * polls how far it has got while a pass runs, and says when the points are
  * ready or a platform could not be read. Starts again when an account is
  * linked. `version` grows after every pass that ran, for whatever shows points.
+ * `stopped`: this page has given up for now (a failed request, the passes ran
+ * out, or a pass that read nothing new, as when a platform is busy), so the
+ * screens show the level they have rather than "calculating" forever (#128: the
+ * header's ring sat at 99 % behind a platform that never settled).
  */
 export function useVaultFill() {
   const { status: auth, data: session } = useAuthSession()
   const { T } = useLanguage()
   const [status, setStatus] = useState<FillStatus | null>(null)
   const [version, setVersion] = useState(0)
+  const [stopped, setStopped] = useState(false)
   // The texts for the toasts, kept current without restarting the fill when the language changes.
   const textRef = useRef(T)
   useEffect(() => {
@@ -47,6 +54,8 @@ export function useVaultFill() {
 
   const user = session?.user
   const linked = user ? [user.raLinked, user.steamid, user.psnaccountid, user.xboxxuid].join('|') : ''
+  // A new account linked starts the fill over.
+  useWhenChanged([auth, linked], () => setStopped(false))
 
   useEffect(() => {
     if (auth !== 'authenticated') return
@@ -66,6 +75,8 @@ export function useVaultFill() {
     }
 
     async function loop() {
+      // Games read after the last pass that ran: one that read nothing new will not be followed by one that does.
+      let lastRead = -1
       for (let pass = 0; pass < MAX_PASSES && alive; pass++) {
         poll = setInterval(() => {
           if (document.visibilityState !== 'visible') return
@@ -77,15 +88,19 @@ export function useVaultFill() {
         if (poll) clearInterval(poll)
         if (!alive) return
         // A failed request ends this page's fill; the heartbeat and the next visit pick it up.
-        if (answer === undefined) return
+        if (answer === undefined) return setStopped(true)
         if (answer) setStatus(answer)
         if (answer && 'ran' in answer && answer.ran) {
           setVersion((v) => v + 1)
           announce(answer)
+          const { read } = fillProgress(answer)
+          if (!answer.complete && read <= lastRead) return setStopped(true)
+          lastRead = read
         }
         if (answer?.complete) return
         await sleep(answer && !answer.running ? NEXT_PASS_MS : BUSY_ELSEWHERE_MS)
       }
+      if (alive) setStopped(true)
     }
     loop()
 
@@ -95,5 +110,5 @@ export function useVaultFill() {
     }
   }, [auth, linked])
 
-  return { status, version }
+  return { status, version, stopped }
 }
