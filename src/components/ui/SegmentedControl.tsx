@@ -54,6 +54,8 @@ export default function SegmentedControl<V extends string>({
             key={v}
             type="button"
             aria-pressed={on}
+            // An option drawn as an icon alone says its name on hover too, not only to a screen reader.
+            title={iconOnly ? text : undefined}
             onClick={() => onChange(v)}
             className={`flex items-center justify-center gap-1.5 whitespace-nowrap font-semibold rounded-chip transition-colors duration-(--motion-hover) cursor-pointer focus-ring ${height} ${
               on ? (tone === 'outline' ? 'text-text-main' : 'text-bg-main') : 'text-text-secondary hover:text-text-main'

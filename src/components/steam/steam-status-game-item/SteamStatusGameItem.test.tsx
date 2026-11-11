@@ -33,6 +33,11 @@ test("the cover is Steam's icon and the chip says Steam", () => {
   expect(screen.getByText('Steam')).toBeInTheDocument()
 })
 
+test('inside the Steam section the chip does not say Steam again', () => {
+  render(<SteamStatusGameItem game={game(partial)} inSection />)
+  expect(screen.queryByText('Steam')).not.toBeInTheDocument()
+})
+
 test('shows the play time and the last played date', () => {
   render(<SteamStatusGameItem game={game()} />)
   expect(screen.getByText(`${en.steam.playtime} · 484 h`)).toBeInTheDocument()

@@ -47,7 +47,7 @@ export default function PsnLibraryDetail({ game, category }: { game: PsnGameProg
         game.playtimeMinutes ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, T.steam, lang), className: 'text-psn' }] : []
       }
       empty={T.psn.noTrophies}
-      grid={<PsnTrophyGrid gameId={game.id} gameTitle={game.title} trophies={trophies} groups={groups} badgeSize={48} limit={60} />}
+      grid={<PsnTrophyGrid gameId={game.id} gameTitle={game.title} trophies={trophies} groups={groups} badgeSize={48} />}
     />
   )
 }

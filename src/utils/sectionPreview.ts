@@ -1,9 +1,7 @@
 import type { CategoryGame } from '@/hooks/useGamesByCategory'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
-import { PSN_PLATFORM } from '@/utils/psnMappers'
 import type { XboxGameProgress } from '@/types/xbox'
-import { XBOX_PLATFORM } from '@/utils/xboxMappers'
 import { raGameId } from '@/utils/gameRef'
 import type { GameSource } from '@/types/game'
 
@@ -16,6 +14,7 @@ export type PreviewGame = {
   source: GameSource
   id: number
   title: string
+  /** The console (RA's, PS4, Xbox 360), never the platform its section already names; empty for Steam. */
   subtitle: string
   /** RA: image path on retroachievements.org. Steam: library icon URL (fallback art). PSN: icon URL. */
   imageRef: string
@@ -56,7 +55,7 @@ export function steamPreviewGames(games: SteamGameProgress[], count = PREVIEW_MA
     source: 'steam',
     id: g.id,
     title: g.title,
-    subtitle: 'Steam',
+    subtitle: '',
     imageRef: g.imageIcon,
     pct: g.achievementsLoaded && g.maxPossible > 0 ? g.pctWon : null,
   }))).slice(0, count)
@@ -68,7 +67,7 @@ export function psnPreviewGames(games: PsnGameProgress[], count = PREVIEW_MAX): 
     source: 'psn',
     id: g.id,
     title: g.title,
-    subtitle: PSN_PLATFORM,
+    subtitle: g.consoleName,
     imageRef: g.imageIcon,
     pct: g.pctWon,
   }))).slice(0, count)
@@ -80,7 +79,7 @@ export function xboxPreviewGames(games: XboxGameProgress[], count = PREVIEW_MAX)
     source: 'xbox',
     id: g.id,
     title: g.title,
-    subtitle: XBOX_PLATFORM,
+    subtitle: g.consoleName,
     imageRef: g.imageIcon,
     pct: g.pctWon,
   }))).slice(0, count)

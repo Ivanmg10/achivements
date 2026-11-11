@@ -15,8 +15,6 @@ import { raAwardCompletedAt } from '@/utils/completionDates'
 import { raImageUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
 
-// About three rows at two columns on a wide screen; the rest is a click away.
-const ACHIEVEMENT_LIMIT = 60
 
 
 /**
@@ -92,7 +90,6 @@ export default function RaLibraryDetail({
           gameId={gameId}
           gameTitle={game.Title}
           badgeSize={48}
-          limit={ACHIEVEMENT_LIMIT}
         />
       }
     />

@@ -25,7 +25,8 @@ test('Steam: progress only once counts are known', () => {
   const preview = steamPreviewGames([unknown, known])
   // The one with progress sorts ahead of the unknown one.
   expect(preview.map((g) => g.pct)).toEqual([25, null])
-  expect(preview[0]).toMatchObject({ key: 'steam:2', source: 'steam', subtitle: 'Steam' })
+  // Inside the Steam section "Steam" again says nothing: no line under the title.
+  expect(preview[0]).toMatchObject({ key: 'steam:2', source: 'steam', subtitle: '' })
 })
 
 test('furthest along first, games without progress after them in their order', () => {
@@ -56,6 +57,8 @@ test('PSN previews: furthest along first, with the PSN icon', () => {
     ['psn:100', 'psn', 20],
   ])
   expect(games[0].imageRef).toBe('https://psn/200.png')
+  // The console, as RA's previews say theirs; never "PlayStation" inside the PlayStation section.
+  expect(games[0].subtitle).toBe('PS5')
 })
 
 describe('xboxPreviewGames', () => {
@@ -64,10 +67,10 @@ describe('xboxPreviewGames', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { xboxGameFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
 
-  test('furthest along first, as Xbox games, with the platform as subtitle', () => {
+  test('furthest along first, as Xbox games, with the console as subtitle', () => {
     const list = xboxPreviewGames([xboxGameFixture({ id: 1, title: 'Low', pctWon: 10 }), xboxGameFixture({ id: 2, title: 'High', pctWon: 90 })])
     expect(list.map((g) => g.title)).toEqual(['High', 'Low'])
-    expect(list[0]).toMatchObject({ key: 'xbox:2', source: 'xbox', id: 2, subtitle: 'Xbox', pct: 90 })
+    expect(list[0]).toMatchObject({ key: 'xbox:2', source: 'xbox', id: 2, subtitle: 'Xbox Series · PC', pct: 90 })
   })
 
   test('at most the count asked', () => {

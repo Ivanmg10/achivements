@@ -52,7 +52,7 @@ export default function SteamCategorySection({
       data={data}
       progressOf={steamProgress}
       previewOf={steamPreviewGames}
-      renderItem={(g) => <SteamStatusGameItem game={g} category={category} />}
+      renderItem={(g) => <SteamStatusGameItem game={g} category={category} inSection />}
       texts={{ error: T.steam.gamesError, errorHint: T.steam.privateProfileHint, retry: T.steam.retry, empty: T.steam.noGamesInCategory }}
       note={data.progressTruncated && category !== 'wantToPlay' && <p className="text-xs text-text-secondary">{T.steam.partialProgressNote}</p>}
     />

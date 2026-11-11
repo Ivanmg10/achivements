@@ -43,7 +43,7 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
         ...(game.playtime2Weeks > 0 ? [{ label: T.steam.last2Weeks, value: formatPlaytime(game.playtime2Weeks, T.steam, lang) }] : []),
       ]}
       empty={T.steam.noAchievements}
-      grid={<SteamAchievementGrid appId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={48} limit={60} />}
+      grid={<SteamAchievementGrid appId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={48} />}
     />
   )
 }

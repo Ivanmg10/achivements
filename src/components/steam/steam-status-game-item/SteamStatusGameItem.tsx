@@ -21,10 +21,13 @@ import type { SteamGameProgress } from '@/types/steam'
 export default function SteamStatusGameItem({
   game,
   category,
+  inSection = false,
 }: {
   game: SteamGameProgress
   /** Which list it is in: what the opened card shows depends on it. */
   category?: string
+  /** Inside the Steam section, whose head already says Steam: no "Steam" chip (Steam has no console to name). */
+  inSection?: boolean
 }) {
   const { T } = useLanguage()
   const hasCounts = game.achievementsLoaded && game.maxPossible > 0
@@ -47,7 +50,7 @@ export default function SteamStatusGameItem({
       ring={done ? 'steam-perfect' : undefined}
       chips={
         <>
-          <GameCardPlatformTag source="steam" tone="steam" label="Steam" />
+          {!inSection && <GameCardPlatformTag source="steam" tone="steam" label="Steam" />}
           {done && <GameCardMark tone="steam-perfect">{T.steam.perfect}</GameCardMark>}
         </>
       }

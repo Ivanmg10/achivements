@@ -12,13 +12,17 @@ const MAX_UPSCALE = 2
 
 export const isWideEnough = (aspect: number) => aspect >= ASPECT_MIN && aspect <= ASPECT_MAX
 
+/** Whether a loaded picture covers a box without being stretched into a blur (whatever its shape). */
+export function sharpEnough(width: number, height: number, boxWidth: number, boxHeight: number): boolean {
+  return width > 0 && height > 0 && width * MAX_UPSCALE >= boxWidth && height * MAX_UPSCALE >= boxHeight
+}
+
 /**
  * Whether a loaded picture may be the cover's background, in a box of this size.
  * The box counts: a 460 px store header is fine on a phone and a smear at 2560 px.
  */
 export function heroArtFits(width: number, height: number, boxWidth: number, boxHeight: number): boolean {
-  if (!width || !height) return false
-  return isWideEnough(width / height) && width * MAX_UPSCALE >= boxWidth && height * MAX_UPSCALE >= boxHeight
+  return sharpEnough(width, height, boxWidth, boxHeight) && isWideEnough(width / height)
 }
 
 /** A loaded picture for the cover: right for this box, too small but better than no background, or never (a portrait is not cropped into one). */
