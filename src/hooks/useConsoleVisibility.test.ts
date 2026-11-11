@@ -60,3 +60,13 @@ test('a library is only asked for when one of its consoles is unticked (#101)', 
   expect(usePsnGamesData).toHaveBeenLastCalledWith({ passive: false })
   expect(useXboxGamesData).toHaveBeenLastCalledWith({ passive: true })
 })
+
+test('loading while the library that says which games are on an unticked console is on its way', () => {
+  setup()
+  ;(usePsnGamesData as jest.Mock).mockReturnValue({ fullLibrary: [], libraryLoading: true })
+  // Xbox loading too, but nothing of Xbox's is unticked: nothing of its to wait for.
+  ;(useXboxGamesData as jest.Mock).mockReturnValue({ fullLibrary: [], libraryLoading: true })
+  expect(renderHook(() => useConsoleVisibility()).result.current.isLoading).toBe(false)
+  window.localStorage.setItem('hidden-consoles:psn', '["PS3"]')
+  expect(renderHook(() => useConsoleVisibility()).result.current.isLoading).toBe(true)
+})

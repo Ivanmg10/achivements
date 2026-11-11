@@ -2,6 +2,9 @@ import { en } from '@/translations/en'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import MainHeader from './MainHeader'
 import { useSession } from 'next-auth/react'
+import { useStreakSummary } from '@/hooks/useStreakSummary'
+
+jest.mock('@/hooks/useStreakSummary', () => ({ useStreakSummary: jest.fn(() => ({ streak: 0 })) }))
 
 jest.mock('@/hooks/useRecentAchievements', () => ({
   useRecentAchievements: () => ({ achievements: [] }),
@@ -134,8 +137,19 @@ test('while the session loads, holds the place of the avatar instead of flashing
   expect(screen.queryByText('Sign in')).not.toBeInTheDocument()
 })
 
+test('while the streak is first read, its room in grey and no number, not a 0 that turns into another', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', rausername: 'Ivan' } } })
+  ;(useStreakSummary as jest.Mock).mockReturnValue({ streak: null })
+  render(<MainHeader />)
+  const link = screen.getByRole('link', { name: en.streak.title })
+  expect(link).toHaveAttribute('href', '/racha')
+  expect(link).toHaveAttribute('aria-busy', 'true')
+  expect(link.querySelector('.bg-skeleton')).toBeInTheDocument()
+})
+
 test('the streak page is always one click away, even with no streak going', () => {
   ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', rausername: 'Ivan' } } })
+  ;(useStreakSummary as jest.Mock).mockReturnValue({ streak: 0 })
   render(<MainHeader />)
   const link = screen.getByRole('link', { name: new RegExp(`^${en.streak.title}:`) })
   expect(link).toHaveAttribute('href', '/racha')

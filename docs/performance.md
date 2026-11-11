@@ -79,6 +79,11 @@ Rankings). Keep these true:
   unticked in the browser (`?hidden=`) left out, UTC days, `calcAllStreaks` from `utils/streaks.ts`.
   Only the viewer's own (it ignores `?user=`); Xbox for admins; every platform failing is a 502.
   Anything else that only shows the streak number uses it too (the search modal does).
+  Its `streak` is `null` until the first answer (the header draws `StreakTag loading`, never a 0 meanwhile).
+- **A streak is drawn whole (2026-11-11):** the year's `isLoading` (`ActivityHeatmapYearContext`) is true
+  before anything is asked and until every linked platform answered, and `useActivityHeatmapYear` also waits
+  for the PSN/Xbox library `useConsoleVisibility` needs when one of their consoles is unticked. A reader of
+  the year shows its skeleton while `isLoading`, never a streak counted from part of it.
 - **`useAuthSession`, never `useSession`, wherever `status` is read.** next-auth's `update()` flips `status`
   to `'loading'` and back, which re-ran every effect keyed on "signed in" on each page load.
   `RaUserRefresher` only calls `update()` when RA's profile moved.

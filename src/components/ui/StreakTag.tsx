@@ -1,5 +1,6 @@
 import { IconFlame, IconFlameFilled } from '@tabler/icons-react'
 import { streakInk, streakTier } from '@/utils/streakTier'
+import { SKELETON_PULSE } from '@/components/ui/Skeleton'
 
 /** What a streak tag says in words, for a screen reader: "Streak: 48 days". */
 type Props = {
@@ -13,6 +14,8 @@ type Props = {
   size?: 'md' | 'lg'
   /** The lit halo around the tag. Off where the tag sits on a busy surface (the header's streak). */
   glow?: boolean
+  /** The streak is still being read: the tag's room in grey, its flame and `text` unseen (give it a stand-in like "00 d"). */
+  loading?: boolean
   /** Layout only. */
   className?: string
 }
@@ -24,8 +27,8 @@ type Props = {
  * header's streak turns the halo off. The flame is filled only while lit, so
  * the difference is never colour alone.
  */
-export default function StreakTag({ days, text, size = 'md', glow = true, className = '', ...aria }: Props) {
-  const lit = days > 0
+export default function StreakTag({ days, text, size = 'md', glow = true, loading = false, className = '', ...aria }: Props) {
+  const lit = days > 0 && !loading
   const tier = streakTier(days)
   const Flame = lit ? IconFlameFilled : IconFlame
   const box = size === 'lg' ? 'h-8 px-3 text-sm gap-1.5 rounded-chip' : 'h-[1.5rem] px-2 text-xs gap-1 rounded-tag'
@@ -34,7 +37,7 @@ export default function StreakTag({ days, text, size = 'md', glow = true, classN
     <span
       aria-label={aria['aria-label']}
       data-tier={tier.id}
-      className={`inline-flex items-center font-extrabold tabular-nums whitespace-nowrap shrink-0 skew-x-(--slant) ${box} ${lit ? '' : 'bg-ink/[0.06] text-text-secondary'} ${className}`}
+      className={`inline-flex items-center font-extrabold tabular-nums whitespace-nowrap shrink-0 skew-x-(--slant) ${box} ${loading ? `bg-skeleton ${SKELETON_PULSE}` : lit ? '' : 'bg-ink/[0.06] text-text-secondary'} ${className}`}
       style={
         lit
           ? {
@@ -45,8 +48,8 @@ export default function StreakTag({ days, text, size = 'md', glow = true, classN
           : undefined
       }
     >
-      <Flame size={size === 'lg' ? 16 : 13} aria-hidden="true" className="-skew-x-(--slant)" style={lit && glow ? { filter: `drop-shadow(0 0 4px rgb(${tier.color} / 0.6))` } : undefined} />
-      <span aria-hidden={aria['aria-label'] ? true : undefined} className="-skew-x-(--slant)">{text}</span>
+      <Flame size={size === 'lg' ? 16 : 13} aria-hidden="true" className={`-skew-x-(--slant) ${loading ? 'invisible' : ''}`} style={lit && glow ? { filter: `drop-shadow(0 0 4px rgb(${tier.color} / 0.6))` } : undefined} />
+      <span aria-hidden={aria['aria-label'] || loading ? true : undefined} className={`-skew-x-(--slant) ${loading ? 'invisible' : ''}`}>{text}</span>
     </span>
   )
 }

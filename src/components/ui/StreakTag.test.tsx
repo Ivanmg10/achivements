@@ -27,3 +27,11 @@ test('each tier has its own colour, from the days', () => {
   const colours = [1, 5, 10, 20, 30, 40, 50].map((d) => tag(d).style.backgroundColor)
   expect(new Set(colours).size).toBe(7)
 })
+
+test("loading: the tag's room in skeleton grey, no flame lit, nothing to read", () => {
+  const tag = render(<StreakTag days={0} text="00 d" loading />).container.firstElementChild as HTMLElement
+  expect(tag).toHaveClass('bg-skeleton')
+  expect(tag.style.backgroundColor).toBe('')
+  expect(screen.getByText('00 d')).toHaveClass('invisible')
+  expect(screen.getByText('00 d')).toHaveAttribute('aria-hidden', 'true')
+})

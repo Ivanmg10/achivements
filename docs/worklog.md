@@ -33,6 +33,35 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-11 — The streak lands whole (`fix/streak-lands-whole`, from `feat/128-home-improvements`)
+
+**Did** — The owner saw the streak show one number on opening the home and another a few seconds later (local, 2026-11-11).
+Four places drew a streak before it was whole:
+- *The header (every load):* `useStreakSummary` returned `summary?.active?.days ?? 0`, so `StreakBadge` drew "0 d" until
+  `/api/me/streak` answered (seconds: the server reads a year of every platform), then the real number. `streak` is now `null`
+  until the first answer; the badge draws `StreakTag loading` (new prop: the tag's room in skeleton grey, nothing to read, in the
+  catalogue) and the search modal leaves the figure out meanwhile. A failed read is still 0, with `error`.
+- *The cover's streak card:* `if (isLoading && !activeStreak)` painted the first platform's streak as soon as it made one,
+  then grew as the others landed. Now the skeleton while `isLoading`.
+- *Unticked PSN/Xbox consoles:* `useConsoleVisibility` needs that platform's library to know which games are on the console,
+  and the year's `isLoading` did not wait for it, so the home counted the hidden console's days until the library landed. It
+  now returns `isLoading` and `useActivityHeatmapYear` (the hook) adds it. No new request: the library was already asked for.
+- *Before anything is asked:* `ActivityHeatmapYearContext`'s `isLoading` only covered `!wanted` for RA accounts, so a
+  Steam/PSN/Xbox-only account had a first render with `isLoading` false and no unlocks (a 0). `!wanted` now counts for all.
+**Checked, not the cause** — Steam's year is one answer (`loadSteamYear`, one cache, one route); the two-step load is Steam's
+library, not its year. While the session loads the home holds its skeleton (`MainPage`), and the provider reads the same session.
+**Header and home** — counted from the same loaders, caches and rules (`lib/meStreak.ts` vs the year in the browser), so whole they
+agree. They disagreed while one was partial: the header's 0 beside the home's skeleton, the cover's first platform, the hidden
+console's days. What can still differ: reads at different times across a server cache refresh (RA 15 min, Steam 30); the header reads
+once and again only when accounts, language, unticked consoles or hidden games change, the home's year when first opened in the tab.
+**Tests** — `useStreakData.landsWhole.test.tsx` (real provider and filter; RA, Steam, PSN's year, then the PSN library land in that
+order; every streak drawn must be the final one; fails on the old code with a 3 before the 2, and a 0 first for a Steam-only account),
+plus `useStreakSummary`, `MainHeader`, `StreakTag`, `useConsoleVisibility`, `useActivityHeatmapYear` and the cover's card.
+**Open** — Not seen in a browser (needs a signed-in account). Steam's year still paints from `lastAnswers` when coming back to the home
+in the same tab and is read again behind it (#101's rule); a newer answer can move the number then.
+
+---
+
 ## 2026-11-11 — The home's improvements from the canvas (`feat/128-home-improvements`, #128)
 
 **Did** — Page 2 of the antislop canvas v2, boards "MejHome", "MejPortada" and "MejPlataformas", one commit per block (cut from

@@ -66,6 +66,20 @@ test('a failed read says so, shows no streak and can be retried', async () => {
   await waitFor(() => expect(result.current.streak).toBe(2))
 })
 
+test('no number until the first answer: a 0 meanwhile read as a streak that then became another', async () => {
+  let answer: (s: typeof SUMMARY) => void = () => {}
+  ;(fetchWithRetry as jest.Mock).mockReturnValue(new Promise((resolve) => { answer = resolve }))
+  // The browser's lists not read yet, then read: still nothing answered.
+  stored['hidden-consoles:ra'] = undefined
+  const { result, rerender } = renderHook(() => useStreakSummary())
+  expect(result.current.streak).toBeNull()
+  stored['hidden-consoles:ra'] = null
+  rerender()
+  expect(result.current.streak).toBeNull()
+  answer(SUMMARY)
+  await waitFor(() => expect(result.current.streak).toBe(2))
+})
+
 test('hiddenParam keeps only real lists', () => {
   expect(hiddenParam({ ra: null, psn: null, xbox: null })).toBe('')
   expect(hiddenParam({ ra: '["SNES"]', psn: 'nope', xbox: '[]' })).toBe('{"ra":["SNES"]}')

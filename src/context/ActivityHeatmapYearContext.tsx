@@ -92,8 +92,10 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
 
   // One platform failing is not the streak failing: it only counts as an error
   // when nothing came back at all, so a Steam or PSN outage does not hide RA's year.
-  // Without an RA account there is nothing of RA's to wait for.
-  const isLoading = (Boolean(rausername) && (!wanted || ra.isLoading)) || steam.isLoading || psn.isLoading || xbox.isLoading
+  // Loading until every linked platform has answered, and before anything is asked
+  // (`!wanted`, the first render, whichever platforms are linked): a streak counted
+  // from part of the year is a number that changes seconds later.
+  const isLoading = !wanted || (Boolean(rausername) && ra.isLoading) || steam.isLoading || psn.isLoading || xbox.isLoading
   const error = (ra.error || Boolean(steam.error) || Boolean(psn.error) || Boolean(xbox.error)) && achievements.length === 0
 
   const value = useMemo(
