@@ -2,16 +2,15 @@ import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
 import { fetchRaProfile, validRaCredentials } from '@/lib/raProfile'
-import { sealRaKey } from '@/lib/raKey'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { clearUserCache } from '@/lib/steamCache'
-import { forgetUnlocks } from '@/lib/steamUnlocks'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { readSteamId } from '@/lib/steamAccount'
 import { findPsnAccount, psnConfigured, psnFailure, psnSummary } from '@/lib/psnClient'
 import { findXboxAccount, isGamertag, xboxConfigured, xboxFailure, xboxSummary } from '@/lib/xboxClient'
 import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 import { forgetUser } from '@/lib/userRecord'
+import { PSN_ONLINE_ID, saveLink, saveRaLink, unlinkPlatform } from '@/lib/platformLinks'
 
 /**
  * An admin linking or unlinking a user's RetroAchievements, Steam or PSN account,
@@ -52,10 +51,7 @@ export async function POST(req: Request) {
       const { profile } = fetched
 
       try {
-        const { sealed, hash } = sealRaKey(apiKey)
-        await pool.query('UPDATE users SET "raUser" = $1, rausername = $2, raid = $3, raid_hash = $4 WHERE id = $5', [
-          JSON.stringify(profile), profile.User, sealed, hash, target.id,
-        ])
+        await saveRaLink(target.id, profile, apiKey)
       } catch (err) {
         if ((err as { code?: string }).code === '23505') {
           return NextResponse.json({ error: 'That RA key already links another account' }, { status: 409 })
@@ -85,7 +81,7 @@ export async function POST(req: Request) {
       }
 
       // One Steam account may be linked to several users, as users can do themselves.
-      await pool.query('UPDATE users SET steamid = $1, steamusername = $2 WHERE id = $3', [steamid, persona, target.id])
+      await saveLink(target.id, 'steam', steamid, persona)
       await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-steam', target, { steamid, steamusername: persona })
@@ -94,7 +90,7 @@ export async function POST(req: Request) {
 
     if (body.platform === 'psn') {
       const name = typeof body.username === 'string' ? body.username.trim() : ''
-      if (!/^[A-Za-z0-9_-]{3,16}$/.test(name)) {
+      if (!PSN_ONLINE_ID.test(name)) {
         return NextResponse.json({ error: 'A PSN online ID (3–16 letters, digits, - or _) is required' }, { status: 400 })
       }
       if (!(await psnConfigured())) return NextResponse.json({ error: 'not-configured' }, { status: 503 })
@@ -108,14 +104,14 @@ export async function POST(req: Request) {
         return psnFailure(err, 'admin/users/accounts psn')
       }
 
-      await pool.query('UPDATE users SET psnaccountid = $1, psnusername = $2 WHERE id = $3', [account.accountId, account.onlineId, target.id])
+      await saveLink(target.id, 'psn', account.accountId, account.onlineId)
       await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-psn', target, { psnaccountid: account.accountId, psnusername: account.onlineId })
       return NextResponse.json({ ok: true, psnaccountid: account.accountId, psnusername: account.onlineId })
     }
 
-    if (body.platform === 'xbox') return withXboxTelemetry('admin/users/accounts/xbox', async () => {
+    if (body.platform === 'xbox') return await withXboxTelemetry('admin/users/accounts/xbox', async () => {
       const gamertag = typeof body.gamertag === 'string' ? body.gamertag.trim() : ''
       if (!isGamertag(gamertag)) return NextResponse.json({ error: 'An Xbox gamertag (up to 15 letters, digits or spaces) is required' }, { status: 400 })
       if (!xboxConfigured()) return NextResponse.json({ error: 'not-configured' }, { status: 503 })
@@ -129,7 +125,7 @@ export async function POST(req: Request) {
         return xboxFailure(err, 'admin/users/accounts xbox')
       }
 
-      await pool.query('UPDATE users SET xboxxuid = $1, xboxgamertag = $2 WHERE id = $3', [account.xuid, account.gamertag, target.id])
+      await saveLink(target.id, 'xbox', account.xuid, account.gamertag)
       await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-xbox', target, { xboxxuid: account.xuid, xboxgamertag: account.gamertag })
@@ -158,18 +154,7 @@ export async function DELETE(req: Request) {
     if (target === 'bad-id') return NextResponse.json({ error: 'A numeric id is required' }, { status: 400 })
     if (!target) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-    if (platform === 'ra') {
-      await pool.query('UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL, raid_hash = NULL WHERE id = $1', [target.id])
-    } else if (platform === 'steam') {
-      await pool.query('UPDATE users SET steamid = NULL, steamusername = NULL, steam_login_id = NULL WHERE id = $1', [target.id])
-      await forgetUnlocks(String(target.id))
-    } else if (platform === 'psn') {
-      await pool.query('UPDATE users SET psnaccountid = NULL, psnusername = NULL WHERE id = $1', [target.id])
-    } else {
-      await pool.query('UPDATE users SET xboxxuid = NULL, xboxgamertag = NULL WHERE id = $1', [target.id])
-    }
-    await clearUserCache(String(target.id))
-    forgetUser(target.id)
+    await unlinkPlatform(target.id, platform)
     await logAdminAction(auth.admin, `unlink-${platform}`, target)
 
     return NextResponse.json({ ok: true })

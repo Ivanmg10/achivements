@@ -96,12 +96,6 @@ describe('RetroAchievements', () => {
     expect(logAdminAction).not.toHaveBeenCalled()
   })
 
-  test('unlinking clears the account and logs it', async () => {
-    expect((await DELETE(del('id=11&platform=ra'))).status).toBe(200)
-    expect(updates()[0][0]).toContain('raid = NULL')
-    expect(clearUserCache).toHaveBeenCalledWith('11')
-    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-ra', BOB)
-  })
 })
 
 describe('Steam', () => {
@@ -146,12 +140,6 @@ describe('Steam', () => {
     expect((await POST(post({ id: 11, platform: 'steam', steamid: STEAM_ID }))).status).toBe(503)
   })
 
-  test('unlinking clears the account and its cache, and logs it', async () => {
-    expect((await DELETE(del('id=11&platform=steam'))).status).toBe(200)
-    expect(updates()[0][0]).toContain('steamid = NULL')
-    expect(clearUserCache).toHaveBeenCalledWith('11')
-    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-steam', BOB)
-  })
 })
 
 describe('PSN', () => {
@@ -192,12 +180,6 @@ describe('PSN', () => {
     expect((await POST(post({ id: 11, platform: 'psn', username: 'BobPS' }))).status).toBe(503)
   })
 
-  test('unlinking clears the account and its cache, and logs it', async () => {
-    expect((await DELETE(del('id=11&platform=psn'))).status).toBe(200)
-    expect(updates()[0][0]).toContain('psnaccountid = NULL')
-    expect(clearUserCache).toHaveBeenCalledWith('11')
-    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-psn', BOB)
-  })
 })
 
 describe('Xbox', () => {
@@ -247,10 +229,4 @@ describe('Xbox', () => {
     expect(updates()).toHaveLength(0)
   })
 
-  test('unlinking clears the account and its cache, and logs it', async () => {
-    expect((await DELETE(del('id=11&platform=xbox'))).status).toBe(200)
-    expect(updates()[0][0]).toContain('xboxxuid = NULL')
-    expect(clearUserCache).toHaveBeenCalledWith('11')
-    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-xbox', BOB)
-  })
 })

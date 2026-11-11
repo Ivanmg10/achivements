@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server'
-import pool from '@/lib/db'
 import { requireSession } from '@/lib/apiAuth'
 import { findPsnAccount, psnConfigured, psnFailure, psnSummary } from '@/lib/psnClient'
 import { forgetUser } from '@/lib/userRecord'
+import { PSN_ONLINE_ID, saveLink } from '@/lib/platformLinks'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
-
-/** PSN online IDs: 3–16 letters, digits, hyphens or underscores. */
-const ONLINE_ID = /^[A-Za-z0-9_-]{3,16}$/
 
 /**
  * Links a PSN account by its username. Nothing proves the account is the
@@ -25,7 +22,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: 'invalid-username' }, { status: 400 })
   }
-  if (typeof username !== 'string' || !ONLINE_ID.test(username.trim())) {
+  if (typeof username !== 'string' || !PSN_ONLINE_ID.test(username.trim())) {
     return NextResponse.json({ error: 'invalid-username' }, { status: 400 })
   }
 
@@ -39,11 +36,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    await pool.query('UPDATE users SET psnaccountid = $1, psnusername = $2 WHERE id = $3', [
-      account.accountId,
-      account.onlineId,
-      auth.id,
-    ])
+    await saveLink(auth.id, 'psn', account.accountId, account.onlineId)
   } catch (err) {
     console.error('[psn/link] save', err)
     return NextResponse.json({ error: 'failed' }, { status: 500 })
