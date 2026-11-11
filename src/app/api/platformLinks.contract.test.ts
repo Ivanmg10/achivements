@@ -156,8 +156,9 @@ describe.each([
     expect(updates()).toEqual([[LINK_SQL[platform], [...values, '7']]])
     expect(forgetUser).toHaveBeenCalledWith('7')
     expect(onPlatformLinked).toHaveBeenCalledWith(7, platform)
-    // As before: a user's link keeps the cache (the admin's PSN, Xbox and Steam links clear it).
-    expect(clearUserCache).not.toHaveBeenCalled()
+    // RA's cache is per user, so linking RA clears it; PSN and Xbox keep it.
+    if (platform === 'ra') expect(clearUserCache).toHaveBeenCalledWith('7')
+    else expect(clearUserCache).not.toHaveBeenCalled()
   })
 
   test('a failed write is a 500 with the same body, and nothing is scored', async () => {
@@ -214,10 +215,10 @@ describe.each(['ra', 'steam', 'psn', 'xbox'] as const)('an admin unlinking %s', 
 })
 
 describe.each([
-  { platform: 'ra', body: { username: 'bobra', apiKey: ' key ' }, values: [JSON.stringify({ User: 'BobRA' }), 'BobRA', 'sealed:key', 'hash:key'], clears: false, log: { rausername: 'BobRA' } },
-  { platform: 'steam', body: { steamid: STEAM_ID }, values: [STEAM_ID, 'Bobby'], clears: true, log: { steamid: STEAM_ID, steamusername: 'Bobby' } },
-  { platform: 'psn', body: { username: 'BobPS' }, values: ['42', 'BobPS'], clears: true, log: { psnaccountid: '42', psnusername: 'BobPS' } },
-  { platform: 'xbox', body: { gamertag: 'BobX' }, values: ['2535', 'BobX'], clears: true, log: { xboxxuid: '2535', xboxgamertag: 'BobX' } },
+  { platform: 'ra', body: { username: 'bobra', apiKey: ' key ' }, values: [JSON.stringify({ User: 'BobRA' }), 'BobRA', 'sealed:key', 'hash:key'], clears: true, log: { rausername: 'BobRA' } },
+  { platform: 'steam', body: { steamid: STEAM_ID }, values: [STEAM_ID, 'Bobby'], clears: false, log: { steamid: STEAM_ID, steamusername: 'Bobby' } },
+  { platform: 'psn', body: { username: 'BobPS' }, values: ['42', 'BobPS'], clears: false, log: { psnaccountid: '42', psnusername: 'BobPS' } },
+  { platform: 'xbox', body: { gamertag: 'BobX' }, values: ['2535', 'BobX'], clears: false, log: { xboxxuid: '2535', xboxgamertag: 'BobX' } },
 ] as const)('an admin linking $platform', ({ platform, body, values, clears, log }) => {
   const link = () => adminLink(json('/api/admin/users/accounts', { id: 11, platform, ...body }))
 

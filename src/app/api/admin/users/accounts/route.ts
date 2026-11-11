@@ -58,6 +58,8 @@ export async function POST(req: Request) {
         }
         throw err
       }
+      // RA's cache is kept per user: another RA account must not show the old one's data.
+      await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-ra', target, { rausername: profile.User })
       return NextResponse.json({ ok: true, rausername: profile.User, ra_display: profile.User })
@@ -82,7 +84,6 @@ export async function POST(req: Request) {
 
       // One Steam account may be linked to several users, as users can do themselves.
       await saveLink(target.id, 'steam', steamid, persona)
-      await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-steam', target, { steamid, steamusername: persona })
       return NextResponse.json({ ok: true, steamid, steamusername: persona })
@@ -105,7 +106,6 @@ export async function POST(req: Request) {
       }
 
       await saveLink(target.id, 'psn', account.accountId, account.onlineId)
-      await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-psn', target, { psnaccountid: account.accountId, psnusername: account.onlineId })
       return NextResponse.json({ ok: true, psnaccountid: account.accountId, psnusername: account.onlineId })
@@ -126,7 +126,6 @@ export async function POST(req: Request) {
       }
 
       await saveLink(target.id, 'xbox', account.xuid, account.gamertag)
-      await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-xbox', target, { xboxxuid: account.xuid, xboxgamertag: account.gamertag })
       return NextResponse.json({ ok: true, xboxxuid: account.xuid, xboxgamertag: account.gamertag })
