@@ -21,12 +21,11 @@ export default function StatusPageSkeleton({ cols = 2 }: { cols?: StatusGridCols
     <div role="status" aria-busy="true" className="flex flex-col gap-3">
       <span className="sr-only">{T.loadingPage.title}</span>
       <div aria-hidden="true" className="flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <Skeleton className="h-8 w-56 max-w-full" />
-          <div className="flex gap-2">
-            <Skeleton radius="tile" className="h-9 w-48" />
-            <Skeleton radius="tile" className="h-9 w-28" />
-          </div>
+        <Skeleton className="h-11 sm:h-14 w-56 max-w-full" />
+        {/* The one toolbar of every view: the search on the left, the views on the right. */}
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <Skeleton radius="field" className="h-10 w-full sm:w-80" />
+          <Skeleton radius="tile" className="h-9 w-64" />
         </div>
         <div className="flex flex-wrap gap-1.5 py-1">
           {[20, 24, 16, 28, 20].map((w, i) => (

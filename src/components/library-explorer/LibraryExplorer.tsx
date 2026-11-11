@@ -8,6 +8,7 @@ import { useBackIntercept } from '@/hooks/useBackIntercept'
 import LibraryShelves from '@/components/library-shelves/LibraryShelves'
 import LibraryList from '@/components/library-list/LibraryList'
 import LibraryQuickFilters from '@/components/library-quick-filters/LibraryQuickFilters'
+import LibraryToolbar from '@/components/library-toolbar/LibraryToolbar'
 import StatusSortControl, { type StatusSortState } from '@/components/status-sort-control/StatusSortControl'
 import type { LibraryLayout } from '@/components/library-layout-toggle/LibraryLayoutToggle'
 import type { PlatformChoice } from '@/components/library-platform-tabs/LibraryPlatformTabs'
@@ -102,13 +103,16 @@ export default function LibraryExplorer({
 
   return (
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-3 flex-wrap">
-          {search}
-          {layout === 'list' && category === 'playing' && <LibraryQuickFilters value={quick} counts={quickCounts} onChange={onQuick} />}
-          <span className="hidden sm:block grow" aria-hidden="true" />
-          {layout === 'list' && <StatusSortControl cat={category} keys={mixedSortKeys(category)} sortState={sort} onChange={onSort} />}
-          {layoutToggle}
-        </div>
+        <LibraryToolbar
+          search={search}
+          filters={layout === 'list' && category === 'playing' && <LibraryQuickFilters value={quick} counts={quickCounts} onChange={onQuick} />}
+          end={
+            <>
+              {layout === 'list' && <StatusSortControl cat={category} keys={mixedSortKeys(category)} sortState={sort} onChange={onSort} />}
+              {layoutToggle}
+            </>
+          }
+        />
 
         {/*
           Changing the view or the platform swaps the whole thing: the old one leaves, the new one comes in.

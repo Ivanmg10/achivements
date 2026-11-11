@@ -86,7 +86,7 @@ jest.mock('@/components/library-explorer/LibraryExplorer', () => ({
 
 jest.mock('@/hooks/useRaLinked', () => ({ useRaLinked: jest.fn() }))
 
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import CategoryPage from './page'
 import { useParams } from 'next/navigation'
 import { useGamesByCategory } from '@/hooks/useGamesByCategory'
@@ -274,8 +274,13 @@ describe('foldable RA and Steam sections', () => {
     expect(links.length).toBeLessThanOrEqual(3)
   })
 
-  test('the page count covers both platforms', () => {
+  test('the page count covers both platforms, said once: by the "all" filter in progress, under the title elsewhere', () => {
     bothAccounts()
+    const { unmount } = renderCards()
+    expect(screen.getByTestId('status-header')).toHaveTextContent(/^$/)
+    expect(within(screen.getByRole('group', { name: en.libraryFilters.quickLabel })).getByRole('button', { pressed: true })).toHaveTextContent('3')
+    unmount()
+    ;(useParams as jest.Mock).mockReturnValue({ category: 'completed' })
     renderCards()
     expect(screen.getByTestId('status-header')).toHaveTextContent('3')
   })

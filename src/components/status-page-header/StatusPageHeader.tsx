@@ -18,7 +18,8 @@ export default function StatusPageHeader({
 }: {
   consoleName?: string
   category: string
-  gameCount: number
+  /** How many games, under the title; left out when the platform tabs or the "all" filter already say it. */
+  gameCount?: number
   /** Beside the title: a control that belongs to it, such as which platform to show. */
   children?: ReactNode
 }) {
@@ -42,7 +43,7 @@ export default function StatusPageHeader({
             <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${style}`}>{label}</span>
           )}
         </div>
-        <p className="text-[0.8125rem] text-text-secondary">{plural(gameCount, T.plurals.games, lang)}</p>
+        {gameCount !== undefined && <p className="text-[0.8125rem] text-text-secondary">{plural(gameCount, T.plurals.games, lang)}</p>}
       </div>
       {children}
     </div>
