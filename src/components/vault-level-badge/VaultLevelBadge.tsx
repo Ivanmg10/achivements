@@ -32,16 +32,20 @@ const SHAPES: Record<TierId, string> = {
  * A user's level and tier from their Vault Points, as a tag in the tier's
  * hue with its shape, leaning on the one angle: a mark of the player's own (#127). `compact` shows the level alone (the tier stays in the
  * accessible name and the tooltip); `compact="phone"` does so below `sm` only,
- * so a caller never has to hide one badge and show another.
+ * so a caller never has to hide one badge and show another. `tierOnly` shows the tier alone, beside a
+ * place that already says the level in big (the cover's ring).
  */
 export default function VaultLevelBadge({
   points,
   compact = false,
+  tierOnly = false,
   size = 'md',
   className = '',
 }: {
   points: number
   compact?: boolean | 'phone'
+  /** The tier alone; the level stays in the accessible name and the tooltip. */
+  tierOnly?: boolean
   /** `lg` (24 px) beside the streak in the top bar, so the player's two marks are one family. */
   size?: 'md' | 'lg'
   className?: string
@@ -65,8 +69,15 @@ export default function VaultLevelBadge({
       <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true" className="w-3 h-3 shrink-0">
         <path d={SHAPES[tier]} />
       </svg>
-      <span className="tabular-nums">{levelText}</span>
-      {compact === true ? (
+      {tierOnly ? (
+        <>
+          <span className="sr-only">{levelText} · </span>
+          {tierText}
+        </>
+      ) : (
+        <span className="tabular-nums">{levelText}</span>
+      )}
+      {tierOnly ? null : compact === true ? (
         <span className="sr-only">{tierText}</span>
       ) : (
         <span className={compact === 'phone' ? 'max-sm:sr-only' : ''}>· {tierText}</span>

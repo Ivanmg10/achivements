@@ -28,3 +28,10 @@ test('the platform split says each share in words', () => {
   render(<VaultPlatformSplit split={{ ra: 300, psn: 100, steam: 0 }} />)
   expect(screen.getByRole('img', { name: 'RA 75 %, PSN 25 %' })).toBeInTheDocument()
 })
+
+test('tierOnly shows the tier and keeps the level for screen readers and the tooltip', () => {
+  const { container } = render(<VaultLevelBadge points={126_000} tierOnly />)
+  expect(screen.getByText('Lv 32 ·')).toHaveClass('sr-only')
+  expect(container.textContent).toBe(`Lv 32 · ${en.rankings.tiers.veteran}`)
+  expect(screen.getByTitle(`Level 32 · ${en.rankings.tiers.veteran}`)).toBeInTheDocument()
+})

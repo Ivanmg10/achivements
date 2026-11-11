@@ -27,9 +27,16 @@ const xboxItem = {
   source: 'xbox', key: 'x', lastPlayed: null,
   game: { _source: 'xbox', id: 9, title: 'Minecraft', consoleName: 'Xbox 360', imageIcon: 'https://icon/xbox.png', maxPossible: 10, numAwarded: 1, pctWon: 10, lastPlayed: null },
 }
+const psnItem = {
+  source: 'psn', key: 'p', lastPlayed: '2026-01-01T10:00:00Z',
+  game: { _source: 'psn', id: 33, title: "Assassin's Creed II", consoleName: 'PS4', imageIcon: '', maxPossible: 51, numAwarded: 33, pctWon: 65, lastPlayed: '2026-01-01T10:00:00Z' },
+}
 const target = (title: string, rarity: number) => ({
   id: title, title, description: `About ${title}`, earned: false, earnedAt: null, rarity, points: null, kind: null, iconUrl: `https://img/${title}.png`, href: '#',
 })
+
+/** The cover's line of facts under the title. */
+const factsLine = () => screen.getByText((_, el) => el?.tagName === 'P' && el.querySelector('.sr-only') !== null)
 
 beforeEach(() => (useGameInsights as jest.Mock).mockReturnValue({ items: [], art: [], loading: false, error: false }))
 
@@ -38,8 +45,7 @@ test('shows the game played last, its console, its progress and the ways in', ()
   render(<MainPagePortada />)
   expect(screen.getByRole('heading', { name: 'Portal 2' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Portal 2' }).closest('section')).toHaveClass('home-cover')
-  expect(screen.getByText('PC')).toBeInTheDocument()
-  expect(screen.getByText('40 / 51')).toBeInTheDocument()
+  expect(factsLine()).toHaveTextContent(/^PC, 40 of 51 achievements$/)
   expect(screen.getByText(en.homeLayout.continueKicker)).toBeInTheDocument()
   expect(screen.getByRole('link', { name: en.homeLayout.openGame })).toHaveAttribute('href', '/steamGame/620')
   expect(screen.getAllByRole('link')).toHaveLength(1)
@@ -210,4 +216,12 @@ test('holds its box while loading, and draws nothing without a game', () => {
   ;(useRecentFeed as jest.Mock).mockReturnValue({ feed: [], loading: false })
   rerender(<MainPagePortada />)
   expect(container).toBeEmptyDOMElement()
+})
+
+test('console, count with its unit and when go on one line of facts, the count in trophies on PlayStation', () => {
+  ;(useRecentFeed as jest.Mock).mockReturnValue({ feed: [psnItem], loading: false })
+  render(<MainPagePortada />)
+  expect(factsLine()).toHaveTextContent(/^PS4, 33 of 51 trophies, .+ago$/)
+  // The kicker no longer says when: the facts do.
+  expect(screen.getByText(en.homeLayout.continueKicker)).toHaveTextContent(new RegExp(`^${en.homeLayout.continueKicker}$`))
 })
