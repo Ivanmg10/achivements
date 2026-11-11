@@ -14,7 +14,10 @@ its contract suite: the badge grid (`BadgeGrid`, generic over the platform's ite
 slots for what a badge is called, where it goes, its ring and its tooltip, and `LazyBadgeGrid` for the
 grid's loading / failure / empty states), the feed row (`FeedGameCard`, a view model), the category
 section (`PlatformCategorySection`, the platform's hook result and its words) and the opened game
-(`GameExpandedLayout`). The families still to do are listed in `docs/worklog.md` (entry of #125 → Open).
+(`GameExpandedLayout`). Family 8 put the account page's cards on one `UserPlatformCard` (identity as data, the
+disconnect button) with `UserRaCard` as RA's adapter, the admin panel's rows on a table (`ADMIN_PLATFORMS`), and the
+routes' link and unlink SQL in `lib/platformLinks.ts` (`docs/accounts.md`). All nine families of #125 are done
+(`docs/worklog.md`, entry of #125); a new per-platform copy goes into its family's shell.
 
 ## Where things live
 

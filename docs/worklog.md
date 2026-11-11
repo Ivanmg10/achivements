@@ -78,7 +78,7 @@ longer throws (it crashed the page). Rows and cards mark their anchor with `data
 Steam's test) put it first when reversed; kept as the code did, ask the owner. Not looked at in a browser: RA's table and phone card (2560
 and 390 px, both designs, Firefox), and the eye's corner in the slanted design. If the owner wants the author or hardcore count back on
 RA's phone card, it is a `card` chip on its column. `useAchievementTable` is tested through the contract suite, not with `renderHook`.
-**Open — the other eight families of #125, in the issue's order** (one PR each, or smaller; read `docs/platform-shells.md` first; sizes are
+**The nine families of #125, in the issue's order (all done; what is left is under "Open — what is left of #125")** (one PR each, or smaller; read `docs/platform-shells.md` first; sizes are
 the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform hex, retries and kickers in these files):
 1. DONE The game page table (D1-01), above.
 2. DONE (2026-11-10, `refactor/125-platform-shells-2`; below, "Done — families 2, 4 and 9") **Group game cards** (B-01): `groups/sortable-item/SortableItem.tsx` (RA, 195), `steam-sortable-item/SteamSortableItem.tsx` (181),
@@ -124,7 +124,7 @@ the audit's of 2026-11-06, re-measure: #120 already swept focus rings, platform 
    (`docs/platforms/README.md`: private vs refused vs busy), Xbox for admins only. *Traps:* the pages hold their skeleton while the session is
    read (#118: a full load of an Xbox page was a 404 before); a game 404 answers HTTP 200 (streaming, `notFound()` on the client); the empty
    case is handled by the page before the table (the table's own empty state only fires for RA).
-8. **Link and unlink** (AP-02, B-06, E-10): routes `api/updateRaUser`, `api/psn/link`, `api/xbox/link`, the four unlink routes ↔
+8. DONE (2026-11-11, `refactor/125-platform-shells-6`; below, "Done — family 8") **Link and unlink** (AP-02, B-06, E-10): routes `api/updateRaUser`, `api/psn/link`, `api/xbox/link`, the four unlink routes ↔
    `api/admin/users/accounts/route.ts` → `lib/platformLinks.ts`; account `user-psn-card-form` / `user-xbox-card-form` (one form), the identity
    block in `UserPlatforms`, `UserSteamCard`, `UserPsnCard`, `UserXboxCard`, RA's card inline in `UserPlatforms` and copied in
    `ConnectAccounts`; admin `AdminLinkedAccounts` (the 36-line block ×4) and `AdminUserCard`. *Keep:* user and admin routes keep their own
@@ -294,6 +294,64 @@ shells follow `docs/platform-shells.md`). Non-test source 1,459 → 1,019 lines 
   left); D1-16 (blurred hero backgrounds); the RA game route (`gameInfo/[gameId]`) keeps its own error screen (its retry already is `Button`).
 - *Not looked at in a browser:* the three game pages' error and empty cards (now `SURFACE` + `Button`, same classes), PSN's new library error,
   the user game pages at 390 and 2560 px, the rarest panels' focus ring in both designs.
+**Done — family 8, link and unlink** (`refactor/125-platform-shells-6`, one commit per part, 2026-11-11; shells follow
+`docs/platform-shells.md`). The 18 files of the family 1,583 → 1,405 lines with the four new ones (−178); tests +677 −503:
+- *SQL (AP-02):* `lib/platformLinks.ts` (67 lines): `linkSql` / `unlinkSql` from one column table (`LINK_COLUMNS`, `UNLINK_COLUMNS` = the link
+  plus Steam's `steam_login_id`), `saveRaLink` (seals the key: `"raUser"`, `rausername`, `raid`, `raid_hash`), `saveLink` (admin Steam, PSN,
+  Xbox), `unlinkPlatform` (the UPDATE, then `clearUserCache`, Steam's `forgetUnlocks` — unlocks and play time — and `forgetUser`; throws only
+  when the write fails, before anything else is touched) and `PSN_ONLINE_ID` (was written twice). Used by `updateRaUser`, `psn/link`,
+  `xbox/link`, `unlinkRaUser`, `steam/unlink`, `psn/unlink`, `xbox/unlink` and `admin/users/accounts`. Every route keeps its own auth
+  (`requireSession`, `requireXboxUser`, `requireAdmin` first), checks, status codes and bodies, `logAdminAction` (same action and data),
+  `onPlatformLinked` where it was, and mails (`sendSteamLinkNotice` on the user's Steam unlink; the callback's link mail is untouched).
+  Steam's OpenID callback (`linkSteam`) keeps its own SQL: it is the only writer of `steam_login_id`. The sign-up's INSERT (`api/users`)
+  stays: it writes the whole row. Column names are constants; every value is a parameter.
+- *How it is held to "the same":* `lib/platformLinks.test.ts` pins the generated SQL character for character against the eight strings the
+  routes wrote by hand (and the `RETURNING username, email` of Steam's user unlink). `app/api/platformLinks.contract.test.ts` (61 tests with
+  the lib's): `describe.each` over the four user unlinks (401 signed out with no query; 200 `{ ok: true }`, the exact SQL with `['7']`, cache,
+  user row, Steam unlocks only for Steam; a failed write is the same 500 body per route and touches nothing), the three user links (exact
+  SQL and values, `forgetUser`, `onPlatformLinked(7, platform)`, no cache clear; a failed write is the same 500 and nothing is scored), the
+  four admin unlinks and links (a locked panel gets the auth answer and nothing runs; exact SQL with `[11]`; the same housekeeping;
+  `logAdminAction` with the same action and data; no mail, no scoring; a failed write is a 500 and nothing is logged); Steam's mail; Xbox's
+  403 for a non-admin. The four unlink route tests and the admin test's unlink cases moved into it; each link route's own test keeps its
+  platform's checks. Checked by moving `forgetUnlocks` to PSN by hand: 6 tests failed.
+- *Account cards (B-06):* `UserPlatformCard` takes `identity` as data (`{ avatar, fallback, name, id, note }`, drawn once) and `disconnect`
+  (`{ label, busyLabel, run, done }`: the card draws the danger `Button`, holds it while it runs, toasts `done` or `T.toast.unlinkFailed`);
+  `action` is only the not-connected control. `user-platform-link-form/UserPlatformLinkForm` replaces `UserPsnCardForm` and `UserXboxCardForm`
+  (ids `psn-online-id` / `xbox-gamertag`, max 16 / 20 kept). `user-ra-card/UserRaCard` (its stats, the RA modal, `hint` for the connect screen)
+  leaves `UserPlatforms` (now 26 lines) and replaces the copy in `ConnectAccounts`. The link hooks lost `isUnlinking` (the card holds it).
+  Contract: `UserPlatformCard.contract.test.tsx` (4 × 3, form × 3 for PSN and Xbox); the adapters' tests keep their own numbers and errors;
+  `UserRaCard.test.tsx`. Checked by toasting success on a failed unlink: 4 tests failed.
+- *Admin panel (E-10):* `utils/adminPlatforms.ts` (`ADMIN_PLATFORMS`: name, the two fields — linked id, shown name — and the boxes;
+  `adminAccount`, `adminAccountChanges`) drives `AdminLinkedAccounts` (226 → 133, `PlatformLogo` and `Button`) and `AdminUserCard`'s rows
+  (4 × 6 lines → one map). Contract: `AdminLinkedAccounts.test.tsx` (4 × 3: link sends every box and reports, a refusal in its own block,
+  linked shows the account and unlinks). Each block is a named `group`.
+- *Visible changes (drifted copies, fixed):* **(a)** RA's Disconnect is held while it runs, like the other three (it could be pressed twice;
+  RA has no "Disconnecting…" text, so its label stays). **(b)** Admin: Unlink is the library's danger `Button` (`sm`, tinted with a ring) instead
+  of a hand-set red text button; the logos go through `PlatformLogo`, so RA's is 10 px tall like everywhere else `PlatformLogo` draws it (was
+  12); on the user cards an unlinked logo is `opacity-30 grayscale` on all four (Steam, PSN and Xbox were a 30 % grey). **(c)** Admin: an account
+  linked with no name shows its id on the user card too (a Steam account whose persona Steam did not send showed "—" there while the
+  linked-accounts block said linked). **(d)** The admin Xbox link `return`ed its handler's promise without `await`, so a failed write escaped
+  the route's `catch` (an unhandled rejection); it is the route's own 500 `Internal error` now. **(e)** `ConnectAccounts` lost the stale
+  comment that Steam's name is typed there.
+- *Kept as it was, on purpose (the owner's call, not drift to fix blindly):* **the cache on link.** A user's RA, PSN and Xbox link and the
+  admin's RA link only drop the cached user row; the admin's Steam, PSN and Xbox links also `clearUserCache`. Both sides are written as they
+  were and the contract pins each. Neither is clearly right: PSN, Xbox and Steam caches are keyed by the platform's account, so clearing after
+  the link only throws away the summary the link itself just read (one more OpenXBL call on Xbox's 150 an hour), while RA's are keyed by our
+  user id (`ra:…:<userId>:…`), so linking a *different* RA account straight over a linked one (the admin route accepts it; the account page
+  only offers linking once unlinked) would serve the old account's settled year buckets. If the owner wants one rule: clear on link for RA
+  only, or clear before the verify read. **The admin's Steam unlink mails no one** (the user's does): admin changes are logged instead, as
+  admin links are.
+
+**Open — what is left of #125** (nothing blocks closing the issue; these are follow-ups or the owner's calls):
+- *Owner's calls:* the cache on link and the admin Steam unlink mail (above); rarity descending in the table (family 1: an unknown rarity
+  sorts first when reversed); whether RA's phone card gets its author / hardcore count back (family 1).
+- *Not done, outside the nine families:* D1-16 (the four blurred hero backgrounds → one `GameHeroBackdrop` with the tuned values as props);
+  `GameCardProgress` into `ui/` with D2-04's 22 "bar + %" copies; the pinned and feed rows' own chevrons (families 3 and 5);
+  `usePsnCollectionTrophies` (a third copy of the trophy fetch); the twin `usePsnLink` / `useXboxLink` (link by name, same shape); the RA game
+  route's own error screen; `useAchievementTable` has no `renderHook` test of its own (the contract covers it).
+- *Never looked at in a browser* (390 and 2560 px, both designs, Firefox): the game page table and RA's phone card, the group and status
+  cards, the home's pinned rows and stat pills, the badge grids, feed rows and opened games, the game pages' states, and now the account
+  cards (RA's held Disconnect, the identity block), `ConnectAccounts` and the admin panel's linked accounts and user cards.
 **Watch out** — `toRow` and `items` must be stable (a module-level mapper, or `useMemo`): the deep link's reset runs when `items` changes,
 and an inline sort would reset it every render. The deep link looks for `data-anchor` on rows and cards; `anchor` is unencoded and the
 fragment is decoded before comparing. `badgeClass` takes a ring colour, not a state.
