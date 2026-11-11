@@ -191,17 +191,19 @@ describe.each(['ra', 'steam', 'psn', 'xbox'] as const)('an admin unlinking %s', 
     expect(pool.query).not.toHaveBeenCalled()
   })
 
-  test('clears the same columns and housekeeping as the user route, logs it, and mails no one', async () => {
+  test('clears the same columns and housekeeping as the user route, logs it, and mails the account only for Steam', async () => {
     const res = await del()
     expect(res.status).toBe(200)
     expect(bodyOf(res)).toEqual({ ok: true })
-    expect(updates()).toEqual([[UNLINK_SQL[platform], [11]]])
+    expect(updates().map(([sql, params]) => [sql.replace(/ RETURNING .*$/, ''), params])).toEqual([[UNLINK_SQL[platform], [11]]])
     expect(clearUserCache).toHaveBeenCalledWith('11')
     expect(forgetUser).toHaveBeenCalledWith(11)
     if (platform === 'steam') expect(forgetUnlocks).toHaveBeenCalledWith('11')
     else expect(forgetUnlocks).not.toHaveBeenCalled()
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, `unlink-${platform}`, BOB)
-    expect(sendSteamLinkNotice).not.toHaveBeenCalled()
+    await Promise.all((after as unknown as { pending: Promise<unknown>[] }).pending)
+    if (platform === 'steam') expect(sendSteamLinkNotice).toHaveBeenCalledWith({ to: 'ana@test.com', username: 'ana', linked: false })
+    else expect(sendSteamLinkNotice).not.toHaveBeenCalled()
   })
 
   test('a failed write is a 500 and nothing is logged', async () => {
