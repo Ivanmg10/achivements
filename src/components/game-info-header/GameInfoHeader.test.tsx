@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import GameInfoHeader from "./GameInfoHeader";
 import type { RetroAchievementsGameWithAchievements } from "@/types/types";
+import { en } from "@/translations/en";
 
 const mockGameData = {
   ID: 1,
@@ -91,4 +92,9 @@ test("a mastered game says so instead of 'in progress'", () => {
   render(<GameInfoHeader gameData={{ ...mockGameData, NumAwardedToUser: 10, HighestAwardKind: 'mastered' } as never} />);
   expect(screen.queryByText(/in progress/i)).not.toBeInTheDocument();
   expect(screen.getByText(/mastered/i)).toBeInTheDocument();
+});
+
+test("an RA game can be pinned and hidden from its page, as on the other platforms", () => {
+  render(<GameInfoHeader gameData={mockGameData} />);
+  expect(screen.getByRole("button", { name: `${en.cards.hideGame}: Sly Cooper` })).toBeInTheDocument();
 });

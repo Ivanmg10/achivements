@@ -49,6 +49,7 @@ export default function GameInfoSubsetSelector({
             key={tab.id}
             href={`/gameInfo/${tab.id}`}
             title={tab.label}
+            aria-current={isActive ? 'page' : undefined}
             className={`relative shrink-0 rounded-box overflow-hidden transition-all duration-150 ${
               isActive
                 ? 'ring-2 ring-ink/60 scale-105'

@@ -63,16 +63,22 @@ test('media: two pictures at most, with captions; one with a full version links 
   render(
     <GameHeroMedia
       shots={[
-        { src: 'a.png', caption: 'Title screen' },
+        { src: 'a.png', alt: 'Title screen', caption: 'Title screen' },
         null,
-        { src: 'b.png', caption: 'In game', full: 'b-full.png' },
-        { src: 'c.png', caption: 'Third' },
+        { src: 'b.png', alt: 'In game', caption: 'In game', full: 'b-full.png' },
+        { src: 'c.png', alt: 'Third', caption: 'Third' },
       ]}
     />,
   )
   expect(screen.getByText('Title screen')).toBeInTheDocument()
   expect(screen.getByText('In game').closest('figure')!.querySelector('a')).toHaveAttribute('href', 'b-full.png')
   expect(screen.queryByText('Third')).not.toBeInTheDocument()
+})
+
+test('media: a screenshot that would only say its number has no caption, only its name for a screen reader', () => {
+  const { container } = render(<GameHeroMedia shots={[{ src: 'a.png', alt: 'Screenshot 1' }]} />)
+  expect(container.querySelector('figcaption')).toBeNull()
+  expect(screen.getByAltText('Screenshot 1')).toBeInTheDocument()
 })
 
 test('media: nothing to show draws nothing', () => {

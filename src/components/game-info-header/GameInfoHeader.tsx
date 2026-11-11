@@ -12,6 +12,7 @@ import { plural, sumAchievementPoints } from '@/utils/utils'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { buttonClass } from '@/components/ui/Button'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
+import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
@@ -139,7 +140,14 @@ export default function GameInfoHeader({
             </>
           )
         }
-        toggles={gameData?.ID ? <PinToggleButton gameId={gameData.ID} className={HERO_TOGGLE} /> : undefined}
+        toggles={
+          gameData?.ID ? (
+            <>
+              <PinToggleButton gameId={gameData.ID} className={HERO_TOGGLE} />
+              <HideGameButton source="ra" gameId={gameData.ID} title={gameData.Title ?? ''} image={raImageUrl(gameData.ImageIcon) ?? null} className={HERO_TOGGLE} />
+            </>
+          ) : undefined
+        }
         tiles={
           gameData?.ID
             ? [
@@ -151,8 +159,8 @@ export default function GameInfoHeader({
         media={
           <GameHeroMedia
             shots={[
-              gameData?.ImageTitle ? { src: raImageUrl(gameData.ImageTitle)!, caption: T.gameInfoPage.titleScreen } : null,
-              gameData?.ImageIngame ? { src: raImageUrl(gameData.ImageIngame)!, caption: T.gameInfoPage.inGame } : null,
+              gameData?.ImageTitle ? { src: raImageUrl(gameData.ImageTitle)!, alt: T.gameInfoPage.titleScreen, caption: T.gameInfoPage.titleScreen } : null,
+              gameData?.ImageIngame ? { src: raImageUrl(gameData.ImageIngame)!, alt: T.gameInfoPage.inGame, caption: T.gameInfoPage.inGame } : null,
             ]}
           />
         }

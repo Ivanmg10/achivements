@@ -1,10 +1,11 @@
 import { FadeImage } from '@/components/ui/FadeImage'
 
-export type GameHeroShot = { src: string; caption: string; full?: string }
+/** `alt` names the picture for a screen reader; `caption` is shown under it, only when it says more than a number. */
+export type GameHeroShot = { src: string; alt: string; caption?: string; full?: string }
 
 /**
- * Two pictures under a game's figures (RA's title screen and in-game shot, a
- * store's screenshots), each with its caption; a picture with a larger
+ * Two pictures under a game's figures (RA's title screen and in-game shot, with
+ * their captions; a store's screenshots, with none); a picture with a larger
  * version opens it.
  */
 export default function GameHeroMedia({ shots }: { shots: (GameHeroShot | null)[] }) {
@@ -17,7 +18,7 @@ export default function GameHeroMedia({ shots }: { shots: (GameHeroShot | null)[
         const img = (
           <FadeImage
             src={s.src}
-            alt={s.caption}
+            alt={s.alt}
             width={320}
             height={224}
             unoptimized
@@ -33,7 +34,7 @@ export default function GameHeroMedia({ shots }: { shots: (GameHeroShot | null)[
             ) : (
               img
             )}
-            <figcaption className="text-[0.8125rem] text-text-secondary truncate">{s.caption}</figcaption>
+            {s.caption && <figcaption className="text-[0.8125rem] text-text-secondary truncate">{s.caption}</figcaption>}
           </figure>
         )
       })}
