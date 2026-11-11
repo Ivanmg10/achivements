@@ -58,12 +58,17 @@ test('deletes, except your own account', () => {
   expect(screen.getByRole('button', { name: 'Delete papucarrot' })).toBeDisabled()
 })
 
-test('shows the PSN online ID once linked', () => {
-  render(<AdminUserCard user={{ ...USER, psnusername: 'PapuPS' }} isSelf={false} onEdit={jest.fn()} onToggleAdmin={jest.fn()} onDelete={jest.fn()} />)
-  expect(screen.getByText('PapuPS')).toBeInTheDocument()
+test.each([
+  ['Steam', { steamid: '765', steamusername: 'PapuSteam' }, 'PapuSteam'],
+  ['PSN', { psnaccountid: '42', psnusername: 'PapuPS' }, 'PapuPS'],
+  ['Xbox', { xboxxuid: '2535', xboxgamertag: 'PapuBox' }, 'PapuBox'],
+])('shows the %s account once linked', (_, linked, shown) => {
+  render(<AdminUserCard user={{ ...USER, ...linked }} isSelf={false} onEdit={jest.fn()} onToggleAdmin={jest.fn()} onDelete={jest.fn()} />)
+  expect(screen.getByText(shown)).toBeInTheDocument()
+  expect(screen.getAllByText('—')).toHaveLength(2)
 })
 
-test('shows the Xbox gamertag once linked', () => {
-  render(<AdminUserCard user={{ ...USER, xboxgamertag: 'PapuBox' }} isSelf={false} onEdit={jest.fn()} onToggleAdmin={jest.fn()} onDelete={jest.fn()} />)
-  expect(screen.getByText('PapuBox')).toBeInTheDocument()
+test('an account linked with no name shows its id, as the linked accounts block does', () => {
+  render(<AdminUserCard user={{ ...USER, steamid: '76561198000000000' }} isSelf={false} onEdit={jest.fn()} onToggleAdmin={jest.fn()} onDelete={jest.fn()} />)
+  expect(screen.getByText('76561198000000000')).toBeInTheDocument()
 })

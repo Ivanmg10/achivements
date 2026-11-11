@@ -6,14 +6,13 @@ import { usePsnTrophies } from '@/hooks/usePsnTrophies'
 import { PsnTrophyGrid } from '@/components/psn/psn-trophy-grid/PsnTrophyGrid'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
 import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetail'
+import { asCategory } from '@/utils/utils'
 import { fromPsn } from '@/utils/gameInsights'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
 import { psnBaseCompletedAt } from '@/utils/completionDates'
-import type { GameStatus } from '@/types/game'
 import ErrorRetry from '@/components/ui/ErrorRetry'
 
-const asCategory = (c?: string): GameStatus => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * An opened PSN card in a status list: Steam's counterpart. Trophies load

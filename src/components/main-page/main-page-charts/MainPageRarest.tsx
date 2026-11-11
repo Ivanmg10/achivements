@@ -10,7 +10,7 @@ import { gameHref } from '@/utils/gameRef'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import { useLanguage } from '@/context/LanguageContext'
-import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { steamAchievementAnchor } from '@/utils/steamTitles'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
@@ -62,7 +62,7 @@ export default function MainPageRarest({
       .sort((a, b) => a.globalPct - b.globalPct)
       .map((a) => ({
         key: `steam:${a.appId}:${a.apiname}`,
-        href: `${gameHref('steam', a.appId, subject)}#${achievementAnchor(a.apiname)}`,
+        href: `${gameHref('steam', a.appId, subject)}#${steamAchievementAnchor(a.apiname)}`,
         imageUrl: a.badgeUrl || undefined,
         title: a.title,
         subtitle: a.gameTitle,

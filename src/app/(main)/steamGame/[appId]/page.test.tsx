@@ -23,6 +23,7 @@ jest.mock('@/components/steam/steam-game-info-table/SteamGameInfoTable', () => (
 }))
 
 import { render, screen, fireEvent } from '@testing-library/react'
+import { useSession } from 'next-auth/react'
 import SteamGamePage from './page'
 import { useParams, notFound } from 'next/navigation'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -127,6 +128,14 @@ test('without Steam linked, points to settings and fetches nothing', () => {
   expect(screen.getByRole('link', { name: en.userData.steamConnect }).getAttribute('href')).toBe('/user')
   expect(useSteamAchievements).toHaveBeenCalledWith(null)
   expect(useSteamGameDetails).toHaveBeenCalledWith(null)
+})
+
+test('a full load holds the skeleton until the session is read, not "not connected" or a 404', () => {
+  ;(useSession as jest.Mock).mockReturnValueOnce({ data: undefined, status: 'loading', update: jest.fn() })
+  setup({ linked: false })
+  render(<SteamGamePage />)
+  expect(screen.getByTestId('loading')).toBeInTheDocument()
+  expect(notFound).not.toHaveBeenCalled()
 })
 
 test.each(['abc', '-1', '1.5'])('a non-numeric app id %p is a 404', (appId) => {

@@ -1,9 +1,11 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
+import Image from 'next/image'
 import { useLanguage } from '@/context/LanguageContext'
+import { notify } from '@/lib/notify'
 import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
-import { buttonClass } from '@/components/ui/Button'
+import Button, { buttonClass } from '@/components/ui/Button'
 import Figure, { type FigureTone } from '@/components/ui/Figure'
 import type { GameSource } from '@/types/game'
 
@@ -22,8 +24,13 @@ export function platformStat(
   return { label, value: text, tone, loading }
 }
 
-export const DISCONNECT_CLASS = buttonClass('danger', 'md', 'w-full')
 export const CONNECT_CLASS = buttonClass('primary', 'md', 'w-full')
+
+/** Who the account is on the platform: its picture (or `fallback`), its name, its id and a note under them. */
+export type PlatformIdentity = { avatar?: string | null; fallback?: ReactNode; name: string; id?: string | null; note?: string }
+
+/** The disconnect button: its words, the hook's unlink (true when it worked) and the toast that says so. */
+export type PlatformDisconnect = { label: string; busyLabel?: string; run: () => Promise<boolean>; done: string }
 
 /**
  * One platform on the account page: its logo, whether it is connected, the
@@ -33,7 +40,8 @@ export const CONNECT_CLASS = buttonClass('primary', 'md', 'w-full')
  * The shell is shared so the platforms read as the same kind of thing; each
  * one is outlined in its own gradient so they are still told apart at a
  * glance. Disconnected, the card shows its logo and what connecting is for
- * instead of empty space.
+ * instead of empty space. Disconnecting is the card's: one button, held while
+ * it runs, and a toast either way.
  */
 export default function UserPlatformCard({
   name,
@@ -47,6 +55,7 @@ export default function UserPlatformCard({
   hint,
   stats = [],
   action,
+  disconnect,
   source,
 }: {
   name: string
@@ -61,16 +70,29 @@ export default function UserPlatformCard({
   /** A message about the last connection attempt. */
   status?: ReactNode
   /** Account details once connected. */
-  identity?: ReactNode
+  identity?: PlatformIdentity | null
   /** What connecting this platform gets you. */
   hint?: string
   /** Four or five headline numbers, side by side. */
   stats?: PlatformStat[]
+  /** What connects it, shown while it is not connected. */
   action?: ReactNode
+  /** How to disconnect it, shown while it is connected. */
+  disconnect?: PlatformDisconnect
   /** The platform, for its Vault Points being calculated right after it is linked. */
   source?: GameSource
 }) {
   const { T } = useLanguage()
+  const [unlinking, setUnlinking] = useState(false)
+
+  const handleDisconnect = async () => {
+    if (!disconnect) return
+    setUnlinking(true)
+    const ok = await disconnect.run()
+    setUnlinking(false)
+    if (ok) notify.success(disconnect.done)
+    else notify.error(T.toast.unlinkFailed)
+  }
 
   return (
     <div className={`rounded-[calc(var(--r-card)+1px)] p-px bg-gradient-to-br ${gradient}`}>
@@ -107,7 +129,20 @@ export default function UserPlatformCard({
 
         {connected ? (
           <>
-            {identity && <div className="rounded-tile bg-ink/[0.03] p-2.5">{identity}</div>}
+            {identity && (
+              <div className="rounded-tile bg-ink/[0.03] p-2.5 flex items-center gap-3 min-w-0">
+                {identity.avatar ? (
+                  <Image src={identity.avatar} alt="" width={44} height={44} className="rounded-box w-10 h-10 object-cover shrink-0" unoptimized />
+                ) : (
+                  identity.fallback
+                )}
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  <span className="font-bold truncate">{identity.name}</span>
+                  {identity.id && <span className="text-[0.6875rem] text-text-secondary truncate">{identity.id}</span>}
+                  {identity.note && <span className="text-[10px] text-text-secondary">{identity.note}</span>}
+                </div>
+              </div>
+            )}
             {stats.length > 0 && (
               <dl className="grid grid-cols-2 gap-1.5">
                 {stats.map((stat, i) => (
@@ -132,7 +167,15 @@ export default function UserPlatformCard({
           </div>
         )}
 
-        <div className="relative mt-auto">{action}</div>
+        <div className="relative mt-auto">
+          {connected && disconnect ? (
+            <Button variant="danger" className="w-full" onClick={handleDisconnect} disabled={unlinking}>
+              {unlinking && disconnect.busyLabel ? disconnect.busyLabel : disconnect.label}
+            </Button>
+          ) : (
+            action
+          )}
+        </div>
       </section>
     </div>
   )

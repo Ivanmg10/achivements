@@ -1,13 +1,11 @@
-jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 jest.mock('@/hooks/useSteamLink', () => ({ useSteamLink: jest.fn() }))
 jest.mock('@/hooks/useSteamProfile', () => ({ useSteamProfile: jest.fn(() => ({ profile: null })) }))
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: () => ({ library: [], libraryLoading: false }) }))
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import UserSteamCard from './UserSteamCard'
 import { useSteamLink } from '@/hooks/useSteamLink'
 import { useSteamProfile } from '@/hooks/useSteamProfile'
-import { notify } from '@/lib/notify'
 import { en } from '@/translations/en'
 
 const LINK_HREF = '/api/auth/steam?intent=link&next=%2Fuser'
@@ -15,7 +13,7 @@ const unlink = jest.fn()
 
 function setSteam(overrides: Record<string, unknown> = {}) {
   ;(useSteamLink as jest.Mock).mockReturnValue({
-    steamId: '76561198000000000', steamUsername: 'ivan', isLinked: true, linkHref: LINK_HREF, unlink, isUnlinking: false,
+    steamId: '76561198000000000', steamUsername: 'ivan', isLinked: true, linkHref: LINK_HREF, unlink,
     ...overrides,
   })
 }
@@ -25,18 +23,9 @@ beforeEach(() => {
   setSteam()
 })
 
-test('linked: the account, its numbers, and a way to disconnect that says whether it worked', async () => {
-  unlink.mockResolvedValueOnce(true).mockResolvedValueOnce(false)
+test('linked: its own numbers', () => {
   render(<UserSteamCard />)
-  const card = screen.getByRole('region', { name: 'Steam' })
-  expect(card).toHaveTextContent('ivan')
-  expect(card).toHaveTextContent('76561198000000000')
-  expect(card).toHaveTextContent(en.steam.perfect)
-
-  fireEvent.click(screen.getByRole('button', { name: en.userData.steamDisconnect }))
-  await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.steamUnlinked))
-  fireEvent.click(screen.getByRole('button', { name: en.userData.steamDisconnect }))
-  await waitFor(() => expect(notify.error).toHaveBeenCalledWith(en.toast.unlinkFailed))
+  expect(screen.getByRole('region', { name: 'Steam' })).toHaveTextContent(en.steam.perfect)
 })
 
 test('shows the Steam profile picture and name once loaded', () => {

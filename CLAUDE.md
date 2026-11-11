@@ -10,6 +10,7 @@ Index of the docs: `docs/README.md`. Before working in an area, read its doc:
 | How UI work is done (canvas first) and every design made | `docs/design-process.md`, `docs/designs.md` |
 | Sign-up, sessions, email, the admin panel, Steam and RA sign-in | `docs/accounts.md` |
 | RA, Steam, PSN, Xbox, and how each fails | `docs/platforms/` |
+| A component written once per platform (one shell, an adapter each) | `docs/platform-shells.md` |
 | Performance and what each page loads | `docs/performance.md` |
 | Presence, follows, the showcase, Vault Points and the rankings | `docs/social.md` (formula: `docs/rankings-plan.md`) |
 | Synced preferences, consoles to show, hidden games, completion dates | `docs/library.md` |
@@ -253,7 +254,9 @@ that keep the look; the landing's first screen is chosen ("Primera pantalla 1 v2
   room and its place, so the visual order holds. Do not size a card to its content to "fix" empty space.
 - **Look before writing.** The two biggest findings were the same component written once per platform (~4,500
   lines) and the library walked around (kickers in 95 files, the focus ring ×220, platform hex ×116). New
-  platform code goes into its family's shell; a new look goes into `ui/` with its guard rule.
+  platform code goes into its family's shell (`docs/platform-shells.md`: a shell, an adapter per platform, one
+  `describe.each` contract suite; reuse `CompareAchievement`, never a new achievement shape); a new look goes
+  into `ui/` with its guard rule.
 - **Short functions, short components.** A 200-line function that could be 50 is a bug (the owner's words).
   Split before it grows; one helper, never two or three copies.
 - **Screenshots of a signed-in account lie unless intercepted:** the account's synced preferences and theme

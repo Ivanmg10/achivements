@@ -6,14 +6,13 @@ import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { XboxAchievementGrid } from '@/components/xbox/xbox-achievement-grid/XboxAchievementGrid'
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetail'
+import { asCategory } from '@/utils/utils'
 import { fromXbox } from '@/utils/gameInsights'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { XboxGameProgress } from '@/types/xbox'
 import { latestFullSetCompletedAt } from '@/utils/completionDates'
-import type { GameStatus } from '@/types/game'
 import ErrorRetry from '@/components/ui/ErrorRetry'
 
-const asCategory = (c?: string): GameStatus => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * An opened Xbox card in a status list: PsnLibraryDetail's counterpart.

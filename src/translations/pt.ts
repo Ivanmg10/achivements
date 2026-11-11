@@ -856,6 +856,8 @@ export const pt: Translations = {
     completions: 'conclusões',
   },
   cards: {
+    showAchievements: 'Ver conquistas',
+    hideAchievements: 'Ocultar conquistas',
     sectionFriends: 'A seguir',
     statsActivity: 'Estatísticas & Atividade',
     dailyAchievements: 'Conquistas diárias · últimos 7 dias',
@@ -1299,8 +1301,6 @@ export const pt: Translations = {
     locked: 'Bloqueada',
     achievementsError: 'Não foi possível carregar as conquistas',
     retry: 'Tentar novamente',
-    showAchievements: 'Ver conquistas',
-    hideAchievements: 'Ocultar conquistas',
     nowPlaying: 'A jogar agora',
     gamesSection: 'Steam',
     gamesError: 'Não foi possível carregar os teus jogos Steam',

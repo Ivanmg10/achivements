@@ -1,27 +1,21 @@
 'use client'
 
-import Link from 'next/link'
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { IconChevronDown, IconGripVertical } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
-import { ProgressBar } from '@/components/ui/ProgressBar'
-import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
+import { COVER_ROW_IMAGE } from '@/components/game-card-cover/GameCardCover'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamRecentlyPlayedExpanded from '@/components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded'
-import { gameKey } from '@/utils/gameRef'
+import { gameHref } from '@/utils/gameRef'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
+import PinnedGameCard from '../pinned-game-card/PinnedGameCard'
 
 /**
- * A pinned Steam game on the main page — PinnedGameRow's counterpart: drag
- * handle, cover, title, Steam label, progress bar, unpin, and the same
- * expanded dashboard as the recent feed. Game data comes from the shared
- * library, so a pin costs no request of its own.
+ * A pinned Steam game on the home. Game data comes from the shared library, so a pin costs no request
+ * of its own; one for a game no longer in it (refunded, family share ended) still renders, with what
+ * can be known without it.
  */
 export default function SteamPinnedGameRow({
   appId,
@@ -34,95 +28,33 @@ export default function SteamPinnedGameRow({
 }) {
   const { T } = useLanguage()
   const { library, recent, libraryLoading } = useSteamGamesData()
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: gameKey('steam', appId),
-  })
-  const style = { transform: CSS.Transform.toString(transform), transition }
+  const card = { source: 'steam', gameId: appId, isOpen, onToggle } as const
 
   const found = library.find((g) => g.id === appId) ?? recent.find((g) => g.id === appId)
+  if (!found && libraryLoading) return <PinnedGameCard {...card} placeholder={<GameRowSkeleton />} />
 
-  if (!found && libraryLoading) {
-    return <div ref={setNodeRef} style={style}><GameRowSkeleton /></div>
-  }
-
-  // A pin for a game no longer in the library (refunded, family share ended)
-  // still renders, with what can be known without it.
-  const game =
-    found ??
-    toSteamGameProgress({ appid: appId, name: `App ${appId}`, playtime_forever: 0, has_community_visible_stats: true })
-  const href = `/steamGame/${appId}`
+  const game = found ?? toSteamGameProgress({ appid: appId, name: `App ${appId}`, playtime_forever: 0, has_community_visible_stats: true })
   const hasCounts = game.achievementsLoaded && game.maxPossible > 0
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
-    >
-      <GameCardBackdrop src={steamAssetUrl(appId, 'header')} />
-      <div className="flex items-center gap-3 px-3 py-3 w-full">
-        <button
-          {...attributes}
-          {...listeners}
-          aria-label={T.cards.dragToReorder}
-          className="text-text-secondary/30 hover:text-text-secondary cursor-grab active:cursor-grabbing touch-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam rounded"
-        >
-          <IconGripVertical className="w-4 h-4" aria-hidden />
-        </button>
-
-        {/* Same destination as the title link, so it is kept out of the tab order. */}
-        <Link href={href} tabIndex={-1} aria-hidden="true" className="shrink-0">
-          <SteamGameImage appId={appId} asset="icon" iconUrl={game.imageIcon} size={56} className="rounded-tile w-14 h-14" />
-        </Link>
-
-        <div className="flex flex-col min-w-0 flex-1 gap-1">
-          <Link
-            href={href}
-            className="w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam rounded"
-          >
-            <span className="text-base font-bold block truncate leading-tight">{game.title}</span>
-          </Link>
-
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 shrink-0 text-xs text-text-secondary">
-              <SteamLogo size={12} className="opacity-60" aria-hidden="true" />
-              Steam
-            </span>
-            {hasCounts && <ProgressBar pct={game.pctWon} label={game.title} className="flex-1" />}
-            <PinToggleButton gameId={appId} source="steam" className="ml-auto" />
-            <button
-              onClick={onToggle}
-              aria-expanded={isOpen}
-              aria-label={`${isOpen ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.title}`}
-              className="p-1 rounded-box-sm text-text-secondary/40 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam shrink-0"
-            >
-              <IconChevronDown
-                size={14}
-                aria-hidden="true"
-                className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
-              />
-            </button>
-          </div>
-
-          {hasCounts && (
-            <div className="flex items-center gap-2 text-xs text-text-secondary">
-              <span>
-                {game.numAwarded}/{game.maxPossible} {T.statusGameItem.achievements}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {isOpen && (
-        <div className="px-3 pb-3 pt-1">
-          {game.hasStats ? (
-            <SteamRecentlyPlayedExpanded game={game} />
-          ) : (
-            <p className="text-sm text-text-secondary">{T.steam.noAchievements}</p>
-          )}
-        </div>
-      )}
-    </div>
+    <PinnedGameCard
+      {...card}
+      view={{
+        href: gameHref('steam', appId),
+        title: game.title,
+        backdrop: steamAssetUrl(appId, 'header'),
+        cover: <SteamGameImage appId={appId} asset="icon" iconUrl={game.imageIcon} size={56} className={COVER_ROW_IMAGE} />,
+        platform: (
+          <>
+            <SteamLogo size={12} className="opacity-60" aria-hidden="true" />
+            Steam
+          </>
+        ),
+        progress: hasCounts ? { pct: game.pctWon } : null,
+        counts: hasCounts && <span>{game.numAwarded}/{game.maxPossible} {T.statusGameItem.achievements}</span>,
+        expand: { show: T.cards.showAchievements, hide: T.cards.hideAchievements },
+        panel: game.hasStats ? <SteamRecentlyPlayedExpanded game={game} /> : <p className="text-sm text-text-secondary">{T.steam.noAchievements}</p>,
+      }}
+    />
   )
 }

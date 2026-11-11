@@ -1,45 +1,22 @@
 'use client'
 
-import { memo, useRef, useState } from 'react'
-import { decimal } from '@/utils/utils'
-import Image from 'next/image'
-import Link from 'next/link'
+import { memo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
-import { formatDate } from '@/utils/dates'
-import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
-import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
-import type { SteamAchievementUnified } from '@/types/steam'
-import ShowAllButton from '@/components/show-all-button/ShowAllButton'
-import { capList } from '@/utils/utils'
 import { useSubject } from '@/context/SubjectContext'
+import { useAchievementPins, STEAM_PINS } from '@/hooks/useAchievementPins'
+import { formatDate } from '@/utils/dates'
 import { gameHref } from '@/utils/gameRef'
-import CursorTooltip from '@/components/ui/CursorTooltip'
-
-const SIZE_CLASSES = {
-  40: { badge: 'w-10 h-10', img: 40 },
-  48: { badge: 'w-12 h-12', img: 48 },
-} as const
-
-const TOOLTIP_DELAY_MS = 450
-
-type Tooltip = { achievement: SteamAchievementUnified; x: number; y: number }
-
-/** Anchor id for an achievement row on the Steam game page. */
-export function achievementAnchor(apiname: string): string {
-  return `ach-${apiname}`
-}
+import { steamAchievementAnchor } from '@/utils/steamTitles'
+import BadgeGrid from '@/components/badge-grid/BadgeGrid'
+import BadgeRarity from '@/components/badge-grid/badge-tip-parts/BadgeRarity'
+import BadgeEarnedChip from '@/components/badge-grid/badge-tip-parts/BadgeEarnedChip'
+import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
+import type { SteamAchievementUnified } from '@/types/steam'
 
 /**
- * A Steam game's achievements as a badge grid, matching RA's AchievementGrid:
- * earned badges get a ring, locked ones are the same colour badge greyed out
- * (Steam's own grey icons are often too dark to make out), and hovering shows
- * the details.
- *
- * Each badge links to that achievement on the game page. Earned/locked is in
- * the accessible name too, not only in the greyscale. A star in the corner
- * pins it to the main page's pinned card — shown on hover/focus, and always
- * once pinned.
+ * A Steam game's achievements in the shared badge grid. Locked ones are the colour badge greyed out (Steam's
+ * own grey icons are often too dark to make out). Steam keeps a secret achievement's text hidden until it
+ * is unlocked, but gives its picture, so that stays; the tooltip flags one that probably needs online play.
  */
 export const SteamAchievementGrid = memo(function SteamAchievementGrid({
   appId,
@@ -57,103 +34,34 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
 }) {
   const { T, lang } = useLanguage()
   const subject = useSubject()
-  const { pinned, toggle, canPin } = useSteamFavoriteAchievements(appId, gameTitle)
-  const [tooltip, setTooltip] = useState<Tooltip | null>(null)
-  const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const size = SIZE_CLASSES[badgeSize]
-  const [showAll, setShowAll] = useState(false)
-  const { visible: shown, capped } = capList(achievements, limit ?? Infinity, showAll)
-
-  function show(a: SteamAchievementUnified, x: number, y: number, delay = TOOLTIP_DELAY_MS) {
-    clearTimeout(hoverTimeout.current)
-    hoverTimeout.current = setTimeout(() => setTooltip({ achievement: a, x, y }), delay)
-  }
-
-  function hide() {
-    clearTimeout(hoverTimeout.current)
-    setTooltip(null)
-  }
-
-  // Steam keeps the text of secret achievements hidden until they are unlocked.
-  const concealed = (a: SteamAchievementUnified) => a.hidden && !a.earned
-  const titleOf = (a: SteamAchievementUnified) => (concealed(a) ? T.steam.hiddenAchievement : a.title)
+  const { pins } = useAchievementPins(STEAM_PINS, appId, gameTitle)
 
   return (
-    <>
-      <ul className="flex flex-wrap gap-1">
-        {shown.map((a) => (
-          <li key={a.apiname} className="relative group/badge">
-            <Link
-              href={`${gameHref('steam', appId, subject)}#${achievementAnchor(a.apiname)}`}
-              aria-label={`${titleOf(a)} — ${a.earned ? T.steam.earned : T.steam.locked}`}
-              onMouseEnter={(e) => show(a, e.clientX, e.clientY)}
-              onMouseLeave={hide}
-              onFocus={(e) => {
-                const r = e.currentTarget.getBoundingClientRect()
-                show(a, r.right, r.top, 0)
-              }}
-              onBlur={hide}
-              className={`block rounded-box overflow-hidden shrink-0 transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                a.earned ? 'ring-2 ring-steam' : ''
-              }`}
-            >
-              {a.badgeUrl ? (
-                <Image
-                  src={a.badgeUrl}
-                  alt=""
-                  width={size.img}
-                  height={size.img}
-                  className={`${size.badge} object-cover ${a.earned ? '' : 'grayscale opacity-40'}`}
-                  unoptimized
-                />
-              ) : (
-                <div className={`${size.badge} bg-ink/10 ${a.earned ? '' : 'opacity-40'}`} aria-hidden="true" />
-              )}
-            </Link>
-            {canPin && (
-              <SteamPinAchievementButton
-                pinned={pinned.has(a.apiname)}
-                title={titleOf(a)}
-                onToggle={() => toggle(a)}
-                size={12}
-                className={`absolute -top-1 -right-1 z-20 w-5 h-5 rounded-full bg-bg-card/90 flex items-center justify-center ${
-                  pinned.has(a.apiname) ? 'opacity-100' : 'opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100'
-                }`}
-              />
-            )}
-          </li>
-        ))}
-      </ul>
-      {capped && <ShowAllButton total={achievements.length} expanded={showAll} onToggle={() => setShowAll((v) => !v)} />}
-
-      {/* Portal so the tooltip escapes any ancestor transform stacking context */}
-      {tooltip && (
-        <CursorTooltip x={tooltip.x} y={tooltip.y}>
-            <p className="text-sm font-semibold text-text-main">{titleOf(tooltip.achievement)}</p>
-            <p className="text-xs text-text-secondary mt-1 leading-snug">
-              {concealed(tooltip.achievement) ? T.steam.hiddenAchievementDesc : tooltip.achievement.description}
-            </p>
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
-              {tooltip.achievement.globalPct !== null && (
-                <span className="text-xs text-text-secondary">
-                  {decimal(tooltip.achievement.globalPct, lang)}
-                  {T.achievement.haveIt}
-                </span>
-              )}
-              {tooltip.achievement.earned ? (
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-steam/20 text-steam">
-                  {T.steam.earned}
-                </span>
-              ) : (
-                <span className="text-xs text-text-secondary">{T.achievement.notEarned}</span>
-              )}
-              {tooltip.achievement.likelyOnline && <SteamOnlineBadge />}
-            </div>
-            {tooltip.achievement.dateEarned && (
-              <p className="text-xs text-text-secondary mt-1">{formatDate(tooltip.achievement.dateEarned, lang)}</p>
-            )}
-          </CursorTooltip>
-      )}
-    </>
+    <BadgeGrid<SteamAchievementUnified>
+      items={achievements}
+      keyOf={(a) => a.apiname}
+      href={(a) => `${gameHref('steam', appId, subject)}#${steamAchievementAnchor(a.apiname)}`}
+      badgeSize={badgeSize}
+      limit={limit}
+      name={(a, concealed) => (concealed ? T.steam.hiddenAchievement : a.title)}
+      label={(a, name) => `${name} — ${a.earned ? T.steam.earned : T.steam.locked}`}
+      earned={(a) => a.earned}
+      ring={(a) => (a.earned ? 'ring-steam' : undefined)}
+      icon={(a) => a.badgeUrl || null}
+      secret={(a) => a.hidden && !a.earned}
+      keepSecretIcon
+      pins={pins}
+      tip={(a, concealed) => ({
+        description: concealed ? T.steam.hiddenAchievementDesc : a.description,
+        chips: (
+          <>
+            <BadgeRarity pct={a.globalPct} />
+            <BadgeEarnedChip earned={a.earned} label={T.steam.earned} className="bg-steam/20 text-steam" />
+            {a.likelyOnline && <SteamOnlineBadge />}
+          </>
+        ),
+        date: a.dateEarned ? formatDate(a.dateEarned, lang) : null,
+      })}
+    />
   )
 })

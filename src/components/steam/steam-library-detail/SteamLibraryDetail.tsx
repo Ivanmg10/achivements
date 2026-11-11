@@ -5,14 +5,13 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
 import { SteamAchievementGrid } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetail'
+import { asCategory } from '@/utils/utils'
 import { fromSteam } from '@/utils/gameInsights'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
 import { latestFullSetCompletedAt } from '@/utils/completionDates'
-import type { GameStatus } from '@/types/game'
 import ErrorRetry from '@/components/ui/ErrorRetry'
 
-const asCategory = (c?: string): GameStatus => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * An opened Steam card in a status list. The achievements load when this

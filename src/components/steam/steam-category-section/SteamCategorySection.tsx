@@ -1,50 +1,33 @@
 'use client'
 
-import { useMemo } from 'react'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import { titleMatches } from '@/utils/gameCandidates'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
-import CollapsibleSection from '@/components/collapsible-section/CollapsibleSection'
-import CollapsibleSectionPreview from '@/components/collapsible-section/collapsible-section-preview/CollapsibleSectionPreview'
-import SteamStatusGameList from '@/components/steam/steam-status-game-list/SteamStatusGameList'
-import EmptyState from '@/components/empty-state/EmptyState'
-import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import { steamPreviewGames } from '@/utils/sectionPreview'
-import { matchesQuick, steamProgress, type QuickFilter } from '@/utils/libraryInsights'
-import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
-import ErrorRetry from '@/components/ui/ErrorRetry'
-
-const SKELETON_CARDS = 4
-
-/** Skeleton only — the real list uses the masonry layout. */
-const GRID_CLASS: Record<StatusGridCols, string> = {
-  1: 'grid-cols-1',
-  2: 'grid-cols-1 md:grid-cols-2',
-  3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-}
+import { steamProgress, type QuickFilter } from '@/utils/libraryInsights'
+import PlatformCategorySection from '@/components/platform-category-section/PlatformCategorySection'
+import SteamStatusGameItem from '@/components/steam/steam-status-game-item/SteamStatusGameItem'
+import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 
 /**
- * The Steam games belonging to one category, as their own foldable section
- * under the RA list rather than mixed into it: the RA list's filtering,
- * sorting and console pills are all built on RA fields Steam games do not
- * have. Cards and layout match the RA list. Renders nothing for users
- * without Steam linked.
+ * The Steam games of one category, as the shared foldable section under the RA list rather than mixed
+ * into it: the RA list's filtering, sorting and console pills are all built on RA fields Steam games do
+ * not have. Steam's progress counts can stop short on a long library, and the section says so. Renders
+ * nothing for users without Steam linked.
  */
 export default function SteamCategorySection({
   category,
-  gridCols = 2,
+  gridCols,
   title,
-  className = '',
-  query = '',
-  quick = 'all',
-  preview = { columns: 3, count: 3 },
+  className,
+  query,
+  quick,
+  preview,
 }: {
   category: string
   gridCols?: StatusGridCols
   /** Heading override, for pages that show several categories at once. */
   title?: string
-  /** Root classes — lets a page card the section without an empty card when unlinked. */
+  /** Root classes: lets a page card the section without an empty card when unlinked. */
   className?: string
   /** Title filter shared with the RA list, from the page's search box. */
   query?: string
@@ -54,42 +37,24 @@ export default function SteamCategorySection({
   preview?: { columns: number; count: number }
 }) {
   const { T } = useLanguage()
-  const { games: allGames, isLinked, loading, error, progressTruncated, refetch } = useSteamGamesByCategory(category)
-  const games = useMemo(() => allGames.filter((g) => titleMatches(g.title, query) && matchesQuick(steamProgress(g), quick)), [allGames, query, quick])
-
-  if (!isLinked) return null
+  const data = useSteamGamesByCategory(category)
 
   return (
-    <CollapsibleSection
+    <PlatformCategorySection
+      source="steam"
+      category={category}
+      gridCols={gridCols}
       title={title ?? T.steam.gamesSection}
-      icon={<SteamLogo size={22} className="text-steam" aria-hidden="true" />}
-      count={loading || error ? undefined : games.length}
-      storageKey={`steam-section-open:${category}`}
       className={className}
-      preview={error ? null : <CollapsibleSectionPreview games={steamPreviewGames(games)} loading={loading} columns={preview.columns} count={preview.count} />}
-    >
-      {progressTruncated && category !== 'wantToPlay' && !loading && !error && (
-        <p className="text-xs text-text-secondary">{T.steam.partialProgressNote}</p>
-      )}
-
-      {loading ? (
-        <div aria-busy="true" className={`grid gap-3 ${GRID_CLASS[gridCols]}`}>
-          {Array.from({ length: SKELETON_CARDS }).map((_, i) => (
-            <GameCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : error ? (
-        <ErrorRetry message={T.steam.gamesError} hint={T.steam.privateProfileHint} retryLabel={T.steam.retry} onRetry={refetch} />
-      ) : games.length === 0 ? (
-        <EmptyState
-          size="compact"
-          icon={<SteamLogo className="w-6 h-6" />}
-          title={query || quick !== 'all' ? T.search.noResults : T.steam.noGamesInCategory}
-          className="py-6"
-        />
-      ) : (
-        <SteamStatusGameList games={games} gridCols={gridCols} category={category} />
-      )}
-    </CollapsibleSection>
+      query={query}
+      quick={quick}
+      preview={preview}
+      data={data}
+      progressOf={steamProgress}
+      previewOf={steamPreviewGames}
+      renderItem={(g) => <SteamStatusGameItem game={g} category={category} />}
+      texts={{ error: T.steam.gamesError, errorHint: T.steam.privateProfileHint, retry: T.steam.retry, empty: T.steam.noGamesInCategory }}
+      note={data.progressTruncated && category !== 'wantToPlay' && <p className="text-xs text-text-secondary">{T.steam.partialProgressNote}</p>}
+    />
   )
 }

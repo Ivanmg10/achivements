@@ -856,6 +856,8 @@ export const ja: Translations = {
     completions: '達成',
   },
   cards: {
+    showAchievements: '実績を表示',
+    hideAchievements: '実績を隠す',
     sectionFriends: 'フォロー中',
     statsActivity: '統計 & アクティビティ',
     dailyAchievements: 'デイリー実績 · 直近7日間',
@@ -1299,8 +1301,6 @@ export const ja: Translations = {
     locked: '未解除',
     achievementsError: '実績を読み込めませんでした',
     retry: '再試行',
-    showAchievements: '実績を表示',
-    hideAchievements: '実績を隠す',
     nowPlaying: 'プレイ中',
     gamesSection: 'Steam',
     gamesError: 'Steam のゲームを読み込めませんでした',

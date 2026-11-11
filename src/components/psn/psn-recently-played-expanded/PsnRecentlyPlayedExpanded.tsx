@@ -3,23 +3,19 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnTrophies } from '@/hooks/usePsnTrophies'
 import { fromPsn } from '@/utils/gameInsights'
-import { CircularProgress } from '@/components/ui/CircularProgress'
-import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
+import GameExpandedLayout from '@/components/game-expanded-layout/GameExpandedLayout'
+import LazyBadgeGrid from '@/components/badge-grid/lazy-badge-grid/LazyBadgeGrid'
 import { PsnTrophyGrid } from '@/components/psn/psn-trophy-grid/PsnTrophyGrid'
 import PsnRarestTrophies from '@/components/psn/psn-rarest-trophies/PsnRarestTrophies'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
 import type { PsnGameProgress } from '@/types/psn'
-import { Skeleton } from '@/components/ui/Skeleton'
-import ErrorRetry from '@/components/ui/ErrorRetry'
 
 const SKELETON_BADGES = 24
 
 /**
- * An expanded PSN game in the recent feed and the pinned list, laid out
- * exactly like Steam's: progress ring (with the trophies by grade), the
- * trophies-over-time chart and the rarest earned on top, the full badge grid
- * across the card below. Trophies load when this mounts, i.e. when the card is
- * opened; until then the ring uses the counts the list already has.
+ * An opened PSN game in the recent feed and the pinned list: the ring with the trophies by grade, the
+ * chart and the rarest earned, the full grid below. Trophies load when this mounts, i.e. when the card
+ * is opened; until then the ring uses the counts the list already has.
  */
 export default function PsnRecentlyPlayedExpanded({ game }: { game: PsnGameProgress }) {
   const { T } = useLanguage()
@@ -30,39 +26,25 @@ export default function PsnRecentlyPlayedExpanded({ game }: { game: PsnGameProgr
   const total = loaded ? trophies.length : game.maxPossible
   const earned = loaded ? trophies.filter((t) => t.earned).length : game.numAwarded
 
-  const unlocks = fromPsn(trophies, game.id)
-
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
-        <CircularProgress earned={earned} total={total} label={T.psn.trophies} size={130} />
-        <PsnTrophyCounts earned={game.earned} of={game.defined} className="flex-col items-start! lg:items-center!" />
-      </div>
-
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
-        <p className="text-sm font-bold text-text-main mb-2.5">{T.psn.trophies}</p>
-        {isLoading ? (
-          <ul aria-busy="true" className="flex flex-wrap gap-1">
-            {Array.from({ length: Math.min(total || SKELETON_BADGES, 60) }).map((_, i) => (
-              <li key={i}><Skeleton radius="tile" className="w-10 h-10" /></li>
-            ))}
-          </ul>
-        ) : error ? (
-          <ErrorRetry message={T.psn.trophiesError} hint={error === 'private' ? T.psn.errors.private : undefined} retryLabel={T.psn.retry} onRetry={retry} />
-        ) : loaded ? (
-          <PsnTrophyGrid gameId={game.id} gameTitle={game.title} trophies={trophies} groups={groups} badgeSize={40} />
-        ) : (
-          <p className="text-sm text-text-secondary">{T.psn.noTrophies}</p>
-        )}
-      </div>
-
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-2 lg:row-start-1">
-        <GameAchievementsProgressChart achievements={unlocks} isLoading={isLoading} />
-      </div>
-
-      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-3 lg:row-start-1">
-        <PsnRarestTrophies gameId={game.id} trophies={trophies} isLoading={isLoading} />
-      </div>
-    </div>
+    <GameExpandedLayout
+      earned={earned}
+      total={total}
+      ringLabel={T.psn.trophies}
+      ringExtra={<PsnTrophyCounts earned={game.earned} of={game.defined} className="flex-col items-start! lg:items-center!" />}
+      gridTitle={T.psn.trophies}
+      unlocks={fromPsn(trophies, game.id)}
+      isLoading={isLoading}
+      side={<PsnRarestTrophies gameId={game.id} trophies={trophies} isLoading={isLoading} />}
+    >
+      <LazyBadgeGrid
+        loading={isLoading}
+        count={total || SKELETON_BADGES}
+        error={error ? { message: T.psn.trophiesError, hint: error === 'private' ? T.psn.errors.private : undefined, retryLabel: T.psn.retry, onRetry: retry } : null}
+        empty={loaded ? null : T.psn.noTrophies}
+      >
+        <PsnTrophyGrid gameId={game.id} gameTitle={game.title} trophies={trophies} groups={groups} badgeSize={40} />
+      </LazyBadgeGrid>
+    </GameExpandedLayout>
   )
 }

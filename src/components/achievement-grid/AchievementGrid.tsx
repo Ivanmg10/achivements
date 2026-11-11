@@ -1,32 +1,39 @@
 'use client'
 
-import { memo, useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
+import { memo, useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { IconAlertTriangle } from '@tabler/icons-react'
 import dynamic from 'next/dynamic'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
-import ShowAllButton from '@/components/show-all-button/ShowAllButton'
-import { capList } from '@/utils/utils'
+import { useAchievementPins, RA_PINS } from '@/hooks/useAchievementPins'
 import { formatDate } from '@/utils/dates'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { raTypeTag } from '@/components/ui/dataTable'
 import { raBadgeUrl } from '@/utils/raAssets'
-import CursorTooltip from '@/components/ui/CursorTooltip'
+import BadgeGrid from '@/components/badge-grid/BadgeGrid'
+import BadgeEarnedChip from '@/components/badge-grid/badge-tip-parts/BadgeEarnedChip'
 
 // Downloaded the first time it opens, not with the page.
 const AchievementModal = dynamic(() => import('@/components/achievement-modal/AchievementModal'), { loading: () => null })
 
-type TooltipData = { achievement: RetroAchievement; x: number; y: number }
+const SKELETON_BADGES = 30
 
-const SIZE_CLASSES = {
-  40: { badge: 'w-10 h-10', img: 40 },
-  48: { badge: 'w-12 h-12', img: 48 },
-} as const
+// Missables not earned yet are marked, so they can be seen at a glance before it is too late.
+const isMissable = (a: RetroAchievement) => a.Type === 'missable' && !a.DateEarned && !a.DateEarnedHardcore
 
-// Memoized so tooltip/selection state changes don't re-render the parent card
+/** The ring an RA badge wears: hardcore, softcore, or red for a missable one not earned yet. */
+function raRing(a: RetroAchievement) {
+  if (a.DateEarnedHardcore) return 'ring-hardcore'
+  if (a.DateEarned) return 'ring-softcore'
+  return isMissable(a) ? 'ring-danger' : undefined
+}
+
+/**
+ * A retro game's achievements in the shared badge grid: hardcore and softcore tell apart by their ring,
+ * and a badge opens the achievement's window instead of a page of its own. The badges are shown once
+ * their pictures have loaded (or a moment has passed), so the grid does not fill in piece by piece.
+ */
 export const AchievementGrid = memo(function AchievementGrid({
   achievements,
   total,
@@ -46,7 +53,6 @@ export const AchievementGrid = memo(function AchievementGrid({
   limit?: number
 }) {
   const { T, lang } = useLanguage()
-  const [tooltip, setTooltip] = useState<TooltipData | null>(null)
   const [selected, setSelected] = useState<RetroAchievement | null>(null)
   // The badge set whose images have loaded. Keyed by the badges, not the array:
   // a parent re-rendering hands over a new array of the same achievements, and
@@ -54,17 +60,9 @@ export const AchievementGrid = memo(function AchievementGrid({
   const badgeKey = achievements.map((a) => a.BadgeName).join(',')
   const [loadedKey, setLoadedKey] = useState<string | null>(null)
   const allLoaded = achievements.length === 0 || loadedKey === badgeKey
-  const [showAll, setShowAll] = useState(false)
-  const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const size = SIZE_CLASSES[badgeSize]
-  const { visible: shown, capped } = capList(achievements, limit ?? Infinity, showAll)
-  // Missables not earned yet are marked, so they can be seen at a glance before it is too late.
-  const isMissable = (a: RetroAchievement) => a.Type === 'missable' && !a.DateEarned && !a.DateEarnedHardcore
   const missables = achievements.filter(isMissable).length
 
-  const { favoritedIds, toggleFavorite } = useRaFavoriteIds(gameId)
-  const handleToggleFavorite = (achievement: RetroAchievement) =>
-    toggleFavorite(achievement, { gameTitle, numDistinctPlayers })
+  const { pins } = useAchievementPins(RA_PINS, gameId, gameTitle, { numDistinctPlayers })
 
   useEffect(() => {
     if (!badgeKey) return
@@ -91,22 +89,11 @@ export const AchievementGrid = memo(function AchievementGrid({
     }
   }, [badgeKey])
 
-  const tooltipTag = tooltip ? raTypeTag(tooltip.achievement.Type, T.achievement) : null
-
-  function handleEnter(a: RetroAchievement, x: number, y: number) {
-    hoverTimeout.current = setTimeout(() => setTooltip({ achievement: a, x, y }), 450)
-  }
-
-  function handleLeave() {
-    if (hoverTimeout.current) clearTimeout(hoverTimeout.current)
-    setTooltip(null)
-  }
-
   if (achievements.length === 0) {
     return (
       <div className="flex flex-wrap gap-1">
-        {Array.from({ length: Math.min(total, 30) }).map((_, i) => (
-          <Skeleton key={i} radius="tile" className={size.badge} />
+        {Array.from({ length: Math.min(total, SKELETON_BADGES) }).map((_, i) => (
+          <Skeleton key={i} radius="tile" className={badgeSize === 48 ? 'w-12 h-12' : 'w-10 h-10'} />
         ))}
       </div>
     )
@@ -120,98 +107,46 @@ export const AchievementGrid = memo(function AchievementGrid({
           {T.libraryDetail.missable}: {missables}
         </p>
       )}
-      {!allLoaded && (
-        <div className="flex flex-wrap gap-1">
-          {shown.map((_, i) => (
-            <Skeleton key={i} radius="tile" className={size.badge} />
-          ))}
-        </div>
-      )}
-      <div className={allLoaded ? 'flex flex-wrap gap-1' : 'hidden'}>
-        {shown.map((a) => {
-          const isHardcore = !!a.DateEarnedHardcore
-          const isSoftcore = !!a.DateEarned && !a.DateEarnedHardcore
-          const earnedAny = isHardcore || isSoftcore
-          const missable = isMissable(a)
-
-          return (
-            <button
-              type="button"
-              key={a.ID}
-              aria-label={`${a.Title}, ${missable ? `${T.achievement.missable}, ` : ''}${earnedAny ? T.steam.earned : T.steam.locked}`}
-              onMouseEnter={(e) => handleEnter(a, e.clientX, e.clientY)}
-              onMouseLeave={handleLeave}
-              onFocus={(e) => {
-                const r = e.currentTarget.getBoundingClientRect()
-                handleEnter(a, r.right, r.top)
-              }}
-              onBlur={handleLeave}
-              onClick={() => {
-                handleLeave()
-                setSelected(a)
-              }}
-              className={`block rounded-box overflow-hidden shrink-0 cursor-pointer transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                isHardcore ? 'ring-2 ring-hardcore' : isSoftcore ? 'ring-2 ring-softcore' : missable ? 'ring-2 ring-danger' : ''
-              }`}
-            >
-              {a.BadgeName ? (
-                <Image
-                  src={raBadgeUrl(a.BadgeName)!}
-                  alt=""
-                  width={size.img}
-                  height={size.img}
-                  className={`${size.badge} object-cover ${earnedAny ? '' : 'grayscale opacity-40'}`}
-                  unoptimized
-                />
-              ) : (
-                <div className={`${size.badge} rounded-box bg-ink/10 ${earnedAny ? '' : 'opacity-40'}`} />
-              )}
-              {missable && (
-                <span aria-hidden="true" className="absolute bottom-0 right-0 flex items-center justify-center w-4 h-4 rounded-tl-box-md bg-danger text-bg-main">
-                  <IconAlertTriangle size={11} stroke={2.5} />
-                </span>
-              )}
-            </button>
+      <BadgeGrid<RetroAchievement>
+        items={achievements}
+        keyOf={(a) => a.ID}
+        onSelect={setSelected}
+        badgeSize={badgeSize}
+        limit={limit}
+        loading={!allLoaded}
+        name={(a) => a.Title}
+        label={(a, name) =>
+          `${name}, ${isMissable(a) ? `${T.achievement.missable}, ` : ''}${a.DateEarned || a.DateEarnedHardcore ? T.steam.earned : T.steam.locked}`
+        }
+        earned={(a) => !!(a.DateEarned || a.DateEarnedHardcore)}
+        ring={raRing}
+        icon={(a) => (a.BadgeName ? (raBadgeUrl(a.BadgeName) ?? null) : null)}
+        corner={(a) =>
+          isMissable(a) && (
+            <span aria-hidden="true" className="absolute bottom-0 right-0 flex items-center justify-center w-4 h-4 rounded-tl-box-md bg-danger text-bg-main">
+              <IconAlertTriangle size={11} stroke={2.5} />
+            </span>
           )
-        })}
-      </div>
-      {allLoaded && capped && (
-        <ShowAllButton total={achievements.length} expanded={showAll} onToggle={() => setShowAll((s) => !s)} />
-      )}
-
-      {/* Portal so the tooltip escapes any ancestor Framer Motion transform stacking context */}
-      {tooltip && (
-        <CursorTooltip x={tooltip.x} y={tooltip.y}>
-            <p className="text-sm font-semibold text-text-main">{tooltip.achievement.Title}</p>
-            <p className="text-xs text-text-secondary mt-1 leading-snug">
-              {tooltip.achievement.Description}
-            </p>
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="text-xs text-text-secondary">{tooltip.achievement.Points} {T.libraryDetail.pointsShort}</span>
-              {tooltipTag && (
-                <span className={`text-xs px-1.5 py-0.5 rounded-full ${tooltipTag.className}`}>{tooltipTag.label}</span>
-              )}
-              {tooltip.achievement.DateEarnedHardcore && (
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-warning/20 text-warning">
-                  {T.achievement.hardcore}
-                </span>
-              )}
-              {tooltip.achievement.DateEarned && !tooltip.achievement.DateEarnedHardcore && (
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-info/20 text-info">
-                  {T.achievement.softcore}
-                </span>
-              )}
-              {!tooltip.achievement.DateEarned && !tooltip.achievement.DateEarnedHardcore && (
-                <span className="text-xs text-text-secondary">{T.achievement.notEarned}</span>
-              )}
-            </div>
-            {(tooltip.achievement.DateEarnedHardcore ?? tooltip.achievement.DateEarned) && (
-              <p className="text-xs text-text-secondary mt-1">
-                {formatDate(tooltip.achievement.DateEarnedHardcore ?? tooltip.achievement.DateEarned, lang)}
-              </p>
-            )}
-          </CursorTooltip>
-      )}
+        }
+        tip={(a) => {
+          const tag = raTypeTag(a.Type, T.achievement)
+          return {
+            description: a.Description,
+            chips: (
+              <>
+                <span className="text-xs text-text-secondary">{a.Points} {T.libraryDetail.pointsShort}</span>
+                {tag && <span className={`text-xs px-1.5 py-0.5 rounded-full ${tag.className}`}>{tag.label}</span>}
+                {a.DateEarnedHardcore ? (
+                  <BadgeEarnedChip earned label={T.achievement.hardcore} className="bg-warning/20 text-warning" />
+                ) : (
+                  <BadgeEarnedChip earned={!!a.DateEarned} label={T.achievement.softcore} className="bg-info/20 text-info" />
+                )}
+              </>
+            ),
+            date: a.DateEarnedHardcore ?? a.DateEarned ? formatDate(a.DateEarnedHardcore ?? a.DateEarned, lang) : null,
+          }
+        }}
+      />
 
       <AnimatePresence>
         {selected && (
@@ -221,8 +156,8 @@ export const AchievementGrid = memo(function AchievementGrid({
             onClose={() => setSelected(null)}
             gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
             gameTitle={gameTitle}
-            isFavorited={favoritedIds.has(selected.ID)}
-            onToggleFavorite={() => handleToggleFavorite(selected)}
+            isFavorited={pins.isPinned(selected)}
+            onToggleFavorite={() => pins.toggle(selected)}
           />
         )}
       </AnimatePresence>

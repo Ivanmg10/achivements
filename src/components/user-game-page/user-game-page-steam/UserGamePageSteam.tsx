@@ -7,12 +7,11 @@ import { useSteamAchievements } from '@/hooks/useSteamAchievements'
 import { useSteamGameDetails } from '@/hooks/useSteamGameDetails'
 import { steamCompareList } from '@/utils/gameCompare'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
-import GameInfoSkeletonTable from '@/components/game-info-skeleton/game-info-skeleton-table/GameInfoSkeletonTable'
 import SteamGameHeroBackground from '@/components/steam/steam-game-hero-background/SteamGameHeroBackground'
 import SteamGameInfoHeader from '@/components/steam/steam-game-info-header/SteamGameInfoHeader'
 import GameCompareTable from '@/components/game-compare-table/GameCompareTable'
-import type { UserGamePlatformProps } from '../user-game-page-ra/UserGamePageRa'
-import { buttonClass } from '@/components/ui/Button'
+import UserGameCompareBody from '@/components/user-game-page/user-game-compare-body/UserGameCompareBody'
+import type { UserGamePlatformProps } from '@/types/userGamePage'
 
 /** A Steam game as a user has it (read inside SubjectProviders): the Steam page's header, then the comparison table. */
 export default function UserGamePageSteam({ id, username, banner, comparing, mine, mineLoading, notice }: UserGamePlatformProps) {
@@ -35,30 +34,17 @@ export default function UserGamePageSteam({ id, username, banner, comparing, min
         : null
 
   return (
-    <>
-      <SteamGameHeroBackground appId={appId} />
-      {banner}
-      <div className="relative w-full flex flex-col items-center">
-        <SteamGameInfoHeader appId={appId} title={title} game={game} details={details} counts={counts} />
-        <div className="w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-7">
-          {isLoading ? (
-            <div role="status" aria-busy="true" className="w-full flex flex-col items-center">
-              <span className="sr-only">{T.loadingPage.game}</span>
-              <GameInfoSkeletonTable />
-            </div>
-          ) : error ? (
-            <section className="bg-bg-card p-5 rounded-tile flex flex-col items-center gap-2 text-center">
-              <p role="alert" className="text-danger">{T.userGame.loadError.replace('{u}', username)}</p>
-              <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
-              <button onClick={retry} className={buttonClass('secondary', 'sm')}>
-                {T.publicProfile.retry}
-              </button>
-            </section>
-          ) : (
-            <GameCompareTable theirs={theirs} mine={mine} username={username} comparing={comparing} mineLoading={mineLoading} notice={notice} />
-          )}
-        </div>
-      </div>
-    </>
+    <UserGameCompareBody
+      background={<SteamGameHeroBackground appId={appId} />}
+      banner={banner}
+      header={<SteamGameInfoHeader appId={appId} title={title} game={game} details={details} counts={counts} />}
+      username={username}
+      isLoading={isLoading}
+      failed={Boolean(error)}
+      hint={T.steam.privateProfileHint}
+      onRetry={retry}
+    >
+      <GameCompareTable theirs={theirs} mine={mine} username={username} comparing={comparing} mineLoading={mineLoading} notice={notice} />
+    </UserGameCompareBody>
   )
 }

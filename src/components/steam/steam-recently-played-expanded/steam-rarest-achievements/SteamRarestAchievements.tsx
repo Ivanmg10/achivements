@@ -1,17 +1,12 @@
 'use client'
 
-import Image from 'next/image'
-import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
-import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { steamAchievementAnchor } from '@/utils/steamTitles'
 import { formatRarity } from '@/utils/steamFeed'
 import type { SteamAchievementUnified } from '@/types/steam'
-import { SkeletonRow } from '@/components/ui/SkeletonList'
-
-const SHOWN = 4
-const SKELETON_ROWS = 4
+import RarestEarned, { type RarestRow } from '@/components/rarest-earned/RarestEarned'
 
 /**
  * The player's rarest unlocks in a game, rarest first. Takes the slot RA's
@@ -30,57 +25,21 @@ export default function SteamRarestAchievements({
   const { T, lang } = useLanguage()
   const subject = useSubject()
 
-  const rarest = achievements
-    .filter((a) => a.earned && a.globalPct !== null)
-    .sort((a, b) => a.globalPct! - b.globalPct!)
-    .slice(0, SHOWN)
+  const rows = achievements
+    .filter((a): a is SteamAchievementUnified & { globalPct: number } => a.earned && a.globalPct !== null)
+    .map((a): RarestRow => ({
+      key: a.apiname,
+      name: a.title,
+      icon: a.badgeUrl || null,
+      href: `${gameHref('steam', appId, subject)}#${steamAchievementAnchor(a.apiname)}`,
+      rarity: a.globalPct,
+      subline: (
+        <span className="text-steam-perfect">
+          {formatRarity(a.globalPct, lang)}
+          {T.achievement.haveIt}
+        </span>
+      ),
+    }))
 
-  return (
-    <div className="flex flex-col gap-2 h-full">
-      <p className="text-text-secondary text-sm px-1">{T.steam.rarestUnlocked}</p>
-
-      {isLoading ? (
-        <ul aria-busy="true" className="flex flex-col gap-2">
-          {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-            <li key={i}><SkeletonRow className="h-12 px-1" /></li>
-          ))}
-        </ul>
-      ) : rarest.length === 0 ? (
-        <p className="flex-1 flex items-center justify-center text-center text-sm text-text-secondary px-4 py-6">
-          {T.steam.noneUnlocked}
-        </p>
-      ) : (
-        <ol className="flex flex-col gap-2">
-          {rarest.map((a) => (
-            <li key={a.apiname}>
-              <Link
-                href={`${gameHref('steam', appId, subject)}#${achievementAnchor(a.apiname)}`}
-                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam"
-              >
-                {a.badgeUrl ? (
-                  <Image
-                    src={a.badgeUrl}
-                    alt=""
-                    width={40}
-                    height={40}
-                    className="w-10 h-10 rounded-box ring-2 ring-steam shrink-0"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
-                )}
-                <span className="flex flex-col min-w-0">
-                  <span className="text-sm font-semibold truncate">{a.title}</span>
-                  <span className="text-xs text-steam-perfect">
-                    {formatRarity(a.globalPct!, lang)}
-                    {T.achievement.haveIt}
-                  </span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
-  )
+  return <RarestEarned title={T.steam.rarestUnlocked} empty={T.steam.noneUnlocked} isLoading={isLoading} rows={rows} ring="ring-steam" />
 }

@@ -1,54 +1,13 @@
 jest.mock('@/hooks/useXboxSummary', () => ({ useXboxSummary: jest.fn() }))
-jest.mock('@/components/day-achievements-modal/DayAchievementsModal', () => ({
-  __esModule: true,
-  default: ({ date }: { date: string }) => <div data-testid="day-modal">{date}</div>,
-}))
 
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import MainPageXboxStats from './MainPageXboxStats'
 import { useXboxSummary } from '@/hooks/useXboxSummary'
-import { en } from '@/translations/en'
-import type { RecentAchievement } from '@/types/types'
 
-const today = new Date().toISOString().split('T')[0]
-const unlock = (date: string) => ({ Date: `${date} 12:00:00`, Source: 'xbox', Title: 'A', GameTitle: 'G', GameID: 1, AchievementID: 1 }) as RecentAchievement
-
-beforeEach(() => {
+// The shared row (counts, modals, streak, loading) is in MainPagePeriodStats.contract.test.tsx.
+test('shows the gamerscore and the total unlocked, in the reader\'s language', () => {
   ;(useXboxSummary as jest.Mock).mockReturnValue({ summary: { gamerscore: 10242, achievementsUnlocked: 593 } })
-})
-
-test("today's achievements, the gamerscore and the total unlocked", () => {
-  render(<MainPageXboxStats streak={0} achievements={[unlock(today), unlock(today)]} />)
-  expect(screen.getByText(en.pointsStats.today).parentElement).toHaveTextContent('2')
+  render(<MainPageXboxStats streak={0} achievements={[]} />)
   expect(screen.getByText('10,242')).toBeInTheDocument()
   expect(screen.getByText('593')).toBeInTheDocument()
-})
-
-test('a running streak, in the theme colour', () => {
-  render(<MainPageXboxStats streak={8} achievements={[]} />)
-  expect(screen.getByText('8 d')).toHaveClass('text-accent')
-})
-
-test('without a summary yet, its pills wait in the row', () => {
-  ;(useXboxSummary as jest.Mock).mockReturnValue({ summary: null, error: null })
-  render(<MainPageXboxStats streak={0} achievements={[unlock(today)]} />)
-  expect(screen.getByText(en.xbox.gamerscore).parentElement?.querySelector('.bg-skeleton')).toBeInTheDocument()
-  expect(screen.getByText(en.xbox.achievements).parentElement?.querySelector('.bg-skeleton')).toBeInTheDocument()
-})
-
-test('with a summary that failed, only what the achievements say', () => {
-  ;(useXboxSummary as jest.Mock).mockReturnValue({ summary: null, error: 'failed' })
-  render(<MainPageXboxStats streak={0} achievements={[unlock(today)]} />)
-  expect(screen.queryByText(en.xbox.gamerscore)).not.toBeInTheDocument()
-})
-
-test('placeholders while loading', () => {
-  render(<MainPageXboxStats streak={0} achievements={[]} isLoading />)
-  expect(document.querySelectorAll('.bg-skeleton').length).toBeGreaterThan(3)
-})
-
-test("the day's pill opens what was earned that day", async () => {
-  render(<MainPageXboxStats streak={0} achievements={[unlock(today)]} />)
-  fireEvent.click(screen.getByText(en.pointsStats.today).closest('button')!)
-  expect(await screen.findByTestId('day-modal')).toHaveTextContent(today)
 })

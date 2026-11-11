@@ -21,7 +21,6 @@ export function usePsnLink() {
   const { data: session, update } = useSession()
 
   const [isLinking, setIsLinking] = useState(false)
-  const [isUnlinking, setIsUnlinking] = useState(false)
   const [error, setError] = useState<PsnError | null>(null)
 
   const link = useCallback(
@@ -55,7 +54,6 @@ export function usePsnLink() {
   )
 
   const unlink = useCallback(async (): Promise<boolean> => {
-    setIsUnlinking(true)
     try {
       const res = await fetch('/api/psn/unlink', { method: 'POST' })
       if (!res.ok) throw new Error(`Failed to unlink PSN (${res.status})`)
@@ -65,8 +63,6 @@ export function usePsnLink() {
     } catch (err) {
       console.error('[usePsnLink] unlink', err)
       return false
-    } finally {
-      setIsUnlinking(false)
     }
   }, [update])
 
@@ -78,6 +74,5 @@ export function usePsnLink() {
     isLinking,
     error,
     unlink,
-    isUnlinking,
   }
 }

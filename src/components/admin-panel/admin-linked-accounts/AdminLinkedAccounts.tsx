@@ -1,19 +1,24 @@
 import { useState } from 'react'
-import RaLogo from '@/components/ra-logo/RaLogo'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
-import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
-import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { adminFetch } from '@/utils/adminFetch'
+import { ADMIN_PLATFORMS, AdminPlatform, adminAccount, adminAccountChanges } from '@/utils/adminPlatforms'
 import type { AdminUser } from '@/types/user'
-import { notify } from '@/lib/notify'
-import { buttonClass } from '@/components/ui/Button'
-import { fieldClass } from '@/components/ui/Input'
 import type { GameSource } from '@/types/game'
+import { notify } from '@/lib/notify'
+import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 import Kicker from '@/components/ui/Kicker'
+import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 
-const PLATFORM_NAMES: Record<GameSource, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
-
-const BUTTON = 'shrink-0 text-xs font-bold px-3 py-2 rounded-tile disabled:opacity-40'
+/** What a refusal means, in the panel's words; anything else is shown as the route sent it. */
+function refusal(code: string | undefined, { source, name }: AdminPlatform): string | undefined {
+  const known: Record<string, string> = {
+    'ra-invalid': 'RA refused that username or key',
+    private: source === 'xbox' ? 'That Xbox profile keeps its games private' : 'That PSN profile keeps its trophies private',
+    'not-configured': `${name} is not configured on the server`,
+    failed: source === 'xbox' ? 'Xbox (OpenXBL) is not answering, try again' : 'Sony is not answering, try again',
+  }
+  return code === undefined ? undefined : (known[code] ?? code)
+}
 
 /**
  * Links or unlinks a user's RetroAchievements, Steam, PSN and Xbox accounts, for support.
@@ -27,200 +32,102 @@ export default function AdminLinkedAccounts({
   user: AdminUser
   onUpdated: (userId: number, changes: Partial<AdminUser>) => void
 }) {
-  const [raUsername, setRaUsername] = useState('')
-  const [raKey, setRaKey] = useState('')
-  const [steamId, setSteamId] = useState('')
-  const [psnName, setPsnName] = useState('')
-  const [xboxName, setXboxName] = useState('')
+  const [values, setValues] = useState<Record<string, string>>({})
   const [busy, setBusy] = useState<GameSource | null>(null)
   const [errors, setErrors] = useState<Partial<Record<GameSource, string>>>({})
 
-  const run = async (platform: GameSource, request: () => Promise<Response>, onDone: (data: Record<string, unknown>) => void) => {
-    setBusy(platform)
-    setErrors((e) => ({ ...e, [platform]: undefined }))
+  const run = async (platform: AdminPlatform, request: () => Promise<Response>, onDone: (data: Record<string, unknown>) => void) => {
+    const { source } = platform
+    setBusy(source)
+    setErrors((e) => ({ ...e, [source]: undefined }))
     try {
       const res = await request()
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        const known: Record<string, string> = {
-          'ra-invalid': 'RA refused that username or key',
-          private: platform === 'xbox' ? 'That Xbox profile keeps its games private' : 'That PSN profile keeps its trophies private',
-          'not-configured': `${PLATFORM_NAMES[platform]} is not configured on the server`,
-          failed: platform === 'xbox' ? 'Xbox (OpenXBL) is not answering, try again' : 'Sony is not answering, try again',
-        }
-        const message = known[data.error] ?? data.error
-        setErrors((e) => ({ ...e, [platform]: message ?? 'Something went wrong' }))
+        setErrors((e) => ({ ...e, [source]: refusal(data.error, platform) ?? 'Something went wrong' }))
         return
       }
       onDone(data)
-      notify.success(`${user.username}: ${PLATFORM_NAMES[platform]} updated`)
+      notify.success(`${user.username}: ${platform.name} updated`)
     } catch {
-      setErrors((e) => ({ ...e, [platform]: 'Something went wrong' }))
+      setErrors((e) => ({ ...e, [source]: 'Something went wrong' }))
     } finally {
       setBusy(null)
     }
   }
 
-  const link = (platform: GameSource, body: Record<string, unknown>, onDone: (data: Record<string, unknown>) => void) =>
-    run(platform, () => adminFetch('/api/admin/users/accounts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: user.id, platform, ...body }),
-    }), onDone)
+  const valueOf = (source: GameSource, key: string) => values[`${source}.${key}`] ?? ''
 
-  const unlink = (platform: GameSource, changes: Partial<AdminUser>) =>
-    run(platform, () => adminFetch(`/api/admin/users/accounts?id=${user.id}&platform=${platform}`, { method: 'DELETE' }), () =>
-      onUpdated(user.id, changes))
+  const link = (platform: AdminPlatform) => {
+    const body = Object.fromEntries(platform.inputs.map(({ key }) => [key, valueOf(platform.source, key)]))
+    return run(
+      platform,
+      () => adminFetch('/api/admin/users/accounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: user.id, platform: platform.source, ...body }),
+      }),
+      (data) => {
+        setValues((v) => Object.fromEntries(Object.entries(v).filter(([k]) => !k.startsWith(`${platform.source}.`))))
+        onUpdated(user.id, adminAccountChanges(platform, data))
+      },
+    )
+  }
+
+  const unlink = (platform: AdminPlatform) =>
+    run(platform, () => adminFetch(`/api/admin/users/accounts?id=${user.id}&platform=${platform.source}`, { method: 'DELETE' }), () =>
+      onUpdated(user.id, adminAccountChanges(platform)))
 
   return (
     <div className="bg-bg-main/50 rounded-tile p-3 flex flex-col gap-4">
       <Kicker as="span" size="md">Linked accounts</Kicker>
 
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-sm">
-          <RaLogo height={12} />
-          {user.rausername ? (
-            <>
-              <span className="font-medium flex-1 truncate">{user.ra_display ?? user.rausername}</span>
-              <button
-                onClick={() => unlink('ra', { rausername: null, ra_display: null })}
-                disabled={busy !== null}
-                className={`${BUTTON} text-danger hover:bg-danger/10`}
-              >
-                Unlink
-              </button>
-            </>
-          ) : (
-            <span className="text-text-secondary italic">Not linked</span>
-          )}
-        </div>
-        {!user.rausername && (
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="RA username" placeholder="RA username" value={raUsername} onChange={(e) => setRaUsername(e.target.value)} className={fieldClass({ size: 'sm' })} />
-            <input aria-label="RA Web API key" placeholder="Web API key" type="password" autoComplete="off" value={raKey} onChange={(e) => setRaKey(e.target.value)} className={fieldClass({ size: 'sm' })} />
-            <button
-              onClick={() => link('ra', { username: raUsername, apiKey: raKey }, (data) => {
-                setRaUsername('')
-                setRaKey('')
-                onUpdated(user.id, { rausername: data.rausername as string, ra_display: data.ra_display as string })
-              })}
-              disabled={busy !== null || !raUsername.trim() || !raKey.trim()}
-              className={buttonClass('primary', 'sm', 'shrink-0')}
-            >
-              {busy === 'ra' ? '…' : 'Link'}
-            </button>
+      {ADMIN_PLATFORMS.map((platform) => {
+        const { source, name, inputs } = platform
+        const account = adminAccount(user, platform)
+        return (
+          <div key={source} role="group" aria-label={name} className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-sm">
+              <PlatformLogo source={source} />
+              {account ? (
+                <>
+                  <span className="font-medium flex-1 truncate">{account}</span>
+                  <Button variant="danger" size="sm" className="shrink-0" onClick={() => unlink(platform)} disabled={busy !== null}>
+                    Unlink
+                  </Button>
+                </>
+              ) : (
+                <span className="text-text-secondary italic">Not linked</span>
+              )}
+            </div>
+            {!account && (
+              <div className="flex flex-col sm:flex-row gap-2">
+                {inputs.map(({ key, label, placeholder, secret }) => (
+                  <input
+                    key={key}
+                    aria-label={label}
+                    placeholder={placeholder}
+                    type={secret ? 'password' : undefined}
+                    autoComplete={secret ? 'off' : undefined}
+                    value={valueOf(source, key)}
+                    onChange={(e) => setValues((v) => ({ ...v, [`${source}.${key}`]: e.target.value }))}
+                    className={fieldClass({ size: 'sm' })}
+                  />
+                ))}
+                <Button
+                  size="sm"
+                  className="shrink-0"
+                  onClick={() => link(platform)}
+                  disabled={busy !== null || inputs.some(({ key }) => !valueOf(source, key).trim())}
+                >
+                  {busy === source ? '…' : 'Link'}
+                </Button>
+              </div>
+            )}
+            {errors[source] && <span role="alert" className="text-xs text-danger">{errors[source]}</span>}
           </div>
-        )}
-        {errors.ra && <span role="alert" className="text-xs text-danger">{errors.ra}</span>}
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-sm">
-          <SteamLogo size={12} className="text-steam" />
-          {user.steamid ? (
-            <>
-              <span className="font-medium flex-1 truncate">{user.steamusername ?? user.steamid}</span>
-              <button
-                onClick={() => unlink('steam', { steamid: null, steamusername: null })}
-                disabled={busy !== null}
-                className={`${BUTTON} text-danger hover:bg-danger/10`}
-              >
-                Unlink
-              </button>
-            </>
-          ) : (
-            <span className="text-text-secondary italic">Not linked</span>
-          )}
-        </div>
-        {!user.steamid && (
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="SteamID64 or profile link" placeholder="SteamID64 or steamcommunity.com/profiles/…" value={steamId} onChange={(e) => setSteamId(e.target.value)} className={fieldClass({ size: 'sm' })} />
-            <button
-              onClick={() => link('steam', { steamid: steamId }, (data) => {
-                setSteamId('')
-                onUpdated(user.id, { steamid: data.steamid as string, steamusername: data.steamusername as string | null })
-              })}
-              disabled={busy !== null || !steamId.trim()}
-              className={buttonClass('primary', 'sm', 'shrink-0')}
-            >
-              {busy === 'steam' ? '…' : 'Link'}
-            </button>
-          </div>
-        )}
-        {errors.steam && <span role="alert" className="text-xs text-danger">{errors.steam}</span>}
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-sm">
-          <PlaystationLogo size={12} className="text-psn" />
-          {user.psnaccountid ? (
-            <>
-              <span className="font-medium flex-1 truncate">{user.psnusername ?? user.psnaccountid}</span>
-              <button
-                onClick={() => unlink('psn', { psnaccountid: null, psnusername: null })}
-                disabled={busy !== null}
-                className={`${BUTTON} text-danger hover:bg-danger/10`}
-              >
-                Unlink
-              </button>
-            </>
-          ) : (
-            <span className="text-text-secondary italic">Not linked</span>
-          )}
-        </div>
-        {!user.psnaccountid && (
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="PSN online ID" placeholder="PSN online ID" value={psnName} onChange={(e) => setPsnName(e.target.value)} className={fieldClass({ size: 'sm' })} />
-            <button
-              onClick={() => link('psn', { username: psnName }, (data) => {
-                setPsnName('')
-                onUpdated(user.id, { psnaccountid: data.psnaccountid as string, psnusername: data.psnusername as string })
-              })}
-              disabled={busy !== null || !psnName.trim()}
-              className={buttonClass('primary', 'sm', 'shrink-0')}
-            >
-              {busy === 'psn' ? '…' : 'Link'}
-            </button>
-          </div>
-        )}
-        {errors.psn && <span role="alert" className="text-xs text-danger">{errors.psn}</span>}
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-sm">
-          <XboxLogo size={12} className="text-xbox" />
-          {user.xboxxuid ? (
-            <>
-              <span className="font-medium flex-1 truncate">{user.xboxgamertag ?? user.xboxxuid}</span>
-              <button
-                onClick={() => unlink('xbox', { xboxxuid: null, xboxgamertag: null })}
-                disabled={busy !== null}
-                className={`${BUTTON} text-danger hover:bg-danger/10`}
-              >
-                Unlink
-              </button>
-            </>
-          ) : (
-            <span className="text-text-secondary italic">Not linked</span>
-          )}
-        </div>
-        {!user.xboxxuid && (
-          <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="Xbox gamertag" placeholder="Xbox gamertag" value={xboxName} onChange={(e) => setXboxName(e.target.value)} className={fieldClass({ size: 'sm' })} />
-            <button
-              onClick={() => link('xbox', { gamertag: xboxName }, (data) => {
-                setXboxName('')
-                onUpdated(user.id, { xboxxuid: data.xboxxuid as string, xboxgamertag: data.xboxgamertag as string })
-              })}
-              disabled={busy !== null || !xboxName.trim()}
-              className={buttonClass('primary', 'sm', 'shrink-0')}
-            >
-              {busy === 'xbox' ? '…' : 'Link'}
-            </button>
-          </div>
-        )}
-        {errors.xbox && <span role="alert" className="text-xs text-danger">{errors.xbox}</span>}
-      </div>
+        )
+      })}
     </div>
   )
 }

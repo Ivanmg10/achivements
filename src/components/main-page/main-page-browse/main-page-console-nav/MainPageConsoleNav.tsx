@@ -1,0 +1,117 @@
+'use client'
+
+import Image from 'next/image'
+import Link from 'next/link'
+import { useMemo } from 'react'
+import { useAllGamesGlobal } from '@/hooks/useAllGamesGlobal'
+import { CONSOLES } from '@/constants'
+import { useLanguage } from '@/context/LanguageContext'
+import { SectionFallback } from '@/components/ui/SectionFallback'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { kickerClass } from '@/components/ui/Kicker'
+import { BROWSE_SECTIONS } from '../browseSections'
+
+const CONSOLE_MAP = new Map(CONSOLES.map((c) => [c.id, c]))
+
+function hasGamesForConsole(
+  games: { ConsoleID: number }[],
+  consoleId: number
+): boolean {
+  return games.some((g) => g.ConsoleID === consoleId)
+}
+
+export default function MainPageConsoleNav() {
+  const { playing, wantToPlay, completed, loading, error, refetch } = useAllGamesGlobal()
+  const { T } = useLanguage()
+
+  const gamesBySection = useMemo(
+    () => ({ playing, wantToPlay, completed }),
+    [playing, wantToPlay, completed]
+  )
+
+  if (error) return <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>
+
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-2 w-20" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="bg-bg-main rounded-box p-3 flex flex-col gap-2">
+              <Skeleton className="h-3 w-24" />
+              <div className="flex flex-wrap gap-1.5">
+                {[0, 1, 2, 3].map((j) => (
+                  <Skeleton key={j} radius="chip" className="h-7 w-20" />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <Link
+        href="/allGames"
+        className={`${kickerClass()} hover:text-text-main transition-colors self-start`}
+      >
+        {T.cards.navigation}
+      </Link>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {BROWSE_SECTIONS.map(({ slug, emoji }) => {
+          const label = T.categories[slug]
+          const sectionGames = gamesBySection[slug]
+          return (
+            <div key={slug} className="bg-bg-main rounded-box p-3 flex flex-col gap-2.5">
+              <Link
+                href={`/${slug}`}
+                className="flex items-center justify-between group focus-ring rounded"
+              >
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm leading-none">{emoji}</span>
+                  <span className="text-xs font-semibold text-text-main group-hover:text-accent transition-colors">
+                    {label}
+                  </span>
+                </div>
+                <span className="text-[10px] text-text-secondary group-hover:text-accent transition-colors">→</span>
+              </Link>
+
+              <div className="flex flex-wrap gap-1.5">
+                {CONSOLES.map((con) => {
+                  const def = CONSOLE_MAP.get(con.id)!
+                  const active = hasGamesForConsole(sectionGames, con.id)
+                  return (
+                    <Link
+                      key={con.id}
+                      href={`/${slug}/${con.id}`}
+                      title={con.name}
+                      // On a phone only the consoles with games: the greyed-out rest made each list very long.
+                      className={`items-center gap-1.5 rounded-tag px-2 py-1.5 transition-colors group focus-ring ${
+                        active
+                          ? `flex ${def.color} hover:brightness-125`
+                          : 'hidden sm:flex bg-bg-card/40 text-text-secondary hover:bg-bg-card hover:text-text-secondary'
+                      }`}
+                    >
+                      <Image
+                        src={def.icon}
+                        alt={def.name}
+                        width={16}
+                        height={16}
+                        className={`object-contain shrink-0 ${active ? '' : 'opacity-30'}`}
+                      />
+                      <span className="text-[10px] whitespace-nowrap">
+                        {def.name}
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}

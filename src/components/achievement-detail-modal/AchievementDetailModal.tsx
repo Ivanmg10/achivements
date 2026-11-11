@@ -4,7 +4,7 @@ import { ReactNode, useId } from 'react'
 import { IconBrandYoutube, IconBook2, IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { FadeImage } from '@/components/ui/FadeImage'
-import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
+import PinAchievementButton from '@/components/pin-achievement-button/PinAchievementButton'
 import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseToggleButton'
 import type { ShowcaseEntry } from '@/utils/showcase'
 import { formatRarity } from '@/utils/steamFeed'
@@ -79,7 +79,7 @@ export default function AchievementDetailModal({
           )}
           <div className="flex flex-col gap-1.5 flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              {pinned !== undefined && onTogglePin && <SteamPinAchievementButton pinned={pinned} title={title} onToggle={onTogglePin} size={18} />}
+              {pinned !== undefined && onTogglePin && <PinAchievementButton pinned={pinned} title={title} onToggle={onTogglePin} size={18} />}
               {earned && <ShowcaseToggleButton entry={showcase ?? null} />}
               <h2 id={titleId} className="text-lg sm:text-xl font-semibold">
                 {title}

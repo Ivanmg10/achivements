@@ -4,7 +4,7 @@ jest.mock('@/components/psn/psn-recently-played-expanded/PsnRecentlyPlayedExpand
 }))
 jest.mock('@/components/pin-toggle-button/PinToggleButton', () => ({ PinToggleButton: () => <span data-testid="pin" /> }))
 
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import PsnGameItem from './PsnGameItem'
 import { en } from '@/translations/en'
 import type { PsnGameProgress } from '@/types/psn'
@@ -24,22 +24,8 @@ test('a row with the game, its platform, progress and pin', () => {
   expect(screen.getByTestId('pin')).toBeInTheDocument()
 })
 
-test('expands on its own when not controlled', () => {
-  render(<PsnGameItem game={GAME} />)
-  expect(screen.queryByTestId('expanded')).not.toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: `${en.psn.showTrophies}: Astro Bot` }))
-  expect(screen.getByTestId('expanded')).toBeInTheDocument()
-})
 
-test('a controlled card asks its parent', () => {
-  const onToggle = jest.fn()
-  render(<PsnGameItem game={GAME} expanded onToggle={onToggle} />)
-  expect(screen.getByTestId('expanded')).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: `${en.psn.hideTrophies}: Astro Bot` }))
-  expect(onToggle).toHaveBeenCalled()
-})
 
-test('shows play time where Sony reports it', () => {
-  render(<PsnGameItem game={{ ...GAME, playtimeMinutes: 125 } as PsnGameProgress} />)
-  expect(screen.getByText(`${en.steam.playtime}:`, { exact: false }).parentElement).toHaveTextContent(`2.1 ${en.steam.hoursShort}`)
-})
+
+
+

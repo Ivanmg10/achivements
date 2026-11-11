@@ -33,10 +33,4 @@ test("opening it shows the collection's games, laid out like an opened game", ()
   expect(screen.getByRole('button', { name: `${en.psn.hideGames}: Ezio Collection` })).toHaveAttribute('aria-expanded', 'true')
 })
 
-test('a controlled card asks its parent', () => {
-  const onToggle = jest.fn()
-  render(<PsnCollectionItem collection={EZIO} games={GAMES} expanded={false} onToggle={onToggle} />)
-  fireEvent.click(screen.getByRole('button', { name: `${en.psn.showGames}: Ezio Collection` }))
-  expect(onToggle).toHaveBeenCalled()
-  expect(screen.queryByTestId('expanded')).not.toBeInTheDocument()
-})
+

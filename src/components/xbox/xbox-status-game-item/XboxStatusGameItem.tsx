@@ -1,129 +1,57 @@
 'use client'
 
-import { useId } from 'react'
-import Link from 'next/link'
-import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import { ProgressBar } from '@/components/ui/ProgressBar'
 import GameIcon from '@/components/game-icon/GameIcon'
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import XboxLibraryDetail from '@/components/xbox/xbox-library-detail/XboxLibraryDetail'
-import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
-import HideGameButton from '@/components/hide-game-button/HideGameButton'
-import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
-import { useExclusiveOpen } from '@/hooks/useExclusiveOpen'
+import StatusGameCard from '@/components/status-game-card/StatusGameCard'
+import GameCardMark from '@/components/game-card-mark/GameCardMark'
+import GameCardPlatformTag from '@/components/game-card-platform-tag/GameCardPlatformTag'
+import GameCardPlaytime from '@/components/game-card-playtime/GameCardPlaytime'
+import GameCardDates from '@/components/game-card-dates/GameCardDates'
+import { COVER_IMAGE } from '@/components/game-card-cover/GameCardCover'
 import { gameHref } from '@/utils/gameRef'
-import { formatPlaytime } from '@/utils/steamFeed'
-import { IconClock } from '@tabler/icons-react'
 import { xboxBackdrop, xboxPlatformTone } from '@/utils/xboxTitles'
 import type { XboxGameProgress } from '@/types/xbox'
-import { formatDate } from '@/utils/dates'
-import Tag from '@/components/ui/Tag'
 
 /**
- * An Xbox game on a category page, laid out like PsnStatusGameItem so the
- * lists read as one: 96px icon, title, chips, "x / y achievements", bar with %,
- * the gamerscore, the last session, and the badge grid when expanded. A game
- * at 100 % gets its chip, as a perfect Steam game does.
- *
- * Icon and title open the game page; everything else in the card is the
- * expand button.
+ * An Xbox game on a category page: StatusGameCard with Xbox's numbers: achievements (only what is
+ * earned when Xbox does not say the total), gamerscore, play time, and a chip at 100 %. In the Completed
+ * list the date is when it was finished.
  */
 export default function XboxStatusGameItem({ game, category }: { game: XboxGameProgress; /** Which list it is in: what the opened card shows depends on it. */ category?: string }) {
-  const { T, lang } = useLanguage()
-  const [open, toggle] = useExclusiveOpen(`xbox:${game.id}`)
-  const panelId = useId()
-  const href = gameHref('xbox', game.id)
-  const isComplete = game.pctWon >= 100
-  const progressText = game.totalKnown
-    ? T.xbox.achievementsProgress.replace('{earned}', String(game.numAwarded)).replace('{total}', String(game.maxPossible))
-    : T.xbox.achievementsEarned.replace('{earned}', String(game.numAwarded))
+  const { T } = useLanguage()
+  const done = game.pctWon >= 100
 
   return (
-    <>
-      <div
-        className={`relative isolate bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
-      >
-        <GameCardBackdrop src={xboxBackdrop(game)} surface="card" />
-        {/* relative: the expand button stretches over this whole header (see the chevron). */}
-        <div className="relative flex flex-row items-start gap-3 sm:gap-5 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">
-          {/* Same destination as the title link, so it is kept out of the tab order. */}
-          <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
-            <div
-              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-tile overflow-hidden transition-all duration-150 ${
-                isComplete ? 'ring-2 ring-success/70 hover:ring-success' : 'hover:ring-2 hover:ring-ink/40'
-              }`}
-            >
-              <GameIcon source="xbox" id={game.id} imageUrl={game.imageIcon} size={96} className="w-16 h-16 sm:w-24 sm:h-24" />
-            </div>
-          </Link>
-
-          <div className="flex flex-col flex-1 min-w-0 gap-1">
-            <Link
-              href={href}
-              className="relative z-10 self-start max-w-full min-w-0 hover:underline decoration-ink/50 underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success rounded"
-            >
-              <p title={game.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">
-                {game.title}
-              </p>
-            </Link>
-            <span className="flex items-center gap-1.5 flex-wrap">
-              <Tag size="xs" tone={xboxPlatformTone(game.consoleName)}>
-                <XboxLogo size={12} aria-hidden="true" />
-                {game.consoleName}
-              </Tag>
-              {isComplete && (
-                <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-success/10 text-success">
-                  <span aria-hidden="true">★</span> {T.steam.perfect}
-                </span>
-              )}
-            </span>
-            <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>{progressText}</span>
-            <span className="flex items-center gap-2 mt-1">
-              <ProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-main" className="flex-1" />
-              <span className={`text-xs tabular-nums ${isComplete ? 'text-success font-semibold' : 'text-text-secondary'}`}>{game.pctWon}%</span>
-            </span>
-            <XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} className="mt-1" />
-            {game.playtimeMinutes !== null && (
-              <span className="flex items-center gap-1 text-xs text-text-secondary mt-1">
-                <IconClock size={12} aria-hidden="true" />
-                {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, T.steam, lang)}
-              </span>
-            )}
-            {category === 'completed' && game.completedAt ? (
-              <span className="text-xs text-text-secondary mt-1">
-                {T.libraryDetail.finished} · {formatDate(game.completedAt, lang, {})}
-              </span>
-            ) : game.lastPlayed && (
-              <span className="text-xs text-text-secondary mt-1">
-                {T.steam.lastPlayed} · {formatDate(game.lastPlayed, lang, {})}
-              </span>
-            )}
-          </div>
-
-          <span className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 shrink-0 self-start sm:self-center -mr-2 sm:mr-0">
-            <HideGameButton source="xbox" gameId={game.id} title={game.title} image={game.imageIcon} className="relative z-10" />
-            <PinToggleButton gameId={game.id} source="xbox" className="relative z-10" />
-            {/* The expand control: a real button, its hit area stretched over the whole header. */}
-            <button
-              type="button"
-              onClick={toggle}
-              aria-expanded={open}
-              aria-controls={panelId}
-              aria-label={`${open ? T.xbox.hideAchievements : T.xbox.showAchievements}: ${game.title}`}
-              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
-            >
-              <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                ▼
-              </span>
-            </button>
-          </span>
-        </div>
-      </div>
-      <LibraryDetailRow open={open} id={panelId} title={game.title}>
-        <XboxLibraryDetail game={game} category={category} />
-      </LibraryDetailRow>
-    </>
+    <StatusGameCard
+      source="xbox"
+      gameId={game.id}
+      href={gameHref('xbox', game.id)}
+      title={game.title}
+      backdrop={xboxBackdrop(game)}
+      hideImage={game.imageIcon}
+      cover={<GameIcon source="xbox" id={game.id} imageUrl={game.imageIcon} size={96} className={COVER_IMAGE} />}
+      ring={done ? 'success' : undefined}
+      chips={
+        <>
+          <GameCardPlatformTag source="xbox" tone={xboxPlatformTone(game.consoleName)} label={game.consoleName} />
+          {done && <GameCardMark tone="success">{T.steam.perfect}</GameCardMark>}
+        </>
+      }
+      progress={{
+        text: game.totalKnown
+          ? T.xbox.achievementsProgress.replace('{earned}', String(game.numAwarded)).replace('{total}', String(game.maxPossible))
+          : T.xbox.achievementsEarned.replace('{earned}', String(game.numAwarded)),
+        done,
+        pct: game.pctWon,
+      }}
+      expand={{ show: T.xbox.showAchievements, hide: T.xbox.hideAchievements }}
+      detail={<XboxLibraryDetail game={game} category={category} />}
+    >
+      <XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} className="mt-1" />
+      {game.playtimeMinutes !== null && <GameCardPlaytime minutes={game.playtimeMinutes} />}
+      <GameCardDates finishedAt={category === 'completed' ? game.completedAt : null} lastPlayed={game.lastPlayed} />
+    </StatusGameCard>
   )
 }

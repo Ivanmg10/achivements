@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { requireSession } from '@/lib/apiAuth'
 import pool from "@/lib/db";
 import { fetchRaProfile, validRaCredentials, type RaProfileResult } from "@/lib/raProfile";
-import { sealRaKey } from "@/lib/raKey";
+import { saveRaLink } from "@/lib/platformLinks";
 import { forgetUser } from "@/lib/userRecord";
 import { onPlatformLinked } from "@/lib/scoreRefresh";
 
@@ -26,11 +26,7 @@ export async function POST(req: Request) {
   const { profile } = fetched;
 
   try {
-    const { sealed, hash } = sealRaKey((apiKey as string).trim());
-    await pool.query(
-      `UPDATE users SET "raUser" = $1, rausername = $2, raid = $3, raid_hash = $4 WHERE id = $5`,
-      [JSON.stringify(profile), profile.User, sealed, hash, auth.id],
-    );
+    await saveRaLink(auth.id, profile, (apiKey as string).trim());
   } catch (err) {
     // raid is unique: the same key already links another account here.
     if ((err as { code?: string }).code === "23505") {

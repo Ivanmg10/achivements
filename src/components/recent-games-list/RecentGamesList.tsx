@@ -20,7 +20,7 @@ const MAX_GAMES = 7
 /**
  * Recently played Steam, PSN and Xbox games, without RA — the main page feed for a
  * user with no RA account. (With RA linked, they join the RA feed in
- * RARecentlyPlayed instead.) One game expanded at a time, like that feed.
+ * RecentlyPlayedFeed instead.) One game expanded at a time, like that feed.
  */
 export default function RecentGamesList() {
   const { T } = useLanguage()

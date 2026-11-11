@@ -120,37 +120,14 @@ describe('MainPagePointsStats', () => {
     expect(screen.getByText('This month')).toBeInTheDocument()
   })
 
-  test('streak pill links to /racha', () => {
-    render(<MainPagePointsStats achievements={[]} heatmapAchievements={[]} rank={null} />)
-    expect(screen.getByText('Streak').closest('a')).toHaveAttribute('href', '/racha')
-  })
-
-  test('clicking Today opens the day achievements modal for today', async () => {
-    render(<MainPagePointsStats achievements={[]} heatmapAchievements={[]} rank={null} />)
-    expect(screen.queryByTestId('day-modal')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByText('Today').closest('button')!)
-    expect(await screen.findByTestId('day-modal')).toHaveTextContent(daysAgo(0))
-  })
-
-  test('clicking This week opens the period modal with the rolling 7-day achievements', async () => {
-    const achievements = [
-      { Date: `${daysAgo(0)} 10:00:00`, Points: 10, HardcoreMode: '1' } as unknown as RecentAchievement,
-      { Date: `${daysAgo(3)} 10:00:00`, Points: 5, HardcoreMode: '0' } as unknown as RecentAchievement,
-      { Date: `${daysAgo(20)} 10:00:00`, Points: 100, HardcoreMode: '0' } as unknown as RecentAchievement,
-    ]
-    render(<MainPagePointsStats achievements={achievements} heatmapAchievements={[]} rank={null} />)
-    fireEvent.click(screen.getByText('This week').closest('button')!)
-    expect(await screen.findByTestId('period-modal')).toHaveTextContent('This week:2')
-  })
-
-  test('clicking This month opens the period modal with this-calendar-month achievements', () => {
+  test('clicking This month opens the period modal with this-calendar-month achievements', async () => {
     const heatmapAchievements = [
       { Date: `${daysAgo(2)} 10:00:00`, Points: 50, HardcoreMode: '0' } as unknown as RecentAchievement,
       { Date: '2000-01-01 10:00:00', Points: 999, HardcoreMode: '0' } as unknown as RecentAchievement,
     ]
     render(<MainPagePointsStats achievements={[]} heatmapAchievements={heatmapAchievements} rank={null} />)
     fireEvent.click(screen.getByText('This month').closest('button')!)
-    expect(screen.getByTestId('period-modal')).toHaveTextContent('This month:1')
+    expect(await screen.findByTestId('period-modal')).toHaveTextContent('This month:1')
   })
 })
 

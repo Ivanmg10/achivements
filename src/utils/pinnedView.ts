@@ -3,7 +3,7 @@ import type { Translations } from '@/translations/en'
 import { pinnedKey } from '@/utils/utils'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
-import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { steamAchievementAnchor } from '@/utils/steamTitles'
 import { raBadgeUrl } from '@/utils/raAssets'
 import type { GameSource } from '@/types/game'
 
@@ -41,7 +41,7 @@ export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView 
       description: concealed ? '' : a.description,
       iconUrl: a.badgeUrl || null,
       earned: a.earned,
-      anchor: achievementAnchor(fav.steam_apiname),
+      anchor: steamAchievementAnchor(fav.steam_apiname),
       value: null,
       valueClass: '',
       rarity: a.globalPct ?? null,

@@ -165,5 +165,13 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   link/unlink RA (checked against RA with the user's key) and Steam (checked to
   exist through the Steam API). Neither proves ownership (users now link Steam
   through Steam, which does), so the log records who linked what.
+- **One link and unlink SQL for both sides** (#125, 2026-11-11): `src/lib/platformLinks.ts` writes each
+  platform's link (`saveRaLink` seals the key, `saveLink` for a typed one) and its unlink (`unlinkPlatform`:
+  the columns, `clearUserCache`, Steam's `forgetUnlocks`, `forgetUser`), for `api/updateRaUser`, `api/psn/link`,
+  `api/xbox/link`, the four unlink routes and `api/admin/users/accounts`. The routes keep their own auth
+  (`requireSession`, `requireXboxUser`, `requireAdmin`), checks, answers, mails (`sendSteamLinkNotice` only on
+  the user's Steam unlink) and `logAdminAction`. Only Steam's OpenID callback writes `steam_login_id`.
+  `platformLinks.test.ts` pins the SQL text; `app/api/platformLinks.contract.test.ts` checks every route,
+  user and admin. The panel's platform rows are `utils/adminPlatforms.ts`.
 - The privacy policy (`/privacy`) says all of this; `/terms` says when an
   account may be suspended or deleted. Change the policy if the panel changes.

@@ -9,15 +9,15 @@ import { useXboxGameDetails } from '@/hooks/useXboxGameDetails'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { isXboxTitleId, xboxBackdrop } from '@/utils/xboxTitles'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
-import GameInfoSkeletonTable from '@/components/game-info-skeleton/game-info-skeleton-table/GameInfoSkeletonTable'
+import GamePageNotLinked from '@/components/game-page-states/game-page-not-linked/GamePageNotLinked'
+import GamePageLibraryError from '@/components/game-page-states/game-page-library-error/GamePageLibraryError'
+import GameTableState from '@/components/game-page-states/game-table-state/GameTableState'
 import XboxGameHeroBackground from '@/components/xbox/xbox-game-hero-background/XboxGameHeroBackground'
 import XboxGameInfoHeader from '@/components/xbox/xbox-game-info-header/XboxGameInfoHeader'
 import XboxGameInfoTable from '@/components/xbox/xbox-game-info-table/XboxGameInfoTable'
 import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPartialListNote'
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { xboxAiSource } from '@/utils/aiExport'
-import Button from '@/components/ui/Button'
-import { buttonClass } from '@/components/ui/Button'
 
 /**
  * An Xbox game's page — the counterpart of /psnGame/[id], built the same way:
@@ -45,33 +45,12 @@ export default function XboxGamePage() {
   if (titleId === null) notFound()
   if (status === 'loading') return <GameInfoSkeleton />
   if (!enabled) notFound()
-
-  if (!isLinked) {
-    return (
-      <main className="flex-1 flex flex-col justify-center items-center text-text-main gap-3 p-6 text-center">
-        <p className="text-text-secondary">Xbox · {T.userData.notConnected}</p>
-        <Button
-          href="/user"
-          size="sm"
-        >
-          {T.xbox.connect}
-        </Button>
-      </main>
-    )
-  }
+  if (!isLinked) return <GamePageNotLinked platform="Xbox" connectLabel={T.xbox.connect} />
 
   const game = fullLibrary.find((g) => g.titleId === titleId) ?? null
   if (!game && libraryLoading) return <GameInfoSkeleton />
   if (!game && libraryError) {
-    return (
-      <div className="flex-1 flex flex-col justify-center items-center text-text-main gap-3 p-6 text-center">
-        <p role="alert" className="text-danger text-lg">{T.xbox.gamesError}</p>
-        <p className="text-sm text-text-secondary">{T.xbox.errors[libraryError]}</p>
-        <Button variant="secondary" size="sm" onClick={refetch}>
-          {T.xbox.retry}
-        </Button>
-      </div>
-    )
+    return <GamePageLibraryError title={T.xbox.gamesError} reason={T.xbox.errors[libraryError]} retryLabel={T.xbox.retry} onRetry={refetch} />
   }
   if (!game) notFound()
 
@@ -84,32 +63,19 @@ export default function XboxGamePage() {
           details={details}
           actions={achievements.length > 0 && <GameAiExport getSource={() => xboxAiSource({ game, achievements, details })} />}
         />
-
-        {isLoading ? (
-          <div role="status" aria-busy="true" className="w-full flex flex-col items-center">
-            <span className="sr-only">{T.loadingPage.game}</span>
-            <GameInfoSkeletonTable />
-          </div>
-        ) : error ? (
-          <section className="bg-bg-card rounded-card ring-1 ring-ink/[0.06] p-6 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-5 flex flex-col items-center gap-2 text-center">
-            <p role="alert" className="text-danger">
-              {T.xbox.achievementsError}
-            </p>
-            {error === 'private' && <p className="text-xs text-text-secondary">{T.xbox.errors.private}</p>}
-            <button onClick={retry} className={buttonClass('secondary', 'sm')}>
-              {T.xbox.retry}
-            </button>
-          </section>
-        ) : achievements.length === 0 ? (
-          <section className="bg-bg-card rounded-card ring-1 ring-ink/[0.06] p-6 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-5 text-center">
-            <p className="text-text-secondary">{T.xbox.noAchievements}</p>
-          </section>
-        ) : (
-          <>
-            <XboxPartialListNote game={game} listed={achievements.length} />
-            <XboxGameInfoTable achievements={achievements} gameId={game.id} gameTitle={game.title} />
-          </>
-        )}
+        <GameTableState
+          isLoading={isLoading}
+          failed={Boolean(error)}
+          errorText={T.xbox.achievementsError}
+          hint={error === 'private' ? T.xbox.errors.private : null}
+          retryLabel={T.xbox.retry}
+          onRetry={retry}
+          emptyText={T.xbox.noAchievements}
+          isEmpty={achievements.length === 0}
+        >
+          <XboxPartialListNote game={game} listed={achievements.length} />
+          <XboxGameInfoTable achievements={achievements} gameId={game.id} gameTitle={game.title} />
+        </GameTableState>
       </div>
     </main>
   )

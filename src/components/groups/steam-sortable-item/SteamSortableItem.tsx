@@ -1,32 +1,21 @@
 'use client'
 
-import { useId, useState } from 'react'
-import Link from 'next/link'
-import { useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { IconClock, IconGripVertical, IconX } from '@tabler/icons-react'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
-import { ProgressBar } from '@/components/ui/ProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
-import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
-import { formatPlaytime } from '@/utils/steamFeed'
+import SteamGameItemAchievements from '@/components/steam/steam-game-item-achievements/SteamGameItemAchievements'
+import GameCardMark from '@/components/game-card-mark/GameCardMark'
+import GameCardPlatformTag from '@/components/game-card-platform-tag/GameCardPlatformTag'
+import GameCardPlaytime from '@/components/game-card-playtime/GameCardPlaytime'
+import { COVER_IMAGE } from '@/components/game-card-cover/GameCardCover'
+import GroupGameCard from '@/components/groups/group-game-card/GroupGameCard'
 import { steamAssetUrl } from '@/lib/steamAssets'
-import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import { gameHref } from '@/utils/gameRef'
 import type { GameGroupItem } from '@/types/types'
-import { relativeTime } from '@/utils/dates'
-import Tag from '@/components/ui/Tag'
-import Facts from '@/components/ui/Facts'
 
 /**
- * A Steam game in a group — SortableItem's counterpart: drag handle, cover,
- * title, Steam chip, "x / y achievements", bar, playtime, last played, a
- * remove button, and the badge grid when expanded.
- *
- * Progress comes live from the shared Steam library; the counts stored when
- * the game was added are the fallback (library still loading, or the game
- * has left it). Sorted by the item's row id, like RA items.
+ * A Steam game in a group: GroupGameCard with Steam's numbers, read live from the shared library; the
+ * counts stored when the game was added are the fallback (library still loading, or the game has left it).
  */
 export default function SteamSortableItem({
   item,
@@ -37,145 +26,49 @@ export default function SteamSortableItem({
   onRemove: (id: number) => void
   draggable: boolean
 }) {
-  const { T, lang } = useLanguage()
+  const { T } = useLanguage()
   const { library, recent } = useSteamGamesData()
-  const [open, setOpen] = useState(false)
-  const panelId = useId()
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: item.id,
-    disabled: !draggable,
-  })
-  const style = { transform: CSS.Transform.toString(transform), transition }
-
   const game = library.find((g) => g.id === item.game_id) ?? recent.find((g) => g.id === item.game_id) ?? null
-  const href = `/steamGame/${item.game_id}`
 
   const live = game?.achievementsLoaded ?? false
   const earned = live ? game!.numAwarded : item.num_awarded
   const total = live ? game!.maxPossible : item.max_possible
   const hasCounts = total > 0
-  const pct = hasCounts ? Math.min((earned / total) * 100, 100) : 0
-  const isComplete = hasCounts && earned >= total
   const hasStats = game?.hasStats ?? true
+  const done = hasCounts && earned >= total
 
-  let progressText: string
-  if (hasCounts) progressText = `${earned} / ${total} ${T.steam.achievements}`
-  else if (!hasStats) progressText = T.steam.noAchievements
-  else progressText = T.steam.progressUnknown
+  let text: string
+  if (hasCounts) text = `${earned} / ${total} ${T.steam.achievements}`
+  else if (!hasStats) text = T.steam.noAchievements
+  else text = T.steam.progressUnknown
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`relative isolate bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
-    >
-      {/* The same blurred art and pointer glow as the game cards in the status lists. */}
-      <GameCardBackdrop src={steamAssetUrl(item.game_id, 'header')} surface="card" />
-      <div className="relative flex items-center gap-3 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">
-        {draggable && (
-          <button
-            {...attributes}
-            {...listeners}
-            aria-label={T.cards.dragToReorder}
-            className="relative z-10 text-text-secondary/40 hover:text-text-secondary transition-colors cursor-grab active:cursor-grabbing shrink-0 touch-none self-stretch flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam"
-          >
-            <IconGripVertical className="w-4 h-4" aria-hidden="true" />
-          </button>
-        )}
-
-        {/* Same destination as the title link, so it is kept out of the tab order. */}
-        <Link
-          href={href}
-          tabIndex={-1}
-          aria-hidden="true"
-          className={`relative z-10 shrink-0 rounded-tile transition-all ${
-            isComplete ? 'ring-2 ring-steam-perfect/70 hover:ring-steam-perfect' : 'hover:ring-2 hover:ring-ink/40'
-          }`}
-        >
-          <SteamGameImage
-            appId={item.game_id}
-            asset="icon"
-            iconUrl={game?.imageIcon ?? item.image_icon ?? ''}
-            size={96}
-            className="w-16 h-16 sm:w-24 sm:h-24 rounded-tile block"
-          />
-        </Link>
-
-        <div className="flex flex-col flex-1 min-w-0 gap-1">
-          <Link
-            href={href}
-            className="relative z-10 self-start max-w-full hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam"
-          >
-            <p title={game?.title ?? item.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game?.title ?? item.title}</p>
-          </Link>
-          <span className="flex items-center gap-1.5 flex-wrap">
-            <Tag size="xs" tone="steam">
-              <SteamLogo size={12} aria-hidden="true" />
-              Steam
-            </Tag>
-            {isComplete && (
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-steam-perfect/10 text-steam-perfect">
-                <span aria-hidden="true">★</span> {T.steam.perfect}
-              </span>
-            )}
-          </span>
-          <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>{progressText}</span>
-          {hasCounts && (
-            <span className="flex items-center gap-2 mt-1">
-              <ProgressBar pct={pct} label={item.title} trackClass="bg-bg-main" className="flex-1" />
-              <span className={`text-xs tabular-nums ${pct >= 100 ? 'text-success font-semibold' : 'text-text-secondary'}`}>{Math.round(pct)}%</span>
-            </span>
-          )}
-          {/* Kept when there is nothing to show, so every card is the same height. */}
-          <span aria-hidden={game ? undefined : true} className="flex items-center gap-1 text-xs text-text-secondary mt-1">
-            {game ? (
-              <>
-                <IconClock size={12} aria-hidden="true" />
-                {T.steam.playtime} ·{' '}
-                {formatPlaytime(game.playtimeForever, T.steam, lang)}
-              </>
-            ) : (
-              '\u00a0'
-            )}
-          </span>
-          <span className="text-xs text-text-secondary mt-1">
-            <Facts items={[game?.lastPlayed ? T.groups.playedAgo.replace('{when}', relativeTime(game.lastPlayed, lang)) : T.groups.neverPlayed, T.groups.addedAgo.replace('{when}', relativeTime(item.added_at, lang))]} />
-          </span>
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 shrink-0 self-start sm:self-center -mr-2 sm:mr-0">
-          <button
-            onClick={() => onRemove(item.id)}
-            aria-label={`${T.groups.removeGame}: ${item.title}`}
-            className="relative z-10 p-2 rounded-chip text-text-secondary hover:text-danger hover:bg-danger/10 transition-all [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
-          >
-            <IconX className="w-4 h-4" aria-hidden="true" />
-          </button>
-          {/* The expand control: a real button, its hit area stretched over the whole header. */}
-          <button
-            type="button"
-            onClick={() => setOpen((o) => !o)}
-            aria-expanded={open}
-            aria-controls={panelId}
-            aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${item.title}`}
-            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-steam"
-          >
-            <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-              ▼
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {open && (
-        <div id={panelId} className="border-t border-bg-main px-4 py-4">
-          {hasStats ? (
-            <SteamGameItemAchievements appId={item.game_id} gameTitle={item.title} expectedCount={hasCounts ? total : undefined} badgeSize={48} limit={60} />
-          ) : (
-            <p className="text-center text-text-secondary text-sm py-2">{T.steam.noAchievements}</p>
-          )}
-        </div>
-      )}
-    </div>
+    <GroupGameCard
+      item={item}
+      onRemove={onRemove}
+      draggable={draggable}
+      href={gameHref('steam', item.game_id)}
+      title={game?.title ?? item.title}
+      backdrop={steamAssetUrl(item.game_id, 'header')}
+      cover={<SteamGameImage appId={item.game_id} asset="icon" iconUrl={game?.imageIcon ?? item.image_icon ?? ''} size={96} className={COVER_IMAGE} />}
+      ring={done ? 'steam-perfect' : undefined}
+      chips={
+        <>
+          <GameCardPlatformTag source="steam" tone="steam" label="Steam" />
+          {done && <GameCardMark tone="steam-perfect">{T.steam.perfect}</GameCardMark>}
+        </>
+      }
+      progress={{ text, done, pct: hasCounts ? Math.min((earned / total) * 100, 100) : null }}
+      detail={game ? <GameCardPlaytime minutes={game.playtimeForever} /> : null}
+      lastPlayed={game?.lastPlayed}
+      expand={{ show: T.cards.showAchievements, hide: T.cards.hideAchievements }}
+      panel={() =>
+        hasStats ? (
+          <SteamGameItemAchievements appId={item.game_id} gameTitle={item.title} expectedCount={hasCounts ? total : undefined} badgeSize={48} limit={60} />
+        ) : (
+          <p className="text-center text-text-secondary text-sm py-2">{T.steam.noAchievements}</p>
+        )
+      }
+    />
   )
 }

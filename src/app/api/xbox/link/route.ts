@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import pool from '@/lib/db'
 import { requireXboxUser } from '@/lib/apiAuth'
 import { findXboxAccount, isGamertag, xboxConfigured, xboxFailure, xboxSummary } from '@/lib/xboxClient'
 import { forgetUser } from '@/lib/userRecord'
+import { saveLink } from '@/lib/platformLinks'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
 import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 
@@ -36,7 +36,7 @@ async function post(req: Request) {
   }
 
   try {
-    await pool.query('UPDATE users SET xboxxuid = $1, xboxgamertag = $2 WHERE id = $3', [account.xuid, account.gamertag, auth.id])
+    await saveLink(auth.id, 'xbox', account.xuid, account.gamertag)
   } catch (err) {
     console.error('[xbox/link] save', err)
     return NextResponse.json({ error: 'failed' }, { status: 500 })

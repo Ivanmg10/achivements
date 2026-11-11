@@ -1,96 +1,61 @@
-global.fetch = jest.fn()
+jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import GameInfoTable from './GameInfoTable'
-import { useSession } from 'next-auth/react'
+import { en } from '@/translations/en'
+import { useAchievementPins, RA_PINS } from '@/hooks/useAchievementPins'
+import { mockPins } from '@/test-utils/pins'
+
+// What every platform's table does is in AchievementTable.contract.test.tsx; this is RA's own.
+
+const achievement = (ID: number, overrides: object = {}) => ({
+  ID, Title: `Ach ${ID}`, Description: 'Do it', BadgeName: 'b', Points: 10, TrueRatio: 15, NumAwarded: 50, NumAwardedHardcore: 20,
+  DateEarned: null, DateEarnedHardcore: null, Author: 'a', AuthorULID: 'u', DateModified: '', DateCreated: '', DisplayOrder: ID, MemAddr: '',
+  ...overrides,
+})
+const game = (...list: ReturnType<typeof achievement>[]) => ({ ID: 1, Title: 'Game', NumDistinctPlayers: 100, Achievements: Object.fromEntries(list.map((a) => [a.ID, a])) }) as never
+
+const names = () => within(screen.getByRole('table')).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)
 
 beforeEach(() => {
-  ;(useSession as jest.Mock).mockReturnValue({ data: null })
-  ;(fetch as jest.Mock).mockResolvedValue({ ok: true, json: () => Promise.resolve([]) })
+  ;(useAchievementPins as jest.Mock).mockReturnValue(mockPins(RA_PINS.idOf).value)
 })
 
-const mockAchievement = {
-  ID: 1,
-  Title: 'First Blood',
-  Description: 'Kill an enemy',
-  BadgeName: 'badge123',
-  Points: 10,
-  TrueRatio: 15,
-  NumAwarded: 500,
-  NumAwardedHardcore: 100,
-  DateEarned: null,
-  DateEarnedHardcore: null,
-  Author: 'Author1',
-  AuthorULID: 'ulid',
-  DateModified: '2023-01-01',
-  DateCreated: '2022-01-01',
-  DisplayOrder: 1,
-  MemAddr: '0x0000',
-}
-
-const mockGameData = { Achievements: { '1': mockAchievement } } as never
-
-test('renders table with achievements', () => {
-  render(<GameInfoTable gameData={mockGameData} />)
-  expect(screen.getByText('Icon')).toHaveClass('sr-only')
-  expect(screen.getAllByText('First Blood')).toHaveLength(2)
+test('a game with no achievements, or none read yet, says so, with no filters or table', () => {
+  render(<GameInfoTable gameData={game()} />)
+  expect(screen.getByText(en.statusGameItem.noPublishedAchievements)).toBeInTheDocument()
+  expect(screen.queryByRole('group')).not.toBeInTheDocument()
+  expect(screen.queryByRole('table')).not.toBeInTheDocument()
 })
 
-test('renders empty when no gameData', () => {
-  const { container } = render(<GameInfoTable />)
-  expect(container.querySelector('table')).toBeNull()
+test('in RA order, each with its type beside the name, the star beside it too', () => {
+  render(<GameInfoTable gameData={game(achievement(2, { Type: 'missable' }), achievement(1, { Type: 'win_condition' }))} />)
+  expect(names()).toEqual(['Ach 1', 'Ach 2'])
+  const second = screen.getAllByRole('row')[2]
+  expect(within(second).getByText(en.achievement.missable)).toBeInTheDocument()
+  expect(within(second).getByRole('button', { name: `${en.favorites.addFavorite}: Ach 2` })).toBeInTheDocument()
 })
 
-test('a game with no achievements says so, with no tabs or table', () => {
-  render(<GameInfoTable gameData={{ Achievements: {} } as never} />)
-  expect(screen.getByText('No published achievements')).toBeInTheDocument()
-  expect(screen.queryByRole('tab')).not.toBeInTheDocument()
+test('earned in hardcore or softcore, said beside the date', () => {
+  render(<GameInfoTable gameData={game(achievement(1, { DateEarned: '2026-01-01 10:00:00', DateEarnedHardcore: '2026-01-01 10:00:00' }), achievement(2, { DateEarned: '2026-01-02 10:00:00' }))} />)
+  expect(within(screen.getAllByRole('row')[1]).getByText(new RegExp(`^${en.categoryPage.hardcore} ·`))).toBeInTheDocument()
+  expect(within(screen.getAllByRole('row')[2]).getByText(new RegExp(`^${en.categoryPage.softcore} ·`))).toBeInTheDocument()
 })
 
-test('filters out undefined achievements', () => {
-  const gameData = { Achievements: { '1': mockAchievement, '2': undefined } } as never
-  render(<GameInfoTable gameData={gameData} />)
-  expect(screen.getAllByText('First Blood')).toHaveLength(2)
+test('players, hardcore players and points are columns; points and players sort most first', () => {
+  render(<GameInfoTable gameData={game(achievement(1, { Points: 5, NumAwarded: 900 }), achievement(2, { Points: 25, NumAwarded: 30 }))} />)
+  const table = within(screen.getByRole('table'))
+  expect(table.getByRole('columnheader', { name: en.gameInfoTable.headerHC })).toBeInTheDocument()
+  fireEvent.click(table.getByRole('button', { name: en.gameInfoTable.headerPoints }))
+  expect(names()).toEqual(['Ach 2', 'Ach 1'])
+  fireEvent.click(table.getByRole('button', { name: en.gameInfoTable.headerPlayers }))
+  expect(names()).toEqual(['Ach 1', 'Ach 2'])
 })
 
-const many = Object.fromEntries(
-  Array.from({ length: 10 }, (_, i) => [String(i + 1), { ...mockAchievement, ID: i + 1, Title: `Ach ${i + 1}`, DisplayOrder: i + 1 }]),
-)
-
-test('the first rows only, then a button for the rest; hidden ones are not rendered', () => {
-  render(<GameInfoTable gameData={{ Achievements: many } as never} />)
-  expect(screen.queryAllByRole('button', { name: 'Ach 10' })).toHaveLength(0)
-  expect(screen.getAllByRole('button', { name: 'Ach 8' }).length).toBeGreaterThan(0)
-  fireEvent.click(screen.getByRole('button', { name: /Show the other 2/ }))
-  expect(screen.getAllByRole('button', { name: 'Ach 10' }).length).toBeGreaterThan(0)
-})
-
-test('a search shows every match, and says when there is none', () => {
-  render(<GameInfoTable gameData={{ Achievements: many } as never} />)
-  fireEvent.change(screen.getByRole('searchbox', { name: 'Search an achievement' }), { target: { value: 'ach 10' } })
-  expect(screen.getAllByRole('button', { name: 'Ach 10' }).length).toBeGreaterThan(0)
-  expect(screen.queryAllByRole('button', { name: 'Ach 1' })).toHaveLength(0)
-  fireEvent.change(screen.getByRole('searchbox', { name: 'Search an achievement' }), { target: { value: 'zzz' } })
-  expect(screen.getByText('No achievement matches')).toBeInTheDocument()
-})
-
-test('missables: one line, and a button that keeps only them', () => {
-  const ach = { ...many, '11': { ...mockAchievement, ID: 11, Title: 'Lose me', Type: 'missable', DisplayOrder: 11 } }
-  render(<GameInfoTable gameData={{ Achievements: ach } as never} />)
-  expect(screen.getByRole('status')).toHaveTextContent('1 achievement can be missed')
-  fireEvent.click(screen.getByRole('button', { name: 'Show only those' }))
-  expect(screen.getAllByRole('button', { name: 'Lose me' }).length).toBeGreaterThan(0)
-  expect(screen.queryAllByRole('button', { name: 'Ach 1' })).toHaveLength(0)
-})
-
-test('columns sort through real buttons and report their order', () => {
-  render(<GameInfoTable gameData={{ Achievements: many } as never} />)
-  const header = screen.getAllByRole('columnheader').find((h) => h.getAttribute('aria-sort') === 'ascending')!
-  expect(header).toBeDefined()
-  expect(header.querySelector('button')).not.toBeNull()
-})
-
-test('the filters say which one is on', () => {
-  render(<GameInfoTable gameData={{ Achievements: many } as never} />)
-  expect(screen.getAllByRole('button', { pressed: true })).toHaveLength(1)
+test('the order menu offers points first, as RA reads them', () => {
+  render(<GameInfoTable gameData={game(achievement(1))} />)
+  fireEvent.click(screen.getByRole('combobox', { name: en.gameInfoTable.sortLabel }))
+  expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual([
+    en.gameInfoTable.sortGameOrder, en.gameInfoTable.headerPoints, en.gameInfoTable.headerRarity, en.gameInfoTable.headerPlayers, en.gameInfoTable.headerEarned,
+  ])
 })

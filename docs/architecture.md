@@ -144,6 +144,26 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   last answer (`lastAnswers`); the RA providers and hooks, pins and the showcase read through it.
 - **Components** (`src/components/`): one folder each, sub-components in
   `parent-sub/ParentSub.tsx`. Shared UI primitives in `components/ui/`.
+  A family of per-platform components is one shell plus an adapter per platform
+  (`docs/platform-shells.md`, #125): the game page table is `achievement-table/` (with
+  `hooks/useAchievementTable`, `utils/achievementTable`, `types/achievementTable`), and RA's,
+  Steam's, PSN's and Xbox's `*GameInfoTable` are its adapters at their old paths. A game card in a
+  group is `groups/group-game-card/GroupGameCard` (adapters `SortableItem`, `Steam-`, `Psn-`,
+  `XboxSortableItem`), and a game on a category page is `status-game-card/StatusGameCard` (adapters
+  `StatusGameItem`, `Steam-`, `Psn-`, `XboxStatusGameItem`); the two share their pieces in
+  `game-card-*/` (cover, title, mark, progress, line, dates, playtime, platform tag, expand button)
+  and `types/gameCard.ts`. The grid of an achievement's badges is `badge-grid/BadgeGrid` (adapters
+  `AchievementGrid`, `Steam-`, `Psn-`, `XboxAchievementGrid`; `useBadgeTooltip`, `types/badgeGrid`), a
+  game in the recent feed is `feed-game-card/FeedGameCard` (adapters `RaGameItem`, `Steam-`, `Psn-`,
+  `XboxGameItem`, `PsnCollectionItem`), a platform's category section is
+  `platform-category-section/PlatformCategorySection`, and an opened game is
+  `game-expanded-layout/GameExpandedLayout` with `badge-grid/lazy-badge-grid/LazyBadgeGrid` for the
+  grid's loading, failure and empty states. A platform on the account page is
+  `user-page/user-platform-card/UserPlatformCard` (identity as data, the disconnect button and its toasts;
+  adapters `UserRaCard`, `UserSteamCard`, `UserPsnCard`, `UserXboxCard`, also on `ConnectAccounts`), with
+  `user-platform-link-form/` for PSN and Xbox; the admin panel's per-platform rows come from
+  `utils/adminPlatforms.ts` (`ADMIN_PLATFORMS`). The link and unlink SQL of the user and admin routes is
+  `lib/platformLinks.ts` (each route keeps its own auth, checks, answers, mails and logs).
 - **Utils** (`src/utils/`): pure functions — mappers per platform
   (`steamMappers`, `psnMappers`), library shelves and insights, `aiExport`. The shared helpers
   (#119): `dates.ts` (the platforms' UTC dates, day keys, dates in the reader's language),
