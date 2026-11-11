@@ -1,13 +1,11 @@
 'use client'
 
 import { IconPencil, IconShield, IconShieldOff, IconTrash } from '@tabler/icons-react'
-import RaLogo from '@/components/ra-logo/RaLogo'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
-import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
-import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { codeToFlag, findCountry } from '@/utils/countries'
+import { ADMIN_PLATFORMS, adminAccount } from '@/utils/adminPlatforms'
 import type { AdminUser } from '@/types/user'
 import Avatar from '@/components/ui/Avatar'
+import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 
 /**
  * One user in the admin panel, as a card: avatar, name, the accounts they
@@ -54,30 +52,15 @@ export default function AdminUserCard({
       </div>
 
       <ul className="flex flex-col gap-1 text-xs">
-        <li className="flex items-center gap-1.5 min-w-0">
-          <RaLogo height={11} className={user.rausername ? '' : 'opacity-30 grayscale'} />
-          <span className={`truncate ${user.rausername ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
-            {user.ra_display ?? user.rausername ?? '—'}
-          </span>
-        </li>
-        <li className="flex items-center gap-1.5 min-w-0">
-          <SteamLogo size={11} className={user.steamusername ? 'text-steam' : 'text-text-secondary/30'} />
-          <span className={`truncate ${user.steamusername ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
-            {user.steamusername ?? '—'}
-          </span>
-        </li>
-        <li className="flex items-center gap-1.5 min-w-0">
-          <PlaystationLogo size={11} className={user.psnusername ? 'text-psn' : 'text-text-secondary/30'} />
-          <span className={`truncate ${user.psnusername ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
-            {user.psnusername ?? '—'}
-          </span>
-        </li>
-        <li className="flex items-center gap-1.5 min-w-0">
-          <XboxLogo size={11} className={user.xboxgamertag ? 'text-xbox' : 'text-text-secondary/30'} />
-          <span className={`truncate ${user.xboxgamertag ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
-            {user.xboxgamertag ?? '—'}
-          </span>
-        </li>
+        {ADMIN_PLATFORMS.map((platform) => {
+          const account = adminAccount(user, platform)
+          return (
+            <li key={platform.source} className="flex items-center gap-1.5 min-w-0">
+              <PlatformLogo source={platform.source} size={11} className={account ? '' : 'opacity-30 grayscale'} />
+              <span className={`truncate text-text-secondary ${account ? '' : 'italic'}`}>{account ?? '—'}</span>
+            </li>
+          )
+        })}
       </ul>
 
       <div className="flex items-center gap-2 mt-auto">
