@@ -18,6 +18,7 @@ import LibraryDetailInfo, { type InfoRow } from './library-detail-info/LibraryDe
 import LibraryDetailSkeleton from '@/components/library-detail-skeleton/LibraryDetailSkeleton'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { formatDate, unlockSpan } from '@/utils/dates'
+import DateText from '@/components/ui/DateText'
 import type { GameStatus } from '@/types/game'
 
 const SKELETON_BADGES = 24
@@ -135,7 +136,7 @@ export default function LibraryGameDetail({
     )
 
   const steps = useMemo(() => milestones(items), [items])
-  const ago = (a: InsightAchievement) => (a.earnedAt ? <span>{formatDate(a.earnedAt, lang, {})}</span> : null)
+  const ago = (a: InsightAchievement) => <DateText value={a.earnedAt} />
 
   // Under the figures, the part that is each list's own: what a game in progress, a finished one and
   // a pending one each have to say, so no list's detail ends with empty space beside the next.

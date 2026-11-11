@@ -43,7 +43,7 @@ describe('formatDate', () => {
   test('in the reader’s language', () => {
     const en = formatDate('2026-10-03 12:00:00', 'en')
     const es = formatDate('2026-10-03 12:00:00', 'es')
-    expect(en).toBe(new Date(Date.UTC(2026, 9, 3, 12)).toLocaleDateString('en', { day: '2-digit', month: 'short', year: 'numeric' }))
+    expect(en).toBe('Oct 3, 2026')
     expect(es).not.toBe(en)
     expect(es).toContain('2026')
   })

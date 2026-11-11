@@ -288,6 +288,11 @@ test('Framer variants only on what opens on a click; an entrance is CSS', () => 
   expect(newOffenders('variants', NEW_RULES.variants, onClick)).toEqual([])
 })
 
+// The one date format (#129, the owner on the canvas, 2026-11-07): day, short month and year, never "13/10/2026".
+test('a date is the one format (DateText or formatDate with its default), never a numeric one', () => {
+  expect(offenders(/formatDate\([^()'"]+,\s*\w+,\s*\{\s*\}\s*\)/)).toEqual([])
+})
+
 // The dialog pass (#121, antislop audit X3): every dialog is a plain Modal, downloaded when first opened.
 test('a dialog is a plain Modal: no CommonModal, and no Escape listener of its own (only the top dialog answers Escape)', () => {
   expect(offenders(/\bCommonModal\b|common-modal/)).toEqual([])
