@@ -1381,7 +1381,7 @@ export const ja: Translations = {
     connectHint: 'Xbox のゲーマータグを入力すると、実績がここに表示されます。ゲーム履歴は公開に設定してください。',
     gamerscore: 'ゲーマースコア',
     achievements: '実績',
-    tier: 'ティア',
+    tier: 'アカウント',
     gamesSection: 'Xbox',
     gamesError: 'Xbox のゲームを読み込めませんでした',
     noGamesInCategory: 'ここに Xbox のゲームはありません',

@@ -1381,7 +1381,7 @@ export const es: Translations = {
     connectHint: 'Escribe tu gamertag de Xbox para ver aquí tus logros. Tu historial de juegos tiene que ser público.',
     gamerscore: 'Gamerscore',
     achievements: 'Logros',
-    tier: 'Nivel',
+    tier: 'Cuenta',
     gamesSection: 'Xbox',
     gamesError: 'No se pudieron cargar tus juegos de Xbox',
     noGamesInCategory: 'No hay juegos de Xbox aquí',

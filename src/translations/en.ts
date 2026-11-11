@@ -1382,7 +1382,7 @@ export const en = {
     connectHint: 'Type your Xbox gamertag to show your achievements here. Your game history has to be public.',
     gamerscore: 'Gamerscore',
     achievements: 'Achievements',
-    tier: 'Tier',
+    tier: 'Account',
     gamesSection: 'Xbox',
     gamesError: 'Could not load your Xbox games',
     noGamesInCategory: 'No Xbox games here',

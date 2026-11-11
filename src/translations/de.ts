@@ -1381,7 +1381,7 @@ export const de: Translations = {
     connectHint: 'Gib deinen Xbox-Gamertag ein, um hier deine Erfolge zu zeigen. Dein Spieleverlauf muss öffentlich sein.',
     gamerscore: 'Gamerscore',
     achievements: 'Erfolge',
-    tier: 'Stufe',
+    tier: 'Konto',
     gamesSection: 'Xbox',
     gamesError: 'Deine Xbox-Spiele konnten nicht geladen werden',
     noGamesInCategory: 'Hier gibt es keine Xbox-Spiele',

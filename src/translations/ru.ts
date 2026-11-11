@@ -1381,7 +1381,7 @@ export const ru: Translations = {
     connectHint: 'Введите игровой тег Xbox, чтобы показать здесь свои достижения. История игр должна быть открытой.',
     gamerscore: 'Gamerscore',
     achievements: 'Достижения',
-    tier: 'Уровень',
+    tier: 'Аккаунт',
     gamesSection: 'Xbox',
     gamesError: 'Не удалось загрузить ваши игры Xbox',
     noGamesInCategory: 'Здесь нет игр Xbox',

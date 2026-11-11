@@ -1381,7 +1381,7 @@ export const fr: Translations = {
     connectHint: 'Saisis ton gamertag Xbox pour afficher tes succès ici. Ton historique de jeux doit être public.',
     gamerscore: 'Gamerscore',
     achievements: 'Succès',
-    tier: 'Niveau',
+    tier: 'Compte',
     gamesSection: 'Xbox',
     gamesError: 'Impossible de charger tes jeux Xbox',
     noGamesInCategory: 'Aucun jeu Xbox ici',

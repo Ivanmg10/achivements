@@ -1381,7 +1381,7 @@ export const it: Translations = {
     connectHint: 'Scrivi il tuo gamertag Xbox per mostrare qui i tuoi obiettivi. La cronologia dei giochi deve essere pubblica.',
     gamerscore: 'Gamerscore',
     achievements: 'Obiettivi',
-    tier: 'Livello',
+    tier: 'Account',
     gamesSection: 'Xbox',
     gamesError: 'Impossibile caricare i tuoi giochi Xbox',
     noGamesInCategory: 'Nessun gioco Xbox qui',
