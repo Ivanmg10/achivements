@@ -1,8 +1,6 @@
 'use client'
 
-import { useEffect, useId, useState } from 'react'
-import { AnimatePresence } from 'framer-motion'
-import { IconX } from '@tabler/icons-react'
+import { useId, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { GameGroup, GameGroupItem } from '@/types/types'
 import type { GameCandidate } from '@/utils/gameCandidates'
@@ -52,7 +50,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
   const { T, lang } = useLanguage()
   const titleId = useId()
   const descriptionId = useId()
-  const headingId = useId()
+  const formId = useId()
   const titleErrorId = useId()
 
   const [title, setTitle] = useState('')
@@ -82,15 +80,6 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
     }
   })
 
-  useEffect(() => {
-    if (!isOpen) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [isOpen, onClose])
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!title.trim()) {
@@ -115,100 +104,75 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
       ? T.groups.createWith.replace('{games}', plural(selectedGames.length, T.plurals.games, lang))
       : T.groups.create
 
-  // On <body>, so an animated (transformed) page wrapper does not become its frame.
-  if (typeof document === 'undefined') return null
-
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={headingId} size={isEditing ? 'md' : 'xl'} showClose={false} className="gap-4">
-            <div className="flex items-center justify-between px-5 sm:px-6 pt-5 pb-3 shrink-0">
-              <h2 id={headingId} className="text-lg font-bold">
-                {isEditing ? T.groups.editGroup : T.groups.newGroup}
-              </h2>
-              <button
-                type="button"
-                onClick={onClose}
-                className="p-2 -m-1 rounded-chip hover:bg-ink/5 transition-colors text-text-secondary hover:text-text-main focus-ring"
-                aria-label={T.groups.close}
-              >
-                <IconX className="w-5 h-5" aria-hidden />
-              </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size={isEditing ? 'md' : 'xl'}
+      title={isEditing ? T.groups.editGroup : T.groups.newGroup}
+      className="gap-4"
+      footer={
+        <>
+          {error && <p role="alert" className="text-xs text-danger w-full text-right">{error}</p>}
+          <Button type="button" onClick={onClose} variant="quiet">
+            {T.groups.cancel}
+          </Button>
+          <Button type="submit" form={formId} disabled={saving}>
+            {saving ? '…' : submitLabel}
+          </Button>
+        </>
+      }
+    >
+      <form id={formId} onSubmit={handleSubmit}>
+        <div className={`grid gap-6 ${isEditing ? '' : 'md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]'}`}>
+          <div className="flex flex-col gap-4">
+            <GroupModalPreview title={title} icon={icon} isPublic={isPublic} games={selectedGames} covers={ownCovers} gameCount={ownCount} />
+
+            <div className="flex flex-col gap-1">
+              <Counter htmlFor={titleId} label={T.groups.groupTitle} length={title.length} max={GROUP_TITLE_MAX} />
+              <input
+                id={titleId}
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value)
+                  if (e.target.value.trim()) setTitleMissing(false)
+                }}
+                placeholder={T.groups.groupTitlePlaceholder}
+                maxLength={GROUP_TITLE_MAX}
+                aria-invalid={titleMissing || undefined}
+                aria-describedby={titleMissing ? titleErrorId : undefined}
+                className={fieldClass({ size: 'sm', invalid: titleMissing })}
+                autoFocus
+              />
+              {titleMissing && (
+                <p id={titleErrorId} role="alert" className="text-xs text-danger">{T.groups.titleRequired}</p>
+              )}
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
-              <div className={`flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 pb-5 grid gap-6 ${isEditing ? '' : 'md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]'}`}>
-                <div className="flex flex-col gap-4">
-                  <GroupModalPreview title={title} icon={icon} isPublic={isPublic} games={selectedGames} covers={ownCovers} gameCount={ownCount} />
+            <div className="flex flex-col gap-1">
+              <Counter htmlFor={descriptionId} label={T.groups.description} length={description.length} max={GROUP_DESCRIPTION_MAX} />
+              <textarea
+                id={descriptionId}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={T.groups.descriptionPlaceholder}
+                maxLength={GROUP_DESCRIPTION_MAX}
+                rows={2}
+                className={fieldClass({ size: 'sm', multiline: true }, 'h-auto! py-2 resize-none')}
+              />
+            </div>
 
-                  <div className="flex flex-col gap-1">
-                    <Counter htmlFor={titleId} label={T.groups.groupTitle} length={title.length} max={GROUP_TITLE_MAX} />
-                    <input
-                      id={titleId}
-                      value={title}
-                      onChange={(e) => {
-                        setTitle(e.target.value)
-                        if (e.target.value.trim()) setTitleMissing(false)
-                      }}
-                      placeholder={T.groups.groupTitlePlaceholder}
-                      maxLength={GROUP_TITLE_MAX}
-                      aria-invalid={titleMissing || undefined}
-                      aria-describedby={titleMissing ? titleErrorId : undefined}
-                      className={fieldClass({ size: 'sm', invalid: titleMissing })}
-                      autoFocus
-                    />
-                    {titleMissing && (
-                      <p id={titleErrorId} role="alert" className="text-xs text-danger">{T.groups.titleRequired}</p>
-                    )}
-                  </div>
+            <GroupModalIconPicker value={icon} onChange={setIcon} />
+            <GroupModalVisibility isPublic={isPublic} onChange={setIsPublic} />
+          </div>
 
-                  <div className="flex flex-col gap-1">
-                    <Counter htmlFor={descriptionId} label={T.groups.description} length={description.length} max={GROUP_DESCRIPTION_MAX} />
-                    <textarea
-                      id={descriptionId}
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      placeholder={T.groups.descriptionPlaceholder}
-                      maxLength={GROUP_DESCRIPTION_MAX}
-                      rows={2}
-                      className={fieldClass({ size: 'sm', multiline: true }, 'h-auto! py-2 resize-none')}
-                    />
-                  </div>
-
-                  <GroupModalIconPicker value={icon} onChange={setIcon} />
-                  <GroupModalVisibility isPublic={isPublic} onChange={setIsPublic} />
-                </div>
-
-                {!isEditing && (
-                  <div className="md:border-l md:border-ink/5 md:pl-6">
-                    <GroupModalGamePicker enabled={isOpen} selected={selectedGames} onChange={setSelectedGames} />
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t border-ink/5 px-5 sm:px-6 py-3 flex flex-col gap-2 shrink-0">
-                {error && (
-                  <p role="alert" className="text-xs text-danger">{error}</p>
-                )}
-                <div className="flex gap-2 justify-end">
-                  <Button
-                    type="button"
-                    onClick={onClose}
-                    variant="quiet"
-                  >
-                    {T.groups.cancel}
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={saving}
-                  >
-                    {saving ? '…' : submitLabel}
-                  </Button>
-                </div>
-              </div>
-            </form>
-          </Modal>
-      )}
-    </AnimatePresence>
+          {!isEditing && (
+            <div className="md:border-l md:border-ink/5 md:pl-6">
+              <GroupModalGamePicker enabled={isOpen} selected={selectedGames} onChange={setSelectedGames} />
+            </div>
+          )}
+        </div>
+      </form>
+    </Modal>
   )
 }

@@ -39,14 +39,14 @@ test('the chips narrow it to one kind, with how many each has', () => {
   expect(screen.queryByText('Zelda')).not.toBeInTheDocument()
 })
 
-test('by default, in the user’s order, with the order editable', () => {
+test('by default, in the user’s order, with the order editable', async () => {
   renderGrid()
   expect(screen.getByRole('button', { name: en.cards.viewMyOrder })).toHaveAttribute('aria-pressed', 'true')
   expect(screen.queryAllByRole('heading', { level: 4 })).toHaveLength(0)
   const list = screen.getByRole('list')
   expect(within(list).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['Zelda', 'Metroid', 'Portal 2'])
   fireEvent.click(screen.getByRole('button', { name: en.cards.reorderMasteredAria }))
-  expect(screen.getByTestId('order-modal')).toBeInTheDocument()
+  expect(await screen.findByTestId('order-modal')).toBeInTheDocument()
 })
 
 test('"by year" hides the edit-order button, which only applies to "my order"', () => {

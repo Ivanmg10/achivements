@@ -4,14 +4,9 @@ import AdminPanelModal from './AdminPanelModal'
 let reportMode: (mode: 'loading' | 'locked' | 'open') => void = () => {}
 jest.mock('@/components/admin-panel/AdminPanel', () => ({
   __esModule: true,
-  default: ({ headerEnd, onModeChange }: { headerEnd: React.ReactNode; onModeChange: (m: 'loading' | 'locked' | 'open') => void }) => {
+  default: ({ onModeChange }: { onModeChange: (m: 'loading' | 'locked' | 'open') => void }) => {
     reportMode = onModeChange
-    return (
-      <div>
-        panel body
-        {headerEnd}
-      </div>
-    )
+    return <div>panel body</div>
   },
 }))
 
@@ -30,7 +25,7 @@ test('the close button and the backdrop close it; a click inside does not', () =
   render(<AdminPanelModal isOpen onClose={onClose} />)
   fireEvent.click(screen.getByText('panel body'))
   expect(onClose).not.toHaveBeenCalled()
-  fireEvent.click(screen.getByRole('button', { name: 'Close admin panel' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Close' }))
   expect(onClose).toHaveBeenCalledTimes(1)
   fireEvent.click(screen.getByRole('dialog').parentElement!)
   expect(onClose).toHaveBeenCalledTimes(2)

@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useId, useMemo, useState } from 'react'
-import { AnimatePresence } from 'framer-motion'
-import { IconArrowLeft, IconX } from '@tabler/icons-react'
+import { useMemo, useState } from 'react'
+import { IconArrowLeft } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useActivityHeatmapYear } from '@/context/ActivityHeatmapYearContext'
 import { useOwnShowcase } from '@/context/ShowcaseContext'
@@ -32,7 +31,6 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<ShowcaseEntry[]>([])
   const [saving, setSaving] = useState(false)
-  const titleId = useId()
 
   // Opening starts it over; state, so while rendering.
   useWhenChanged([isOpen], () => {
@@ -43,15 +41,6 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
       setSaving(false)
     }
   })
-
-  useEffect(() => {
-    if (!isOpen) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [isOpen, onClose])
 
   // Games with something earned; the ones with an unlock this year first, latest first, then by name.
   const withEarned = useMemo(() => {
@@ -86,69 +75,52 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
   }
 
   return (
-    <AnimatePresence>
-      {isOpen && showcase && (
-        <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={titleId} size="md" showClose={false} className="gap-4">
-            <div className="flex items-start justify-between gap-3 p-5 border-b border-bg-header">
-              <div className="flex flex-col gap-1 min-w-0">
-                {game && (
-                  <button
-                    type="button"
-                    onClick={() => setGame(null)}
-                    className="self-start flex items-center gap-1 text-xs text-text-secondary hover:text-text-main rounded focus-ring"
-                  >
-                    <IconArrowLeft size={14} aria-hidden="true" />
-                    {T.showcase.back}
-                  </button>
-                )}
-                <h2 id={titleId} className="text-lg font-semibold truncate">{game ? game.title : T.showcase.pickerTitle}</h2>
-                {!game && <p className="text-xs text-text-secondary">{T.showcase.pickerHint}</p>}
-              </div>
-              <button
-                type="button"
-                onClick={onClose}
-                aria-label={T.toast.close}
-                className="p-1 rounded-chip text-text-secondary hover:text-text-main transition-colors focus-ring"
-              >
-                <IconX size={18} aria-hidden="true" />
-              </button>
-            </div>
-
-            {game ? (
-              <ShowcasePickerModalGame
-                game={game}
-                isSelected={(e) => keys.has(showcaseKey(e))}
-                inShowcase={(e) => showcase.has(e)}
-                blocked={selected.length >= free}
-                onToggle={toggle}
-              />
-            ) : (
-              <ShowcasePickerModalGames
-                games={withEarned}
-                isLoading={isLoading}
-                query={query}
-                onQuery={setQuery}
-                selectedIn={(k) => perGame.get(k) ?? 0}
-                onOpen={setGame}
-              />
-            )}
-
-            <div className="flex items-center justify-between gap-3 p-4 border-t border-bg-header">
-              <p role="status" className="text-xs text-text-secondary tabular-nums">
-                {T.showcase.selected.replace('{n}', String(selected.length))} ·{' '}
-                {free - selected.length > 0 ? T.showcase.slotsLeft.replace('{n}', String(free - selected.length)) : T.showcase.noSlots}
-              </p>
-              <Button
-                type="button"
-                onClick={save}
-                disabled={selected.length === 0 || saving}
-                className="shrink-0"
-              >
-                {T.showcase.addSelected}
-              </Button>
-            </div>
-          </Modal>
+    <Modal
+      isOpen={isOpen && !!showcase}
+      onClose={onClose}
+      size="md"
+      title={game ? game.title : T.showcase.pickerTitle}
+      hint={game ? undefined : T.showcase.pickerHint}
+      footer={
+        <>
+          <p role="status" className="text-xs text-text-secondary tabular-nums mr-auto">
+            {T.showcase.selected.replace('{n}', String(selected.length))} ·{' '}
+            {free - selected.length > 0 ? T.showcase.slotsLeft.replace('{n}', String(free - selected.length)) : T.showcase.noSlots}
+          </p>
+          <Button type="button" onClick={save} disabled={selected.length === 0 || saving} className="shrink-0">
+            {T.showcase.addSelected}
+          </Button>
+        </>
+      }
+    >
+      {game && showcase ? (
+        <>
+          <button
+            type="button"
+            onClick={() => setGame(null)}
+            className="self-start flex items-center gap-1 text-xs text-text-secondary hover:text-text-main rounded focus-ring"
+          >
+            <IconArrowLeft size={14} aria-hidden="true" />
+            {T.showcase.back}
+          </button>
+          <ShowcasePickerModalGame
+            game={game}
+            isSelected={(e) => keys.has(showcaseKey(e))}
+            inShowcase={(e) => showcase.has(e)}
+            blocked={selected.length >= free}
+            onToggle={toggle}
+          />
+        </>
+      ) : (
+        <ShowcasePickerModalGames
+          games={withEarned}
+          isLoading={isLoading}
+          query={query}
+          onQuery={setQuery}
+          selectedIn={(k) => perGame.get(k) ?? 0}
+          onOpen={setGame}
+        />
       )}
-    </AnimatePresence>
+    </Modal>
   )
 }

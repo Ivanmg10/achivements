@@ -3,10 +3,13 @@
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { IconSparkles } from '@tabler/icons-react'
+import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import type { AiExportSource } from '@/utils/aiExport'
-import GameAiExportDialog from './game-ai-export-dialog/GameAiExportDialog'
 import { buttonClass } from '@/components/ui/Button'
+
+// Downloaded the first time it opens, not with the page.
+const GameAiExportDialog = dynamic(() => import('./game-ai-export-dialog/GameAiExportDialog'), { loading: () => null })
 
 /**
  * "Ask an AI" beside a game's links: a window that turns the game's

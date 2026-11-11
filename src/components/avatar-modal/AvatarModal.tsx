@@ -2,8 +2,8 @@
 
 import { useId, useState } from 'react'
 import Image from 'next/image'
-import { IconChevronDown, IconLink, IconPhotoUp, IconUser, IconX } from '@tabler/icons-react'
-import CommonModal from '@/components/common-modal/CommonModal'
+import { IconChevronDown, IconLink, IconPhotoUp, IconUser } from '@tabler/icons-react'
+import Modal from '@/components/ui/Modal'
 import { useAvatarUpload } from '@/hooks/useAvatarUpload'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
 import { useLanguage } from '@/context/LanguageContext'
@@ -55,22 +55,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={close}>
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-xl font-bold">{t.avatarTitle}</h2>
-          <p className="text-sm text-text-secondary">{t.avatarHint}</p>
-        </div>
-        <button
-          type="button"
-          onClick={close}
-          aria-label={t.close}
-          className="w-9 h-9 -mr-1 -mt-1 shrink-0 rounded-tile flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 focus-ring"
-        >
-          <IconX size={18} aria-hidden="true" />
-        </button>
-      </div>
-
+    <Modal isOpen={isOpen} onClose={close} icon={<IconUser size={20} />} title={t.avatarTitle} hint={t.avatarHint}>
       <label
         htmlFor={inputId}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
@@ -173,6 +158,6 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
           )}
         </div>
       )}
-    </CommonModal>
+    </Modal>
   )
 }

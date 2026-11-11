@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { IconChartHistogram, IconLayoutGrid, IconLibrary } from '@tabler/icons-react'
+import dynamic from 'next/dynamic'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import UserPlatformCard from '@/components/user-page/user-platform-card/UserPlatformCard'
-import RaLoginModal from '@/components/ra-login-modal/RaLoginModal'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import UserSteamCard from '@/components/user-page/user-steam-card/UserSteamCard'
 import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
@@ -12,6 +13,9 @@ import UserXboxCard from '@/components/user-page/user-xbox-card/UserXboxCard'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useLanguage } from '@/context/LanguageContext'
 import { buttonClass } from '@/components/ui/Button'
+
+// Downloaded the first time it opens, not with the page.
+const RaLoginModal = dynamic(() => import('@/components/ra-login-modal/RaLoginModal'), { loading: () => null })
 
 const ACTION = buttonClass('primary', 'md', 'w-full')
 
@@ -93,7 +97,9 @@ export default function ConnectAccounts() {
         </section>
       </div>
 
-      <RaLoginModal isOpen={raModalOpen} setIsOpen={setRaModalOpen} />
+      <LazyWhenOpened open={raModalOpen}>
+        <RaLoginModal isOpen={raModalOpen} setIsOpen={setRaModalOpen} />
+      </LazyWhenOpened>
     </main>
   )
 }

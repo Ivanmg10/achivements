@@ -1,18 +1,16 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import type { ReactNode } from 'react'
-import { IconLock, IconPlus, IconSearch, IconShield } from '@tabler/icons-react'
+import dynamic from 'next/dynamic'
+import { IconLock, IconPlus, IconSearch } from '@tabler/icons-react'
 import { useSession } from 'next-auth/react'
-import AdminCreateUserModal from './AdminCreateUserModal'
-import AdminEditUserModal from './AdminEditUserModal'
 import AdminUserCard from './admin-user-card/AdminUserCard'
 import AdminUnlock from './admin-unlock/AdminUnlock'
 import AdminActionLog from './admin-action-log/AdminActionLog'
 import AdminPsnToken from './admin-psn-token/AdminPsnToken'
 import AdminXbox from './admin-xbox/AdminXbox'
 import AdminRankings from './admin-rankings/AdminRankings'
-import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { normalizeTitle } from '@/utils/gameCandidates'
 import { ADMIN_LOCKED_EVENT, adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
@@ -21,15 +19,16 @@ import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import AdminUsersSkeleton from './admin-users-skeleton/AdminUsersSkeleton'
 
+const AdminCreateUserModal = dynamic(() => import('./AdminCreateUserModal'), { loading: () => null })
+const AdminEditUserModal = dynamic(() => import('./AdminEditUserModal'), { loading: () => null })
+const DeleteConfirmDialog = dynamic(() => import('@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'), { loading: () => null })
+
 /** What the panel is showing, for a container that sizes itself to it. */
 export type AdminPanelMode = 'loading' | 'locked' | 'open'
 
 export default function AdminPanel({
-  headerEnd,
   onModeChange,
 }: {
-  /** Rendered at the end of the header row, e.g. the modal's close button. */
-  headerEnd?: ReactNode
   onModeChange?: (mode: AdminPanelMode) => void
 } = {}) {
   const { data: session } = useSession()
@@ -154,48 +153,39 @@ export default function AdminPanel({
 
   return (
     <section className="w-full pb-6 flex flex-col gap-4">
-      {/* Sticks to the top of the modal, so search, lock and close stay at hand in a long list. */}
-      <div className="sticky top-0 z-10 -mx-1 px-1 pt-5 pb-3 bg-bg-header flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-2">
-          <IconShield size={18} className="text-accent" />
-          <h2 className="text-lg font-bold">Admin panel</h2>
-          {!locked && (
-            <span className="text-xs bg-accent text-bg-main font-bold px-2 py-0.5 rounded-full">
-              {users.length}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2 flex-wrap ml-auto">
-        {!locked && <>
-          <div className="relative">
-            <IconSearch
-              size={15}
-              aria-hidden="true"
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none"
-            />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search users…"
-              aria-label="Search users"
-              className={fieldClass({ size: 'sm', icon: true }, 'w-56!')}
-            />
+      {/* Sticks to the top of the modal, so search and lock stay at hand in a long list. */}
+      {!locked && (
+        <div className="sticky top-0 z-10 -mx-1 px-1 pb-3 bg-bg-header flex items-center gap-2 flex-wrap">
+          <span className="text-xs bg-accent text-bg-main font-bold px-2 py-0.5 rounded-full">{users.length}</span>
+          <div className="flex items-center gap-2 flex-wrap ml-auto">
+            <div className="relative">
+              <IconSearch
+                size={15}
+                aria-hidden="true"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none"
+              />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search users…"
+                aria-label="Search users"
+                className={fieldClass({ size: 'sm', icon: true }, 'w-56!')}
+              />
+            </div>
+            <Button size="sm" onClick={() => setCreateOpen(true)}>
+              <IconPlus size={14} aria-hidden="true" />
+              New user
+            </Button>
+            <button
+              onClick={lockNow}
+              className="flex items-center gap-1.5 px-3 py-2 bg-bg-card text-text-secondary text-sm rounded-tile hover:text-text-main transition-colors"
+            >
+              <IconLock size={14} aria-hidden="true" />
+              Lock
+            </button>
           </div>
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
-            <IconPlus size={14} aria-hidden="true" />
-            New user
-          </Button>
-          <button
-            onClick={lockNow}
-            className="flex items-center gap-1.5 px-3 py-2 bg-bg-card text-text-secondary text-sm rounded-tile hover:text-text-main transition-colors"
-          >
-            <IconLock size={14} aria-hidden="true" />
-            Lock
-          </button>
-        </>}
-        {headerEnd}
         </div>
-      </div>
+      )}
 
       {locked ? <AdminUnlock onUnlocked={handleUnlocked} /> : <>
       <AdminPsnToken />
@@ -236,19 +226,19 @@ export default function AdminPanel({
       <AdminActionLog />
       </>}
 
-      <DeleteConfirmDialog
-        isOpen={deleteUser !== null}
-        onClose={() => setDeleteUser(null)}
-        onConfirm={confirmDelete}
-        message={`Delete ${deleteUser?.username} and everything they own? This cannot be undone.`}
-        confirmLabel="Delete user"
-      />
+      <LazyWhenOpened open={deleteUser !== null}>
+        <DeleteConfirmDialog
+          isOpen={deleteUser !== null}
+          onClose={() => setDeleteUser(null)}
+          onConfirm={confirmDelete}
+          message={`Delete ${deleteUser?.username} and everything they own? This cannot be undone.`}
+          confirmLabel="Delete user"
+        />
+      </LazyWhenOpened>
 
-      <AdminCreateUserModal
-        isOpen={createOpen}
-        onClose={() => setCreateOpen(false)}
-        onCreated={handleCreated}
-      />
+      <LazyWhenOpened open={createOpen}>
+        <AdminCreateUserModal isOpen={createOpen} onClose={() => setCreateOpen(false)} onCreated={handleCreated} />
+      </LazyWhenOpened>
 
       {editUser && (
         <AdminEditUserModal

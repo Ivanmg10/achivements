@@ -46,12 +46,12 @@ test('counts unlocks today, this week and this month, with the Steam level and p
   expect(pill(en.streak.title)).toHaveTextContent('1d')
 })
 
-test('opens the day and period modals from the pills', () => {
+test('opens the day and period modals from the pills', async () => {
   render(<MainPageSteamStats streak={0} achievements={[unlock(daysAgo(0))]} games={[]} />)
   fireEvent.click(pill(en.pointsStats.today))
-  expect(screen.getByTestId('day-modal')).toHaveTextContent(new Date().toISOString().split('T')[0])
+  expect(await screen.findByTestId('day-modal')).toHaveTextContent(new Date().toISOString().split('T')[0])
   fireEvent.click(pill(en.pointsStats.thisWeek))
-  expect(screen.getByTestId('period-modal')).toHaveTextContent(`${en.pointsStats.thisWeek}:1`)
+  expect(await screen.findByTestId('period-modal')).toHaveTextContent(`${en.pointsStats.thisWeek}:1`)
 })
 
 test('says there is no activity today, and keeps the level in the row while the profile loads', () => {

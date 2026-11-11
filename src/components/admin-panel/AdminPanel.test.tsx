@@ -74,7 +74,7 @@ describe('deleting a user', () => {
 
   test('asks first, then removes the user from the list', async () => {
     await openConfirm()
-    expect(screen.getByText(/Delete papucarrot and everything they own/)).toBeInTheDocument()
+    expect(await screen.findByText(/Delete papucarrot and everything they own/)).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete user' }))
     await waitFor(() => expect(screen.queryByText('papucarrot')).not.toBeInTheDocument())

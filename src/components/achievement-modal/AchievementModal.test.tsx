@@ -35,6 +35,13 @@ test('Escape closes it', () => {
   expect(onClose).toHaveBeenCalledTimes(1)
 })
 
+test('its corner button has a name and closes it', () => {
+  const onClose = jest.fn()
+  render(<AchievementModal achievement={achievement} numDistinctPlayers={1000} onClose={onClose} />)
+  fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+  expect(onClose).toHaveBeenCalledTimes(1)
+})
+
 test('closing gives the focus back to what opened it', () => {
   const opener = document.createElement('button')
   document.body.appendChild(opener)

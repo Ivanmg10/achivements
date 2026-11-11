@@ -269,8 +269,9 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
 - **Never draw a control by hand**: `Button` / `IconButton` (or `buttonClass`), `Input`, `Textarea`,
   `SearchInput`, `PasswordInput` in `Field` (or `fieldClass`), `Select` (never a native `<select>`),
   `Switch` (state in words beside it), `Checkbox`, `ChoiceCards`, `Tabs`, `SegmentedControl`, `Pill`,
-  `Modal` (`CommonModal` wraps it; a `Modal` draws the frame, never a card inside it; `placement="top"` for a
-  command panel or a menu), `Notice`, `ErrorRetry` (a failed read with its retry), `Spinner` (or `Button loading`),
+  `Modal` (every dialog is one: its own head (`title`, `hint`, `icon`), the corner close, `footer` for the actions, `tone="danger"` for a
+  destructive one; no hand-drawn head or ✕, no Escape listener of its own, no `createPortal`, no `CommonModal` (deleted, #121); a `Modal` draws the frame,
+  never a card inside it; `placement="top"` for a command panel or a menu), `Notice`, `ErrorRetry` (a failed read with its retry), `Spinner` (or `Button loading`),
   `TOOLTIP_SURFACE`, `MENU_SURFACE`, `SURFACE`, `Accordion`, `ShowMore`, `Shelf`, `SectionHead`, `DropSlot`,
   `ToggleButton`, `Kicker` (the small label, sentence case), `Tag`, `Avatar` (with the presence dot), `ListRow`, `Figure`
   (every labelled number), `DataBar` (a chart bar) and `Facts` (facts on one line). `className` on them is for layout only,
@@ -417,7 +418,9 @@ with its tests; it is the part that decides whether the answers are any good.
 - **Nothing in the browser makes a platform's data older than its server cache** (the user's rule): page reads
   are painted from their last answer and always read again, never served from a client TTL.
 - **recharts only through the lazy `AchievementsLinePlot`.** A modal is a `next/dynamic` import in
-  `LazyWhenOpened`, **always with `{ loading: () => null }`**; never imported statically into a page or the header.
+  `LazyWhenOpened`, **always with `{ loading: () => null }`**; never imported statically into a page or the header (`uiGuard.test.ts` refuses a static
+  `import XModal` / `XDialog` and a `dynamic()` of one without `loading`). A modal that opens on data (`{selected && <XModal …/>}`) is lazy by
+  its condition alone; one with an `isOpen` is wrapped in `LazyWhenOpened`.
 - Expensive read routes send `cachedJson(data, ttl)`; mutable data (groups, pins, preferences) never does.
   A context value is memoized when its provider reads the session. A route group has an `error.tsx` whose retry
   calls `retry()`, not `reset()`.

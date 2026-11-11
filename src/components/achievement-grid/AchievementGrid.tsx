@@ -4,16 +4,19 @@ import { memo, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { AnimatePresence } from 'framer-motion'
 import { IconAlertTriangle } from '@tabler/icons-react'
+import dynamic from 'next/dynamic'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
-import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import { capList } from '@/utils/utils'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { raTypeTag } from '@/components/ui/dataTable'
 import { raBadgeUrl } from '@/utils/raAssets'
 import CursorTooltip from '@/components/ui/CursorTooltip'
+
+// Downloaded the first time it opens, not with the page.
+const AchievementModal = dynamic(() => import('@/components/achievement-modal/AchievementModal'), { loading: () => null })
 
 type TooltipData = { achievement: RetroAchievement; x: number; y: number }
 

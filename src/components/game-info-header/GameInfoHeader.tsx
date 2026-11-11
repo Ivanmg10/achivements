@@ -3,6 +3,8 @@
 import { ReactNode, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { IconHash, IconExternalLink } from '@tabler/icons-react'
+import dynamic from 'next/dynamic'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { CONSOLES } from '@/constants'
@@ -14,10 +16,12 @@ import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
-import GameHashesModal from './GameHashesModal'
 import { formatDay } from '@/utils/dates'
 import { raImageUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
+
+// Downloaded the first time it opens, not with the page.
+const GameHashesModal = dynamic(() => import('./GameHashesModal'), { loading: () => null })
 
 type StatusKey = 'mastered' | 'completed' | 'beatenHC' | 'beaten' | 'inProgress'
 
@@ -157,12 +161,14 @@ export default function GameInfoHeader({
       </GameHero>
 
       {gameData?.ID && (
-        <GameHashesModal
-          isOpen={hashesOpen}
-          onClose={() => setHashesOpen(false)}
-          gameId={gameData.ID}
-          gameTitle={gameData.Title ?? ''}
-        />
+        <LazyWhenOpened open={hashesOpen}>
+          <GameHashesModal
+            isOpen={hashesOpen}
+            onClose={() => setHashesOpen(false)}
+            gameId={gameData.ID}
+            gameTitle={gameData.Title ?? ''}
+          />
+        </LazyWhenOpened>
       )}
     </>
   )

@@ -54,7 +54,7 @@ test('names the easiest achievement left, with how many players have it', () => 
   expect(screen.getAllByText(/43\.9 % of players have it/)).not.toHaveLength(0)
 })
 
-test('shows five grey unearned achievements at most and a matching remaining tile', () => {
+test('shows five grey unearned achievements at most and a matching remaining tile', async () => {
   ;(useRecentFeed as jest.Mock).mockReturnValue({ feed: [steamItem], loading: false })
   ;(useGameInsights as jest.Mock).mockReturnValue({ items: Array.from({ length: 7 }, (_, i) => target(`Target ${i + 1}`, 50 - i)), art: [], loading: false, error: false })
   render(<MainPagePortada />)
@@ -64,19 +64,19 @@ test('shows five grey unearned achievements at most and a matching remaining til
   expect(screen.getByRole('tooltip', { name: /Target 5/ })).toHaveTextContent('About Target 5')
   expect(fifth).toHaveAttribute('aria-describedby')
   fireEvent.click(fifth)
-  expect(screen.getByTestId('achievement-modal')).toHaveTextContent('Target 5')
+  expect(await screen.findByTestId('achievement-modal')).toHaveTextContent('Target 5')
   const remaining = screen.getByRole('link', { name: '6 left to unlock' })
   expect(remaining).toHaveTextContent('+6')
   expect(remaining).toHaveAttribute('href', '/steamGame/620')
   expect(remaining).toHaveClass('w-full', 'h-full')
 })
 
-test('an RA target opens the same modal as gameInfo', () => {
+test('an RA target opens the same modal as gameInfo', async () => {
   ;(useRecentFeed as jest.Mock).mockReturnValue({ feed: [raItem], loading: false })
   ;(useGameInsights as jest.Mock).mockReturnValue({ items: [{ ...target('RA target', 50), id: '1' }], art: [], ra: { items: [{ ID: 1, Title: 'RA target' }], players: 100 }, loading: false, error: false })
   render(<MainPagePortada />)
   fireEvent.click(screen.getByRole('button', { name: 'RA target' }))
-  expect(screen.getByTestId('ra-achievement-modal')).toHaveTextContent('RA target')
+  expect(await screen.findByTestId('ra-achievement-modal')).toHaveTextContent('RA target')
   expect(screen.queryByTestId('achievement-modal')).not.toBeInTheDocument()
 })
 

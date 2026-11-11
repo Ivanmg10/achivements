@@ -172,3 +172,13 @@ test('says when nothing matches, and the add button waits for a pick', () => {
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'xyz' } })
   expect(screen.getByText('No games match “xyz”')).toBeInTheDocument()
 })
+
+test('is a named dialog that Escape and its named corner button close', () => {
+  const { onClose } = renderModal({ groupTitle: 'Speedruns' })
+  expect(screen.getByRole('dialog', { name: en.groups.addGames })).toBeInTheDocument()
+  expect(screen.getByText(en.groups.addTo.replace('{group}', 'Speedruns'))).toBeInTheDocument()
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(onClose).toHaveBeenCalledTimes(1)
+  fireEvent.click(screen.getByRole('button', { name: en.cards.close }))
+  expect(onClose).toHaveBeenCalledTimes(2)
+})

@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { signOut } from 'next-auth/react'
-import CommonModal from '@/components/common-modal/CommonModal'
+import { IconTrash } from '@tabler/icons-react'
+import Modal from '@/components/ui/Modal'
 import PasswordInput from '@/components/ui/PasswordInput'
 import { useLanguage } from '@/context/LanguageContext'
 import Button from '@/components/ui/Button'
@@ -53,10 +54,24 @@ export default function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolea
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={handleClose}>
-      <h2 className="text-xl font-bold">{D.title}</h2>
-      <p className="text-sm text-text-secondary">{D.confirmText}</p>
-
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      tone="danger"
+      icon={<IconTrash size={20} />}
+      title={D.title}
+      hint={D.confirmText}
+      footer={
+        <>
+          <Button onClick={handleClose} disabled={loading} variant="secondary">
+            {T.editProfileModal.cancel}
+          </Button>
+          <Button onClick={handleDelete} disabled={!password || loading} variant="danger">
+            {loading ? D.deleting : D.confirm}
+          </Button>
+        </>
+      }
+    >
       <PasswordInput
         label={D.password}
         value={password}
@@ -65,23 +80,6 @@ export default function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolea
       />
 
       {error && <Notice tone="danger">{error}</Notice>}
-
-      <div className="flex gap-3 mt-2">
-        <Button
-          onClick={handleClose}
-          disabled={loading}
-          variant="secondary" size="lg" className="flex-1"
-        >
-          {T.editProfileModal.cancel}
-        </Button>
-        <Button
-          onClick={handleDelete}
-          disabled={!password || loading}
-          variant="danger" size="lg" className="flex-1"
-        >
-          {loading ? D.deleting : D.confirm}
-        </Button>
-      </div>
-    </CommonModal>
+    </Modal>
   )
 }

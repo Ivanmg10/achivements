@@ -4,6 +4,7 @@ import { useId, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentFeed } from '@/hooks/useRecentFeed'
 import { useGameInsights } from '@/hooks/useGameInsights'
@@ -16,12 +17,14 @@ import { decimal } from '@/utils/utils'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import Button from '@/components/ui/Button'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
-import AchievementDetailModal from '@/components/achievement-detail-modal/AchievementDetailModal'
-import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 import MainPagePortadaSkeleton from '../main-page-portada-skeleton/MainPagePortadaSkeleton'
 import { relativeTime } from '@/utils/dates'
 import Kicker from '@/components/ui/Kicker'
+
+// Downloaded the first time it opens, not with the page.
+const AchievementDetailModal = dynamic(() => import('@/components/achievement-detail-modal/AchievementDetailModal'), { loading: () => null })
+const AchievementModal = dynamic(() => import('@/components/achievement-modal/AchievementModal'), { loading: () => null })
 
 /**
  * The top of the home in its "cover" layout (Preferences → General): the game

@@ -66,3 +66,13 @@ test('cancel closes without deleting anything', () => {
   expect(onClose).toHaveBeenCalled()
   expect(global.fetch).not.toHaveBeenCalled()
 })
+
+test('is a danger dialog with a named head, closed by Escape and its corner button', () => {
+  const onClose = jest.fn()
+  render(<DeleteAccountModal isOpen onClose={onClose} />)
+  expect(screen.getByRole('alertdialog', { name: D.title })).toBeInTheDocument()
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(onClose).toHaveBeenCalledTimes(1)
+  fireEvent.click(screen.getByRole('button', { name: en.cards.close }))
+  expect(onClose).toHaveBeenCalledTimes(2)
+})

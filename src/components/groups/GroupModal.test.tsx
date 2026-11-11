@@ -128,7 +128,7 @@ test('the title and description say how much room is left', () => {
 
 test('Escape closes it', () => {
   const { onClose } = setup()
-  fireEvent.keyDown(window, { key: 'Escape' })
+  fireEvent.keyDown(document, { key: 'Escape' })
   expect(onClose).toHaveBeenCalled()
 })
 

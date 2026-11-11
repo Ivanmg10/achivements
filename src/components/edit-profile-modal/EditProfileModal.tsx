@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import CommonModal from '../common-modal/CommonModal'
+import Modal from '@/components/ui/Modal'
 import { useLanguage } from '@/context/LanguageContext'
 import Button from '@/components/ui/Button'
 import { Field, fieldClass } from '@/components/ui/Input'
@@ -90,10 +90,21 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={handleClose}>
-      <h2 className="text-xl font-bold">
-        {T.editProfileModal.title} {label}
-      </h2>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={`${T.editProfileModal.title} ${label}`}
+      footer={
+        <>
+          <Button onClick={handleClose} disabled={loading} variant="secondary">
+            {T.editProfileModal.cancel}
+          </Button>
+          <Button onClick={handleSubmit} disabled={!canSubmit || success}>
+            {loading ? T.editProfileModal.saving : T.editProfileModal.save}
+          </Button>
+        </>
+      }
+    >
 
       {/* Current value */}
       <div className="flex flex-col gap-1">
@@ -159,24 +170,6 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
       {success && (
         <Notice tone="success">{T.editProfileModal.success}</Notice>
       )}
-
-      {/* Actions */}
-      <div className="flex gap-3 mt-2">
-        <Button
-          onClick={handleClose}
-          disabled={loading}
-          variant="secondary" size="lg" className="flex-1"
-        >
-          {T.editProfileModal.cancel}
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          disabled={!canSubmit || success}
-          size="lg" className="flex-1"
-        >
-          {loading ? T.editProfileModal.saving : T.editProfileModal.save}
-        </Button>
-      </div>
-    </CommonModal>
+    </Modal>
   )
 }

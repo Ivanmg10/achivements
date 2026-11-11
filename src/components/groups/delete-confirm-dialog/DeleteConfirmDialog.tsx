@@ -1,5 +1,6 @@
 import { useLanguage } from '@/context/LanguageContext'
 import Button from '@/components/ui/Button'
+import { IconTrash } from '@tabler/icons-react'
 import Modal from '@/components/ui/Modal'
 
 /** Asks before deleting something. Defaults to the wording for a group. */
@@ -17,25 +18,24 @@ export default function DeleteConfirmDialog({
   confirmLabel?: string
 }) {
   const { T } = useLanguage()
-  if (!isOpen) return null
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="sm" showClose={false} className="gap-4">
-        <p className="text-sm text-text-main">{message ?? T.groups.confirmDelete}</p>
-        <div className="flex gap-2">
-          <Button
-            onClick={onClose}
-            variant="secondary" className="flex-1"
-          >
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      tone="danger"
+      icon={<IconTrash size={20} />}
+      title={message ?? T.groups.confirmDelete}
+      footer={
+        <>
+          <Button onClick={onClose} variant="secondary">
             {T.groups.cancel}
           </Button>
-          <Button
-            onClick={onConfirm}
-            variant="danger" className="flex-1"
-          >
+          <Button onClick={onConfirm} variant="danger">
             {confirmLabel ?? T.groups.deleteGroup}
           </Button>
-        </div>
-      </Modal>
+        </>
+      }
+    />
   )
 }

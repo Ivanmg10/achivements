@@ -6,11 +6,13 @@ import dynamic from 'next/dynamic'
 import { RecentAchievement } from '@/types/types'
 import { groupByDaySource } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
-import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import { LineChartSkeleton } from '@/components/ui/ChartSkeleton'
 import { Skeleton } from '@/components/ui/Skeleton'
 import AchivementsLineChartTooltip from './achivements-line-chart-tooltip/AchivementsLineChartTooltip'
 import { formatDay } from '@/utils/dates'
+
+// Downloaded the first time it opens, not with the page.
+const DayAchievementsModal = dynamic(() => import('@/components/day-achievements-modal/DayAchievementsModal'), { loading: () => null })
 
 // recharts is the heaviest thing on the page: it arrives after the page is up, in the room the chart keeps.
 const AchievementsLinePlot = dynamic(() => import('./achievements-line-plot/AchievementsLinePlot'), {

@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode, useId } from 'react'
-import { IconBrandYoutube, IconBook2, IconCheck, IconLock, IconX } from '@tabler/icons-react'
+import { IconBrandYoutube, IconBook2, IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { FadeImage } from '@/components/ui/FadeImage'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
@@ -20,8 +20,8 @@ const GUIDE_ICON = { youtube: IconBrandYoutube, steamGuides: IconBook2, psnProfi
  * the badge, the text, when it was earned, how rare it is, and where to
  * find a guide. Platform details (grade, DLC, online) come in as `tags`.
  *
- * Rendered inside the caller's AnimatePresence. Focus moves in on open and
- * back to the opener on close; Escape and the backdrop close it.
+ * Focus moves in on open and back to the opener on close; Escape, the corner
+ * button and the backdrop close it.
  */
 export default function AchievementDetailModal({
   title,
@@ -63,7 +63,7 @@ export default function AchievementDetailModal({
   const guideLabel = { youtube: T.achievementDetail.youtube, steamGuides: T.achievementDetail.steamGuides, psnProfiles: T.achievementDetail.psnProfiles, trueAchievements: T.achievementDetail.trueAchievements }
 
   return (
-    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="md" showClose={false} className="gap-4">
+    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="md" className="gap-4">
         <div className="flex items-start gap-4 p-5 sm:p-6 border-b border-bg-header">
           {iconUrl ? (
             <FadeImage
@@ -89,14 +89,6 @@ export default function AchievementDetailModal({
             <p className="text-sm text-text-secondary">{description}</p>
             {tags && <div className="flex items-center gap-2 flex-wrap text-xs">{tags}</div>}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={T.achievementDetail.close}
-            className="p-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-ring"
-          >
-            <IconX className="w-5 h-5" aria-hidden="true" />
-          </button>
         </div>
 
         <dl className="grid grid-cols-2 divide-x divide-bg-header border-b border-bg-header">

@@ -6,7 +6,7 @@ import { IconEyeOff } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useSubject } from '@/context/SubjectContext'
-import CommonModal from '@/components/common-modal/CommonModal'
+import Modal from '@/components/ui/Modal'
 import Button from '@/components/ui/Button'
 import type { GameSource } from '@/types/game'
 
@@ -61,32 +61,23 @@ export default function HideGameButton({
 
       {/* React carries clicks out of a portal to the card around it: stop them here. */}
       <span className="contents" onClick={(e) => e.stopPropagation()}>
-      <CommonModal isOpen={open} onClose={() => setOpen(false)} className="min-h-0">
-        <div className="flex flex-col gap-4">
-          <span aria-hidden="true" className="w-12 h-12 rounded-card bg-accent/10 ring-1 ring-accent/20 text-accent flex items-center justify-center">
-            <IconEyeOff size={22} />
-          </span>
-          <h2 id={`hide-${source}-${gameId}`} className="text-lg font-semibold">
-            {T.cards.hideGameTitle}
-          </h2>
-          <p className="text-sm text-text-secondary">{T.cards.hideGameText.replace('{title}', title)}</p>
-          <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              onClick={() => setOpen(false)}
-              variant="secondary"
-            >
+      <Modal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        icon={<IconEyeOff size={20} />}
+        title={T.cards.hideGameTitle}
+        hint={T.cards.hideGameText.replace('{title}', title)}
+        footer={
+          <>
+            <Button type="button" onClick={() => setOpen(false)} variant="secondary">
               {T.cards.cancel}
             </Button>
-            <Button
-              type="button"
-              onClick={confirm}
-            >
+            <Button type="button" onClick={confirm}>
               {T.cards.hideConfirm}
             </Button>
-          </div>
-        </div>
-      </CommonModal>
+          </>
+        }
+      />
       </span>
     </>
   )

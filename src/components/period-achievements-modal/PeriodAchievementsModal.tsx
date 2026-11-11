@@ -3,7 +3,6 @@
 import { useMemo } from 'react'
 import { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { IconX } from '@tabler/icons-react'
 import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
 import Modal from '@/components/ui/Modal'
 
@@ -39,18 +38,20 @@ export default function PeriodAchievementsModal({ title, achievements, onClose }
   const totalAch = days.reduce((s, d) => s + d.achievements.length, 0)
 
   return (
-    <Modal isOpen onClose={onClose} size="lg" showClose={false} aria-label={title} className="gap-3">
-        <div className="flex items-start justify-between gap-2 shrink-0">
-          <p className="text-sm font-semibold text-text-main">{title}</p>
-          <button
-            onClick={onClose}
-            aria-label={T.cards.close}
-            className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-ring"
-          >
-            <IconX size={16} />
-          </button>
-        </div>
-
+    <Modal
+      isOpen
+      onClose={onClose}
+      size="lg"
+      title={title}
+      className="gap-3"
+      footer={
+        totalAch > 0 ? (
+          <p className="text-xs text-text-secondary">
+            {totalAch} {T.dayModal.achievements}{hasPoints && ` · ${totalPts.toLocaleString()}pts`}
+          </p>
+        ) : undefined
+      }
+    >
         <div className="flex flex-col gap-4 overflow-y-auto flex-1 min-h-0">
           {days.length === 0 ? (
             <p className="text-sm text-text-secondary text-center py-6">{T.cards.noData}</p>
@@ -72,12 +73,6 @@ export default function PeriodAchievementsModal({ title, achievements, onClose }
             ))
           )}
         </div>
-
-        {totalAch > 0 && (
-          <p className="text-xs text-text-secondary text-right pt-2 border-t border-ink/5 shrink-0">
-            {totalAch} {T.dayModal.achievements}{hasPoints && ` · ${totalPts.toLocaleString()}pts`}
-          </p>
-        )}
     </Modal>
   )
 }

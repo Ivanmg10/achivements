@@ -47,8 +47,8 @@ test('placeholders while loading', () => {
   expect(document.querySelectorAll('.bg-skeleton').length).toBeGreaterThan(3)
 })
 
-test("the day's pill opens what was earned that day", () => {
+test("the day's pill opens what was earned that day", async () => {
   render(<MainPageXboxStats streak={0} achievements={[unlock(today)]} />)
   fireEvent.click(screen.getByText(en.pointsStats.today).closest('button')!)
-  expect(screen.getByTestId('day-modal')).toHaveTextContent(today)
+  expect(await screen.findByTestId('day-modal')).toHaveTextContent(today)
 })

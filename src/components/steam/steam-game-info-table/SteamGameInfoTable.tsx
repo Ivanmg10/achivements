@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
 import SteamGameInfoAchievement from './steam-game-info-achievement/SteamGameInfoAchievement'
@@ -22,8 +23,10 @@ import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
 import { SURFACE } from '@/components/ui/surface'
 import { TABLE, TH } from '@/components/ui/dataTable'
 import { plural } from '@/utils/utils'
-import AchievementDetailModal from '@/components/achievement-detail-modal/AchievementDetailModal'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
+
+// Downloaded the first time it opens, not with the page.
+const AchievementDetailModal = dynamic(() => import('@/components/achievement-detail-modal/AchievementDetailModal'), { loading: () => null })
 type Filter = 'all' | 'earned' | 'unearned' | 'online'
 
 /** Rows shown before "show the other N". */

@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useState } from 'react'
-import { IconCopy, IconDownload, IconSparkles, IconX } from '@tabler/icons-react'
+import { IconCopy, IconDownload, IconSparkles } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { aiExportFileName, aiExportText, buildAiExport, type AiExportSource } from '@/utils/aiExport'
 import Button from '@/components/ui/Button'
@@ -14,14 +14,12 @@ type CopyState = 'idle' | 'copied' | 'failed'
  * The window behind "Ask an AI": what the file is for, an optional question
  * that goes into it, and the two ways out — copy the text to paste in a chat,
  * or download the .json to attach. Copying says how it went right here (the
- * window stays open), not in a toast. Rendered inside the caller's
- * AnimatePresence; focus moves in on open and back on close.
+ * window stays open), not in a toast.
  */
 export default function GameAiExportDialog({ source, onClose }: { source: AiExportSource; onClose: () => void }) {
   const { T, lang } = useLanguage()
   const [question, setQuestion] = useState('')
   const [copy, setCopy] = useState<CopyState>('idle')
-  const titleId = useId()
   const questionId = useId()
 
   const build = () => buildAiExport(source, { lang, question })
@@ -47,24 +45,14 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
   }
 
   return (
-    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="md" showClose={false} className="gap-4">
-        <div className="flex items-start justify-between gap-3">
-          <h2 id={titleId} className="text-lg sm:text-xl font-semibold flex items-center gap-2">
-            <IconSparkles className="w-5 h-5 text-accent shrink-0" aria-hidden="true" />
-            {T.aiExport.title}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={T.aiExport.close}
-            className="p-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-ring"
-          >
-            <IconX className="w-5 h-5" aria-hidden="true" />
-          </button>
-        </div>
-
-        <p className="text-sm text-text-secondary">{T.aiExport.intro.replace('{game}', source.game.title)}</p>
-
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      size="md"
+      icon={<IconSparkles size={20} />}
+      title={T.aiExport.title}
+      hint={T.aiExport.intro.replace('{game}', source.game.title)}
+    >
         <div className="flex flex-col gap-1.5">
           <label htmlFor={questionId} className="text-sm font-medium">
             {T.aiExport.questionLabel}

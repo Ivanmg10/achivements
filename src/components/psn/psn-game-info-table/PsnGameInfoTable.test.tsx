@@ -129,10 +129,10 @@ test('a trophy pinned now stays where it is (moved up, it dragged the page with 
   expect(screen.getByRole('table').querySelector('[data-trophy="2"]')!.className).toContain('bg-accent/[0.05]')
 })
 
-test('a trophy opens in a detail window with its grade, its DLC and guide links', () => {
+test('a trophy opens in a detail window with its grade, its DLC and guide links', async () => {
   render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={WITH_DLC} groups={GROUPS} />)
   fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'DLC one' }))
-  const dialog = screen.getByRole('dialog', { name: 'DLC one' })
+  const dialog = await screen.findByRole('dialog', { name: 'DLC one' })
   expect(within(dialog).getByText(en.psn.bronze)).toBeInTheDocument()
   expect(within(dialog).getByText('DLC · Winter Wonder')).toBeInTheDocument()
   expect(within(dialog).getByRole('link', { name: en.achievementDetail.psnProfiles })).toHaveAttribute(

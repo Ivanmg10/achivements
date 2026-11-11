@@ -1,6 +1,6 @@
 'use client'
 
-import CommonModal from '../common-modal/CommonModal'
+import Modal from '@/components/ui/Modal'
 import { useLanguage } from '@/context/LanguageContext'
 import { LANGUAGES, type Lang } from '@/utils/languages'
 
@@ -18,8 +18,7 @@ export default function LanguageModal({ isOpen, onClose }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose} size="md">
-      <h2 className="text-xl font-bold mb-4">{T.userConfig.language}</h2>
+    <Modal isOpen={isOpen} onClose={onClose} size="md" title={T.userConfig.language}>
 
       <div
         role="radiogroup"
@@ -46,6 +45,6 @@ export default function LanguageModal({ isOpen, onClose }: Props) {
           </button>
         ))}
       </div>
-    </CommonModal>
+    </Modal>
   )
 }
