@@ -19,9 +19,9 @@ test('opens the group and shows its covers, progress and counts', () => {
   expect(screen.getByText('Private')).toBeInTheDocument()
   expect(screen.getByText('59%')).toBeInTheDocument()
   expect(screen.getByRole('progressbar', { name: 'October' })).toHaveAttribute('aria-valuenow', '59')
-  expect(screen.getByText('1 completed')).toBeInTheDocument()
-  expect(screen.getByText('3 in progress')).toBeInTheDocument()
-  expect(screen.getByText(/103\/176 achievements/)).toBeInTheDocument()
+  // One line at the foot, said once: games, in progress, achievements, when.
+  expect(screen.getByText(/4 games/).closest('p')).toHaveTextContent(/^4 games, 3 in progress, 103\/176 achievements, /)
+  expect(screen.queryByText('1 completed')).not.toBeInTheDocument()
   expect(container.querySelector('img[src="https://retroachievements.org/Images/1.png"]')).toBeInTheDocument()
   expect(container.querySelector('img[src="https://cdn/2.jpg"]')).toBeInTheDocument()
 })

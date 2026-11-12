@@ -7,14 +7,13 @@ import { plural } from '@/utils/utils'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
-import GroupPlatformLogos from '@/components/groups/group-platform-logos/GroupPlatformLogos'
-import { relativeTime } from '@/utils/dates'
+import GroupFacts from '@/components/groups/group-facts/GroupFacts'
 import Tag from '@/components/ui/Tag'
-import Facts from '@/components/ui/Facts'
 
 /**
  * A group as an album: its first games' covers as a banner, a ring with how far
- * along it is, its name, platforms and how many games are done or started. An
+ * along it is, its name, and one line of facts (games and their platforms, how many
+ * are started, achievements, when it last changed). An
  * empty group shows empty slots and asks for games. The whole card opens it.
  */
 export default function GroupAlbumCard({ group }: { group: GameGroup }) {
@@ -64,30 +63,17 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
         </span>
         {group.total_possible > 0 && <ProgressBar pct={pct} label={group.title} />}
 
-        <span className="flex flex-wrap items-center gap-1.5 text-xs mt-auto">
-          <Tag>
-            {plural(group.game_count, T.plurals.games, lang)}
-            <GroupPlatformLogos group={group} />
-          </Tag>
-          {empty ? (
+        {empty ? (
+          <span className="flex flex-wrap items-center gap-1.5 text-xs mt-auto">
+            <Tag>{plural(group.game_count, T.plurals.games, lang)}</Tag>
             <span className="ml-auto inline-flex items-center gap-1 text-accent font-semibold">
               <IconPlus className="w-3.5 h-3.5" aria-hidden="true" />
               {T.groups.addGames}
             </span>
-          ) : (
-            <>
-              {(group.started_count ?? 0) > 0 && (
-                <Tag tone="info">{T.groups.startedCount.replace('{n}', String(group.started_count))}</Tag>
-              )}
-              {(group.completed_count ?? 0) > 0 && (
-                <Tag tone="success">{T.groups.completedCount.replace('{n}', String(group.completed_count))}</Tag>
-              )}
-              <span className="ml-auto text-text-secondary truncate">
-                <Facts items={[group.total_possible > 0 && T.groups.achievementsCount.replace('{earned}', String(group.total_awarded)).replace('{total}', String(group.total_possible)), relativeTime(group.updated_at, lang)]} />
-              </span>
-            </>
-          )}
-        </span>
+          </span>
+        ) : (
+          <GroupFacts group={group} className="mt-auto leading-[1.375rem]" />
+        )}
       </div>
     </Link>
   )

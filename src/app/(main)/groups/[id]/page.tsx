@@ -81,7 +81,6 @@ export default function GroupDetailPage() {
               covers={covers}
               gameCount={items.length}
               summary={summary}
-              states={states}
               onAdd={() => setAddGameOpen(true)}
               onEdit={() => setEditOpen(true)}
               onDelete={() => setConfirmDelete(true)}

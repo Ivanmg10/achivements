@@ -3,16 +3,13 @@ import Link from 'next/link'
 import { IconLock, IconPlus, IconWorld } from '@tabler/icons-react'
 import { GameGroup } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { plural } from '@/utils/utils'
 import { gameHref } from '@/utils/gameRef'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
-import GroupPlatformLogos from '@/components/groups/group-platform-logos/GroupPlatformLogos'
 import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgressBar'
-import { relativeTime } from '@/utils/dates'
 import Kicker from '@/components/ui/Kicker'
-import Facts from '@/components/ui/Facts'
+import GroupFacts from '@/components/groups/group-facts/GroupFacts'
 
 const TILE = 'flex flex-col items-center justify-center gap-1 aspect-square rounded-tile border-2 border-dashed border-ink/10 text-xs text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-ring'
 
@@ -22,7 +19,7 @@ const TILE = 'flex flex-col items-center justify-center gap-1 aspect-square roun
  * the other, and a last tile that opens the group: to see the rest, or to add some.
  */
 export default function GroupShelfRow({ group }: { group: GameGroup }) {
-  const { T, lang } = useLanguage()
+  const { T } = useLanguage()
   const Privacy = group.is_public ? IconWorld : IconLock
   const href = `/groups/${group.id}`
   const games = group.covers ?? []
@@ -45,14 +42,8 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
           <Privacy className={`w-3.5 h-3.5 shrink-0 ${group.is_public ? 'text-accent' : 'text-text-secondary'}`} aria-hidden="true" />
           <span className="sr-only">{group.is_public ? T.groups.public : T.groups.private}</span>
         </div>
-        <p className="flex items-center gap-2 text-xs text-text-secondary">
-          {plural(group.game_count, T.plurals.games, lang)}
-          <GroupPlatformLogos group={group} />
-        </p>
         <GroupProgressBar earned={group.total_awarded} total={group.total_possible} label={group.title} className="mt-1" />
-        <p className="text-xs text-text-secondary">
-          <Facts items={[group.total_possible > 0 && T.groups.achievementsCount.replace('{earned}', String(group.total_awarded)).replace('{total}', String(group.total_possible)), T.groups.updatedAgo.replace('{when}', relativeTime(group.updated_at, lang))]} />
-        </p>
+        <GroupFacts group={group} />
         {group.next_up && (
           <div className="mt-auto rounded-tile bg-bg-main/60 p-3 flex flex-col gap-0.5">
             <Kicker as="span" size="sm" tone="accent">{T.groups.nextUp}</Kicker>
