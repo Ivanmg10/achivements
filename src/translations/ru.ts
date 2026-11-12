@@ -281,7 +281,7 @@ export const ru: Translations = {
     raKeyInvalid: 'RetroAchievements больше не принимает ваш API-ключ. Возможно, он был отозван или создан заново: подключите аккаунт снова, чтобы вернуть данные.',
     raKeyInvalidAction: 'Перейти к аккаунту',
     hiddenEmpty: 'Вы не скрыли ни одной игры. Нажмите на глаз у игры в списке, чтобы скрыть её.',
-    showGame: 'Снова показать {title}',
+    showAgain: 'Показать',
     close: 'Закрыть',
   },
   userStats: {

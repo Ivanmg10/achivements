@@ -281,7 +281,7 @@ export const ja: Translations = {
     raKeyInvalid: 'RetroAchievements があなたのAPIキーを受け付けなくなりました（無効化または再生成された可能性があります）。アカウントを再接続するとデータが戻ります。',
     raKeyInvalidAction: 'アカウントへ',
     hiddenEmpty: '非表示のゲームはありません。リストのゲームの目のアイコンで非表示にできます。',
-    showGame: '{title} を再表示',
+    showAgain: '表示',
     close: '閉じる',
   },
   userStats: {

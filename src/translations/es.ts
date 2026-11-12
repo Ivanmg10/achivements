@@ -281,7 +281,7 @@ export const es: Translations = {
     raKeyInvalid: 'RetroAchievements ya no acepta tu clave de API: puede que la hayas revocado o regenerado. Vuelve a conectar tu cuenta para recuperar tus datos.',
     raKeyInvalidAction: 'Ir a tu cuenta',
     hiddenEmpty: 'No has ocultado ningún juego. Usa el ojo de un juego en tus listas para ocultarlo.',
-    showGame: 'Volver a mostrar {title}',
+    showAgain: 'Mostrar',
     close: 'Cerrar',
   },
   userStats: {

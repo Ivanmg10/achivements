@@ -1,10 +1,11 @@
 'use client'
 
 import Image from 'next/image'
-import { IconEye, IconEyeOff } from '@tabler/icons-react'
+import { IconEyeOff } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import Modal from '@/components/ui/Modal'
+import Button from '@/components/ui/Button'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
@@ -12,8 +13,9 @@ import { PLATFORM_NAME } from '@/utils/gameRef'
 import RaLogo from '@/components/ra-logo/RaLogo'
 
 /**
- * The games hidden from the status lists, with an eye on each to show it
- * again. They come back in the list at once; a toast says how it went.
+ * The games hidden from the status lists, with a small "Show" on each to show it
+ * again (a word, not an eye: the eye reads as "view", #132). They come back in the list
+ * at once; a toast says how it went.
  */
 export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { T } = useLanguage()
@@ -47,14 +49,9 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
                     {PLATFORM_NAME[g.source]}
                   </span>
                 </span>
-                <button
-                  type="button"
-                  onClick={() => showGame(g.id, g.source)}
-                  aria-label={T.userPage.showGame.replace('{title}', g.title)}
-                  className="p-2 rounded-chip text-text-secondary hover:text-accent hover:bg-ink/5 transition-colors focus-ring"
-                >
-                  <IconEye size={18} aria-hidden="true" />
-                </button>
+                <Button variant="quiet" size="sm" onClick={() => showGame(g.id, g.source)} aria-label={`${T.userPage.showAgain} ${g.title}`}>
+                  {T.userPage.showAgain}
+                </Button>
               </li>
             ))}
           </ul>

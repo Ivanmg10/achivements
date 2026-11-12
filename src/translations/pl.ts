@@ -281,7 +281,7 @@ export const pl: Translations = {
     raKeyInvalid: 'RetroAchievements nie akceptuje już twojego klucza API – mógł zostać unieważniony lub wygenerowany od nowa. Połącz konto ponownie, aby odzyskać dane.',
     raKeyInvalidAction: 'Przejdź do konta',
     hiddenEmpty: 'Nie ukryto żadnej gry. Użyj oka przy grze na liście, aby ją ukryć.',
-    showGame: 'Pokaż ponownie {title}',
+    showAgain: 'Pokaż',
     close: 'Zamknij',
   },
   userStats: {

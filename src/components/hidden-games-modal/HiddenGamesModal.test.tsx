@@ -7,7 +7,7 @@ jest.mock('@/context/HiddenGamesContext', () => ({ useHiddenGames: jest.fn() }))
 
 const showGame = jest.fn()
 
-test('lists the hidden games of both platforms, each with an eye to show it again', () => {
+test('lists the hidden games of both platforms, each with a small Show button', () => {
   ;(useHiddenGames as jest.Mock).mockReturnValue({
     hidden: [
       { source: 'ra', id: 5, title: 'Zelda', image: 'https://retroachievements.org/i.png' },
@@ -18,7 +18,10 @@ test('lists the hidden games of both platforms, each with an eye to show it agai
   render(<HiddenGamesModal isOpen onClose={jest.fn()} />)
   expect(screen.getByRole('dialog', { name: en.userPage.hiddenGames })).toBeInTheDocument()
   expect(screen.getAllByRole('listitem')).toHaveLength(2)
-  fireEvent.click(screen.getByRole('button', { name: en.userPage.showGame.replace('{title}', 'Portal 2') }))
+  // A word, not an eye icon; the name carries the game it is for.
+  const show = screen.getByRole('button', { name: `${en.userPage.showAgain} Portal 2` })
+  expect(show).toHaveTextContent(en.userPage.showAgain)
+  fireEvent.click(show)
   expect(showGame).toHaveBeenCalledWith(620, 'steam')
 })
 

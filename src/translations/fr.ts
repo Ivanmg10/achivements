@@ -281,7 +281,7 @@ export const fr: Translations = {
     raKeyInvalid: 'RetroAchievements n’accepte plus ta clé d’API : elle a peut-être été révoquée ou régénérée. Reconnecte ton compte pour retrouver tes données.',
     raKeyInvalidAction: 'Aller à ton compte',
     hiddenEmpty: 'Tu n’as masqué aucun jeu. Utilise l’œil d’un jeu dans tes listes pour le masquer.',
-    showGame: 'Afficher de nouveau {title}',
+    showAgain: 'Afficher',
     close: 'Fermer',
   },
   userStats: {

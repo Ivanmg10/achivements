@@ -282,7 +282,7 @@ export const en = {
     raKeyInvalid: 'RetroAchievements no longer accepts your API key. It may have been revoked or regenerated: connect your account again to get your data back.',
     raKeyInvalidAction: 'Go to your account',
     hiddenEmpty: 'You have not hidden any game. Use the eye on a game in your lists to hide it.',
-    showGame: 'Show {title} again',
+    showAgain: 'Show',
     close: 'Close',
   },
   userStats: {
