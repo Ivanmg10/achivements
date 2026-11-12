@@ -33,6 +33,51 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-12 — Recently played off-centre and the handhelds (`fix/115-handhelds`, #114 + #115)
+
+**Did** — Stacked on `feat/134-phone` (PR #161, not merged). One commit per point:
+- *#114, the cause* (`fix(ui)`): the feed's rows carry `flex: 1 1 0` (`ROW_STYLE` in `RecentlyPlayedFeed`) and grow to the
+  height of the profile column beside them (the home's grid stretches its row). Their content was centred by two CSS rules
+  only, `.home-fit … > * > *` (≥ 1024 px wide **and ≥ 1000 px tall**, Overview open) and `.profile-recent … > * > *` (someone's
+  profile). Anywhere else (a window under 1000 px tall: a 1080 screen with the browser's bars, the Steam Deck's 800) a profile
+  column taller than the list stretched the rows and the content stuck to their top, with blank space under it. Why it came
+  and went: it depends on the window's height crossing 1000 px and on the profile's height (which platform tab, the motto, the
+  "now playing" card arriving, the recent achievements). Reproduced at 1920 × 950 with a taller profile: 0 px over the content,
+  53 px under it in every row. Fixed in the shell: `FeedGameCard` is `justify-center` (open, the panel takes the spare room, so
+  nothing changes), and the two CSS rules are gone. Not the scrollbar, fonts, fractional widths or breakpoints (all measured).
+  The contract test checks the class on every platform's row.
+- *The streak's day panel* (`fix(streak)`): stacked under the calendar (the card under 48rem: a phone, the Thor, and the
+  Steam Deck, where `/racha` has two columns), `flex-1` gave the panel a basis of 0 that beat its `h-[24.25rem]`: it was 0 px
+  tall and the picked day hung out of the card. `@3xl:flex-1` only. A bug from #131 at every stacked width, 390 included.
+- *Touch areas* (`feat(ui)`): `tap-target` in `globals.css` (an unseen `::after` to 44 × 44 px under `any-pointer: coarse`) on
+  `Button`, `IconButton`, `ToggleButton`, `Tabs`, `SegmentedControl`, the pin, the password eye, the category search's clear
+  (now placed by its own box), the home's profile actions, the profile's Follow / Copy link, the footer, legal and public links,
+  the sign-in's text links, the rankings' "how" link. The `short` variant (≤ 500 px tall) is defined here.
+- *The bar and the home held sideways* (`feat(home)`): the header's links showed from `md` and ran 47 px past the edge at
+  800 px: from `lg` now, the menu below it (checked at 1024 / 1100 / 1280 in es, de, ru: no overflow, the search shrinks to
+  ~170 px at 1024). On `short` the app's bar and `LandingNav` scroll away (`short:relative`), the stats strip sticks at
+  `top-0`, and below `lg` the home's profile folds to one line (#134's fold: `max-lg:short:flex` / `max-lg:short:hidden`,
+  skeleton too), so on the Thor your games come right under the bar instead of after ~650 px of profile.
+- *Phones unchanged* (`fix(ui)`): the visible touch sizes (sm tabs 44 px, the stats strip's tabs, the bar's icon spacing, the
+  sign-in's link spacing) apply from `sm`; a phone keeps #134's sizes and only gets the unseen area.
+**How it was seen** — No account and no database: a throwaway `/hh-lab` page (deleted, `proxy.ts` restored) drew the real home,
+library, streak page and someone's profile with every `/api` call answered by Playwright from sample data, touch emulation on.
+1280 × 800, 800 × 450, 760 × 360, 1080 × 1240, 390 and 2560, slanted dark and round light: no horizontal scroll anywhere
+(the landing, sign-in, rankings, a comparison and /privacy too, signed out). Screenshots were handed to the coordinator.
+**Decisions** — Touch areas are invisible rather than bigger controls, so the desktop and the look do not change; only where a
+scrolling strip would clip the area does the control grow, from `sm`. `any-pointer` (not `pointer`): the Deck in desktop mode
+has a trackpad as its main pointer and a touch screen too. The fold on `short` keeps #134's rule that it never shows on
+someone else's page. Title links in the feed stay 21 px tall: the 64 px icon beside them goes to the same page.
+**Open / watch out** — Not seen on the real devices. To try there: on the Thor (landscape) the home starts with the fold line and
+your games, the bar scrolls away, the stats strip sticks at the top, the menu opens; pins, tabs and the bar's icons take a tap
+at their edge; on the Deck the header shows its links with no overflow, the feed's rows are centred, `/racha` shows the day under
+the calendar. The year map's 10–16 px days and the
+streak calendar's 37–40 px days are under 44 px (a grid of days; their keyboard path is there); the tooltips that open on hover
+(badges on Following, the cover's details) are information, not actions. The 1080 × 1240 secondary screen gets the tablet
+layout (profile stacked first, not folded: it is not short). The owner's checkout and other worktrees were not touched.
+
+---
+
 ## 2026-11-12 — The phone pass (`feat/134-phone`, #134)
 
 **Did** — Board "MejMovil" (canvas page 2), cut from `origin/develop` with #129–#135 in. One commit per point:

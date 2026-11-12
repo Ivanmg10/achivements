@@ -271,7 +271,9 @@ that keep the look; the landing's first screen is chosen ("Primera pantalla 1 v2
   the account**. Signed-out shots in a fresh browser context.
 - **Data read with the app's own credential hides per-account differences** (#113: Steam sends
   `rtime_last_played` only for the API key's owner). Check a second, ordinary account before trusting it.
-- **Sizes to check:** 390 and 2560 px, and the handhelds (Steam Deck 1280×800, AYN Thor ~800×450, #115).
+- **Sizes to check:** 390 and 2560 px, and the handhelds (Steam Deck 1280×800, AYN Thor ~800×450 and 760×360, #115),
+  those with touch emulation on. A small control on a touch screen is `relative tap-target` (an unseen 44 px area); a
+  screen 500 px tall or less is the `short:` variant (`docs/design-system.md` → The rules that keep it honest).
 - **Designs are drawn from the real components and art, with today beside them**, and each round changes only
   what the owner asked.
 

@@ -94,6 +94,19 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   the calendar card is a fixed height (the weeks' arrows, the months, seven rows, the legend) and the day beside it shows
   at most five achievements, "See more" in its head; the best streaks next to it show as many rows as the card holds
   (`useFitCount` measures it), more where the calendar card stacks its panel under the grid and grows.
+- **A row that grows centres its content** (#114). The home's feed rows share the column's height (`flex: 1 1 0`) and grow to
+  the profile beside them; `FeedGameCard` is `justify-center` itself, so its content never sticks to the top of a taller row.
+  A shell that can grow centres itself; never a page-level CSS rule that only some screens reach.
+- **Touch: 44 × 44 px, unseen** (#115). A small control (an icon, a pin, a chip, a text link) carries `relative tap-target`:
+  its `::after` reaches out to 44 px, only under `any-pointer: coarse` (the Steam Deck, the AYN Thor, a phone), so a mouse sees
+  nothing change. The library's `Button`, `IconButton`, `ToggleButton`, `Tabs`, `SegmentedControl` already do. A positioned
+  caller wraps the control in its own box (the control is `relative`), and inside a strip that scrolls the area is clipped,
+  so the control itself grows there, from `sm` only (`sm:any-pointer-coarse:h-11`, the tabs): a phone keeps #134's sizes.
+- **A screen held sideways is `short:`** (500 px tall or less, `@custom-variant short` in `globals.css`: the AYN Thor
+  ~760 × 360 to 800 × 450, a phone on its side). There the app's bar and the public pages' bar scroll away (`short:relative`)
+  instead of keeping a fifth of the screen, what sticks under them sticks to the very top (`short:top-0`), and below `lg`
+  the home's profile folds to one line as on a phone (`max-lg:short:`). Check the handhelds (1280 × 800, 800 × 450,
+  760 × 360) with touch on: Chrome's touch emulation is what turns on `any-pointer: coarse`.
 
 ## Entrances
 
