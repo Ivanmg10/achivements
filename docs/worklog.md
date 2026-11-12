@@ -33,6 +33,43 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-12 — The phone pass (`feat/134-phone`, #134)
+
+**Did** — Board "MejMovil" (canvas page 2), cut from `origin/develop` with #129–#135 in. One commit per point:
+- *Strips that scroll say so* (`feat(ui)`): `useScrollFade` (`src/hooks/`) and `ui/scrollFade.ts`: the edge a sideways strip is cut at
+  fades out (a CSS mask, start, end or both), nothing while it fits. Built into `Tabs` (profile tabs, the stats rail as a strip on a phone,
+  the library's platform tabs, every tab row), used by a group's status filters (now one line that scrolls, no more "Sin empezar 0" alone on
+  a line), a game's achievement filters and the streak's year, which opens scrolled to today (`fromEnd`). Specimen "Scroll fade" in `/design`.
+- *The version and the footer* (`fix(ui)`): `VersionBadge` (fixed bottom-right, over the content) is gone; the version is in `MainFooter`'s
+  name line and at the end of `PublicFooter`. The footer's rows wrap (GitHub ran off the right edge). This change was written by another
+  Claude session that worked in this worktree for a minute (20:18, stopped by the coordinator); kept as it was, it is the issue's point.
+- *Phone fixes* (`fix(ui)`): `Tabs size="lg"` (the home's "Jugados recientemente / Juegos fijados") is 15 px on one line on a phone (Spanish 298 px, Russian 312 of the 319 px a 375 px screen leaves, in Barlow) and
+  scrolls with the fade if a language does not fit (`text-xl`, free to wrap, from `sm`); its skeleton line is 30 px there (was 72 px for two
+  lines). `FeedGameCard` puts the platform tag on its own line under the title on a phone (the title gets the width); `GameRowSkeleton` has
+  that line too (phone only). The account's level row wraps, so the points take their own line (V4-03).
+- *Figures by three* (`feat(ui)`): `FIGURES_BY_THREE` (home's activity row: three to a row on a phone, side by side from `sm`) and
+  `FIGURES_BY_THREE_TO_LG` (a profile's six; `KPIS_ROW` is it) hide the mark in front of each row's first figure (`data-figure-mark`).
+  `pointsStats.avgPerDay` is short in the nine languages ("Media 30 d", "Avg 30 d"; the line under it says "/day").
+- *The profile folded* (`feat(home)`): `main-page-profile-fold/MainPageProfileFold` on your own home, phone only (`sm:hidden`): picture,
+  name, level (`VaultLevelBadge compact`, its room while the points load or fill) and streak (the year's, `useStreakData`, the same the home
+  reads; a grey tag until the whole year is in), and "Ver perfil" / "Ocultar perfil" (`mainPage.showProfile`, `hideProfile`, nine languages,
+  `aria-expanded` + `aria-controls`). The side column is `max-sm:hidden` while folded, in both layouts (classic and cover). The home's
+  skeleton draws the line (`MainPageProfileFoldSkeleton`) and hides the column below `sm`.
+**Already done before** — the podium's level once on a phone (#118, `VaultLevelBadge compact="phone"`; the podium passes it); the library
+list's platform as its logo on a phone (#129); the home's activity row is five figures since #128 (not six), so on a phone it is 3 + 2.
+**Decisions** — Fold below `sm` only: between 640 and 1023 px the column still stacks first, as before (the issue says phone). The fold is
+never on someone else's page (it shows your own account). The column's `min-height` with profile tabs only exists at `lg` and taller than
+1000 px (`globals.css`), so folding never touches it, and `homeFit` does not remember a folded (0 px) height. The fold opens by state, not
+stored: every visit starts folded. The year map starts at today rather than adding a second control. The footer keeps its "·" between links
+(the guard allows it there: links, not facts). The short average label applies on every screen (one name per thing).
+**Open / watch out** — Not seen signed in (no real account may be used). Look on a phone at 390 and 375 px: the fold line with a long name
+(it truncates; the button keeps its width), the home's two view tabs in each language (German and Russian are the longest; they scroll with
+the fade if they do not fit), a group with the four status filters, the streak's year opening on today, the account's points under the
+level. Firefox for the mask. The cookie notice was not touched (the owner's call). Seen while measuring, not fixed here (texts, not phone):
+`pinnedGames.title` is still English ("Pinned games") in German, Portuguese and Russian, and Russian `cards.recentlyPlayed` is "Недавно играл"
+(a masculine verb, against the gender-neutral rule). Checked signed out at 375 px with `next dev`: the landing's footer ends with the version and
+nothing fixed is left over the page.
+
 ## 2026-11-12 — The theme picker: a base, then an option under it, every theme kept (`feat/135-theme-picker`, #135)
 
 **Did** — Boards "TemMain", "TemBasicos", "TemNombrados" and the `MiniTema` piece (canvas page 3), then the owner's table after seeing it, stacked on `feat/133-auth-public-pages` (not merged).

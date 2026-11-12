@@ -258,6 +258,15 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   words beside it), **`Checkbox`**, **`ChoiceCards`** / `choiceClass`.
 - **`Tabs`** (the mark in front of the tab you are on, no underline; `lg` a card's title, `orientation="rail"` a column of sections; roving tabindex; the panel is the caller's, `tabIds`; `tabClass` + `TabMark` for pressed buttons),
   **`SegmentedControl`** (a sliding pill leaning on the one angle), **`Pill`** / `pillClass` for filter chips.
+- **A strip that scrolls sideways says there is more** (#134): `useScrollFade` (`src/hooks/`) gives the scrolling element a `ref`
+  and a `fade` class (`ui/scrollFade.ts`, a mask, so it fades into any ground) that fades the edge it is cut at, start, end or both,
+  and nothing while it fits; `fromEnd` opens it on its end (the streak's year, which ends today). Every `Tabs` row has it built in
+  (the profile tabs, the stats rail on a phone, the library's platforms); the group's status filters, a game's achievement filters
+  and the streak's year use the hook. A new sideways strip uses it too. `lg` tabs (a card's title that is its own switch) are
+  15 px on one line on a phone (measured: the longest pair, Russian, is 312 px of the 319 a 375 px screen leaves) and scroll with the fade; from `sm` they are `text-xl` and may wrap.
+- **Bare figures that wrap** (#134): `FIGURES_BY_THREE` (`ui/Figure`; three to a row on a phone, side by side from `sm`, the home's
+  activity row) and `FIGURES_BY_THREE_TO_LG` (three to a row until `lg`, then six: a profile's figures) hide the mark in front of
+  each row's first figure (the mark carries `data-figure-mark`); a hand-made grid of bare figures leaves it hanging at the row's start.
 - `className` on them is for layout only (margin, width, flex), never colours.
 - **The look lives in tokens** in `globals.css` (`--slant`, `--mark`, `--r-*`, `--h-*`, `--motion-*`,
   `--hardcore`/`--softcore`), defined once for every theme (`designTokens.test.ts`): a future
