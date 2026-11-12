@@ -7,6 +7,7 @@ import { streakInk, streakTier } from '@/utils/streakTier'
 import { CountUp } from '@/components/ui/CountUp'
 import { formatDay } from '@/utils/dates'
 import { kickerClass } from '@/components/ui/Kicker'
+import Facts from '@/components/ui/Facts'
 
 interface Props {
   activeStreak: Streak | null
@@ -33,14 +34,12 @@ export default function StreakStatsBanner({ activeStreak, bestStreak, lastActive
   // The streak going colours the hero by its tier; none going, the dimmest.
   const tier = streakTier(activeStreak?.days ?? 0)
 
-  let kicker = T.streak.yourStreak
-  if (activeStreak && bestStreak) {
-    kicker += ` · ${
-      activeStreak.days >= bestStreak.days
+  const record =
+    activeStreak && bestStreak
+      ? activeStreak.days >= bestStreak.days
         ? T.streak.newRecord
         : T.streak.toBeatRecord.replace('{days}', plural(bestStreak.days - activeStreak.days + 1, T.plurals.days, lang))
-    }`
-  }
+      : null
 
   return (
     <section
@@ -50,7 +49,7 @@ export default function StreakStatsBanner({ activeStreak, bestStreak, lastActive
       style={{ backgroundImage: `linear-gradient(110deg, rgb(${tier.color} / 0.22), transparent 55%)` }}
     >
       <div className="flex-1 min-w-0 flex flex-col gap-2 enter-rows">
-        <p className={kickerClass('inherit', 'md')} style={{ color: streakInk(tier) }}>{kicker}</p>
+        <p className={kickerClass('inherit', 'md')} style={{ color: streakInk(tier) }}><Facts items={[T.streak.yourStreak, record]} /></p>
         {activeStreak ? (
           <>
             <p className="font-display italic font-extrabold text-6xl sm:text-[6.5rem] leading-[0.9] pr-3 text-text-main">

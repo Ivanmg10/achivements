@@ -8,6 +8,7 @@ import { plural } from '@/utils/utils'
 import StreakDayRow from '../streak-day-row/StreakDayRow'
 import StreakCalendar from '../streak-calendar/StreakCalendar'
 import SectionHead from '@/components/ui/SectionHead'
+import Facts from '@/components/ui/Facts'
 import { utcDay } from '@/utils/dates'
 
 const COMPLETION_TYPES = new Set(['Mastery/Completion', 'Game Beaten'])
@@ -67,7 +68,7 @@ export default function StreakList({ selectedStreak, today }: { selectedStreak: 
         size="lg"
         id="streak-days-title"
         title={T.streak.listTitle}
-        aside={`${plural(selectedStreak.days, T.plurals.days, lang)} · ${T.streak.calendarHint}`}
+        aside={<Facts items={[plural(selectedStreak.days, T.plurals.days, lang), T.streak.calendarHint]} />}
       />
 
       {/* Calendar and the picked day side by side when the card has room, stacked otherwise. */}
