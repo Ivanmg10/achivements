@@ -331,3 +331,7 @@ test('a modal or dialog is a next/dynamic import with { loading }, never a stati
 test('the logo is drawn from utils/themeIcon\'s shapes (BrandMark, the favicon): never a second copy of its path', () => {
   expect(offenders(/M963 90/).filter((f) => !f.endsWith('themeIcon.ts'))).toEqual([])
 })
+
+test('a theme shown inside another is ThemeScreen (its tokens under data-theme), never a preview drawn by hand (#135)', () => {
+  expect(offenders(/data-theme=\{/)).toEqual([])
+})

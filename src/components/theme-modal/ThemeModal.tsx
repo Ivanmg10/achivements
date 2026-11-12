@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, type MouseEvent } from 'react'
+import { useState } from 'react'
 import Modal from '@/components/ui/Modal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useThemeChoice } from '@/hooks/useThemeChoice'
 import type { Theme } from '@/types/types'
 import { lookTransition, spreadFrom } from '@/utils/lookTransition'
-import ThemeModalGroups from './theme-modal-groups/ThemeModalGroups'
+import ThemeModalPicker from './theme-modal-picker/ThemeModalPicker'
 
 interface Props {
   isOpen: boolean
@@ -14,7 +14,7 @@ interface Props {
 }
 
 /**
- * Every theme by family. A pick spreads over the whole page from its tile and
+ * Every theme, as a base and an option under it. A pick spreads over the whole page from its card and
  * the dialog stays open, so themes can be compared; the line under the title
  * says which one is on and when it has been saved. A failed save brings the
  * old one back and says so here. No blur behind it: the whole page has to take
@@ -25,10 +25,10 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
   const { T } = useLanguage()
   const [savedTheme, setSavedTheme] = useState<Theme | null>(null)
 
-  function pick(id: Theme, e: MouseEvent<HTMLButtonElement>) {
+  function pick(id: Theme, from: Element) {
     if (id === theme) return
     setSavedTheme(null)
-    const box = e.currentTarget.getBoundingClientRect()
+    const box = from.getBoundingClientRect()
     lookTransition(
       () => void choose(id).then((saved) => setSavedTheme(saved ? id : null)),
       spreadFrom(box.left + box.width / 2, box.top + box.height / 2),
@@ -41,12 +41,12 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size="xl"
+      size="2xl"
       backdrop="dim"
       title={T.userTheme.theme}
       hint={<span role="status">{savedTheme === theme ? `${name} · ${T.toast.saved}` : name}</span>}
     >
-      <ThemeModalGroups theme={theme} onSelect={pick} columns="grid-cols-2 min-[400px]:grid-cols-3 lg:grid-cols-6" />
+      <ThemeModalPicker theme={theme} onSelect={pick} />
       {saveError && (
         <p role="alert" className="text-sm text-danger">
           {T.userTheme.saveError}
