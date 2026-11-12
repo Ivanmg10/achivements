@@ -491,20 +491,40 @@ export const fr: Translations = {
     sections: [
       {
         heading: 'Ce que nous conservons',
-        body: [
-          'Votre compte : un nom d’utilisateur, un hash de votre mot de passe (jamais le mot de passe lui-même) et votre adresse e-mail, utilisée uniquement pour récupérer le compte et confirmer qu’il vous appartient.',
-          'Ce que vous choisissez d’ajouter : un avatar (un lien, ou une image que vous importez et que nous conservons jusqu’à ce que vous la remplaciez ou supprimiez votre compte), votre pays, vos jeux et succès favoris et épinglés, votre vitrine de succès et vos groupes.',
-          'Préférences d’affichage : quelles consoles s’affichent, comment ta bibliothèque est présentée et quelques réglages, enregistrés sur ton compte pour te suivre d’un appareil à l’autre. Toi seul(e) les vois.',
-          'Ton profil public, tant qu’il l’est, montre aux utilisateurs connectés ton nom d’utilisateur, ton avatar, ton pays et ta description, les plateformes liées et leurs noms, tes jeux favoris, ton thème, tes groupes publics et ta vitrine de succès, ainsi que ta progression et ton activité, et leur permet de les comparer aux leurs. Ton genre n’apparaît que si tu choisis de l’afficher. Jamais ton e-mail, tes clés ni les succès que tu épingles comme objectifs. Tu peux rendre le profil privé à tout moment.',
-          'Qui tu suis, et qui te suit : conservé pour que tu les retrouves. Toi seul vois ces deux listes, où n’apparaissent que des profils publics ; personne d’autre ne voit qui suit qui.',
-          'Quand tu es venu sur CheevoVault pour la dernière fois : l’heure de ta dernière visite avec le site ouvert devant toi, mise à jour toutes les quelques minutes. Les utilisateurs connectés qui te croisent sur le site (ton profil, la recherche, les listes de ceux qui te suivent) voient si tu es en ligne et, à peu près, quand tu es venu pour la dernière fois. Tu peux arrêter de le partager dans les préférences de ton compte ; il n’est alors montré à personne. Ceux qui te suivent voient aussi le jeu Steam auquel tu joues à ce moment-là, si ton profil Steam le montre publiquement ; arrêter le partage le masque aussi.',
-          'Points Vault et classements : à partir des succès des plateformes que tu lies, nous calculons un score et un niveau, conservés avec ton compte. Tant que ton profil est public, ton nom d’utilisateur, ton avatar, ton niveau et tes points apparaissent dans les classements, visibles par tous sans compte ; les utilisateurs connectés voient aussi si tu es en ligne. Tu peux quitter les classements depuis les préférences de ton compte, ou en rendant ton profil privé.',
-          'Comptes liés : votre nom d’utilisateur et votre clé Web API RetroAchievements, ainsi que votre Steam ID et votre nom affiché, pour récupérer votre progression, y compris lorsque quelqu’un ouvre votre profil public. La clé ne quitte jamais notre serveur. Steam se lie via la connexion de Steam elle-même, qui prouve que le compte est le vôtre ; un compte Steam ne peut être lié qu’à un seul compte CheevoVault.',
-          'Inscription ou connexion avec Steam : Steam nous confirme votre SteamID (et rien d’autre : ni mot de passe, ni e-mail), que nous gardons pour vous reconnaître la prochaine fois. Votre nom et votre image Steam sont copiés comme suggestion de nom d’utilisateur et comme avatar ; vous pouvez changer les deux. Les dates de vos succès Steam et vos heures de jeu par jeu sont conservées avec votre compte, pour tracer votre série et votre activité et savoir quand vous avez joué à chaque jeu pour la dernière fois, jusqu’à ce que vous déliiez Steam ou supprimiez le compte.',
-          'Inscription avec RetroAchievements : le nom d’utilisateur et la clé Web API RetroAchievements que tu indiques sont vérifiés auprès de RetroAchievements et liés au nouveau compte, comme s’ils étaient liés plus tard ; ta photo RetroAchievements est copiée comme avatar, et tu peux la changer. Tu choisis quand même ton e-mail et ton mot de passe.',
-          'PlayStation, si tu le relies : ton ID en ligne PSN et ton numéro de compte. Relier le compte vérifie seulement qu’il existe et affiche ses trophées publiquement. Cela ne prouve pas que le compte est à toi. Tes trophées, et ton temps de jeu et les images de tes jeux si ton historique de jeu est public, sont lus chez Sony avec le compte PlayStation du site et gardés dans un cache qui expire tout seul.',
-          'Xbox, si tu le relies (pour l’instant réservé aux administrateurs du site) : ton gamertag et ton numéro de compte Xbox. La liaison vérifie seulement que le compte existe. Elle ne prouve pas qu’il est à toi. Tes jeux, succès et temps de jeu sont lus via le service OpenXBL et gardés dans un cache qui expire de lui-même.',
-          'Journaux de sécurité : l’adresse IP (et le nom d’utilisateur, pour les connexions) des connexions échouées, inscriptions et demandes de réinitialisation, conservée un jour pour freiner les abus.',
+        parts: [
+          {
+            heading: 'Compte',
+            body: [
+              'Votre compte : un nom d’utilisateur, un hash de votre mot de passe (jamais le mot de passe lui-même) et votre adresse e-mail, utilisée uniquement pour récupérer le compte et confirmer qu’il vous appartient.',
+              'Ce que vous choisissez d’ajouter : un avatar (un lien, ou une image que vous importez et que nous conservons jusqu’à ce que vous la remplaciez ou supprimiez votre compte), votre pays, vos jeux et succès favoris et épinglés, votre vitrine de succès et vos groupes.',
+              'Préférences d’affichage : quelles consoles s’affichent, comment ta bibliothèque est présentée et quelques réglages, enregistrés sur ton compte pour te suivre d’un appareil à l’autre. Toi seul(e) les vois.',
+            ],
+          },
+          {
+            heading: 'Profil et activité',
+            body: [
+              'Ton profil public, tant qu’il l’est, montre aux utilisateurs connectés ton nom d’utilisateur, ton avatar, ton pays et ta description, les plateformes liées et leurs noms, tes jeux favoris, ton thème, tes groupes publics et ta vitrine de succès, ainsi que ta progression et ton activité, et leur permet de les comparer aux leurs. Ton genre n’apparaît que si tu choisis de l’afficher. Jamais ton e-mail, tes clés ni les succès que tu épingles comme objectifs. Tu peux rendre le profil privé à tout moment.',
+              'Qui tu suis, et qui te suit : conservé pour que tu les retrouves. Toi seul vois ces deux listes, où n’apparaissent que des profils publics ; personne d’autre ne voit qui suit qui.',
+              'Quand tu es venu sur CheevoVault pour la dernière fois : l’heure de ta dernière visite avec le site ouvert devant toi, mise à jour toutes les quelques minutes. Les utilisateurs connectés qui te croisent sur le site (ton profil, la recherche, les listes de ceux qui te suivent) voient si tu es en ligne et, à peu près, quand tu es venu pour la dernière fois. Tu peux arrêter de le partager dans les préférences de ton compte ; il n’est alors montré à personne. Ceux qui te suivent voient aussi le jeu Steam auquel tu joues à ce moment-là, si ton profil Steam le montre publiquement ; arrêter le partage le masque aussi.',
+              'Points Vault et classements : à partir des succès des plateformes que tu lies, nous calculons un score et un niveau, conservés avec ton compte. Tant que ton profil est public, ton nom d’utilisateur, ton avatar, ton niveau et tes points apparaissent dans les classements, visibles par tous sans compte ; les utilisateurs connectés voient aussi si tu es en ligne. Tu peux quitter les classements depuis les préférences de ton compte, ou en rendant ton profil privé.',
+            ],
+          },
+          {
+            heading: 'Plateformes',
+            body: [
+              'Comptes liés : votre nom d’utilisateur et votre clé Web API RetroAchievements, ainsi que votre Steam ID et votre nom affiché, pour récupérer votre progression, y compris lorsque quelqu’un ouvre votre profil public. La clé ne quitte jamais notre serveur. Steam se lie via la connexion de Steam elle-même, qui prouve que le compte est le vôtre ; un compte Steam ne peut être lié qu’à un seul compte CheevoVault.',
+              'Inscription ou connexion avec Steam : Steam nous confirme votre SteamID (et rien d’autre : ni mot de passe, ni e-mail), que nous gardons pour vous reconnaître la prochaine fois. Votre nom et votre image Steam sont copiés comme suggestion de nom d’utilisateur et comme avatar ; vous pouvez changer les deux. Les dates de vos succès Steam et vos heures de jeu par jeu sont conservées avec votre compte, pour tracer votre série et votre activité et savoir quand vous avez joué à chaque jeu pour la dernière fois, jusqu’à ce que vous déliiez Steam ou supprimiez le compte.',
+              'Inscription avec RetroAchievements : le nom d’utilisateur et la clé Web API RetroAchievements que tu indiques sont vérifiés auprès de RetroAchievements et liés au nouveau compte, comme s’ils étaient liés plus tard ; ta photo RetroAchievements est copiée comme avatar, et tu peux la changer. Tu choisis quand même ton e-mail et ton mot de passe.',
+              'PlayStation, si tu le relies : ton ID en ligne PSN et ton numéro de compte. Relier le compte vérifie seulement qu’il existe et affiche ses trophées publiquement. Cela ne prouve pas que le compte est à toi. Tes trophées, et ton temps de jeu et les images de tes jeux si ton historique de jeu est public, sont lus chez Sony avec le compte PlayStation du site et gardés dans un cache qui expire tout seul.',
+              'Xbox, si tu le relies (pour l’instant réservé aux administrateurs du site) : ton gamertag et ton numéro de compte Xbox. La liaison vérifie seulement que le compte existe. Elle ne prouve pas qu’il est à toi. Tes jeux, succès et temps de jeu sont lus via le service OpenXBL et gardés dans un cache qui expire de lui-même.',
+            ],
+          },
+          {
+            heading: 'Sécurité',
+            body: [
+              'Journaux de sécurité : l’adresse IP (et le nom d’utilisateur, pour les connexions) des connexions échouées, inscriptions et demandes de réinitialisation, conservée un jour pour freiner les abus.',
+            ],
+          },
         ],
       },
       {

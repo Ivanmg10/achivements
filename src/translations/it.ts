@@ -491,20 +491,40 @@ export const it: Translations = {
     sections: [
       {
         heading: 'Cosa conserviamo',
-        body: [
-          'Il tuo account: un nome utente, un hash della password (mai la password stessa) e il tuo indirizzo email, usato solo per recuperare l’account e confermare che è tuo.',
-          'Ciò che scegli di aggiungere: un avatar (un link, o un’immagine che carichi e che conserviamo finché non la sostituisci o elimini l’account), il tuo paese, giochi e obiettivi preferiti e fissati, la tua vetrina degli obiettivi e i tuoi gruppi.',
-          'Preferenze di visualizzazione: quali console mostrare, come è organizzata la tua libreria e qualche interruttore, salvate sul tuo account per seguirti da un dispositivo all’altro. Le vedi solo tu.',
-          'Il tuo profilo pubblico, finché lo è, mostra agli utenti connessi il tuo nome utente, avatar, paese e descrizione, le piattaforme collegate e i loro nomi, i giochi preferiti, il tema, i gruppi pubblici e la vetrina degli obiettivi, oltre ai tuoi progressi e alla tua attività, e permette loro di confrontarli con i propri. Il genere appare solo se scegli di mostrarlo. Mai la tua email, le tue chiavi né gli obiettivi che fissi come traguardo. Puoi rendere privato il profilo in qualsiasi momento.',
-          'Chi segui e chi ti segue: conservato perché tu possa ritrovarli. Solo tu vedi entrambe le liste, in cui compaiono solo profili pubblici; a nessun altro viene mostrato chi segue chi.',
-          'Quando sei stato su CheevoVault l’ultima volta: l’ora della tua ultima visita con il sito aperto davanti a te, aggiornata ogni pochi minuti. Gli utenti connessi che ti incontrano sul sito (il tuo profilo, la ricerca, gli elenchi di chi ti segue) vedono se sei online e, più o meno, quando sei passato l’ultima volta. Puoi smettere di condividerlo dalle preferenze del tuo account; allora non viene mostrato a nessuno. Chi ti segue vede anche il gioco Steam a cui stai giocando in quel momento, se il tuo profilo Steam lo mostra pubblicamente; smettendo di condividere, si nasconde anche quello.',
-          'Punti Vault e classifiche: dagli obiettivi delle piattaforme che colleghi calcoliamo un punteggio e un livello, conservati con il tuo account. Finché il tuo profilo è pubblico, nome utente, avatar, livello e punti compaiono nelle classifiche, visibili a chiunque senza account; gli utenti che hanno effettuato l’accesso vedono anche se sei online. Puoi uscire dalle classifiche dalle preferenze dell’account o rendendo privato il profilo.',
-          'Account collegati: nome utente e chiave Web API di RetroAchievements, e il tuo Steam ID e nome visualizzato, per recuperare i tuoi progressi, anche quando qualcuno apre il tuo profilo pubblico. La chiave non lascia mai il nostro server. Steam si collega con l’accesso di Steam stesso, che dimostra che l’account è tuo; un account Steam può essere collegato a un solo account CheevoVault.',
-          'Registrazione o accesso con Steam: Steam ci conferma il tuo SteamID (e nient’altro: né password né email), che conserviamo per riconoscerti la prossima volta. Il tuo nome e la tua immagine di Steam vengono copiati come suggerimento di nome utente e come avatar; puoi cambiarli entrambi. Le date dei tuoi obiettivi Steam e le ore giocate in ogni gioco sono conservate con il tuo account, per mostrare la tua serie e la tua attività e sapere quando hai giocato l’ultima volta a ogni gioco, finché non scolleghi Steam o elimini l’account.',
-          'Registrazione con RetroAchievements: il nome utente e la chiave Web API di RetroAchievements che indichi vengono verificati con RetroAchievements e collegati al nuovo account, come collegandoli in seguito; la tua foto di RetroAchievements viene copiata come avatar, e puoi cambiarla. Email e password le scegli comunque.',
-          'PlayStation, se la colleghi: il tuo ID online PSN e il tuo numero di account. Il collegamento controlla solo che l’account esista e mostri i trofei pubblicamente: non dimostra che l’account sia tuo. I tuoi trofei, e il tempo di gioco e le immagini dei giochi se la tua cronologia di gioco è pubblica, vengono letti da Sony con l’account PlayStation del sito e conservati in una cache che scade da sola.',
-          'Xbox, se la colleghi (per ora disponibile solo agli amministratori del sito): il tuo gamertag e il numero del tuo account Xbox. Il collegamento verifica soltanto che l’account esista: non prova che sia tuo. I tuoi giochi, obiettivi e tempo di gioco vengono letti tramite il servizio OpenXBL e conservati in una cache che scade da sola.',
-          'Registri di sicurezza: l’indirizzo IP (e il nome utente, per gli accessi) di accessi falliti, registrazioni e richieste di reimpostazione della password, conservati per un giorno per frenare gli abusi.',
+        parts: [
+          {
+            heading: 'Account',
+            body: [
+              'Il tuo account: un nome utente, un hash della password (mai la password stessa) e il tuo indirizzo email, usato solo per recuperare l’account e confermare che è tuo.',
+              'Ciò che scegli di aggiungere: un avatar (un link, o un’immagine che carichi e che conserviamo finché non la sostituisci o elimini l’account), il tuo paese, giochi e obiettivi preferiti e fissati, la tua vetrina degli obiettivi e i tuoi gruppi.',
+              'Preferenze di visualizzazione: quali console mostrare, come è organizzata la tua libreria e qualche interruttore, salvate sul tuo account per seguirti da un dispositivo all’altro. Le vedi solo tu.',
+            ],
+          },
+          {
+            heading: 'Profilo e attività',
+            body: [
+              'Il tuo profilo pubblico, finché lo è, mostra agli utenti connessi il tuo nome utente, avatar, paese e descrizione, le piattaforme collegate e i loro nomi, i giochi preferiti, il tema, i gruppi pubblici e la vetrina degli obiettivi, oltre ai tuoi progressi e alla tua attività, e permette loro di confrontarli con i propri. Il genere appare solo se scegli di mostrarlo. Mai la tua email, le tue chiavi né gli obiettivi che fissi come traguardo. Puoi rendere privato il profilo in qualsiasi momento.',
+              'Chi segui e chi ti segue: conservato perché tu possa ritrovarli. Solo tu vedi entrambe le liste, in cui compaiono solo profili pubblici; a nessun altro viene mostrato chi segue chi.',
+              'Quando sei stato su CheevoVault l’ultima volta: l’ora della tua ultima visita con il sito aperto davanti a te, aggiornata ogni pochi minuti. Gli utenti connessi che ti incontrano sul sito (il tuo profilo, la ricerca, gli elenchi di chi ti segue) vedono se sei online e, più o meno, quando sei passato l’ultima volta. Puoi smettere di condividerlo dalle preferenze del tuo account; allora non viene mostrato a nessuno. Chi ti segue vede anche il gioco Steam a cui stai giocando in quel momento, se il tuo profilo Steam lo mostra pubblicamente; smettendo di condividere, si nasconde anche quello.',
+              'Punti Vault e classifiche: dagli obiettivi delle piattaforme che colleghi calcoliamo un punteggio e un livello, conservati con il tuo account. Finché il tuo profilo è pubblico, nome utente, avatar, livello e punti compaiono nelle classifiche, visibili a chiunque senza account; gli utenti che hanno effettuato l’accesso vedono anche se sei online. Puoi uscire dalle classifiche dalle preferenze dell’account o rendendo privato il profilo.',
+            ],
+          },
+          {
+            heading: 'Piattaforme',
+            body: [
+              'Account collegati: nome utente e chiave Web API di RetroAchievements, e il tuo Steam ID e nome visualizzato, per recuperare i tuoi progressi, anche quando qualcuno apre il tuo profilo pubblico. La chiave non lascia mai il nostro server. Steam si collega con l’accesso di Steam stesso, che dimostra che l’account è tuo; un account Steam può essere collegato a un solo account CheevoVault.',
+              'Registrazione o accesso con Steam: Steam ci conferma il tuo SteamID (e nient’altro: né password né email), che conserviamo per riconoscerti la prossima volta. Il tuo nome e la tua immagine di Steam vengono copiati come suggerimento di nome utente e come avatar; puoi cambiarli entrambi. Le date dei tuoi obiettivi Steam e le ore giocate in ogni gioco sono conservate con il tuo account, per mostrare la tua serie e la tua attività e sapere quando hai giocato l’ultima volta a ogni gioco, finché non scolleghi Steam o elimini l’account.',
+              'Registrazione con RetroAchievements: il nome utente e la chiave Web API di RetroAchievements che indichi vengono verificati con RetroAchievements e collegati al nuovo account, come collegandoli in seguito; la tua foto di RetroAchievements viene copiata come avatar, e puoi cambiarla. Email e password le scegli comunque.',
+              'PlayStation, se la colleghi: il tuo ID online PSN e il tuo numero di account. Il collegamento controlla solo che l’account esista e mostri i trofei pubblicamente: non dimostra che l’account sia tuo. I tuoi trofei, e il tempo di gioco e le immagini dei giochi se la tua cronologia di gioco è pubblica, vengono letti da Sony con l’account PlayStation del sito e conservati in una cache che scade da sola.',
+              'Xbox, se la colleghi (per ora disponibile solo agli amministratori del sito): il tuo gamertag e il numero del tuo account Xbox. Il collegamento verifica soltanto che l’account esista: non prova che sia tuo. I tuoi giochi, obiettivi e tempo di gioco vengono letti tramite il servizio OpenXBL e conservati in una cache che scade da sola.',
+            ],
+          },
+          {
+            heading: 'Sicurezza',
+            body: [
+              'Registri di sicurezza: l’indirizzo IP (e il nome utente, per gli accessi) di accessi falliti, registrazioni e richieste di reimpostazione della password, conservati per un giorno per frenare gli abusi.',
+            ],
+          },
         ],
       },
       {

@@ -491,20 +491,40 @@ export const pt: Translations = {
     sections: [
       {
         heading: 'O que guardamos',
-        body: [
-          'A sua conta: um nome de utilizador, um hash da sua palavra-passe (nunca a palavra-passe em si) e o seu email, usado apenas para recuperar a conta e confirmar que é sua.',
-          'O que decide adicionar: um avatar (um link, ou uma imagem que carrega e que guardamos até a substituir ou eliminar a conta), o seu país, jogos e conquistas favoritos e fixados, a sua vitrine de conquistas e os seus grupos.',
-          'Preferências de visualização: que consoles aparecem, como a sua biblioteca está organizada e alguns interruptores, guardados na sua conta para o acompanharem entre dispositivos. Só você as vê.',
-          'O teu perfil público, enquanto o for, mostra aos utilizadores com sessão iniciada o teu nome de utilizador, avatar, país e descrição, as plataformas que ligaste e os seus nomes, os teus jogos favoritos, tema, grupos públicos e vitrine de conquistas, e o teu progresso e atividade, e permite-lhes compará-los com os seus. O teu género só aparece se escolheres mostrá-lo. Nunca o teu email, as tuas chaves nem as conquistas que fixas como objetivo. Podes tornar o perfil privado a qualquer momento.',
-          'Quem segues e quem te segue: guardado para que os voltes a encontrar. Só tu vês as duas listas, e nelas só aparecem perfis públicos; a mais ninguém é mostrado quem segue quem.',
-          'Quando estiveste no CheevoVault pela última vez: a hora da tua última visita com o site aberto à tua frente, atualizada a cada poucos minutos. Os utilizadores com sessão iniciada que te encontram no site (o teu perfil, a pesquisa, as listas de quem te segue) veem se estás online e, aproximadamente, quando estiveste cá pela última vez. Podes deixar de o partilhar nas preferências da tua conta; nesse caso não é mostrado a ninguém. Quem te segue também vê o jogo da Steam que estás a jogar nesse momento, se o teu perfil da Steam o mostrar publicamente; ao deixares de partilhar, isso também deixa de se ver.',
-          'Pontos Vault e rankings: com as conquistas das plataformas que ligas calculamos uma pontuação e um nível, guardados com a tua conta. Enquanto o teu perfil for público, o teu nome de utilizador, avatar, nível e pontos aparecem nos rankings, que qualquer pessoa pode ver sem conta; os utilizadores com sessão iniciada veem também se estás online. Podes sair dos rankings nas preferências da conta, ou tornando o perfil privado.',
-          'Contas ligadas: o seu utilizador e chave Web API do RetroAchievements, e o seu Steam ID e nome visível, para obter o seu progresso, também quando alguém abre o seu perfil público. A chave nunca sai do nosso servidor. A Steam liga-se através do início de sessão da própria Steam, que prova que a conta é sua; uma conta Steam só pode estar ligada a uma conta CheevoVault.',
-          'Cadastro ou login com a Steam: a Steam nos confirma seu SteamID (e nada mais: nem senha, nem e-mail), que guardamos para reconhecer você da próxima vez. Seu nome e sua foto da Steam são copiados como sugestão de nome de usuário e como avatar; você pode mudar os dois. As datas das suas conquistas da Steam e as horas jogadas em cada jogo ficam guardadas com a sua conta, para desenhar a sua sequência e atividade e saber quando cada jogo foi jogado pela última vez, até desligar a Steam ou apagar a conta.',
-          'Registo com o RetroAchievements: o utilizador e a chave Web API do RetroAchievements que indicas são verificados com o RetroAchievements e ligados à conta nova, como ao ligá-los depois; a tua foto do RetroAchievements é copiada como avatar, e podes mudá-la. O e-mail e a palavra-passe escolhes à mesma.',
-          'PlayStation, se a ligar: o seu ID online da PSN e o número da conta. Ligar a conta apenas verifica que ela existe e mostra os troféus publicamente. Não prova que a conta é sua. Os seus troféus, e o tempo de jogo e as imagens dos jogos se o seu histórico de jogo for público, são lidos da Sony com a conta PlayStation do próprio site e guardados numa cache que expira sozinha.',
-          'Xbox, se a ligar (por agora só disponível para os administradores do site): o seu gamertag e o número da sua conta Xbox. Ligar só verifica que a conta existe: não prova que é sua. Os seus jogos, conquistas e tempo de jogo são lidos através do serviço OpenXBL e guardados numa cache que expira sozinha.',
-          'Registos de segurança: o endereço IP (e o utilizador, nos inícios de sessão) de inícios de sessão falhados, registos e pedidos de redefinição de palavra-passe, guardados durante um dia para travar abusos.',
+        parts: [
+          {
+            heading: 'Conta',
+            body: [
+              'A sua conta: um nome de utilizador, um hash da sua palavra-passe (nunca a palavra-passe em si) e o seu email, usado apenas para recuperar a conta e confirmar que é sua.',
+              'O que decide adicionar: um avatar (um link, ou uma imagem que carrega e que guardamos até a substituir ou eliminar a conta), o seu país, jogos e conquistas favoritos e fixados, a sua vitrine de conquistas e os seus grupos.',
+              'Preferências de visualização: que consoles aparecem, como a sua biblioteca está organizada e alguns interruptores, guardados na sua conta para o acompanharem entre dispositivos. Só você as vê.',
+            ],
+          },
+          {
+            heading: 'Perfil e atividade',
+            body: [
+              'O teu perfil público, enquanto o for, mostra aos utilizadores com sessão iniciada o teu nome de utilizador, avatar, país e descrição, as plataformas que ligaste e os seus nomes, os teus jogos favoritos, tema, grupos públicos e vitrine de conquistas, e o teu progresso e atividade, e permite-lhes compará-los com os seus. O teu género só aparece se escolheres mostrá-lo. Nunca o teu email, as tuas chaves nem as conquistas que fixas como objetivo. Podes tornar o perfil privado a qualquer momento.',
+              'Quem segues e quem te segue: guardado para que os voltes a encontrar. Só tu vês as duas listas, e nelas só aparecem perfis públicos; a mais ninguém é mostrado quem segue quem.',
+              'Quando estiveste no CheevoVault pela última vez: a hora da tua última visita com o site aberto à tua frente, atualizada a cada poucos minutos. Os utilizadores com sessão iniciada que te encontram no site (o teu perfil, a pesquisa, as listas de quem te segue) veem se estás online e, aproximadamente, quando estiveste cá pela última vez. Podes deixar de o partilhar nas preferências da tua conta; nesse caso não é mostrado a ninguém. Quem te segue também vê o jogo da Steam que estás a jogar nesse momento, se o teu perfil da Steam o mostrar publicamente; ao deixares de partilhar, isso também deixa de se ver.',
+              'Pontos Vault e rankings: com as conquistas das plataformas que ligas calculamos uma pontuação e um nível, guardados com a tua conta. Enquanto o teu perfil for público, o teu nome de utilizador, avatar, nível e pontos aparecem nos rankings, que qualquer pessoa pode ver sem conta; os utilizadores com sessão iniciada veem também se estás online. Podes sair dos rankings nas preferências da conta, ou tornando o perfil privado.',
+            ],
+          },
+          {
+            heading: 'Plataformas',
+            body: [
+              'Contas ligadas: o seu utilizador e chave Web API do RetroAchievements, e o seu Steam ID e nome visível, para obter o seu progresso, também quando alguém abre o seu perfil público. A chave nunca sai do nosso servidor. A Steam liga-se através do início de sessão da própria Steam, que prova que a conta é sua; uma conta Steam só pode estar ligada a uma conta CheevoVault.',
+              'Cadastro ou login com a Steam: a Steam nos confirma seu SteamID (e nada mais: nem senha, nem e-mail), que guardamos para reconhecer você da próxima vez. Seu nome e sua foto da Steam são copiados como sugestão de nome de usuário e como avatar; você pode mudar os dois. As datas das suas conquistas da Steam e as horas jogadas em cada jogo ficam guardadas com a sua conta, para desenhar a sua sequência e atividade e saber quando cada jogo foi jogado pela última vez, até desligar a Steam ou apagar a conta.',
+              'Registo com o RetroAchievements: o utilizador e a chave Web API do RetroAchievements que indicas são verificados com o RetroAchievements e ligados à conta nova, como ao ligá-los depois; a tua foto do RetroAchievements é copiada como avatar, e podes mudá-la. O e-mail e a palavra-passe escolhes à mesma.',
+              'PlayStation, se a ligar: o seu ID online da PSN e o número da conta. Ligar a conta apenas verifica que ela existe e mostra os troféus publicamente. Não prova que a conta é sua. Os seus troféus, e o tempo de jogo e as imagens dos jogos se o seu histórico de jogo for público, são lidos da Sony com a conta PlayStation do próprio site e guardados numa cache que expira sozinha.',
+              'Xbox, se a ligar (por agora só disponível para os administradores do site): o seu gamertag e o número da sua conta Xbox. Ligar só verifica que a conta existe: não prova que é sua. Os seus jogos, conquistas e tempo de jogo são lidos através do serviço OpenXBL e guardados numa cache que expira sozinha.',
+            ],
+          },
+          {
+            heading: 'Segurança',
+            body: [
+              'Registos de segurança: o endereço IP (e o utilizador, nos inícios de sessão) de inícios de sessão falhados, registos e pedidos de redefinição de palavra-passe, guardados durante um dia para travar abusos.',
+            ],
+          },
         ],
       },
       {

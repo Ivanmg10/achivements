@@ -492,20 +492,40 @@ export const en = {
     sections: [
       {
         heading: 'What we store',
-        body: [
-          'Your account: a username, a hash of your password (never the password itself) and your email address, which is used only to recover the account and to confirm it is yours.',
-          'What you choose to add: an avatar (a link, or a picture you upload, which we store until you replace it or delete your account), your country, favourite and pinned games and achievements, your achievement showcase, and your groups.',
-          'Display preferences: which consoles show, how your library is laid out and a few switches, saved on your account so they follow you between devices. Only you see them.',
-          'Your public profile, while it is public, shows signed-in users your username, avatar, country and description, the platforms you linked and their names, your favourite games, theme, public groups and achievement showcase, and your progress and activity, and lets them compare it with their own. Your gender appears only if you choose to show it. Never your email, your keys or the achievements you pinned as goals. You can make the profile private at any time.',
-          'Who you follow, and who follows you: kept so you can find them again. Only you see both lists, and only people whose profile is public appear in them; nobody else is shown who follows whom.',
-          'When you were last on CheevoVault: the time of your last visit with the site open in front of you, updated every few minutes. Signed-in users who come across you (your profile, the search, the lists of people who follow you) see whether you are online and, roughly, when you were last on. You can stop sharing it from your account preferences; it is then shown to nobody. People who follow you also see the Steam game you are in at that moment, when your Steam profile shows it publicly; turning sharing off hides that too.',
-          'Vault Points and the rankings: from the achievements of the platforms you link we work out a score and a level, kept with your account. While your profile is public, your username, avatar, level and points appear in the rankings, which anyone can see without an account; signed-in users also see whether you are online. You can leave the rankings from your account preferences, or by making your profile private.',
-          'Linked accounts: your RetroAchievements username and Web API key, and your Steam ID and display name, so your progress can be fetched, including when someone opens your public profile. The API key never leaves our server. Steam is linked through Steam’s own sign-in, which proves the account is yours; one Steam account can be linked to only one CheevoVault account.',
-          'Signing up or in with Steam: Steam confirms your SteamID to us (and nothing else: no password, no email), which we keep to recognise you next time. Your Steam display name and picture are copied in as your username suggestion and avatar; you can change both. The dates of your Steam achievements and the hours you have played each game are kept with your account, to draw your streak and activity and to know when you last played each game, until you unlink Steam or delete the account.',
-          'Signing up with RetroAchievements: the RetroAchievements username and Web API key you give are checked with RetroAchievements and linked to the new account, as linking them later would; your RetroAchievements picture is copied in as your avatar, and you can change it. You still choose your own email and password.',
-          'PlayStation, if you link it: your PSN online ID and account number. Linking only checks that the account exists and shows its trophies publicly. It does not prove the account is yours. Your trophies, and your play time and game art if your gaming history is public, are read from Sony with the site’s own PlayStation account and kept in a cache that expires on its own.',
-          'Xbox, if you link it (for now only available to the site’s administrators): your gamertag and Xbox account number. Linking only checks that the account exists. It does not prove the account is yours. Your games, achievements and play time are read through the OpenXBL service and kept in a cache that expires on its own.',
-          'Security records: the IP address (and username, for sign-ins) of failed sign-ins, sign-ups and password reset requests, kept for one day to stop abuse.',
+        parts: [
+          {
+            heading: 'Account',
+            body: [
+              'Your account: a username, a hash of your password (never the password itself) and your email address, which is used only to recover the account and to confirm it is yours.',
+              'What you choose to add: an avatar (a link, or a picture you upload, which we store until you replace it or delete your account), your country, favourite and pinned games and achievements, your achievement showcase, and your groups.',
+              'Display preferences: which consoles show, how your library is laid out and a few switches, saved on your account so they follow you between devices. Only you see them.',
+            ],
+          },
+          {
+            heading: 'Profile and activity',
+            body: [
+              'Your public profile, while it is public, shows signed-in users your username, avatar, country and description, the platforms you linked and their names, your favourite games, theme, public groups and achievement showcase, and your progress and activity, and lets them compare it with their own. Your gender appears only if you choose to show it. Never your email, your keys or the achievements you pinned as goals. You can make the profile private at any time.',
+              'Who you follow, and who follows you: kept so you can find them again. Only you see both lists, and only people whose profile is public appear in them; nobody else is shown who follows whom.',
+              'When you were last on CheevoVault: the time of your last visit with the site open in front of you, updated every few minutes. Signed-in users who come across you (your profile, the search, the lists of people who follow you) see whether you are online and, roughly, when you were last on. You can stop sharing it from your account preferences; it is then shown to nobody. People who follow you also see the Steam game you are in at that moment, when your Steam profile shows it publicly; turning sharing off hides that too.',
+              'Vault Points and the rankings: from the achievements of the platforms you link we work out a score and a level, kept with your account. While your profile is public, your username, avatar, level and points appear in the rankings, which anyone can see without an account; signed-in users also see whether you are online. You can leave the rankings from your account preferences, or by making your profile private.',
+            ],
+          },
+          {
+            heading: 'Platforms',
+            body: [
+              'Linked accounts: your RetroAchievements username and Web API key, and your Steam ID and display name, so your progress can be fetched, including when someone opens your public profile. The API key never leaves our server. Steam is linked through Steam’s own sign-in, which proves the account is yours; one Steam account can be linked to only one CheevoVault account.',
+              'Signing up or in with Steam: Steam confirms your SteamID to us (and nothing else: no password, no email), which we keep to recognise you next time. Your Steam display name and picture are copied in as your username suggestion and avatar; you can change both. The dates of your Steam achievements and the hours you have played each game are kept with your account, to draw your streak and activity and to know when you last played each game, until you unlink Steam or delete the account.',
+              'Signing up with RetroAchievements: the RetroAchievements username and Web API key you give are checked with RetroAchievements and linked to the new account, as linking them later would; your RetroAchievements picture is copied in as your avatar, and you can change it. You still choose your own email and password.',
+              'PlayStation, if you link it: your PSN online ID and account number. Linking only checks that the account exists and shows its trophies publicly. It does not prove the account is yours. Your trophies, and your play time and game art if your gaming history is public, are read from Sony with the site’s own PlayStation account and kept in a cache that expires on its own.',
+              'Xbox, if you link it (for now only available to the site’s administrators): your gamertag and Xbox account number. Linking only checks that the account exists. It does not prove the account is yours. Your games, achievements and play time are read through the OpenXBL service and kept in a cache that expires on its own.',
+            ],
+          },
+          {
+            heading: 'Security',
+            body: [
+              'Security records: the IP address (and username, for sign-ins) of failed sign-ins, sign-ups and password reset requests, kept for one day to stop abuse.',
+            ],
+          },
         ],
       },
       {
