@@ -28,7 +28,7 @@ export default function DeleteConfirmDialog({
       title={message ?? T.groups.confirmDelete}
       footer={
         <>
-          <Button onClick={onClose} variant="secondary">
+          <Button onClick={onClose} variant="quiet">
             {T.groups.cancel}
           </Button>
           <Button onClick={onConfirm} variant="danger">

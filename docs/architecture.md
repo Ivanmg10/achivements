@@ -159,7 +159,7 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   `platform-category-section/PlatformCategorySection`, and an opened game is
   `game-expanded-layout/GameExpandedLayout` with `badge-grid/lazy-badge-grid/LazyBadgeGrid` for the
   grid's loading, failure and empty states. A platform on the account page is
-  `user-page/user-platform-card/UserPlatformCard` (identity as data, the disconnect button and its toasts;
+  `user-page/user-platform-card/UserPlatformCard` (identity as data, the small ringed disconnect beside "Connected" with its `platform-unlink-dialog/PlatformUnlinkDialog` confirmation, and its toasts;
   adapters `UserRaCard`, `UserSteamCard`, `UserPsnCard`, `UserXboxCard`, also on `ConnectAccounts`), with
   `user-platform-link-form/` for PSN and Xbox; the admin panel's per-platform rows come from
   `utils/adminPlatforms.ts` (`ADMIN_PLATFORMS`). The link and unlink SQL of the user and admin routes is

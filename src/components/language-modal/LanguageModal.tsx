@@ -25,7 +25,7 @@ export default function LanguageModal({ isOpen, onClose }: Props) {
         aria-label={T.userConfig.language}
         className="grid grid-cols-3 gap-3"
       >
-        {LANGUAGES.map(({ id, label, flag }) => (
+        {LANGUAGES.map(({ id, label }) => (
           <button
             key={id}
             onClick={() => handleSelect(id)}
@@ -37,7 +37,6 @@ export default function LanguageModal({ isOpen, onClose }: Props) {
                 : 'bg-bg-main hover:bg-bg-card text-text-main'
             }`}
           >
-            <span className="text-xl shrink-0" aria-hidden="true">{flag}</span>
             <span className="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">{label}</span>
             {lang === id && (
               <span className="ml-auto w-2 h-2 rounded-full bg-current opacity-80 shrink-0" aria-hidden="true" />

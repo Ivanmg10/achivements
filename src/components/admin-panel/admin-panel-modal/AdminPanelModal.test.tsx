@@ -17,6 +17,7 @@ test('shows nothing while closed', () => {
 
 test('opens the admin panel in a named dialog', () => {
   render(<AdminPanelModal isOpen onClose={jest.fn()} />)
+  act(() => reportMode('open'))
   expect(screen.getByRole('dialog', { name: 'Admin panel' })).toHaveTextContent('panel body')
 })
 
@@ -53,10 +54,33 @@ test('Escape leaves it open while another dialog sits over it', () => {
   other.remove()
 })
 
+test('until it is known the head claims neither title and the body is the unlock skeleton (#132)', () => {
+  render(<AdminPanelModal isOpen onClose={jest.fn()} />)
+  expect(screen.queryByText('Admin panel')).not.toBeInTheDocument()
+  expect(screen.queryByText('Unlock the admin panel')).not.toBeInTheDocument()
+  expect(screen.getByRole('dialog')).toHaveClass('sm:max-w-[33.75rem]')
+  expect(screen.getAllByRole('status')[0]).toHaveTextContent('Loading')
+  expect(screen.getByText('panel body').parentElement).toHaveAttribute('hidden')
+  act(() => reportMode('locked'))
+  expect(screen.getByRole('dialog', { name: 'Unlock the admin panel' })).toHaveClass('sm:max-w-[33.75rem]')
+  expect(screen.queryByRole('status')).not.toBeInTheDocument()
+})
+
+test('the door has one title, with the lock; the open panel has the shield (#132)', () => {
+  render(<AdminPanelModal isOpen onClose={jest.fn()} />)
+  act(() => reportMode('locked'))
+  const dialog = screen.getByRole('dialog', { name: 'Unlock the admin panel' })
+  expect(dialog.querySelectorAll('h1, h2, h3')).toHaveLength(1)
+  expect(screen.getByTestId('IconLock')).toBeInTheDocument()
+  act(() => reportMode('open'))
+  expect(screen.getByRole('dialog', { name: 'Admin panel' })).toBeInTheDocument()
+  expect(screen.getByTestId('IconShield')).toBeInTheDocument()
+})
+
 test('narrow while it is only the password door, wide once the panel is open', () => {
   render(<AdminPanelModal isOpen onClose={jest.fn()} />)
   act(() => reportMode('locked'))
-  expect(screen.getByRole('dialog')).toHaveClass('sm:max-w-[27.5rem]')
+  expect(screen.getByRole('dialog')).toHaveClass('sm:max-w-[33.75rem]')
   act(() => reportMode('open'))
   expect(screen.getByRole('dialog')).toHaveClass('sm:max-w-5xl')
 })

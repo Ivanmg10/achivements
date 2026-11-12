@@ -58,3 +58,9 @@ test('a network failure is reported', async () => {
   save()
   await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(en.editProfileModal.errorGeneric))
 })
+
+test('while Save is off, Cancel is quiet: no ring to stand out beside it (#132)', () => {
+  render(<ChangePasswordModal isOpen onClose={jest.fn()} />)
+  expect(screen.getByRole('button', { name: en.editProfileModal.save })).toBeDisabled()
+  expect(screen.getByRole('button', { name: en.editProfileModal.cancel }).className).not.toContain('ring-ink/20')
+})

@@ -82,7 +82,7 @@ export default function DesignCatalogFeedback() {
           title="Delete it?"
           hint="It cannot be undone."
           size="sm"
-          footer={<><Button variant="secondary" size="sm" onClick={() => setOpen(null)}>Cancel</Button><Button variant="danger" size="sm" onClick={() => setOpen(null)}>Delete</Button></>}
+          footer={<><Button variant="quiet" size="sm" onClick={() => setOpen(null)}>Cancel</Button><Button variant="danger" size="sm" onClick={() => setOpen(null)}>Delete</Button></>}
         >
           <p className="text-sm text-text-secondary">A confirmation that destroys something is an alert dialog.</p>
         </Modal>

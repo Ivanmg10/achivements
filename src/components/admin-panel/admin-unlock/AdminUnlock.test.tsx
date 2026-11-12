@@ -70,3 +70,9 @@ test.each([
   expect(await screen.findByRole('alert')).toHaveTextContent(message)
   expect(onUnlocked).not.toHaveBeenCalled()
 })
+
+test('is only the step\'s body: the title and the lock are the dialog\'s head (#132)', () => {
+  render(<AdminUnlock onUnlocked={jest.fn()} />)
+  expect(screen.queryByRole('heading')).not.toBeInTheDocument()
+  expect(screen.getByText(/Type your password and a code/)).toBeInTheDocument()
+})

@@ -36,10 +36,12 @@ test('linked: its own numbers and its picture', () => {
   expect(container.querySelector('img[src*="p.png"]')).not.toBeNull()
 })
 
-test('disconnecting unlinks with the session to read again', () => {
+test('disconnecting asks first, then unlinks with the session to read again', async () => {
   ;(unlinkRaUser as jest.Mock).mockResolvedValue(true)
   render(<UserRaCard />)
   fireEvent.click(screen.getByRole('button', { name: en.userConfig.disconnectRA }))
+  expect(unlinkRaUser).not.toHaveBeenCalled()
+  fireEvent.click(await screen.findByRole('button', { name: en.userData.disconnect, hidden: false }))
   expect(unlinkRaUser).toHaveBeenCalledWith(update)
 })
 

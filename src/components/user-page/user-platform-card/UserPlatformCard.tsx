@@ -2,12 +2,18 @@
 
 import { ReactNode, useState } from 'react'
 import Image from 'next/image'
+import { IconPlugConnectedX } from '@tabler/icons-react'
+import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import Button, { buttonClass } from '@/components/ui/Button'
 import Figure, { type FigureTone } from '@/components/ui/Figure'
 import type { GameSource } from '@/types/game'
+
+// Downloaded the first time it is wanted, not with the page.
+const PlatformUnlinkDialog = dynamic(() => import('@/components/user-page/platform-unlink-dialog/PlatformUnlinkDialog'), { loading: () => null })
 
 export type PlatformStat = { label: string; value: string; tone?: FigureTone; loading?: boolean }
 
@@ -29,19 +35,20 @@ export const CONNECT_CLASS = buttonClass('primary', 'md', 'w-full')
 /** Who the account is on the platform: its picture (or `fallback`), its name, its id and a note under them. */
 export type PlatformIdentity = { avatar?: string | null; fallback?: ReactNode; name: string; id?: string | null; note?: string }
 
-/** The disconnect button: its words, the hook's unlink (true when it worked) and the toast that says so. */
+/** The disconnect: its name (for a screen reader), the hook's unlink (true when it worked) and the toast that says so. */
 export type PlatformDisconnect = { label: string; busyLabel?: string; run: () => Promise<boolean>; done: string }
 
 /**
  * One platform on the account page: its logo, whether it is connected, the
  * account it is connected as, its headline numbers, and the one button that
- * changes anything — connect or disconnect.
+ * changes anything: connect, or a small disconnect beside "Connected" that asks first.
  *
  * The shell is shared so the platforms read as the same kind of thing; each
  * one is outlined in its own gradient so they are still told apart at a
  * glance. Disconnected, the card shows its logo and what connecting is for
- * instead of empty space. Disconnecting is the card's: one button, held while
- * it runs, and a toast either way.
+ * instead of empty space. Disconnecting is the card's: a small ringed button with an icon
+ * (no red: the red is in its confirmation, #132), held while it runs, and a
+ * toast either way.
  */
 export default function UserPlatformCard({
   name,
@@ -84,12 +91,14 @@ export default function UserPlatformCard({
 }) {
   const { T } = useLanguage()
   const [unlinking, setUnlinking] = useState(false)
+  const [asking, setAsking] = useState(false)
 
   const handleDisconnect = async () => {
     if (!disconnect) return
     setUnlinking(true)
     const ok = await disconnect.run()
     setUnlinking(false)
+    setAsking(false)
     if (ok) notify.success(disconnect.done)
     else notify.error(T.toast.unlinkFailed)
   }
@@ -100,7 +109,7 @@ export default function UserPlatformCard({
         aria-label={name}
         className="relative h-full bg-bg-card rounded-card p-5 flex flex-col gap-3 overflow-hidden"
       >
-        <div className="relative flex items-center justify-between gap-2">
+        <div className="relative flex flex-col gap-1">
           <span className="flex items-center gap-2 min-w-0">
             {logo}
             {connected && href ? (
@@ -117,11 +126,18 @@ export default function UserPlatformCard({
               <span className="font-extrabold truncate">{name}</span>
             )}
           </span>
-          <span
-            className={`inline-flex items-center gap-1.5 text-xs font-bold shrink-0 ${connected ? 'text-success' : 'text-text-secondary'}`}
-          >
-            <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-current" />
-            {connected ? T.userData.connected : T.userData.notConnected}
+          {/* One height connected or not, so the figures start at the same place in every card of the row. */}
+          <span className="flex items-center justify-between gap-2 min-h-(--h-control-sm)">
+            <span className={`inline-flex items-center gap-1.5 text-xs font-bold ${connected ? 'text-success' : 'text-text-secondary'}`}>
+              <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-current" />
+              {connected ? T.userData.connected : T.userData.notConnected}
+            </span>
+            {connected && disconnect && (
+              <Button variant="secondary" size="sm" aria-label={disconnect.label} aria-haspopup="dialog" onClick={() => setAsking(true)}>
+                <IconPlugConnectedX size={16} aria-hidden="true" />
+                {T.userData.disconnect}
+              </Button>
+            )}
           </span>
         </div>
 
@@ -167,16 +183,20 @@ export default function UserPlatformCard({
           </div>
         )}
 
-        <div className="relative mt-auto">
-          {connected && disconnect ? (
-            <Button variant="danger" className="w-full" onClick={handleDisconnect} disabled={unlinking}>
-              {unlinking && disconnect.busyLabel ? disconnect.busyLabel : disconnect.label}
-            </Button>
-          ) : (
-            action
-          )}
-        </div>
+        {(!connected || !disconnect) && action && <div className="relative mt-auto">{action}</div>}
       </section>
+      {disconnect && (
+        <LazyWhenOpened open={asking}>
+          <PlatformUnlinkDialog
+            isOpen={asking}
+            onClose={() => setAsking(false)}
+            onConfirm={handleDisconnect}
+            name={name}
+            busy={unlinking}
+            busyLabel={disconnect.busyLabel}
+          />
+        </LazyWhenOpened>
+      )}
     </div>
   )
 }

@@ -25,6 +25,11 @@ test('offers the nine languages as one labelled radio group, the current one che
   expect(radios.filter((r) => r.getAttribute('aria-checked') === 'true')).toHaveLength(1)
 })
 
+test("each option is the language's own name, with no country code or flag (#132)", () => {
+  render(<LanguageModal isOpen onClose={jest.fn()} />)
+  expect(screen.getAllByRole('radio').map((r) => r.textContent)).toEqual(['English', 'Español', 'Português', 'Français', 'Deutsch', 'Italiano', 'Русский', 'Polski', '日本語'])
+})
+
 test('choosing one sets the language and closes', () => {
   const onClose = jest.fn()
   render(<LanguageModal isOpen onClose={onClose} />)

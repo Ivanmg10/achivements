@@ -30,7 +30,7 @@ export default function GenderModal({ isOpen, onClose, current }: Props) {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={T.userData.gender}>
+    <Modal isOpen={isOpen} onClose={onClose} size="md" title={T.userData.gender}>
       {error && <Notice tone="danger">{error}</Notice>}
       <div role="radiogroup" aria-label={T.userData.gender} className="grid grid-cols-2 gap-3">
         {options.map(({ id, label }) => {

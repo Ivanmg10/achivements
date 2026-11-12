@@ -90,10 +90,11 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      size="md"
       title={`${T.editProfileModal.title} ${label}`}
       footer={
         <>
-          <Button onClick={handleClose} disabled={loading} variant="secondary">
+          <Button onClick={handleClose} disabled={loading} variant="quiet">
             {T.editProfileModal.cancel}
           </Button>
           <Button onClick={handleSubmit} disabled={!canSubmit || success}>

@@ -18,7 +18,7 @@ jest.mock('@/hooks/useXboxLink', () => ({ useXboxLink: jest.fn() }))
 jest.mock('@/hooks/useXboxSummary', () => ({ useXboxSummary: () => ({ summary: null, isLoading: false, error: null }) }))
 jest.mock('@/context/XboxGamesDataContext', () => ({ useXboxGamesData: () => ({ library: [], libraryLoading: false }) }))
 
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { notify } from '@/lib/notify'
 import { unlinkRaUser } from '@/utils/apiCallsUtils'
@@ -42,7 +42,8 @@ const PLATFORMS = [
     Card: UserRaCard,
     hint: en.userPage.raConnectHint,
     disconnect: en.userConfig.disconnectRA,
-    busy: en.userConfig.disconnectRA,
+    // RA has no progress word of its own: the dialog's button keeps its short one (and a spinner).
+    busy: en.userData.disconnect,
     unlinked: en.toast.raUnlinked,
     set: (linked: boolean) => {
       ;(useSession as jest.Mock).mockReturnValue({
@@ -107,6 +108,18 @@ describe.each(PLATFORMS)('$platform account card', ({ region, Card, hint, discon
     expect(card).toHaveTextContent('ID-1')
   })
 
+  test('linked: disconnect is a small ringed button with an icon, never red; the red is in its dialog', async () => {
+    set(true)
+    render(<Card />)
+    const small = screen.getByRole('button', { name: disconnect })
+    expect(small).toHaveTextContent(en.userData.disconnect)
+    expect(small.className).not.toContain('danger')
+    expect(small.className).toContain('ring-ink/20')
+    expect(small.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
+    fireEvent.click(small)
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+  })
+
   test('not linked: what linking is for, and no disconnect', () => {
     set(false)
     render(<Card />)
@@ -121,12 +134,17 @@ describe.each(PLATFORMS)('$platform account card', ({ region, Card, hint, discon
     unlink.mockImplementationOnce(() => new Promise<boolean>((resolve) => (finish = resolve))).mockResolvedValueOnce(false)
     render(<Card />)
 
+    // The button on the card only asks; the red one in the dialog does it.
     fireEvent.click(screen.getByRole('button', { name: disconnect }))
-    expect(screen.getByRole('button', { name: busy })).toBeDisabled()
+    expect(unlink).not.toHaveBeenCalled()
+    fireEvent.click(await screen.findByRole('button', { name: en.userData.disconnect }))
+    expect(within(await screen.findByRole('alertdialog')).getByRole('button', { name: busy })).toBeDisabled()
     await act(async () => finish(true))
     expect(notify.success).toHaveBeenCalledWith(unlinked)
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument())
 
     fireEvent.click(screen.getByRole('button', { name: disconnect }))
+    fireEvent.click(await screen.findByRole('button', { name: en.userData.disconnect }))
     await waitFor(() => expect(notify.error).toHaveBeenCalledWith(en.toast.unlinkFailed))
     expect(notify.success).toHaveBeenCalledTimes(1)
   })

@@ -1,14 +1,17 @@
-/** The languages the app is written in, by their own names (how a speaker looks for theirs). */
+/**
+ * The languages the app is written in, by their own names (how a speaker looks for theirs).
+ * No flags: a flag is a country, not a language, and Windows draws one as two letters ("GB"), #132.
+ */
 export const LANGUAGES = [
-  { id: 'en', label: 'English', flag: '🇬🇧' },
-  { id: 'es', label: 'Español', flag: '🇪🇸' },
-  { id: 'pt', label: 'Português', flag: '🇧🇷' },
-  { id: 'fr', label: 'Français', flag: '🇫🇷' },
-  { id: 'de', label: 'Deutsch', flag: '🇩🇪' },
-  { id: 'it', label: 'Italiano', flag: '🇮🇹' },
-  { id: 'ru', label: 'Русский', flag: '🇷🇺' },
-  { id: 'pl', label: 'Polski', flag: '🇵🇱' },
-  { id: 'ja', label: '日本語', flag: '🇯🇵' },
+  { id: 'en', label: 'English' },
+  { id: 'es', label: 'Español' },
+  { id: 'pt', label: 'Português' },
+  { id: 'fr', label: 'Français' },
+  { id: 'de', label: 'Deutsch' },
+  { id: 'it', label: 'Italiano' },
+  { id: 'ru', label: 'Русский' },
+  { id: 'pl', label: 'Polski' },
+  { id: 'ja', label: '日本語' },
 ] as const
 
 export type Lang = (typeof LANGUAGES)[number]['id']

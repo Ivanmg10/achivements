@@ -83,3 +83,9 @@ test('a confirmation can be only its head and footer: no empty body', () => {
   expect(dialog).toHaveAccessibleDescription('Cannot be undone')
   expect(dialog.querySelector('.overflow-y-auto')).toBeNull()
 })
+
+test('the footer keeps its actions at the right, under a hairline, at their normal size (#132)', () => {
+  render(<Modal isOpen onClose={jest.fn()} title="Save it" footer={<><button>Cancel</button><button>Save</button></>} />)
+  const footer = screen.getByRole('button', { name: 'Save' }).parentElement
+  expect(footer).toHaveClass('justify-end', 'shadow-hairline-t')
+})

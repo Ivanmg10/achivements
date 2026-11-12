@@ -126,7 +126,7 @@ export default function UserIdentityCard() {
           <Button variant="secondary" size="sm" onClick={() => setPasswordOpen(true)}>
             {T.userData.changePassword}
           </Button>
-          <Button variant="danger" size="sm" onClick={() => signOut({ callbackUrl: '/authPage' })}>
+          <Button variant="secondary" size="sm" onClick={() => signOut({ callbackUrl: '/authPage' })}>
             {T.userConfig.signOut}
           </Button>
         </div>

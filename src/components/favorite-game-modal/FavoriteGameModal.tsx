@@ -76,7 +76,7 @@ export default function FavoriteGameModal({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" title={T.userData.favoriteGame} className="gap-3">
+    <Modal isOpen={isOpen} onClose={onClose} size="lg" title={T.userData.favoriteGame} className="gap-3">
       <SearchInput
         ref={inputRef}
         value={query}

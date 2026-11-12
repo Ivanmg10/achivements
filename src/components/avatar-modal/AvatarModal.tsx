@@ -55,7 +55,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={close} icon={<IconUser size={20} />} title={t.avatarTitle} hint={t.avatarHint}>
+    <Modal isOpen={isOpen} onClose={close} size="md" icon={<IconUser size={20} />} title={t.avatarTitle} hint={t.avatarHint}>
       <label
         htmlFor={inputId}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}

@@ -29,7 +29,7 @@ export default function RaLoginModal({
 
   return (
     // Steam and PSN link by name alone: the hint says why RA still asks for the key.
-    <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={T.raLoginModal.title} hint={T.raLoginModal.whyKey}>
+    <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} size="md" title={T.raLoginModal.title} hint={T.raLoginModal.whyKey}>
       <form className="flex flex-col gap-5" onSubmit={handleLogin}>
         <input
           type="text"

@@ -69,7 +69,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
   const currentLocation = values.location as string
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} icon={<Avatar src={user.avatar} name={user.username} />} title={user.username} hint={`ID: ${user.id}`}>
+    <Modal isOpen={isOpen} onClose={onClose} size="md" icon={<Avatar src={user.avatar} name={user.username} />} title={user.username} hint={`ID: ${user.id}`}>
       <div className="flex flex-col gap-4">
 
         {/* Username */}

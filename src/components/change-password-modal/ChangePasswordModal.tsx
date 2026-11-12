@@ -71,11 +71,12 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      size="md"
       icon={<IconLock size={20} />}
       title={T.userConfig.changePassword}
       footer={
         <>
-          <Button onClick={handleClose} disabled={loading} variant="secondary">
+          <Button onClick={handleClose} disabled={loading} variant="quiet">
             {T.editProfileModal.cancel}
           </Button>
           <Button onClick={handleSubmit} disabled={!canSubmit || success}>

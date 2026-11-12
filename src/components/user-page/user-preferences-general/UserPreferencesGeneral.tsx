@@ -117,7 +117,7 @@ export default function UserPreferencesGeneral({
       <ProfileField
         label={T.userPage.hiddenGames}
         icon={<IconEyeOff size={18} />}
-        value={hidden.length > 0 ? T.userPage.hiddenCount.replace('{n}', String(hidden.length)) : null}
+        value={hidden.length > 0 ? hidden.length.toLocaleString(lang) : null}
         empty={T.userPage.hiddenNone}
         onEdit={onOpenHidden}
       />

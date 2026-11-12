@@ -49,7 +49,9 @@ test('linked: shows the account, that it is admin-only, and its numbers', () => 
   expect(screen.getByText('10,242')).toBeInTheDocument()
   expect(screen.getByText('135')).toBeInTheDocument()
   expect(screen.getByText('593')).toBeInTheDocument()
-  expect(screen.getByText('Silver')).toBeInTheDocument()
+  // The tier is the account's kind ("Account Silver"), and its achievements are labelled like Steam's.
+  expect(screen.getByText('Silver').parentElement).toHaveTextContent(en.xbox.tier)
+  expect(screen.getByText(en.userStats.achievements)).toBeInTheDocument()
   expect(screen.getByText(en.xbox.adminOnly)).toBeInTheDocument()
   // One game under way of the three.
   expect(screen.getByText(en.steam.playtime).parentElement).toHaveTextContent('—')

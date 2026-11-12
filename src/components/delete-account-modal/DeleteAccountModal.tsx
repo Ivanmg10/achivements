@@ -57,13 +57,14 @@ export default function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolea
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      size="md"
       tone="danger"
       icon={<IconTrash size={20} />}
       title={D.title}
       hint={D.confirmText}
       footer={
         <>
-          <Button onClick={handleClose} disabled={loading} variant="secondary">
+          <Button onClick={handleClose} disabled={loading} variant="quiet">
             {T.editProfileModal.cancel}
           </Button>
           <Button onClick={handleDelete} disabled={!password || loading} variant="danger">
