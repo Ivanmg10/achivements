@@ -108,12 +108,14 @@ describe.each(PLATFORMS)('$platform account card', ({ region, Card, hint, discon
     expect(card).toHaveTextContent('ID-1')
   })
 
-  test('linked: disconnect is a small quiet button, never red; the red is in its dialog', async () => {
+  test('linked: disconnect is a small ringed button with an icon, never red; the red is in its dialog', async () => {
     set(true)
     render(<Card />)
     const small = screen.getByRole('button', { name: disconnect })
     expect(small).toHaveTextContent(en.userData.disconnect)
     expect(small.className).not.toContain('danger')
+    expect(small.className).toContain('ring-ink/20')
+    expect(small.querySelector('svg')).toHaveAttribute('aria-hidden', 'true')
     fireEvent.click(small)
     expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
   })

@@ -2,6 +2,7 @@
 
 import { ReactNode, useState } from 'react'
 import Image from 'next/image'
+import { IconPlugConnectedX } from '@tabler/icons-react'
 import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
@@ -45,7 +46,7 @@ export type PlatformDisconnect = { label: string; busyLabel?: string; run: () =>
  * The shell is shared so the platforms read as the same kind of thing; each
  * one is outlined in its own gradient so they are still told apart at a
  * glance. Disconnected, the card shows its logo and what connecting is for
- * instead of empty space. Disconnecting is the card's: a small quiet button
+ * instead of empty space. Disconnecting is the card's: a small ringed button with an icon
  * (no red: the red is in its confirmation, #132), held while it runs, and a
  * toast either way.
  */
@@ -132,7 +133,8 @@ export default function UserPlatformCard({
               {connected ? T.userData.connected : T.userData.notConnected}
             </span>
             {connected && disconnect && (
-              <Button variant="quiet" size="sm" aria-label={disconnect.label} aria-haspopup="dialog" onClick={() => setAsking(true)}>
+              <Button variant="secondary" size="sm" aria-label={disconnect.label} aria-haspopup="dialog" onClick={() => setAsking(true)}>
+                <IconPlugConnectedX size={16} aria-hidden="true" />
                 {T.userData.disconnect}
               </Button>
             )}
