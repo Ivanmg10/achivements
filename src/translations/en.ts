@@ -1078,7 +1078,7 @@ export const en = {
     activeDays: 'Active days',
     inLastYear: 'in the last year',
     avgStreak: 'Average streak',
-    sinceLast: 'Since your last achievement',
+    sinceLast: 'Last achievement',
     today: 'Today',
     longestGap: 'Longest break',
     weekdaysTitle: 'When you play',

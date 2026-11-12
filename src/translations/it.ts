@@ -1077,7 +1077,7 @@ export const it: Translations = {
     activeDays: 'Giorni attivi',
     inLastYear: 'nell’ultimo anno',
     avgStreak: 'Serie media',
-    sinceLast: 'Dal tuo ultimo obiettivo',
+    sinceLast: 'Ultimo obiettivo',
     today: 'Oggi',
     longestGap: 'Pausa più lunga',
     weekdaysTitle: 'Quando giochi',

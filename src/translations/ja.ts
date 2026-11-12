@@ -1077,7 +1077,7 @@ export const ja: Translations = {
     activeDays: 'アクティブ日数',
     inLastYear: '過去1年',
     avgStreak: '平均連続日数',
-    sinceLast: '最後の実績から',
+    sinceLast: '最後の実績',
     today: '今日',
     longestGap: '最長の休止',
     weekdaysTitle: 'プレイする曜日',

@@ -1077,7 +1077,7 @@ export const pt: Translations = {
     activeDays: 'Dias ativos',
     inLastYear: 'no último ano',
     avgStreak: 'Sequência média',
-    sinceLast: 'Desde a sua última conquista',
+    sinceLast: 'Última conquista',
     today: 'Hoje',
     longestGap: 'Pausa mais longa',
     weekdaysTitle: 'Quando joga',

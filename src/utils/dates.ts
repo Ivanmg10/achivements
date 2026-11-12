@@ -78,6 +78,19 @@ export function relativeTime(dateStr: string | null | undefined, lang = 'en', st
   return fmt.format(0, 'minute')
 }
 
+/**
+ * "N days ago" in the reader's language, cut around its number so the number
+ * can be drawn big: es 3 → { before: 'hace ', figure: '3', after: ' días' },
+ * en → { before: '', figure: '3', after: ' days ago' }. Always the number, never "yesterday".
+ */
+export function daysAgoParts(days: number, lang: string): { before: string; figure: string; after: string } {
+  const parts = new Intl.RelativeTimeFormat(lang, { numeric: 'always' }).formatToParts(-days, 'day')
+  const first = parts.findIndex((p) => p.type !== 'literal')
+  const last = parts.findLastIndex((p) => p.type !== 'literal')
+  const text = (from: number, to: number) => parts.slice(from, to).map((p) => p.value).join('')
+  return { before: text(0, first), figure: text(first, last + 1), after: text(last + 1, parts.length) }
+}
+
 export type SpanLabels = { underMinute: string; minutes: string; hours: string; days: string; months: string }
 
 /**
