@@ -942,6 +942,7 @@ export const ja: Translations = {
     heatLess: '少',
     heatMore: '多',
     trophyCabinet: '最近コンプリートした5本',
+    perfectWord: '100%',
     viewByYear: '年別',
     viewMyOrder: '自分の並び順',
     undated: '日付なし',

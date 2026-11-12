@@ -942,6 +942,7 @@ export const es: Translations = {
     heatLess: 'Menos',
     heatMore: 'Más',
     trophyCabinet: 'Últimos 5 juegos completados',
+    perfectWord: '100 %',
     viewByYear: 'Por año',
     viewMyOrder: 'Mi orden',
     undated: 'Sin fecha',

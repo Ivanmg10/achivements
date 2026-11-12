@@ -943,6 +943,7 @@ export const en = {
     heatLess: 'Less',
     heatMore: 'More',
     trophyCabinet: 'Last 5 completed games',
+    perfectWord: '100%',
     viewByYear: 'By year',
     viewMyOrder: 'My order',
     undated: 'No date',

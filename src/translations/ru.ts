@@ -942,6 +942,7 @@ export const ru: Translations = {
     heatLess: 'Меньше',
     heatMore: 'Больше',
     trophyCabinet: 'Последние 5 завершённых игр',
+    perfectWord: '100 %',
     viewByYear: 'По годам',
     viewMyOrder: 'Мой порядок',
     undated: 'Без даты',
