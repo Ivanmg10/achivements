@@ -1074,6 +1074,8 @@ export const pl: Translations = {
     calendarTitle: 'Dzień po dniu',
     calendarHint: 'Wybierz dzień, by zobaczyć, co odblokowałeś.',
     dayMore: 'i {n} więcej',
+    prevWeeks: 'Wcześniejsze tygodnie',
+    nextWeeks: 'Późniejsze tygodnie',
     activeDays: 'Aktywne dni',
     inLastYear: 'w ostatnim roku',
     avgStreak: 'Średnia seria',

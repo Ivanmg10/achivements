@@ -1074,6 +1074,8 @@ export const de: Translations = {
     calendarTitle: 'Tag für Tag',
     calendarHint: 'Wähle einen Tag, um zu sehen, was du freigeschaltet hast.',
     dayMore: 'und {n} weitere',
+    prevWeeks: 'Frühere Wochen',
+    nextWeeks: 'Spätere Wochen',
     activeDays: 'Aktive Tage',
     inLastYear: 'im letzten Jahr',
     avgStreak: 'Durchschnittliche Serie',

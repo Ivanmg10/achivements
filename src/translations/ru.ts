@@ -1074,6 +1074,8 @@ export const ru: Translations = {
     calendarTitle: 'По дням',
     calendarHint: 'Выберите день, чтобы увидеть, что вы открыли.',
     dayMore: 'и ещё {n}',
+    prevWeeks: 'Предыдущие недели',
+    nextWeeks: 'Следующие недели',
     activeDays: 'Активные дни',
     inLastYear: 'за последний год',
     avgStreak: 'Средняя серия',

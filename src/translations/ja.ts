@@ -1074,6 +1074,8 @@ export const ja: Translations = {
     calendarTitle: '日ごと',
     calendarHint: '日付を選ぶと、その日に解除した実績が表示されます。',
     dayMore: 'ほか{n}件',
+    prevWeeks: '前の週',
+    nextWeeks: '次の週',
     activeDays: 'アクティブ日数',
     inLastYear: '過去1年',
     avgStreak: '平均連続日数',

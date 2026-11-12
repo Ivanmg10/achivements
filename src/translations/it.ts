@@ -1074,6 +1074,8 @@ export const it: Translations = {
     calendarTitle: 'Giorno per giorno',
     calendarHint: 'Scegli un giorno per vedere cosa hai sbloccato.',
     dayMore: 'e altri {n}',
+    prevWeeks: 'Settimane precedenti',
+    nextWeeks: 'Settimane successive',
     activeDays: 'Giorni attivi',
     inLastYear: 'nell’ultimo anno',
     avgStreak: 'Serie media',

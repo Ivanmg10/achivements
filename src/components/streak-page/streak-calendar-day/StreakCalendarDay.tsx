@@ -9,6 +9,8 @@ interface Props {
   /** How busy the day was against the streak's busiest one, 0 to 1. */
   heat: number
   selected: boolean
+  /** The calendar's one tab stop: the picked day, or the first one shown when the picked day is paged away. */
+  tabbable: boolean
   isToday: boolean
   /** Its place in the calendar's grid. */
   style: CSSProperties
@@ -17,11 +19,10 @@ interface Props {
 
 /**
  * One day of the streak calendar: its number, shaded in the accent by how
- * much was unlocked (as the year below it), ringed when picked. Only the
- * picked day is in the tab order; the calendar moves between days with the
- * arrow keys.
+ * much was unlocked (as the year below it), ringed when picked. One day is
+ * in the tab order; the calendar moves between days with the arrow keys.
  */
-export default function StreakCalendarDay({ day, count, heat, selected, isToday, style, onSelect }: Props) {
+export default function StreakCalendarDay({ day, count, heat, selected, tabbable, isToday, style, onSelect }: Props) {
   const { T, lang } = useLanguage()
   const alpha = 0.3 + 0.7 * heat
   // On the strongest tints the number turns dark, as on an accent button.
@@ -32,7 +33,7 @@ export default function StreakCalendarDay({ day, count, heat, selected, isToday,
     <button
       type="button"
       data-day={day}
-      tabIndex={selected ? 0 : -1}
+      tabIndex={tabbable ? 0 : -1}
       onClick={() => onSelect(day)}
       aria-pressed={selected}
       aria-current={isToday ? 'date' : undefined}
@@ -43,7 +44,7 @@ export default function StreakCalendarDay({ day, count, heat, selected, isToday,
       }`}
       style={{ ...style, backgroundColor: count > 0 ? `rgb(var(--accent) / ${alpha.toFixed(2)})` : 'rgb(var(--ink) / 0.06)' }}
     >
-      <span className={`text-xs sm:text-[0.8125rem] ${selected ? 'font-extrabold' : 'font-semibold'}`}>{formatDay(day, lang, { day: 'numeric' })}</span>
+      <span className={`text-xs ${selected ? 'font-extrabold' : 'font-semibold'}`}>{formatDay(day, lang, { day: 'numeric' })}</span>
     </button>
   )
 }

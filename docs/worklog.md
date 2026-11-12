@@ -59,6 +59,12 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   `minmax(1.75rem, 3.5rem)` in a `w-fit` grid, so the calendar is as wide as its weeks, shrinks to 28 px days, then scrolls
   inside itself (the picked week kept in view, never the page); the day panel takes the rest (`@3xl:min-w-72`). Left/right
   move a week, up/down a day. The skeleton draws the same grid at ten weeks.
+- *A fixed window of weeks* after the owner found the days too big: 13 weeks of 40 px days from 640 px wide, 7 of 32 px below
+  (`useMediaQuery`), the number in `text-xs`. No sideways scroll: `streak-calendar-nav/StreakCalendarNav` over the grid ("8 Sept –
+  11 Nov", `IconButton`s labelled `T.streak.prevWeeks/nextWeeks`, nine languages, off at the streak's ends) pages a long streak;
+  the window opens on the streak's last week (keyed by streak, so picking another starts there), and the keyboard leaving it moves
+  it. A short streak still shows the whole window, the days before it dimmed `aria-hidden` spans; the skeleton is the same window.
+  New `addDays` in `utils/dates.ts`.
 **Already done before** — what the issue says #127 brings: "Cuándo juegas" is `DataBar` upright (only its stale comment said
 "slanted"; fixed) and the labels are in sentence case (`kickerClass`). The year and hidden consoles are untouched: the calendar
 draws `selectedStreak.achievements`, which come from `useActivityHeatmapYear` (filtered by `useConsoleVisibility`, its

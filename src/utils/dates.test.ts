@@ -1,4 +1,4 @@
-import { dateFormat, daysAgoParts, formatDate, formatDateTime, formatDay, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay } from './dates'
+import { addDays, dateFormat, daysAgoParts, formatDate, formatDateTime, formatDay, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay } from './dates'
 
 describe('parseUnlockTime', () => {
   test('a zone-less platform date is UTC, whatever the browser zone is', () => {
@@ -94,5 +94,13 @@ describe('daysAgoParts', () => {
   })
   test('a big number keeps its grouping inside the figure', () => {
     expect(daysAgoParts(1234, 'en').figure).toBe('1,234')
+  })
+})
+
+describe('addDays', () => {
+  test('moves across months and years, both ways', () => {
+    expect(addDays('2026-06-29', 3)).toBe('2026-07-02')
+    expect(addDays('2026-01-01', -1)).toBe('2025-12-31')
+    expect(addDays('2026-03-10', 0)).toBe('2026-03-10')
   })
 })

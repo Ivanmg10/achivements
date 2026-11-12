@@ -121,6 +121,13 @@ export function formatDay(day: string, lang: string, options?: Intl.DateTimeForm
   return d.toLocaleDateString(lang, options ?? dateFormat(d))
 }
 
+/** The calendar day `n` days after `day` (before, when negative), as "YYYY-MM-DD", local time. */
+export function addDays(day: string, n: number): string {
+  const d = new Date(`${day}T00:00:00`)
+  d.setDate(d.getDate() + n)
+  return localDay(d)
+}
+
 /** Every day from `start` to `end` (inclusive), as "YYYY-MM-DD", local time. */
 export function daysBetween(start: string, end: string): string[] {
   const out: string[] = []

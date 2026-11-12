@@ -1075,6 +1075,8 @@ export const en = {
     calendarTitle: 'Day by day',
     calendarHint: 'Pick a day to see what you unlocked.',
     dayMore: 'and {n} more',
+    prevWeeks: 'Earlier weeks',
+    nextWeeks: 'Later weeks',
     activeDays: 'Active days',
     inLastYear: 'in the last year',
     avgStreak: 'Average streak',
