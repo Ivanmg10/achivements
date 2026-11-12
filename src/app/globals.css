@@ -7,6 +7,8 @@
 */
 
 @theme inline {
+  /* The 2560 px screen the owner works on: a breakpoint of its own, so it sorts after xl (an arbitrary min-[2560px] sorts before it and loses). */
+  --breakpoint-uhd: 160rem;
   --font-sans: var(--font-face), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-face-display), var(--font-face), ui-sans-serif, system-ui, sans-serif;
 

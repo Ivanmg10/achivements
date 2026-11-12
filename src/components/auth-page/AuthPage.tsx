@@ -73,7 +73,7 @@ export default function AuthPage({ wantsRegister, steam, form, next = null }: { 
             </motion.div>
           ) : (
             <motion.div key="d-collage-l" className="absolute inset-0" {...fromLeft} transition={SLIDE_T}>
-              <AuthCollagePanel />
+              <AuthCollagePanel wall />
             </motion.div>
           )}
         </AnimatePresence>
@@ -84,7 +84,7 @@ export default function AuthPage({ wantsRegister, steam, form, next = null }: { 
         <AnimatePresence mode="wait" initial={false}>
           {isLogin ? (
             <motion.div key="d-collage-r" className="absolute inset-0" {...fromRight} transition={SLIDE_T}>
-              <AuthCollagePanel />
+              <AuthCollagePanel wall />
             </motion.div>
           ) : (
             <motion.div key="d-register" className="relative z-10 w-full h-full" {...fromRight} transition={SLIDE_T}>

@@ -230,6 +230,14 @@ const ROTATIONS = [8, 6, 11, 5, 9, 7, 10, 4]
  */
 const ZIGZAG = [1, 0.8, 1.1, 0.9]
 
+// The wall's extra look from 2560 px (full class names, so Tailwind finds them).
+const WALL = {
+  ground: 'bg-bg-card uhd:bg-bg-main uhd:[--zig:4.5rem]',
+  glow: 'uhd:hidden',
+  gap: 'uhd:gap-28',
+  tile: 'uhd:w-32 uhd:h-32',
+}
+
 /** Alternating lean, so a column reads as a zig-zag rather than a straight line. */
 function zigzag(column: number, i: number) {
   const side = (i + column) % 2 === 0 ? -1 : 1
@@ -272,8 +280,12 @@ function intoColumns(images: string[]): string[][] {
  * Every visit deals a different hand from the pool, and each column's content
  * is doubled so the loop never shows a seam. Resting on a game stops its
  * column so it can be read; reduced motion stops all of them.
+ *
+ * `wall` is the sign-in page's own full-height wall. From 2560 px it takes larger
+ * covers (128 px), shorter gaps and the page's own ground, so it does not change colour
+ * where the form ends (to try, #133). The windows (the landing, a phone's band) keep their size.
  */
-export default function AuthCollagePanel() {
+export default function AuthCollagePanel({ wall = false }: { wall?: boolean }) {
   // Dealt once mounted, so no two visits look the same. Nothing before that: a
   // first deal for the server's HTML would download every tile twice, and the
   // art would compete with the scripts that make the page work.
@@ -281,9 +293,9 @@ export default function AuthCollagePanel() {
   const images = useMemo(() => (client ? dealBothPlatforms(shuffle(RA_IMAGES), shuffle(STEAM_IMAGES), TILES_SHOWN) : []), [client])
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-bg-card [--zig:1.2rem] md:[--zig:2rem] xl:[--zig:3.6rem]">
+    <div className={`relative w-full h-full overflow-hidden [--zig:1.2rem] md:[--zig:2rem] xl:[--zig:3.6rem] ${wall ? WALL.ground : 'bg-bg-card'}`}>
       {/* subtle accent glow behind images */}
-      <div className="absolute inset-0 bg-linear-to-br from-accent/10 via-transparent to-bg-secondary/60" />
+      <div className={`absolute inset-0 bg-linear-to-br from-accent/10 via-transparent to-bg-secondary/60 ${wall ? WALL.glow : ''}`} />
 
       {/* blend edges into form bg */}
       <div className="absolute inset-y-0 left-0 w-10 z-20 bg-linear-to-r from-bg-main to-transparent pointer-events-none" />
@@ -299,7 +311,7 @@ export default function AuthCollagePanel() {
             <div key={c} className="flex-1 h-full min-w-0">
               <div
                 data-column={c}
-                className="marquee-column flex flex-col items-center gap-20 sm:gap-28 xl:gap-36"
+                className={`marquee-column flex flex-col items-center gap-20 sm:gap-28 xl:gap-36 ${wall ? WALL.gap : ''}`}
                 style={{
                   marginTop: COLUMN_OFFSETS[c % COLUMN_OFFSETS.length],
                   willChange: 'transform',
@@ -325,7 +337,7 @@ export default function AuthCollagePanel() {
                         src={src}
                         alt=""
                         aria-hidden="true"
-                        className="w-16 h-16 sm:w-20 sm:h-20 xl:w-24 xl:h-24 object-cover rounded-box"
+                        className={`w-16 h-16 sm:w-20 sm:h-20 xl:w-24 xl:h-24 object-cover rounded-box ${wall ? WALL.tile : ''}`}
                         loading="lazy"
                         decoding="async"
                         // Decoration: never ahead of the form or its fonts.
