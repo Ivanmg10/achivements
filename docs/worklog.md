@@ -33,6 +33,33 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-12 — The theme picker: a base and an accent, every theme kept (`feat/135-theme-picker`, #135)
+
+**Did** — Boards "TemMain", "TemBasicos", "TemNombrados" and the `MiniTema` piece (canvas page 3), stacked on `feat/133-auth-public-pages` (not merged).
+- `src/utils/themePicker.ts`: the 14 basic themes as (base, accent) pairs, exactly the canvas's table (Dark: dark, dark-red, dark-green, dark-blue, dark-white;
+  Tinted: purple, red, green, blue, no white; Light: light, light-red, light-green, light-blue, light-black), `NAMED_THEMES` (palettes, then tributes),
+  `pairOf`, `pickBase` (keeps the accent, else violet) and `pickAccent` (the base on, or dark under a named theme). Its test: each basic id from exactly one pair,
+  every offered pair a theme, every theme a pair or named. `THEME_GROUPS` (types.ts) and its tests are gone.
+- `ui/ThemeScreen` (the MiniTema): the top bar with the logo (`LOGO_PATHS`) and a slanted level, the display-italic title, two game rows with covers from the
+  art wall and their bars, the filters and the slanted primary button, all under `data-theme` so it is drawn in that theme's tokens; it scales with its width
+  (`@container`, sizes in em over `3.125cqw`). `on` adds a tick and "On". Specimen in `/design` (Foundations); `uiGuard.test.ts` refuses a `data-theme={…}` outside it.
+  `ThemePreview`, `ThemeModalGroups` and `ThemeModalOption` are deleted.
+- `theme-modal/theme-modal-picker/ThemeModalPicker`: three `ChoiceCards` (Base 3, Accent 5, Named 4 × 2), each option the `ThemeScreen` of the theme it lands on.
+  Used by `ThemeModal` (same rules: stays open, spreads from the card, `backdrop="dim"`, the status line, the inline save error) and the welcome's style step.
+- `ChoiceCards`: an option can be `disabled` (kept in its place, dimmed, skipped by the arrows) and `columns={5}`.
+- Texts (nine languages): `userTheme.base`, `accent`, `named`, `base_*`, `accent_*`, `kind_palette` / `kind_tribute`, `noPair`, `on`; the five `group_*` keys are gone.
+**Decisions** — Each option is a screen (the issue's "each option drawn as a small screen") rather than the board's text buttons plus one big preview: the base cards
+show the current accent on each base, the accent cards the current base with each accent, so a card always shows what clicking it gives. The pair with no theme
+(Tinted × white) is **shown disabled**, not left out, so the accent row keeps five places on every base; its card says "Not on this base" and so does its radio's name.
+The accent words follow the theme names already in each language ("Morado" in Spanish, as in "Oscuro · Morado"), not the board's "violeta": one name per thing.
+While a named theme is on, no base or accent is checked (honest), and an accent then lands on Dark. The spread origin is the picked card, caught with
+`onChangeCapture` in the picker, so `ChoiceCards`' `onChange` keeps its one argument. Arrow keys in a group pick and save as they move (native radios).
+**Open** — Not seen signed in (the dialog needs a session). Looked at with a throwaway page (removed) at 1440 and 390 px: the base row is 2 + 1 on a phone and the
+accents 3 + 2, `ChoiceCards`' usual phone grid. The dialog at `xl` is about 1,000 px tall: it scrolls on a 1080 px screen.
+**Watch out** — A new theme must join `themePicker.ts` (a pair or `NAMED_THEMES`) or its test fails; `CLAUDE.md` and `docs/design-system.md` → The theme picker say so.
+
+---
+
 ## 2026-11-12 — Sign-in, sign-up and the public pages (`feat/133-auth-public-pages`, #133)
 
 **Did** — Boards "MejAcceso" and "MejPublicas" (canvas page 2), stacked on `feat/132-account-dialogs` (not merged). One commit per point:

@@ -330,6 +330,29 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   the old value until the person picks another: no migration, nothing else reads it.
 - **`apple-icon.tsx` still says "CH"**: out of #84, left as it was.
 
+### The theme picker — a base and an accent, or a name (#135, 2026-11-12)
+
+The 22 themes stay, ids unchanged (the canvas's page 3, "TemBasicos" and "TemNombrados", approved 2026-11-07). The picker
+(`ThemeModal` and the welcome's style step, both `theme-modal-picker/ThemeModalPicker`) only translates a pick into an existing
+id, so `users.theme`, the favicon and the head script never change. The table is `src/utils/themePicker.ts`, and its test holds
+that each basic id comes from exactly one pair and every theme is a pair or a named one:
+
+| Base × accent | violet | red | green | blue | white / black |
+|---|---|---|---|---|---|
+| Dark | `dark` | `dark-red` | `dark-green` | `dark-blue` | `dark-white` |
+| Tinted | `purple` | `red` | `green` | `blue` | none (shown dimmed, not offered) |
+| Light | `light` | `light-red` | `light-green` | `light-blue` | `light-black` |
+
+Named, whole, in one row of four by two: Midnight, Crimson, Sakura, Arctic (palettes), Black Ops II, Steam Retro, Snake Eater, Venom (tributes).
+
+- Three `ChoiceCards` (native radios: a named group each, the arrows move and pick, the library's focus ring). Each option is a
+  `ui/ThemeScreen` of the theme it lands on, under its `data-theme`, so it is drawn in that theme's tokens; the one in use says
+  "On" with a tick. The base and the accent of the theme on are checked on opening; while a named theme is on neither is.
+- A base keeps the accent on when it has it, else violet (Tinted from Dark · White lands on `purple`); an accent goes on the base
+  that is on, or on Dark while a named theme is. The fifth accent reads White on Dark and Tinted, Black on Light.
+- Every pick spreads from its card and saves as before; the dialog stays open, `backdrop="dim"`.
+- A theme shown inside another is `ThemeScreen`: `uiGuard.test.ts` refuses a `data-theme={…}` anywhere else.
+
 ### Contrast — every theme, every tint (#123, 2026-11-09)
 
 `src/app/themes.test.ts` runs over **all** of `THEMES` (colour maths in `src/app/themeContrast.ts`, `color-mix` in oklab included)

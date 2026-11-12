@@ -339,7 +339,8 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
 - **The logo was drawn by a friend of the user and keeps its shape**: recolour it, never redraw it or swap it
   for a simpler mark (`LOGO` in `src/utils/themeIcon.ts`). The favicon is the logo in the accent, never on a
   ground or a plate. **A new theme needs its row in `THEME_ACCENT`** (and a new light theme joins the light
-  selector lists in `globals.css`). **Every theme must pass WCAG AA** (`themes.test.ts`: text, accent, meaning colours
+  selector lists in `globals.css`) **and its place in the picker** (`src/utils/themePicker.ts`: a base and accent pair or
+  `NAMED_THEMES`; the picker only maps a pick to an existing id, its test refuses a theme left out). **Every theme must pass WCAG AA** (`themes.test.ts`: text, accent, meaning colours
   and streak inks, on their grounds and their own tints; see `docs/design-system.md` → Contrast): fix the theme's value, never the rule.
 - `/api/image-proxy` serves only the platforms' image hosts: never widen it to anything a user can type
   (an open proxy).
