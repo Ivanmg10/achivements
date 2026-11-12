@@ -72,7 +72,11 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   like the public pages (only this page loads it); every number
   on it (rarity and difficulty tables, examples, level thresholds) is computed from the formula
   and the examples are the same ones the balance tests use (`src/utils/vaultExamples.ts`). If the
-  formula changes, reread its prose.
+  formula changes, reread its prose. Its parts are topics, not steps: no "01" numbers (`FaqList numbered={false}`), the rules a
+  plain list, and "Beta" is said once, in the FAQ question (the small tag stays on `/rankings`, #130).
+- **A shared place is marked** (`RankRow.tied`, set by the route from the listed people who hold the same rank): "3=" on the
+  podium, the table and the list (`RankingsPageRank`), "tied" to a screen reader. Your own level is said once, in the ring
+  (the number) with `VaultLevelBadge tierOnly` beside it.
 - **Who is listed**: public profile and `show_in_rankings` (Preferences → General; not in the
   session on purpose, see the plan). Hidden games and unticked consoles do not score. A game
   counts only for the account linked now, never while flagged `suspect` (Steam unlock tool;
