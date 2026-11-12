@@ -1080,7 +1080,7 @@ export const it: Translations = {
     activeDays: 'Giorni attivi',
     inLastYear: 'nell’ultimo anno',
     avgStreak: 'Serie media',
-    sinceLast: 'Ultimo obiettivo',
+    sinceLast: 'Dal tuo ultimo obiettivo',
     today: 'Oggi',
     longestGap: 'Pausa più lunga',
     weekdaysTitle: 'Quando giochi',

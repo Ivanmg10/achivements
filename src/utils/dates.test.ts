@@ -1,4 +1,4 @@
-import { addDays, dateFormat, daysAgoParts, formatDate, formatDateTime, formatDay, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay } from './dates'
+import { addDays, dateFormat, formatDate, formatDateTime, formatDay, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay } from './dates'
 
 describe('parseUnlockTime', () => {
   test('a zone-less platform date is UTC, whatever the browser zone is', () => {
@@ -84,16 +84,6 @@ describe('relativeTime', () => {
   })
   test('no date, no time', () => {
     expect(relativeTime(null)).toBe('—')
-  })
-})
-
-describe('daysAgoParts', () => {
-  test("the number apart from the words around it, in the reader's language", () => {
-    expect(daysAgoParts(1, 'es')).toEqual({ before: 'hace ', figure: '1', after: ' día' })
-    expect(daysAgoParts(3, 'en')).toEqual({ before: '', figure: '3', after: ' days ago' })
-  })
-  test('a big number keeps its grouping inside the figure', () => {
-    expect(daysAgoParts(1234, 'en').figure).toBe('1,234')
   })
 })
 

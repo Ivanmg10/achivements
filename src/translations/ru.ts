@@ -1080,7 +1080,7 @@ export const ru: Translations = {
     activeDays: 'Активные дни',
     inLastYear: 'за последний год',
     avgStreak: 'Средняя серия',
-    sinceLast: 'Последнее достижение',
+    sinceLast: 'С последнего достижения',
     today: 'Сегодня',
     longestGap: 'Самый долгий перерыв',
     weekdaysTitle: 'Когда вы играете',

@@ -8,16 +8,20 @@ jest.mock('@/context/LanguageContext', () => ({
 
 const stats = (daysSinceLast: number | null) => render(<StreakQuickStats activeDays={40} avgStreak={3} daysSinceLast={daysSinceLast} longestGap={9} />)
 
-test('the last achievement says how long ago, in the reader\'s language', () => {
+test('the days since the last achievement: the label, the number big and the unit under it, like the others', () => {
   lang.current = 'es'
   stats(1)
-  expect(screen.getByText('Último logro').nextElementSibling).toHaveTextContent(/^hace 1 día$/)
+  const label = screen.getByText('Desde el último logro')
+  expect(label.nextElementSibling).toHaveTextContent(/^1$/)
+  expect(label.nextElementSibling?.nextElementSibling).toHaveTextContent(/^día$/)
 })
 
-test('in English the words come after the number', () => {
+test('in English, with the plural unit', () => {
   lang.current = 'en'
   stats(12)
-  expect(screen.getByText('Last achievement').nextElementSibling).toHaveTextContent(/^12 days ago$/)
+  const label = screen.getByText('Since your last achievement')
+  expect(label.nextElementSibling).toHaveTextContent(/^12$/)
+  expect(label.nextElementSibling?.nextElementSibling).toHaveTextContent(/^days$/)
 })
 
 test('today still says the streak is alive', () => {

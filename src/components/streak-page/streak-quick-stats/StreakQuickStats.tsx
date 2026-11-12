@@ -2,26 +2,11 @@ import { useLanguage } from '@/context/LanguageContext'
 import { decimal, plural } from '@/utils/utils'
 import { CountUp } from '@/components/ui/CountUp'
 import { kickerClass } from '@/components/ui/Kicker'
-import { daysAgoParts } from '@/utils/dates'
 
 const TILE = 'bg-bg-main rounded-pane px-4 py-3.5 flex flex-col min-w-0'
 const LABEL = `${kickerClass('muted', 'sm')} truncate`
 const VALUE = 'text-[1.875rem] leading-tight font-extrabold tabular-nums'
-const WORDS = 'text-[0.8125rem] font-normal text-text-secondary'
-
-/** "hace 1 día" / "1 day ago": the words small, the number as the tile's figure. */
-function DaysAgo({ days, lang }: { days: number; lang: string }) {
-  const { before, figure, after } = daysAgoParts(days, lang)
-  return (
-    <>
-      {before && <span className={WORDS}>{before}</span>}
-      {figure}
-      <span className={WORDS}>{after}</span>
-    </>
-  )
-}
-
-/** Four numbers about the year, as tiles: days played, the average streak, how long ago the last achievement was, the longest break. */
+/** Four numbers about the year, as tiles: days played, the average streak, the days since the last achievement, the longest break. */
 export default function StreakQuickStats({
   activeDays,
   avgStreak,
@@ -41,8 +26,8 @@ export default function StreakQuickStats({
     { label: T.streak.avgStreak, value: decimal(avgStreak, lang), sub: T.streak.daysUnit },
     {
       label: T.streak.sinceLast,
-      value: daysSinceLast === null ? '—' : daysSinceLast === 0 ? T.streak.today : <DaysAgo days={daysSinceLast} lang={lang} />,
-      sub: daysSinceLast === 0 ? T.streak.stillAlive : '',
+      value: daysSinceLast === null ? '—' : daysSinceLast === 0 ? T.streak.today : daysSinceLast.toLocaleString(lang),
+      sub: daysSinceLast === null ? '' : daysSinceLast === 0 ? T.streak.stillAlive : unit(daysSinceLast),
       accent: daysSinceLast === 0 ? 'text-success' : '',
     },
     { label: T.streak.longestGap, value: <CountUp value={longestGap} locale={lang} />, sub: unit(longestGap) },

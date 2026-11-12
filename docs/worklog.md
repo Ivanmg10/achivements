@@ -51,9 +51,10 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   the strip's place in the guard's lean allow-list.
 - *Best streaks* (`StreakChart`): grey (`streakTier(0)`) until one is picked; the picked one takes its own tier (bar and place).
   `CLAUDE.md` and `docs/design-system.md` say so; the "streaks in the accent" line was already gone since #124.
-- *"Último logro: hace 1 día":* the tile's label is a noun in the nine languages ("Last achievement"; the others said "Since your
-  last achievement") and its value "hace **1** día" / "**1** day ago": `daysAgoParts` (`utils/dates.ts`, `Intl.RelativeTimeFormat`
-  with `numeric: 'always'`, cut around the number so it stays the tile's figure). Today still says "Today / still going".
+- *The last achievement's tile* ("ÚLTIMO LOGRO · 1 · día" read as "the last achievement: 1 day"): first tried as "Último logro /
+  hace **1** día" (Intl's relative time cut around the number); the owner found it broke the pattern of the other three tiles,
+  so it reads like them: "Desde el último logro" (en "Since your last achievement", nine languages) / **1** / "día" (`plural`),
+  and "Hoy / sigue viva" on the day itself. No new helper left behind.
 - *Turned on its side* after the owner saw a 65-day streak at 2560 px (10 rows, ~650 px tall, empty room on the right): weeks
   are columns and weekdays rows (initials on the left, the month over the week it starts in), always seven rows; columns
   `minmax(1.75rem, 3.5rem)` in a `w-fit` grid, so the calendar is as wide as its weeks, shrinks to 28 px days, then scrolls
@@ -91,7 +92,7 @@ calendar down (eight weeks are about 560 px tall); no inner scroll.
 **Watch out** — Not seen in a browser (it needs a session): check at 2560 px (calendar and panel side by side), at 1280–1535 px
 (the two cards side by side, so the calendar card is narrow and stacks), 390 px (days about 43 px), both designs, Firefox,
 and a light theme (the number turns `text-bg-main` on tints over 0.6). The skeleton holds eight weeks; a shorter streak's
-card lands a little shorter. A test pinning a relative time must use `numeric: 'always'` wording ("1 day ago", not "yesterday").
+card lands a little shorter.
 
 ---
 
