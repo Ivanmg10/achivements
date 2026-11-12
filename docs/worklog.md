@@ -33,6 +33,42 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-12 — The streak page: the calendar back, best streaks by tier (`feat/131-streak-calendar`, #131)
+
+**Did** — Boards "MejRacha" and "MejRacha5" (canvas page 2), stacked on `feat/130-profiles-rankings-groups` (not merged):
+- *The calendar is back* in "The streak, day by day" (`streak-calendar/StreakCalendar`, `streak-calendar-day/StreakCalendarDay`),
+  from the one `d56b7fee` removed (2026-10-24), wider: columns of at most 56 px (`CALENDAR_COLUMNS`, they shrink to fit a phone),
+  the week from Monday, each day shaded in the accent by its count against the streak's busiest day (as the year below it),
+  the month named on the streak's first day and on each 1st, a "Less … More" legend (`T.cards.heatLess/heatMore`), `.enter-cards`
+  on the grid. The picked day is ringed (`ring-2` with an offset) and bolder, `aria-pressed`; today has `aria-current="date"`;
+  each day's `aria-label` is its full date and count. Keyboard: one tab stop (roving `tabIndex`), the arrows move a day or a week,
+  Home / End to the ends, focus follows. Beside it when the card is at least 48rem wide (`@container`, `@3xl:`), stacked
+  otherwise: the picked day (`StreakDayRow`, now a panel: the day in big, the count, "today", the games, a game finished that
+  day) and its achievements listed (`streak-day-achievements/StreakDayAchievements`: `ListRow` per unlock, badge ringed when
+  hardcore, opening the game; past six, "and 3 more" opens `DayAchievementsModal`; `T.streak.dayMore`, nine languages). Its
+  skeleton is `streak-calendar-skeleton/StreakCalendarSkeleton` (weekday row, 56 days, the legend, the panel), drawn by
+  `StreakPageSkeleton`. Deleted: `StreakDayStrip`, `stripCap`, `T.streak.stripHint` (the sentence that explained the bars) and
+  the strip's place in the guard's lean allow-list.
+- *Best streaks* (`StreakChart`): grey (`streakTier(0)`) until one is picked; the picked one takes its own tier (bar and place).
+  `CLAUDE.md` and `docs/design-system.md` say so; the "streaks in the accent" line was already gone since #124.
+- *"Último logro: hace 1 día":* the tile's label is a noun in the nine languages ("Last achievement"; the others said "Since your
+  last achievement") and its value "hace **1** día" / "**1** day ago": `daysAgoParts` (`utils/dates.ts`, `Intl.RelativeTimeFormat`
+  with `numeric: 'always'`, cut around the number so it stays the tile's figure). Today still says "Today / still going".
+**Already done before** — what the issue says #127 brings: "Cuándo juegas" is `DataBar` upright (only its stale comment said
+"slanted"; fixed) and the labels are in sentence case (`kickerClass`). The year and hidden consoles are untouched: the calendar
+draws `selectedStreak.achievements`, which come from `useActivityHeatmapYear` (filtered by `useConsoleVisibility`, its
+`isLoading` covering every platform and the libraries), so the streak still lands whole.
+**Decisions** — The days are shaded in the accent, not the canvas's white: the board was drawn on the Dark theme, and the year
+heatmap under it (same data) is in the accent. Nothing is coloured on the best streaks at first (the page starts with
+`picked` null and shows the live or best streak day by day): "grey until picked", as the owner put it. A long streak grows the
+calendar down (eight weeks are about 560 px tall); no inner scroll.
+**Watch out** — Not seen in a browser (it needs a session): check at 2560 px (calendar and panel side by side), at 1280–1535 px
+(the two cards side by side, so the calendar card is narrow and stacks), 390 px (days about 43 px), both designs, Firefox,
+and a light theme (the number turns `text-bg-main` on tints over 0.6). The skeleton holds eight weeks; a shorter streak's
+card lands a little shorter. A test pinning a relative time must use `numeric: 'always'` wording ("1 day ago", not "yesterday").
+
+---
+
 ## 2026-11-12 — Following, rankings, the guide and groups, part 2 of #130 (`feat/130-profiles-rankings-groups`)
 
 **Did** — Boards "MejSiguiendo", "MejRankings" and "MejGrupos" (canvas page 2), after part 1 on the same branch (stacked on
