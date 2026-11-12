@@ -49,7 +49,7 @@ export default function FollowingCardBanner({ friend, lastPlayed }: { friend: Fr
             <PlatformLogo source={lastPlayed.source} size={12} label={PLATFORM_NAME[lastPlayed.source]} />
             <span className="flex flex-col min-w-0">
               <Kicker as="span" size="sm" className="truncate">
-                {T.following.lastPlayed} · {relativeTime(lastPlayed.at, lang)}
+                {T.following.lastPlayed} · {relativeTime(lastPlayed.at, lang, 'long')}
               </Kicker>
               <span className="text-[0.8125rem] font-bold text-white truncate">{lastPlayed.title}</span>
             </span>

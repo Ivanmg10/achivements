@@ -19,3 +19,9 @@ test('numbers the questions in order', () => {
   expect(screen.getByText('01')).toBeInTheDocument()
   expect(screen.getByText('02')).toBeInTheDocument()
 })
+
+test('without numbers where the questions are topics, not steps', () => {
+  render(<FaqList title="FAQ" items={items} numbered={false} />)
+  expect(screen.queryByText('01')).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Which platforms\?/ })).toBeInTheDocument()
+})

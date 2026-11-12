@@ -6,6 +6,7 @@ import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import RankingsPageUser from '../rankings-page-user/RankingsPageUser'
 import RankingsPageDelta from '../rankings-page-delta/RankingsPageDelta'
 import RankingsPageStreak from '../rankings-page-streak/RankingsPageStreak'
+import RankingsPageRank from '../rankings-page-rank/RankingsPageRank'
 
 /** The rankings on a phone: one row each, place, who with their level and streaks, and points. */
 export default function RankingsPageList({
@@ -33,7 +34,7 @@ export default function RankingsPageList({
         >
           <span className={`text-center font-extrabold tabular-nums ${r.isMe ? 'text-accent' : 'text-text-secondary'}`}>
             <span className="sr-only">{T.rankings.colRank} </span>
-            {r.rank}
+            <RankingsPageRank rank={r.rank} tied={r.tied} />
           </span>
           <RankingsPageUser row={r} size="md" linked={linked}>
             <VaultLevelBadge points={r.totalPoints} className="self-start" />

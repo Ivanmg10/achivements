@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import type { ProfileTeaser as Teaser } from '@/lib/rankings'
 import { useLanguage } from '@/context/LanguageContext'
 import RankingsPageUser from '@/components/rankings-page/rankings-page-user/RankingsPageUser'
@@ -27,17 +26,17 @@ export default function ProfileTeaser({ teaser }: { teaser: Teaser }) {
         </h1>
         <VaultLevelBadge points={teaser.points} className="relative" />
 
-        <p className="relative text-3xl font-bold tabular-nums">
+        <p className="relative font-display italic font-extrabold text-4xl leading-none tabular-nums pr-1">
           <CountUp value={teaser.points} locale={lang} /> <span className="text-base font-semibold text-text-secondary">{T.rankings.vp}</span>
         </p>
-        <VaultPlatformSplit split={teaser.split} className="relative w-full max-w-60" />
+        <VaultPlatformSplit split={teaser.split} legend className="relative w-full max-w-60" />
 
         <dl className="relative grid grid-cols-2 gap-3 w-full">
-          <div className="bg-ink/5 rounded-card p-3">
+          <div className="bg-ink/5 rounded-tile p-3">
             <dt className="text-xs text-text-secondary">{T.rankings.colCompleted}</dt>
             <dd className="text-lg font-semibold tabular-nums">{n(teaser.completed)}</dd>
           </div>
-          <div className="bg-ink/5 rounded-card p-3">
+          <div className="bg-ink/5 rounded-tile p-3">
             <dt className="text-xs text-text-secondary">{T.rankings.colAchievements}</dt>
             <dd className="text-lg font-semibold tabular-nums">{n(teaser.achievements)}</dd>
           </div>
@@ -45,17 +44,8 @@ export default function ProfileTeaser({ teaser }: { teaser: Teaser }) {
 
         <p className="relative text-sm text-text-secondary">{T.rankings.profileTeaser}</p>
         <div className="relative flex flex-wrap justify-center gap-2">
-          <Button
-            href={REGISTER_HREF}
-          >
-            {T.rankings.joinCta}
-          </Button>
-          <Link
-            href="/rankings"
-            className="px-4 py-2 rounded-full bg-ink/10 text-sm font-semibold hover:bg-ink/15 transition-colors focus-ring"
-          >
-            {T.rankings.seeAll}
-          </Link>
+          <Button href={REGISTER_HREF}>{T.rankings.joinCta}</Button>
+          <Button href="/rankings" variant="secondary">{T.rankings.seeAll}</Button>
         </div>
       </div>
     </section>

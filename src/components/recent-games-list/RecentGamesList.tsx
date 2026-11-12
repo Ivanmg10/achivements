@@ -14,6 +14,8 @@ import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 import ErrorRetry from '@/components/ui/ErrorRetry'
+import SectionHead from '@/components/ui/SectionHead'
+import { useSubject } from '@/context/SubjectContext'
 
 const MAX_GAMES = 7
 
@@ -24,6 +26,7 @@ const MAX_GAMES = 7
  */
 export default function RecentGamesList() {
   const { T } = useLanguage()
+  const subject = useSubject()
   const { isLinked: steamLinked, recent, recentLoading, recentError, refetch } = useSteamGamesData()
   const { library: psn, libraryLoading: psnLoading, libraryError: psnError, refetch: refetchPsn } = usePsnGamesData()
   const { library: xbox, libraryLoading: xboxLoading, libraryError: xboxError, refetch: refetchXbox } = useXboxGamesData()
@@ -35,7 +38,8 @@ export default function RecentGamesList() {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 gap-2">
-      <h2 className="text-2xl font-bold shrink-0">{T.cards.recentlyPlayed}</h2>
+      {/* On someone's page, the head every section of it has (#130); on the home, the home's. */}
+      {subject ? <SectionHead as="h2" size="lg" title={T.cards.recentlyPlayed} className="shrink-0" /> : <h2 className="text-2xl font-bold shrink-0">{T.cards.recentlyPlayed}</h2>}
 
       {recentLoading || psnLoading || xboxLoading ? (
         <div aria-busy="true" className="flex flex-col gap-1.5 flex-1">

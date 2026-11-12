@@ -27,7 +27,7 @@ interface Props {
  */
 export default function StreakChart({ streaks, selectedStreak, activeStreak, avgStreak, onSelect }: Props) {
   const { T, lang } = useLanguage()
-  const short = (d: string) => formatDay(d, lang, { day: 'numeric', month: 'short' })
+  const short = (d: string) => formatDay(d, lang)
   const top = streaks.slice(0, MAX_ROWS)
   const maxDays = top[0]?.days ?? 1
   const same = (a: Streak | null, b: Streak) => a?.start === b.start && a?.end === b.end

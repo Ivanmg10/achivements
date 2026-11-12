@@ -32,27 +32,45 @@ export function localDay(d: Date | number): string {
 }
 
 /**
- * The site's one date format: day, short month and year, in the reader's language ("3 oct 2026", "Oct 3, 2026").
- * Never a numeric one ("3/10/2026"): the guard refuses `formatDate(…, {})`. On screen, `ui/DateText`.
+ * The site's one date format (#130, the owner on the canvas, 2026-11-07): day and short month in the
+ * reader's language, the year only when it is not the current one ("23 oct", "Oct 23", "3 oct 2025").
+ * Never a numeric one ("3/10/2026") and never written by hand: `uiGuard` refuses both. On screen,
+ * `ui/DateText`; where JSX cannot go, `formatDate` / `formatDay` with no options.
  */
-export const DATE_FORMAT: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' }
+export function dateFormat(d: Date, now = new Date()): Intl.DateTimeFormatOptions {
+  return d.getFullYear() === now.getFullYear() ? { day: 'numeric', month: 'short' } : { day: 'numeric', month: 'short', year: 'numeric' }
+}
 
-/** A platform date for a reader, in their language, in the one format; "—" when there is none. */
-export function formatDate(s: string | null | undefined, lang: string, options: Intl.DateTimeFormatOptions = DATE_FORMAT): string {
-  const t = parseUnlockTime(s)
-  return Number.isNaN(t) ? '—' : new Date(t).toLocaleDateString(lang, options)
+/**
+ * A platform date (its string, or a moment in ms) for a reader, in their language, in the one format;
+ * "—" when there is none. `options` is for a date that is not "the date of something" (an axis, a month).
+ */
+export function formatDate(s: string | number | null | undefined, lang: string, options?: Intl.DateTimeFormatOptions): string {
+  const t = typeof s === 'number' ? s : parseUnlockTime(s)
+  if (Number.isNaN(t)) return '—'
+  const d = new Date(t)
+  return d.toLocaleDateString(lang, options ?? dateFormat(d))
+}
+
+/** A platform date with its time, where the time is the point (an unlock's moment): the one format, then hh:mm. */
+export function formatDateTime(s: string | number | null | undefined, lang: string): string {
+  const t = typeof s === 'number' ? s : parseUnlockTime(s)
+  if (Number.isNaN(t)) return '—'
+  const d = new Date(t)
+  return d.toLocaleString(lang, { ...dateFormat(d), hour: '2-digit', minute: '2-digit' })
 }
 
 /**
  * How long ago, in the given language ("2 hours ago", "hace 2 horas"), in the
- * largest unit that fits. "—" when there is no date to tell.
+ * largest unit that fits ("6 mo. ago", or with `style: 'long'` "6 months ago": where
+ * "6 m" could be minutes). "—" when there is no date to tell.
  */
-export function relativeTime(dateStr: string | null | undefined, lang = 'en'): string {
+export function relativeTime(dateStr: string | null | undefined, lang = 'en', style: 'short' | 'long' = 'short'): string {
   if (!dateStr) return '—'
   const t = parseUnlockTime(dateStr)
   if (isNaN(t)) return '—'
   const secs = Math.round((t - Date.now()) / 1000)
-  const fmt = new Intl.RelativeTimeFormat(lang, { numeric: 'auto', style: 'short' })
+  const fmt = new Intl.RelativeTimeFormat(lang, { numeric: 'auto', style })
   const units: [Intl.RelativeTimeFormatUnit, number][] = [['year', 31536000], ['month', 2592000], ['day', 86400], ['hour', 3600], ['minute', 60]]
   for (const [unit, size] of units) {
     if (Math.abs(secs) >= size) return fmt.format(Math.trunc(secs / size), unit)
@@ -82,10 +100,12 @@ export function unlockSpan(dates: (string | null | undefined)[], labels: SpanLab
 
 /**
  * A calendar day ("2026-06-05") in the app's language, read as a local date:
- * parsed as UTC it can land on the day before west of Greenwich.
+ * parsed as UTC it can land on the day before west of Greenwich. Without
+ * `options`, the one format (`dateFormat`).
  */
-export function formatDay(day: string, lang: string, options: Intl.DateTimeFormatOptions): string {
-  return new Date(`${day}T00:00:00`).toLocaleDateString(lang, options)
+export function formatDay(day: string, lang: string, options?: Intl.DateTimeFormatOptions): string {
+  const d = new Date(`${day}T00:00:00`)
+  return d.toLocaleDateString(lang, options ?? dateFormat(d))
 }
 
 /** Every day from `start` to `end` (inclusive), as "YYYY-MM-DD", local time. */

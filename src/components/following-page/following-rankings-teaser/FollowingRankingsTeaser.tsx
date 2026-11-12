@@ -7,6 +7,7 @@ import { useRankings } from '@/hooks/useRankings'
 import { SLANT_PLATE } from '@/components/ui/shape'
 import Tag from '@/components/ui/Tag'
 import Avatar from '@/components/ui/Avatar'
+import GhostIcon from '@/components/ui/GhostIcon'
 
 /** Second, first and third, as a podium stands: the picture's size (px) and ring, the step's height and colour. */
 const PODIUM = [
@@ -34,7 +35,7 @@ export default function FollowingRankingsTeaser({ className = '' }: { className?
       className={`enter-card [--i:3] group relative rounded-card overflow-hidden ring-1 ring-inset ring-ink/[0.06] p-5 flex flex-col gap-3 hover:ring-accent/50 transition-shadow focus-ring ${className}`}
       style={{ background: 'radial-gradient(ellipse at 50% 100%, rgb(var(--accent) / 0.2), transparent 70%), rgb(var(--bg-card))' }}
     >
-      <IconTrophy aria-hidden="true" size={150} stroke={1} className="absolute -right-6 -top-6 text-accent/[0.08] pointer-events-none" />
+      <GhostIcon icon={IconTrophy} />
 
       <span className="relative flex items-center justify-between gap-2">
         <span id="following-rankings-title" className="flex items-center gap-2 font-bold">

@@ -36,3 +36,14 @@ test('a signed-out visitor never reads Xbox while it is admin-only (V3-15)', () 
     expect(JSON.stringify({ ...rest, example: { ...example, platforms: undefined } })).not.toMatch(/xbox/i)
   }
 })
+
+test('its parts are topics, not steps: no numbers, the rules a plain list, "Beta" only in the question (#130)', () => {
+  const { container } = render(<RankingsGuide />)
+  expect(screen.queryByText(/^0\d$/)).not.toBeInTheDocument()
+  // The rules are a bulleted list, not boxes with a coloured stripe.
+  expect(container.querySelector('li[class*="before:"]')).toBeNull()
+  expect(container.querySelector('ul.list-disc')).toBeInTheDocument()
+  // The little tag and the note in a box are gone; the question that says what can change stays.
+  expect(screen.queryByText(en.rankings.beta)).not.toBeInTheDocument()
+  expect(screen.getAllByText(/beta/i)).toHaveLength(1)
+})

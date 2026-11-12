@@ -26,10 +26,18 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   text field, select, switch, checkbox, dialog, hard-coded palette colour, fixed
   `polygon(...)` or `skew-*-[..]`. If it fails, use the piece; if the piece is
   missing, add it (below).
-- **One date format** (#129, the owner on the canvas, 2026-11-07): day, short month and year in the reader's
-  language ("22 oct 2026", "Oct 22, 2026"). On screen it is `ui/DateText` (a `<time>`); where JSX cannot go,
-  `formatDate(s, lang)` with its default (`DATE_FORMAT` in `utils/dates.ts`). Never a numeric date: the guard
-  refuses `formatDate(…, lang, {})`. #130 takes it to the rest of the site.
+- **One date format** (#129, #130; the owner on the canvas, 2026-11-07): day and short month in the reader's
+  language, **the year only when it is not the current one** ("23 oct", "Oct 23", "3 oct 2025"; `dateFormat`
+  in `utils/dates.ts`). On screen it is `ui/DateText` (a `<time>`); where JSX cannot go, `formatDate(s, lang)`
+  or `formatDay(day, lang)` with no options. The guard refuses a numeric date (`formatDate(…, lang, {})`), the
+  format written by hand (`{ day: 'numeric', month: 'short' }`, with or without a year), any
+  `toLocaleDateString` outside `utils/dates.ts`, and a `toLocaleString` or `Intl.DateTimeFormat` given a day,
+  month or year anywhere else (the admin panel is exempt). A date with its time (the unlock tooltip, RA's
+  achievement modal) is `formatDateTime`: the one format, then hh:mm. What keeps its own options, through
+  `formatDate` / `formatDay`, is not "the date of something": a chart's axis, a month ("January 2024", the best
+  month), a range of days (`MainPageMonthCompare`, its own formatter), a day with its weekday (the journal, the
+  streak page's rows, a day modal's title, the heatmap tooltip). A test that pins a formatted date fixes the clock
+  (`jest.useFakeTimers({ now })`) or uses a past year, so it says the same next year.
 - **A rule that starts with offenders lists them** (#120, 2026-11-08): `NEW_RULES` in the guard, each with its
   list of files still drawing the piece by hand in `ui/uiGuard.pending.json`. A file not on its list fails; a
   file on it that no longer offends fails too, so the list only shrinks. Migrate a file, then take it off.
@@ -196,7 +204,8 @@ flag is read from the database, never the session).
   `-3xl` and arbitrary values, on any side, but for its short list of exceptions; a bare `rounded` is only a focus ring's corner.
   A `rounded-full` chip is a pill in both designs: left so on purpose, since moving it would change the slanted design.
 - **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `Shelf`, `DropSlot` and `ToggleButton`
-  are in `ui/`; a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
+  are in `ui/`; a `DropSlot` is a dashed border and nothing else (no stripes, #130); the big faint icon behind a hero card's title is
+  `GhostIcon` (one size and opacity, whole inside its card at the title's line; never an oversized icon cut by the edge); a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
   `GameCardBackdrop` is the one place that draws it, so every game card follows it.
 - **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the best streaks' bars, the

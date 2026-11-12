@@ -139,3 +139,14 @@ test('a second tab lists who follows you, read only when it is open', () => {
   rerender(<FollowingPage />)
   expect(screen.getByText(en.following.noFollowersTitle)).toBeInTheDocument()
 })
+
+test('on the Followers tab the hero counts and names your followers, not the people you follow', () => {
+  setup({ users: [person('ana', { online: true }), person('bob', { online: true }), person('cid', { online: true })] })
+  ;(useLocationHash as jest.Mock).mockReturnValue('#followers')
+  ;(useFollowers as jest.Mock).mockReturnValue({ followers: [person('fan', { online: true })], isLoading: false, error: false, retry })
+  render(<FollowingPage />)
+  const hero = screen.getByRole('heading', { name: en.following.title }).closest('section')!
+  expect(hero).toHaveTextContent(new RegExp(`1${en.following.followers}`))
+  expect(hero).toHaveTextContent(en.following.onlineNow.replace('{n}', '1'))
+  expect(hero).not.toHaveTextContent(en.following.people)
+})

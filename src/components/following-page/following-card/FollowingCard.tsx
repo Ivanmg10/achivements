@@ -70,17 +70,15 @@ export default function FollowingCard({
 
         <FollowingCardPlatforms friend={friend} />
 
-        {/* Not known yet (or beyond the follows whose games are read): nothing, rather than a wrong "none". */}
-        {recent && (
-          <div className="flex flex-col gap-2">
-            <Kicker>{T.following.recentUnlocks}</Kicker>
-            {recent.length === 0 ? (
-              <p className="text-xs text-text-secondary italic">{T.following.noRecentUnlocks}</p>
-            ) : (
-              <FollowingCardBadges items={recent.slice(0, RECENT_MAX).map(recentAsBadge)} username={friend.username} label={T.following.recentUnlocks} />
-            )}
-          </div>
-        )}
+        {/* One sentence for every card with nothing to show: none earned, or not read (beyond the follows whose games are read), so it claims neither. */}
+        <div className="flex flex-col gap-2">
+          <Kicker>{T.following.recentUnlocks}</Kicker>
+          {recent && recent.length > 0 ? (
+            <FollowingCardBadges items={recent.slice(0, RECENT_MAX).map(recentAsBadge)} username={friend.username} label={T.following.recentUnlocks} />
+          ) : (
+            <p className="text-xs text-text-secondary italic">{T.following.noRecentUnlocks}</p>
+          )}
+        </div>
 
         {friend.showcase.length > 0 && (
           <div className="flex flex-col gap-2">
@@ -89,10 +87,12 @@ export default function FollowingCard({
           </div>
         )}
 
-        <p className="mt-auto pt-3 border-t border-ink/[0.06] flex items-center justify-end gap-1 text-[0.6875rem] text-text-secondary">
-          <IconFolders size={12} aria-hidden="true" />
-          {T.friends.publicGroups.replace('{n}', friend.publicGroups.toLocaleString(lang))}
-        </p>
+        {friend.publicGroups > 0 && (
+          <p className="mt-auto pt-3 border-t border-ink/[0.06] flex items-center justify-end gap-1 text-[0.6875rem] text-text-secondary">
+            <IconFolders size={12} aria-hidden="true" />
+            {T.friends.publicGroups.replace('{n}', friend.publicGroups.toLocaleString(lang))}
+          </p>
+        )}
       </div>
     </article>
   )

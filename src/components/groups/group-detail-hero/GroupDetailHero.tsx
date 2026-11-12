@@ -16,15 +16,13 @@ import Facts from '@/components/ui/Facts'
 /**
  * The top of a group's page: its games' covers as a faded banner, a ring with
  * how far along the whole group is, its privacy and size above its name, its
- * description, how many games are started, finished and not started, and what
- * can be done to it (add games, edit, delete).
+ * description, and what can be done to it (add games, edit, delete).
  */
 export default function GroupDetailHero({
   group,
   covers,
   gameCount,
   summary,
-  states,
   onAdd,
   onEdit,
   onDelete,
@@ -34,7 +32,6 @@ export default function GroupDetailHero({
   covers: string[]
   gameCount: number
   summary: Counts
-  states: { done: number; started: number; notStarted: number }
   onAdd: () => void
   onEdit: () => void
   onDelete: () => void
@@ -101,13 +98,6 @@ export default function GroupDetailHero({
               <h1 className="font-display italic font-extrabold text-5xl sm:text-[4.5rem] leading-[0.95] pr-2 text-text-main break-words">{group.title}</h1>
             </div>
             {group.description && <p className="text-sm text-text-main/80">{group.description}</p>}
-            {gameCount > 0 && (
-              <ul className="flex flex-wrap gap-1.5 text-xs font-bold">
-                <li><Tag tone="info">{T.groups.startedCount.replace('{n}', String(states.started))}</Tag></li>
-                <li><Tag tone="success">{T.groups.completedCount.replace('{n}', String(states.done))}</Tag></li>
-                <li><Tag tone="overlay">{T.groups.notStartedCount.replace('{n}', String(states.notStarted))}</Tag></li>
-              </ul>
-            )}
           </div>
 
           <div className="flex items-center gap-2 shrink-0 enter-rise [--i:4]">

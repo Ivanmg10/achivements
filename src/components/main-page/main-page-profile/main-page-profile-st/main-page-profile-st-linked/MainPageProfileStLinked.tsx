@@ -32,7 +32,8 @@ export default function MainPageProfileStLinked({
   const { T } = useLanguage()
   const own = useSubject() === null
   const { library, libraryLoading, recent, refetch } = useSteamGamesData()
-  const recentAchievements = useSteamRecentAchievements()
+  // Someone's page lists their unlocks itself, so the column does not (#130): nothing to ask Steam for.
+  const recentAchievements = useSteamRecentAchievements(own ? 'recent' : null)
 
   if (error || !profile) {
     return (

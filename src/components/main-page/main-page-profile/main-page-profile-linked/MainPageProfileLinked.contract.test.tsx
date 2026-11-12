@@ -143,4 +143,11 @@ describe.each(PLATFORMS)('a linked profile on the home: $name', (p) => {
     render(<SubjectContext.Provider value="someone">{p.row(s, true)}</SubjectContext.Provider>)
     expect(screen.queryByRole('button', { name: en.profileRa.refreshData })).not.toBeInTheDocument()
   })
+
+  test('on someone\'s page the latest unlocks are not drawn: their page lists them itself (#130)', () => {
+    const s = spies()
+    p.setup(s, { game: true, libraryLoading: false })
+    render(<SubjectContext.Provider value="someone">{p.row(s, true)}</SubjectContext.Provider>)
+    expect(screen.queryByTestId('recent')).not.toBeInTheDocument()
+  })
 })

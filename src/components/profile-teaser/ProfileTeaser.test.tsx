@@ -19,3 +19,13 @@ test('never links to the full profile', () => {
   render(<ProfileTeaser teaser={teaser} />)
   expect(screen.queryByRole('link', { name: 'Ana' })).not.toBeInTheDocument()
 })
+
+test('the points in the display italic, the platforms named under their bar, two library buttons (#130)', () => {
+  render(<ProfileTeaser teaser={teaser} />)
+  expect(screen.getByText('12,345').closest('p')!.className).toContain('font-display italic')
+  expect(screen.getByRole('img', { name: 'RA 81 %, PSN 19 %' }).nextElementSibling).toHaveTextContent(/^RAPSN$/)
+  const join = screen.getByRole('link', { name: en.rankings.joinCta })
+  const all = screen.getByRole('link', { name: en.rankings.seeAll })
+  expect(all.className).not.toContain('rounded-full')
+  expect(all.className).not.toBe(join.className)
+})

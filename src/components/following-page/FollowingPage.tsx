@@ -40,7 +40,12 @@ export default function FollowingPage() {
     <div className="flex flex-col items-center py-6 px-4">
       <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <FollowingHero users={users} isLoading={isLoading} className="lg:col-span-2" />
+          <FollowingHero
+            users={tab === 'followers' ? (fans.followers ?? []) : users}
+            isLoading={tab === 'followers' ? fans.isLoading : isLoading}
+            label={tab === 'followers' ? T.following.followers : undefined}
+            className="lg:col-span-2"
+          />
           <FollowingRankingsTeaser />
         </div>
 

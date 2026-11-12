@@ -138,6 +138,8 @@ export type LatestPerfect = {
   /** Platform-proven base completion date; activity-only timestamps are never used. */
   date: string
   hardcore: boolean
+  /** PSN only: the game's platinum is earned, so the shelf says "Platinum" rather than "100%". */
+  platinum?: boolean
 }
 
 /**
@@ -192,6 +194,7 @@ export function latestPerfects(
       iconUrl: g.coverUrl ?? (g.imageIcon || undefined),
       date: g.completedAt!,
       hardcore: false,
+      platinum: g.earned.platinum > 0,
     }))
 
   const xbox: LatestPerfect[] = xboxGames

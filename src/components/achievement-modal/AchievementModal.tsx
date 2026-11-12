@@ -13,7 +13,7 @@ import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseTo
 import Modal from '@/components/ui/Modal'
 import { decimal } from '@/utils/utils'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
-import { formatDate, parseUnlockTime } from '@/utils/dates'
+import { formatDate, formatDateTime, parseUnlockTime } from '@/utils/dates'
 import { raTypeTag } from '@/components/ui/dataTable'
 import { raBadgeUrl, raAvatarUrl } from '@/utils/raAssets'
 import Avatar from '@/components/ui/Avatar'
@@ -55,8 +55,6 @@ interface AchievementDetail {
     Results: Comment[]
   } | null
 }
-
-const SHORT_DATE: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short', year: '2-digit' }
 
 export default function AchievementModal({
   achievement,
@@ -107,10 +105,7 @@ export default function AchievementModal({
   }, [achievement.ID])
 
   const earnedDate = achievement.DateEarned
-    ? new Date(parseUnlockTime(achievement.DateEarned)).toLocaleString(lang, {
-        day: 'numeric', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit',
-      })
+    ? formatDateTime(achievement.DateEarned, lang)
     : null
 
   return (
@@ -255,7 +250,7 @@ export default function AchievementModal({
                               )}
                             </div>
                             <p className="text-xs text-text-secondary tabular-nums">
-                              {formatDate(u.DateAwarded, lang, SHORT_DATE)}
+                              {formatDate(u.DateAwarded, lang)}
                             </p>
                           </div>
                         ))}
@@ -305,7 +300,7 @@ export default function AchievementModal({
                             <div className="flex items-baseline gap-2">
                               <p className="text-sm font-medium">{c.User}</p>
                               <p className="text-xs text-text-secondary">
-                                {formatDate(c.Submitted, lang, SHORT_DATE)}
+                                {formatDate(c.Submitted, lang)}
                               </p>
                             </div>
                             <p className="text-sm text-text-secondary wrap-break-word">{c.CommentText}</p>

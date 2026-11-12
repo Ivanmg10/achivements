@@ -5,11 +5,13 @@ import { Skeleton } from './Skeleton'
 import { kickerClass } from './Kicker'
 import { MARK } from './shape'
 
-export type FigureTone = 'main' | 'accent' | 'hardcore' | 'softcore' | 'success' | 'info' | 'warning' | 'danger' | 'platinum'
+export type FigureTone = 'main' | 'muted' | 'accent' | 'hardcore' | 'softcore' | 'success' | 'info' | 'warning' | 'danger' | 'platinum'
 export type FigureLook = 'bare' | 'tile' | 'card'
 
 const TONES: Record<FigureTone, string> = {
   main: 'text-text-main',
+  // A figure that says nothing yet (a 0): quieter than the ones beside it.
+  muted: 'text-text-secondary',
   accent: 'text-accent',
   hardcore: 'text-hardcore',
   softcore: 'text-softcore',

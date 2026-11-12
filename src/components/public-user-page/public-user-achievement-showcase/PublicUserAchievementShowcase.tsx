@@ -6,6 +6,7 @@ import { useSubject } from '@/context/SubjectContext'
 import { useShowcase } from '@/hooks/useShowcase'
 import { SHOWCASE_MAX, showcaseKey } from '@/utils/showcase'
 import { SectionFallback } from '@/components/ui/SectionFallback'
+import SectionHead from '@/components/ui/SectionHead'
 import EmptyState from '@/components/empty-state/EmptyState'
 import ShowcaseTile from '@/components/showcase-tile/ShowcaseTile'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -24,10 +25,7 @@ export default function PublicUserAchievementShowcase() {
 
   return (
     <section aria-labelledby="public-showcase-title" className="flex flex-col gap-3">
-      <h3 id="public-showcase-title" className="flex items-center gap-2 text-base font-semibold">
-        <IconTrophy size={18} className="text-accent" aria-hidden="true" />
-        {T.showcase.title}
-      </h3>
+      <SectionHead as="h3" size="lg" id="public-showcase-title" title={T.showcase.title} />
       {isLoading ? (
         <div aria-busy="true" className={GRID}>
           {Array.from({ length: SHOWCASE_MAX }, (_, i) => (

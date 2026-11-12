@@ -171,7 +171,9 @@ test('covers by default: a banner with the group and one cover per game, each op
   expect(screen.getByRole('link', { name: 'Zelda' })).toHaveAttribute('href', '/gameInfo/620')
   expect(screen.getByRole('link', { name: 'Portal 2' })).toHaveAttribute('href', '/steamGame/620')
   expect(screen.queryByText('ra-item Zelda')).not.toBeInTheDocument()
-  expect(screen.getByText(en.groups.notStartedCount.replace('{n}', '2'))).toBeInTheDocument()
+  // The states are counted once, in the tabs: no coloured counts over them.
+  expect(screen.queryByText(en.groups.notStartedCount.replace('{n}', '2'))).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: new RegExp(en.groups.filter0) })).toHaveTextContent('2')
   fireEvent.click(screen.getByRole('button', { name: en.groups.viewList }))
   expect(screen.getByText('ra-item Zelda')).toBeInTheDocument()
   expect(localStorage.getItem('group-detail-view')).toBe('list')

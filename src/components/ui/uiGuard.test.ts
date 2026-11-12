@@ -288,9 +288,29 @@ test('Framer variants only on what opens on a click; an entrance is CSS', () => 
   expect(newOffenders('variants', NEW_RULES.variants, onClick)).toEqual([])
 })
 
-// The one date format (#129, the owner on the canvas, 2026-11-07): day, short month and year, never "13/10/2026".
-test('a date is the one format (DateText or formatDate with its default), never a numeric one', () => {
+// The one date format (#129, #130, the owner on the canvas, 2026-11-07): day and short month, the year only when it is
+// not this one. It lives in utils/dates (`dateFormat`): never "13/10/2026", never the same options written by hand,
+// and never a toLocaleDateString of one's own.
+test('a date is the one format (DateText, formatDate or formatDay with no options), never a numeric one', () => {
   expect(offenders(/formatDate\([^()'"]+,\s*\w+,\s*\{\s*\}\s*\)/)).toEqual([])
+})
+
+test('the one date format is never written by hand ({ day, month: short[, year] }); options are for an axis or a month', () => {
+  // A range of two days ("3 – 9 Oct") is not a date: it keeps its own options.
+  const range = ['components/main-page/main-page-charts/main-page-month-compare/MainPageMonthCompare.tsx']
+  const found = offenders(/\{\s*day:\s*'(?:numeric|2-digit)',\s*month:\s*'short'(?:,\s*year:\s*'(?:numeric|2-digit)')?\s*\}/)
+  expect(found.map((f) => f.split(path.sep).join('/')).filter((f) => !range.includes(f) && f !== 'utils/dates.ts')).toEqual([])
+})
+
+test('every date on screen goes through utils/dates: no toLocaleDateString elsewhere (the admin panel is exempt)', () => {
+  expect(offenders(/\.toLocaleDateString\(/).filter((f) => !/utils[\\/]dates\.ts$|admin-panel/.test(f))).toEqual([])
+})
+
+test('nor a date of its own through toLocaleString or Intl.DateTimeFormat (a weekday alone, an axis label, is not a date)', () => {
+  // A range of two days ("3 – 9 Oct") is not a date: it keeps its own formatter. A date with its time: formatDateTime.
+  const range = ['components/main-page/main-page-charts/main-page-month-compare/MainPageMonthCompare.tsx']
+  const found = offenders(/(?:toLocaleString|Intl\.DateTimeFormat)\([^)]*\{[^}]*\b(?:day|month|year):/)
+  expect(found.map((f) => f.split(path.sep).join('/')).filter((f) => !range.includes(f) && f !== 'utils/dates.ts' && !f.includes('admin-panel'))).toEqual([])
 })
 
 // The dialog pass (#121, antislop audit X3): every dialog is a plain Modal, downloaded when first opened.

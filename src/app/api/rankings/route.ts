@@ -33,6 +33,8 @@ export type RankRow = Omit<RankEntry, 'id' | 'listed'> & {
   /** Places moved since Monday (positive: up); null when unknown or not this view. */
   delta: number | null
   isMe: boolean
+  /** Someone else listed shares this place (equal points): the page writes "3=" so the gap after it reads as a tie, not a fault. */
+  tied?: boolean
   /** Points in each of the last weeks (TREND_WEEKS), oldest first, on the chosen platforms. */
   trend: number[]
   /** Days in a row with an unlock, up to today or yesterday (UTC), and the longest run, on the chosen platforms. */
@@ -131,6 +133,9 @@ export async function GET(req: Request) {
       allStreaks ?? streaksOf(shown.map((e) => e.id), source, xbox),
     ])
 
+    // How many listed people hold each place: more than one is a tie.
+    const holders = new Map<number, number>()
+    for (const e of listed) holders.set(e.rank, (holders.get(e.rank) ?? 0) + 1)
     const toRow = (e: RankEntry): RankRow => {
       const { id, listed: _listed, ...rest } = e
       void _listed
@@ -140,6 +145,7 @@ export async function GET(req: Request) {
         ...rest,
         delta: arrows && e.listed ? (was === undefined ? null : was - e.rank) : null,
         isMe: id === viewerId,
+        tied: e.listed && (holders.get(e.rank) ?? 0) > 1,
         trend: trend.get(id) ?? [],
         streak: streaks.get(id)?.current ?? 0,
         bestStreak: streaks.get(id)?.best ?? 0,

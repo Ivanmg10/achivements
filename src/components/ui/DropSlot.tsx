@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-/** The striped, empty place that adds another item to a collection. */
+/** The empty place that adds another item to a collection: a dashed border and nothing else (no stripes, #130). */
 export default function DropSlot({
   label,
   onClick,
@@ -17,7 +17,7 @@ export default function DropSlot({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className={`w-full h-full flex items-center justify-center gap-2 rounded-card text-text-main ring-[1.5px] ring-inset ring-accent/35 hover:ring-accent bg-[repeating-linear-gradient(-60deg,rgb(var(--accent)/0.05)_0_10px,transparent_10px_20px)] transition-shadow cursor-pointer focus-ring ${className}`}
+      className={`w-full h-full flex items-center justify-center gap-2 rounded-card text-text-main border-2 border-dashed border-accent/35 hover:border-accent transition-colors cursor-pointer focus-ring ${className}`}
     >
       {children}
     </button>

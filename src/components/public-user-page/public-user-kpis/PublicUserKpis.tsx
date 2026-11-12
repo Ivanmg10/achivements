@@ -1,64 +1,48 @@
 'use client'
 
 import { useMemo } from 'react'
-import { IconCalendarEvent, IconCalendarMonth, IconCalendarWeek, IconChartLine, IconFlame, IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useStreakData } from '@/hooks/useStreakData'
-import { activityKpis } from '@/utils/utils'
-import UserVaultStat from '@/components/user-page/user-vault-stat/UserVaultStat'
-import { Skeleton } from '@/components/ui/Skeleton'
+import { activityKpis, decimal, plural } from '@/utils/utils'
+import { streakInk, streakTier } from '@/utils/streakTier'
+import Figure from '@/components/ui/Figure'
+import PublicUserKpisSkeleton, { KPIS_ROW } from '../public-user-kpis-skeleton/PublicUserKpisSkeleton'
 
 /**
  * A user's pace at a glance, every platform together: unlocks today, in the
- * last week and this month, the daily average, and the current and best streak.
- * Read from the year of activity the streak already loads, so it costs no call.
+ * last week and this month, the daily average, and the current and best
+ * streak, as one row of bare figures with the mark between them (MejPerfil 9,
+ * #130). A zero is quieter than the figures beside it. Read from the year of
+ * activity the streak already loads, so it costs no call.
  */
 export default function PublicUserKpis() {
   const { T, lang } = useLanguage()
   const { achievements, activeStreak, bestStreak, now, isLoading } = useStreakData()
   const kpis = useMemo(() => activityKpis(achievements, now), [achievements, now])
 
-  if (isLoading) {
-    return (
-      <div aria-busy="true" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-        <span className="sr-only">{T.userProfile.loadingActivity}</span>
-        {Array.from({ length: 6 }, (_, i) => (
-          <Skeleton key={i} radius="card" className="h-24" />
-        ))}
-      </div>
-    )
-  }
+  if (isLoading) return <PublicUserKpisSkeleton />
 
   const streak = activeStreak?.days ?? 0
+  const best = bestStreak?.days ?? 0
   const days = (n: number) => T.userProfile.days.replace('{n}', n.toLocaleString(lang))
+  const unit = (n: number) => plural(n, T.plurals.achievementsWord, lang)
+  const tone = (n: number) => (n > 0 ? 'main' : 'muted')
 
   return (
-    <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 enter-cards">
-      <UserVaultStat icon={<IconCalendarEvent size={18} />} label={T.userProfile.today} value={kpis.today} accent="text-text-main" />
-      <UserVaultStat icon={<IconCalendarWeek size={18} />} label={T.userProfile.week} value={kpis.week} accent="text-text-main" />
-      <UserVaultStat icon={<IconCalendarMonth size={18} />} label={T.userProfile.month} value={kpis.month} accent="text-text-main" />
-      <UserVaultStat
-        icon={<IconChartLine size={18} />}
-        label={T.userProfile.perDay}
-        value={kpis.avgPerDay}
-        display={kpis.avgPerDay.toLocaleString(lang, { maximumFractionDigits: 1 })}
-        sub={T.userProfile.last30Days}
-        accent="text-text-main"
-      />
-      <UserVaultStat
-        icon={<IconFlame size={18} />}
+    <dl className={`${KPIS_ROW} enter-cards`}>
+      <Figure term label={T.userProfile.today} value={kpis.today} sub={unit(kpis.today)} tone={tone(kpis.today)} />
+      <Figure term label={T.userProfile.week} value={kpis.week} sub={unit(kpis.week)} tone={tone(kpis.week)} />
+      <Figure term label={T.userProfile.month} value={kpis.month} sub={unit(kpis.month)} tone={tone(kpis.month)} />
+      <Figure term label={T.userProfile.perDay} value={decimal(kpis.avgPerDay, lang)} sub={T.userProfile.last30Days} tone={tone(kpis.avgPerDay)} />
+      <Figure
+        term
         label={T.userProfile.streak}
-        value={streak}
-        format={days}
-        accent={streak > 0 ? 'text-accent' : 'text-text-secondary'}
+        value={days(streak)}
+        sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
+        tone={tone(streak)}
+        color={streak > 0 ? streakInk(streakTier(streak)) : undefined}
       />
-      <UserVaultStat
-        icon={<IconTrophy size={18} />}
-        label={T.userProfile.bestStreak}
-        value={bestStreak?.days ?? 0}
-        format={days}
-        accent="text-text-main"
-      />
+      <Figure term label={T.userProfile.bestStreak} value={days(best)} tone={tone(best)} />
     </dl>
   )
 }

@@ -33,6 +33,87 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-12 — Following, rankings, the guide and groups, part 2 of #130 (`feat/130-profiles-rankings-groups`)
+
+**Did** — Boards "MejSiguiendo", "MejRankings" and "MejGrupos" (canvas page 2), after part 1 on the same branch (stacked on
+`feat/129-library-game-allgames`, not merged). One commit per area:
+- *Following* (`feat(following)`): the Followers tab's hero counts and names **your followers** ("Followers", their online count;
+  `FollowingHero` takes a `label`), not the people you follow. New library piece `ui/GhostIcon` (112 px, `text-accent/10`, `right-6 top-6`,
+  hidden on a phone) for the people on Following's hero, the cup on its rankings card and the cup on the guide: whole inside the card,
+  never cut. The last game says "Last played · 6 months ago" (`relativeTime(…, lang, 'long')`: new third argument, the short style stays
+  elsewhere; "6 m" could be minutes); sentence case was already there since #127. A card with nothing to show says one sentence for
+  every case, "No recent achievements to show" (`following.noRecentUnlocks`, nine languages): it fits "none earned" and "not read"
+  (only the newest `DETAIL_LIMIT` follows are read) without claiming either. "0 public groups" is not drawn: the footer line and its
+  rule appear only when there are some.
+- *Rankings* (`feat(rankings)`): "Your level" shows the number in the ring and only the tier (`VaultLevelBadge tierOnly`, which was
+  already there) and "Global #19" beside it. `VaultWeeksChart` is titled (`rankings.weeksTitle` = "Points per week", visible `Kicker`) and
+  has the Monday's day under each bar, with the month where it changes (`formatDay` with `{ day }` / `{ month }`). A shared place is
+  marked: the route sets `RankRow.tied` (listed people holding the same rank, per view), `RankingsPageRank` draws "3=" with a "tied" for
+  a screen reader (`rankings.tied`) on the podium, table and list. A streak of 0 is `font-medium` grey (it was grey already; now
+  also light). The guide: no "01" numbers on parts (`RankingsGuideBlock` keeps `index` only for the heading id) nor on its FAQ
+  (`FaqList numbered`, default true: the landing and the SEO pages keep theirs), the rules a `list-disc` list, no "Beta" tag in its title
+  and no `betaNote` box (key removed in nine languages): the question stays. `LandingNav` / `PublicShell` take `wide`, which the signed-out
+  `/rankings` passes: the bar is as wide as the content.
+- *Groups* (`feat(groups)`): `DropSlot` is a dashed border only (the diagonal stripes are gone; both "Nuevo grupo" and "Añadir
+  juegos" stay). New `group-facts/GroupFacts`: one line "4 games / 4 in progress / 141/176 achievements / 12 d ago" with the platform
+  logos beside the games (`Facts`, never a hand-made "·"), on the album card and the shelf row; the completed count left the card
+  (the percentage and the ring say it). Inside a group the three coloured counts under the banner are gone (`GroupDetailHero` lost its
+  `states` prop): the toolbar's tabs already carry the same numbers and filter by them.
+**Already done before** — Xbox on `/rankings/how` (#118, V3-15: its test stays); "Último jugado" in sentence case (#127); the podium's
+steps at one angle and the two title styles of a Following card (brought by #127); "0 d" grey (the colour was there, the weight is new).
+**Left out on purpose** — the mobile bug of the podium's places 2 and 3 saying the level twice (on the canvas list, not in the issue):
+`VaultLevelBadge compact="phone"` is built to say it once, so it needs a look on a phone first. `GroupCard` (public profile's groups) keeps
+its own foot: it was not on the board. The empty "Jugados recientemente" and "Sin grupos públicos" keep their room.
+**Decisions** — Ties come from the server, not from the loaded page, so a tie across the "show more" boundary or between the podium and
+the table is still marked. The "no recent" sentence is neutral on purpose: a card beyond `DETAIL_LIMIT` has no data, and "nothing earned"
+would be false for an active player. The week labels are day numbers plus a month at the change, never "5/10" (a numeric date is refused).
+**Watch out** — Not seen in a browser (it needs a session): check at 2560 and 390 px, both designs, Firefox. Likely spots: the ghost icon
+behind the teaser's "See all", the weeks chart's labels at 12 bars in the 340 px column, the album card's height (the foot is a line of
+text at the old tag's 22 px height, `leading-[1.375rem]`, so the skeleton's 268 px should still hold; a very long line wraps), the signed-out
+bar at 390 px. `RankRow.tied` is optional in the type; the route always sets it. A test that pins "12 d ago" must use `days ago` in English
+(`Intl` short style keeps "days").
+
+---
+
+## 2026-11-12 — Public profile, its signed-out card and the one date format, part 1 of #130 (`feat/130-profiles-rankings-groups`)
+
+**Did** — Boards "MejPerfil", "MejPerfil9" and the teaser points of "MejPublicas" (canvas page 2), stacked on `feat/129-library-game-allgames`
+(not merged yet). One commit per point:
+- *One date format, everywhere* (`b30601bc` + `feat(ui): the one date format on the dates still drawn…`): "23 oct", the year only when it
+  is not this one (`dateFormat`), as the default of `formatDate` / `formatDay` / `DateText`. Swept the site: the best day / week / month on
+  the activity tab showed raw keys ("2024-01-10", "2024-01"; now the one format, the month "January 2024"), the streak hero spelled its
+  months out, RA's achievement modal and the unlock tooltip (`formatUnlock`) wrote date + time by hand: new `formatDateTime`. The guard
+  also refuses a day, month or year given to `toLocaleString` / `Intl.DateTimeFormat` outside `utils/dates.ts` (admin exempt; the
+  two-day range of `MainPageMonthCompare` allowed). `CLAUDE.md` (Shared helpers) and `docs/design-system.md` say so.
+- *Profile:* the side "recent achievements" leave the platform card on someone's page (RA's and the shell's; Steam is not asked for
+  them there, `useSteamRecentAchievements(null)`); "Steam level 30" (`steam.level` in nine languages); "Last 5 completed games" without the
+  medal numbers, covers in a row from the left, "Hardcore" / "Platinum" (`LatestPerfect.platinum`, PSN) / "100%" (`cards.perfectWord`) in
+  words and the counts in words, skeleton to match; one `SectionHead` per section (recently played, latest achievements, by platform,
+  completed games, showcase, preferences, public groups), no cup; "at 100%" green only above 0; the six figures as one row of bare
+  `Figure`s with the mark (new `muted` tone for a 0, the streak in its tier colour), in a grid (3 × 2 on phones, 6 from lg) shared with
+  `PublicUserKpisSkeleton`, which the route skeleton draws too.
+- *Signed-out card (`ProfileTeaser`):* "See the rankings" is the library's secondary `Button`; the points in the display italic;
+  `VaultPlatformSplit legend` names each platform under the bar (no new data, Xbox is never in `profileTeaser`'s split); the two tiles
+  `rounded-tile` (V5-17).
+**Already done before** — "Create an account" opens sign-up on the card and the signed-out rankings (#118, `REGISTER_HREF`); the
+Vault level in the hero (`VaultLevelBadge`); what B brings (#127). "Jugados recientemente" empty and "Sin grupos públicos" keep their room.
+**Left out on purpose** — dates that are not "the date of something" keep their options through `formatDate` / `formatDay`: chart axes and
+month labels, a day with its weekday (the journal, the streak rows, day / week / period modal titles, the heatmap tooltip), relative times
+("6 months ago"), the legal pages' "Last updated" (a sentence in `T`). The admin panel is exempt.
+**Open — the rest of #130** (to build on top of this branch): *Following* (the Followers tab's head counting the other tab; the ghost icons
+whole in their card, one size and opacity, aligned with the title, Rankings' cup too; "Último jugado · hace 6 meses" in sentence case;
+"0 grupos públicos" only when there are some; one sentence for a card with no recent achievements). *Rankings and "Cómo funcionan"*
+(Xbox on `/rankings/how` was done in #118): the level once (ring + "Veterano" + "Global #19"), "Points per week" with the week under each
+bar, a tie marked ("3="), "0 d" streaks in grey, no "01" numbers nor coloured stripes on the guide, "Beta" said once (the question; the
+tag on /rankings stays), the signed-out top bar as wide as the content. *Groups*: dashed border only on the add cards, one footer line
+"4 juegos · 4 en curso · 141/176 logros · hace 12 d" with the logos, no coloured counts above the tabs inside a group.
+**Watch out** — Not seen in a browser (a profile needs a session): check at 2560 and 390 px, both designs, Firefox: the figures' row
+(on a phone the fourth figure starts row 2 with the mark in front of it), the route skeleton's hero height (`min-h-[551px]
+sm:min-h-[322px]`, estimated from the old boxes, not measured), the shelf's tiles, the teaser's legend. A test that pins a date of the
+current year must fix the clock (`jest.useFakeTimers({ now })`) or use a past year.
+
+---
+
 ## 2026-11-11 — Library, game pages and `/allGames` from the canvas (`feat/129-library-game-allgames`, #129)
 
 **Did** — Page 2 of the antislop canvas v2, boards "MejBiblioteca", "MejBibliotecaVistas", "MejJuego", "MejJuego8", "MejTodos" and

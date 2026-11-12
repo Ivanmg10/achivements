@@ -20,6 +20,7 @@ import XboxGameItem from '@/components/xbox/xbox-game-item/XboxGameItem'
 import { RecentFeedItem } from '@/utils/steamFeed'
 import { useRecentFeed } from '@/hooks/useRecentFeed'
 import { useSubject } from '@/context/SubjectContext'
+import SectionHead from '@/components/ui/SectionHead'
 import { withSubject } from '@/utils/withSubject'
 import { raAchievementList } from '@/utils/gameAchievements'
 
@@ -89,7 +90,7 @@ export default function RecentlyPlayedFeed({ skipLatest = false }: { skipLatest?
       {/* Header */}
       <div className="flex items-center gap-2 shrink-0">
         {/* Pinned games are the viewer's own, so another user's page has no such view. */}
-        {subject ? <p className="text-2xl font-bold flex-1">{T.cards.recentlyPlayed}</p> : <MainViewToggle />}
+        {subject ? <SectionHead as="h2" size="lg" title={T.cards.recentlyPlayed} className="flex-1" /> : <MainViewToggle />}
       </div>
 
       {/* Cards */}

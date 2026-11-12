@@ -122,9 +122,9 @@ export default function DesignCatalogData() {
 
       <DesignCatalogPiece id="date">
         <Panel>
-          <Specimen name="a platform's date, in the reader's language">
+          <Specimen name="a platform's date, in the reader's language: the year only when it is not this one">
             <span className="text-sm text-text-secondary">
-              <DateText value="2026-10-22 18:30:00" />
+              <DateText value="2026-10-22 18:30:00" /> · <DateText value="2025-10-22 18:30:00" />
             </span>
           </Specimen>
         </Panel>

@@ -108,3 +108,10 @@ test('a failure is a 500', async () => {
   ;(loadRanking as jest.Mock).mockRejectedValue(new Error('db'))
   expect((await get()).status).toBe(500)
 })
+
+test('equal points share a place and every holder of it says so (the page writes "3=")', async () => {
+  ;(loadRanking as jest.Mock).mockResolvedValue([entry(1, 1, 900), entry(2, 2, 500), entry(3, 3, 100), entry(4, 3, 100), entry(5, 5, 50), entry(6, 1, 900, false)])
+  const res = await get()
+  const rows = res.data.rows as { username: string; rank: number; tied: boolean }[]
+  expect(rows.map((r) => [r.username, r.rank, r.tied])).toEqual([['u1', 1, false], ['u2', 2, false], ['u3', 3, true], ['u4', 3, true], ['u5', 5, false]])
+})

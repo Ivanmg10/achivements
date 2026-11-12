@@ -1,8 +1,7 @@
 'use client'
 
 import type { ComponentProps, ReactNode } from 'react'
-import { useLanguage } from '@/context/LanguageContext'
-import { formatDate } from '@/utils/dates'
+import DateText from '@/components/ui/DateText'
 import MainPageProfileRecent from './MainPageProfileRecent'
 import MainPageProfileRecentRow from './main-page-profile-recent-row/MainPageProfileRecentRow'
 
@@ -28,7 +27,6 @@ const SHOWN = 3
  * (`items`, newest first), this draws the first three with the game and the day under each name.
  */
 export default function MainPageProfileRecentList({ items, ...frame }: { items: RecentItem[] } & Omit<ComponentProps<typeof MainPageProfileRecent>, 'children'>) {
-  const { lang } = useLanguage()
   return (
     <MainPageProfileRecent {...frame}>
       {items.slice(0, SHOWN).map((i) => (
@@ -38,7 +36,7 @@ export default function MainPageProfileRecentList({ items, ...frame }: { items: 
           badge={i.badge}
           hardcore={i.hardcore}
           title={i.title}
-          sub={<>{i.gameTitle} · <time dateTime={i.at}>{formatDate(i.at, lang, { day: 'numeric', month: 'short' })}</time></>}
+          sub={<>{i.gameTitle} · <DateText value={i.at} /></>}
           right={i.right}
         />
       ))}

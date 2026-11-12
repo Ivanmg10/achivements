@@ -10,6 +10,7 @@ import { render, screen, within } from '@testing-library/react'
 import LibraryGameDetail from './LibraryGameDetail'
 import { en } from '@/translations/en'
 import type { InsightAchievement } from '@/utils/gameInsights'
+import { formatDate } from '@/utils/dates'
 
 const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString()
 const a = (id: string, o: Partial<InsightAchievement> = {}): InsightAchievement => ({
@@ -35,7 +36,7 @@ test('playing: the calendar of the game, and the latest unlocked with their date
   expect(screen.getByTestId('calendar')).toHaveTextContent('Hades')
   const latest = within(screen.getByText(L.recentTitle).parentElement!).getAllByRole('link')
   expect(latest.map((l) => l.getAttribute('href'))).toEqual(['/g#done3', '/g#done2', '/g#done1'])
-  expect(latest[0]).toHaveTextContent(new Date(finished[2].earnedAt!).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' }))
+  expect(latest[0]).toHaveTextContent(formatDate(finished[2].earnedAt, 'en'))
 })
 
 test('completed: the calendar, and the milestones with the days they were reached', () => {

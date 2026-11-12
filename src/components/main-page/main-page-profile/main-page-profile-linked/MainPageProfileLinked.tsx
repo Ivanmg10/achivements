@@ -46,7 +46,8 @@ export default function MainPageProfileLinked(
         actions={link && <MainPageProfileActions href={link.href} linkLabel={link.label} ringClass={link.ringClass} onRefresh={subject ? undefined : onRefresh} />}
       />
       {game}
-      {recent}
+      {/* Someone's page lists their latest unlocks itself (#130): the column does not say them a second time. */}
+      {subject ? null : recent}
     </div>
   )
 }

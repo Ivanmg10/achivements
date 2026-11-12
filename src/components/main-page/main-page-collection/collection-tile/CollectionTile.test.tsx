@@ -14,13 +14,13 @@ test('shows the name, not only on hover, and links to the game', () => {
 })
 
 test('tells screen readers the mode and when it got to 100%', () => {
-  render(<CollectionTile game={ra} date="2026-08-09T10:00:00Z" />)
-  expect(screen.getByRole('link')).toHaveTextContent(`Hardcore, ${en.cards.perfectOn.replace('{date}', 'Aug 9, 2026')}`)
+  render(<CollectionTile game={ra} date="2025-08-09T10:00:00Z" />)
+  expect(screen.getByRole('link')).toHaveTextContent(`Hardcore, ${en.cards.perfectOn.replace('{date}', 'Aug 9, 2025')}`)
 })
 
 test('Steam: links to its page and says the date is the last session', () => {
-  render(<CollectionTile game={steam} date="2026-09-07T10:00:00Z" />)
+  render(<CollectionTile game={steam} date="2025-09-07T10:00:00Z" />)
   const link = screen.getByRole('link')
   expect(link).toHaveAttribute('href', '/steamGame/620')
-  expect(link).toHaveTextContent(en.cards.lastPlayedOn.replace('{date}', 'Sep 7, 2026'))
+  expect(link).toHaveTextContent(en.cards.lastPlayedOn.replace('{date}', 'Sep 7, 2025'))
 })

@@ -130,8 +130,8 @@ describe.each(PLATFORMS)('$name feed row', (p) => {
   })
 
   test('says when it was last played', () => {
-    p.render({ title: 'Astro Bot', lastPlayed: '2026-01-15T12:00:00Z' })
-    expect(screen.getByText('Jan 15, 2026')).toBeInTheDocument()
+    p.render({ title: 'Astro Bot', lastPlayed: '2025-01-15T12:00:00Z' })
+    expect(screen.getByText('Jan 15, 2025')).toBeInTheDocument()
   })
 
   test('keeps its panel closed until it is opened, and the button says which way it goes', () => {

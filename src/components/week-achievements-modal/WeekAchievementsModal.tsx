@@ -5,7 +5,7 @@ import { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
 import Modal from '@/components/ui/Modal'
-import { formatDay, utcDay } from '@/utils/dates'
+import { formatDate, formatDay, utcDay } from '@/utils/dates'
 
 interface Props {
   startDate: string
@@ -30,7 +30,7 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
       if (dayAchs.length > 0) {
         days.push({
           date: dateKey,
-          label: d.toLocaleDateString(lang, { weekday: 'long', month: 'short', day: 'numeric' }),
+          label: formatDate(d.getTime(), lang, { weekday: 'long', month: 'short', day: 'numeric' }),
           achievements: dayAchs,
           pts: dayAchs.reduce((s, a) => s + a.Points, 0),
         })
@@ -48,7 +48,7 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
       onClose={onClose}
       size="lg"
       title={T.cards.bestWeek}
-      hint={T.cards.weekOf.replace('{date}', formatDay(startDate, lang, { day: 'numeric', month: 'short', year: 'numeric' }))}
+      hint={T.cards.weekOf.replace('{date}', formatDay(startDate, lang))}
       className="gap-3"
       footer={
         totalAch > 0 ? (
