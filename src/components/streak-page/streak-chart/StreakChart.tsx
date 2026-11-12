@@ -21,7 +21,7 @@ interface Props {
 
 /**
  * The longest streaks as a ranked list: the place in the display face, a
- * bar (upright: it is data) in the colour of its tier and as long as the streak against the
+ * bar (upright: it is data), grey until picked and then in its tier's colour, as long as the streak against the
  * best (the one going now says so), its dates under it and its days on the
  * right. Picking one shows it day by day and on the year; picking it again lets go.
  */
@@ -45,7 +45,8 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
         {top.map((streak, i) => {
           const on = same(selectedStreak, streak)
           const live = same(activeStreak, streak)
-          const tier = streakTier(streak.days)
+          // Grey until picked; the one picked takes its tier's colour.
+          const tier = streakTier(on ? streak.days : 0)
           return (
             <li key={streak.start}>
               <button

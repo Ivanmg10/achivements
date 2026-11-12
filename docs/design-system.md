@@ -208,10 +208,12 @@ flag is read from the database, never the session).
   `GhostIcon` (one size and opacity, whole inside its card at the title's line; never an oversized icon cut by the edge); a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
   `GameCardBackdrop` is the one place that draws it, so every game card follows it.
-- **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the best streaks' bars, the
+- **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the picked best streak, the
   streak hero and its live bar, the cover's streak card, the home's stats tile, the rankings' streak column). Every streak
-  colour comes from it; the older rule "streaks in the accent, amber only in the streak hero" is gone (#124 checked: the hero uses
-  `streakTier` too). A tier's ink keeps `--streak-hue` of its hue (72 %, less on light themes and Steam Retro), so it reads in every theme.
+  colour comes from it; there is no "streaks in the accent" rule (gone since #124: the hero uses `streakTier` too). **The best
+  streaks on `/racha` are grey until one is picked** (the `none` tier's grey); the picked one takes its own tier (the owner's
+  call, #131). The days of a streak (its calendar, the year) are shaded in the accent by how much was unlocked: that is
+  activity, not a streak's colour. A tier's ink keeps `--streak-hue` of its hue (72 %, less on light themes and Steam Retro), so it reads in every theme.
 
 ### The Layout modal and look transitions
 
