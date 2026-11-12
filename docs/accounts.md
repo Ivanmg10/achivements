@@ -71,6 +71,22 @@ reads that column, so the rest of the app works without it.
   the most comfortable flow, here and in the welcome): the mail and the unlink are what answer a
   link nobody asked for. Admins still link by typing (logged).
 
+## The sign-in screens and where they send you back (#133, 2026-11-12)
+
+- **One layout for the screens that wear it:** `AuthPage` draws sign-in and register (art wall, plain card, `BrandMark`, the
+  platforms on one line); `/resetPassword` is the same page with `form` (its token is read on the server, like `steam` and
+  `next`, so the form needs no `Suspense`). A new screen of this family passes its form the same way, never a copy of the layout.
+- **A spent or missing reset token** (the server answers `invalid-token`, or there is none) replaces the form with the notice and
+  "Ask for a new link", which opens `ForgotPasswordModal`: the sign-in's own "forgot your password", with its rules unchanged
+  (the same answer whether or not the address has an account; `503 email-not-configured` without `RESEND_API_KEY`, never a pretended send).
+- **Back to where you were going:** `src/proxy.ts` sends a signed-out visitor of a private (or non-existent) path to
+  `/authPage?next=<path and query>`; the page says "That page does not exist or needs an account" and, after a credentials sign-in,
+  `router.push(next)`. **`next` goes through `safeNext` (`src/utils/safeNext.ts`) on the way in and again on the server page:** only a
+  path of this site (starts with `/`, not `//`, no backslash or control character, still on this origin once parsed, not the sign-in,
+  reset or API); anything else is the home page. Never read `next` without it, and never use NextAuth's `callbackUrl` for this
+  (the form signs in with `redirect: false`). Left out on purpose: Steam's sign-in leaves the site and comes back to `/authPage?steam=…`,
+  so it still lands on the home page; carrying `next` through it would need a signed cookie.
+
 ## Sessions
 
 - The session is rebuilt from the `users` row on every read (`jwt` callback in
