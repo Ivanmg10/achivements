@@ -6,6 +6,7 @@ import { useStreakData } from '@/hooks/useStreakData'
 import { activityKpis, decimal, plural } from '@/utils/utils'
 import { streakInk, streakTier } from '@/utils/streakTier'
 import Figure from '@/components/ui/Figure'
+import PublicUserKpisSkeleton, { KPIS_ROW } from '../public-user-kpis-skeleton/PublicUserKpisSkeleton'
 
 /**
  * A user's pace at a glance, every platform together: unlocks today, in the
@@ -19,17 +20,7 @@ export default function PublicUserKpis() {
   const { achievements, activeStreak, bestStreak, now, isLoading } = useStreakData()
   const kpis = useMemo(() => activityKpis(achievements, now), [achievements, now])
 
-  const labels = [T.userProfile.today, T.userProfile.week, T.userProfile.month, T.userProfile.perDay, T.userProfile.streak, T.userProfile.bestStreak]
-  if (isLoading) {
-    return (
-      <div aria-busy="true" className="flex flex-wrap gap-3">
-        <span className="sr-only">{T.userProfile.loadingActivity}</span>
-        {labels.map((label) => (
-          <Figure key={label} label={label} value="" loading />
-        ))}
-      </div>
-    )
-  }
+  if (isLoading) return <PublicUserKpisSkeleton />
 
   const streak = activeStreak?.days ?? 0
   const best = bestStreak?.days ?? 0
@@ -38,7 +29,7 @@ export default function PublicUserKpis() {
   const tone = (n: number) => (n > 0 ? 'main' : 'muted')
 
   return (
-    <dl className="flex flex-wrap gap-3 enter-cards">
+    <dl className={`${KPIS_ROW} enter-cards`}>
       <Figure term label={T.userProfile.today} value={kpis.today} sub={unit(kpis.today)} tone={tone(kpis.today)} />
       <Figure term label={T.userProfile.week} value={kpis.week} sub={unit(kpis.week)} tone={tone(kpis.week)} />
       <Figure term label={T.userProfile.month} value={kpis.month} sub={unit(kpis.month)} tone={tone(kpis.month)} />
