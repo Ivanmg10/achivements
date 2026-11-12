@@ -644,6 +644,7 @@ export const en = {
     saveFailed: 'Could not save your new password. Try again in a moment.',
     missingToken: 'This link is incomplete. Ask for a new one.',
     backToSignIn: 'Go to sign in',
+    askAgain: 'Ask for a new link',
   },
   registerForm: {
     raCta: 'Create account with RetroAchievements',

@@ -643,6 +643,7 @@ export const ja: Translations = {
     saveFailed: '新しいパスワードを保存できませんでした。しばらくしてからもう一度お試しください。',
     missingToken: 'このリンクは不完全です。新しいリンクを取得してください。',
     backToSignIn: 'サインインへ',
+    askAgain: '新しいリンクを依頼する',
   },
   registerForm: {
     raCta: 'RetroAchievementsでアカウントを作成',

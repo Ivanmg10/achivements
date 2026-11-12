@@ -643,6 +643,7 @@ export const fr: Translations = {
     saveFailed: "Impossible d'enregistrer ton nouveau mot de passe. Réessaie dans un instant.",
     missingToken: 'Ce lien est incomplet. Demandes-en un nouveau.',
     backToSignIn: 'Aller à la connexion',
+    askAgain: 'Demander un nouveau lien',
   },
   registerForm: {
     raCta: 'Créer un compte avec RetroAchievements',

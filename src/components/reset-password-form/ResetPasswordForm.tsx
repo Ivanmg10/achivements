@@ -2,29 +2,35 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { IconArrowRight, IconLock } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import AuthTitle from '@/components/auth-title/AuthTitle'
 import { useLanguage } from '@/context/LanguageContext'
 import { checkPassword, PASSWORD_MIN } from '@/utils/authValidation'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import Button from '@/components/ui/Button'
 import Notice from '@/components/ui/Notice'
+
+// Downloaded the first time it is opened, not with the page.
+const ForgotPasswordModal = dynamic(() => import('@/components/forgot-password-modal/ForgotPasswordModal'), { loading: () => null })
 
 /**
  * The page the reset link opens: a new password, typed twice, plus the token
  * from the link. The token is checked on the server, so a stale or spent link
- * is only found out on submit — which is what it says then.
+ * is only found out on submit. Then (or with no token at all) the form gives way to
+ * what to do next: ask for another link, which opens the sign-in's own "forgot your password".
  */
-export default function ResetPasswordForm() {
+export default function ResetPasswordForm({ token }: { token: string }) {
   const { T } = useLanguage()
-  const token = useSearchParams().get('token') ?? ''
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [fieldErrors, setFieldErrors] = useState<{ password?: string; confirm?: string }>({})
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
+  const [expired, setExpired] = useState(false)
+  const [askOpen, setAskOpen] = useState(false)
 
   const passwordRule = T.registerForm.passwordRule.replace('{min}', String(PASSWORD_MIN))
 
@@ -50,7 +56,8 @@ export default function ResetPasswordForm() {
       const data = await res.json().catch(() => ({}))
 
       if (res.ok) setDone(true)
-      else setError(data.error === 'invalid-token' ? T.passwordReset.invalidToken : T.passwordReset.saveFailed)
+      else if (data.error === 'invalid-token') setExpired(true)
+      else setError(T.passwordReset.saveFailed)
     } catch {
       setError(T.passwordReset.saveFailed)
     }
@@ -58,11 +65,16 @@ export default function ResetPasswordForm() {
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto enter-card">
+    <div className="w-full max-w-sm mx-auto">
       <AuthTitle>{T.passwordReset.title}</AuthTitle>
 
-      {!token ? (
-        <Notice tone="danger" className="mb-5">{T.passwordReset.missingToken}</Notice>
+      {!token || expired ? (
+        <div className="flex flex-col gap-3 mb-5">
+          <Notice tone="danger">{token ? T.passwordReset.invalidToken : T.passwordReset.missingToken}</Notice>
+          <Button size="lg" className="w-full" onClick={() => setAskOpen(true)}>
+            {T.passwordReset.askAgain}
+          </Button>
+        </div>
       ) : done ? (
         <Notice tone="success" className="mb-5">{T.passwordReset.done}</Notice>
       ) : (
@@ -118,6 +130,10 @@ export default function ResetPasswordForm() {
           </form>
         </>
       )}
+
+      <LazyWhenOpened open={askOpen}>
+        <ForgotPasswordModal isOpen={askOpen} onClose={() => setAskOpen(false)} />
+      </LazyWhenOpened>
 
       <p className="text-center mt-5">
         <Link

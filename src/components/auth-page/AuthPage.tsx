@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import LoginUserForm from '@/components/login-user-form/LoginUserForm'
 import RegisterUserForm from '@/components/register-user-form/RegisterUserForm'
@@ -23,9 +23,10 @@ const WIDE = '(min-width: 1024px)'
 /**
  * The sign-in and register page. `wantsRegister` opens it on the register form,
  * for the landing button; `steam` is Steam's sign-in coming back
- * (api/auth/steam/callback), and takes the sign-in slot.
+ * (api/auth/steam/callback), and takes the sign-in slot. `form` takes it too, for another
+ * screen that wears the same layout (the reset-password page).
  */
-export default function AuthPage({ wantsRegister, steam }: { wantsRegister: boolean; steam: string | null }) {
+export default function AuthPage({ wantsRegister, steam, form }: { wantsRegister: boolean; steam: string | null; form?: ReactNode }) {
   const [isLogin, setIsLogin] = useState(!wantsRegister)
   const [hasRegister, setHasRegister] = useState(false)
 
@@ -35,7 +36,7 @@ export default function AuthPage({ wantsRegister, steam }: { wantsRegister: bool
   const isWide = useMediaQuery(WIDE)
   const inPhone = !isClient || !isWide
   const inDesktop = !isClient || isWide
-  const signInForm = steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />
+  const signInForm = form ?? (steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />)
   const registerForm = <RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setHasRegister} />
 
   return (

@@ -643,6 +643,7 @@ export const pl: Translations = {
     saveFailed: 'Nie udało się zapisać nowego hasła. Spróbuj ponownie za chwilę.',
     missingToken: 'Ten link jest niepełny. Poproś o nowy.',
     backToSignIn: 'Przejdź do logowania',
+    askAgain: 'Poproś o nowy link',
   },
   registerForm: {
     raCta: 'Utwórz konto z RetroAchievements',

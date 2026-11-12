@@ -643,6 +643,7 @@ export const ru: Translations = {
     saveFailed: 'Не удалось сохранить новый пароль. Попробуйте ещё раз через минуту.',
     missingToken: 'Ссылка неполная. Запросите новую.',
     backToSignIn: 'Перейти ко входу',
+    askAgain: 'Запросить новую ссылку',
   },
   registerForm: {
     raCta: 'Создать аккаунт с RetroAchievements',
