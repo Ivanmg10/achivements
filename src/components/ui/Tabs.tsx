@@ -1,4 +1,5 @@
-import { useRef, type ReactNode } from 'react'
+import { useCallback, useRef, type ReactNode } from 'react'
+import { useScrollFade } from '@/hooks/useScrollFade'
 import { MARK } from './shape'
 
 export type Tab<V extends string> = {
@@ -97,6 +98,15 @@ export default function Tabs<V extends string>({
   className?: string
 }) {
   const listRef = useRef<HTMLDivElement>(null)
+  // A row wider than its room scrolls, and its cut edge fades so it says there is more (#134).
+  const { ref: fadeRef, fade } = useScrollFade()
+  const ref = useCallback(
+    (el: HTMLDivElement | null) => {
+      listRef.current = el
+      return fadeRef(el)
+    },
+    [fadeRef],
+  )
   const rail = orientation === 'rail'
 
   function onKeyDown(e: React.KeyboardEvent, index: number) {
@@ -112,7 +122,7 @@ export default function Tabs<V extends string>({
   const list = rail ? LISTS.rail : size === 'lg' ? LISTS.lg : LISTS.horizontal
 
   return (
-    <div ref={listRef} role="tablist" aria-label={label} aria-orientation={rail ? 'vertical' : undefined} className={`${list} ${className}`}>
+    <div ref={ref} role="tablist" aria-label={label} aria-orientation={rail ? 'vertical' : undefined} className={`${list} ${fade} ${className}`}>
       {tabs.map((t, i) => {
         const on = t.value === value
         const ids = tabIds(id, t.value)

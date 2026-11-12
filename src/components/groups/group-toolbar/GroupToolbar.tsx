@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useScrollFade } from '@/hooks/useScrollFade'
 import type { GameGroupItem } from '@/types/types'
 import { DECADES, type DecadeFilter, type GroupFilters as Filters, type PctFilter } from '@/utils/groupItems'
 import GroupViewToggle, { type GroupDetailView } from '@/components/groups/group-view-toggle/GroupViewToggle'
@@ -39,6 +40,7 @@ export default function GroupToolbar({
   counts?: { done: number; started: number; notStarted: number }
 }) {
   const { T } = useLanguage()
+  const { ref: statesRef, fade } = useScrollFade()
   const consoles = useMemo(
     () => [...new Set(items.map((i) => i.console_name).filter((n): n is string => !!n))].sort((a, b) => a.localeCompare(b)),
     [items],
@@ -55,7 +57,8 @@ export default function GroupToolbar({
 
   return (
     <div className="flex flex-wrap items-center gap-2 px-1 sm:px-4 pb-1.5 shadow-hairline-b">
-      <div role="group" aria-label={T.groups.filterProgressLabel} className="flex flex-wrap gap-1 -mb-1.5">
+      {/* One line that scrolls, as the profile's tabs do: wrapped, "Not started 0" was left alone on a line (#134). */}
+      <div ref={statesRef} role="group" aria-label={T.groups.filterProgressLabel} className={`flex gap-1 -mb-1.5 min-w-0 max-w-full overflow-x-auto [scrollbar-width:none] ${fade}`}>
         {states.map((s) => (
           <button
             key={s.value}
