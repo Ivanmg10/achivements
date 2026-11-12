@@ -7,6 +7,7 @@ import {
 } from '@/types/types'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSubject } from '@/context/SubjectContext'
 import { useUserRank } from '@/hooks/useUserRank'
 
 import MainPageProfileActions from '../main-page-profile-actions/MainPageProfileActions'
@@ -39,6 +40,7 @@ export default function MainPageProfileRa({
   onRefresh?: () => void | Promise<void>
 }) {
   const { T, lang } = useLanguage()
+  const subject = useSubject()
 
   const { rank, isLoading: rankLoading } = useUserRank()
 
@@ -82,7 +84,8 @@ export default function MainPageProfileRa({
             <MainPageProfileRaGame game={game} richPresenceMsg={user?.RichPresenceMsg} />
           ) : null}
 
-          <MainPageProfileRaAchievements achievements={recentAchievements} isLoading={achievementsLoading} />
+          {/* Someone's page lists their latest unlocks itself (#130): the column does not say them a second time. */}
+          {!subject && <MainPageProfileRaAchievements achievements={recentAchievements} isLoading={achievementsLoading} />}
 
           {hasContribs && (
             <div className={`${SURFACE} p-5 flex flex-col gap-3`}>

@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import MainPageProfileRa from './MainPageProfileRa'
+import { SubjectContext } from '@/context/SubjectContext'
 
 const mockUser = {
   ID: 1,
@@ -43,6 +44,15 @@ test('keeps the recent achievements block visible with an empty state instead of
   render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} achievementsLoading={false} />)
   expect(screen.getByText('Recent achievements')).toBeInTheDocument()
   expect(screen.getByText('No achievements earned yet')).toBeInTheDocument()
+})
+
+test('on someone\'s page the recent achievements are not drawn: their page lists them itself (#130)', () => {
+  render(
+    <SubjectContext.Provider value="someone">
+      <MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} achievementsLoading={false} />
+    </SubjectContext.Provider>,
+  )
+  expect(screen.queryByText('Recent achievements')).not.toBeInTheDocument()
 })
 
 test('shows RA\'s RetroRatio as a plain figure, not a percentage', () => {

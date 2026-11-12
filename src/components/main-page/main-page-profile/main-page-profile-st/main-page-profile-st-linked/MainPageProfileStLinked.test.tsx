@@ -69,6 +69,14 @@ describe('header, like the RA profile', () => {
     expect(screen.getByText(en.steam.level).textContent).toBe(`${en.steam.level}78`)
   })
 
+  test('reads the latest unlocks only on your own card: someone\'s page lists them itself (#130)', () => {
+    const { unmount } = renderIt()
+    expect(useSteamRecentAchievements).toHaveBeenLastCalledWith('recent')
+    unmount()
+    render(<SubjectContext.Provider value="someone"><MainPageProfileStLinked profile={PROFILE} isLoading={false} error={null} onRetry={retry} /></SubjectContext.Provider>)
+    expect(useSteamRecentAchievements).toHaveBeenLastCalledWith(null)
+  })
+
   test('omits the level when Steam gave none', () => {
     renderIt({ profile: { ...PROFILE, level: null } })
     expect(screen.queryByText(en.steam.level)).not.toBeInTheDocument()
