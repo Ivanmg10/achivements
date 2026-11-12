@@ -7,7 +7,6 @@ jest.mock('next/image', () => {
   NextImage.displayName = 'NextImage'
   return NextImage
 })
-jest.mock('@/context/LanguageContext', () => ({ useLanguage: () => ({ T: jest.requireActual('@/translations/en').en, lang: 'en' }) }))
 
 const RA: RecentAchievement = {
   AchievementID: 7, Date: '2024-03-02 12:00:00', HardcoreMode: '1', Title: 'Beat it',
@@ -19,7 +18,7 @@ const STEAM: RecentAchievement = {
 }
 
 test('each achievement names itself and its game and opens the game on its platform', () => {
-  render(<StreakDayAchievements date="2024-03-02" achievements={[RA, STEAM]} />)
+  render(<StreakDayAchievements achievements={[RA, STEAM]} />)
   const links = screen.getAllByRole('link')
   expect(links).toHaveLength(2)
   expect(links[0]).toHaveAttribute('href', '/gameInfo/1')
@@ -27,16 +26,4 @@ test('each achievement names itself and its game and opens the game on its platf
   expect(links[0].querySelector('img')).toHaveAttribute('src', 'https://media.retroachievements.org/Badge/12345.png')
   expect(links[1]).toHaveAttribute('href', '/steamGame/620')
   expect(links[1].querySelector('img')).toHaveAttribute('src', 'https://cdn/win.jpg')
-})
-
-test('six rows at most, then "and N more"', () => {
-  const many = Array.from({ length: 9 }, (_, i) => ({ ...RA, AchievementID: i, Title: `A${i}` }))
-  render(<StreakDayAchievements date="2024-03-02" achievements={many} />)
-  expect(screen.getAllByRole('link')).toHaveLength(6)
-  expect(screen.getByRole('button', { name: 'and 3 more' })).toBeInTheDocument()
-})
-
-test('no "more" when everything fits', () => {
-  render(<StreakDayAchievements date="2024-03-02" achievements={[RA]} />)
-  expect(screen.queryByRole('button')).toBeNull()
 })

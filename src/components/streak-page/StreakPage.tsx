@@ -48,7 +48,8 @@ export default function StreakPage() {
       </StreakStatsBanner>
       <div className="grid gap-4 xl:grid-cols-2 enter-cards">
         <div className="flex flex-col gap-4 min-w-0">
-          <StreakChart streaks={streaks} selectedStreak={picked} activeStreak={activeStreak} avgStreak={insights.avgStreak} onSelect={togglePicked} />
+          {/* The streak the calendar shows counts as picked: its bar is coloured, the rest grey. */}
+          <StreakChart streaks={streaks} selectedStreak={shownStreak} activeStreak={activeStreak} avgStreak={insights.avgStreak} onSelect={togglePicked} />
         </div>
         <div className="min-w-0 flex flex-col">
           {/* Keyed by streak: picking another one starts its calendar on its last day. */}

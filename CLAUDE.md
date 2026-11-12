@@ -314,7 +314,7 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
 - **Colours with a meaning come from the theme** (danger, success, warning, `hardcore`, `softcore`); no palette
   class of any hue. Platform hues are tokens (`--color-steam`…, `platinum`); tier hues live in their util.
 - **Streaks are coloured by tier** (`streakTier`) wherever a streak is coloured, never in the accent; the best streaks on
-  `/racha` are grey until one is picked, which takes its tier (#131).
+  `/racha` are grey but the one being shown day by day, in its tier's colour (#131).
 - **Every progress bar is `ProgressBar` or `CircularProgress`** in the theme's `--progress`; only a finished
   bar glows; **the green is only in the percentage beside it**, never on the bar (the user tried a green ring
   and did not like it). Never a bar in a platform's colour; those stay in charts that compare platforms.

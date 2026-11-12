@@ -65,13 +65,22 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   the window opens on the streak's last week (keyed by streak, so picking another starts there), and the keyboard leaving it moves
   it. A short streak still shows the whole window, the days before it dimmed `aria-hidden` spans; the skeleton is the same window.
   New `addDays` in `utils/dates.ts`.
+- *Cards fill their row* (the owner's rule, 2026-11-12, now in `CLAUDE.md` and `docs/design-system.md`): the best streaks show
+  as many rows as the card holds (`useFitCount`, new in `src/hooks/`, measures the list's box; at least six alone, about seven
+  beside the 2560 px calendar, more where the calendar card stacks its panel and grows); the bar of the streak being shown is in
+  its tier, the rest grey (`selectedStreak={shownStreak}`, the owner, 2026-11-12). The day panel lists five achievements (four
+  with a finished game) and "See more" (`T.streak.dayMore`) in its head opens the day; the games on one truncated line with
+  the whole list in `title`. The hand-made "·" left for `Facts`: the calendar card's aside, the panel's "today", the hero's
+  kicker and the best streaks' head (`T.streak.bestSub` split into `bestCount` and `bestAvg`, nine languages). The bottom row
+  ("Tu año", "Cuándo juegas") was left as it is: about the same height at 2560 px by the numbers (not measured); at
+  1280–1535 px the year's days hit their 10 px minimum and its card may end ~50 px of blank under the grid: look there.
 **Already done before** — what the issue says #127 brings: "Cuándo juegas" is `DataBar` upright (only its stale comment said
 "slanted"; fixed) and the labels are in sentence case (`kickerClass`). The year and hidden consoles are untouched: the calendar
 draws `selectedStreak.achievements`, which come from `useActivityHeatmapYear` (filtered by `useConsoleVisibility`, its
 `isLoading` covering every platform and the libraries), so the streak still lands whole.
 **Decisions** — The days are shaded in the accent, not the canvas's white: the board was drawn on the Dark theme, and the year
 heatmap under it (same data) is in the accent. Nothing is coloured on the best streaks at first (the page starts with
-`picked` null and shows the live or best streak day by day): "grey until picked", as the owner put it. A long streak grows the
+`picked` null and shows the live or best streak day by day): "grey until picked", as the owner put it (changed later the same day: the shown one is coloured). A long streak grows the
 calendar down (eight weeks are about 560 px tall); no inner scroll.
 **Watch out** — Not seen in a browser (it needs a session): check at 2560 px (calendar and panel side by side), at 1280–1535 px
 (the two cards side by side, so the calendar card is narrow and stacks), 390 px (days about 43 px), both designs, Firefox,

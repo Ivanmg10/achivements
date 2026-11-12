@@ -218,8 +218,8 @@ flag is read from the database, never the session).
 - **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the picked best streak, the
   streak hero and its live bar, the cover's streak card, the home's stats tile, the rankings' streak column). Every streak
   colour comes from it; there is no "streaks in the accent" rule (gone since #124: the hero uses `streakTier` too). **The best
-  streaks on `/racha` are grey until one is picked** (the `none` tier's grey); the picked one takes its own tier (the owner's
-  call, #131). The days of a streak (its calendar, the year) are shaded in the accent by how much was unlocked: that is
+  streaks on `/racha` are grey but the one being shown day by day** (the `none` tier's grey), which is in its tier's colour:
+  the live or best one at first, then the one picked (the owner's call, #131). The days of a streak (its calendar, the year) are shaded in the accent by how much was unlocked: that is
   activity, not a streak's colour. A tier's ink keeps `--streak-hue` of its hue (72 %, less on light themes and Steam Retro), so it reads in every theme.
 
 ### The Layout modal and look transitions
