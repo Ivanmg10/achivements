@@ -114,6 +114,8 @@ export const ru: Translations = {
     wantToPlay: 'Не начаты',
     completed: 'Завершённые',
     allGames: 'Все игры',
+    showProfile: 'Показать профиль',
+    hideProfile: 'Скрыть профиль',
   },
   pinnedGames: {
     title: 'Pinned games',

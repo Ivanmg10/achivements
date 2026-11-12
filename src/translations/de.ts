@@ -114,6 +114,8 @@ export const de: Translations = {
     wantToPlay: 'Nicht begonnen',
     completed: 'Abgeschlossen',
     allGames: 'Alle Spiele',
+    showProfile: 'Profil ansehen',
+    hideProfile: 'Profil ausblenden',
   },
   pinnedGames: {
     title: 'Pinned games',

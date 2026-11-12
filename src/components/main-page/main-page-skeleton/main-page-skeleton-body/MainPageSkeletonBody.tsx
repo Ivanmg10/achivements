@@ -7,6 +7,7 @@ import MainPageHeatmap from '../../main-page-charts/MainPageHeatmap'
 import MainPageProfileSkeleton from '../../main-page-profile/main-page-profile-skeleton/MainPageProfileSkeleton'
 import MainPagePortadaSkeleton, { PortadaSideSkeleton } from '../../main-page-portada-skeleton/MainPagePortadaSkeleton'
 import Kicker from '@/components/ui/Kicker'
+import MainPageProfileFoldSkeleton from '../../main-page-profile-fold/main-page-profile-fold-skeleton/MainPageProfileFoldSkeleton'
 
 const ROWS = 6
 const PINS = 4
@@ -30,8 +31,9 @@ export default function MainPageSkeletonBody({ cover, pinned, label }: { cover: 
       {cover && <MainPagePortadaSkeleton />}
 
       <div aria-hidden="true" className="home-fit-top flex-1 min-h-0 grid grid-cols-1 items-stretch lg:grid-cols-[2fr_1fr]">
-        {/* Profile: first on a phone, right column on desktop, like the page. */}
-        <div className="home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1">
+        {/* Profile: folded to one line on a phone, right column on desktop, like the page. */}
+        <MainPageProfileFoldSkeleton />
+        <div className="home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1 max-sm:hidden">
           {cover ? (
             <PortadaSideSkeleton />
           ) : (

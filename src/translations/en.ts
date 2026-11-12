@@ -115,6 +115,8 @@ export const en = {
     wantToPlay: 'Not started',
     completed: 'Completed',
     allGames: 'All games',
+    showProfile: 'See profile',
+    hideProfile: 'Hide profile',
   },
   pinnedGames: {
     title: 'Pinned games',

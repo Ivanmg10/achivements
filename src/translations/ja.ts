@@ -114,6 +114,8 @@ export const ja: Translations = {
     wantToPlay: '未着手',
     completed: 'コンプリート',
     allGames: 'すべてのゲーム',
+    showProfile: 'プロフィールを見る',
+    hideProfile: 'プロフィールを隠す',
   },
   pinnedGames: {
     title: 'Pinned games',
