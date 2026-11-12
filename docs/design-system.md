@@ -330,29 +330,24 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   the old value until the person picks another: no migration, nothing else reads it.
 - **`apple-icon.tsx` still says "CH"**: out of #84, left as it was.
 
-### The theme picker — a base and an accent, or a name (#135, 2026-11-12)
+### The theme picker — a base, then an option under it (#135, 2026-11-12)
 
-The 22 themes stay, ids unchanged (the canvas's page 3, "TemBasicos" and "TemNombrados", approved 2026-11-07). The picker
-(`ThemeModal` and the welcome's style step, both `theme-modal-picker/ThemeModalPicker`) only translates a pick into an existing
-id, so `users.theme`, the favicon and the head script never change. The table is `src/utils/themePicker.ts`, and its test holds
-that each basic id comes from exactly one pair and every theme is a pair or a named one:
+The 22 themes stay, ids unchanged (canvas page 3, then the owner's table on 2026-11-12). The picker (`ThemeModal`, `Modal size="2xl"`, and the welcome's style
+step, both `theme-modal-picker/ThemeModalPicker`) only translates a pick into an existing id, so `users.theme`, the favicon and the head script never change.
+The table is `src/utils/themePicker.ts`; its test holds that every theme comes from exactly one base and option:
 
-| Base × accent | violet | red | green | blue | white / black |
-|---|---|---|---|---|---|
-| Dark | `dark` | `dark-red` | `dark-green` | `dark-blue` | `dark-white` |
-| Tinted | `purple` | `red` | `green` | `blue` | none (shown dimmed, not offered) |
-| Light | `light` | `light-red` | `light-green` | `light-blue` | `light-black` |
+| Base | The row under it ("Accent"; "Theme" under Special) |
+|---|---|
+| Dark | violet `dark`, red `dark-red`, green `dark-green`, blue `dark-blue`, white `dark-white` |
+| Tinted | violet `purple`, red `red`, green `green`, blue `blue`, Crimson `crimson`, Midnight `midnight` |
+| Light | violet `light`, red `light-red`, green `light-green`, blue `light-blue`, black `light-black`, Sakura `sakura`, Arctic `arctic` |
+| Special | Black Ops II `black-ops-2`, Snake Eater `snake-eater`, Steam Retro `steam-retro`, Venom `venom` |
 
-Special themes, whole, four by two: Midnight, Crimson, Sakura, Arctic (palettes), Black Ops II, Steam Retro, Snake Eater, Venom (tributes).
-The dialog is `Modal size="3xl"`: the basics on the left and the special themes in a column of their own once the picker is 72rem wide (`@6xl`),
-split `47fr 53fr` so both columns are the same height; stacked below that (a phone, the welcome's step). A tribute's screen shows the games it
-pays tribute to (`src/utils/themeGames.ts`, Steam covers); every other theme shows two covers of the art wall.
-
-- Three `ChoiceCards` (native radios: a named group each, the arrows move and pick, the library's focus ring). Each option is a
-  `ui/ThemeScreen` of the theme it lands on, under its `data-theme`, so it is drawn in that theme's tokens; the one in use says
-  "On" with a tick. The base and the accent of the theme on are checked on opening; while a named theme is on neither is.
-- A base keeps the accent on when it has it, else violet (Tinted from Dark · White lands on `purple`); an accent goes on the base
-  that is on, or on Dark while a named theme is. The fifth accent reads White on Dark and Tinted, Black on Light.
+- Two `ChoiceCards` (native radios: a named group each, the arrows move and pick, the library's focus ring). Each option is a `ui/ThemeScreen` of the theme it
+  lands on, under its `data-theme`, so it is drawn in that theme's tokens; the one in use says "On" with a tick. The base and option of the theme on are checked on opening.
+- Picking a base keeps the same option when the new base has it (white and black are one option), else takes its first.
+- The options' row is `columns={7}`: seven in a row once the group is 64rem wide, so no base wraps it and changing base never moves the dialog; four below, three on a phone.
+- A tribute's screen shows the games it pays tribute to (`src/utils/themeGames.ts`, Steam covers); every other theme shows two covers of the art wall.
 - Every pick spreads from its card and saves as before; the dialog stays open, `backdrop="dim"`.
 - A theme shown inside another is `ThemeScreen`: `uiGuard.test.ts` refuses a `data-theme={…}` anywhere else.
 

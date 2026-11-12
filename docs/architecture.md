@@ -202,7 +202,7 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   (`src/utils/themeIcon.ts`) for `src/app/layout.tsx`. It also sets the favicon, the logo
   in the theme's accent as a data URL on the layout's `<link id="theme-icon">`;
   `public/icon.svg` is that logo in the default theme, for no JavaScript and the manifest.
-  The picker (`ThemeModal`, the welcome's style step) offers them as a base and an accent or by name
+  The picker (`ThemeModal`, the welcome's style step) offers them as a base and an option under it
   (`src/utils/themePicker.ts`), each option a `ui/ThemeScreen`.
 - **Language**: `LanguageContext` shows the saved choice (`app-language`, in storage and in a
   cookie of the same name), else the first of `navigator.languages` the app has (`pickLanguage`,

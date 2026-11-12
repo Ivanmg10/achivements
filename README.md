@@ -46,7 +46,7 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
   how-tos at `/compare/*` and `/track/*`, plus a FAQ on the landing, for
   visitors and for what search engines and chat AIs read.
 - **Personalization** — 22 themes (`THEMES` in `src/types/types.ts`), picked as a
-  base and an accent or by name, with a favicon in the theme's colour, 9 UI
+  base and an option under it, with a favicon in the theme's colour, 9 UI
   languages (en, es, de, fr, it, ja, pl, pt, ru), taken from the browser until
   the user picks one, country with flag.
 

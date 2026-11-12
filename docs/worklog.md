@@ -33,36 +33,32 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
-## 2026-11-12 — The theme picker: a base and an accent, every theme kept (`feat/135-theme-picker`, #135)
+## 2026-11-12 — The theme picker: a base, then an option under it, every theme kept (`feat/135-theme-picker`, #135)
 
-**Did** — Boards "TemMain", "TemBasicos", "TemNombrados" and the `MiniTema` piece (canvas page 3), stacked on `feat/133-auth-public-pages` (not merged).
-- `src/utils/themePicker.ts`: the 14 basic themes as (base, accent) pairs, exactly the canvas's table (Dark: dark, dark-red, dark-green, dark-blue, dark-white;
-  Tinted: purple, red, green, blue, no white; Light: light, light-red, light-green, light-blue, light-black), `NAMED_THEMES` (palettes, then tributes),
-  `pairOf`, `pickBase` (keeps the accent, else violet) and `pickAccent` (the base on, or dark under a named theme). Its test: each basic id from exactly one pair,
-  every offered pair a theme, every theme a pair or named. `THEME_GROUPS` (types.ts) and its tests are gone.
-- `ui/ThemeScreen` (the MiniTema): the top bar with the logo (`LOGO_PATHS`) and a slanted level, the display-italic title, two game rows with covers from the
-  art wall and their bars, the filters and the slanted primary button, all under `data-theme` so it is drawn in that theme's tokens; it scales with its width
-  (`@container`, sizes in em over `3.125cqw`). `on` adds a tick and "On". Specimen in `/design` (Foundations); `uiGuard.test.ts` refuses a `data-theme={…}` outside it.
-  `ThemePreview`, `ThemeModalGroups` and `ThemeModalOption` are deleted.
-- `theme-modal/theme-modal-picker/ThemeModalPicker`: three `ChoiceCards` (Base 3, Accent 5, Named 4 × 2), each option the `ThemeScreen` of the theme it lands on.
-  Used by `ThemeModal` (same rules: stays open, spreads from the card, `backdrop="dim"`, the status line, the inline save error) and the welcome's style step.
-- `ChoiceCards`: an option can be `disabled` (kept in its place, dimmed, skipped by the arrows) and `columns={5}`.
-- Texts (nine languages): `userTheme.base`, `accent`, `named`, `base_*`, `accent_*`, `kind_palette` / `kind_tribute`, `noPair`, `on`; the five `group_*` keys are gone.
-**Decisions** — Each option is a screen (the issue's "each option drawn as a small screen") rather than the board's text buttons plus one big preview: the base cards
-show the current accent on each base, the accent cards the current base with each accent, so a card always shows what clicking it gives. The pair with no theme
-(Tinted × white) is **shown disabled**, not left out, so the accent row keeps five places on every base; its card says "Not on this base" and so does its radio's name.
-The accent words follow the theme names already in each language ("Morado" in Spanish, as in "Oscuro · Morado"), not the board's "violeta": one name per thing.
-While a named theme is on, no base or accent is checked (honest), and an accent then lands on Dark. The spread origin is the picked card, caught with
-`onChangeCapture` in the picker, so `ChoiceCards`' `onChange` keeps its one argument. Arrow keys in a group pick and save as they move (native radios).
-**Open** — Not seen signed in (the dialog needs a session). Looked at with a throwaway page (removed) at 1440 and 390 px: the base row is 2 + 1 on a phone and the
-accents 3 + 2, `ChoiceCards`' usual phone grid. The dialog at `xl` is about 1,000 px tall: it scrolls on a 1080 px screen.
-**After the owner saw it (same day)** — The 8 named themes became "Special themes" (`userTheme.named`, nine languages), a column of their own beside the basics
-(`@6xl` on the picker's own width, a rule between them; stacked below, in the welcome too), in a new `Modal size="3xl"` (100rem). The split `47fr 53fr` gives both
-columns the same height within 6 px (measured 1280 to 2560 px wide); the dialog is about 490 px tall at 1920 × 1080, so it fits without scrolling (440 at 1280 × 800).
-The tributes show their own games (`src/utils/themeGames.ts`, Steam covers through `steamAssetUrl`, the art wall's CDN, no proxy): Black Ops II 202970 and Black Ops 42700,
-Snake Eater 2131650 (MGS3 Master Collection) and 2417610 (MGS Δ), Venom 2651280 (Marvel's Spider-Man 2) and 1817070 (Spider-Man Remastered), Steam Retro 70 (Half-Life)
-and 400 (Portal); the palettes and the basics keep the two RA covers. The welcome's theme step now shows the groups' names (it hid every legend, right for its one-choice steps).
-**Watch out** — A new theme must join `themePicker.ts` (a pair or `NAMED_THEMES`) or its test fails; `CLAUDE.md` and `docs/design-system.md` → The theme picker say so.
+**Did** — Boards "TemMain", "TemBasicos", "TemNombrados" and the `MiniTema` piece (canvas page 3), then the owner's table after seeing it, stacked on `feat/133-auth-public-pages` (not merged).
+- `src/utils/themePicker.ts`: all 22 themes as a base (Dark, Tinted, Light, Special) and an option under it, the owner's table (`docs/design-system.md` → The theme picker):
+  Dark: violet, red, green, blue, white; Tinted: violet, red, green, blue, Crimson, Midnight; Light: violet, red, green, blue, black, Sakura, Arctic;
+  Special: Black Ops II, Snake Eater, Steam Retro, Venom. `pairOf`, `optionsOf`, `pickBase` (keeps the same option when the new base has it, else its first).
+  Its test: every id from exactly one pair, every pair a theme, the table as given. `THEME_GROUPS` (types.ts) and its tests are gone. Ids, `users.theme`, the favicon and the theme values are untouched.
+- `ui/ThemeScreen` (the MiniTema): the top bar with the logo (`LOGO_PATHS`) and a slanted level, the display-italic title, two game rows with their covers and bars, the filters
+  and the slanted primary button, all under `data-theme` so it is drawn in that theme's tokens; it scales with its width (`@container`, sizes in em over `3.125cqw`).
+  `on` adds a tick and "On". Specimen in `/design` (Foundations); `uiGuard.test.ts` refuses a `data-theme={…}` outside it. `ThemePreview`, `ThemeModalGroups`, `ThemeModalOption` deleted.
+- The covers: `src/utils/themeGames.ts` gives each tribute its own games as Steam covers (`steamAssetUrl`, the art wall's CDN, no proxy): Black Ops II 202970 and Black Ops 42700,
+  Snake Eater 2131650 (MGS3 Master Collection) and 2417610 (MGS Δ), Venom 2651280 (Marvel's Spider-Man 2) and 1817070 (Spider-Man Remastered), Steam Retro 70 (Half-Life) and 400 (Portal);
+  every other theme shows two RA covers of the wall. Tested.
+- `theme-modal/theme-modal-picker/ThemeModalPicker`: two `ChoiceCards`, the bases (4) and the options of the base on (up to 7, "Accent", or "Theme" under Special), each option the
+  `ThemeScreen` of the theme it lands on; the base and option of the theme on are checked when it opens. Used by `ThemeModal` (`size="2xl"`; same rules: stays open, spreads from the card,
+  `backdrop="dim"`, the status line, the inline save error) and by the welcome's style step, which now shows the groups' names (it hid every legend, right for its one-choice steps).
+- `ChoiceCards`: `columns={7}`, seven in a row once the group itself is 64rem wide (`@container` on the fieldset), four below, three on a phone.
+- Texts (nine languages): `userTheme.base`, `accent`, `base_*` (with `base_special`), `accent_*`, `on`; the five `group_*` keys are gone; the option row under Special reuses `userTheme.theme`.
+**Decisions** — Each option is a small screen (the issue), so a card always shows what clicking it gives. The accent words follow the theme names already in each language
+("Morado" in Spanish, as in "Oscuro · Morado"): one name per thing; the moved palettes keep their theme names. The picked card is caught with `onChangeCapture` in the picker,
+so `ChoiceCards`' `onChange` keeps its one argument. Arrow keys in a group pick and save as they move (native radios).
+**Tried and dropped the same day** — The 8 named themes as a third row, then as a "Special themes" column beside the basics in a 100rem `Modal size="3xl"`: a misunderstanding of the owner's
+"Especiales", which is a fourth base. The `3xl` size, the column split and `ChoiceCards`' `disabled` (for Tinted × white, which is no longer a choice) were removed.
+**Open** — Not seen signed in (the dialog needs a session). Looked at with a throwaway page (removed, `proxy.ts` restored): at 1920 × 1080 the dialog is 1240 × 549 px with no scroll, the
+options' row 167 px tall on every base (it never moves); the welcome-width (760 px) picker has four per row; on a phone, 2 + 2 bases and three options per row (the sheet scrolls, and changing base changes its height there).
+**Watch out** — A new theme must join `themePicker.ts` (a base and an option) or its test fails; `CLAUDE.md` and `docs/design-system.md` → The theme picker say so.
 
 ---
 
