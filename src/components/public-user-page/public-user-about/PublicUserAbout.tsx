@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { IconFolders, IconGenderBigender, IconPalette } from '@tabler/icons-react'
+import SectionHead from '@/components/ui/SectionHead'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import type { CheevoUser } from '@/hooks/useCheevoUser'
@@ -59,9 +60,7 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <section aria-labelledby="public-user-preferences" className="bg-bg-card rounded-tile p-4 flex flex-col gap-4">
-        <Kicker as="h2" id="public-user-preferences">
-          {T.userProfile.preferences}
-        </Kicker>
+        <SectionHead as="h2" size="lg" id="public-user-preferences" title={T.userProfile.preferences} />
         <dl className="flex flex-col gap-3">
           {themeName && (
             <Fact icon={<IconPalette size={18} />} label={T.userTheme.theme}>
@@ -104,10 +103,7 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
       </section>
 
       <section aria-labelledby="public-user-groups" className="bg-bg-card rounded-tile p-4 flex flex-col gap-3 lg:col-span-2">
-        <Kicker as="h2" id="public-user-groups" className="flex items-center gap-2">
-          <IconFolders size={14} aria-hidden="true" />
-          {T.userProfile.publicGroups}
-        </Kicker>
+        <SectionHead as="h2" size="lg" id="public-user-groups" title={T.userProfile.publicGroups} />
         {groups.length === 0 ? (
           <EmptyState icon={<IconFolders className="w-6 h-6" />} title={T.userProfile.noGroups} subtitle={T.userProfile.noGroupsHint} className="py-8" />
         ) : (

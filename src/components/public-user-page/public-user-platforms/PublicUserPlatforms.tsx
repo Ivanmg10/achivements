@@ -13,7 +13,7 @@ import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { Skeleton } from '@/components/ui/Skeleton'
 import type { GameSource } from '@/types/game'
-import Kicker from '@/components/ui/Kicker'
+import SectionHead from '@/components/ui/SectionHead'
 
 const LOGOS: Record<GameSource, ReactNode> = {
   ra: <RaLogo height={11} />,
@@ -29,7 +29,7 @@ export default function PublicUserPlatforms({ games, isLoading }: { games: Libra
 
   return (
     <div className="flex flex-col gap-3">
-      <Kicker as="h2">{T.userProfile.byPlatform}</Kicker>
+      <SectionHead as="h2" size="lg" title={T.userProfile.byPlatform} />
       {isLoading ? (
         <div aria-busy="true" className="flex flex-col gap-2">
           {[0, 1].map((i) => (
