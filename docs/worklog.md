@@ -56,6 +56,12 @@ While a named theme is on, no base or accent is checked (honest), and an accent 
 `onChangeCapture` in the picker, so `ChoiceCards`' `onChange` keeps its one argument. Arrow keys in a group pick and save as they move (native radios).
 **Open** — Not seen signed in (the dialog needs a session). Looked at with a throwaway page (removed) at 1440 and 390 px: the base row is 2 + 1 on a phone and the
 accents 3 + 2, `ChoiceCards`' usual phone grid. The dialog at `xl` is about 1,000 px tall: it scrolls on a 1080 px screen.
+**After the owner saw it (same day)** — The 8 named themes became "Special themes" (`userTheme.named`, nine languages), a column of their own beside the basics
+(`@6xl` on the picker's own width, a rule between them; stacked below, in the welcome too), in a new `Modal size="3xl"` (100rem). The split `47fr 53fr` gives both
+columns the same height within 6 px (measured 1280 to 2560 px wide); the dialog is about 490 px tall at 1920 × 1080, so it fits without scrolling (440 at 1280 × 800).
+The tributes show their own games (`src/utils/themeGames.ts`, Steam covers through `steamAssetUrl`, the art wall's CDN, no proxy): Black Ops II 202970 and Black Ops 42700,
+Snake Eater 2131650 (MGS3 Master Collection) and 2417610 (MGS Δ), Venom 2651280 (Marvel's Spider-Man 2) and 1817070 (Spider-Man Remastered), Steam Retro 70 (Half-Life)
+and 400 (Portal); the palettes and the basics keep the two RA covers. The welcome's theme step now shows the groups' names (it hid every legend, right for its one-choice steps).
 **Watch out** — A new theme must join `themePicker.ts` (a pair or `NAMED_THEMES`) or its test fails; `CLAUDE.md` and `docs/design-system.md` → The theme picker say so.
 
 ---

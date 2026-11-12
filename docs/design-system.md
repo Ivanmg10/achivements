@@ -343,7 +343,10 @@ that each basic id comes from exactly one pair and every theme is a pair or a na
 | Tinted | `purple` | `red` | `green` | `blue` | none (shown dimmed, not offered) |
 | Light | `light` | `light-red` | `light-green` | `light-blue` | `light-black` |
 
-Named, whole, in one row of four by two: Midnight, Crimson, Sakura, Arctic (palettes), Black Ops II, Steam Retro, Snake Eater, Venom (tributes).
+Special themes, whole, four by two: Midnight, Crimson, Sakura, Arctic (palettes), Black Ops II, Steam Retro, Snake Eater, Venom (tributes).
+The dialog is `Modal size="3xl"`: the basics on the left and the special themes in a column of their own once the picker is 72rem wide (`@6xl`),
+split `47fr 53fr` so both columns are the same height; stacked below that (a phone, the welcome's step). A tribute's screen shows the games it
+pays tribute to (`src/utils/themeGames.ts`, Steam covers); every other theme shows two covers of the art wall.
 
 - Three `ChoiceCards` (native radios: a named group each, the arrows move and pick, the library's focus ring). Each option is a
   `ui/ThemeScreen` of the theme it lands on, under its `data-theme`, so it is drawn in that theme's tokens; the one in use says
