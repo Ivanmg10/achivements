@@ -8,7 +8,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { streakInk, streakTier } from '@/utils/streakTier'
 import { calcAvgPerDay, decimal, plural } from '@/utils/utils'
 import { parseUnlockTime, utcDay } from '@/utils/dates'
-import Figure from '@/components/ui/Figure'
+import Figure, { FIGURES_BY_THREE } from '@/components/ui/Figure'
 
 // Downloaded the first time it opens, not with the page.
 const DayAchievementsModal = dynamic(() => import('@/components/day-achievements-modal/DayAchievementsModal'), { loading: () => null })
@@ -57,7 +57,7 @@ export default function MainPagePeriodStats({
   const labels = [T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.last30Days, T.pointsStats.avgPerDay, ...(streak === null ? [] : [T.streak.title])]
   if (isLoading) {
     return (
-      <div className="flex flex-wrap gap-3" aria-busy="true">
+      <div className={FIGURES_BY_THREE} aria-busy="true">
         {labels.map((label) => (
           <Figure key={label} label={label} value="" loading />
         ))}
@@ -67,7 +67,7 @@ export default function MainPagePeriodStats({
 
   const unit = (n: number) => plural(n, T.plurals.achievementsWord, lang)
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className={FIGURES_BY_THREE}>
       <Figure
         label={T.pointsStats.today}
         value={stats.today.length}

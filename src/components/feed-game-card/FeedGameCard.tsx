@@ -69,7 +69,8 @@ export default function FeedGameCard({
         )}
 
         <div className="flex flex-col min-w-0 flex-1 gap-1">
-          <span className="flex items-center gap-2 min-w-0">
+          {/* On a phone the platform goes under the title, which gets the whole width (#134: "Call of Duty®: Bl…"). */}
+          <span className="flex flex-col items-start gap-1 min-w-0 sm:flex-row sm:items-center sm:gap-2">
             {href ? (
               <Link href={href} className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 rounded focus-ring">
                 <span className={TITLE_CLASS}>{title}</span>
@@ -77,7 +78,7 @@ export default function FeedGameCard({
             ) : (
               <span className={TITLE_CLASS}>{title}</span>
             )}
-            <Tag size="sm" tone="overlay" className="shrink-0 max-w-[45%] truncate">
+            <Tag size="sm" tone="overlay" className="shrink-0 max-w-full sm:max-w-[45%] truncate">
               {Logo && <Logo size={12} className="opacity-60" aria-hidden="true" />}
               {platform.label}
             </Tag>

@@ -8,7 +8,6 @@ import NavigationProgress from "@/components/navigation-progress/NavigationProgr
 import MainHeader from "@/components/main-header/MainHeader";
 import RaUserRefresher from "@/components/ra-user-refresher/RaUserRefresher";
 import { MainProviders } from "@/components/main-providers/MainProviders";
-import VersionBadge from "@/components/version-badge/VersionBadge";
 
 export default async function MainLayout({
   children,
@@ -36,7 +35,6 @@ export default async function MainLayout({
         <main className="flex-1 overflow-x-clip">{children}</main>
         <MainFooter />
       </div>
-      <VersionBadge />
     </MainProviders>
     </LanguageProvider>
   );

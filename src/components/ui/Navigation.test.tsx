@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import SegmentedControl from './SegmentedControl'
 import Pill, { pillClass } from './Pill'
 import Tabs, { tabIds } from './Tabs'
+import { scrollFadeClass } from './scrollFade'
 
 describe('SegmentedControl', () => {
   it('presses the chosen option and reports a new one', () => {
@@ -83,5 +84,18 @@ describe('Tabs', () => {
     expect(screen.getByRole('tab', { name: 'One' })).not.toHaveAttribute('aria-controls')
     fireEvent.keyDown(screen.getByRole('tab', { name: 'One' }), { key: 'ArrowDown' })
     expect(screen.getByRole('tab', { name: 'Two' })).toHaveAttribute('aria-selected', 'true')
+  })
+
+  it('a row wider than its room fades at the edge it is cut at, and not once it fits (#134)', () => {
+    const wide = jest.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(600)
+    const room = jest.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(300)
+    const { unmount } = render(<Harness />)
+    expect(screen.getByRole('tablist')).toHaveClass(scrollFadeClass({ start: false, end: true }))
+    unmount()
+    wide.mockReturnValue(300)
+    render(<Harness />)
+    expect(screen.getByRole('tablist').className).not.toContain('mask-image')
+    wide.mockRestore()
+    room.mockRestore()
   })
 })

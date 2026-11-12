@@ -24,7 +24,7 @@ const unlock = (daysAgo: number, Source: RecentAchievement['Source'] = 'steam') 
 const TODAY = stamp(0).slice(0, 10)
 
 const pill = (label: string) => screen.getByText(label).parentElement!
-const order = () => [...document.querySelectorAll('.flex-wrap > *')].map((p) => p.firstElementChild?.textContent)
+const order = () => [...document.querySelectorAll('.grid > *')].map((p) => p.querySelector('span:not([data-figure-mark])')?.textContent)
 
 test('counts unlocks of every platform together, never RA points', () => {
   render(<MainPagePeriodStats achievements={[unlock(0, 'ra'), unlock(0, 'psn'), unlock(1, 'xbox')]} streak={0} />)

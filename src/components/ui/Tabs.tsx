@@ -1,4 +1,5 @@
-import { useRef, type ReactNode } from 'react'
+import { useCallback, useRef, type ReactNode } from 'react'
+import { useScrollFade } from '@/hooks/useScrollFade'
 import { MARK } from './shape'
 
 export type Tab<V extends string> = {
@@ -17,7 +18,8 @@ const SIZES: Record<Size | 'rail', string> = {
   sm: 'h-10 px-3 gap-1.5 text-sm',
   md: 'h-11 px-3.5 gap-1.5 text-[0.9375rem]',
   // A card's title that is also its switch (the home's "Recently played" / "Pinned games").
-  lg: 'pb-1.5 gap-1.5 text-xl tracking-tight',
+  // Smaller on a phone, where both titles must share one line (#134: they wrapped and read as two headings).
+  lg: 'pb-1.5 gap-1.5 text-[0.9375rem]/6 sm:text-xl tracking-tight',
   rail: 'snap-start px-3.5 py-2 lg:py-2.5 gap-2.5 rounded-tile text-sm',
 }
 
@@ -27,7 +29,8 @@ const LISTS: Record<Size | Orientation, string> = {
   rail: 'flex lg:flex-col gap-1 overflow-x-auto snap-x lg:overflow-visible [scrollbar-width:none]',
   sm: '',
   md: '',
-  lg: 'flex flex-wrap items-end gap-x-6 gap-y-1',
+  // One line that scrolls on a phone (with the fade); free to wrap from sm.
+  lg: 'flex items-end gap-x-4 sm:gap-x-6 gap-y-1 overflow-x-auto [scrollbar-width:none] sm:flex-wrap sm:overflow-visible',
 }
 
 /**
@@ -97,6 +100,15 @@ export default function Tabs<V extends string>({
   className?: string
 }) {
   const listRef = useRef<HTMLDivElement>(null)
+  // A row wider than its room scrolls, and its cut edge fades so it says there is more (#134).
+  const { ref: fadeRef, fade } = useScrollFade()
+  const ref = useCallback(
+    (el: HTMLDivElement | null) => {
+      listRef.current = el
+      return fadeRef(el)
+    },
+    [fadeRef],
+  )
   const rail = orientation === 'rail'
 
   function onKeyDown(e: React.KeyboardEvent, index: number) {
@@ -112,7 +124,7 @@ export default function Tabs<V extends string>({
   const list = rail ? LISTS.rail : size === 'lg' ? LISTS.lg : LISTS.horizontal
 
   return (
-    <div ref={listRef} role="tablist" aria-label={label} aria-orientation={rail ? 'vertical' : undefined} className={`${list} ${className}`}>
+    <div ref={ref} role="tablist" aria-label={label} aria-orientation={rail ? 'vertical' : undefined} className={`${list} ${fade} ${className}`}>
       {tabs.map((t, i) => {
         const on = t.value === value
         const ids = tabIds(id, t.value)

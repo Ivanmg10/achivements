@@ -1,5 +1,6 @@
 'use client'
 
+import { useId, useState } from 'react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 
 import MainPageSkeleton from './main-page-skeleton/MainPageSkeleton'
@@ -18,6 +19,7 @@ import { homeFit } from '@/lib/homeFit'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
 import MainPagePortada from '@/components/main-page/main-page-portada/MainPagePortada'
 import MainPagePortadaSide from '@/components/main-page/main-page-portada-side/MainPagePortadaSide'
+import MainPageProfileFold from '@/components/main-page/main-page-profile-fold/MainPageProfileFold'
 
 export default function MainPage() {
   const { status, data: session } = useAuthSession()
@@ -53,14 +55,19 @@ export function MainPageBody() {
   const { view } = useMainView()
   const visitor = useSubject() !== null
   const [layout] = useHomeLayout()
+  // On a phone your profile starts folded to one line, so your games come first (#134); from sm it is always open.
+  const [profileOpen, setProfileOpen] = useState(false)
+  const sideId = useId()
+  const folded = !visitor && !profileOpen
 
   return (
     <>
       {/* The "cover" layout: the game played last, in big, before the usual home. Never on someone else's page. */}
       {layout === 'cover' && !visitor && <MainPagePortada />}
       <div className="home-fit-top flex-1 min-h-0 grid grid-cols-1 items-stretch lg:grid-cols-[2fr_1fr]">
-        {/* Profile first in DOM → top on mobile; placed col-2 on desktop */}
-        <div className="home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1">
+        {!visitor && <MainPageProfileFold open={profileOpen} onToggle={() => setProfileOpen((o) => !o)} controls={sideId} />}
+        {/* Profile first in DOM → top on mobile (folded on a phone until opened); placed col-2 on desktop */}
+        <div id={sideId} className={`home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1 ${folded ? 'max-sm:hidden' : ''}`}>
           {/* The cover puts your level, streak and last achievements here; the classic home, the platform profiles. */}
           {layout === 'cover' && !visitor ? <MainPagePortadaSide /> : <MainPageProfile />}
         </div>

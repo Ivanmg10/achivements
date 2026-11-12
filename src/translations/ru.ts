@@ -114,6 +114,8 @@ export const ru: Translations = {
     wantToPlay: 'Не начаты',
     completed: 'Завершённые',
     allGames: 'Все игры',
+    showProfile: 'Показать профиль',
+    hideProfile: 'Скрыть профиль',
   },
   pinnedGames: {
     title: 'Pinned games',
@@ -1125,7 +1127,7 @@ export const ru: Translations = {
     today: 'Сегодня',
     thisWeek: 'На этой неделе',
     last30Days: 'Последние 30 дней',
-    avgPerDay: 'Сред/день (30д)',
+    avgPerDay: 'Сред. 30 д',
     perDay: 'достижений/день',
     noActivity: 'нет активности',
     active: 'активна',

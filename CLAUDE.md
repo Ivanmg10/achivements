@@ -290,7 +290,8 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
   never a card inside it; `placement="top"` for a command panel or a menu), `Notice`, `ErrorRetry` (a failed read with its retry), `Spinner` (or `Button loading`),
   `TOOLTIP_SURFACE`, `MENU_SURFACE`, `SURFACE`, `Accordion`, `ShowMore`, `Shelf`, `SectionHead`, `DropSlot`,
   `ToggleButton`, `Kicker` (the small label, sentence case), `Tag`, `Avatar` (with the presence dot), `ListRow`, `Figure`
-  (every labelled number), `DataBar` (a chart bar) and `Facts` (facts on one line). `className` on them is for layout only,
+  (every labelled number; rows that wrap are `FIGURES_BY_THREE` / `_TO_LG`, no mark at a row's start), `DataBar` (a chart bar),
+  `Facts` (facts on one line) and `useScrollFade` (a strip that scrolls sideways fades where it is cut; `Tabs` has it). `className` on them is for layout only,
   never colours. **Tokens, not strings:** `focus-ring`, `shadow-hairline-t/-b`, `shadow-sunken`,
   `drop-shadow-done`, and a platform's colour is `text-steam` / `bg-psn/10`…, never a hex. Rules added in #120
   start with the files still to migrate (`ui/uiGuard.pending.json`): the list only shrinks, never add to it.

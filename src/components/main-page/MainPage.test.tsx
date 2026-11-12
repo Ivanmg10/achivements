@@ -33,12 +33,19 @@ jest.mock('@/components/recently-played-feed/RecentlyPlayedFeed', () => ({
   default: () => null,
 }))
 
+jest.mock('@/components/main-page/main-page-profile-fold/MainPageProfileFold', () => ({
+  __esModule: true,
+  default: ({ open, onToggle, controls }: { open: boolean; onToggle: () => void; controls: string }) => (
+    <button type="button" aria-expanded={open} aria-controls={controls} onClick={onToggle}>fold</button>
+  ),
+}))
+
 jest.mock('@/context/MainViewContext', () => ({
   useMainView: () => ({ view: 'pinned' }),
   MainViewProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import MainPage from './MainPage'
 import { useSession } from 'next-auth/react'
 
@@ -99,4 +106,20 @@ test('a session refresh does not swap the page back to the skeleton', () => {
   ;(useSession as jest.Mock).mockReturnValue({ status: 'loading', data: { user: { name: 'Ivan', rausername: 'Ivan' } } })
   render(<MainPage />)
   expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+})
+
+test('on a phone the profile column starts folded and the fold line opens it (#134); from sm it is never hidden', () => {
+  ;(useSession as jest.Mock).mockReturnValue({
+    status: 'authenticated',
+    data: { user: { raUser: { User: 'Ivan' }, rausername: 'Ivan', raLinked: true } },
+  })
+  render(<MainPage />)
+  const fold = screen.getByRole('button', { name: 'fold' })
+  const column = document.getElementById(fold.getAttribute('aria-controls')!)!
+  expect(column).toContainElement(screen.getByTestId('profile'))
+  expect(column).toHaveClass('max-sm:hidden')
+  expect(column.className).not.toMatch(/(^|\s)hidden/)
+  fireEvent.click(fold)
+  expect(fold).toHaveAttribute('aria-expanded', 'true')
+  expect(column).not.toHaveClass('max-sm:hidden')
 })

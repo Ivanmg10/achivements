@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useScrollFade } from '@/hooks/useScrollFade'
 import { TabMark, tabClass, TAB_ROW } from '@/components/ui/Tabs'
 import SearchInput from '@/components/ui/SearchInput'
 import Select from '@/components/ui/Select'
@@ -34,9 +35,10 @@ export default function AchievementTableToolbar<F extends string, S extends stri
   extra?: ReactNode
 }) {
   const { T } = useLanguage()
+  const { ref, fade } = useScrollFade()
   return (
     <div className="flex flex-col lg:flex-row lg:items-end gap-3 lg:gap-4 w-full">
-      <div className={`${TAB_ROW} flex-1`} role="group" aria-label={label}>
+      <div ref={ref} className={`${TAB_ROW} ${fade} flex-1`} role="group" aria-label={label}>
         {tabs.map((t) => (
           <button key={t.value} type="button" onClick={() => onFilter(t.value)} aria-pressed={filter === t.value} className={tabClass(filter === t.value)}>
             <TabMark on={filter === t.value} />

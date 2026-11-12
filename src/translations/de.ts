@@ -114,6 +114,8 @@ export const de: Translations = {
     wantToPlay: 'Nicht begonnen',
     completed: 'Abgeschlossen',
     allGames: 'Alle Spiele',
+    showProfile: 'Profil ansehen',
+    hideProfile: 'Profil ausblenden',
   },
   pinnedGames: {
     title: 'Pinned games',
@@ -1125,7 +1127,7 @@ export const de: Translations = {
     today: 'Heute',
     thisWeek: 'Diese Woche',
     last30Days: 'Letzte 30 Tage',
-    avgPerDay: 'Ø/Tag (30T)',
+    avgPerDay: 'Ø 30 T',
     perDay: 'Erfolge/Tag',
     noActivity: 'keine Aktivität',
     active: 'aktiv',

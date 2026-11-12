@@ -38,6 +38,16 @@ function TabsDemo() {
   return <Tabs id={id} aria-label="Demo tabs" value={tab} onChange={setTab} tabs={[{ value: 'all', label: 'All', count: 170 }, { value: 'ra', label: 'RetroAchievements', count: 26 }, { value: 'steam', label: 'Steam', count: 123 }]} />
 }
 
+function ScrollFadeDemo() {
+  const id = useId()
+  const [tab, setTab] = useState('ra')
+  return (
+    <div className="max-w-64">
+      <Tabs id={id} aria-label="Demo of a cut row" size="sm" value={tab} onChange={setTab} tabs={['ra', 'steam', 'psn', 'xbox'].map((v) => ({ value: v, label: { ra: 'RetroAchievements', steam: 'Steam', psn: 'PlayStation', xbox: 'Xbox' }[v] }))} />
+    </div>
+  )
+}
+
 function SegmentedDemo() {
   const [seg, setSeg] = useState('list')
   const [small, setSmall] = useState('week')
@@ -153,6 +163,7 @@ export default function DesignCatalogControls() {
       <DesignCatalogPiece id="checkbox"><Panel><CheckboxDemo /></Panel></DesignCatalogPiece>
       <DesignCatalogPiece id="choice-cards"><Panel><ChoiceDemo /><ChoiceDemo withPreview /></Panel></DesignCatalogPiece>
       <DesignCatalogPiece id="tabs"><Compare><TabsDemo /></Compare></DesignCatalogPiece>
+      <DesignCatalogPiece id="scroll-fade"><Compare><ScrollFadeDemo /></Compare></DesignCatalogPiece>
       <DesignCatalogPiece id="segmented"><Compare><SegmentedDemo /></Compare></DesignCatalogPiece>
       <DesignCatalogPiece id="pill"><Compare><PillDemo /></Compare></DesignCatalogPiece>
     </>

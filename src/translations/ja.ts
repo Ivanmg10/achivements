@@ -114,6 +114,8 @@ export const ja: Translations = {
     wantToPlay: '未着手',
     completed: 'コンプリート',
     allGames: 'すべてのゲーム',
+    showProfile: 'プロフィールを見る',
+    hideProfile: 'プロフィールを隠す',
   },
   pinnedGames: {
     title: 'Pinned games',
@@ -1125,7 +1127,7 @@ export const ja: Translations = {
     today: '今日',
     thisWeek: '今週',
     last30Days: '過去30日',
-    avgPerDay: '平均/日 (30日)',
+    avgPerDay: '平均 30日',
     perDay: '実績/日',
     noActivity: '活動なし',
     active: '継続中',

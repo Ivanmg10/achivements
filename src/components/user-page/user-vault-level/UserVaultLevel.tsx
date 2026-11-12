@@ -29,7 +29,8 @@ export default function UserVaultLevel() {
         href="/rankings"
         className="group flex flex-col gap-2 rounded-box -m-1 p-1 hover:bg-ink/[0.06] transition-colors focus-ring"
       >
-        <span className="flex items-center justify-between gap-2 min-w-0">
+        {/* Wraps when the two do not fit: on a phone the points take their own line instead of running under the level (V4-03, #134). */}
+        <span className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 min-w-0">
           <span className="flex items-center gap-2 min-w-0">
             <span className="sr-only">{T.rankings.yourLevel}</span>
             {fill?.active ? (

@@ -115,6 +115,8 @@ export const en = {
     wantToPlay: 'Not started',
     completed: 'Completed',
     allGames: 'All games',
+    showProfile: 'See profile',
+    hideProfile: 'Hide profile',
   },
   pinnedGames: {
     title: 'Pinned games',
@@ -1126,7 +1128,7 @@ export const en = {
     today: 'Today',
     thisWeek: 'This week',
     last30Days: 'Last 30 days',
-    avgPerDay: 'Avg/day (30d)',
+    avgPerDay: 'Avg 30 d',
     perDay: 'ach/day',
     noActivity: 'no activity',
     active: 'active',

@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useScrollFade } from '@/hooks/useScrollFade'
 import type { Streak } from '@/types/types'
 import { plural } from '@/utils/utils'
 import SectionHead from '@/components/ui/SectionHead'
@@ -30,6 +31,8 @@ export default function StreakYearHeatmap({
   onSelect: (streak: Streak) => void
 }) {
   const { T, lang } = useLanguage()
+  // Opens on today, the end that matters, with the fade saying the rest of the year is before it (#134).
+  const { ref: scrollRef, fade } = useScrollFade({ fromEnd: true })
 
   const { columns, months, streakOf, max } = useMemo(() => {
     const end = new Date(`${today}T00:00:00`)
@@ -64,7 +67,7 @@ export default function StreakYearHeatmap({
       />
       <p className="sr-only">{T.streak.yearHint}</p>
       {/* Scrolls sideways on a narrow screen rather than shrinking the days to dots. */}
-      <div className="overflow-x-auto pb-1 [scrollbar-width:thin]">
+      <div ref={scrollRef} className={`overflow-x-auto pb-1 [scrollbar-width:thin] ${fade}`}>
         {/* The days fill the card's width: one grid column per week, each day a square. */}
         <div className="relative px-1" style={{ minWidth: columns.length * (MIN_CELL + GAP), paddingTop: 22 }}>
           {months.map((m) => (
