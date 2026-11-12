@@ -837,8 +837,6 @@ html[data-font="fira"],
   .home-fit:not(:has(.home-cover)):has([data-stats-section="overview"]) .home-fit-chart { height: max(160px, clamp(160px, 20dvh, 260px) - var(--home-fit-trim, 0px)); }
   /* The rows carry flex: 1 1 0 inline (ROW_STYLE). Here they may grow to share spare height but never shrink: short of room, the list scrolls. */
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * { flex: 1 0 auto !important; }
-  /* A row taller than its content keeps the content in the middle, not stuck to the top. */
-  .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * > * { justify-content: center; }
 }
 
 /* A skeleton draws every variant; <html> says which ones show, before the first frame (LOOK_SCRIPT, then ShapeSync). */
@@ -1037,4 +1035,3 @@ html[data-font="fira"],
    may grow to share the spare height but never shrink below their content.
 */
 .profile-recent .home-fit-scroll > * { flex: 1 0 auto !important; }
-.profile-recent .home-fit-scroll > * > * { justify-content: center; }

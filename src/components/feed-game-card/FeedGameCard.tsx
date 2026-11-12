@@ -53,7 +53,8 @@ export default function FeedGameCard({
   const picture = icon(`${ICON_CLASS} ${href ? 'transition-transform duration-300 hover:scale-105' : ''} ${ring ? ICON_RING[ring] : 'ring-1 ring-ink/10'}`)
 
   return (
-    <div className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}>
+    // justify-center: a feed row grows to share the column's height (the profile beside it can be taller), and its content stays in the middle (#114).
+    <div className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col justify-center min-h-0 ring-1 ring-ink/[0.04] ${className}`}>
       <GameCardBackdrop src={backdrop} />
 
       {/* relative: the expand button stretches over this whole row. */}
