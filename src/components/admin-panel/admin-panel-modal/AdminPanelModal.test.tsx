@@ -53,6 +53,17 @@ test('Escape leaves it open while another dialog sits over it', () => {
   other.remove()
 })
 
+test('the door has one title, with the lock; the open panel has the shield (#132)', () => {
+  render(<AdminPanelModal isOpen onClose={jest.fn()} />)
+  act(() => reportMode('locked'))
+  const dialog = screen.getByRole('dialog', { name: 'Unlock the admin panel' })
+  expect(dialog.querySelectorAll('h1, h2, h3')).toHaveLength(1)
+  expect(screen.getByTestId('IconLock')).toBeInTheDocument()
+  act(() => reportMode('open'))
+  expect(screen.getByRole('dialog', { name: 'Admin panel' })).toBeInTheDocument()
+  expect(screen.getByTestId('IconShield')).toBeInTheDocument()
+})
+
 test('narrow while it is only the password door, wide once the panel is open', () => {
   render(<AdminPanelModal isOpen onClose={jest.fn()} />)
   act(() => reportMode('locked'))

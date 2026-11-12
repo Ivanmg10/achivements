@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { IconLock } from '@tabler/icons-react'
 import PasswordInput from '@/components/ui/PasswordInput'
 import Button from '@/components/ui/Button'
 import AdminUnlockRecovery from '@/components/admin-panel/admin-unlock-recovery/AdminUnlockRecovery'
@@ -14,7 +13,8 @@ const MESSAGES: Record<string, string> = {
 /**
  * The panel's front door: the admin's own password and a one-time code, every
  * 15 minutes. Until then the panel shows nobody's data, so an unattended session
- * gives away nothing. The first time, it also sets the authenticator up.
+ * gives away nothing. The first time, it also sets the authenticator up. Its title and lock
+ * are the dialog's head (`AdminPanelModal`): this is only the step's body.
  */
 export default function AdminUnlock({ onUnlocked }: { onUnlocked: () => void }) {
   const [password, setPassword] = useState('')
@@ -61,25 +61,14 @@ export default function AdminUnlock({ onUnlocked }: { onUnlocked: () => void }) 
   if (recovery) return <AdminUnlockRecovery codes={recovery} onDone={onUnlocked} />
 
   return (
-    <form onSubmit={unlock} className="w-full max-w-sm mx-auto flex flex-col items-center text-center gap-4 py-4">
-      <span
-        aria-hidden="true"
-        className="w-14 h-14 rounded-card bg-accent/10 ring-1 ring-accent/20 text-accent flex items-center justify-center"
-      >
-        <IconLock size={26} />
-      </span>
-      <div className="flex flex-col gap-1.5">
-        <h3 className="text-lg font-semibold">Unlock the admin panel</h3>
-        <p className="text-sm text-text-secondary text-balance">
-          Type your password and a code to see and change other users&apos; accounts. It stays unlocked for 15 minutes.
-        </p>
-      </div>
-      <div className="w-full text-left">
-        <PasswordInput label="Your password" value={password} onChange={(v) => { setPassword(v); setError(null) }} disabled={loading} />
-      </div>
+    <form onSubmit={unlock} className="w-full flex flex-col gap-4">
+      <p className="text-sm text-text-secondary">
+        Type your password and a code to see and change other users&apos; accounts. It stays unlocked for 15 minutes.
+      </p>
+      <PasswordInput label="Your password" value={password} onChange={(v) => { setPassword(v); setError(null) }} disabled={loading} />
       {askCode && <AdminUnlockTotp setup={setup} code={code} onChange={(v) => { setCode(v); setError(null) }} disabled={loading} />}
-      {error && <p role="alert" className="w-full text-left text-sm text-danger">{error}</p>}
-      <Button type="submit" disabled={!password} loading={loading} size="lg" className="w-full">
+      {error && <p role="alert" className="text-sm text-danger">{error}</p>}
+      <Button type="submit" disabled={!password} loading={loading} className="self-end">
         {loading ? 'Unlocking…' : 'Unlock'}
       </Button>
     </form>

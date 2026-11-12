@@ -10,7 +10,7 @@ export default function AdminUnlockRecovery({ codes, onDone }: { codes: string[]
       <ul className="grid grid-cols-2 gap-2 font-mono text-sm">
         {codes.map((code) => <li key={code} className="rounded-tile bg-bg-secondary px-3 py-2 text-center">{code}</li>)}
       </ul>
-      <Button size="lg" className="w-full" onClick={onDone}>I have saved them</Button>
+      <Button className="self-end" onClick={onDone}>I have saved them</Button>
     </div>
   )
 }
