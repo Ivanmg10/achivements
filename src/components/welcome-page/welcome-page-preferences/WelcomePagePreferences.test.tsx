@@ -88,8 +88,8 @@ test('the language is picked from a list of their own names', () => {
 test('a theme applies at once', () => {
   renderStep()
   fireEvent.click(row(en.userTheme.theme))
-  fireEvent.click(screen.getByRole('radio', { name: /Venom/ }))
-  expect(mockChoose).toHaveBeenCalledWith('venom')
+  fireEvent.click(screen.getByRole('radio', { name: en.userTheme.base_special }))
+  expect(mockChoose).toHaveBeenCalledWith('black-ops-2')
 })
 
 test('the theme already on is not picked again', () => {
@@ -106,15 +106,15 @@ test('a failed save is said in place', () => {
   expect(screen.getByRole('alert')).toHaveTextContent(en.userTheme.saveError)
 })
 
-test('the theme opens over the whole step: base, accent and the named themes, the sample beside them, and a way on', () => {
+test('the theme opens over the whole step: the bases and their options, the sample beside them, and a way on', () => {
   const { onNext } = renderStep()
   fireEvent.click(row(en.userTheme.theme))
   expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument()
   expect(screen.getByRole('region', { name: en.homeLayout.previewLabel })).toBeInTheDocument()
-  expect(screen.getByRole('group', { name: en.userTheme.named })).toBeInTheDocument()
+  expect(screen.getByRole('group', { name: en.userTheme.accent })).toBeInTheDocument()
   // Its groups keep their names on screen (a one-choice step hides its legend: the title says it).
   expect(screen.getByText(en.userTheme.base).closest('[class*="[&_legend]:sr-only"]')).toBeNull()
-  expect(screen.getByRole('radio', { name: /Sakura/ })).toBeInTheDocument()
+  expect(screen.getByRole('radio', { name: en.userTheme.base_special })).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: T.next }))
   expect(onNext).toHaveBeenCalled()
 })

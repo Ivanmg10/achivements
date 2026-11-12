@@ -14,7 +14,7 @@ interface Props {
 }
 
 /**
- * Every theme, as a base and an accent or by name. A pick spreads over the whole page from its card and
+ * Every theme, as a base and an option under it. A pick spreads over the whole page from its card and
  * the dialog stays open, so themes can be compared; the line under the title
  * says which one is on and when it has been saved. A failed save brings the
  * old one back and says so here. No blur behind it: the whole page has to take
@@ -41,7 +41,7 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size="3xl"
+      size="2xl"
       backdrop="dim"
       title={T.userTheme.theme}
       hint={<span role="status">{savedTheme === theme ? `${name} · ${T.toast.saved}` : name}</span>}

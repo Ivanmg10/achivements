@@ -1,55 +1,45 @@
 import type { Theme } from '@/types/types'
 
-export const BASES = ['dark', 'tinted', 'light'] as const
+export const BASES = ['dark', 'tinted', 'light', 'special'] as const
 export type Base = (typeof BASES)[number]
 
-/** `mono` is white on the dark base and black on the light one; the tinted base has none. */
-export const ACCENTS = ['violet', 'red', 'green', 'blue', 'mono'] as const
+/** The accents a coloured base shares; `mono` is white on the dark base and black on the light one. */
+const ACCENTS = ['violet', 'red', 'green', 'blue', 'mono'] as const
 export type Accent = (typeof ACCENTS)[number]
 
+/** The second choice under a base: an accent, or a theme by its own name (a palette, a tribute). */
+export type Option = Accent | Theme
+
+export function isAccent(option: Option): option is Accent {
+  return (ACCENTS as readonly string[]).includes(option)
+}
+
 /**
- * The 14 basic themes as a base and an accent (canvas "TemBasicos", #135). The picker
- * only translates a pair into one of these ids, so what is stored and the favicon never change.
+ * Every theme as a base and an option (the owner's table, #135). The picker only translates a pick
+ * into one of these ids, so what is stored and the favicon never change.
  */
-const PAIRS: Record<Base, Partial<Record<Accent, Theme>>> = {
-  dark: { violet: 'dark', red: 'dark-red', green: 'dark-green', blue: 'dark-blue', mono: 'dark-white' },
-  tinted: { violet: 'purple', red: 'red', green: 'green', blue: 'blue' },
-  light: { violet: 'light', red: 'light-red', green: 'light-green', blue: 'light-blue', mono: 'light-black' },
+const ROWS: Record<Base, [Option, Theme][]> = {
+  dark: [['violet', 'dark'], ['red', 'dark-red'], ['green', 'dark-green'], ['blue', 'dark-blue'], ['mono', 'dark-white']],
+  tinted: [['violet', 'purple'], ['red', 'red'], ['green', 'green'], ['blue', 'blue'], ['crimson', 'crimson'], ['midnight', 'midnight']],
+  light: [['violet', 'light'], ['red', 'light-red'], ['green', 'light-green'], ['blue', 'light-blue'], ['mono', 'light-black'], ['sakura', 'sakura'], ['arctic', 'arctic']],
+  special: [['black-ops-2', 'black-ops-2'], ['snake-eater', 'snake-eater'], ['steam-retro', 'steam-retro'], ['venom', 'venom']],
 }
 
-/** The 8 themes with their own grounds and surfaces, which no base and accent can make: the palettes, then the tributes. */
-export const NAMED_THEMES: { id: Theme; kind: 'palette' | 'tribute' }[] = [
-  { id: 'midnight', kind: 'palette' },
-  { id: 'crimson', kind: 'palette' },
-  { id: 'sakura', kind: 'palette' },
-  { id: 'arctic', kind: 'palette' },
-  { id: 'black-ops-2', kind: 'tribute' },
-  { id: 'steam-retro', kind: 'tribute' },
-  { id: 'snake-eater', kind: 'tribute' },
-  { id: 'venom', kind: 'tribute' },
-]
-
-/** The theme a pair is, or null when that pair has none (tinted with white or black). */
-export function themeFor(base: Base, accent: Accent): Theme | null {
-  return PAIRS[base][accent] ?? null
+export function optionsOf(base: Base): { option: Option; theme: Theme }[] {
+  return ROWS[base].map(([option, theme]) => ({ option, theme }))
 }
 
-/** The pair a basic theme is made of; null for a named one. */
-export function pairOf(theme: Theme): { base: Base; accent: Accent } | null {
+/** The base and the option a theme is made of. */
+export function pairOf(theme: Theme): { base: Base; option: Option } {
   for (const base of BASES) {
-    for (const accent of ACCENTS) if (PAIRS[base][accent] === theme) return { base, accent }
+    const row = ROWS[base].find(([, id]) => id === theme)
+    if (row) return { base, option: row[0] }
   }
-  return null
+  throw new Error(`theme ${theme} has no place in the picker`)
 }
 
-/**
- * Where a pick lands. A base keeps the accent on when it has it, else violet; an accent goes on the base
- * that is on, or the dark one while a named theme is. Null for a pair that has no theme (it is not offered).
- */
-export function pickBase(base: Base, accent: Accent | undefined): Theme {
-  return themeFor(base, accent ?? 'violet') ?? themeFor(base, 'violet')!
-}
-
-export function pickAccent(base: Base | undefined, accent: Accent): Theme | null {
-  return themeFor(base ?? 'dark', accent)
+/** Where picking a base lands: the same option when that base has it, else its first. */
+export function pickBase(base: Base, option: Option): Theme {
+  const row = ROWS[base]
+  return (row.find(([o]) => o === option) ?? row[0])[1]
 }

@@ -35,7 +35,7 @@ test('saves the theme, says so and stays open to try another', async () => {
   expect(onClose).not.toHaveBeenCalled()
 })
 
-test('says which theme is on, its base and accent marked on opening; picking it again does nothing', () => {
+test('says which theme is on, its base and option checked on opening; picking it again does nothing', () => {
   on('light-blue')
   render(<ThemeModal isOpen onClose={jest.fn()} />)
   expect(screen.getByRole('status')).toHaveTextContent(t['name_light-blue'])
@@ -46,44 +46,38 @@ test('says which theme is on, its base and accent marked on opening; picking it 
   expect(fetch).not.toHaveBeenCalled()
 })
 
-test('a base keeps the accent on; the fifth accent is white on dark and black on light', async () => {
+test('a base keeps the same option when it has it, else takes its first', async () => {
   ;(fetch as jest.Mock).mockResolvedValue({ ok: true })
-  on('dark-red')
-  render(<ThemeModal isOpen onClose={jest.fn()} />)
-  expect(group(t.accent).getByRole('radio', { name: t.accent_white })).toBeEnabled()
-  fireEvent.click(group(t.base).getByRole('radio', { name: t.base_light }))
-  expect(setTheme).toHaveBeenCalledWith('light-red')
-  await waitFor(() => expect(update).toHaveBeenCalled())
-})
-
-test('a pair with no theme is shown but not offered, and a base without the accent falls back to violet', async () => {
-  ;(fetch as jest.Mock).mockResolvedValue({ ok: true })
-  on('red')
-  const { unmount } = render(<ThemeModal isOpen onClose={jest.fn()} />)
-  expect(group(t.base).getByRole('radio', { name: t.base_tinted })).toBeChecked()
-  const white = group(t.accent).getByRole('radio', { name: new RegExp(t.accent_white) })
-  expect(white).toBeDisabled()
-  expect(white).toHaveAccessibleName(new RegExp(t.noPair))
-  unmount()
   on('dark-white')
   render(<ThemeModal isOpen onClose={jest.fn()} />)
+  fireEvent.click(group(t.base).getByRole('radio', { name: t.base_light }))
+  expect(setTheme).toHaveBeenCalledWith('light-black')
   fireEvent.click(group(t.base).getByRole('radio', { name: t.base_tinted }))
-  expect(setTheme).toHaveBeenCalledWith('purple')
-  await waitFor(() => expect(update).toHaveBeenCalled())
+  expect(setTheme).toHaveBeenLastCalledWith('purple')
+  await waitFor(() => expect(update).toHaveBeenCalledTimes(2))
 })
 
-test('a named theme is whole: it is checked alone, and picking one sets its own id', async () => {
+test('each base shows its own options: the palettes beside the accents of their ground', () => {
+  on('sakura')
+  render(<ThemeModal isOpen onClose={jest.fn()} />)
+  expect(group(t.base).getByRole('radio', { name: t.base_light })).toBeChecked()
+  const accents = group(t.accent)
+  expect(accents.getByRole('radio', { name: t.name_sakura })).toBeChecked()
+  const names = [t.accent_violet, t.accent_red, t.accent_green, t.accent_blue, t.accent_black, t.name_sakura, t.name_arctic]
+  accents.getAllByRole('radio').forEach((radio, i) => expect(radio).toHaveAccessibleName(names[i]))
+})
+
+test('the special base offers the tributes by name, under "Theme"', async () => {
   ;(fetch as jest.Mock).mockResolvedValue({ ok: true })
   on('venom')
   render(<ThemeModal isOpen onClose={jest.fn()} />)
-  expect(group(t.named).getByRole('radio', { name: new RegExp(t.name_venom) })).toBeChecked()
-  expect(screen.getAllByRole('radio', { checked: true })).toHaveLength(1)
-  fireEvent.click(group(t.named).getByRole('radio', { name: new RegExp(t.name_sakura) }))
-  expect(setTheme).toHaveBeenCalledWith('sakura')
-  // With a named theme on, an accent goes on the dark base.
-  fireEvent.click(group(t.accent).getByRole('radio', { name: t.accent_green }))
-  expect(setTheme).toHaveBeenLastCalledWith('dark-green')
-  await waitFor(() => expect(update).toHaveBeenCalledTimes(2))
+  expect(group(t.base).getByRole('radio', { name: t.base_special })).toBeChecked()
+  const themes = group(t.theme)
+  expect(themes.getAllByRole('radio')).toHaveLength(4)
+  expect(themes.getByRole('radio', { name: t.name_venom })).toBeChecked()
+  fireEvent.click(themes.getByRole('radio', { name: t['name_snake-eater'] }))
+  expect(setTheme).toHaveBeenCalledWith('snake-eater')
+  await waitFor(() => expect(update).toHaveBeenCalled())
 })
 
 test('puts the old theme back and says so when saving fails', async () => {
@@ -101,8 +95,8 @@ test('puts the old theme back and says so when saving fails', async () => {
 test('every option is a small screen in the colours of the theme it lands on, the one on saying so', () => {
   const { container } = render(<ThemeModal isOpen onClose={jest.fn()} />)
   const doc = container.ownerDocument
-  expect(screen.getAllByRole('radio')).toHaveLength(3 + 5 + 8)
-  for (const id of ['dark', 'purple', 'light', 'dark-red', 'dark-white', 'sakura', 'venom']) expect(doc.querySelector(`[data-theme="${id}"]`)).not.toBeNull()
+  expect(screen.getAllByRole('radio')).toHaveLength(4 + 5)
+  for (const id of ['dark', 'purple', 'light', 'black-ops-2', 'dark-red', 'dark-white']) expect(doc.querySelector(`[data-theme="${id}"]`)).not.toBeNull()
   // The dark base and the violet accent are both the theme on.
   expect(screen.getAllByText(t.on)).toHaveLength(2)
 })

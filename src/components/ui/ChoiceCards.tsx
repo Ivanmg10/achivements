@@ -21,8 +21,6 @@ export type Choice<V> = {
   icon?: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' }>
   /** A small drawing of the choice, above its words (decorative: the words say it). */
   preview?: React.ReactNode
-  /** Shown but not offered: it keeps its place, dimmed, and the arrows skip it. */
-  disabled?: boolean
 }
 
 /**
@@ -41,22 +39,23 @@ export default function ChoiceCards<V>({
   value: V
   onChange: (value: V) => void
   options: Choice<V>[]
-  columns?: 2 | 3 | 4 | 5
+  columns?: 2 | 3 | 4 | 7
   className?: string
 }) {
   const name = useId()
-  const grid = { 2: 'grid-cols-2', 3: 'grid-cols-2 sm:grid-cols-3', 4: 'grid-cols-2 sm:grid-cols-4', 5: 'grid-cols-3 sm:grid-cols-5' }[columns]
+  const grid = { 2: 'grid-cols-2', 3: 'grid-cols-2 sm:grid-cols-3', 4: 'grid-cols-2 sm:grid-cols-4', 7: 'grid-cols-3 @lg:grid-cols-4 @5xl:grid-cols-7' }[columns]
 
   return (
-    <fieldset className={`flex flex-col gap-2 ${className}`}>
+    // Seven in a row only where the group itself has the room (a wide dialog, not the welcome's narrow step).
+    <fieldset className={`flex flex-col gap-2 ${columns === 7 ? '@container' : ''} ${className}`}>
       <legend className="text-xs font-semibold text-text-secondary mb-2">{legend}</legend>
       <div className={`grid ${grid} gap-2`}>
         {options.map((o, i) => {
           const checked = o.value === value
           const Icon = o.icon
           return (
-            <label key={i} className={choiceClass(checked, `${o.preview ? 'flex-col items-stretch! gap-3' : ''} ${o.disabled ? 'opacity-50 cursor-not-allowed!' : ''}`)}>
-              <input type="radio" name={name} checked={checked} disabled={o.disabled} onChange={() => onChange(o.value)} className="sr-only" />
+            <label key={i} className={choiceClass(checked, o.preview ? 'flex-col items-stretch! gap-3' : '')}>
+              <input type="radio" name={name} checked={checked} onChange={() => onChange(o.value)} className="sr-only" />
               {o.preview && <span aria-hidden="true">{o.preview}</span>}
               {Icon && <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${checked ? 'text-accent' : 'text-text-secondary'}`} aria-hidden="true" />}
               <span className="flex flex-col min-w-0">

@@ -1,8 +1,8 @@
 import { THEMES } from '@/types/types'
-import { NAMED_THEMES } from './themePicker'
+import { optionsOf } from './themePicker'
 import { themeCovers } from './themeGames'
 
-const tributes = NAMED_THEMES.filter((n) => n.kind === 'tribute').map((n) => n.id)
+const tributes = optionsOf('special').map((o) => o.theme)
 const wall = themeCovers('dark')
 
 test('each tribute shows its own games, none shared with another or with the art wall', () => {
