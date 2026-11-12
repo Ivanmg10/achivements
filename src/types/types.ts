@@ -11,16 +11,6 @@ export const THEME_STORAGE_KEY = 'app-theme'
 
 export type Theme = (typeof THEMES)[number]
 
-/** How the theme picker sorts them; every theme sits in exactly one group. */
-export const THEME_GROUPS: { id: 'dark' | 'light' | 'tinted' | 'palettes' | 'tributes'; themes: Theme[] }[] = [
-  // Neutral dark and light, with the same accents: violet, red, green, blue, and white or black.
-  { id: 'dark', themes: ['dark', 'dark-red', 'dark-green', 'dark-blue', 'dark-white'] },
-  { id: 'light', themes: ['light', 'light-red', 'light-green', 'light-blue', 'light-black'] },
-  { id: 'tinted', themes: ['purple', 'red', 'green', 'blue'] },
-  { id: 'palettes', themes: ['midnight', 'crimson', 'sakura', 'arctic'] },
-  { id: 'tributes', themes: ['black-ops-2', 'steam-retro', 'snake-eater', 'venom'] },
-]
-
 export function isTheme(value: unknown): value is Theme {
   return typeof value === 'string' && (THEMES as readonly string[]).includes(value)
 }

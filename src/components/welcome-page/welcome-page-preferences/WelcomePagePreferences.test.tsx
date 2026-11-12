@@ -95,7 +95,7 @@ test('a theme applies at once', () => {
 test('the theme already on is not picked again', () => {
   renderStep()
   fireEvent.click(row(en.userTheme.theme))
-  fireEvent.click(screen.getByRole('radio', { name: new RegExp(en.userTheme.name_dark) }))
+  fireEvent.click(screen.getByRole('radio', { name: en.userTheme.base_dark }))
   expect(mockChoose).not.toHaveBeenCalled()
 })
 
@@ -106,12 +106,12 @@ test('a failed save is said in place', () => {
   expect(screen.getByRole('alert')).toHaveTextContent(en.userTheme.saveError)
 })
 
-test('the theme opens over the whole step: every theme by family, the sample beside them, and a way on', () => {
+test('the theme opens over the whole step: base, accent and the named themes, the sample beside them, and a way on', () => {
   const { onNext } = renderStep()
   fireEvent.click(row(en.userTheme.theme))
   expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument()
   expect(screen.getByRole('region', { name: en.homeLayout.previewLabel })).toBeInTheDocument()
-  expect(screen.getByRole('heading', { name: en.userTheme.group_tributes })).toBeInTheDocument()
+  expect(screen.getByRole('group', { name: en.userTheme.named })).toBeInTheDocument()
   expect(screen.getByRole('radio', { name: /Sakura/ })).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: T.next }))
   expect(onNext).toHaveBeenCalled()

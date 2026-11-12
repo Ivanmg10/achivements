@@ -1,6 +1,7 @@
 import { MARK, SLANT_PLATE } from '@/components/ui/shape'
 import Kicker from '@/components/ui/Kicker'
 import BrandMark from '@/components/ui/BrandMark'
+import ThemeScreen from '@/components/ui/ThemeScreen'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
 import DesignCatalogEntrances from '../design-catalog-entrances/DesignCatalogEntrances'
 
@@ -143,6 +144,17 @@ export default function DesignCatalogFoundations() {
             </Specimen>
           ))}
         </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="theme-screen">
+        <Compare>
+          <div className="grid grid-cols-2 gap-3">
+            <ThemeScreen theme="dark" on />
+            <ThemeScreen theme="light-black" />
+            <ThemeScreen theme="sakura" />
+            <ThemeScreen theme="venom" />
+          </div>
+        </Compare>
       </DesignCatalogPiece>
 
       <DesignCatalogPiece id="shape">
