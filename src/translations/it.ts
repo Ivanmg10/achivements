@@ -1278,7 +1278,7 @@ export const it: Translations = {
     retry: 'Riprova',
   },
   steam: {
-    level: 'Livello',
+    level: 'Livello Steam',
     online: 'Online',
     offline: 'Offline',
     statGames: 'Giochi',

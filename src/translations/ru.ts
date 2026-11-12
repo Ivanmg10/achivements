@@ -1278,7 +1278,7 @@ export const ru: Translations = {
     retry: 'Повторить',
   },
   steam: {
-    level: 'Уровень',
+    level: 'Уровень Steam',
     online: 'В сети',
     offline: 'Не в сети',
     statGames: 'Игры',

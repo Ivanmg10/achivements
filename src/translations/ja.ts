@@ -1278,7 +1278,7 @@ export const ja: Translations = {
     retry: '再試行',
   },
   steam: {
-    level: 'レベル',
+    level: 'Steamレベル',
     online: 'オンライン',
     offline: 'オフライン',
     statGames: 'ゲーム',

@@ -1279,7 +1279,7 @@ export const en = {
     retry: 'Try again',
   },
   steam: {
-    level: 'Level',
+    level: 'Steam level',
     online: 'Online',
     offline: 'Offline',
     statGames: 'Games',
