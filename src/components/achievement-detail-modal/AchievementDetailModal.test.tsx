@@ -25,9 +25,10 @@ test('a locked one: its text, rarity, "not earned yet" and the guide links, open
 })
 
 test('an earned one says so, with its date', () => {
-  render(<AchievementDetailModal {...BASE} earned earnedAt="2026-01-02T10:00:00Z" onClose={jest.fn()} />)
+  render(<AchievementDetailModal {...BASE} earned earnedAt="2025-01-02T10:00:00Z" onClose={jest.fn()} />)
   expect(screen.getByText(en.achievementDetail.earned)).toBeInTheDocument()
-  expect(screen.getByText(/2026/)).toBeInTheDocument()
+  // A past year, so the one date format shows it every year.
+  expect(screen.getByText(/Jan 2, 2025/)).toBeInTheDocument()
 })
 
 test('no guide section without links, and tags when given', () => {
