@@ -33,6 +33,44 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-12 — The account page and the dialogs (`feat/132-account-dialogs`, #132)
+
+**Did** — Boards "MejCuenta" and "MejDialogos" (canvas page 2), stacked on `feat/131-streak-calendar` (not merged). One commit per point:
+- *Reds* (`feat(account)`): `UserPlatformCard`'s head is two lines now: logo and name, then "Connected" with a small quiet
+  "Disconnect" beside it (`aria-label` is the long "Disconnect Steam"), the same height connected or not so the figures line up in a
+  row; the full-width red button is gone. The red is in the confirmation, `user-page/platform-unlink-dialog/PlatformUnlinkDialog`
+  (`Modal tone="danger"`, title "Disconnect {name}?", a line, a quiet Cancel and the danger button; it stays up and blocked while the
+  unlink runs and the card closes it with its toast). "Sign out" is `secondary`; "Delete account" stays where it is, in red.
+  New texts `userData.disconnect`, `disconnectTitle`, `disconnectText` (nine languages, impersonal, no gender).
+- *Texts* (`fix(account)`): Steam's "logros" and Xbox's "Logros" are one label, `userStats.achievements` (nine languages); the Hidden
+  games row's value is the count ("Hidden games / 2", `toLocaleString(lang)`), `userPage.hiddenCount` is gone.
+- *Cancel is quiet* (`feat(ui)`): beside a disabled Save a ringed Cancel was what stood out, so every dialog footer's Cancel is a
+  `quiet` Button (the footer was already normal-size buttons on the right since #121; only the primary leans). `uiGuard.test.ts`
+  refuses a `secondary` in a footer fragment; the catalogue's danger modal is the specimen; `CLAUDE.md` and `docs/design-system.md` say so.
+- *Admin unlock* (`feat(admin)`): one title. `AdminPanelModal`'s head is "Unlock the admin panel" with the lock while the door is
+  shut and "Admin panel" with the shield once open; `AdminUnlock` lost its tile and its own h3 (a left-aligned line, the fields and a
+  normal-size "Unlock" at the right). The recovery codes step keeps its own line "Save your recovery codes" and a normal button.
+- *Language list* (`feat(ui)`): names only; `LANGUAGES` lost its `flag` field. *Hidden games* (`feat(ui)`): each row has a small
+  quiet "Show" button (`userPage.showAgain`, named "Show {game}"); `userPage.showGame` is gone.
+- *Layout sample* (`feat(ui)`): `LayoutModalPreviewSampleProfile` reads `useAuthSession` and `useVaultMe`: the person's name, an
+  `Avatar`, `VaultLevelBadge compact`, their Vault Points and the real `ProgressBar` with "N to level M" (a skeleton for the badge
+  and `loading` on the points while they load). The welcome's style step shows the same card. The streak figure stays a fixed 12.
+**Already done before** — "Theme: —" / "Language: —" for a screen reader (the `ProfileField` test says so); the Venom switch knob
+(`bg-bg-main` when on); "Maestrías" (`userStats.masteries`); Xbox "Cuenta Silver" (`xbox.tier` is "Account", the value "Silver"; #128);
+the one head for every dialog with the ✕ (#121: every dialog is a `Modal`, only the search has its own way out); the delete-account
+dialog is `tone="danger"` with its hint; normal-size right-aligned footers; "ID 3" untouched on purpose.
+**Decisions** — The audit said "Disconnect already confirms": it did not (the button unlinked at once), so the confirmation is new
+(only the flow's order changed; no route, no stored data). The language flags go entirely rather than grey: a flag is a country, and
+Windows draws it as two letters. The unlock dialog's "Unlock" is a normal button, not a full-width slab. Cancel is `quiet` in all
+dialogs, not only the two named on the board, so none can outshine a disabled primary.
+**Watch out** — Not seen in a browser (it needs a session). Look at: the platform cards' new second head line at 1280 px (four
+cards) and 390 px; the Disconnect dialog on each platform; the unlock dialog switching its head when it reports `locked` (it opens as
+"Admin panel" for a moment while the panel asks the server); the layout sample's profile column at its narrowest (the level word);
+the welcome's style step now reads `/api/rankings/me` (database only) for that card. The country on the account page and the
+profile still use emoji flags (Windows shows letters); the board only named the language list.
+
+---
+
 ## 2026-11-12 — The streak page: the calendar back, best streaks by tier (`feat/131-streak-calendar`, #131)
 
 **Did** — Boards "MejRacha" and "MejRacha5" (canvas page 2), stacked on `feat/130-profiles-rankings-groups` (not merged):
