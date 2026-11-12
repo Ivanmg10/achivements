@@ -6,7 +6,7 @@ import { Streak, UserAward } from '@/types/types'
 import { useUserAwards } from '@/hooks/useUserAwards'
 import { plural } from '@/utils/utils'
 import StreakDayRow from '../streak-day-row/StreakDayRow'
-import StreakDayStrip from '../streak-day-strip/StreakDayStrip'
+import StreakCalendar from '../streak-calendar/StreakCalendar'
 import SectionHead from '@/components/ui/SectionHead'
 import { utcDay } from '@/utils/dates'
 
@@ -17,10 +17,10 @@ function awardDate(awardedAt: string): string {
 }
 
 /**
- * A streak day by day: a strip of its days, as tall as how much was
- * unlocked, and what was unlocked on the day picked (the last one to begin
- * with). Rendered with the streak as key, so picking another streak starts
- * again from its last day.
+ * A streak day by day: a calendar of its days, shaded by how much was
+ * unlocked, and beside it what was unlocked on the day picked (the last one to
+ * begin with); stacked when the card is narrow. Rendered with the streak as
+ * key, so picking another streak starts again from its last day.
  */
 export default function StreakList({ selectedStreak, today }: { selectedStreak: Streak | null; today: string }) {
   const { T, lang } = useLanguage()
@@ -70,12 +70,13 @@ export default function StreakList({ selectedStreak, today }: { selectedStreak: 
         aside={`${plural(selectedStreak.days, T.plurals.days, lang)} · ${T.streak.calendarHint}`}
       />
 
-      {/* The strip on top, how it is drawn under it, the picked day's unlocks last. */}
-      <div className="flex flex-col gap-2">
-        <StreakDayStrip start={selectedStreak.start} end={selectedStreak.end} today={today} counts={counts} selected={shown} onSelect={setDay} />
-        <p className="text-xs text-text-secondary">{T.streak.stripHint}</p>
+      {/* Calendar and the picked day side by side when the card has room, stacked otherwise. */}
+      <div className="@container">
+        <div className="flex flex-col @3xl:flex-row gap-6 @3xl:gap-10">
+          <StreakCalendar start={selectedStreak.start} end={selectedStreak.end} today={today} counts={counts} selected={shown} onSelect={setDay} />
+          <StreakDayRow date={shown} today={today} achievements={byDate[shown] ?? []} awards={streakAwards[shown]} />
+        </div>
       </div>
-      <StreakDayRow date={shown} today={today} achievements={byDate[shown] ?? []} awards={streakAwards[shown]} />
     </section>
   )
 }

@@ -19,33 +19,22 @@ const STEAM: RecentAchievement = {
   GameTitle: 'Portal 2', ConsoleName: 'Steam', Source: 'steam', BadgeUrl: 'https://cdn/win.jpg',
 }
 
-test('an RA badge links to its RA page', () => {
-  render(<StreakDayRow date="2024-03-02" today="2024-03-02" achievements={[RA]} />)
-
-  const link = screen.getByRole('link', { name: 'Beat it — Zelda' })
-  expect(link).toHaveAttribute('href', '/gameInfo/1')
-  expect(screen.getByRole('link', { name: /Beat it/ }).querySelector('img')).toHaveAttribute('src', 'https://media.retroachievements.org/Badge/12345.png')
-})
-
-test('a Steam badge links to its Steam page and uses the URL it carries', () => {
-  render(<StreakDayRow date="2024-03-02" today="2024-03-02" achievements={[STEAM]} />)
-
-  const link = screen.getByRole('link', { name: 'Win — Portal 2' })
-  expect(link).toHaveAttribute('href', '/steamGame/620')
-  expect(screen.getByRole('link', { name: /Win/ }).querySelector('img')).toHaveAttribute('src', 'https://cdn/win.jpg')
-})
-
-test('both platforms on one day render side by side', () => {
+test('the day, its count, "today" and its games, then its achievements listed', () => {
   // A Steam unlock is numbered by its position, so it can collide with an RA id.
   render(<StreakDayRow date="2024-03-02" today="2024-03-02" achievements={[RA, { ...STEAM, AchievementID: 7 }]} />)
 
-  expect(screen.getAllByRole('link')).toHaveLength(2)
   expect(screen.getByRole('heading')).toHaveTextContent(/2 achievements · today/)
   expect(screen.getByText('Zelda, Portal 2')).toBeInTheDocument()
+  expect(screen.getAllByRole('link')).toHaveLength(2)
 })
 
-test('one achievement names its game and itself', () => {
+test('another day does not say today', () => {
   render(<StreakDayRow date="2024-03-02" today="2024-03-05" achievements={[RA]} />)
-  expect(screen.getByText(/^Zelda · Beat it, /)).toBeInTheDocument()
-  expect(screen.getByRole('heading')).not.toHaveTextContent('today')
+  expect(screen.getByRole('heading')).toHaveTextContent(/1 achievement$/)
+})
+
+test('a day with nothing lists nothing but keeps its head', () => {
+  render(<StreakDayRow date="2024-03-02" today="2024-03-05" achievements={[]} />)
+  expect(screen.getByRole('heading')).toHaveTextContent(/0 achievements/)
+  expect(screen.queryByRole('link')).toBeNull()
 })

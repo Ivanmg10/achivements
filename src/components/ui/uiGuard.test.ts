@@ -103,11 +103,9 @@ test('one angle: the drifting slants and the fixed cuts are gone (identity B, #1
 })
 
 test('only the big gestures and the player\'s own marks lean: outside the library a lean is SLANT_PLATE or a piece', () => {
-  // The podium's skeleton step (a Skeleton cannot carry a plate), the shape preference's drawing of the button, and
-  // the streak strip's break mark across a capped bar (an annotation, not the data).
+  // The podium's skeleton step (a Skeleton cannot carry a plate) and the shape preference's drawing of the button.
   const allowed = [
     'components/rankings-page/rankings-page-skeleton/RankingsPageSkeleton.tsx',
-    'components/streak-page/streak-day-strip/StreakDayStrip.tsx',
     'components/user-page/user-shape-preference/user-shape-preference-preview/UserShapePreferencePreview.tsx',
   ]
   const found = offenders(/(?<![\w-])-?skew-[xy]-\(--slant\)/).map((f) => f.split(path.sep).join('/'))

@@ -117,14 +117,14 @@ where it means something.
 
 - **One angle.** `--slant` is 12° (0 in round). Every lean is `skew-x-(--slant)` on a library piece, or `SLANT_PLATE`
   (a plate behind the content) for a big piece; a plate's cut follows the angle at any height, so the three podium steps
-  lean alike. The guard refuses the old `--slant-*` / `--clip-*` and a lean outside the library but three drawings it names.
+  lean alike. The guard refuses the old `--slant-*` / `--clip-*` and a lean outside the library but two drawings it names.
 - **What leans:** the big gestures and the player's own marks: the primary `Button`, the chosen option of a
   `SegmentedControl`, the level (`VaultLevelBadge`, `Tag slant`) and the streak (`StreakTag`) wherever they are (the top
   bar shows them at one height, one family), the podium's steps.
 - **What stands upright:** small controls, fields, search, filters, `Select`, `Switch`, secondary, quiet and danger
   buttons, every other tag (the game page's chips too), the header's account link, a row's accent mark.
 - **Data never leans:** `ProgressBar`, `DataBar`, the streak page's bars and every chart bar are upright, square in
-  slanted and rounded in round (`--bar-radius`). The streak strip's break mark across a capped bar is an annotation and keeps the angle.
+  slanted and rounded in round (`--bar-radius`).
 - **The mark is the signature:** `--mark` ("/" slanted, "•" round; `MARK` on an `aria-hidden` span). In front of the
   tab you are on (`Tabs`, the one drawing of every tab bar: the profile tabs, the home's view switch, the stats rail,
   the account and public profile; `TabMark` in the top bar's links and the filter rows), in the search bar, between
