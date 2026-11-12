@@ -33,6 +33,59 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-11 — Library, game pages and `/allGames` from the canvas (`feat/129-library-game-allgames`, #129)
+
+**Did** — Page 2 of the antislop canvas v2, boards "MejBiblioteca", "MejBibliotecaVistas", "MejJuego", "MejJuego8", "MejTodos" and
+"MejTodosRework", one commit per block (cut from `origin/develop` at `5066eaac`):
+- *One date format, a library piece:* `ui/DateText` (a `<time>`, "22 oct 2026") and `DATE_FORMAT` as `formatDate`'s default (day
+  numeric, was `2-digit`); the guard refuses `formatDate(…, lang, {})` (numeric "13/10/2026"); specimen in `/design`. Used by the
+  library's "latest unlocked", the cards' "Finished · / Last played ·" line, the chart's period window and the game table. #130 extends it.
+- *RA game that does not exist:* `getGameProgression` answered 503 when RA sent a 200 with no game in it (the cache validator threw
+  `RA_VALIDATION_FAILED`, which `raUnavailable` turned into a 503 the client retried); it is a 404 `not-found` now, so the page shows
+  "Game not found" like the other platforms. #118 had only fixed RA's own 404/422.
+- *Game table:* the pin is the last cell on all four (`pinInTitle` removed from the shell, the row, the desktop table and RA's adapter);
+  the "Earned" column shows the date in the one format (RA's mode, Hardcore/Softcore, under it in its colour) instead of a ✓, and the
+  date line under the name is gone, so rows are two lines. A dateless earned one keeps the ✓; each says "Earned" to a screen reader.
+- *Game header:* RA has hide beside pin, like the other three. Store screenshots have no "Screenshot 1/2" caption (`GameHeroShot` has
+  `alt` always and `caption` only when it says more than a number; RA's "Title screen" / "In game" stay). The subset thumbnails get
+  `aria-current` on the one shown.
+- *Library detail:* "To beat the game 30 / 30" is "Story achievements: 30 of 30", and "Game beaten" (es "Te has pasado el juego") once
+  all are earned (`libraryDetail.storyOf`, `storyDone`); the chart's title keeps one line and the Weekly/Monthly switch wraps under it
+  when the panel is narrow; "Beaten HC" is "Beaten in hardcore" (`statusGameItem.beatenHardcore`, `gameStatus.beatenHC`). The game
+  page's status chip (`gameStatus.*`) was English in seven languages: translated.
+- *Views:* the folded sections' previews name the console (PS4, "Xbox Series · PC") or nothing (Steam), never the section's platform;
+  inside the Steam section the full card drops its "Steam" chip (`inSection`); icon-only segmented options (the card size) say their
+  name on hover (`title`); a shelf's wide art that would be stretched past twice its size (`sharpEnough`, shared with the home's
+  `heroArtFits`) gives way to the blurred icon; the opened game shows its whole badge grid on all four (the 60 cap was the same rule
+  everywhere, only Xbox's 93 crossed it); on phones a list row's platform tag is the logo (the name stays for a screen reader).
+- *One toolbar:* the page is `library-page/LibraryPage` (the route only passes its status), every view puts `LibraryToolbar` under
+  the title: search, filters, then order, size, "by platform / all together" and the views. The count under the title shows only
+  when the platform tabs and the "All" quick filter do not say it. Steam/PSN/Xbox-only accounts get the title in the cards view too
+  (it had none); with no account at all the page says to connect one instead of being blank. `StatusPageSkeleton` follows.
+- *`/allGames`:* the library page with `category="all"`: "All games" in the header's Library menu (desktop and phone), every status
+  of every platform (Xbox only for admins, through the same hook), the statuses as its quick filters, shelves "continue" then one per
+  status, cards always together, a game opening as its own status. Deleted: `AllGamesSection`, `AllGamesSkeleton`, `NoMainHeader`
+  and their tests (`useAllGamesGlobal` stays: the home uses it).
+- *To try, its own commit (`feat(ui): try a 1760 px column…`):* the four game pages, the friend's game view and the game skeleton
+  in a column of at most 1760 px (`GAME_COLUMN`), centred; the backdrop stays full width.
+**Already done before, not touched** — "60" beside the heatmap reads "60 achievements" (#128, `MainPageHeatmap` is shared); the
+half-slanted toolbar and the uppercase labels in the detail and the table head (#127); the subset thumbnails already had their name as
+a native tooltip (`title`) and `alt`; the RA phone card keeps its own date line with the time.
+**Decisions** — "Story achievements" over "Logros de la historia: 30 de 30" as a sentence, to fit the figure tiles. The badge grid
+cap: no cap in the opened game on any platform (the owner saw a cut only on Xbox; the group cards keep theirs). Steam has no console,
+so its previews show no line under the title. On "all" the cards view has no "by platform" switch (a game's status is what the page
+sorts by); the platform tabs serve the shelves and the list.
+**Open** — Not seen in a browser (needs a signed-in account): check at 2560 and 390 px, both designs, Firefox: the toolbar in the
+three views, `/allGames` (shelves, list with the status filters, cards), the game table's earned column and last-cell pin, RA's hide,
+the shelf art fallback (Pokémon Colosseum) and the 1760 px column (revert `feat(ui): try a 1760 px column…` if it does not convince;
+the revert will touch `src/lib/version.ts`, keep the higher version). Not done: MejBiblioteca 8 (the RA tag on phones) is in this
+branch as the logo, but #134 owns the phone pass.
+**Watch out** — `LibraryEntry.status` is required; a test fixture building entries by hand may need it. `QuickFilter` now includes
+the statuses: `countQuick` returns every key. `formatDate`'s default changed from "03 Oct 2026" to "Oct 3, 2026" (tests pinning the
+old one were updated).
+
+---
+
 ## 2026-11-11 — Owner calls after the antislop round (`feat/153-owner-calls`, #153)
 
 **Did** — Five decisions the owner took after reviewing #122, #125 and #128, one commit each:

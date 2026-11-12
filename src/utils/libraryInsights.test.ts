@@ -1,4 +1,4 @@
-import { buildEntries, countQuick, matchesQuick, mixedSortKeys, sortEntries, type LibraryEntry } from './libraryInsights'
+import { buildEntries, countQuick, matchesQuick, mixedSortKeys, quickFiltersFor, raProgress, sortEntries, type LibraryEntry } from './libraryInsights'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
 
@@ -28,7 +28,30 @@ test('countQuick counts each filter', () => {
     { pct: 85, lastPlayed: daysAgo(200) },
     { pct: 10, lastPlayed: daysAgo(300) },
   ]
-  expect(countQuick(items, NOW)).toEqual({ all: 3, almost: 2, stalled: 2 })
+  expect(countQuick(items, NOW)).toMatchObject({ all: 3, almost: 2, stalled: 2 })
+})
+
+test('on all games the quick filters are the statuses, and a game is where it stands', () => {
+  expect(quickFiltersFor('all')).toEqual(['all', 'playing', 'completed', 'wantToPlay'])
+  expect(quickFiltersFor('playing')).toEqual(['all', 'almost', 'stalled'])
+  expect(quickFiltersFor('completed')).toEqual([])
+  const items = [
+    { pct: 100, lastPlayed: null, status: 'completed' as const },
+    { pct: 40, lastPlayed: null, status: 'playing' as const },
+    { pct: null, lastPlayed: null, status: 'wantToPlay' as const },
+    { pct: 0.4, lastPlayed: null, status: 'playing' as const },
+  ]
+  expect(countQuick(items, NOW)).toMatchObject({ all: 4, playing: 2, completed: 1, wantToPlay: 1 })
+  expect(matchesQuick(items[0], 'completed', NOW)).toBe(true)
+  expect(matchesQuick(items[0], 'playing', NOW)).toBe(false)
+})
+
+test('an RA game is started from its first achievement, however small the share', () => {
+  const started = { GameID: 1, Title: 'A', PctWon: '0.004' } as never
+  const want = { ID: 2, Title: 'B' } as never
+  expect(raProgress(started).status).toBe('playing')
+  expect(raProgress({ GameID: 3, Title: 'C', PctWon: '1' } as never).status).toBe('completed')
+  expect(raProgress(want).status).toBe('wantToPlay')
 })
 
 describe('mixed list', () => {
@@ -77,7 +100,7 @@ describe('Xbox entries', () => {
   const { xboxGameFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
 
   test('progress is the gamerscore percentage and the last session', () => {
-    expect(xboxProgress(xboxGameFixture({ pctWon: 40, lastPlayed: '2026-01-01T00:00:00Z' }))).toEqual({ pct: 40, lastPlayed: '2026-01-01T00:00:00Z' })
+    expect(xboxProgress(xboxGameFixture({ pctWon: 40, lastPlayed: '2026-01-01T00:00:00Z' }))).toEqual({ pct: 40, lastPlayed: '2026-01-01T00:00:00Z', status: 'playing' })
   })
 
   test('the mixed list takes Xbox games, keyed apart from the other platforms', () => {

@@ -109,7 +109,7 @@ export default function PsnGameInfoHeader({
             ? [{ label: T.psn.platinum, value: game.earned.platinum > 0 ? T.psn.earned : T.psn.locked, done: game.earned.platinum > 0 }]
             : []),
       ]}
-      media={details && <GameHeroMedia shots={details.screenshots.map((s, i) => ({ src: s.thumb, full: s.full, caption: `${T.steam.screenshot} ${i + 1}` }))} />}
+      media={details && <GameHeroMedia shots={details.screenshots.map((s, i) => ({ src: s.thumb, full: s.full, alt: `${T.steam.screenshot} ${i + 1}` }))} />}
     >
       <PsnTrophyCounts earned={game.earned} of={game.defined} className="text-sm" />
     </GameHero>

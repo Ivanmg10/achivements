@@ -9,9 +9,11 @@ import Tag from '@/components/ui/Tag'
  */
 export default function LibraryPlatformBadge({ source, size = 'sm' }: { source: GameSource; size?: 'sm' | 'lg' | 'tag' }) {
   if (size === 'tag') {
+    // On a phone the name ("RetroAchievements") ate the game's title: the logo says it there, the name stays for a screen reader.
     return (
-      <span className="inline-flex items-center h-[1.1875rem] px-1.5 rounded-badge text-[0.6875rem] font-bold whitespace-nowrap bg-ink/[0.07] text-text-secondary">
-        {PLATFORM_NAME[source]}
+      <span className="inline-flex shrink-0 items-center h-[1.1875rem] px-1.5 rounded-badge text-[0.6875rem] font-bold whitespace-nowrap bg-ink/[0.07] text-text-secondary">
+        <PlatformLogo source={source} size={11} className="sm:hidden" />
+        <span className="max-sm:sr-only">{PLATFORM_NAME[source]}</span>
       </span>
     )
   }

@@ -31,10 +31,14 @@ export function localDay(d: Date | number): string {
   return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
 }
 
-const DAY_MONTH_YEAR: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short', year: 'numeric' }
+/**
+ * The site's one date format: day, short month and year, in the reader's language ("3 oct 2026", "Oct 3, 2026").
+ * Never a numeric one ("3/10/2026"): the guard refuses `formatDate(…, {})`. On screen, `ui/DateText`.
+ */
+export const DATE_FORMAT: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' }
 
-/** A platform date for a reader, in their language ("03 oct 2026"); "—" when there is none. */
-export function formatDate(s: string | null | undefined, lang: string, options: Intl.DateTimeFormatOptions = DAY_MONTH_YEAR): string {
+/** A platform date for a reader, in their language, in the one format; "—" when there is none. */
+export function formatDate(s: string | null | undefined, lang: string, options: Intl.DateTimeFormatOptions = DATE_FORMAT): string {
   const t = parseUnlockTime(s)
   return Number.isNaN(t) ? '—' : new Date(t).toLocaleDateString(lang, options)
 }

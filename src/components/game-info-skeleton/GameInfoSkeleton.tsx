@@ -18,7 +18,7 @@ export default function GameInfoSkeleton() {
     <main role="status" aria-busy="true" className="flex-1 flex flex-col items-center text-text-main">
       <span className="sr-only">{T.loadingPage.game}</span>
 
-      <div aria-hidden="true" className="w-full flex flex-col items-center">
+      <div aria-hidden="true" className="w-full max-w-[110rem] mx-auto flex flex-col items-center">
         <section className="w-full px-4 sm:px-8 lg:px-14 pt-6 lg:pt-10 flex flex-col lg:flex-row gap-6 lg:gap-9 items-start">
           <Skeleton radius="tile" className="w-32 sm:w-40 lg:w-[13.5rem] aspect-[216/306] shrink-0" />
           <div className="flex flex-col flex-1 min-w-0 gap-3.5 lg:pt-1.5 w-full min-h-[451px] lg:min-h-0">

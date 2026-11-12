@@ -26,6 +26,10 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   text field, select, switch, checkbox, dialog, hard-coded palette colour, fixed
   `polygon(...)` or `skew-*-[..]`. If it fails, use the piece; if the piece is
   missing, add it (below).
+- **One date format** (#129, the owner on the canvas, 2026-11-07): day, short month and year in the reader's
+  language ("22 oct 2026", "Oct 22, 2026"). On screen it is `ui/DateText` (a `<time>`); where JSX cannot go,
+  `formatDate(s, lang)` with its default (`DATE_FORMAT` in `utils/dates.ts`). Never a numeric date: the guard
+  refuses `formatDate(…, lang, {})`. #130 takes it to the rest of the site.
 - **A rule that starts with offenders lists them** (#120, 2026-11-08): `NEW_RULES` in the guard, each with its
   list of files still drawing the piece by hand in `ui/uiGuard.pending.json`. A file not on its list fails; a
   file on it that no longer offends fails too, so the list only shrinks. Migrate a file, then take it off.

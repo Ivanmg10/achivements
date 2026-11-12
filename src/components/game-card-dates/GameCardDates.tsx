@@ -2,7 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { validCompletionDate } from '@/utils/completionDates'
-import { formatDate } from '@/utils/dates'
+import DateText from '@/components/ui/DateText'
 import GameCardLine from '@/components/game-card-line/GameCardLine'
 
 /**
@@ -21,9 +21,9 @@ export default function GameCardDates({
   /** What to write after "Last played" when there is no date. */
   never?: string
 }) {
-  const { T, lang } = useLanguage()
+  const { T } = useLanguage()
   const finished = validCompletionDate(finishedAt)
-  if (finished) return <GameCardLine>{T.libraryDetail.finished} · {formatDate(finished, lang, {})}</GameCardLine>
-  if (lastPlayed) return <GameCardLine>{T.steam.lastPlayed} · {formatDate(lastPlayed, lang, {})}</GameCardLine>
+  if (finished) return <GameCardLine>{T.libraryDetail.finished} · <DateText value={finished} /></GameCardLine>
+  if (lastPlayed) return <GameCardLine>{T.steam.lastPlayed} · <DateText value={lastPlayed} /></GameCardLine>
   return never ? <GameCardLine>{T.steam.lastPlayed} · {never}</GameCardLine> : null
 }

@@ -1,4 +1,4 @@
-import { IconBookmark, IconDeviceGamepad2, IconTrophy } from '@tabler/icons-react'
+import { IconBookmark, IconDeviceGamepad2, IconLayoutGrid, IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import EmptyState from '@/components/empty-state/EmptyState'
 
@@ -9,6 +9,7 @@ export default function StatusEmptyState({ category, className }: { category: st
     wantToPlay: { Icon: IconBookmark, title: T.categoryPage.noWantToPlay, sub: T.categoryPage.noWantToPlaySub },
     playing: { Icon: IconDeviceGamepad2, title: T.categoryPage.noPlaying, sub: T.categoryPage.noPlayingSub },
     completed: { Icon: IconTrophy, title: T.categoryPage.noCompleted, sub: T.categoryPage.noCompletedSub },
+    all: { Icon: IconLayoutGrid, title: T.categoryPage.noGames, sub: T.categoryPage.noGamesSub },
   }
   const { Icon, title, sub } = byCategory[category] ?? byCategory.playing
   return <EmptyState icon={<Icon className="w-7 h-7" />} title={title} subtitle={sub} className={className} />

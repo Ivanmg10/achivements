@@ -35,7 +35,7 @@ test('playing: the calendar of the game, and the latest unlocked with their date
   expect(screen.getByTestId('calendar')).toHaveTextContent('Hades')
   const latest = within(screen.getByText(L.recentTitle).parentElement!).getAllByRole('link')
   expect(latest.map((l) => l.getAttribute('href'))).toEqual(['/g#done3', '/g#done2', '/g#done1'])
-  expect(latest[0]).toHaveTextContent(new Date(finished[2].earnedAt!).toLocaleDateString('en'))
+  expect(latest[0]).toHaveTextContent(new Date(finished[2].earnedAt!).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' }))
 })
 
 test('completed: the calendar, and the milestones with the days they were reached', () => {

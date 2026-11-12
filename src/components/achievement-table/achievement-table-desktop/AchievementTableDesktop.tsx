@@ -18,7 +18,6 @@ export default function AchievementTableDesktop<T>({
   onSort,
   pinColumn,
   tags,
-  pinInTitle,
   unoptimized,
 }: {
   /** The panel the PSN group tabs control. */
@@ -30,7 +29,6 @@ export default function AchievementTableDesktop<T>({
   onSort: (key: string) => void
   pinColumn: boolean
   tags?: (e: TableEntry<T>) => ReactNode
-  pinInTitle?: boolean
   unoptimized: boolean
 }) {
   const { T } = useLanguage()
@@ -65,7 +63,7 @@ export default function AchievementTableDesktop<T>({
         </thead>
         <tbody className="enter-rows">
           {views.map((v) => (
-            <AchievementTableRow key={v.entry.row.id} view={v} columns={columns} tags={tags} pinInTitle={pinInTitle} unoptimized={unoptimized} />
+            <AchievementTableRow key={v.entry.row.id} view={v} columns={columns} tags={tags} unoptimized={unoptimized} />
           ))}
         </tbody>
       </table>

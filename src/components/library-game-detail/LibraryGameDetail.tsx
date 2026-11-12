@@ -18,6 +18,7 @@ import LibraryDetailInfo, { type InfoRow } from './library-detail-info/LibraryDe
 import LibraryDetailSkeleton from '@/components/library-detail-skeleton/LibraryDetailSkeleton'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { formatDate, unlockSpan } from '@/utils/dates'
+import DateText from '@/components/ui/DateText'
 import type { GameStatus } from '@/types/game'
 
 const SKELETON_BADGES = 24
@@ -97,7 +98,11 @@ export default function LibraryGameDetail({
 
     if (category === 'playing') {
       const beaten = beatenProgress(items)
-      if (beaten) out.push({ label: L.beaten, value: `${beaten.done} / ${beaten.total}` })
+      if (beaten) {
+        const done = beaten.done >= beaten.total
+        const value = done ? L.storyDone : L.storyOf.replace('{n}', beaten.done.toLocaleString(lang)).replace('{total}', beaten.total.toLocaleString(lang))
+        out.push({ label: L.beaten, value, className: done ? 'text-success' : undefined })
+      }
       const missed = missablesLeft(items)
       if (missed > 0) out.push({ label: L.missable, value: String(missed), className: 'text-warning' })
       const pace = paceEstimate(items)
@@ -135,7 +140,7 @@ export default function LibraryGameDetail({
     )
 
   const steps = useMemo(() => milestones(items), [items])
-  const ago = (a: InsightAchievement) => (a.earnedAt ? <span>{formatDate(a.earnedAt, lang, {})}</span> : null)
+  const ago = (a: InsightAchievement) => <DateText value={a.earnedAt} />
 
   // Under the figures, the part that is each list's own: what a game in progress, a finished one and
   // a pending one each have to say, so no list's detail ends with empty space beside the next.

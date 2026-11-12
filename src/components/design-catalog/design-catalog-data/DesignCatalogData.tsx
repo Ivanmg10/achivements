@@ -5,6 +5,7 @@ import Figure from '@/components/ui/Figure'
 import RarityBadge from '@/components/ui/RarityBadge'
 import Tag, { type TagTone } from '@/components/ui/Tag'
 import Facts from '@/components/ui/Facts'
+import DateText from '@/components/ui/DateText'
 import Avatar from '@/components/ui/Avatar'
 import ListRow from '@/components/ui/ListRow'
 import { ProgressBar } from '@/components/ui/ProgressBar'
@@ -117,6 +118,16 @@ export default function DesignCatalogData() {
             </span>
           </Specimen>
         </Compare>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="date">
+        <Panel>
+          <Specimen name="a platform's date, in the reader's language">
+            <span className="text-sm text-text-secondary">
+              <DateText value="2026-10-22 18:30:00" />
+            </span>
+          </Specimen>
+        </Panel>
       </DesignCatalogPiece>
 
       <DesignCatalogPiece id="avatar">

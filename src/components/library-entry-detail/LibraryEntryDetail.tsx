@@ -14,6 +14,7 @@ import PsnLibraryDetail from '@/components/psn/psn-library-detail/PsnLibraryDeta
 import XboxLibraryDetail from '@/components/xbox/xbox-library-detail/XboxLibraryDetail'
 import { entryHref, entryId } from '@/utils/libraryShelves'
 import type { LibraryEntry } from '@/utils/libraryInsights'
+import { detailCategory } from '@/utils/libraryCategory'
 
 type Of<K extends LibraryEntry['kind']> = Extract<LibraryEntry, { kind: K }>
 
@@ -39,7 +40,9 @@ function RaBody({ entry, category }: { entry: Of<'ra'>; category: string }) {
  * hide, and then the same detail the cards open to. Mounted per game, so each
  * one is asked for when it is shown, not for the whole list.
  */
-export default function LibraryEntryDetail({ entry, category }: { entry: LibraryEntry; category: string }) {
+export default function LibraryEntryDetail({ entry, category: page }: { entry: LibraryEntry; category: string }) {
+  // On "all games" a game opens as its own status: a finished one shows its trophy room, not a game in progress.
+  const category = detailCategory(page, entry.status)
   const { T } = useLanguage()
   const id = entryId(entry)
 

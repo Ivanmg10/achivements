@@ -17,10 +17,11 @@ describe('the platform badge', () => {
     expect(container.firstElementChild).toHaveClass('text-xs', 'px-2')
   })
 
-  test('is a plain tag in a list row: the name alone', () => {
+  test('is a plain tag in a list row: the name, and on a phone only the logo (#129)', () => {
     const { container } = render(<LibraryPlatformBadge source="steam" size="tag" />)
     expect(screen.getByText('Steam')).toBeInTheDocument()
-    expect(container.querySelector('svg')).toBeNull()
+    expect(container.querySelector('svg')).toHaveClass('sm:hidden')
+    expect(screen.getByText('Steam')).toHaveClass('max-sm:sr-only')
   })
 })
 

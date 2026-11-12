@@ -1,6 +1,7 @@
 'use client'
 
 import { notFound, useParams } from 'next/navigation'
+import { GAME_COLUMN } from '@/components/game-page-states/gameSectionWidth'
 import { useLanguage } from '@/context/LanguageContext'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
@@ -57,7 +58,7 @@ export default function XboxGamePage() {
   return (
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <XboxGameHeroBackground src={details?.heroUrl ?? xboxBackdrop(game)} />
-      <div className="relative w-full flex flex-col items-center">
+      <div className={GAME_COLUMN}>
         <XboxGameInfoHeader
           game={game}
           details={details}

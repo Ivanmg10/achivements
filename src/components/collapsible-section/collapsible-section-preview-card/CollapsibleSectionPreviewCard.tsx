@@ -53,7 +53,7 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
         <span className="text-sm font-semibold truncate group-hover:underline decoration-ink/40 underline-offset-2">
           {game.title}
         </span>
-        <span className="text-xs text-text-secondary truncate">{game.subtitle}</span>
+        {game.subtitle && <span className="text-xs text-text-secondary truncate">{game.subtitle}</span>}
         {game.pct !== null && (
           <span className="flex items-center gap-2">
             <ProgressBar pct={game.pct} label={game.title} height="h-1" className="flex-1" />

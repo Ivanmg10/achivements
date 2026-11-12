@@ -164,6 +164,10 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   `user-platform-link-form/` for PSN and Xbox; the admin panel's per-platform rows come from
   `utils/adminPlatforms.ts` (`ADMIN_PLATFORMS`). The link and unlink SQL of the user and admin routes is
   `lib/platformLinks.ts` (each route keeps its own auth, checks, answers, mails and logs).
+  The library's pages are one component, `library-page/LibraryPage` (`category`: `playing`, `completed`,
+  `wantToPlay`, or `all` for `/allGames`, #129): the `[category]` route and `/allGames` only pass it their
+  status. Its one row of controls is `library-toolbar/LibraryToolbar`; which page takes which game is
+  `utils/libraryCategory.ts` (`inCategory`, and `detailCategory`: on "all" a game opens as its own status).
 - **Utils** (`src/utils/`): pure functions — mappers per platform
   (`steamMappers`, `psnMappers`), library shelves and insights, `aiExport`. The shared helpers
   (#119): `dates.ts` (the platforms' UTC dates, day keys, dates in the reader's language),

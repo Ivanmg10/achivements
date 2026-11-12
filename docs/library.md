@@ -3,6 +3,18 @@
 Moved out of `CLAUDE.md` on 2026-11-07 (#124). `CLAUDE.md` → Libraries keeps the rules that bite on any
 task that lists games.
 
+## The library's pages — one page, four statuses (#129, 2026-11-11)
+
+"Not started", "In progress", "Completed" and "All games" (`/allGames`) are one component,
+`LibraryPage`, with the status as its `category` (`all` is every status). A new library page is a new
+status there, not a page of its own. What each status takes is `inCategory` (`utils/libraryCategory.ts`),
+used by the four `use*GamesByCategory` hooks; on "all" each game keeps its own status (`LibraryEntry.status`),
+its quick filters are the statuses (`quickFiltersFor`), its shelves are "continue" and one per status, its
+cards are always together (no "by platform" switch), and an opened game shows the detail of its own status
+(`detailCategory`). Every view has the same row of controls (`LibraryToolbar`: search, filters, then the
+order, size and views); the game count under the title only shows when neither the platform tabs nor the
+"all" quick filter say it.
+
 ## Preferences that follow the account
 
 The display preferences (which consoles show, library layout/view/columns/sort,

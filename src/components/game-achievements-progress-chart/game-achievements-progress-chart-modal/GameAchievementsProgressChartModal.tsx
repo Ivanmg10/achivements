@@ -4,7 +4,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { InsightAchievement } from '@/utils/gameInsights'
 import LibraryDetailList from '@/components/library-game-detail/library-detail-list/LibraryDetailList'
 import Modal from '@/components/ui/Modal'
-import { formatDate } from '@/utils/dates'
+import DateText from '@/components/ui/DateText'
 
 /**
  * What was unlocked in the week or month clicked on a game's chart, newest
@@ -22,7 +22,7 @@ export default function GameAchievementsProgressChartModal({
   items: InsightAchievement[]
   onClose: () => void
 }) {
-  const { T, lang } = useLanguage()
+  const { T } = useLanguage()
 
   const sorted = [...items].sort((a, b) => (b.earnedAt ?? '').localeCompare(a.earnedAt ?? ''))
 
@@ -32,7 +32,7 @@ export default function GameAchievementsProgressChartModal({
         title={`${items.length} ${T.dayModal.achievements}`}
         items={sorted}
         empty={T.gameExpanded.noActivity}
-        meta={(a) => a.earnedAt && <span>{formatDate(a.earnedAt, lang, {})}</span>}
+        meta={(a) => <DateText value={a.earnedAt} />}
       />
     </Modal>
   )

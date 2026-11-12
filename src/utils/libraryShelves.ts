@@ -3,7 +3,8 @@ import { gameHref, raGameId } from '@/utils/gameRef'
 import { matchesQuick, type LibraryEntry, type QuickFilter } from '@/utils/libraryInsights'
 import type { GameSource } from '@/types/game'
 
-export type ShelfId = 'continue' | 'almost' | 'stalled' | 'rest' | 'recent' | 'older' | 'start' | 'backlog'
+/** The shelves of a status page, and on "all games" one per status after "continue". */
+export type ShelfId = 'continue' | 'almost' | 'stalled' | 'rest' | 'recent' | 'older' | 'start' | 'backlog' | 'playing' | 'completed' | 'wantToPlay'
 
 export type Shelf = {
   id: ShelfId
@@ -68,8 +69,18 @@ export function buildShelves(entries: LibraryEntry[], category: string, now = Da
   const take = (list: LibraryEntry[]) => list.filter((e) => !taken.has(e.key) && (taken.add(e.key), true))
   const shelf = (id: ShelfId, list: LibraryEntry[], quick: QuickFilter = 'all'): Shelf => ({ id, entries: list, quick, cap: SHELF_CAP })
 
+  const byStatus = (status: 'playing' | 'completed' | 'wantToPlay') => entries.filter((e) => e.status === status)
+  const shortestFirst = (a: LibraryEntry, b: LibraryEntry) => entryTotal(a) - entryTotal(b) || a.title.localeCompare(b.title)
+
   const out: Shelf[] =
-    category === 'completed'
+    category === 'all'
+      ? [
+          shelf('continue', take(entries.filter((e) => now - time(e) <= CONTINUE_DAYS * DAY).sort(recentFirst))),
+          shelf('playing', take(byStatus('playing').sort(recentFirst)), 'playing'),
+          shelf('completed', take(byStatus('completed').sort(completedFirst)), 'completed'),
+          shelf('wantToPlay', take(byStatus('wantToPlay').sort(shortestFirst)), 'wantToPlay'),
+        ]
+      : category === 'completed'
       ? [
           shelf('recent', take(entries.filter((e) => e.completedAt).sort(completedFirst).slice(0, SHELF_CAP))),
           shelf('older', take([...entries].sort(completedFirst))),
