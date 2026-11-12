@@ -1211,7 +1211,7 @@ export const ja: Translations = {
     rankingsText: 'フォロー中の人や全員と比べて、Vaultポイントで自分の位置を確認しましょう。',
     lastPlayed: '最後にプレイ',
     recentUnlocks: '最近の解除',
-    noRecentUnlocks: '最近の解除はありません',
+    noRecentUnlocks: '表示できる最近の実績はありません',
     online: 'オンライン',
     seen: '{when}に確認',
     seenLongAgo: '1か月以上前に確認',

@@ -1212,7 +1212,7 @@ export const en = {
     rankingsText: 'See where you stand against the people you follow, and against everyone, in Vault Points.',
     lastPlayed: 'Last played',
     recentUnlocks: 'Latest unlocks',
-    noRecentUnlocks: 'Nothing earned lately',
+    noRecentUnlocks: 'No recent achievements to show',
     online: 'Online',
     seen: 'Seen {when}',
     seenLongAgo: 'Seen over a month ago',

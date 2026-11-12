@@ -1211,7 +1211,7 @@ export const es: Translations = {
     rankingsText: 'Mira dónde estás frente a la gente que sigues, y frente a todos, en Puntos Vault.',
     lastPlayed: 'Último jugado',
     recentUnlocks: 'Últimos logros',
-    noRecentUnlocks: 'Nada conseguido últimamente',
+    noRecentUnlocks: 'Sin logros recientes que mostrar',
     online: 'En línea',
     seen: 'Visto {when}',
     seenLongAgo: 'Visto hace más de un mes',

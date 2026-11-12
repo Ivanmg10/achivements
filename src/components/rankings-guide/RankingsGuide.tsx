@@ -5,6 +5,7 @@ import { IconArrowLeft, IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { vaultGuideText } from '@/translations/vaultGuide'
 import FaqList from '@/components/faq-list/FaqList'
+import GhostIcon from '@/components/ui/GhostIcon'
 import Tag from '@/components/ui/Tag'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import { TIERS, pointsForLevel } from '@/utils/vaultLevel'
@@ -35,7 +36,7 @@ export default function RankingsGuide() {
         className="relative overflow-hidden rounded-card ring-1 ring-inset ring-ink/[0.06] p-6 sm:p-10 flex flex-col gap-4 enter-rows"
         style={{ background: 'radial-gradient(ellipse at top left, rgb(var(--accent) / 0.22), transparent 60%), rgb(var(--bg-card))' }}
       >
-        <IconTrophy aria-hidden="true" size={240} stroke={1} className="hidden sm:block absolute -right-8 -bottom-10 text-accent/[0.08] pointer-events-none" />
+        <GhostIcon icon={IconTrophy} />
         <Link
           href="/rankings"
           className="relative self-start inline-flex items-center gap-1.5 text-sm font-semibold text-text-secondary hover:text-text-main rounded focus-ring"

@@ -1,4 +1,4 @@
-import { dateFormat, formatDate, formatDateTime, formatDay, localDay, parseUnlockTime, unlockIso, utcDay } from './dates'
+import { dateFormat, formatDate, formatDateTime, formatDay, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay } from './dates'
 
 describe('parseUnlockTime', () => {
   test('a zone-less platform date is UTC, whatever the browser zone is', () => {
@@ -71,5 +71,18 @@ describe('formatDate', () => {
   test('"—" for nothing', () => {
     expect(formatDate(null, 'en')).toBe('—')
     expect(formatDate('nope', 'es')).toBe('—')
+  })
+})
+
+describe('relativeTime', () => {
+  const ago = (ms: number) => new Date(Date.now() - ms).toISOString()
+  test('short by default, whole words on request ("6 m" could be minutes)', () => {
+    const t = ago(6 * 31 * 86400e3)
+    expect(relativeTime(t, 'en')).toBe('6 mo. ago')
+    expect(relativeTime(t, 'en', 'long')).toBe('6 months ago')
+    expect(relativeTime(t, 'es', 'long')).toBe('hace 6 meses')
+  })
+  test('no date, no time', () => {
+    expect(relativeTime(null)).toBe('—')
   })
 })

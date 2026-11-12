@@ -30,9 +30,10 @@ test('who they are, their platforms and their groups; their name opens their pro
   expect(accounts).toHaveTextContent('Steam')
   expect(screen.getByRole('img', { name: 'RetroAchievements' })).toBeInTheDocument()
   expect(screen.getByText(en.friends.publicGroups.replace('{n}', '2'))).toBeInTheDocument()
-  // Nothing in the showcase, and unlocks not read yet: neither says a wrong "none".
+  // Nothing in the showcase: no empty shelf. Unlocks not read yet say the one sentence every card with none says.
   expect(screen.queryByRole('list', { name: en.friends.showcase })).not.toBeInTheDocument()
-  expect(screen.queryByText(en.following.recentUnlocks)).not.toBeInTheDocument()
+  expect(screen.getByText(en.following.recentUnlocks)).toBeInTheDocument()
+  expect(screen.getByText(en.following.noRecentUnlocks)).toBeInTheDocument()
   // Not known yet: no last game.
   expect(screen.queryByText(new RegExp(en.following.lastPlayed))).not.toBeInTheDocument()
 })
@@ -84,4 +85,18 @@ test('offline: when they were last seen, or a while ago; nothing shared, the bio
   render(<FollowingCard friend={friend({ online: false, lastSeenAt: null })} />)
   expect(screen.getByText('Hardcore o nada')).toBeInTheDocument()
   expect(screen.queryByText(en.following.online)).not.toBeInTheDocument()
+})
+
+test('"0 public groups" is not said: the foot is there only when they have some', () => {
+  const { unmount } = render(<FollowingCard friend={friend({ publicGroups: 0 })} />)
+  expect(screen.queryByText(en.friends.publicGroups.replace('{n}', '0'))).not.toBeInTheDocument()
+  unmount()
+  render(<FollowingCard friend={friend({ publicGroups: 1 })} />)
+  expect(screen.getByText(en.friends.publicGroups.replace('{n}', '1'))).toBeInTheDocument()
+})
+
+test('the last game played says "Last played", with the time in whole words', () => {
+  const at = new Date(Date.now() - 6 * 31 * 86400e3).toISOString()
+  render(<FollowingCard friend={friend()} lastPlayed={{ source: 'steam', id: 620, title: 'Portal 2', at, image: null, wide: true }} />)
+  expect(screen.getByRole('link', { name: /Portal 2/ })).toHaveTextContent(/Last played · 6 months ago/)
 })

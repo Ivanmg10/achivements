@@ -62,14 +62,15 @@ export function formatDateTime(s: string | number | null | undefined, lang: stri
 
 /**
  * How long ago, in the given language ("2 hours ago", "hace 2 horas"), in the
- * largest unit that fits. "—" when there is no date to tell.
+ * largest unit that fits ("6 mo. ago", or with `style: 'long'` "6 months ago": where
+ * "6 m" could be minutes). "—" when there is no date to tell.
  */
-export function relativeTime(dateStr: string | null | undefined, lang = 'en'): string {
+export function relativeTime(dateStr: string | null | undefined, lang = 'en', style: 'short' | 'long' = 'short'): string {
   if (!dateStr) return '—'
   const t = parseUnlockTime(dateStr)
   if (isNaN(t)) return '—'
   const secs = Math.round((t - Date.now()) / 1000)
-  const fmt = new Intl.RelativeTimeFormat(lang, { numeric: 'auto', style: 'short' })
+  const fmt = new Intl.RelativeTimeFormat(lang, { numeric: 'auto', style })
   const units: [Intl.RelativeTimeFormatUnit, number][] = [['year', 31536000], ['month', 2592000], ['day', 86400], ['hour', 3600], ['minute', 60]]
   for (const [unit, size] of units) {
     if (Math.abs(secs) >= size) return fmt.format(Math.trunc(secs / size), unit)

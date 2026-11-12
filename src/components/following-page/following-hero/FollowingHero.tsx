@@ -7,16 +7,28 @@ import { CountUp } from '@/components/ui/CountUp'
 import { Skeleton } from '@/components/ui/Skeleton'
 import Kicker from '@/components/ui/Kicker'
 import Avatar from '@/components/ui/Avatar'
+import GhostIcon from '@/components/ui/GhostIcon'
 
 const STACK_MAX = 5
 
 /**
  * The top of the Following page: a wash of the theme's accent, the title with
  * its icon and line at the top left, and, once the list is in, how many people
- * you follow (in the display face) with a few of their faces and how many of
- * them are online now, at the bottom.
+ * you follow (in the display face; on the Followers tab, who follows you) with
+ * a few of their faces and how many of them are online now, at the bottom.
  */
-export default function FollowingHero({ users, isLoading = false, className = '' }: { users: FriendOverview[]; isLoading?: boolean; className?: string }) {
+export default function FollowingHero({
+  users,
+  isLoading = false,
+  label,
+  className = '',
+}: {
+  users: FriendOverview[]
+  isLoading?: boolean
+  /** What the figure counts; the page's own word for people unless the tab says otherwise. */
+  label?: string
+  className?: string
+}) {
   const { T, lang } = useLanguage()
   const stack = users.slice(0, STACK_MAX)
   const more = users.length - stack.length
@@ -28,7 +40,7 @@ export default function FollowingHero({ users, isLoading = false, className = ''
       className={`relative rounded-card overflow-hidden ring-1 ring-inset ring-ink/[0.06] ${className}`}
       style={{ background: 'radial-gradient(ellipse at top left, rgb(var(--accent) / 0.25), transparent 60%), rgb(var(--bg-card))' }}
     >
-      <IconUsers aria-hidden="true" size={220} stroke={1} className="hidden sm:block absolute -right-10 -bottom-16 text-accent/10 pointer-events-none" />
+      <GhostIcon icon={IconUsers} />
 
       <div className="relative px-4 sm:px-7 py-6 sm:py-7 flex flex-col gap-6 h-full justify-between enter-rows">
         <div className="flex items-center gap-4 min-w-0">
@@ -59,7 +71,7 @@ export default function FollowingHero({ users, isLoading = false, className = ''
           <div className="flex items-end gap-x-5 gap-y-3 flex-wrap">
             <p className="flex flex-col">
               <CountUp value={users.length} locale={lang} className="font-display italic font-extrabold text-[3.25rem] leading-[0.85] pr-1" />
-              <Kicker as="span" size="sm" className="mt-1.5">{T.following.people}</Kicker>
+              <Kicker as="span" size="sm" className="mt-1.5">{label ?? T.following.people}</Kicker>
             </p>
             <div aria-hidden="true" className="flex items-center pb-0.5 pl-2">
               {stack.map((u) => (

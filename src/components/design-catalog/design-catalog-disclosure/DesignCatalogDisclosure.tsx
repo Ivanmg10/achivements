@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { IconBookmark, IconBookmarkFilled, IconPlus, IconStar, IconStarFilled } from '@tabler/icons-react'
+import { IconBookmark, IconBookmarkFilled, IconPlus, IconStar, IconStarFilled, IconTrophy } from '@tabler/icons-react'
 import AccordionItem from '@/components/ui/Accordion'
 import ShowMore from '@/components/ui/ShowMore'
 import ToggleButton from '@/components/ui/ToggleButton'
 import Shelf from '@/components/ui/Shelf'
 import SectionHead from '@/components/ui/SectionHead'
 import DropSlot from '@/components/ui/DropSlot'
+import GhostIcon from '@/components/ui/GhostIcon'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
 
 function ShowMoreDemo() {
@@ -72,6 +73,14 @@ export default function DesignCatalogDisclosure() {
       </DesignCatalogPiece>
       <DesignCatalogPiece id="drop-slot">
         <Compare><DropSlotDemo /></Compare>
+      </DesignCatalogPiece>
+      <DesignCatalogPiece id="ghost-icon">
+        <Panel>
+          <div className="relative overflow-hidden rounded-card bg-bg-card p-7 min-h-40">
+            <GhostIcon icon={IconTrophy} />
+            <p className="font-display italic font-extrabold text-5xl leading-[0.9]">Rankings</p>
+          </div>
+        </Panel>
       </DesignCatalogPiece>
     </>
   )

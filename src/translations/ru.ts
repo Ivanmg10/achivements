@@ -1211,7 +1211,7 @@ export const ru: Translations = {
     rankingsText: 'Узнайте, где вы находитесь среди тех, на кого подписаны, и среди всех, в очках Vault.',
     lastPlayed: 'Последняя игра',
     recentUnlocks: 'Последние достижения',
-    noRecentUnlocks: 'В последнее время ничего не получено',
+    noRecentUnlocks: 'Нет недавних достижений для показа',
     online: 'В сети',
     seen: 'Был(а) {when}',
     seenLongAgo: 'Был(а) больше месяца назад',
