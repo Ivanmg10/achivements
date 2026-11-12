@@ -49,6 +49,14 @@ const LOOKS = {
 }
 const COMPACT = { box: 'bg-bg-main rounded-tile px-3 py-2.5 flex flex-col min-w-0', label: 'text-xs text-text-secondary truncate', value: 'text-xl font-extrabold tabular-nums truncate' }
 
+/**
+ * Bare figures three to a row on a phone and side by side from sm (the home's activity row). A row
+ * of bare figures that wraps draws no mark in front of a row's first figure (#134: it hung at the
+ * edge); `FIGURES_BY_THREE_TO_LG` keeps three to a row until lg, then six (a profile's figures).
+ */
+export const FIGURES_BY_THREE = 'grid grid-cols-3 gap-y-3 sm:flex sm:flex-wrap sm:gap-3 max-sm:[&>:nth-child(3n+1)>[data-figure-mark]]:hidden'
+export const FIGURES_BY_THREE_TO_LG = 'grid grid-cols-3 lg:grid-cols-6 gap-y-3 max-lg:[&>:nth-child(3n+1)>[data-figure-mark]]:hidden'
+
 export type FigureProps = {
   label: string
   value: string | number
@@ -85,7 +93,7 @@ export default function Figure({ label, value, sub, look = 'bare', tone = 'main'
   const Value = term ? 'dd' : 'span'
   const inner = (
     <>
-      {look === 'bare' && <span aria-hidden="true" className={`${MARK} absolute -left-0.5 top-1.5 text-[2.5rem] font-light leading-none text-accent/16 group-first/figure:hidden`} />}
+      {look === 'bare' && <span aria-hidden="true" data-figure-mark className={`${MARK} absolute -left-0.5 top-1.5 text-[2.5rem] font-light leading-none text-accent/16 group-first/figure:hidden`} />}
       <Label className={text.label}>{label}</Label>
       <Value className={`${text.value} ${color ? '' : TONES[tone]}`} style={color ? { color } : undefined}>
         {loading ? <Skeleton className={l.skeleton} /> : shown}

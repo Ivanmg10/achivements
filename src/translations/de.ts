@@ -1125,7 +1125,7 @@ export const de: Translations = {
     today: 'Heute',
     thisWeek: 'Diese Woche',
     last30Days: 'Letzte 30 Tage',
-    avgPerDay: 'Ø/Tag (30T)',
+    avgPerDay: 'Ø 30 T',
     perDay: 'Erfolge/Tag',
     noActivity: 'keine Aktivität',
     active: 'aktiv',

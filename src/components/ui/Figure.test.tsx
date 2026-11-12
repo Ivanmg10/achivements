@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import Figure from './Figure'
+import Figure, { FIGURES_BY_THREE, FIGURES_BY_THREE_TO_LG } from './Figure'
 
 test('bare: a label in sentence case over the figure, in its tone, with the line under it', () => {
   render(<Figure label="Vault Points" value="143,820" sub="this week +48" tone="hardcore" />)
@@ -81,4 +81,17 @@ test('with onClick it is a button, with href a link', () => {
   expect(onClick).toHaveBeenCalled()
   rerender(<Figure label="Games" value="3" href="/library" />)
   expect(screen.getByRole('link', { name: /Games/ })).toHaveAttribute('href', '/library')
+})
+
+test('rows of three hide the mark in front of each row\'s first figure, never the others (#134)', () => {
+  const { container } = render(
+    <div className={FIGURES_BY_THREE}>
+      <Figure label="Today" value="1" />
+      <Figure label="Week" value="2" />
+    </div>,
+  )
+  // The rows find the mark by its attribute: the selector and the attribute must keep matching.
+  expect(container.querySelectorAll('[data-figure-mark]')).toHaveLength(2)
+  expect(FIGURES_BY_THREE).toContain('max-sm:[&>:nth-child(3n+1)>[data-figure-mark]]:hidden')
+  expect(FIGURES_BY_THREE_TO_LG).toContain('max-lg:[&>:nth-child(3n+1)>[data-figure-mark]]:hidden')
 })

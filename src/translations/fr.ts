@@ -1125,7 +1125,7 @@ export const fr: Translations = {
     today: "Aujourd'hui",
     thisWeek: 'Cette semaine',
     last30Days: '30 derniers jours',
-    avgPerDay: 'Moy/jour (30j)',
+    avgPerDay: 'Moy. 30 j',
     perDay: 'succès/jour',
     noActivity: 'aucune activité',
     active: 'actif',
