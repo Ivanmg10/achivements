@@ -15,12 +15,14 @@ type Size = 'sm' | 'md' | 'lg'
 type Orientation = 'horizontal' | 'rail'
 
 const SIZES: Record<Size | 'rail', string> = {
-  sm: 'h-10 px-3 gap-1.5 text-sm',
+  // On a touch screen a strip that scrolls clips a tab's touch area (tap-target), so the tab itself is 44 px from sm (#115;
+  // a phone keeps the size #134 left it at).
+  sm: 'h-10 sm:any-pointer-coarse:h-11 px-3 gap-1.5 text-sm',
   md: 'h-11 px-3.5 gap-1.5 text-[0.9375rem]',
   // A card's title that is also its switch (the home's "Recently played" / "Pinned games").
   // Smaller on a phone, where both titles must share one line (#134: they wrapped and read as two headings).
   lg: 'pb-1.5 gap-1.5 text-[0.9375rem]/6 sm:text-xl tracking-tight',
-  rail: 'snap-start px-3.5 py-2 lg:py-2.5 gap-2.5 rounded-tile text-sm',
+  rail: 'snap-start px-3.5 py-2 sm:max-lg:any-pointer-coarse:py-3 lg:py-2.5 gap-2.5 rounded-tile text-sm',
 }
 
 const LISTS: Record<Size | Orientation, string> = {
@@ -50,7 +52,7 @@ export function TabMark({ on, keepRoom = false }: { on: boolean; keepRoom?: bool
  */
 export function tabClass(on: boolean, className = '', size: Size | 'rail' = 'sm') {
   return (
-    `relative shrink-0 inline-flex items-center whitespace-nowrap font-semibold transition-colors duration-(--motion-hover) cursor-pointer focus-ring focus-visible:rounded-chip ${SIZES[size]} ` +
+    `relative tap-target shrink-0 inline-flex items-center whitespace-nowrap font-semibold transition-colors duration-(--motion-hover) cursor-pointer focus-ring focus-visible:rounded-chip ${SIZES[size]} ` +
     `${on ? 'text-text-main' : 'text-text-secondary hover:text-text-main'} ${className}`
   )
 }

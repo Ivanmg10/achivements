@@ -48,7 +48,7 @@ export function PinToggleButton({
         onClick={handleClick}
         aria-label={pinned ? T.pinnedGames.unpinAria : T.pinnedGames.pinAria}
         aria-pressed={pinned}
-        className={`p-1.5 rounded-chip transition-colors focus-ring shrink-0 ${
+        className={`relative tap-target p-1.5 rounded-chip transition-colors focus-ring shrink-0 ${
           hasError
             ? 'text-danger'
             : pinned

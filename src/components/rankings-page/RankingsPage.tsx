@@ -67,7 +67,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
           </h1>
           <p className="text-sm sm:text-[0.9375rem] text-text-secondary">
             {T.rankings.intro}{' '}
-            <Link href="/rankings/how" className="font-bold text-accent hover:underline rounded focus-ring">
+            <Link href="/rankings/how" className="relative tap-target font-bold text-accent hover:underline rounded focus-ring">
               {T.rankings.how}
             </Link>
           </p>

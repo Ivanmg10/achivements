@@ -23,7 +23,7 @@ export default function MainHeaderLevel({ glass }: { glass?: boolean }) {
   return (
     <Link
       href="/rankings"
-      className="hidden sm:flex items-center shrink-0 rounded-tag transition-[filter] hover:brightness-125 focus-ring"
+      className="relative tap-target hidden sm:flex items-center shrink-0 rounded-tag transition-[filter] hover:brightness-125 focus-ring"
     >
       <span className="sr-only">{T.rankings.title}</span>
       {calculating ? (

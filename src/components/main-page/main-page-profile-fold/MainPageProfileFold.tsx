@@ -13,12 +13,12 @@ import StreakTag from '@/components/ui/StreakTag'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 
 /** The fold's box, shared with its skeleton so nothing moves when it lands. */
-export const FOLD_BOX = 'sm:hidden mx-3 mt-3 flex items-center gap-3 rounded-tile bg-bg-card p-3'
+export const FOLD_BOX = 'sm:hidden max-lg:short:flex mx-3 mt-3 flex items-center gap-3 rounded-tile bg-bg-card p-3'
 
 /**
- * The home's profile folded to one line on a phone (#134, MejMovil 7): picture, name, level and
- * streak, and "See profile" opening the whole column under it, so your games come right after.
- * From sm the column shows as it always did and this line is not drawn. The streak is the year's
+ * The home's profile folded to one line on a phone (#134, MejMovil 7) and on a screen held sideways
+ * below lg (`short`, the AYN Thor, #115): picture, name, level and streak, and "See profile" opening the
+ * whole column under it, so your games come right after. Elsewhere the column shows as it always did. The streak is the year's
  * (the home reads it anyway), drawn only once the whole year is in; the level waits for the points.
  */
 export default function MainPageProfileFold({ open, onToggle, controls }: { open: boolean; onToggle: () => void; controls: string }) {

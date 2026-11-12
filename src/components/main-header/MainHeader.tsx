@@ -30,7 +30,7 @@ function NavLink({ href, label, active }: { href: string; label: string; active:
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={`relative inline-flex items-center gap-1 h-10 px-3 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors cursor-pointer focus-ring focus-visible:rounded-chip ${active ? 'text-text-main' : 'text-text-secondary hover:text-text-main'}`}
+      className={`relative tap-target inline-flex items-center gap-1 h-10 px-3 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors cursor-pointer focus-ring focus-visible:rounded-chip ${active ? 'text-text-main' : 'text-text-secondary hover:text-text-main'}`}
     >
       <TabMark on={active} />
       {label}
@@ -50,7 +50,7 @@ function StreakBadge({ streak, glass }: { streak: number | null; glass?: boolean
       href="/racha"
       aria-label={streak === null ? T.streak.title : `${T.streak.title}: ${plural(streak, T.plurals.days, lang)}`}
       aria-busy={streak === null || undefined}
-      className={`rounded-tag transition-[filter] hover:brightness-125 focus-ring ${glass ? 'backdrop-blur-sm' : ''}`}
+      className={`relative tap-target rounded-tag transition-[filter] hover:brightness-125 focus-ring ${glass ? 'backdrop-blur-sm' : ''}`}
     >
       <StreakTag
         days={streak ?? 0}
@@ -131,20 +131,22 @@ export default function MainHeader() {
       {/*
         Floating bar: the wrapper keeps the 64px the game heroes are drawn
         under (8px gap + 56px bar), so nothing below has to move.
+        On a screen held sideways (short: 500px tall or less, the AYN Thor) it
+        scrolls away with the page instead of keeping a fifth of the screen (#115).
       */}
-      <div className={`sticky top-0 z-40 h-16 shrink-0 pointer-events-none transition-[padding] duration-300 motion-reduce:transition-none ${scrolled ? 'px-0 pt-0' : 'px-2 sm:px-3 pt-2'}`}>
+      <div className={`sticky short:relative top-0 z-40 h-16 shrink-0 pointer-events-none transition-[padding] duration-300 motion-reduce:transition-none ${scrolled ? 'px-0 pt-0' : 'px-2 sm:px-3 pt-2'}`}>
       <header
         className={`pointer-events-auto relative flex items-center gap-2.5 text-text-main px-2.5 backdrop-blur-xl backdrop-saturate-150 ring-1 shadow-lg shadow-black/20 transition-all duration-300 motion-reduce:transition-none ${
           scrolled ? 'h-16 rounded-none' : 'h-14 rounded-card'
         } ${isGameInfo ? 'bg-bg-header/60 ring-ink/10' : 'bg-bg-header/85 ring-ink/[0.08]'}`}
       >
         {/* Left: home + back + nav (desktop) / hamburguesa (mobile) */}
-        <div className="flex items-center gap-1 shrink-0 z-10">
+        <div className="flex items-center gap-1 sm:any-pointer-coarse:gap-2 shrink-0 z-10">
           <Link
             href="/"
             aria-label={T.header.home}
             aria-current={isHome ? 'page' : undefined}
-            className={`inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring ${isHome ? 'text-accent bg-accent/[0.14]' : 'text-text-secondary hover:text-text-main hover:bg-ink/[0.08]'}`}
+            className={`relative tap-target inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring ${isHome ? 'text-accent bg-accent/[0.14]' : 'text-text-secondary hover:text-text-main hover:bg-ink/[0.08]'}`}
           >
             <IconHome className="w-[1.125rem] h-[1.125rem]" aria-hidden="true" />
           </Link>
@@ -152,15 +154,15 @@ export default function MainHeader() {
             <button
               onClick={() => { if (!tryHandleBack()) router.back() }}
               aria-label={T.header.goBack}
-              className="inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
+              className="relative tap-target inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
             >
               <IconChevronLeft className="w-[1.125rem] h-[1.125rem]" aria-hidden="true" />
             </button>
           )}
 
-          {/* Desktop nav - visible on md+ */}
+          {/* Desktop nav from lg: below it the bar ran off the right edge (800 px, the AYN Thor; #115) */}
           {hasPlatform && (
-          <nav className="hidden md:flex items-center ml-1.5" aria-label={T.header.mainNav}>
+          <nav className="hidden lg:flex items-center ml-1.5" aria-label={T.header.mainNav}>
             <StatusNavDropdown
               items={statusItems.map(({ href, label }) => ({
                 href: session ? href : '/authPage',
@@ -185,7 +187,7 @@ export default function MainHeader() {
           <button
             onClick={() => setMobileMenuOpen(true)}
             aria-label={T.header.menu}
-            className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
+            className="lg:hidden relative tap-target inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
           >
             <IconMenu className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -214,7 +216,7 @@ export default function MainHeader() {
           <button
             onClick={openSearch}
             aria-label={T.search.placeholder}
-            className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
+            className="lg:hidden relative tap-target inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-ring text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
           >
             <IconSearch className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -228,7 +230,7 @@ export default function MainHeader() {
                 href="/user"
                 aria-label={T.sidePanel.userSettings}
                 aria-current={pathname === '/user' ? 'page' : undefined}
-                className={`relative isolate flex items-center gap-2.5 pl-3.5 pr-1.5 h-10 before:content-[''] before:absolute before:inset-0 before:-z-10 before:rounded-nav before:transition-colors focus-visible:outline-none focus-visible:before:ring-2 focus-visible:before:ring-accent/70 ${pathname === '/user' ? 'before:bg-accent/[0.14] before:ring-1 before:ring-inset before:ring-accent/50' : isGameInfo ? 'before:bg-ink/10 before:backdrop-blur-sm hover:before:bg-ink/20' : 'before:bg-ink/[0.05] hover:before:bg-ink/10'}`}
+                className={`relative isolate tap-target flex items-center gap-2.5 pl-3.5 pr-1.5 h-10 before:content-[''] before:absolute before:inset-0 before:-z-10 before:rounded-nav before:transition-colors focus-visible:outline-none focus-visible:before:ring-2 focus-visible:before:ring-accent/70 ${pathname === '/user' ? 'before:bg-accent/[0.14] before:ring-1 before:ring-inset before:ring-accent/50' : isGameInfo ? 'before:bg-ink/10 before:backdrop-blur-sm hover:before:bg-ink/20' : 'before:bg-ink/[0.05] hover:before:bg-ink/10'}`}
               >
                 <span className="text-[0.9375rem] font-bold hidden sm:block text-text-main leading-none">
                   {session.user?.name ?? session.user?.email}

@@ -108,7 +108,7 @@ test('a session refresh does not swap the page back to the skeleton', () => {
   expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
 })
 
-test('on a phone the profile column starts folded and the fold line opens it (#134); from sm it is never hidden', () => {
+test('on a phone (#134) or a screen held sideways (#115) the profile column starts folded and the fold line opens it; elsewhere it is never hidden', () => {
   ;(useSession as jest.Mock).mockReturnValue({
     status: 'authenticated',
     data: { user: { raUser: { User: 'Ivan' }, rausername: 'Ivan', raLinked: true } },
@@ -117,9 +117,10 @@ test('on a phone the profile column starts folded and the fold line opens it (#1
   const fold = screen.getByRole('button', { name: 'fold' })
   const column = document.getElementById(fold.getAttribute('aria-controls')!)!
   expect(column).toContainElement(screen.getByTestId('profile'))
-  expect(column).toHaveClass('max-sm:hidden')
+  expect(column).toHaveClass('max-sm:hidden', 'max-lg:short:hidden')
   expect(column.className).not.toMatch(/(^|\s)hidden/)
   fireEvent.click(fold)
   expect(fold).toHaveAttribute('aria-expanded', 'true')
   expect(column).not.toHaveClass('max-sm:hidden')
+  expect(column).not.toHaveClass('max-lg:short:hidden')
 })

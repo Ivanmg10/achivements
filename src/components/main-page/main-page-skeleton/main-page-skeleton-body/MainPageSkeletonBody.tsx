@@ -33,7 +33,7 @@ export default function MainPageSkeletonBody({ cover, pinned, label }: { cover: 
       <div aria-hidden="true" className="home-fit-top flex-1 min-h-0 grid grid-cols-1 items-stretch lg:grid-cols-[2fr_1fr]">
         {/* Profile: folded to one line on a phone, right column on desktop, like the page. */}
         <MainPageProfileFoldSkeleton />
-        <div className="home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1 max-sm:hidden">
+        <div className="home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1 max-sm:hidden max-lg:short:hidden">
           {cover ? (
             <PortadaSideSkeleton />
           ) : (

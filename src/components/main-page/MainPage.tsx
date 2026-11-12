@@ -55,7 +55,7 @@ export function MainPageBody() {
   const { view } = useMainView()
   const visitor = useSubject() !== null
   const [layout] = useHomeLayout()
-  // On a phone your profile starts folded to one line, so your games come first (#134); from sm it is always open.
+  // On a phone (#134) or a screen held sideways below lg (#115) your profile starts folded to one line, so your games come first; elsewhere it is always open.
   const [profileOpen, setProfileOpen] = useState(false)
   const sideId = useId()
   const folded = !visitor && !profileOpen
@@ -67,7 +67,7 @@ export function MainPageBody() {
       <div className="home-fit-top flex-1 min-h-0 grid grid-cols-1 items-stretch lg:grid-cols-[2fr_1fr]">
         {!visitor && <MainPageProfileFold open={profileOpen} onToggle={() => setProfileOpen((o) => !o)} controls={sideId} />}
         {/* Profile first in DOM → top on mobile (folded on a phone until opened); placed col-2 on desktop */}
-        <div id={sideId} className={`home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1 ${folded ? 'max-sm:hidden' : ''}`}>
+        <div id={sideId} className={`home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1 ${folded ? 'max-sm:hidden max-lg:short:hidden' : ''}`}>
           {/* The cover puts your level, streak and last achievements here; the classic home, the platform profiles. */}
           {layout === 'cover' && !visitor ? <MainPagePortadaSide /> : <MainPageProfile />}
         </div>

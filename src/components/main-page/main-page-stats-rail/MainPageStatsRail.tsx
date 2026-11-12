@@ -32,7 +32,8 @@ export default function MainPageStatsRail({
   idPrefix: string
 }) {
   return (
-    <div className="sticky top-16 z-30 -mx-4 px-4 py-2 bg-bg-main/85 backdrop-blur-xl lg:static lg:z-auto lg:mx-0 lg:p-2 lg:self-stretch lg:bg-bg-card lg:backdrop-blur-none lg:rounded-card">
+    // Below the app's bar, which scrolls away on a short screen (#115): there the strip sticks to the very top.
+    <div className="sticky top-16 short:top-0 z-30 -mx-4 px-4 py-2 bg-bg-main/85 backdrop-blur-xl lg:static lg:z-auto lg:mx-0 lg:p-2 lg:self-stretch lg:bg-bg-card lg:backdrop-blur-none lg:rounded-card">
       <Tabs
         id={idPrefix}
         aria-label={label}

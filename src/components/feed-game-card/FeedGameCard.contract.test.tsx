@@ -157,6 +157,15 @@ describe.each(PLATFORMS)('$name feed row', (p) => {
     expect(screen.getByRole('button', { name: `${p.expand.show}: Astro Bot` }).querySelector('a, button')).toBeNull()
   })
 
+  // #114: the feed's rows grow to the height of the profile column beside them. The centring lived in two
+  // CSS rules (a tall desktop home, someone's profile), so anywhere else the content stuck to the top of a
+  // taller row. The shell centres it itself now; jsdom has no layout, so the class is what can be checked.
+  test('centres its content in a row taller than it (#114)', () => {
+    p.render({ title: 'Astro Bot' }, p.controlled ? { expanded: false } : undefined)
+    const card = screen.getByRole('button', { name: `${p.expand.show}: Astro Bot` }).closest('.rounded-card')
+    expect(card).toHaveClass('flex', 'flex-col', 'justify-center')
+  })
+
   test('a row the feed does not control opens and closes itself', () => {
     if (p.controlled) return
     p.render({ title: 'Astro Bot' })

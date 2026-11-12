@@ -25,7 +25,7 @@ export default function IconButton({ tone = 'default', size = 'md', className = 
   return (
     <button
       type={type}
-      className={`${SIZES[size]} shrink-0 inline-flex items-center justify-center rounded-button transition-colors duration-(--motion-hover) hover:bg-ink/[0.08] aria-pressed:bg-accent/15 aria-pressed:text-accent disabled:opacity-50 disabled:cursor-not-allowed focus-ring ${TONES[tone]} ${className}`}
+      className={`${SIZES[size]} relative tap-target shrink-0 inline-flex items-center justify-center rounded-button transition-colors duration-(--motion-hover) hover:bg-ink/[0.08] aria-pressed:bg-accent/15 aria-pressed:text-accent disabled:opacity-50 disabled:cursor-not-allowed focus-ring ${TONES[tone]} ${className}`}
       {...rest}
     >
       {children}

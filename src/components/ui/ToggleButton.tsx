@@ -35,7 +35,7 @@ export default function ToggleButton({
       aria-label={label}
       title={label}
       onClick={onToggle}
-      className={`transition-colors duration-(--motion-hover) rounded-chip cursor-pointer focus-ring ${
+      className={`relative tap-target transition-colors duration-(--motion-hover) rounded-chip cursor-pointer focus-ring ${
         pressed ? 'text-hardcore' : 'text-text-secondary hover:text-hardcore'
       } ${className}`}
     >

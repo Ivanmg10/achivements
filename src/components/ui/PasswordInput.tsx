@@ -43,7 +43,7 @@ export default function PasswordInput({
             onClick={() => setShow((s) => !s)}
             aria-label={show ? T.passwordInput.hide : T.passwordInput.show}
             aria-pressed={show}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main transition-colors"
+            className="absolute tap-target right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main transition-colors"
             tabIndex={-1}
           >
             {show ? <IconEyeOff size={16} aria-hidden="true" /> : <IconEye size={16} aria-hidden="true" />}

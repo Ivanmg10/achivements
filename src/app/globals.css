@@ -156,6 +156,25 @@
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70;
 }
 
+/*
+   A small control on a touch screen (the Steam Deck, the AYN Thor, a phone) is tapped through
+   44 × 44 px however small it is drawn (#115): its ::after reaches out around it, unseen. With a
+   mouse alone nothing changes. The control must be positioned (relative or absolute), and the box it
+   sits in must not clip it (an overflow strip does: size the control there instead).
+*/
+@utility tap-target {
+  @media (any-pointer: coarse) {
+    &::after {
+      content: '';
+      position: absolute;
+      inset: min(0px, calc((100% - 2.75rem) / 2));
+    }
+  }
+}
+
+/* A screen held sideways, at most 500 px tall: the AYN Thor (~760 × 360 to 800 × 450), a phone on its side (#115). */
+@custom-variant short (@media (max-height: 31.25rem));
+
 /* ============================================
    VARIABLES BASE — fallback
    ============================================ */
@@ -837,8 +856,6 @@ html[data-font="fira"],
   .home-fit:not(:has(.home-cover)):has([data-stats-section="overview"]) .home-fit-chart { height: max(160px, clamp(160px, 20dvh, 260px) - var(--home-fit-trim, 0px)); }
   /* The rows carry flex: 1 1 0 inline (ROW_STYLE). Here they may grow to share spare height but never shrink: short of room, the list scrolls. */
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * { flex: 1 0 auto !important; }
-  /* A row taller than its content keeps the content in the middle, not stuck to the top. */
-  .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * > * { justify-content: center; }
 }
 
 /* A skeleton draws every variant; <html> says which ones show, before the first frame (LOOK_SCRIPT, then ShapeSync). */
@@ -1037,4 +1054,3 @@ html[data-font="fira"],
    may grow to share the spare height but never shrink below their content.
 */
 .profile-recent .home-fit-scroll > * { flex: 1 0 auto !important; }
-.profile-recent .home-fit-scroll > * > * { justify-content: center; }
