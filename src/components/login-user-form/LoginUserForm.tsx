@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
+import AuthTitle from '@/components/auth-title/AuthTitle'
 import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import Button from '@/components/ui/Button'
@@ -64,10 +65,7 @@ export default function LoginUserForm({
 
   return (
     <div className="w-full max-w-sm mx-auto">
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-text-main">{T.loginForm.title}</h1>
-        <div className="mt-2 h-0.5 w-10 bg-accent mx-auto rounded-full" />
-      </div>
+      <AuthTitle>{T.loginForm.title}</AuthTitle>
 
       {isRegister && (
         <div role="status" className="mb-5 bg-success/20 border border-success/40 rounded-tile p-3">

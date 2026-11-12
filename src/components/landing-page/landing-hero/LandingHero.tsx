@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { IconArrowRight } from '@tabler/icons-react'
-import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
+import CoverBand from '@/components/cover-band/CoverBand'
 import { useLanguage } from '@/context/LanguageContext'
 import { buttonClass } from '@/components/ui/Button'
 import { REGISTER_HREF } from '@/utils/authLinks'
@@ -34,13 +34,7 @@ export default function LandingHero() {
         </div>
       </div>
 
-      <div
-        aria-hidden="true"
-        className="enter-card [--i:3] relative h-72 sm:h-96 lg:h-[540px] rounded-[2rem] overflow-hidden ring-1 ring-ink/10 bg-bg-card shadow-2xl shadow-black/40 pointer-events-none select-none"
-      >
-        <AuthCollagePanel />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgb(var(--bg-main)/0.85))]" />
-      </div>
+      <CoverBand className="enter-card [--i:3] h-72 sm:h-96 lg:h-[540px] rounded-[2rem] shadow-2xl shadow-black/40" />
     </section>
   )
 }

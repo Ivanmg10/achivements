@@ -6,7 +6,7 @@ import LoginUserForm from '@/components/login-user-form/LoginUserForm'
 import RegisterUserForm from '@/components/register-user-form/RegisterUserForm'
 import LegalLinks from '@/components/legal-links/LegalLinks'
 import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
-import AuthBrand from '@/components/auth-brand/AuthBrand'
+import AuthPhoneFrame from '@/components/auth-phone-frame/AuthPhoneFrame'
 import AuthFormCard from '@/components/auth-form-card/AuthFormCard'
 import AuthDesktopFormPanel from '@/components/auth-desktop-form-panel/AuthDesktopFormPanel'
 import SteamSignupForm from '@/components/steam-signup-form/SteamSignupForm'
@@ -41,15 +41,8 @@ export default function AuthPage({ wantsRegister, steam }: { wantsRegister: bool
   return (
     <div className="relative bg-bg-main text-text-main min-h-[100dvh] lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
 
-      {/* Phone: the art wall behind, the form on a frosted card over it. */}
-      <div className="lg:hidden flex-1 relative flex flex-col items-center justify-center gap-6 px-4 pt-10 pb-4">
-        <div aria-hidden="true" className="fixed inset-0 opacity-30 pointer-events-none select-none">
-          <AuthCollagePanel />
-        </div>
-        <div aria-hidden="true" className="fixed inset-0 bg-linear-to-b from-bg-main/90 via-bg-main/40 to-bg-main/90 pointer-events-none" />
-        <div className="relative z-10">
-          <AuthBrand />
-        </div>
+      {/* Phone: a band of covers, the name, then the form on its card. */}
+      <AuthPhoneFrame>
         <AnimatePresence mode="wait" initial={false}>
           {isLogin ? (
             <motion.div key="m-login" className="relative z-10 w-full" variants={formTransition} initial="hidden" animate="visible" exit="exit">
@@ -65,7 +58,7 @@ export default function AuthPage({ wantsRegister, steam }: { wantsRegister: bool
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </AuthPhoneFrame>
 
       {/* Desktop, left: the sign-in form or the art wall. */}
       <div className="hidden lg:flex flex-col relative lg:w-[42%] px-10 h-full">

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { IconArrowRight, IconLock } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
+import AuthTitle from '@/components/auth-title/AuthTitle'
 import { useLanguage } from '@/context/LanguageContext'
 import { checkPassword, PASSWORD_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
@@ -58,10 +59,7 @@ export default function ResetPasswordForm() {
 
   return (
     <div className="w-full max-w-sm mx-auto enter-card">
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-text-main">{T.passwordReset.title}</h1>
-        <div className="mt-2 h-0.5 w-10 bg-accent mx-auto rounded-full" />
-      </div>
+      <AuthTitle>{T.passwordReset.title}</AuthTitle>
 
       {!token ? (
         <Notice tone="danger" className="mb-5">{T.passwordReset.missingToken}</Notice>
