@@ -1,10 +1,10 @@
 import { SURFACE } from '@/components/ui/surface'
 
 /**
- * One part of the guide, as a card: its number in the display face with the
- * heading on the left (they stay in view while a long part scrolls on a wide
- * screen), what it means on the right, its rules as marked cards, and any
- * table or chart under them.
+ * One part of the guide, as a card: its heading on the left (it stays in view
+ * while a long part scrolls on a wide screen), what it means on the right, its
+ * rules as a plain list, and any table or chart under them. Parts are topics,
+ * not steps: no numbers.
  */
 export default function RankingsGuideBlock({
   index,
@@ -13,7 +13,7 @@ export default function RankingsGuideBlock({
   points,
   children,
 }: {
-  /** The part's place in the guide, shown as 01, 02… */
+  /** The part's place in the guide, for its heading's id. */
   index: number
   heading: string
   text: string
@@ -22,23 +22,13 @@ export default function RankingsGuideBlock({
 }) {
   return (
     <section aria-labelledby={`guide-${index}`} className={`enter-card ${SURFACE} p-5 sm:p-7 grid gap-5 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10`}>
-      <div className="lg:sticky lg:top-24 self-start flex flex-col gap-2">
-        <span aria-hidden="true" className="font-display italic font-extrabold text-6xl leading-[0.85] text-accent pr-2">
-          {String(index).padStart(2, '0')}
-        </span>
-        <h2 id={`guide-${index}`} className="text-xl sm:text-2xl font-extrabold tracking-tight leading-tight">{heading}</h2>
-      </div>
+      <h2 id={`guide-${index}`} className="lg:sticky lg:top-24 self-start text-xl sm:text-2xl font-extrabold tracking-tight leading-tight">{heading}</h2>
       <div className="flex flex-col gap-4 min-w-0">
         <p className="text-sm sm:text-base text-text-secondary leading-relaxed">{text}</p>
         {points && (
-          <ul className="flex flex-col gap-2">
+          <ul className="list-disc pl-5 flex flex-col gap-2 text-sm sm:text-base text-text-secondary leading-relaxed">
             {points.map((p) => (
-              <li
-                key={p}
-                className="relative rounded-pane bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] py-3 pl-6 pr-4 text-sm sm:text-base text-text-secondary leading-relaxed before:content-[''] before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-[3px] before:bg-accent"
-              >
-                {p}
-              </li>
+              <li key={p}>{p}</li>
             ))}
           </ul>
         )}

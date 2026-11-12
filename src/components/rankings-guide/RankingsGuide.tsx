@@ -6,7 +6,6 @@ import { useLanguage } from '@/context/LanguageContext'
 import { vaultGuideText } from '@/translations/vaultGuide'
 import FaqList from '@/components/faq-list/FaqList'
 import GhostIcon from '@/components/ui/GhostIcon'
-import Tag from '@/components/ui/Tag'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import { TIERS, pointsForLevel } from '@/utils/vaultLevel'
 import { difficultyMultiplier, rarityMultiplier } from '@/utils/vaultScore'
@@ -21,7 +20,8 @@ const REACHES = [1, 0.5, 0.25, 0.1]
 /**
  * "How Vault Points work", for users: why platforms are not simply added up,
  * what makes an achievement and a game worth more, what does not count, the
- * levels, and when points change. Every number shown is worked out from the
+ * levels, and when points change. "Beta" is said once, in the question that
+ * explains what may change (the small tag stays on /rankings). Every number shown is worked out from the
  * real formula, so the page cannot say one thing while the code does another.
  */
 export default function RankingsGuide() {
@@ -46,10 +46,8 @@ export default function RankingsGuide() {
         </Link>
         <h1 className="relative flex items-center gap-3 flex-wrap font-display italic font-extrabold text-5xl sm:text-[4.5rem] leading-[0.9] pr-2">
           {g.heading}
-          <Tag tone="accent">{T.rankings.beta}</Tag>
         </h1>
         <p className="relative max-w-2xl text-base sm:text-lg text-text-main/85 leading-relaxed">{g.intro}</p>
-        <p className="relative self-start max-w-2xl text-[0.8125rem] text-text-secondary bg-black/25 rounded-tile px-3.5 py-2.5">{T.rankings.betaNote}</p>
       </header>
 
       <RankingsGuideBlock index={1} {...g.bag} />
@@ -110,7 +108,7 @@ export default function RankingsGuide() {
 
       <RankingsGuideBlock index={8} {...g.updates} />
 
-      <div className="mt-4"><FaqList title={T.publicPages.faqTitle} items={g.faq} /></div>
+      <div className="mt-4"><FaqList title={T.publicPages.faqTitle} items={g.faq} numbered={false} /></div>
     </div>
   )
 }

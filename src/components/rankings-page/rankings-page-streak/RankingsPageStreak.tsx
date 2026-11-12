@@ -20,7 +20,7 @@ export default function RankingsPageStreak({ streak, best, className = '' }: { s
   return (
     <span title={label} className={`inline-flex flex-col items-center gap-0.5 tabular-nums whitespace-nowrap ${className}`}>
       <span className="sr-only">{label}</span>
-      <span aria-hidden="true" className={`inline-flex items-center gap-1 font-extrabold ${lit ? '' : 'text-text-secondary'}`} style={lit ? { color: streakInk(streakTier(streak)) } : undefined}>
+      <span aria-hidden="true" className={`inline-flex items-center gap-1 ${lit ? 'font-extrabold' : 'font-medium text-text-secondary'}`} style={lit ? { color: streakInk(streakTier(streak)) } : undefined}>
         <Flame size={14} />
         {T.rankings.daysShort.replace('{n}', n(streak))}
       </span>

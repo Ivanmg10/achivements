@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { CountUp } from '@/components/ui/CountUp'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import RankingsPageUser from '../rankings-page-user/RankingsPageUser'
+import RankingsPageRank from '../rankings-page-rank/RankingsPageRank'
 import { SLANT_PLATE } from '@/components/ui/shape'
 
 /** Second, first and third, as a podium stands: each step's height and colour, the picture's size and ring. */
@@ -67,7 +68,7 @@ export default function RankingsPagePodium({ rows, linked, approx = false }: { r
             </span>
             <span style={arrival(place, STEP_AFTER)} className={`enter-grow-y ${STEP_CLASS} ${STEP[place]}`}>
               <span className="sr-only">{T.rankings.colRank}</span>
-              {r.rank}
+              <RankingsPageRank rank={r.rank} tied={r.tied} />
             </span>
           </li>
         ),

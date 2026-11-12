@@ -18,8 +18,8 @@ import Tag from '@/components/ui/Tag'
 export const CARD = 'bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 flex flex-col gap-3'
 
 /**
- * Your own level beside the rankings: the ring to the next level, your tier,
- * your global place and the next tier, this week and this month, and, in a
+ * Your own level beside the rankings: the ring to the next level (the level
+ * in big, said once), your tier, your global place and the next tier, this week and this month, and, in a
  * card of its own, how your points split across platforms. Says so while some
  * games still count provisionally, or before anything is scored.
  */
@@ -79,7 +79,7 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
                 }
               />
               <span className="flex flex-wrap justify-center items-center gap-1.5">
-                <VaultLevelBadge points={me.points} />
+                <VaultLevelBadge points={me.points} tierOnly />
                 {me.rank > 0 && (
                   <Tag>
                     {T.rankings.statRank} #{n(me.rank)}

@@ -19,6 +19,8 @@ test('the longest takes the colour of its tier while the current streak is the r
 
 test('no streak ever: a dimmed 0 and no longest', () => {
   render(<RankingsPageStreak streak={0} best={0} />)
-  expect(screen.getByText('0 d')).toHaveClass('text-text-secondary')
+  // Grey and light, so a row with no streak does not weigh like one with a streak.
+  expect(screen.getByText('0 d')).toHaveClass('text-text-secondary', 'font-medium')
+  expect(screen.getByText('0 d')).not.toHaveClass('font-extrabold')
   expect(screen.queryByText(/best/)).not.toBeInTheDocument()
 })

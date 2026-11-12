@@ -3,6 +3,7 @@ import { en } from '@/translations/en'
 import RankingsPage from './RankingsPage'
 import { useRankings } from '@/hooks/useRankings'
 import { useVaultMe } from '@/hooks/useVaultMe'
+import { levelOf } from '@/utils/vaultLevel'
 
 jest.mock('@/hooks/useRankings', () => ({ useRankings: jest.fn(), ZONE_MAX: 50 }))
 jest.mock('@/hooks/useVaultMe', () => ({ useVaultMe: jest.fn() }))
@@ -133,4 +134,28 @@ test('beside your level, who is most active this week, and a way to that ranking
 test('leads to how points work', () => {
   render(<RankingsPage signedIn />)
   expect(screen.getByRole('link', { name: en.rankings.how })).toHaveAttribute('href', '/rankings/how')
+})
+
+test('a tie reads as one: "3=" on the podium and in the table, the jump to 5 is explained', () => {
+  const tied = [row(1, 'user1'), row(2, 'user2'), row(3, 'user3', { tied: true }), row(3, 'user4', { tied: true }), row(5, 'user5')]
+  setup({ rows: tied })
+  render(<RankingsPage signedIn />)
+  const podium = screen.getByRole('list', { name: en.rankings.title })
+  expect(podium).toHaveTextContent('3=')
+  expect(podium).not.toHaveTextContent('1=')
+  const table = screen.getByRole('table')
+  expect(table).toHaveTextContent('3=')
+  expect(table).not.toHaveTextContent('5=')
+})
+
+test('your level is said once: the ring has the number, beside it only the tier and your place', () => {
+  ;(useVaultMe as jest.Mock).mockReturnValue({ me: { points: 500, split: { ra: 500 }, week: 20, month: 80, rank: 120, listed: true, showInRankings: true, provisional: 0, refreshedAt: null, weeks: [] } })
+  render(<RankingsPage signedIn />)
+  const panel = screen.getByRole('heading', { name: en.rankings.yourLevel }).closest('section')!
+  // "Lv 5 · Novice" would repeat the ring: the tier only; the level stays for a screen reader.
+  const level = en.rankings.levelShort.replace('{n}', String(levelOf(500)))
+  const said = [...panel.querySelectorAll('*')].filter((el) => el.children.length === 0 && el.textContent?.includes(level))
+  expect(said.length).toBeGreaterThan(0)
+  expect(said.every((el) => el.classList.contains('sr-only'))).toBe(true)
+  expect(panel).toHaveTextContent(`${en.rankings.statRank} #120`)
 })
