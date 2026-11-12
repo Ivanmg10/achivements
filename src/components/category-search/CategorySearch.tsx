@@ -33,9 +33,12 @@ export default function CategorySearch({
         className="w-full [&_input]:pr-10 [&_input::-webkit-search-cancel-button]:appearance-none"
       />
       {value && (
-        <IconButton size="sm" aria-label={T.categoryPage.clearSearch} onClick={() => onChange('')} className="absolute right-1.5 top-1/2 -translate-y-1/2">
-          <IconX className="w-4 h-4" aria-hidden="true" />
-        </IconButton>
+        // Placed by a box of its own: the button is relative (its touch area, #115).
+        <span className="absolute right-1.5 top-1/2 -translate-y-1/2 flex">
+          <IconButton size="sm" aria-label={T.categoryPage.clearSearch} onClick={() => onChange('')}>
+            <IconX className="w-4 h-4" aria-hidden="true" />
+          </IconButton>
+        </span>
       )}
     </div>
   )

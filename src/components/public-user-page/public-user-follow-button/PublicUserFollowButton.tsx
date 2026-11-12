@@ -16,7 +16,7 @@ export default function PublicUserFollowButton({ username, initial }: { username
       onClick={toggle}
       disabled={pending}
       aria-pressed={following}
-      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-tile font-semibold transition-colors disabled:opacity-60 focus-ring ${
+      className={`relative tap-target flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-tile font-semibold transition-colors disabled:opacity-60 focus-ring ${
         following ? 'bg-bg-main text-text-main ring-1 ring-ink/10 hover:bg-ink/10' : 'bg-bg-main text-accent hover:bg-ink/10'
       }`}
     >

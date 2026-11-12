@@ -124,18 +124,18 @@ export default function LoginUserForm({
         <button
           type="button"
           onClick={() => setForgotOpen(true)}
-          className="text-text-secondary hover:text-text-main text-sm underline underline-offset-2 transition-colors rounded focus-ring"
+          className="relative tap-target text-text-secondary hover:text-text-main text-sm underline underline-offset-2 transition-colors rounded focus-ring"
         >
           {T.passwordReset.forgotLink}
         </button>
       </p>
 
-      <p className="text-text-secondary text-sm text-center mt-3">
+      <p className="text-text-secondary text-sm text-center mt-3 any-pointer-coarse:mt-6">
         {T.loginForm.noAccountLead}{' '}
         <button
           type="button"
           onClick={() => setIsLogin(false)}
-          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-ring"
+          className="relative tap-target text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-ring"
         >
           {T.loginForm.noAccountAction}
         </button>

@@ -11,7 +11,7 @@ const PLATFORMS = [
   { name: 'Steam', href: 'https://store.steampowered.com' },
   { name: 'PlayStation', href: 'https://www.playstation.com' },
 ]
-const LINK = 'text-text-secondary hover:text-accent transition-colors'
+const LINK = 'relative tap-target text-text-secondary hover:text-accent transition-colors'
 
 export default function MainFooter() {
   const { T } = useLanguage()

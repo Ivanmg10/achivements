@@ -8,7 +8,7 @@ type Size = 'sm' | 'md' | 'lg'
 // Its shape is inset by what the slant adds on each side, so a full-width primary
 // lines up with the fields above and below it; the others are upright and fill their box.
 const BASE =
-  'relative isolate inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none ' +
+  'relative isolate tap-target inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none ' +
   "before:content-[''] before:absolute before:inset-y-0 before:-z-10 before:rounded-button before:transition-colors before:duration-(--motion-hover) " +
   'transition-colors duration-(--motion-hover) disabled:opacity-50 disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:pointer-events-none ' +
   'focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main focus-visible:rounded-button'

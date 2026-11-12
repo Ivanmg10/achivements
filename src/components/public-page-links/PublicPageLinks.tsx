@@ -16,7 +16,7 @@ export default function PublicPageLinks({ current }: { current?: string }) {
         <Link
           key={seoPath(page)}
           href={seoPath(page)}
-          className="text-text-secondary hover:text-accent underline-offset-2 hover:underline transition-colors rounded focus-ring"
+          className="relative tap-target text-text-secondary hover:text-accent underline-offset-2 hover:underline transition-colors rounded focus-ring"
         >
           {seoText(page, lang).link}
         </Link>
