@@ -36,8 +36,8 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 ## 2026-11-12 — The account page and the dialogs (`feat/132-account-dialogs`, #132)
 
 **Did** — Boards "MejCuenta" and "MejDialogos" (canvas page 2), stacked on `feat/131-streak-calendar` (not merged). One commit per point:
-- *Reds* (`feat(account)`): `UserPlatformCard`'s head is two lines now: logo and name, then "Connected" with a small quiet
-  "Disconnect" beside it (`aria-label` is the long "Disconnect Steam"), the same height connected or not so the figures line up in a
+- *Reds* (`feat(account)`): `UserPlatformCard`'s head is two lines now: logo and name, then "Connected" with a small ringed
+  "Disconnect" with an unlink icon beside it (`aria-label` is the long "Disconnect Steam"), the same height connected or not so the figures line up in a
   row; the full-width red button is gone. The red is in the confirmation, `user-page/platform-unlink-dialog/PlatformUnlinkDialog`
   (`Modal tone="danger"`, title "Disconnect {name}?", a line, a quiet Cancel and the danger button; it stays up and blocked while the
   unlink runs and the card closes it with its toast). "Sign out" is `secondary`; "Delete account" stays where it is, in red.
@@ -55,6 +55,13 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 - *Layout sample* (`feat(ui)`): `LayoutModalPreviewSampleProfile` reads `useAuthSession` and `useVaultMe`: the person's name, an
   `Avatar`, `VaultLevelBadge compact`, their Vault Points and the real `ProgressBar` with "N to level M" (a skeleton for the badge
   and `loading` on the points while they load). The welcome's style step shows the same card. The streak figure stays a fixed 12.
+- *After the owner saw it at 2560 px* (same day): "Disconnect" went from quiet to `secondary` small with an icon (still no red; the
+  head row keeps one height). Account dialogs were too narrow at the default `sm` (27.5rem): `md` for change password, edit profile,
+  gender, avatar, RA connect, delete account, disconnect, the admin unlock door and the admin create / edit forms; `lg` for hidden games
+  and the favourite-game picker; language, location, theme (`xl`), layout (`2xl`) and the open admin panel (`xl`) already had their own.
+  `Modal`'s default is unchanged. The admin dialog no longer flashes "Admin panel" before "Unlock the admin panel": until the panel
+  reports its mode the head is a title skeleton over an empty icon tile and the body is `AdminUnlockSkeleton` (the unlock step's boxes,
+  `md`), so only the words arrive.
 **Already done before** — "Theme: —" / "Language: —" for a screen reader (the `ProfileField` test says so); the Venom switch knob
 (`bg-bg-main` when on); "Maestrías" (`userStats.masteries`); Xbox "Cuenta Silver" (`xbox.tier` is "Account", the value "Silver"; #128);
 the one head for every dialog with the ✕ (#121: every dialog is a `Modal`, only the search has its own way out); the delete-account
