@@ -3,11 +3,14 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { Streak } from '@/types/types'
 import { decimal, plural } from '@/utils/utils'
+import { useFitCount } from '@/hooks/useFitCount'
 import SectionHead from '@/components/ui/SectionHead'
+import Facts from '@/components/ui/Facts'
 import { streakInk, streakTier } from '@/utils/streakTier'
 import { formatDay } from '@/utils/dates'
 
-const MAX_ROWS = 6
+// Rows before the card is measured: about what it holds beside the calendar at 2560 px.
+const FIRST_ROWS = 7
 
 interface Props {
   streaks: Streak[]
@@ -21,31 +24,43 @@ interface Props {
 
 /**
  * The longest streaks as a ranked list: the place in the display face, a
- * bar (upright: it is data) in the colour of its tier and as long as the streak against the
+ * bar (upright: it is data), grey but the one shown day by day, which is in its tier's colour, as long as the streak against the
  * best (the one going now says so), its dates under it and its days on the
  * right. Picking one shows it day by day and on the year; picking it again lets go.
  */
 export default function StreakChart({ streaks, selectedStreak, activeStreak, avgStreak, onSelect }: Props) {
   const { T, lang } = useLanguage()
   const short = (d: string) => formatDay(d, lang)
-  const top = streaks.slice(0, MAX_ROWS)
+  // As many rows as the card holds: it is as tall as the calendar beside it, so it never has blank space.
+  const [list, fits] = useFitCount<HTMLOListElement>(FIRST_ROWS)
+  const top = streaks.slice(0, fits)
   const maxDays = top[0]?.days ?? 1
   const same = (a: Streak | null, b: Streak) => a?.start === b.start && a?.end === b.end
 
   return (
-    <section aria-labelledby="streak-best-title" className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-3 h-full">
+    <section aria-labelledby="streak-best-title" className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-3 flex-1">
       <SectionHead
         size="lg"
         id="streak-best-title"
         title={T.streak.chartTitle}
-        aside={T.streak.bestSub.replace('{n}', String(streaks.length)).replace('{avg}', `${decimal(avgStreak, lang)} ${T.streak.daysUnit}`)}
+        aside={
+          <Facts
+            items={[
+              T.streak.bestCount.replace('{n}', streaks.length.toLocaleString(lang)),
+              T.streak.bestAvg.replace('{avg}', `${decimal(avgStreak, lang)} ${T.streak.daysUnit}`),
+            ]}
+          />
+        }
       />
 
-      <ol className="flex flex-col enter-rows">
+      {/* The list fills what the row gives the card, whole rows only; at least six when the card stands alone. */}
+      <div className="relative flex-1 min-h-[20.5rem]">
+      <ol ref={list} className="absolute inset-0 flex flex-col overflow-hidden enter-rows">
         {top.map((streak, i) => {
           const on = same(selectedStreak, streak)
           const live = same(activeStreak, streak)
-          const tier = streakTier(streak.days)
+          // Grey but the one shown day by day, in its tier's colour.
+          const tier = streakTier(on ? streak.days : 0)
           return (
             <li key={streak.start}>
               <button
@@ -53,7 +68,7 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
                 onClick={() => onSelect(streak)}
                 aria-label={`${plural(streak.days, T.plurals.days, lang)}, ${short(streak.start)} – ${short(streak.end)}${live ? `, ${T.streak.ongoing}` : ''}`}
                 aria-pressed={on}
-                className={`w-full grid grid-cols-[2rem_minmax(0,1fr)_3.5rem] items-center gap-3 px-2 py-1.5 rounded-control text-left transition-colors duration-(--motion-hover) focus-ring ${
+                className={`w-full grid grid-cols-[2rem_minmax(0,1fr)_3.5rem] items-center gap-3 px-2 py-1.5 rounded-control text-left transition-colors duration-(--motion-hover) focus-ring focus-visible:ring-inset ${
                   on ? 'bg-ink/[0.06] ring-1 ring-inset ring-ink/20' : 'hover:bg-ink/[0.04]'
                 }`}
               >
@@ -78,6 +93,7 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
           )
         })}
       </ol>
+      </div>
     </section>
   )
 }

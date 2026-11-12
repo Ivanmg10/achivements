@@ -6,8 +6,7 @@ import { kickerClass } from '@/components/ui/Kicker'
 const TILE = 'bg-bg-main rounded-pane px-4 py-3.5 flex flex-col min-w-0'
 const LABEL = `${kickerClass('muted', 'sm')} truncate`
 const VALUE = 'text-[1.875rem] leading-tight font-extrabold tabular-nums'
-
-/** Four numbers about the year, as tiles: days played, the average streak, the last achievement, the longest break. */
+/** Four numbers about the year, as tiles: days played, the average streak, the days since the last achievement, the longest break. */
 export default function StreakQuickStats({
   activeDays,
   avgStreak,
@@ -28,7 +27,7 @@ export default function StreakQuickStats({
     {
       label: T.streak.sinceLast,
       value: daysSinceLast === null ? '—' : daysSinceLast === 0 ? T.streak.today : daysSinceLast.toLocaleString(lang),
-      sub: daysSinceLast === 0 ? T.streak.stillAlive : daysSinceLast === null ? '' : unit(daysSinceLast),
+      sub: daysSinceLast === null ? '' : daysSinceLast === 0 ? T.streak.stillAlive : unit(daysSinceLast),
       accent: daysSinceLast === 0 ? 'text-success' : '',
     },
     { label: T.streak.longestGap, value: <CountUp value={longestGap} locale={lang} />, sub: unit(longestGap) },

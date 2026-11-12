@@ -33,6 +33,69 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-12 — The streak page: the calendar back, best streaks by tier (`feat/131-streak-calendar`, #131)
+
+**Did** — Boards "MejRacha" and "MejRacha5" (canvas page 2), stacked on `feat/130-profiles-rankings-groups` (not merged):
+- *The calendar is back* in "The streak, day by day" (`streak-calendar/StreakCalendar`, `streak-calendar-day/StreakCalendarDay`),
+  from the one `d56b7fee` removed (2026-10-24), wider: columns of at most 56 px (`CALENDAR_COLUMNS`, they shrink to fit a phone),
+  the week from Monday, each day shaded in the accent by its count against the streak's busiest day (as the year below it),
+  the month named on the streak's first day and on each 1st, a "Less … More" legend (`T.cards.heatLess/heatMore`), `.enter-cards`
+  on the grid. The picked day is ringed (`ring-2` with an offset) and bolder, `aria-pressed`; today has `aria-current="date"`;
+  each day's `aria-label` is its full date and count. Keyboard: one tab stop (roving `tabIndex`), the arrows move a day or a week,
+  Home / End to the ends, focus follows. Beside it when the card is at least 48rem wide (`@container`, `@3xl:`), stacked
+  otherwise: the picked day (`StreakDayRow`, now a panel: the day in big, the count, "today", the games, a game finished that
+  day) and its achievements listed (`streak-day-achievements/StreakDayAchievements`: `ListRow` per unlock, badge ringed when
+  hardcore, opening the game; past six, "and 3 more" opens `DayAchievementsModal`; `T.streak.dayMore`, nine languages). Its
+  skeleton is `streak-calendar-skeleton/StreakCalendarSkeleton` (weekday row, 56 days, the legend, the panel), drawn by
+  `StreakPageSkeleton`. Deleted: `StreakDayStrip`, `stripCap`, `T.streak.stripHint` (the sentence that explained the bars) and
+  the strip's place in the guard's lean allow-list.
+- *Best streaks* (`StreakChart`): grey (`streakTier(0)`) until one is picked; the picked one takes its own tier (bar and place).
+  `CLAUDE.md` and `docs/design-system.md` say so; the "streaks in the accent" line was already gone since #124.
+- *The last achievement's tile* ("ÚLTIMO LOGRO · 1 · día" read as "the last achievement: 1 day"): first tried as "Último logro /
+  hace **1** día" (Intl's relative time cut around the number); the owner found it broke the pattern of the other three tiles,
+  so it reads like them: "Desde el último logro" (en "Since your last achievement", nine languages) / **1** / "día" (`plural`),
+  and "Hoy / sigue viva" on the day itself. No new helper left behind.
+- *Turned on its side* after the owner saw a 65-day streak at 2560 px (10 rows, ~650 px tall, empty room on the right): weeks
+  are columns and weekdays rows (initials on the left, the month over the week it starts in), always seven rows; columns
+  `minmax(1.75rem, 3.5rem)` in a `w-fit` grid, so the calendar is as wide as its weeks, shrinks to 28 px days, then scrolls
+  inside itself (the picked week kept in view, never the page); the day panel takes the rest (`@3xl:min-w-72`). Left/right
+  move a week, up/down a day. The skeleton draws the same grid at ten weeks.
+- *A fixed window of weeks* after the owner found the days too big: 13 weeks of 40 px days from 640 px wide, 7 of 32 px below
+  (`useMediaQuery`), the number in `text-xs`. No sideways scroll: `streak-calendar-nav/StreakCalendarNav` over the grid ("8 Sept –
+  11 Nov", `IconButton`s labelled `T.streak.prevWeeks/nextWeeks`, nine languages, off at the streak's ends) pages a long streak;
+  the window opens on the streak's last week (keyed by streak, so picking another starts there), and the keyboard leaving it moves
+  it. A short streak still shows the whole window, the days before it dimmed `aria-hidden` spans; the skeleton is the same window.
+  New `addDays` in `utils/dates.ts`.
+- *Cards fill their row* (the owner's rule, 2026-11-12, now in `CLAUDE.md` and `docs/design-system.md`): the best streaks show
+  as many rows as the card holds (`useFitCount`, new in `src/hooks/`, measures the list's box; at least six alone, about seven
+  beside the 2560 px calendar, more where the calendar card stacks its panel and grows); the bar of the streak being shown is in
+  its tier, the rest grey (`selectedStreak={shownStreak}`, the owner, 2026-11-12). The day panel lists five achievements (four
+  with a finished game) and "See more" (`T.streak.dayMore`) in its head opens the day; the games on one truncated line with
+  the whole list in `title`. The hand-made "·" left for `Facts`: the calendar card's aside, the panel's "today", the hero's
+  kicker and the best streaks' head (`T.streak.bestSub` split into `bestCount` and `bestAvg`, nine languages). The bottom row
+  ("Tu año", "Cuándo juegas") was left as it is: about the same height at 2560 px by the numbers (not measured); at
+  1280–1535 px the year's days hit their 10 px minimum and its card may end ~50 px of blank under the grid: look there.
+- *The day panel never sets the height* (a day with a finished game made the card and the row jump): its content is
+  `absolute inset-0` in a box that takes the calendar's height beside it and a fixed 388 px stacked (`h-[24.25rem]`: its head
+  and five rows), and the achievements are as many whole rows as fit under the head and the finished game (`useFitCount`). One
+  finished game drawn at most; more of them, and the rest of the achievements, are in "See more" (the modal lists them all).
+  The skeleton's calendar card now has the real padding (`sm:p-[1.375rem]`), head line (25.5 px) and the panel's box; the
+  legend is `h-4` in both.
+**Already done before** — what the issue says #127 brings: "Cuándo juegas" is `DataBar` upright (only its stale comment said
+"slanted"; fixed) and the labels are in sentence case (`kickerClass`). The year and hidden consoles are untouched: the calendar
+draws `selectedStreak.achievements`, which come from `useActivityHeatmapYear` (filtered by `useConsoleVisibility`, its
+`isLoading` covering every platform and the libraries), so the streak still lands whole.
+**Decisions** — The days are shaded in the accent, not the canvas's white: the board was drawn on the Dark theme, and the year
+heatmap under it (same data) is in the accent. Nothing is coloured on the best streaks at first (the page starts with
+`picked` null and shows the live or best streak day by day): "grey until picked", as the owner put it (changed later the same day: the shown one is coloured). A long streak grows the
+calendar down (eight weeks are about 560 px tall); no inner scroll.
+**Watch out** — Not seen in a browser (it needs a session): check at 2560 px (calendar and panel side by side), at 1280–1535 px
+(the two cards side by side, so the calendar card is narrow and stacks), 390 px (days about 43 px), both designs, Firefox,
+and a light theme (the number turns `text-bg-main` on tints over 0.6). The skeleton holds eight weeks; a shorter streak's
+card lands a little shorter.
+
+---
+
 ## 2026-11-12 — Following, rankings, the guide and groups, part 2 of #130 (`feat/130-profiles-rankings-groups`)
 
 **Did** — Boards "MejSiguiendo", "MejRankings" and "MejGrupos" (canvas page 2), after part 1 on the same branch (stacked on

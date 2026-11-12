@@ -1,4 +1,4 @@
-import { activityKpis, calcAvgPerDay, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, stripCap, matchParts, decimal, asCategory } from "./utils";
+import { activityKpis, calcAvgPerDay, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, matchParts, decimal, asCategory } from "./utils";
 import type { RecentAchievement } from '@/types/types'
 
 describe("getBestMonth", () => {
@@ -338,17 +338,6 @@ describe('gameSourceFromPath', () => {
     expect(gameSourceFromPath('/nope')).toBeNull()
     expect(gameSourceFromPath('/')).toBeNull()
     expect(gameSourceFromPath(null)).toBeNull()
-  })
-})
-
-describe('stripCap', () => {
-  test('the 90th percentile of the busy days, so one huge day is cut', () => {
-    expect(stripCap([1, 2, 3, 4, 5, 6, 7, 8, 9, 200])).toBe(9)
-    expect(stripCap([0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 90])).toBe(3)
-  })
-  test('at least 1, empty days ignored', () => {
-    expect(stripCap([])).toBe(1)
-    expect(stripCap([0, 0])).toBe(1)
   })
 })
 

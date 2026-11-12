@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { cleanup, render, screen, fireEvent } from '@testing-library/react'
 import StreakChart from './StreakChart'
 import type { Streak } from '@/types/types'
 import { streakTier } from '@/utils/streakTier'
@@ -18,10 +18,14 @@ test('with nothing picked no row is pressed', () => {
   expect(screen.getAllByRole('button', { pressed: false })).toHaveLength(2)
 })
 
-test('each streak has the colour of its own tier', () => {
+test('grey but the one shown, in the colour of its tier', () => {
+  const colours = (c: HTMLElement) => [...c.querySelectorAll<HTMLElement>('.enter-grow-x')].map((bar) => bar.style.backgroundColor.replace(/\s|,/g, ''))
+  const rgb = (days: number) => `rgb(${streakTier(days).color})`.replace(/\s/g, '')
   const { container } = setup()
-  const bars = [...container.querySelectorAll<HTMLElement>('.enter-grow-x')].map((bar) => bar.style.backgroundColor.replace(/\s|,/g, ''))
-  expect(bars).toEqual([long, short].map((s) => `rgb(${streakTier(s.days).color})`.replace(/\s/g, '')))
+  expect(colours(container)).toEqual([rgb(0), rgb(0)])
+  cleanup()
+  const picked = setup(short)
+  expect(colours(picked.container)).toEqual([rgb(0), rgb(short.days)])
 })
 
 test('a row says it is picked, and tells the page either way', () => {
@@ -30,4 +34,12 @@ test('a row says it is picked, and tells the page either way', () => {
   expect(pressed).toHaveClass('ring-1')
   fireEvent.click(pressed)
   expect(onSelect).toHaveBeenCalledWith(short)
+})
+
+test('the head says how many and the average as two facts', () => {
+  setup()
+  const head = screen.getByRole('heading').parentElement!
+  expect(head).toHaveTextContent(/2 in all.*on average, 20.0 days/)
+  // Joined by the mark, never a hand-made dot.
+  expect(head).not.toHaveTextContent('·')
 })

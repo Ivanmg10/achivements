@@ -256,6 +256,8 @@ that keep the look; the landing's first screen is chosen ("Primera pantalla 1 v2
   that say what the code says. What stays: what makes it CheevoVault.
 - **A page does not shrink when data is missing** (the owner, 2026-11-07): an empty or one-item section keeps its
   room and its place, so the visual order holds. Do not size a card to its content to "fix" empty space.
+- **Cards that share a row are one height with no blank inside** (the owner, 2026-11-12): each one's content is sized to
+  fill it (more rows in the short one, a cap and "See more" in the long one), never a card stretched around empty space.
 - **Look before writing.** The two biggest findings were the same component written once per platform (~4,500
   lines) and the library walked around (kickers in 95 files, the focus ring ×220, platform hex ×116). New
   platform code goes into its family's shell (`docs/platform-shells.md`: a shell, an adapter per platform, one
@@ -311,7 +313,8 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
   or arbitrary values.
 - **Colours with a meaning come from the theme** (danger, success, warning, `hardcore`, `softcore`); no palette
   class of any hue. Platform hues are tokens (`--color-steam`…, `platinum`); tier hues live in their util.
-- **Streaks are coloured by tier** (`streakTier`) wherever a streak is coloured.
+- **Streaks are coloured by tier** (`streakTier`) wherever a streak is coloured, never in the accent; the best streaks on
+  `/racha` are grey but the one being shown day by day, in its tier's colour (#131).
 - **Every progress bar is `ProgressBar` or `CircularProgress`** in the theme's `--progress`; only a finished
   bar glows; **the green is only in the percentage beside it**, never on the bar (the user tried a green ring
   and did not like it). Never a bar in a platform's colour; those stay in charts that compare platforms.

@@ -87,6 +87,13 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   the admin panel are the exception (English).
 
 - **Loading is drawn from `Skeleton`.** One composed skeleton per screen or view, on the real page's boxes, gutters and classes (the home's uses the `home-fit` ones), so the content lands without a jump. Where a height comes from data, measure the real thing in the browser and write that number down. Pulse only; the guard refuses a hand-made `animate-pulse`.
+- **Cards that share a row are one height, and full** (the owner, 2026-11-12). Two or three cards side by side (2-2,
+  3-3-3…) stretch to the row's height (a grid row does it by itself) and **what each shows is sized to fill it**: more rows
+  in the shorter one, a cap and a "See more" in the longer one; never a card stretched around blank space. It goes with
+  "a page does not shrink when data is missing": with no data the room is kept, with data it is filled. Example, `/racha`:
+  the calendar card is a fixed height (the weeks' arrows, the months, seven rows, the legend) and the day beside it shows
+  at most five achievements, "See more" in its head; the best streaks next to it show as many rows as the card holds
+  (`useFitCount` measures it), more where the calendar card stacks its panel under the grid and grows.
 
 ## Entrances
 
@@ -117,14 +124,14 @@ where it means something.
 
 - **One angle.** `--slant` is 12° (0 in round). Every lean is `skew-x-(--slant)` on a library piece, or `SLANT_PLATE`
   (a plate behind the content) for a big piece; a plate's cut follows the angle at any height, so the three podium steps
-  lean alike. The guard refuses the old `--slant-*` / `--clip-*` and a lean outside the library but three drawings it names.
+  lean alike. The guard refuses the old `--slant-*` / `--clip-*` and a lean outside the library but two drawings it names.
 - **What leans:** the big gestures and the player's own marks: the primary `Button`, the chosen option of a
   `SegmentedControl`, the level (`VaultLevelBadge`, `Tag slant`) and the streak (`StreakTag`) wherever they are (the top
   bar shows them at one height, one family), the podium's steps.
 - **What stands upright:** small controls, fields, search, filters, `Select`, `Switch`, secondary, quiet and danger
   buttons, every other tag (the game page's chips too), the header's account link, a row's accent mark.
 - **Data never leans:** `ProgressBar`, `DataBar`, the streak page's bars and every chart bar are upright, square in
-  slanted and rounded in round (`--bar-radius`). The streak strip's break mark across a capped bar is an annotation and keeps the angle.
+  slanted and rounded in round (`--bar-radius`).
 - **The mark is the signature:** `--mark` ("/" slanted, "•" round; `MARK` on an `aria-hidden` span). In front of the
   tab you are on (`Tabs`, the one drawing of every tab bar: the profile tabs, the home's view switch, the stats rail,
   the account and public profile; `TabMark` in the top bar's links and the filter rows), in the search bar, between
@@ -208,10 +215,12 @@ flag is read from the database, never the session).
   `GhostIcon` (one size and opacity, whole inside its card at the title's line; never an oversized icon cut by the edge); a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
   `GameCardBackdrop` is the one place that draws it, so every game card follows it.
-- **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the best streaks' bars, the
+- **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the picked best streak, the
   streak hero and its live bar, the cover's streak card, the home's stats tile, the rankings' streak column). Every streak
-  colour comes from it; the older rule "streaks in the accent, amber only in the streak hero" is gone (#124 checked: the hero uses
-  `streakTier` too). A tier's ink keeps `--streak-hue` of its hue (72 %, less on light themes and Steam Retro), so it reads in every theme.
+  colour comes from it; there is no "streaks in the accent" rule (gone since #124: the hero uses `streakTier` too). **The best
+  streaks on `/racha` are grey but the one being shown day by day** (the `none` tier's grey), which is in its tier's colour:
+  the live or best one at first, then the one picked (the owner's call, #131). The days of a streak (its calendar, the year) are shaded in the accent by how much was unlocked: that is
+  activity, not a streak's colour. A tier's ink keeps `--streak-hue` of its hue (72 %, less on light themes and Steam Retro), so it reads in every theme.
 
 ### The Layout modal and look transitions
 

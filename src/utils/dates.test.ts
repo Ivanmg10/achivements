@@ -1,4 +1,4 @@
-import { dateFormat, formatDate, formatDateTime, formatDay, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay } from './dates'
+import { addDays, dateFormat, formatDate, formatDateTime, formatDay, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay } from './dates'
 
 describe('parseUnlockTime', () => {
   test('a zone-less platform date is UTC, whatever the browser zone is', () => {
@@ -84,5 +84,13 @@ describe('relativeTime', () => {
   })
   test('no date, no time', () => {
     expect(relativeTime(null)).toBe('—')
+  })
+})
+
+describe('addDays', () => {
+  test('moves across months and years, both ways', () => {
+    expect(addDays('2026-06-29', 3)).toBe('2026-07-02')
+    expect(addDays('2026-01-01', -1)).toBe('2025-12-31')
+    expect(addDays('2026-03-10', 0)).toBe('2026-03-10')
   })
 })

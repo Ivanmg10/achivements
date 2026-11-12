@@ -9,7 +9,7 @@ import { formatDay } from '@/utils/dates'
 const WEEK = ['2026-06-01', '2026-06-02', '2026-06-03', '2026-06-04', '2026-06-05', '2026-06-06', '2026-06-07']
 const BAR_HEIGHT = 120
 
-/** Achievements per day of the week, Monday first, as slanted bars; the busiest day in full accent. */
+/** Achievements per day of the week, Monday first, as upright bars (their height is the data); the busiest day in full accent. */
 export default function StreakWeekdays({ counts }: { counts: number[] }) {
   const { T, lang } = useLanguage()
   const max = Math.max(1, ...counts)

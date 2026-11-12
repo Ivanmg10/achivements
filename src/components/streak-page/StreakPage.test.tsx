@@ -31,19 +31,24 @@ test('with streaks: the record, the bars and the best streak day by day', () => 
   expect(screen.getByRole('heading', { name: en.streak.listTitle })).toBeInTheDocument()
 })
 
-test('no streak starts picked; one is picked in the list and let go the same way', () => {
-  const best = { start: '2026-06-08', end: '2026-06-09', days: 2, achievements: [{ Date: '2026-06-08 10:00:00' }] }
-  ;(useStreakData as jest.Mock).mockReturnValue({ ...base, achievements: best.achievements, streaks: [best], bestStreak: best })
+test('the streak shown day by day counts as picked in the list; another is picked there and let go the same way', () => {
+  const best = { start: '2026-06-01', end: '2026-06-03', days: 3, achievements: [{ Date: '2026-06-01 10:00:00' }] }
+  const other = { start: '2026-06-08', end: '2026-06-09', days: 2, achievements: [{ Date: '2026-06-08 10:00:00' }] }
+  ;(useStreakData as jest.Mock).mockReturnValue({ ...base, achievements: [...best.achievements, ...other.achievements], streaks: [best, other], bestStreak: best })
   render(<StreakPage />)
   const year = screen.getByRole('group', { name: en.streak.yearTitle })
   const list = screen.getByRole('region', { name: en.streak.chartTitle })
+  const pressed = () => within(list).getByRole('button', { pressed: true })
+  // The best streak is shown, so its row is the coloured one; the year has nothing picked.
+  expect(pressed()).toHaveAccessibleName(/^3 days/)
   expect(within(year).queryByRole('button', { pressed: true })).toBeNull()
 
-  fireEvent.click(within(list).getByRole('button', { pressed: false }))
-  expect(within(list).getByRole('button', { pressed: true })).toBeInTheDocument()
+  fireEvent.click(within(list).getByRole('button', { name: /^2 days/ }))
+  expect(pressed()).toHaveAccessibleName(/^2 days/)
   expect(within(year).getAllByRole('button', { pressed: true }).length).toBeGreaterThan(0)
 
-  fireEvent.click(within(list).getByRole('button', { pressed: true }))
+  fireEvent.click(pressed())
+  expect(pressed()).toHaveAccessibleName(/^3 days/)
   expect(within(year).queryByRole('button', { pressed: true })).toBeNull()
 })
 
