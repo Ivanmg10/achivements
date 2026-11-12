@@ -6,7 +6,6 @@ import LandingBento from '@/components/landing-page/landing-bento/LandingBento'
 import LandingClosing from '@/components/landing-page/landing-closing/LandingClosing'
 import FaqList from '@/components/faq-list/FaqList'
 import PublicFooter from '@/components/public-footer/PublicFooter'
-import VersionBadge from '@/components/version-badge/VersionBadge'
 import { useLanguage } from '@/context/LanguageContext'
 
 /**
@@ -36,8 +35,6 @@ export default function LandingPage() {
       </section>
 
       <PublicFooter />
-
-      <VersionBadge />
     </div>
   )
 }

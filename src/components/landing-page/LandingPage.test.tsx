@@ -6,7 +6,6 @@ jest.mock('@/components/auth-collage-panel/AuthCollagePanel', () => ({
   __esModule: true,
   default: () => <div data-testid="collage" />,
 }))
-jest.mock('@/components/version-badge/VersionBadge', () => ({ __esModule: true, default: () => null }))
 
 test('says what the app is, in one heading and one paragraph', () => {
   render(<LandingPage />)

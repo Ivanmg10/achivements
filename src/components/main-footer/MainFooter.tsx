@@ -3,6 +3,7 @@
 import { IconBrandGithub } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import LegalLinks from '@/components/legal-links/LegalLinks'
+import { APP_VERSION } from '@/lib/version'
 
 const REPO_URL = 'https://github.com/Ivanmg10/achivements'
 const PLATFORMS = [
@@ -22,9 +23,11 @@ export default function MainFooter() {
         <span className="font-semibold text-text-main tracking-wide">
           CheevoVault
           <span className="font-normal text-text-secondary ml-2">© {new Date().getFullYear()}</span>
+          <span className="font-normal text-text-secondary ml-2 tabular-nums">v{APP_VERSION}</span>
         </span>
 
-        <div className="flex items-center gap-3">
+        {/* Each row wraps on a phone instead of running off the right edge. */}
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
           <span className="text-text-secondary">{T.mainFooter.poweredBy}</span>
           {PLATFORMS.map(({ name, href }, i) => (
             <span key={name} className="flex items-center gap-3">
@@ -34,7 +37,7 @@ export default function MainFooter() {
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
           <LegalLinks />
           <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-1.5 ${LINK}`}>
             <IconBrandGithub size={14} aria-hidden="true" />
