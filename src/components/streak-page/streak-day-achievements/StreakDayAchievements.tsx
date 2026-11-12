@@ -1,3 +1,4 @@
+import type { Ref } from 'react'
 import Image from 'next/image'
 import { RecentAchievement } from '@/types/types'
 import { achievementBadgeUrl } from '@/utils/utils'
@@ -8,9 +9,19 @@ import ListRow from '@/components/ui/ListRow'
  * Achievements of the picked day of a streak: the achievement and its game per
  * row, each opening the game. A hardcore unlock (RA) has its badge ringed.
  */
-export default function StreakDayAchievements({ achievements }: { achievements: RecentAchievement[] }) {
+export default function StreakDayAchievements({
+  achievements,
+  ref,
+  className = '',
+}: {
+  achievements: RecentAchievement[]
+  /** The list itself, for a parent that measures how many rows it holds. */
+  ref?: Ref<HTMLUListElement>
+  /** Layout only. */
+  className?: string
+}) {
   return (
-    <ul className="flex flex-col">
+    <ul ref={ref} className={`flex flex-col ${className}`}>
       {achievements.map((ach) => {
         const badge = achievementBadgeUrl(ach)
         return (

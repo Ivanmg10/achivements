@@ -22,7 +22,7 @@ export default function StreakCalendarSkeleton() {
           </div>
           <Skeleton className="h-4 w-32" />
         </div>
-        <Skeleton radius="pane" className="flex-1 @3xl:min-w-72 h-72" />
+        <Skeleton radius="pane" className="flex-1 @3xl:min-w-72 self-stretch h-[24.25rem] @3xl:h-auto" />
       </div>
     </div>
   )

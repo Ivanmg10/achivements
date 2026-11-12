@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import StreakCalendarSkeleton from '../streak-calendar-skeleton/StreakCalendarSkeleton'
 
 const BARS = [100, 46, 40, 34, 29, 26, 20, 20, 20, 14]
-const CARD = 'bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 flex flex-col gap-4'
+const CARD = 'bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-4'
 
 /** The streak page while a year of unlocks loads, block for block: the banner, the best streaks and the calendar, the year and the weekdays. Announced once. */
 export default function StreakPageSkeleton() {
@@ -35,7 +35,10 @@ export default function StreakPageSkeleton() {
           </div>
         </div>
         <div className={CARD}>
-          <Skeleton className="h-5 w-48" />
+          {/* The head's line is its title's: 17 px at 1.5. */}
+          <div className="h-[1.59375rem] flex items-center">
+            <Skeleton className="h-5 w-48" />
+          </div>
           <StreakCalendarSkeleton />
         </div>
       </div>

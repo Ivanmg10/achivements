@@ -74,6 +74,12 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   kicker and the best streaks' head (`T.streak.bestSub` split into `bestCount` and `bestAvg`, nine languages). The bottom row
   ("Tu año", "Cuándo juegas") was left as it is: about the same height at 2560 px by the numbers (not measured); at
   1280–1535 px the year's days hit their 10 px minimum and its card may end ~50 px of blank under the grid: look there.
+- *The day panel never sets the height* (a day with a finished game made the card and the row jump): its content is
+  `absolute inset-0` in a box that takes the calendar's height beside it and a fixed 388 px stacked (`h-[24.25rem]`: its head
+  and five rows), and the achievements are as many whole rows as fit under the head and the finished game (`useFitCount`). One
+  finished game drawn at most; more of them, and the rest of the achievements, are in "See more" (the modal lists them all).
+  The skeleton's calendar card now has the real padding (`sm:p-[1.375rem]`), head line (25.5 px) and the panel's box; the
+  legend is `h-4` in both.
 **Already done before** — what the issue says #127 brings: "Cuándo juegas" is `DataBar` upright (only its stale comment said
 "slanted"; fixed) and the labels are in sentence case (`kickerClass`). The year and hidden consoles are untouched: the calendar
 draws `selectedStreak.achievements`, which come from `useActivityHeatmapYear` (filtered by `useConsoleVisibility`, its

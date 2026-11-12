@@ -140,7 +140,7 @@ export default function StreakCalendar({
           </span>
         ))}
       </div>
-      <div aria-hidden="true" className="flex items-center gap-1.5 text-[0.6875rem] text-text-secondary">
+      <div aria-hidden="true" className="h-4 flex items-center gap-1.5 text-[0.6875rem] text-text-secondary">
         {T.cards.heatLess}
         {LEGEND.map((a) => (
           <span key={a} className="w-3 h-3 rounded-cell" style={{ backgroundColor: `rgb(var(--accent) / ${a})` }} />
