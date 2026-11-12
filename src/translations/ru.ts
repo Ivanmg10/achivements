@@ -209,7 +209,7 @@ export const ru: Translations = {
     name_venom: 'Веном',
     base: 'Фон',
     accent: 'Акцент',
-    named: 'Темы с названием',
+    named: 'Особые темы',
     base_dark: 'Тёмный',
     base_tinted: 'Цветной',
     base_light: 'Светлый',

@@ -112,6 +112,8 @@ test('the theme opens over the whole step: base, accent and the named themes, th
   expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument()
   expect(screen.getByRole('region', { name: en.homeLayout.previewLabel })).toBeInTheDocument()
   expect(screen.getByRole('group', { name: en.userTheme.named })).toBeInTheDocument()
+  // Its groups keep their names on screen (a one-choice step hides its legend: the title says it).
+  expect(screen.getByText(en.userTheme.base).closest('[class*="[&_legend]:sr-only"]')).toBeNull()
   expect(screen.getByRole('radio', { name: /Sakura/ })).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: T.next }))
   expect(onNext).toHaveBeenCalled()

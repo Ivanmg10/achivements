@@ -85,7 +85,7 @@ export default function WelcomePagePreferencesDetail({
 
         {stage && <div className="sticky top-[5.25rem] z-10 h-60 py-2 min-w-0 bg-bg-card lg:static lg:h-auto lg:min-h-0 lg:p-0 lg:col-start-1">{stage}</div>}
 
-        <div className={`flex-1 min-w-0 [&_legend]:sr-only [&_legend]:mb-0 ${stage ? 'lg:col-start-2 lg:row-start-1 lg:row-span-3 lg:min-h-0 lg:overflow-y-auto lg:mt-8 lg:pr-2 lg:[scrollbar-width:thin]' : ''}`}>
+        <div className={`flex-1 min-w-0 ${stage ? 'lg:col-start-2 lg:row-start-1 lg:row-span-3 lg:min-h-0 lg:overflow-y-auto lg:mt-8 lg:pr-2 lg:[scrollbar-width:thin]' : '[&_legend]:sr-only [&_legend]:mb-0'}`}>
           {children}
         </div>
 

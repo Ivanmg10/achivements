@@ -41,7 +41,7 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size="xl"
+      size="3xl"
       backdrop="dim"
       title={T.userTheme.theme}
       hint={<span role="status">{savedTheme === theme ? `${name} · ${T.toast.saved}` : name}</span>}

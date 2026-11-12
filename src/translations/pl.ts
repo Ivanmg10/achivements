@@ -209,7 +209,7 @@ export const pl: Translations = {
     name_venom: 'Venom',
     base: 'Tło',
     accent: 'Akcent',
-    named: 'Motywy z nazwą',
+    named: 'Motywy specjalne',
     base_dark: 'Ciemny',
     base_tinted: 'Barwny',
     base_light: 'Jasny',

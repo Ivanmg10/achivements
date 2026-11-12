@@ -209,7 +209,7 @@ export const ja: Translations = {
     name_venom: 'ヴェノム',
     base: '背景',
     accent: 'アクセント',
-    named: '名前付きテーマ',
+    named: '特別なテーマ',
     base_dark: 'ダーク',
     base_tinted: 'カラー',
     base_light: 'ライト',

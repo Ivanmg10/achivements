@@ -210,7 +210,7 @@ export const en = {
     name_venom: 'Venom',
     base: 'Base',
     accent: 'Accent',
-    named: 'Named themes',
+    named: 'Special themes',
     base_dark: 'Dark',
     base_tinted: 'Tinted',
     base_light: 'Light',
