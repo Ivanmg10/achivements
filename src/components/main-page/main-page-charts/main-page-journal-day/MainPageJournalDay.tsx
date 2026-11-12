@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import { achievementGameIconUrl, plural } from '@/utils/utils'
 import { gameHref } from '@/utils/gameRef'
+import { formatDay } from '@/utils/dates'
 import { GameListRow } from '@/components/ui/GameListRow'
 
 const GAMES_SHOWN = 2
@@ -29,7 +30,7 @@ export default function MainPageJournalDay({ day }: { day: JournalDay }) {
   const label =
     ago <= 1
       ? new Intl.RelativeTimeFormat(lang, { numeric: 'auto' }).format(-ago, 'day')
-      : new Intl.DateTimeFormat(lang, { weekday: 'short', day: 'numeric', month: 'short' }).format(date)
+      : formatDay(day.day, lang, { weekday: 'short', day: 'numeric', month: 'short' })
   const hidden = day.games.length - GAMES_SHOWN
 
   return (

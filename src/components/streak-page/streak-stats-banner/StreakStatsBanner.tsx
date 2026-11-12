@@ -32,7 +32,6 @@ export default function StreakStatsBanner({ activeStreak, bestStreak, lastActive
   const { T, lang } = useLanguage()
   // The streak going colours the hero by its tier; none going, the dimmest.
   const tier = streakTier(activeStreak?.days ?? 0)
-  const long = (d: string) => formatDay(d, lang, { day: 'numeric', month: 'long' })
 
   let kicker = T.streak.yourStreak
   if (activeStreak && bestStreak) {
@@ -59,8 +58,8 @@ export default function StreakStatsBanner({ activeStreak, bestStreak, lastActive
             </p>
             <p className="text-[0.9375rem] text-text-secondary">
               {(activeStreak.end === today ? T.streak.untilToday : T.streak.untilDay)
-                .replace('{start}', long(activeStreak.start))
-                .replace('{end}', long(activeStreak.end))}{' '}
+                .replace('{start}', formatDay(activeStreak.start, lang))
+                .replace('{end}', formatDay(activeStreak.end, lang))}{' '}
               {todayCount > 0 ? plural(todayCount, T.plurals.todayAchievements, lang) : T.homeLayout.todayNone.replace('{h}', String(hoursLeft))}
             </p>
           </>

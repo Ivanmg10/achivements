@@ -13,7 +13,7 @@ import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseTo
 import Modal from '@/components/ui/Modal'
 import { decimal } from '@/utils/utils'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
-import { formatDate, parseUnlockTime } from '@/utils/dates'
+import { formatDate, formatDateTime, parseUnlockTime } from '@/utils/dates'
 import { raTypeTag } from '@/components/ui/dataTable'
 import { raBadgeUrl, raAvatarUrl } from '@/utils/raAssets'
 import Avatar from '@/components/ui/Avatar'
@@ -105,10 +105,7 @@ export default function AchievementModal({
   }, [achievement.ID])
 
   const earnedDate = achievement.DateEarned
-    ? new Date(parseUnlockTime(achievement.DateEarned)).toLocaleString(lang, {
-        day: 'numeric', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit',
-      })
+    ? formatDateTime(achievement.DateEarned, lang)
     : null
 
   return (

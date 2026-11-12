@@ -32,7 +32,9 @@ test('RA: the best periods are the ones with the most points', () => {
   render(<MainPageBestPeriod achievements={[ach('2024-01-10', 100), ach('2024-02-03', 5), ach('2024-02-03', 5)]} />)
   expect(card(en.cards.bestDay)).toHaveTextContent('100')
   expect(card(en.cards.bestDay)).toHaveTextContent('pts')
-  expect(card(en.cards.bestMonth)).toHaveTextContent('2024-01')
+  expect(card(en.cards.bestMonth)).toHaveTextContent('January 2024')
+  // The day in the one format, never "2024-01-10".
+  expect(card(en.cards.bestDay)).toHaveTextContent('Jan 10, 2024')
 })
 
 test('Steam: the best periods are the ones with the most unlocks, shown as counts', () => {
@@ -41,7 +43,7 @@ test('Steam: the best periods are the ones with the most unlocks, shown as count
   expect(card(en.cards.bestDay)).toHaveTextContent('2')
   expect(card(en.cards.bestDay)).toHaveTextContent(en.lineChart.achievements)
   expect(card(en.cards.bestDay)).not.toHaveTextContent('pts')
-  expect(card(en.cards.bestMonth)).toHaveTextContent('2024-02')
+  expect(card(en.cards.bestMonth)).toHaveTextContent('February 2024')
 })
 
 test('opens the best day, week and month in a modal', async () => {
@@ -52,7 +54,7 @@ test('opens the best day, week and month in a modal', async () => {
   expect(await screen.findByTestId('week-modal')).toBeInTheDocument()
   fireEvent.click(card(en.cards.bestMonth))
   // Only that month's unlocks, not December's.
-  expect(await screen.findByTestId('month-modal')).toHaveTextContent(`${en.cards.bestMonth} · 2024-01:2`)
+  expect(await screen.findByTestId('month-modal')).toHaveTextContent(`${en.cards.bestMonth} · January 2024:2`)
 })
 
 test('says so without data, and shows placeholders while loading', () => {

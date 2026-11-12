@@ -1,4 +1,4 @@
-import { dateFormat, formatDate, formatDay, localDay, parseUnlockTime, unlockIso, utcDay } from './dates'
+import { dateFormat, formatDate, formatDateTime, formatDay, localDay, parseUnlockTime, unlockIso, utcDay } from './dates'
 
 describe('parseUnlockTime', () => {
   test('a zone-less platform date is UTC, whatever the browser zone is', () => {
@@ -60,6 +60,12 @@ describe('formatDate', () => {
     expect(formatDay('2024-06-05', 'en')).toBe('Jun 5, 2024')
     expect(formatDate('2026-10-03', 'en', { year: 'numeric' })).toBe('2026')
     expect(dateFormat(new Date(2026, 0, 1), new Date(2026, 11, 31))).toEqual({ day: 'numeric', month: 'short' })
+  })
+
+  test('with its time, where the time is the point: the same format, then hh:mm', () => {
+    expect(formatDateTime('2026-10-03T09:05:00Z', 'en')).toMatch(/^Oct 3, \d\d:\d\d [AP]M$/)
+    expect(formatDateTime('2025-10-03T09:05:00Z', 'es')).toMatch(/^3 oct 2025, \d\d:\d\d$/)
+    expect(formatDateTime(null, 'en')).toBe('—')
   })
 
   test('"—" for nothing', () => {

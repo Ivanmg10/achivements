@@ -9,7 +9,7 @@ import MainPageBestPeriodRow from './main-page-best-period-row/MainPageBestPerio
 import { getBestMonth } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
-import { parseUnlockTime, utcDay } from '@/utils/dates'
+import { formatDay, parseUnlockTime, utcDay } from '@/utils/dates'
 import Kicker from '@/components/ui/Kicker'
 
 // Downloaded the first time it opens, not with the page.
@@ -73,6 +73,8 @@ export default function MainPageBestPeriod({
     isSteam
       ? { value: p.ach.toLocaleString(lang), unit: T.lineChart.achievements }
       : { value: p.pts.toLocaleString(lang), unit: T.libraryDetail.pointsShort }
+  /** A month ("2024-01") as a reader says it: "January 2024". */
+  const month = (m: string) => formatDay(`${m}-01`, lang, { month: 'long', year: 'numeric' })
   /** The line under the period: when it was, with RA's unlock count alongside. */
   const when = (p: { pts: number; ach: number }, date: string) =>
     isSteam ? date : `${p.ach} ${T.lineChart.achievements} · ${date}`
@@ -101,7 +103,7 @@ export default function MainPageBestPeriod({
               tone="purple"
               icon={<IconCalendarEvent className="w-4 h-4" />}
               {...amount(bestDay[1])}
-              when={when(bestDay[1], T.cards.dayOf.replace('{date}', bestDay[0]))}
+              when={when(bestDay[1], T.cards.dayOf.replace('{date}', formatDay(bestDay[0], lang)))}
               onClick={() => setSelectedDay(bestDay[0])}
             />
           ) : (
@@ -115,7 +117,7 @@ export default function MainPageBestPeriod({
               tone="yellow"
               icon={<IconCalendarWeek className="w-4 h-4" />}
               {...amount(bestWeek[1])}
-              when={when(bestWeek[1], T.cards.weekOf.replace('{date}', bestWeek[0]))}
+              when={when(bestWeek[1], T.cards.weekOf.replace('{date}', formatDay(bestWeek[0], lang)))}
               onClick={() => setSelectedWeek(bestWeek[0])}
             />
           ) : (
@@ -130,7 +132,7 @@ export default function MainPageBestPeriod({
               tone="red"
               icon={<IconCalendarMonth className="w-4 h-4" />}
               {...amount(bestMonth[1])}
-              when={when(bestMonth[1], bestMonth[0])}
+              when={when(bestMonth[1], month(bestMonth[0]))}
               onClick={() => setSelectedMonth(bestMonth[0])}
             />
           ) : (
@@ -157,7 +159,7 @@ export default function MainPageBestPeriod({
         )}
         {selectedMonth && (
           <PeriodAchievementsModal
-            title={`${T.cards.bestMonth} · ${selectedMonth}`}
+            title={`${T.cards.bestMonth} · ${month(selectedMonth)}`}
             achievements={achievements.filter((a) => a.Date.startsWith(selectedMonth))}
             onClose={closeMonthModal}
           />

@@ -52,6 +52,14 @@ export function formatDate(s: string | number | null | undefined, lang: string, 
   return d.toLocaleDateString(lang, options ?? dateFormat(d))
 }
 
+/** A platform date with its time, where the time is the point (an unlock's moment): the one format, then hh:mm. */
+export function formatDateTime(s: string | number | null | undefined, lang: string): string {
+  const t = typeof s === 'number' ? s : parseUnlockTime(s)
+  if (Number.isNaN(t)) return '—'
+  const d = new Date(t)
+  return d.toLocaleString(lang, { ...dateFormat(d), hour: '2-digit', minute: '2-digit' })
+}
+
 /**
  * How long ago, in the given language ("2 hours ago", "hace 2 horas"), in the
  * largest unit that fits. "—" when there is no date to tell.

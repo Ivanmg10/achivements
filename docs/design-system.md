@@ -30,11 +30,13 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   language, **the year only when it is not the current one** ("23 oct", "Oct 23", "3 oct 2025"; `dateFormat`
   in `utils/dates.ts`). On screen it is `ui/DateText` (a `<time>`); where JSX cannot go, `formatDate(s, lang)`
   or `formatDay(day, lang)` with no options. The guard refuses a numeric date (`formatDate(…, lang, {})`), the
-  format written by hand (`{ day: 'numeric', month: 'short' }`, with or without a year) and any
-  `toLocaleDateString` outside `utils/dates.ts` (the admin panel is exempt). What keeps its own options is
-  not "the date of something": a chart's month axis, a range of days (`MainPageMonthCompare`), a day with
-  its weekday (the journal, the streak page's rows, a day modal's title), a date with its time (the unlock
-  tooltip, RA's achievement modal). A test that pins a formatted date fixes the clock
+  format written by hand (`{ day: 'numeric', month: 'short' }`, with or without a year), any
+  `toLocaleDateString` outside `utils/dates.ts`, and a `toLocaleString` or `Intl.DateTimeFormat` given a day,
+  month or year anywhere else (the admin panel is exempt). A date with its time (the unlock tooltip, RA's
+  achievement modal) is `formatDateTime`: the one format, then hh:mm. What keeps its own options, through
+  `formatDate` / `formatDay`, is not "the date of something": a chart's axis, a month ("January 2024", the best
+  month), a range of days (`MainPageMonthCompare`, its own formatter), a day with its weekday (the journal, the
+  streak page's rows, a day modal's title, the heatmap tooltip). A test that pins a formatted date fixes the clock
   (`jest.useFakeTimers({ now })`) or uses a past year, so it says the same next year.
 - **A rule that starts with offenders lists them** (#120, 2026-11-08): `NEW_RULES` in the guard, each with its
   list of files still drawing the piece by hand in `ui/uiGuard.pending.json`. A file not on its list fails; a
