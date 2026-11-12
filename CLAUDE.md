@@ -256,6 +256,8 @@ that keep the look; the landing's first screen is chosen ("Primera pantalla 1 v2
   that say what the code says. What stays: what makes it CheevoVault.
 - **A page does not shrink when data is missing** (the owner, 2026-11-07): an empty or one-item section keeps its
   room and its place, so the visual order holds. Do not size a card to its content to "fix" empty space.
+- **Cards that share a row are one height with no blank inside** (the owner, 2026-11-12): each one's content is sized to
+  fill it (more rows in the short one, a cap and "See more" in the long one), never a card stretched around empty space.
 - **Look before writing.** The two biggest findings were the same component written once per platform (~4,500
   lines) and the library walked around (kickers in 95 files, the focus ring ×220, platform hex ×116). New
   platform code goes into its family's shell (`docs/platform-shells.md`: a shell, an adapter per platform, one

@@ -87,6 +87,13 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   the admin panel are the exception (English).
 
 - **Loading is drawn from `Skeleton`.** One composed skeleton per screen or view, on the real page's boxes, gutters and classes (the home's uses the `home-fit` ones), so the content lands without a jump. Where a height comes from data, measure the real thing in the browser and write that number down. Pulse only; the guard refuses a hand-made `animate-pulse`.
+- **Cards that share a row are one height, and full** (the owner, 2026-11-12). Two or three cards side by side (2-2,
+  3-3-3…) stretch to the row's height (a grid row does it by itself) and **what each shows is sized to fill it**: more rows
+  in the shorter one, a cap and a "See more" in the longer one; never a card stretched around blank space. It goes with
+  "a page does not shrink when data is missing": with no data the room is kept, with data it is filled. Example, `/racha`:
+  the calendar card is a fixed height (the weeks' arrows, the months, seven rows, the legend) and the day beside it shows
+  at most five achievements, "See more" in its head; the best streaks next to it show as many rows as the card holds
+  (`useFitCount` measures it), more where the calendar card stacks its panel under the grid and grows.
 
 ## Entrances
 
