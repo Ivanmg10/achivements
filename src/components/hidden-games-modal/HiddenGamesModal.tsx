@@ -22,7 +22,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
   const { hidden, showGame } = useHiddenGames()
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" icon={<IconEyeOff size={20} />} title={T.userPage.hiddenGames}>
+    <Modal isOpen={isOpen} onClose={onClose} size="lg" icon={<IconEyeOff size={20} />} title={T.userPage.hiddenGames}>
         {hidden.length === 0 ? (
           <p className="text-sm text-text-secondary py-6 text-center">{T.userPage.hiddenEmpty}</p>
         ) : (

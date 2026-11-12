@@ -57,6 +57,7 @@ export default function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolea
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      size="md"
       tone="danger"
       icon={<IconTrash size={20} />}
       title={D.title}

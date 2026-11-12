@@ -33,6 +33,7 @@ export default function PlatformUnlinkDialog({
     <Modal
       isOpen={isOpen}
       onClose={busy ? () => {} : onClose}
+      size="md"
       tone="danger"
       icon={<IconPlugConnectedX size={20} />}
       title={T.userData.disconnectTitle.replace('{name}', name)}

@@ -90,6 +90,7 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      size="md"
       title={`${T.editProfileModal.title} ${label}`}
       footer={
         <>

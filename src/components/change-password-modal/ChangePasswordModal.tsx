@@ -71,6 +71,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      size="md"
       icon={<IconLock size={20} />}
       title={T.userConfig.changePassword}
       footer={

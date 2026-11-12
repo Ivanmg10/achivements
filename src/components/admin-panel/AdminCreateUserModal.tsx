@@ -57,6 +57,7 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
+      size="md"
       title="Create user"
       footer={
         <>
