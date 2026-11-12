@@ -61,7 +61,8 @@ export default function PublicUserPlatforms({ games, isLoading }: { games: Libra
                 </div>
                 <div className="flex flex-col-reverse">
                   <dt className="text-[10px] text-text-secondary">{T.userProfile.completed}</dt>
-                  <dd className="text-lg font-bold tabular-nums text-success">{p.completed.toLocaleString(lang)}</dd>
+                  {/* The green says "done": only when there is something done (#130). */}
+                  <dd className={`text-lg font-bold tabular-nums ${p.completed > 0 ? 'text-success' : ''}`}>{p.completed.toLocaleString(lang)}</dd>
                 </div>
                 <div className="flex flex-col-reverse">
                   <dt className="text-[10px] text-text-secondary">{T.userProfile.playing}</dt>
