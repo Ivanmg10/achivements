@@ -130,7 +130,7 @@ export default function LoginUserForm({
         </button>
       </p>
 
-      <p className="text-text-secondary text-sm text-center mt-3 any-pointer-coarse:mt-6">
+      <p className="text-text-secondary text-sm text-center mt-3 sm:any-pointer-coarse:mt-6">
         {T.loginForm.noAccountLead}{' '}
         <button
           type="button"

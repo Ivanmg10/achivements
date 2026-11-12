@@ -141,7 +141,7 @@ export default function MainHeader() {
         } ${isGameInfo ? 'bg-bg-header/60 ring-ink/10' : 'bg-bg-header/85 ring-ink/[0.08]'}`}
       >
         {/* Left: home + back + nav (desktop) / hamburguesa (mobile) */}
-        <div className="flex items-center gap-1 any-pointer-coarse:gap-2 shrink-0 z-10">
+        <div className="flex items-center gap-1 sm:any-pointer-coarse:gap-2 shrink-0 z-10">
           <Link
             href="/"
             aria-label={T.header.home}
