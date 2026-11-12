@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import Switch from './Switch'
 import Checkbox from './Checkbox'
+import userEvent from '@testing-library/user-event'
 import ChoiceCards, { choiceClass } from './ChoiceCards'
 
 describe('Switch', () => {
@@ -61,6 +62,14 @@ describe('ChoiceCards', () => {
     render(<ChoiceCards legend="Who sees it" value={false} onChange={onChange} options={options} />)
     fireEvent.click(screen.getByRole('radio', { name: /Public/ }))
     expect(onChange).toHaveBeenCalledWith(true)
+  })
+
+  it('keeps a disabled choice in its place without offering it', async () => {
+    const onChange = jest.fn()
+    render(<ChoiceCards legend="Who sees it" value={false} onChange={onChange} options={[options[0], { ...options[1], disabled: true }]} />)
+    expect(screen.getByRole('radio', { name: /Public/ })).toBeDisabled()
+    await userEvent.click(screen.getByText('Public'))
+    expect(onChange).not.toHaveBeenCalled()
   })
 
   it('marks the chosen card with a ring, not colour alone', () => {
