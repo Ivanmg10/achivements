@@ -38,10 +38,10 @@ test('opened, the button folds it again', () => {
   expect(screen.getByRole('button', { name: en.mainPage.hideProfile })).toHaveAttribute('aria-expanded', 'true')
 })
 
-test('only on a phone: from sm the line is not drawn', () => {
+test('only on a phone, or a screen held sideways below lg (#115): elsewhere the line is not drawn', () => {
   given()
   const { container } = render(<MainPageProfileFold open={false} onToggle={() => {}} controls="side" />)
-  expect(container.firstElementChild).toHaveClass('sm:hidden')
+  expect(container.firstElementChild).toHaveClass('sm:hidden', 'max-lg:short:flex')
 })
 
 test('the streak is drawn only whole and the level only once the points are known: their room meanwhile, no 0', () => {
@@ -60,6 +60,6 @@ test('while the points are calculated the level keeps its room, with no number',
 
 test('its skeleton is the same box, phone only, hidden from a screen reader', () => {
   const { container } = render(<MainPageProfileFoldSkeleton />)
-  expect(container.firstElementChild).toHaveClass('sm:hidden')
+  expect(container.firstElementChild).toHaveClass('sm:hidden', 'max-lg:short:flex')
   expect(container.firstElementChild).toHaveAttribute('aria-hidden', 'true')
 })

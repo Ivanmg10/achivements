@@ -15,12 +15,12 @@ import Button from '@/components/ui/Button'
 export default function LandingNav({ wide = false }: { wide?: boolean }) {
   const { T } = useLanguage()
   return (
-    <div className={`sticky top-0 z-40 pt-2 ${wide ? 'px-4 sm:px-8' : 'px-2 sm:px-3'}`}>
+    <div className={`sticky short:relative top-0 z-40 pt-2 ${wide ? 'px-4 sm:px-8' : 'px-2 sm:px-3'}`}>
       <nav
         aria-label={T.authPage.brand}
         className={`${wide ? 'w-full' : 'max-w-6xl mx-auto'} h-14 px-4 rounded-card flex items-center justify-between bg-bg-card/75 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-ink/[0.06] shadow-lg shadow-black/20`}
       >
-        <Link href="/" className="rounded focus-ring">
+        <Link href="/" className="relative tap-target rounded focus-ring">
           <BrandMark name={T.authPage.brand} size="sm" />
         </Link>
         <Button href="/authPage" variant="secondary" size="sm">

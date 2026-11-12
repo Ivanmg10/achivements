@@ -28,7 +28,7 @@ export default function StatusNavDropdown({
         aria-expanded={isOpen}
         aria-label={label}
         onClick={() => setIsOpen((o) => !o)}
-        className={`relative inline-flex items-center gap-1 h-10 px-3 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors cursor-pointer focus-ring focus-visible:rounded-chip ${active ? 'text-text-main' : 'text-text-secondary hover:text-text-main'}`}
+        className={`relative tap-target inline-flex items-center gap-1 h-10 px-3 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors cursor-pointer focus-ring focus-visible:rounded-chip ${active ? 'text-text-main' : 'text-text-secondary hover:text-text-main'}`}
       >
         <TabMark on={active} />
         {label}
