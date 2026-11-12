@@ -1,5 +1,6 @@
 import { MARK, SLANT_PLATE } from '@/components/ui/shape'
 import Kicker from '@/components/ui/Kicker'
+import BrandMark from '@/components/ui/BrandMark'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
 import DesignCatalogEntrances from '../design-catalog-entrances/DesignCatalogEntrances'
 
@@ -129,6 +130,16 @@ export default function DesignCatalogFoundations() {
               <Kicker as="span" size={size}>Last 7 days</Kicker>
               <Kicker as="span" size={size} tone="accent">Step 2 of 8</Kicker>
               <Kicker as="span" size={size} tone="danger">Failed to load</Kicker>
+            </Specimen>
+          ))}
+        </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="brand-mark">
+        <Panel>
+          {(['sm', 'md', 'lg'] as const).map((size) => (
+            <Specimen key={size} name={`size ${size}`}>
+              <BrandMark name="CheevoVault" size={size} />
             </Specimen>
           ))}
         </Panel>

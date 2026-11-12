@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
+import BrandMark from '@/components/ui/BrandMark'
+import Button from '@/components/ui/Button'
 
 /**
- * The bar a visitor sees: the name, and the way in for anyone who already
- * has an account. The same floating, frosted shape as the app's own bar, so
- * signing in feels like stepping through rather than into another site. `wide`
+ * The bar a visitor sees: the logo and the name, and the way in for anyone who
+ * already has an account. The same floating, frosted shape as the app's own bar,
+ * so signing in feels like stepping through rather than into another site. `wide`
  * is for a page whose content runs the full width (the rankings): the bar is as
  * wide as it and starts at the same edge.
  */
@@ -18,18 +20,12 @@ export default function LandingNav({ wide = false }: { wide?: boolean }) {
         aria-label={T.authPage.brand}
         className={`${wide ? 'w-full' : 'max-w-6xl mx-auto'} h-14 px-4 rounded-card flex items-center justify-between bg-bg-card/75 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-ink/[0.06] shadow-lg shadow-black/20`}
       >
-        <Link
-          href="/"
-          className="text-lg font-extrabold tracking-tight rounded focus-ring"
-        >
-          {T.authPage.brand}
+        <Link href="/" className="rounded focus-ring">
+          <BrandMark name={T.authPage.brand} size="sm" />
         </Link>
-        <Link
-          href="/authPage"
-          className="px-4 py-1.5 rounded-full text-sm font-medium bg-bg-main ring-1 ring-ink/10 hover:ring-ink/25 transition-shadow focus-ring"
-        >
+        <Button href="/authPage" variant="secondary" size="sm">
           {T.landing.signIn}
-        </Link>
+        </Button>
       </nav>
     </div>
   )
