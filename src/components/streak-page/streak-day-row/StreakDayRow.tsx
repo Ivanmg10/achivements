@@ -46,7 +46,8 @@ export default function StreakDayRow({ date, today, achievements, awards = [] }:
 
   return (
     // The content is absolute, so the panel adds nothing to its row's height: 388 px stacked (its head and five rows).
-    <div className="relative flex-1 min-w-0 @3xl:min-w-72 self-stretch h-[24.25rem] @3xl:h-auto">
+    // flex-1 only beside the calendar: stacked, a basis of 0 beat the height and the panel was 0 px tall (#115).
+    <div className="relative min-w-0 @3xl:flex-1 @3xl:min-w-72 self-stretch h-[24.25rem] @3xl:h-auto">
       <div className="absolute inset-0 overflow-hidden flex flex-col gap-4 rounded-pane bg-bg-main p-4 sm:p-5">
         <div className="flex items-center gap-4 min-w-0 shrink-0">
           <span aria-hidden="true" className="flex flex-col items-center shrink-0 w-12">
