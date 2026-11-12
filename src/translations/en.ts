@@ -608,6 +608,7 @@ export const en = {
     noAccountLead: 'Don’t have an account?',
     noAccountAction: 'Register',
     tooManyAttempts: 'Too many failed attempts. Wait 15 minutes and try again.',
+    needsAccount: 'That page does not exist or needs an account',
   },
   passwordReset: {
     forgotLink: 'Forgot your password?',

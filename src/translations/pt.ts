@@ -607,6 +607,7 @@ export const pt: Translations = {
     noAccountLead: 'Ainda não tens conta?',
     noAccountAction: 'Regista-te',
     tooManyAttempts: 'Muitas tentativas falhadas. Aguarde 15 minutos e tente novamente.',
+    needsAccount: 'Essa página não existe ou precisa de uma conta',
   },
   passwordReset: {
     forgotLink: 'Esqueceste-te da palavra-passe?',

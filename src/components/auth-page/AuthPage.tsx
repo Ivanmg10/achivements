@@ -24,9 +24,10 @@ const WIDE = '(min-width: 1024px)'
  * The sign-in and register page. `wantsRegister` opens it on the register form,
  * for the landing button; `steam` is Steam's sign-in coming back
  * (api/auth/steam/callback), and takes the sign-in slot. `form` takes it too, for another
- * screen that wears the same layout (the reset-password page).
+ * screen that wears the same layout (the reset-password page). `next` is the own-site path the
+ * proxy sent the visitor from, already checked by `safeNext`: the sign-in says so and goes back to it.
  */
-export default function AuthPage({ wantsRegister, steam, form }: { wantsRegister: boolean; steam: string | null; form?: ReactNode }) {
+export default function AuthPage({ wantsRegister, steam, form, next = null }: { wantsRegister: boolean; steam: string | null; form?: ReactNode; next?: string | null }) {
   const [isLogin, setIsLogin] = useState(!wantsRegister)
   const [hasRegister, setHasRegister] = useState(false)
 
@@ -36,7 +37,7 @@ export default function AuthPage({ wantsRegister, steam, form }: { wantsRegister
   const isWide = useMediaQuery(WIDE)
   const inPhone = !isClient || !isWide
   const inDesktop = !isClient || isWide
-  const signInForm = form ?? (steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />)
+  const signInForm = form ?? (steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} next={next} />)
   const registerForm = <RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setHasRegister} />
 
   return (

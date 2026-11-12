@@ -58,7 +58,16 @@ test('the app needs an account: a visitor is sent to sign in', async () => {
   ;(getToken as jest.Mock).mockResolvedValue(null)
   const res = await proxy(request('/groups'))
   expect(res.status).toBe(307)
-  expect(res.headers.get('location')).toBe('http://localhost:3000/authPage')
+  expect(res.headers.get('location')).toBe('http://localhost:3000/authPage?next=%2Fgroups')
+})
+
+test('the sign-in is told where the visitor was going, with the query, and never a place off this site', async () => {
+  ;(getToken as jest.Mock).mockResolvedValue(null)
+  expect((await proxy(request('/groups?tab=2'))).headers.get('location')).toBe('http://localhost:3000/authPage?next=%2Fgroups%3Ftab%3D2')
+  // A path that does not exist is the same: the sign-in cannot tell, and says so.
+  expect((await proxy(request('/no-such-page'))).headers.get('location')).toBe('http://localhost:3000/authPage?next=%2Fno-such-page')
+  // Nothing to remember for a path that is not a place (a double slash is read as a host by a browser).
+  expect((await proxy(request('//evil.com'))).headers.get('location')).toBe('http://localhost:3000/authPage')
 })
 
 test('someone signed in goes where they asked', async () => {

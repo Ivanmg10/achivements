@@ -607,6 +607,7 @@ export const ja: Translations = {
     noAccountLead: 'アカウントをお持ちでないですか?',
     noAccountAction: '新規登録',
     tooManyAttempts: '失敗した試行が多すぎます。15分待ってからもう一度お試しください。',
+    needsAccount: 'このページは存在しないか、アカウントが必要です',
   },
   passwordReset: {
     forgotLink: 'パスワードをお忘れですか?',

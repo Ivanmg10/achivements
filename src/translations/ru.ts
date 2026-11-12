@@ -607,6 +607,7 @@ export const ru: Translations = {
     noAccountLead: 'Нет аккаунта?',
     noAccountAction: 'Зарегистрируйтесь',
     tooManyAttempts: 'Слишком много неудачных попыток. Подождите 15 минут и попробуйте снова.',
+    needsAccount: 'Такой страницы нет, или для неё нужен аккаунт',
   },
   passwordReset: {
     forgotLink: 'Забыли пароль?',

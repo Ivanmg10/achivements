@@ -19,9 +19,12 @@ const ForgotPasswordModal = dynamic(() => import('@/components/forgot-password-m
 export default function LoginUserForm({
   setIsLogin,
   isRegister,
+  next = null,
 }: {
   setIsLogin: React.Dispatch<React.SetStateAction<boolean>>
   isRegister: boolean
+  /** The own-site path the visitor was going to (see `safeNext`): said above the form, and where to go after signing in. */
+  next?: string | null
 }) {
   const router = useRouter()
   const [username, setUsername] = useState('')
@@ -55,7 +58,7 @@ export default function LoginUserForm({
         return
       }
 
-      router.push('/')
+      router.push(next ?? '/')
       router.refresh()
     } catch {
       setError(T.loginForm.invalidCredentials)
@@ -67,6 +70,9 @@ export default function LoginUserForm({
     <div className="w-full max-w-sm mx-auto">
       <AuthTitle>{T.loginForm.title}</AuthTitle>
 
+      {next && !isRegister && (
+        <Notice className="mb-5">{T.loginForm.needsAccount}</Notice>
+      )}
       {isRegister && (
         <div role="status" className="mb-5 bg-success/20 border border-success/40 rounded-tile p-3">
           <p className="text-sm text-success">{T.loginForm.accountCreated}</p>
