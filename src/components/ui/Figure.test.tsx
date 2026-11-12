@@ -50,6 +50,8 @@ test('a figure uses theme text tokens by default, and a tone overrides them', ()
   expect(screen.getByText('5').className).toContain('text-warning')
   rerender(<Figure look="tile" label="Platinum" value="5" tone="platinum" />)
   expect(screen.getByText('5').className).toContain('text-platinum')
+  rerender(<Figure label="Today" value="0" tone="muted" />)
+  expect(screen.getByText('0').className).toContain('text-text-secondary')
 })
 
 test('a bare figure on its way keeps the line under its figure, so the row does not grow when it lands', () => {
