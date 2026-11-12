@@ -28,6 +28,11 @@ test('linked: its own numbers', () => {
   expect(screen.getByRole('region', { name: 'Steam' })).toHaveTextContent(en.steam.perfect)
 })
 
+test('its achievements are labelled in a capital, like Xbox', () => {
+  render(<UserSteamCard />)
+  expect(screen.getByText(en.userStats.achievements)).toBeInTheDocument()
+})
+
 test('shows the Steam profile picture and name once loaded', () => {
   ;(useSteamProfile as jest.Mock).mockReturnValue({ profile: { personaname: 'Palmera', avatarfull: 'https://avatars.steamstatic.com/abc_full.jpg' } })
   const { container } = render(<UserSteamCard />)

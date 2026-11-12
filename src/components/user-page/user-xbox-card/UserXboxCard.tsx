@@ -30,7 +30,7 @@ export default function UserXboxCard() {
   const stats: PlatformStat[] = [
     platformStat(T.xbox.gamerscore, summary?.gamerscore, { ...summaryOpts, tone: 'success' }),
     platformStat(T.userStats.games, summary?.games, summaryOpts),
-    platformStat(T.xbox.achievements, summary?.achievementsUnlocked, summaryOpts),
+    platformStat(T.userStats.achievements, summary?.achievementsUnlocked, summaryOpts),
     platformStat(T.xbox.tier, summary?.tier, summaryOpts),
     // No play time reads as absent, not as "0 min".
     platformStat(T.steam.playtime, minutes === 0 ? null : formatPlaytime(minutes, T.steam, lang), { lang, loading: libraryLoading }),
