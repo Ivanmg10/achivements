@@ -112,6 +112,11 @@ test('only the big gestures and the player\'s own marks lean: outside the librar
   expect(found.filter((f) => !allowed.includes(f))).toEqual([])
 })
 
+test('a dialog\'s Cancel is quiet: beside a disabled primary a ringed one is what stands out (#132)', () => {
+  // The actions of a footer written as a fragment ("footer={<>…</>}"): no secondary (ringed) button among them.
+  expect(offenders(/footer=\{\s*<>(?:(?!<\/>)[\s\S])*?variant="secondary"/)).toEqual([])
+})
+
 test('facts on one line are joined by Facts (the mark), never a hand-made separator', () => {
   // The footer separates links, not facts.
   const found = offenders(/aria-hidden="true">\s*[·•/|]\s*</).map((f) => f.split(path.sep).join('/'))

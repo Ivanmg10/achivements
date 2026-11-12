@@ -285,7 +285,7 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
 - **Never draw a control by hand**: `Button` / `IconButton` (or `buttonClass`), `Input`, `Textarea`,
   `SearchInput`, `PasswordInput` in `Field` (or `fieldClass`), `Select` (never a native `<select>`),
   `Switch` (state in words beside it), `Checkbox`, `ChoiceCards`, `Tabs`, `SegmentedControl`, `Pill`,
-  `Modal` (every dialog is one: its own head (`title`, `hint`, `icon`), the corner close, `footer` for the actions, `tone="danger"` for a
+  `Modal` (every dialog is one: its own head (`title`, `hint`, `icon`), the corner close, `footer` for the actions (the Cancel is `quiet`, never ringed: beside a disabled primary it would stand out), `tone="danger"` for a
   destructive one; no hand-drawn head or ✕, no Escape listener of its own, no `createPortal`, no `CommonModal` (deleted, #121); a `Modal` draws the frame,
   never a card inside it; `placement="top"` for a command panel or a menu), `Notice`, `ErrorRetry` (a failed read with its retry), `Spinner` (or `Button loading`),
   `TOOLTIP_SURFACE`, `MENU_SURFACE`, `SURFACE`, `Accordion`, `ShowMore`, `Shelf`, `SectionHead`, `DropSlot`,

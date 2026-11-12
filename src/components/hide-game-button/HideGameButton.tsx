@@ -69,7 +69,7 @@ export default function HideGameButton({
         hint={T.cards.hideGameText.replace('{title}', title)}
         footer={
           <>
-            <Button type="button" onClick={() => setOpen(false)} variant="secondary">
+            <Button type="button" onClick={() => setOpen(false)} variant="quiet">
               {T.cards.cancel}
             </Button>
             <Button type="button" onClick={confirm}>

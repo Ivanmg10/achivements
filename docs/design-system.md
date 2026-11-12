@@ -263,7 +263,7 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   `alertdialog`; sizes `sm`–`xl`; a sheet on phones, or `placement="top"`, a panel near the top on every screen
   for a command panel or a menu (the phone menu, the search panel; `flush` drops the body's padding for rows that reach the edges); Escape, outside click, focus kept inside and
   given back; only the top dialog answers Escape). `CommonModal` is gone (#121): a dialog is a `Modal` with its head,
-  corner close and `footer`, with no `children` when it is only a confirmation. A modal names itself by its `title`, its first heading, or
+  corner close and `footer`, with no `children` when it is only a confirmation. **Its Cancel is a `quiet` Button** (#132): a ringed one beside a disabled primary (Save while nothing changed) is what stands out, and only the primary leans; the actions are normal-size buttons at the right of the footer (`uiGuard.test.ts` refuses a `secondary` in a footer fragment; the catalogue's danger modal is the specimen). A modal names itself by its `title`, its first heading, or
   `aria-label` / `aria-labelledby`. A dialog whose content is its own hero (the achievement windows) keeps it as content and takes the corner close.
 - **Feedback**: `Notice` (tinted inline notice, `role="alert"` for errors, or for a warning with `alert`; `size="sm"` for a line in a card), `ErrorRetry` (a failed read: a
   danger `Notice` with what failed, an optional hint and a quiet retry `Button`), `Spinner` (an action on its

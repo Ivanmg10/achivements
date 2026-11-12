@@ -60,7 +60,7 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
       title="Create user"
       footer={
         <>
-          <Button onClick={handleClose} variant="secondary">Cancel</Button>
+          <Button onClick={handleClose} variant="quiet">Cancel</Button>
           <Button onClick={handleSubmit} disabled={!canSubmit}>
             {loading ? 'Creating...' : 'Create'}
           </Button>
