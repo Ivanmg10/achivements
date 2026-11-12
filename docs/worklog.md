@@ -54,6 +54,11 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 - *"Último logro: hace 1 día":* the tile's label is a noun in the nine languages ("Last achievement"; the others said "Since your
   last achievement") and its value "hace **1** día" / "**1** day ago": `daysAgoParts` (`utils/dates.ts`, `Intl.RelativeTimeFormat`
   with `numeric: 'always'`, cut around the number so it stays the tile's figure). Today still says "Today / still going".
+- *Turned on its side* after the owner saw a 65-day streak at 2560 px (10 rows, ~650 px tall, empty room on the right): weeks
+  are columns and weekdays rows (initials on the left, the month over the week it starts in), always seven rows; columns
+  `minmax(1.75rem, 3.5rem)` in a `w-fit` grid, so the calendar is as wide as its weeks, shrinks to 28 px days, then scrolls
+  inside itself (the picked week kept in view, never the page); the day panel takes the rest (`@3xl:min-w-72`). Left/right
+  move a week, up/down a day. The skeleton draws the same grid at ten weeks.
 **Already done before** — what the issue says #127 brings: "Cuándo juegas" is `DataBar` upright (only its stale comment said
 "slanted"; fixed) and the labels are in sentence case (`kickerClass`). The year and hidden consoles are untouched: the calendar
 draws `selectedStreak.achievements`, which come from `useActivityHeatmapYear` (filtered by `useConsoleVisibility`, its

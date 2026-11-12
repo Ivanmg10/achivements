@@ -1,28 +1,27 @@
 import { Skeleton } from '@/components/ui/Skeleton'
-import { CALENDAR_COLUMNS } from '../streak-calendar/StreakCalendar'
+import { CALENDAR_GRID, calendarColumns } from '../streak-calendar/StreakCalendar'
 
-// Eight weeks: about a long streak's calendar, so the card keeps its room when it lands.
-const CELLS = 56
+// Ten weeks: about a long streak's calendar, so the card keeps its room when it lands.
+const WEEKS = 10
 
-/** "The streak, day by day" while the year loads: the weekday row, the days and the picked day's panel, on the real boxes. */
+/** "The streak, day by day" while the year loads, in the calendar's own grid: the months, the weekdays, seven rows of days, the legend and the picked day's panel. */
 export default function StreakCalendarSkeleton() {
   return (
     <div aria-hidden="true" className="@container">
       <div className="flex flex-col @3xl:flex-row gap-6 @3xl:gap-10">
-        <div className="flex flex-col gap-2 w-full max-w-[27.5rem] shrink-0">
-          <div className={CALENDAR_COLUMNS}>
+        <div className="flex flex-col gap-2 min-w-0 max-w-full overflow-hidden">
+          <div className={CALENDAR_GRID} style={calendarColumns(WEEKS)}>
+            <Skeleton className="h-4 w-8" style={{ gridRow: 1, gridColumn: 2 }} />
             {Array.from({ length: 7 }, (_, i) => (
-              <Skeleton key={i} className="h-3.5" />
+              <Skeleton key={`w${i}`} className="h-3 w-2.5 self-center mr-1" style={{ gridRow: i + 2, gridColumn: 1 }} />
+            ))}
+            {Array.from({ length: 7 * WEEKS }, (_, i) => (
+              <Skeleton key={i} radius="tile" className="aspect-square" style={{ gridRow: (i % 7) + 2, gridColumn: Math.floor(i / 7) + 2 }} />
             ))}
           </div>
-          <div className={CALENDAR_COLUMNS}>
-            {Array.from({ length: CELLS }, (_, i) => (
-              <Skeleton key={i} radius="tile" className="aspect-square" />
-            ))}
-          </div>
-          <Skeleton className="h-3 w-32 mt-1" />
+          <Skeleton className="h-4 w-32" />
         </div>
-        <Skeleton radius="pane" className="flex-1 h-72" />
+        <Skeleton radius="pane" className="flex-1 @3xl:min-w-72 h-72" />
       </div>
     </div>
   )

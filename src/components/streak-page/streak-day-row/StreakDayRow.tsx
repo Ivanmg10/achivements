@@ -24,7 +24,7 @@ export default function StreakDayRow({ date, today, achievements, awards = [] }:
   const games = [...new Set(achievements.map((a) => a.GameTitle))]
 
   return (
-    <div className="flex-1 min-w-0 self-stretch @3xl:self-start flex flex-col gap-4 rounded-pane bg-bg-main p-4 sm:p-5">
+    <div className="flex-1 min-w-0 @3xl:min-w-72 self-stretch @3xl:self-start flex flex-col gap-4 rounded-pane bg-bg-main p-4 sm:p-5">
       <div className="flex items-center gap-4 min-w-0">
         <span aria-hidden="true" className="flex flex-col items-center shrink-0 w-12">
           <span className="font-display italic font-extrabold text-[2.5rem] leading-none tabular-nums pr-1">{formatDay(date, lang, { day: 'numeric' })}</span>
