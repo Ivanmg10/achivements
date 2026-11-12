@@ -17,7 +17,7 @@ function List() {
   )
 }
 
-test('the fallback until measured, then what the box holds, following its size', () => {
+test('what the box holds from the first render (measured before paint), following its size', () => {
   let notify = () => {}
   const disconnect = jest.fn()
   ;(globalThis as { ResizeObserver?: unknown }).ResizeObserver = class {
@@ -32,8 +32,6 @@ test('the fallback until measured, then what the box holds, following its size',
   const boxHeight = jest.spyOn(Element.prototype, 'clientHeight', 'get').mockImplementation(() => height)
 
   const { unmount } = render(<List />)
-  expect(screen.getByRole('list')).toHaveAccessibleName('6')
-  act(() => notify())
   expect(screen.getByRole('list')).toHaveAccessibleName('8')
   height = 900
   act(() => notify())
