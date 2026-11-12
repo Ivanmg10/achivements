@@ -4,7 +4,7 @@ import type { SeoPageEntry } from '@/translations/seoPages'
 import { useLanguage } from '@/context/LanguageContext'
 import { seoPath, seoText } from '@/utils/seoPages'
 import LandingNav from '@/components/landing-page/landing-nav/LandingNav'
-import LandingClosing from '@/components/landing-page/landing-closing/LandingClosing'
+import SeoPageClosing from '@/components/seo-page/seo-page-closing/SeoPageClosing'
 import FaqList from '@/components/faq-list/FaqList'
 import PublicFooter from '@/components/public-footer/PublicFooter'
 
@@ -41,9 +41,9 @@ export default function SeoPage({ page }: { page: SeoPageEntry }) {
           </section>
         ))}
 
-        <FaqList title={T.publicPages.faqTitle} items={text.faq} />
+        <FaqList title={T.publicPages.faqTitle} items={text.faq} numbered={false} />
 
-        <LandingClosing />
+        <SeoPageClosing />
       </main>
 
       <PublicFooter current={seoPath(page)} note={text.note} />

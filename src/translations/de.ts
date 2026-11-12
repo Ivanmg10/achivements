@@ -491,20 +491,40 @@ export const de: Translations = {
     sections: [
       {
         heading: 'Was wir speichern',
-        body: [
-          'Dein Konto: ein Benutzername, ein Hash deines Passworts (nie das Passwort selbst) und deine E-Mail-Adresse, die nur zur Wiederherstellung des Kontos und zur Bestätigung, dass es dir gehört, genutzt wird.',
-          'Was du selbst hinzufügst: einen Avatar (einen Link oder ein hochgeladenes Bild, das wir speichern, bis du es ersetzt oder dein Konto löschst), dein Land, Lieblings- und angeheftete Spiele und Erfolge, deine Erfolgsvitrine sowie deine Gruppen.',
-          'Anzeigeeinstellungen: welche Konsolen angezeigt werden, wie deine Bibliothek aufgebaut ist und ein paar Schalter, in deinem Konto gespeichert, damit sie dir auf allen Geräten folgen. Nur du siehst sie.',
-          'Dein öffentliches Profil zeigt angemeldeten Nutzern, solange es öffentlich ist, deinen Benutzernamen, Avatar, dein Land und deine Beschreibung, die verknüpften Plattformen und ihre Namen, deine Lieblingsspiele, dein Design, öffentliche Gruppen und Erfolgsvitrine sowie deinen Fortschritt und deine Aktivität, und lässt sie diese mit ihren eigenen vergleichen. Dein Geschlecht erscheint nur, wenn du es anzeigen lässt. Nie deine E-Mail, deine Schlüssel oder die Erfolge, die du als Ziel angeheftet hast. Du kannst das Profil jederzeit privat machen.',
-          'Wem du folgst und wer dir folgt: gespeichert, damit du sie wiederfindest. Nur du siehst beide Listen, und darin erscheinen nur öffentliche Profile; niemand sonst sieht, wer wem folgt.',
-          'Wann du zuletzt auf CheevoVault warst: die Zeit deines letzten Besuchs mit der Seite im Vordergrund, alle paar Minuten aktualisiert. Angemeldete Nutzer, die dich auf der Seite sehen (dein Profil, die Suche, die Listen derer, die dir folgen), sehen, ob du online bist und ungefähr, wann du zuletzt da warst. Du kannst das in deinen Kontoeinstellungen abschalten; dann wird es niemandem gezeigt. Wer dir folgt, sieht außerdem das Steam-Spiel, das du gerade spielst, wenn dein Steam-Profil es öffentlich zeigt; schaltest du das Teilen ab, wird auch das ausgeblendet.',
-          'Vault-Punkte und Ranglisten: Aus den Erfolgen der verknüpften Plattformen berechnen wir eine Punktzahl und eine Stufe, die bei deinem Konto gespeichert werden. Solange dein Profil öffentlich ist, erscheinen dein Benutzername, Avatar, deine Stufe und Punkte in den Ranglisten, die jeder ohne Konto sehen kann; angemeldete Nutzer sehen außerdem, ob du online bist. Du kannst die Ranglisten in deinen Kontoeinstellungen verlassen oder dein Profil privat machen.',
-          'Verknüpfte Konten: dein RetroAchievements-Benutzername und Web-API-Schlüssel sowie deine Steam-ID und dein Anzeigename, um deinen Fortschritt abzurufen, auch wenn jemand dein öffentliches Profil öffnet. Der Schlüssel verlässt nie unseren Server. Steam wird über die Anmeldung bei Steam selbst verknüpft, die beweist, dass das Konto dir gehört; ein Steam-Konto kann nur mit einem CheevoVault-Konto verknüpft sein.',
-          'Registrierung oder Anmeldung mit Steam: Steam bestätigt uns deine SteamID (und sonst nichts: kein Passwort, keine E-Mail), die wir speichern, um dich beim nächsten Mal zu erkennen. Dein Steam-Name und -Bild werden als Vorschlag für den Benutzernamen und als Avatar übernommen; du kannst beides ändern. Die Daten deiner Steam-Erfolge und deine Spielstunden pro Spiel werden mit deinem Konto gespeichert, um deine Serie und Aktivität zu zeigen und zu wissen, wann du jedes Spiel zuletzt gespielt hast, bis du Steam trennst oder das Konto löschst.',
-          'Registrierung mit RetroAchievements: Der RetroAchievements-Benutzername und Web-API-Schlüssel, die du angibst, werden bei RetroAchievements geprüft und mit dem neuen Konto verknüpft, wie beim späteren Verknüpfen; dein RetroAchievements-Bild wird als Avatar übernommen, und du kannst es ändern. E-Mail und Passwort wählst du trotzdem selbst.',
-          'PlayStation, wenn du es verbindest: deine PSN-Online-ID und deine Kontonummer. Beim Verbinden wird nur geprüft, dass das Konto existiert und seine Trophäen öffentlich zeigt. Es beweist nicht, dass das Konto dir gehört. Deine Trophäen und, wenn dein Spielverlauf öffentlich ist, Spielzeit und Spielbilder werden mit dem PlayStation-Konto der Seite bei Sony abgerufen und in einem Cache gespeichert, der von selbst abläuft.',
-          'Xbox, wenn du es verbindest (derzeit nur für die Administratoren der Seite verfügbar): dein Gamertag und deine Xbox-Kontonummer. Beim Verbinden wird nur geprüft, ob das Konto existiert – es beweist nicht, dass es deins ist. Deine Spiele, Erfolge und Spielzeit werden über den Dienst OpenXBL gelesen und in einem Cache gehalten, der von selbst abläuft.',
-          'Sicherheitsprotokolle: die IP-Adresse (bei Anmeldungen auch der Benutzername) fehlgeschlagener Anmeldungen, Registrierungen und Passwort-Zurücksetzungen, einen Tag lang gespeichert, um Missbrauch zu bremsen.',
+        parts: [
+          {
+            heading: 'Konto',
+            body: [
+              'Dein Konto: ein Benutzername, ein Hash deines Passworts (nie das Passwort selbst) und deine E-Mail-Adresse, die nur zur Wiederherstellung des Kontos und zur Bestätigung, dass es dir gehört, genutzt wird.',
+              'Was du selbst hinzufügst: einen Avatar (einen Link oder ein hochgeladenes Bild, das wir speichern, bis du es ersetzt oder dein Konto löschst), dein Land, Lieblings- und angeheftete Spiele und Erfolge, deine Erfolgsvitrine sowie deine Gruppen.',
+              'Anzeigeeinstellungen: welche Konsolen angezeigt werden, wie deine Bibliothek aufgebaut ist und ein paar Schalter, in deinem Konto gespeichert, damit sie dir auf allen Geräten folgen. Nur du siehst sie.',
+            ],
+          },
+          {
+            heading: 'Profil und Aktivität',
+            body: [
+              'Dein öffentliches Profil zeigt angemeldeten Nutzern, solange es öffentlich ist, deinen Benutzernamen, Avatar, dein Land und deine Beschreibung, die verknüpften Plattformen und ihre Namen, deine Lieblingsspiele, dein Design, öffentliche Gruppen und Erfolgsvitrine sowie deinen Fortschritt und deine Aktivität, und lässt sie diese mit ihren eigenen vergleichen. Dein Geschlecht erscheint nur, wenn du es anzeigen lässt. Nie deine E-Mail, deine Schlüssel oder die Erfolge, die du als Ziel angeheftet hast. Du kannst das Profil jederzeit privat machen.',
+              'Wem du folgst und wer dir folgt: gespeichert, damit du sie wiederfindest. Nur du siehst beide Listen, und darin erscheinen nur öffentliche Profile; niemand sonst sieht, wer wem folgt.',
+              'Wann du zuletzt auf CheevoVault warst: die Zeit deines letzten Besuchs mit der Seite im Vordergrund, alle paar Minuten aktualisiert. Angemeldete Nutzer, die dich auf der Seite sehen (dein Profil, die Suche, die Listen derer, die dir folgen), sehen, ob du online bist und ungefähr, wann du zuletzt da warst. Du kannst das in deinen Kontoeinstellungen abschalten; dann wird es niemandem gezeigt. Wer dir folgt, sieht außerdem das Steam-Spiel, das du gerade spielst, wenn dein Steam-Profil es öffentlich zeigt; schaltest du das Teilen ab, wird auch das ausgeblendet.',
+              'Vault-Punkte und Ranglisten: Aus den Erfolgen der verknüpften Plattformen berechnen wir eine Punktzahl und eine Stufe, die bei deinem Konto gespeichert werden. Solange dein Profil öffentlich ist, erscheinen dein Benutzername, Avatar, deine Stufe und Punkte in den Ranglisten, die jeder ohne Konto sehen kann; angemeldete Nutzer sehen außerdem, ob du online bist. Du kannst die Ranglisten in deinen Kontoeinstellungen verlassen oder dein Profil privat machen.',
+            ],
+          },
+          {
+            heading: 'Plattformen',
+            body: [
+              'Verknüpfte Konten: dein RetroAchievements-Benutzername und Web-API-Schlüssel sowie deine Steam-ID und dein Anzeigename, um deinen Fortschritt abzurufen, auch wenn jemand dein öffentliches Profil öffnet. Der Schlüssel verlässt nie unseren Server. Steam wird über die Anmeldung bei Steam selbst verknüpft, die beweist, dass das Konto dir gehört; ein Steam-Konto kann nur mit einem CheevoVault-Konto verknüpft sein.',
+              'Registrierung oder Anmeldung mit Steam: Steam bestätigt uns deine SteamID (und sonst nichts: kein Passwort, keine E-Mail), die wir speichern, um dich beim nächsten Mal zu erkennen. Dein Steam-Name und -Bild werden als Vorschlag für den Benutzernamen und als Avatar übernommen; du kannst beides ändern. Die Daten deiner Steam-Erfolge und deine Spielstunden pro Spiel werden mit deinem Konto gespeichert, um deine Serie und Aktivität zu zeigen und zu wissen, wann du jedes Spiel zuletzt gespielt hast, bis du Steam trennst oder das Konto löschst.',
+              'Registrierung mit RetroAchievements: Der RetroAchievements-Benutzername und Web-API-Schlüssel, die du angibst, werden bei RetroAchievements geprüft und mit dem neuen Konto verknüpft, wie beim späteren Verknüpfen; dein RetroAchievements-Bild wird als Avatar übernommen, und du kannst es ändern. E-Mail und Passwort wählst du trotzdem selbst.',
+              'PlayStation, wenn du es verbindest: deine PSN-Online-ID und deine Kontonummer. Beim Verbinden wird nur geprüft, dass das Konto existiert und seine Trophäen öffentlich zeigt. Es beweist nicht, dass das Konto dir gehört. Deine Trophäen und, wenn dein Spielverlauf öffentlich ist, Spielzeit und Spielbilder werden mit dem PlayStation-Konto der Seite bei Sony abgerufen und in einem Cache gespeichert, der von selbst abläuft.',
+              'Xbox, wenn du es verbindest (derzeit nur für die Administratoren der Seite verfügbar): dein Gamertag und deine Xbox-Kontonummer. Beim Verbinden wird nur geprüft, ob das Konto existiert – es beweist nicht, dass es deins ist. Deine Spiele, Erfolge und Spielzeit werden über den Dienst OpenXBL gelesen und in einem Cache gehalten, der von selbst abläuft.',
+            ],
+          },
+          {
+            heading: 'Sicherheit',
+            body: [
+              'Sicherheitsprotokolle: die IP-Adresse (bei Anmeldungen auch der Benutzername) fehlgeschlagener Anmeldungen, Registrierungen und Passwort-Zurücksetzungen, einen Tag lang gespeichert, um Missbrauch zu bremsen.',
+            ],
+          },
         ],
       },
       {
@@ -607,6 +627,7 @@ export const de: Translations = {
     noAccountLead: 'Noch kein Konto?',
     noAccountAction: 'Registrieren',
     tooManyAttempts: 'Zu viele fehlgeschlagene Versuche. Warte 15 Minuten und versuche es erneut.',
+    needsAccount: 'Diese Seite gibt es nicht oder sie braucht ein Konto',
   },
   passwordReset: {
     forgotLink: 'Passwort vergessen?',
@@ -643,6 +664,7 @@ export const de: Translations = {
     saveFailed: 'Dein neues Passwort konnte nicht gespeichert werden. Versuche es gleich noch einmal.',
     missingToken: 'Dieser Link ist unvollständig. Fordere einen neuen an.',
     backToSignIn: 'Zur Anmeldung',
+    askAgain: 'Neuen Link anfordern',
   },
   registerForm: {
     raCta: 'Konto mit RetroAchievements erstellen',

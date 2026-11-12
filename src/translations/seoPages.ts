@@ -269,7 +269,7 @@ export const SEO_PAGES: SeoPageEntry[] = [
   {
     section: 'track',
     slug: 'achievements-with-friends',
-    updated: '2026-11-08',
+    updated: '2026-11-12',
     text: {
       en: {
         link: 'Compare achievements with friends',
@@ -282,13 +282,13 @@ export const SEO_PAGES: SeoPageEntry[] = [
             heading: 'How it works',
             points: [
               'Follow anyone with a public profile; they appear in your Following section.',
-              'Open their profile: their platforms, favourite games, public groups, achievement showcase and recent activity.',
+              'Open their profile: their platforms, favourite games, public groups, the achievements they picked for their showcase, and recent activity.',
               'Compare a game: open a game on their profile and see your progress next to theirs, achievement by achievement.',
             ],
           },
           {
             heading: 'Privacy',
-            text: 'Your profile can be made private at any time. A public profile shows signed-in users your progress, never your email or your keys. Only you see who follows you and who you follow.',
+            text: 'Your profile can be made private at any time. A public profile shows signed-in users your progress, your showcase (up to five earned achievements you pick) and your public groups, never your email or your keys. The achievements you still want to get are private, and so are your followers and the people you follow: nobody else sees either list.',
           },
         ],
         faq: [
@@ -307,13 +307,13 @@ export const SEO_PAGES: SeoPageEntry[] = [
             heading: 'Cómo funciona',
             points: [
               'Sigue a cualquiera con perfil público; aparece en tu sección de Siguiendo.',
-              'Abre su perfil: sus plataformas, juegos favoritos, grupos públicos, vitrina de logros y actividad reciente.',
+              'Abre su perfil: sus plataformas, juegos favoritos, grupos públicos, los logros que ha elegido para su vitrina y su actividad reciente.',
               'Compara un juego: ábrelo en su perfil y ve tu progreso junto al suyo, logro a logro.',
             ],
           },
           {
             heading: 'Privacidad',
-            text: 'Puedes hacer tu perfil privado cuando quieras. Un perfil público enseña tu progreso a los usuarios con sesión iniciada, nunca tu email ni tus claves. Solo tú ves quién te sigue y a quién sigues.',
+            text: 'Puedes hacer tu perfil privado cuando quieras. Un perfil público enseña tu progreso a los usuarios con sesión iniciada, tu vitrina (hasta cinco logros conseguidos que eliges tú) y tus grupos públicos, nunca tu email ni tus claves. Los logros que aún quieres conseguir son privados, igual que tus seguidores y las personas a las que sigues: nadie más ve ninguna de las dos listas.',
           },
         ],
         faq: [

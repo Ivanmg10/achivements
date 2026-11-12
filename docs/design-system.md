@@ -213,6 +213,10 @@ flag is read from the database, never the session).
 - **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `Shelf`, `DropSlot` and `ToggleButton`
   are in `ui/`; a `DropSlot` is a dashed border and nothing else (no stripes, #130); the big faint icon behind a hero card's title is
   `GhostIcon` (one size and opacity, whole inside its card at the title's line; never an oversized icon cut by the edge); a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
+- **The signature:** `BrandMark` (the logo in the accent from `themeIcon`'s own shapes, `LOGO_PATHS`, and the name in the display italic) is the one way the
+  site signs itself: the visitors' bar and the sign-in screens. A second drawing of the logo is refused by `uiGuard.test.ts`. `CoverBand` (not in `ui/`: it draws the
+  sign-in art wall) is the window onto the covers: the landing's first screen and the band over the name on a phone's sign-in.
+  The 2560 px screen is the `uhd` breakpoint (`--breakpoint-uhd`): an arbitrary `min-[2560px]:` sorts before `xl:` and loses to it.
 - **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
   `GameCardBackdrop` is the one place that draws it, so every game card follows it.
 - **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the picked best streak, the

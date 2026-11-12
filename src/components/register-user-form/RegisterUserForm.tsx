@@ -6,6 +6,7 @@ import { signIn } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
+import AuthTitle from '@/components/auth-title/AuthTitle'
 import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
 import WelcomeEntryCurtain from '@/components/welcome-entry-curtain/WelcomeEntryCurtain'
 import RegisterUserFormRa from '@/components/register-user-form/register-user-form-ra/RegisterUserFormRa'
@@ -106,10 +107,7 @@ export default function RegisterUserForm({
   return (
     <div className="w-full max-w-sm mx-auto">
       {entering && entry.animate && <WelcomeEntryCurtain phase="leaving" />}
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-text-main">{T.registerForm.title}</h1>
-        <div className="mt-2 h-0.5 w-10 bg-accent mx-auto rounded-full" />
-      </div>
+      <AuthTitle>{T.registerForm.title}</AuthTitle>
 
       {error && (
         <Notice tone="danger" className="mb-5">{error}</Notice>
@@ -198,14 +196,10 @@ export default function RegisterUserForm({
       <SteamSignInDivider />
 
       {!raOpen && (
-        <button
-          type="button"
-          onClick={() => setRaOpen(true)}
-          className="mt-3 w-full py-3 rounded-tile font-semibold flex items-center justify-center gap-2 bg-bg-card text-text-main border border-ink/15 hover:border-accent transition-colors focus-ring"
-        >
+        <Button variant="secondary" size="lg" onClick={() => setRaOpen(true)} className="mt-3 w-full">
           <RaLogo height={16} />
           {T.registerForm.raCta}
-        </button>
+        </Button>
       )}
 
       <p className="text-text-secondary text-xs text-center mt-4">

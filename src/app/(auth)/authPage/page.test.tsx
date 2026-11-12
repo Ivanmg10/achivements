@@ -60,3 +60,17 @@ test("links to the privacy policy once, where the account is created", async () 
   render(await AuthPage({ searchParams: Promise.resolve(query) }));
   expect(screen.getByRole("link", { name: en.privacy.link })).toHaveAttribute("href", "/privacy");
 });
+
+test.each([
+  ["//evil.com", null],
+  ["https://evil.com", null],
+  ["javascript:alert(1)", null],
+  ["/groups", "/groups"],
+])("?next=%s reaches the form as %s (only a path of this site gets through)", async (next, expected) => {
+  const form = jest.requireMock("@/components/login-user-form/LoginUserForm") as { default: jest.Mock };
+  const seen: unknown[] = [];
+  form.default = ((props: { next?: string | null }) => { seen.push(props.next); return null }) as never;
+  render(await AuthPage({ searchParams: Promise.resolve({ next }) }));
+  expect(seen.length).toBeGreaterThan(0);
+  expect(seen.every((n) => n === expected)).toBe(true);
+});

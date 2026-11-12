@@ -30,13 +30,22 @@ const THEME_ACCENT: Record<Theme, string> = {
 // The logo as drawn. Its shape is not to be changed: only the colours go in `$0`–`$5`.
 // No ground behind it: a page cannot read the colour of a tab, so any ground clashes with
 // some browser's theme. `prefers-color-scheme` gives the tone, as in the logo's first file.
+// The shapes are exported for `ui/BrandMark`, which draws the same logo in the theme's accent: one drawing, never a copy.
+export const LOGO_VIEWBOX = '440 80 1060 1200'
+/** The frame, the V's top, its left facet and its right facet. */
+export const LOGO_PATHS = [
+  'M963 90 L1482 384 L1376 452 L963 227 L581 456 L581 897 L970 1123 L1374 893 L1490 960 L975 1265 L456 965 L452 385 Z',
+  'M963 322 L1172 447 L970 930 L760 452 Z',
+  'M655 495 L880 965 L662 858 Z',
+  'M1265 495 L1282 855 L1055 975 Z',
+]
 const LOGO =
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="440 80 1060 1200">' +
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${LOGO_VIEWBOX}">` +
   '<style>.a{fill:$0}.b{fill:$1}.c{fill:$2}@media (prefers-color-scheme:light){.a{fill:$3}.b{fill:$4}.c{fill:$5}}</style>' +
-  '<path class="a" d="M963 90 L1482 384 L1376 452 L963 227 L581 456 L581 897 L970 1123 L1374 893 L1490 960 L975 1265 L456 965 L452 385 Z"/>' +
-  '<path class="a" d="M963 322 L1172 447 L970 930 L760 452 Z"/>' +
-  '<path class="b" d="M655 495 L880 965 L662 858 Z"/>' +
-  '<path class="c" d="M1265 495 L1282 855 L1055 975 Z"/>' +
+  `<path class="a" d="${LOGO_PATHS[0]}"/>` +
+  `<path class="a" d="${LOGO_PATHS[1]}"/>` +
+  `<path class="b" d="${LOGO_PATHS[2]}"/>` +
+  `<path class="c" d="${LOGO_PATHS[3]}"/>` +
   '</svg>'
 
 const BROWSER = { dark: { tab: '#35363a', ink: '#e1e4eb', towards: 255 }, light: { tab: '#ffffff', ink: '#17181e', towards: 0 } }

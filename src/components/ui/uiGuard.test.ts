@@ -327,3 +327,7 @@ test('a modal or dialog is a next/dynamic import with { loading }, never a stati
   // Without `loading` the first download suspends up to the route's loading.tsx and the page flashes its skeleton.
   expect(offenders(/dynamic\(\s*\(\)\s*=>\s*import\(\s*['"][^'"]*(?:Modal|Dialog)[^'"]*['"]\s*\)\s*\)/)).toEqual([])
 })
+
+test('the logo is drawn from utils/themeIcon\'s shapes (BrandMark, the favicon): never a second copy of its path', () => {
+  expect(offenders(/M963 90/).filter((f) => !f.endsWith('themeIcon.ts'))).toEqual([])
+})

@@ -18,6 +18,19 @@ test('shows every section of the policy', () => {
   expect(screen.getByRole('link', { name: en.privacy.back })).toHaveAttribute('href', '/')
 })
 
+test('what we store has a subheading per kind of data, not thirteen paragraphs in a row', () => {
+  render(<PrivacyPolicy />)
+  const store = en.privacy.sections[0]
+  expect(store.parts!.length).toBeGreaterThan(1)
+  for (const part of store.parts!) expect(screen.getByRole('heading', { level: 3, name: part.heading })).toBeInTheDocument()
+})
+
+test('has the visitors bar on top and the public footer below, so there is a way out at both ends', () => {
+  render(<PrivacyPolicy />)
+  expect(screen.getByRole('navigation', { name: en.authPage.brand })).toBeInTheDocument()
+  expect(screen.getByText(en.landing.footer)).toBeInTheDocument()
+})
+
 test('names who is responsible for the data', () => {
   render(<PrivacyPolicy />)
   expect(screen.getByText(`${en.privacy.controller}:`)).toBeInTheDocument()

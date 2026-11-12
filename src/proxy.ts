@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
+import { safeNext } from '@/utils/safeNext'
 
 /**
  * Everything inside the app needs an account. The home page is the exception:
@@ -44,7 +45,10 @@ export async function proxy(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
   if (token) return NextResponse.next()
 
+  // Sign-in says why it was reached and sends the person back to where they were going (a safe, own-site path only).
   const signIn = new URL('/authPage', req.url)
+  const back = safeNext(`${pathname}${req.nextUrl.search}`)
+  if (back !== '/') signIn.searchParams.set('next', back)
   return NextResponse.redirect(signIn)
 }
 

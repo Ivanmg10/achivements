@@ -491,20 +491,40 @@ export const pl: Translations = {
     sections: [
       {
         heading: 'Co przechowujemy',
-        body: [
-          'Twoje konto: nazwę użytkownika, hash hasła (nigdy samo hasło) i adres e-mail, używany wyłącznie do odzyskania konta i potwierdzenia, że należy do Ciebie.',
-          'To, co sam dodajesz: awatar (link albo przesłany obraz, który przechowujemy, dopóki go nie zmienisz lub nie usuniesz konta), kraj, ulubione i przypięte gry oraz osiągnięcia, gablotę osiągnięć, a także Twoje grupy.',
-          'Ustawienia wyświetlania: które konsole są widoczne, jak ułożona jest twoja biblioteka i kilka przełączników, zapisane na koncie, by podążały za tobą między urządzeniami. Widzisz je tylko ty.',
-          'Twój profil publiczny, dopóki jest publiczny, pokazuje zalogowanym użytkownikom twoją nazwę użytkownika, awatar, kraj i opis, połączone platformy i ich nazwy, ulubione gry, motyw, publiczne grupy i gablotę osiągnięć oraz twoje postępy i aktywność, i pozwala porównać je z ich własnymi. Płeć pojawia się tylko, jeśli zdecydujesz się ją pokazać. Nigdy twój e-mail, klucze ani osiągnięcia przypięte jako cele. Możesz w każdej chwili ustawić profil jako prywatny.',
-          'Kogo obserwujesz i kto obserwuje ciebie: zapisujemy, abyś mógł ich znowu znaleźć. Obie listy widzisz tylko ty i pojawiają się na nich tylko profile publiczne; nikomu innemu nie pokazujemy, kto kogo obserwuje.',
-          'Ostatnia wizyta na CheevoVault: czas twojej ostatniej wizyty ze stroną otwartą na pierwszym planie, aktualizowany co kilka minut. Zalogowani użytkownicy, którzy cię widzą na stronie (twój profil, wyszukiwarka, listy osób, które cię obserwują), widzą, czy jesteś online i mniej więcej kiedy była twoja ostatnia wizyta. Możesz przestać to udostępniać w preferencjach konta; wtedy nikt tego nie widzi. Osoby, które cię obserwują, widzą też grę Steam, w którą właśnie grasz, jeśli twój profil Steam pokazuje ją publicznie; wyłączenie udostępniania ukrywa także to.',
-          'Punkty Vault i rankingi: na podstawie osiągnięć z połączonych platform obliczamy wynik i poziom, zapisywane na twoim koncie. Dopóki twój profil jest publiczny, twoja nazwa użytkownika, awatar, poziom i punkty pojawiają się w rankingach, które każdy może zobaczyć bez konta; zalogowani użytkownicy widzą też, czy jesteś online. Możesz wyjść z rankingów w ustawieniach konta lub ustawiając profil jako prywatny.',
-          'Połączone konta: nazwę użytkownika i klucz Web API RetroAchievements oraz Steam ID i nazwę wyświetlaną, aby pobierać Twoje postępy, także gdy ktoś otwiera Twój publiczny profil. Klucz nigdy nie opuszcza naszego serwera. Steam łączy się przez logowanie w samym Steam, które dowodzi, że konto jest Twoje; jedno konto Steam może być połączone tylko z jednym kontem CheevoVault.',
-          'Rejestracja lub logowanie przez Steam: Steam potwierdza nam Twój SteamID (i nic więcej: ani hasła, ani e-maila), który przechowujemy, aby rozpoznać Cię następnym razem. Twoja nazwa i zdjęcie ze Steam są kopiowane jako propozycja nazwy użytkownika i jako awatar; możesz zmienić oba. Daty Twoich osiągnięć Steam i liczba godzin w każdej grze są przechowywane z Twoim kontem, aby pokazywać serię i aktywność oraz wiedzieć, kiedy ostatnio grano w każdą grę, dopóki nie odłączysz Steam lub nie usuniesz konta.',
-          'Rejestracja z RetroAchievements: podane nazwa użytkownika i klucz Web API RetroAchievements są sprawdzane w RetroAchievements i łączone z nowym kontem, tak jak przy późniejszym połączeniu; twoje zdjęcie z RetroAchievements jest kopiowane jako awatar i można je zmienić. E-mail i hasło i tak wybierasz samodzielnie.',
-          'PlayStation, jeśli je połączysz: twoje ID online PSN i numer konta. Połączenie sprawdza tylko, czy konto istnieje i publicznie pokazuje trofea. Nie dowodzi, że konto należy do ciebie. Twoje trofea, a jeśli historia gier jest publiczna, także czas gry i grafiki gier, są pobierane z Sony za pomocą konta PlayStation strony i przechowywane w pamięci podręcznej, która sama wygasa.',
-          'Xbox, jeśli go połączysz (na razie dostępny tylko dla administratorów serwisu): twój gamertag i numer konta Xbox. Połączenie tylko sprawdza, czy konto istnieje – nie dowodzi, że jest twoje. Twoje gry, osiągnięcia i czas gry są pobierane przez usługę OpenXBL i trzymane w pamięci podręcznej, która sama wygasa.',
-          'Rejestry bezpieczeństwa: adres IP (a przy logowaniu także nazwę użytkownika) nieudanych logowań, rejestracji i próśb o reset hasła, przechowywany przez jeden dzień, aby ograniczać nadużycia.',
+        parts: [
+          {
+            heading: 'Konto',
+            body: [
+              'Twoje konto: nazwę użytkownika, hash hasła (nigdy samo hasło) i adres e-mail, używany wyłącznie do odzyskania konta i potwierdzenia, że należy do Ciebie.',
+              'To, co sam dodajesz: awatar (link albo przesłany obraz, który przechowujemy, dopóki go nie zmienisz lub nie usuniesz konta), kraj, ulubione i przypięte gry oraz osiągnięcia, gablotę osiągnięć, a także Twoje grupy.',
+              'Ustawienia wyświetlania: które konsole są widoczne, jak ułożona jest twoja biblioteka i kilka przełączników, zapisane na koncie, by podążały za tobą między urządzeniami. Widzisz je tylko ty.',
+            ],
+          },
+          {
+            heading: 'Profil i aktywność',
+            body: [
+              'Twój profil publiczny, dopóki jest publiczny, pokazuje zalogowanym użytkownikom twoją nazwę użytkownika, awatar, kraj i opis, połączone platformy i ich nazwy, ulubione gry, motyw, publiczne grupy i gablotę osiągnięć oraz twoje postępy i aktywność, i pozwala porównać je z ich własnymi. Płeć pojawia się tylko, jeśli zdecydujesz się ją pokazać. Nigdy twój e-mail, klucze ani osiągnięcia przypięte jako cele. Możesz w każdej chwili ustawić profil jako prywatny.',
+              'Kogo obserwujesz i kto obserwuje ciebie: zapisujemy, abyś mógł ich znowu znaleźć. Obie listy widzisz tylko ty i pojawiają się na nich tylko profile publiczne; nikomu innemu nie pokazujemy, kto kogo obserwuje.',
+              'Ostatnia wizyta na CheevoVault: czas twojej ostatniej wizyty ze stroną otwartą na pierwszym planie, aktualizowany co kilka minut. Zalogowani użytkownicy, którzy cię widzą na stronie (twój profil, wyszukiwarka, listy osób, które cię obserwują), widzą, czy jesteś online i mniej więcej kiedy była twoja ostatnia wizyta. Możesz przestać to udostępniać w preferencjach konta; wtedy nikt tego nie widzi. Osoby, które cię obserwują, widzą też grę Steam, w którą właśnie grasz, jeśli twój profil Steam pokazuje ją publicznie; wyłączenie udostępniania ukrywa także to.',
+              'Punkty Vault i rankingi: na podstawie osiągnięć z połączonych platform obliczamy wynik i poziom, zapisywane na twoim koncie. Dopóki twój profil jest publiczny, twoja nazwa użytkownika, awatar, poziom i punkty pojawiają się w rankingach, które każdy może zobaczyć bez konta; zalogowani użytkownicy widzą też, czy jesteś online. Możesz wyjść z rankingów w ustawieniach konta lub ustawiając profil jako prywatny.',
+            ],
+          },
+          {
+            heading: 'Platformy',
+            body: [
+              'Połączone konta: nazwę użytkownika i klucz Web API RetroAchievements oraz Steam ID i nazwę wyświetlaną, aby pobierać Twoje postępy, także gdy ktoś otwiera Twój publiczny profil. Klucz nigdy nie opuszcza naszego serwera. Steam łączy się przez logowanie w samym Steam, które dowodzi, że konto jest Twoje; jedno konto Steam może być połączone tylko z jednym kontem CheevoVault.',
+              'Rejestracja lub logowanie przez Steam: Steam potwierdza nam Twój SteamID (i nic więcej: ani hasła, ani e-maila), który przechowujemy, aby rozpoznać Cię następnym razem. Twoja nazwa i zdjęcie ze Steam są kopiowane jako propozycja nazwy użytkownika i jako awatar; możesz zmienić oba. Daty Twoich osiągnięć Steam i liczba godzin w każdej grze są przechowywane z Twoim kontem, aby pokazywać serię i aktywność oraz wiedzieć, kiedy ostatnio grano w każdą grę, dopóki nie odłączysz Steam lub nie usuniesz konta.',
+              'Rejestracja z RetroAchievements: podane nazwa użytkownika i klucz Web API RetroAchievements są sprawdzane w RetroAchievements i łączone z nowym kontem, tak jak przy późniejszym połączeniu; twoje zdjęcie z RetroAchievements jest kopiowane jako awatar i można je zmienić. E-mail i hasło i tak wybierasz samodzielnie.',
+              'PlayStation, jeśli je połączysz: twoje ID online PSN i numer konta. Połączenie sprawdza tylko, czy konto istnieje i publicznie pokazuje trofea. Nie dowodzi, że konto należy do ciebie. Twoje trofea, a jeśli historia gier jest publiczna, także czas gry i grafiki gier, są pobierane z Sony za pomocą konta PlayStation strony i przechowywane w pamięci podręcznej, która sama wygasa.',
+              'Xbox, jeśli go połączysz (na razie dostępny tylko dla administratorów serwisu): twój gamertag i numer konta Xbox. Połączenie tylko sprawdza, czy konto istnieje – nie dowodzi, że jest twoje. Twoje gry, osiągnięcia i czas gry są pobierane przez usługę OpenXBL i trzymane w pamięci podręcznej, która sama wygasa.',
+            ],
+          },
+          {
+            heading: 'Bezpieczeństwo',
+            body: [
+              'Rejestry bezpieczeństwa: adres IP (a przy logowaniu także nazwę użytkownika) nieudanych logowań, rejestracji i próśb o reset hasła, przechowywany przez jeden dzień, aby ograniczać nadużycia.',
+            ],
+          },
         ],
       },
       {
@@ -607,6 +627,7 @@ export const pl: Translations = {
     noAccountLead: 'Nie masz konta?',
     noAccountAction: 'Zarejestruj się',
     tooManyAttempts: 'Zbyt wiele nieudanych prób. Odczekaj 15 minut i spróbuj ponownie.',
+    needsAccount: 'Ta strona nie istnieje albo wymaga konta',
   },
   passwordReset: {
     forgotLink: 'Nie pamiętasz hasła?',
@@ -643,6 +664,7 @@ export const pl: Translations = {
     saveFailed: 'Nie udało się zapisać nowego hasła. Spróbuj ponownie za chwilę.',
     missingToken: 'Ten link jest niepełny. Poproś o nowy.',
     backToSignIn: 'Przejdź do logowania',
+    askAgain: 'Poproś o nowy link',
   },
   registerForm: {
     raCta: 'Utwórz konto z RetroAchievements',

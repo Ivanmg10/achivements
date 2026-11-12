@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
+import AuthTitle from '@/components/auth-title/AuthTitle'
 import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import Button from '@/components/ui/Button'
@@ -18,9 +19,12 @@ const ForgotPasswordModal = dynamic(() => import('@/components/forgot-password-m
 export default function LoginUserForm({
   setIsLogin,
   isRegister,
+  next = null,
 }: {
   setIsLogin: React.Dispatch<React.SetStateAction<boolean>>
   isRegister: boolean
+  /** The own-site path the visitor was going to (see `safeNext`): said above the form, and where to go after signing in. */
+  next?: string | null
 }) {
   const router = useRouter()
   const [username, setUsername] = useState('')
@@ -54,7 +58,7 @@ export default function LoginUserForm({
         return
       }
 
-      router.push('/')
+      router.push(next ?? '/')
       router.refresh()
     } catch {
       setError(T.loginForm.invalidCredentials)
@@ -64,11 +68,11 @@ export default function LoginUserForm({
 
   return (
     <div className="w-full max-w-sm mx-auto">
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-text-main">{T.loginForm.title}</h1>
-        <div className="mt-2 h-0.5 w-10 bg-accent mx-auto rounded-full" />
-      </div>
+      <AuthTitle>{T.loginForm.title}</AuthTitle>
 
+      {next && !isRegister && (
+        <Notice className="mb-5">{T.loginForm.needsAccount}</Notice>
+      )}
       {isRegister && (
         <div role="status" className="mb-5 bg-success/20 border border-success/40 rounded-tile p-3">
           <p className="text-sm text-success">{T.loginForm.accountCreated}</p>

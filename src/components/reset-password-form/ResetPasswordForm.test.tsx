@@ -1,13 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import ResetPasswordForm from './ResetPasswordForm'
-import { useSearchParams } from 'next/navigation'
 import { en } from '@/translations/en'
 
-jest.mock('next/navigation', () => ({ useSearchParams: jest.fn() }))
-
 function withToken(token: string | null) {
-  ;(useSearchParams as jest.Mock).mockReturnValue({ get: () => token })
-  render(<ResetPasswordForm />)
+  render(<ResetPasswordForm token={token ?? ''} />)
 }
 
 function fill(password: string, confirm = password) {
@@ -26,6 +22,7 @@ test('a link without a token says so instead of showing a form', () => {
   withToken(null)
   expect(screen.getByRole('alert')).toHaveTextContent(en.passwordReset.missingToken)
   expect(screen.queryByLabelText(en.passwordReset.newPassword)).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: en.passwordReset.askAgain })).toBeInTheDocument()
 })
 
 test('sets the password and says it worked', async () => {
@@ -64,6 +61,16 @@ test('a spent or stale link is reported', async () => {
   fill('secret12')
   save()
   expect(await screen.findByRole('alert')).toHaveTextContent(en.passwordReset.invalidToken)
+  // The form is no use any more: what is left is to ask again, and the way back.
+  expect(screen.queryByLabelText(en.passwordReset.newPassword)).not.toBeInTheDocument()
+  expect(screen.getByRole('link', { name: en.passwordReset.backToSignIn })).toBeInTheDocument()
+})
+
+test('"Ask for a new link" opens the forgot-your-password dialog', async () => {
+  withToken(null)
+  fireEvent.click(screen.getByRole('button', { name: en.passwordReset.askAgain }))
+  expect(await screen.findByRole('dialog', { name: en.passwordReset.forgotTitle })).toBeInTheDocument()
+  expect(screen.getByLabelText(en.passwordReset.email)).toBeInTheDocument()
 })
 
 test('always offers the way back to signing in', () => {

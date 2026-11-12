@@ -33,6 +33,37 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-12 — Sign-in, sign-up and the public pages (`feat/133-auth-public-pages`, #133)
+
+**Did** — Boards "MejAcceso" and "MejPublicas" (canvas page 2), stacked on `feat/132-account-dialogs` (not merged). One commit per point:
+- *The signature* (`feat(ui)`): `ui/BrandMark` (the logo and the name in the display italic). The logo is drawn from the favicon's own shapes
+  (`LOGO_PATHS` / `LOGO_VIEWBOX` exported by `utils/themeIcon.ts`, which builds its SVG from them: same shapes, never a copy) in the accent, facets at the
+  favicon's 1 / 0.65 / 0.4. `LandingNav` (the bar of every public page) uses it, and its "Sign in" is the library's secondary `Button` instead of a hand-made pill.
+  Specimen in `/design`; `uiGuard.test.ts` refuses a second copy of the logo's path. The landing in code did **not** have the logo + italic name yet (only the canvas did),
+  so this piece is the first: the landing's own rework should use it.
+- *Sign-in and register* (`feat(auth)`): `AuthBrand` is `BrandMark lg`, the tagline and the platforms on one line (`Facts`, the mark between them, their logos kept);
+  `AuthFormCard` is a plain card (no blur, no big shadow) and `AuthDesktopFormPanel` lost its glow; `AuthTitle` is the one title of the family (display italic, no rule
+  under it; login, register, reset and the Steam finish step); `SteamSignInButton` is `buttonClass('secondary', 'lg')` with `SteamLogo` in `text-steam` (an `<a>` on purpose:
+  `Button href` is a `Link` and this is a redirecting route handler) and the RA button is a `Button secondary`. On a phone `AuthPhoneFrame` puts a band of covers
+  (`CoverBand`, extracted from the landing's first screen, which uses it now) above the name instead of the wall at 30 % behind the card.
+- *Reset with a spent link* (`fix(auth)`): `/resetPassword` renders `AuthPage` with `form` (art wall and card); with no token or an `invalid-token` answer the form gives way to the notice and
+  "Ask for a new link" (`passwordReset.askAgain`, nine languages), which opens `ForgotPasswordModal`. The token is now read on the server (a `token` prop), so the form has no `useSearchParams`/`Suspense`.
+- *Back to where you were going* (`feat(auth)`): the proxy sends `/authPage?next=<path and query>`; the sign-in says `loginForm.needsAccount` ("That page does not exist or needs an account", nine languages) and pushes to it after signing in.
+  `utils/safeNext.ts` is the only gate (own-site path; `//evil.com`, `https://evil.com`, `/evil.com`, `javascript:`, control characters, the sign-in/reset/API paths and anything over 512 characters go home), used by the proxy and the server page; tested with those inputs.
+- *Comparisons and /track* (`feat(seo)`): `SeoPageClosing` (a rule, a line, a button; the landing keeps `LandingClosing`), `FaqList numbered={false}` on the SEO pages.
+  `/track/achievements-with-friends` now says the showcase is public (up to five earned achievements, to signed-in users), achievements to get are private and nobody else sees who follows whom; `updated` 2026-11-12.
+- *Legal pages* (`feat(legal)`): `LegalDocument` sits in `PublicShell` (bar and footer); "What we store" is four `parts` with an h3 each (Account, Profile and activity, Platforms, Security) in nine languages, text unchanged.
+- *To try, its own commit* (`feat(auth): try bigger covers…`): from 2560 px the sign-in wall has 128 px covers, `gap-28` and the page's ground (`AuthCollagePanel wall`); windows keep their size. Revert that commit alone to drop it.
+**Already done before** — the em dashes in the legal texts (CP-09's sweep: `copy.test.ts` finds none outside Russian; Russian keeps its punctuation dash with spaces); the primary button's corners staying inside the fields' column (`--button-inset`, #127);
+`/track`'s two sentences were already mostly right after #118 (they said "only you see who follows you"); no Xbox on any of these pages (a test keeps it).
+**Decisions** — `next` is carried by the credentials sign-in only: Steam's sign-in leaves the site and returns to `/authPage?steam=…`, so it still lands on the home page (carrying it would need a signed cookie; said in `docs/accounts.md`). The line above the form
+is an `info` `Notice` (it is not an error) and shows on sign-in only. The 2560 px screen is the named breakpoint `uhd` (`--breakpoint-uhd` in `globals.css`): an arbitrary `min-[2560px]:` sorts before `xl:` and loses to it (measured: the covers stayed at 96 px).
+**Open** — the landing's own pieces (the italic title, the cover band as a moving strip) belong to its issue; `LandingClosing` and the landing's numbered FAQ are untouched. The `steam-button` / `steam-slate` tokens are no longer used by the sign-in (still listed in the catalogue).
+**Watch out** — Not seen signed in or in Firefox. Look at: the sign-in at 390 px (the band is 128 px tall and sparse: four columns of big tiles), 2560 px (covers clipped at the wall's right edge by the 40 px fade), the reset page with a real spent token (needs the mail), `/privacy` at 390 px, the title sizes in a long language (the reset title wraps in Spanish at `lg`).
+In dev, Turbopack sometimes served a stale server render of a client component (a hydration mismatch that was not one): restart `next dev` before believing it.
+
+---
+
 ## 2026-11-12 — The account page and the dialogs (`feat/132-account-dialogs`, #132)
 
 **Did** — Boards "MejCuenta" and "MejDialogos" (canvas page 2), stacked on `feat/131-streak-calendar` (not merged). One commit per point:

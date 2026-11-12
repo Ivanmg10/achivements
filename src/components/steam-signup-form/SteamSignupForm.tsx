@@ -5,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useSteamSignup } from '@/hooks/useSteamSignup'
 import { USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 import SteamSignInButton from '@/components/steam-sign-in-button/SteamSignInButton'
+import AuthTitle from '@/components/auth-title/AuthTitle'
 import SteamSignupFormFields from '@/components/steam-signup-form-fields/SteamSignupFormFields'
 import WelcomeEntryCurtain from '@/components/welcome-entry-curtain/WelcomeEntryCurtain'
 import AuthFormSkeleton from '@/components/auth-form-skeleton/AuthFormSkeleton'
@@ -39,10 +40,7 @@ export default function SteamSignupForm({ outcome }: { outcome: string }) {
   return (
     <div className="w-full max-w-sm mx-auto">
       {entering && <WelcomeEntryCurtain phase="leaving" />}
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-text-main">{s.title}</h1>
-        <div className="mt-2 h-0.5 w-10 bg-accent mx-auto rounded-full" />
-      </div>
+      <AuthTitle>{s.title}</AuthTitle>
 
       {(state.status === 'loading' || state.status === 'signed-in') && (
         <AuthFormSkeleton label={s.checking} />

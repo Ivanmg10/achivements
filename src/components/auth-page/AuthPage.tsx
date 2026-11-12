@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import LoginUserForm from '@/components/login-user-form/LoginUserForm'
 import RegisterUserForm from '@/components/register-user-form/RegisterUserForm'
 import LegalLinks from '@/components/legal-links/LegalLinks'
 import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
-import AuthBrand from '@/components/auth-brand/AuthBrand'
+import AuthPhoneFrame from '@/components/auth-phone-frame/AuthPhoneFrame'
 import AuthFormCard from '@/components/auth-form-card/AuthFormCard'
 import AuthDesktopFormPanel from '@/components/auth-desktop-form-panel/AuthDesktopFormPanel'
 import SteamSignupForm from '@/components/steam-signup-form/SteamSignupForm'
@@ -23,9 +23,11 @@ const WIDE = '(min-width: 1024px)'
 /**
  * The sign-in and register page. `wantsRegister` opens it on the register form,
  * for the landing button; `steam` is Steam's sign-in coming back
- * (api/auth/steam/callback), and takes the sign-in slot.
+ * (api/auth/steam/callback), and takes the sign-in slot. `form` takes it too, for another
+ * screen that wears the same layout (the reset-password page). `next` is the own-site path the
+ * proxy sent the visitor from, already checked by `safeNext`: the sign-in says so and goes back to it.
  */
-export default function AuthPage({ wantsRegister, steam }: { wantsRegister: boolean; steam: string | null }) {
+export default function AuthPage({ wantsRegister, steam, form, next = null }: { wantsRegister: boolean; steam: string | null; form?: ReactNode; next?: string | null }) {
   const [isLogin, setIsLogin] = useState(!wantsRegister)
   const [hasRegister, setHasRegister] = useState(false)
 
@@ -35,21 +37,14 @@ export default function AuthPage({ wantsRegister, steam }: { wantsRegister: bool
   const isWide = useMediaQuery(WIDE)
   const inPhone = !isClient || !isWide
   const inDesktop = !isClient || isWide
-  const signInForm = steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />
+  const signInForm = form ?? (steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} next={next} />)
   const registerForm = <RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setHasRegister} />
 
   return (
     <div className="relative bg-bg-main text-text-main min-h-[100dvh] lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
 
-      {/* Phone: the art wall behind, the form on a frosted card over it. */}
-      <div className="lg:hidden flex-1 relative flex flex-col items-center justify-center gap-6 px-4 pt-10 pb-4">
-        <div aria-hidden="true" className="fixed inset-0 opacity-30 pointer-events-none select-none">
-          <AuthCollagePanel />
-        </div>
-        <div aria-hidden="true" className="fixed inset-0 bg-linear-to-b from-bg-main/90 via-bg-main/40 to-bg-main/90 pointer-events-none" />
-        <div className="relative z-10">
-          <AuthBrand />
-        </div>
+      {/* Phone: a band of covers, the name, then the form on its card. */}
+      <AuthPhoneFrame>
         <AnimatePresence mode="wait" initial={false}>
           {isLogin ? (
             <motion.div key="m-login" className="relative z-10 w-full" variants={formTransition} initial="hidden" animate="visible" exit="exit">
@@ -65,7 +60,7 @@ export default function AuthPage({ wantsRegister, steam }: { wantsRegister: bool
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </AuthPhoneFrame>
 
       {/* Desktop, left: the sign-in form or the art wall. */}
       <div className="hidden lg:flex flex-col relative lg:w-[42%] px-10 h-full">
@@ -78,7 +73,7 @@ export default function AuthPage({ wantsRegister, steam }: { wantsRegister: bool
             </motion.div>
           ) : (
             <motion.div key="d-collage-l" className="absolute inset-0" {...fromLeft} transition={SLIDE_T}>
-              <AuthCollagePanel />
+              <AuthCollagePanel wall />
             </motion.div>
           )}
         </AnimatePresence>
@@ -89,7 +84,7 @@ export default function AuthPage({ wantsRegister, steam }: { wantsRegister: bool
         <AnimatePresence mode="wait" initial={false}>
           {isLogin ? (
             <motion.div key="d-collage-r" className="absolute inset-0" {...fromRight} transition={SLIDE_T}>
-              <AuthCollagePanel />
+              <AuthCollagePanel wall />
             </motion.div>
           ) : (
             <motion.div key="d-register" className="relative z-10 w-full h-full" {...fromRight} transition={SLIDE_T}>
