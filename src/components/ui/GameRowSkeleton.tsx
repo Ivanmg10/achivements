@@ -11,6 +11,8 @@ export function GameRowSkeleton({ className = '' }: { className?: string }) {
       <Skeleton radius="tile" className="w-14 h-14 sm:w-16 sm:h-16 shrink-0" />
       <div className="flex flex-col flex-1 min-w-0 gap-2">
         <Skeleton className="h-3.5 w-2/5" />
+        {/* The platform tag, on its own line on a phone (FeedGameCard). */}
+        <Skeleton radius="tag" className="h-5 w-24 sm:hidden" />
         <div className="flex items-center gap-2">
           <Skeleton className="h-2.5 w-16" />
           <Skeleton className="h-1.5 flex-1" />

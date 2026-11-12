@@ -44,7 +44,7 @@ export default function MainPageSkeletonBody({ cover, pinned, label }: { cover: 
 
         <div className="home-fit-main flex flex-col min-h-0 min-w-0 lg:col-start-1 lg:row-start-1">
           <div className="m-3 bg-bg-card rounded-tile p-4 flex flex-col flex-1 min-h-0 gap-2">
-            <Skeleton className="h-[72px] sm:h-[2.125rem] w-48 max-w-full shrink-0" />
+            <Skeleton className="h-[1.875rem] sm:h-[2.125rem] w-48 max-w-full shrink-0" />
             {pinned ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {Array.from({ length: PINS }, (_, i) => (
