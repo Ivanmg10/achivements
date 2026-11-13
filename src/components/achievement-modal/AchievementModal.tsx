@@ -3,59 +3,30 @@
 import { RetroAchievement } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useId, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
+import { useAchievementDetail } from '@/hooks/useAchievementDetail'
 import { gameHref } from '@/utils/gameRef'
 import { IconStar, IconStarFilled } from '@tabler/icons-react'
 import { raShowcaseEntry } from '@/utils/showcase'
 import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseToggleButton'
 import Modal from '@/components/ui/Modal'
-import { decimal } from '@/utils/utils'
+import Tag from '@/components/ui/Tag'
+import ToggleButton from '@/components/ui/ToggleButton'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
-import { formatDate, formatDateTime, parseUnlockTime } from '@/utils/dates'
-import { raTypeTag } from '@/components/ui/dataTable'
-import { raBadgeUrl, raAvatarUrl } from '@/utils/raAssets'
-import Avatar from '@/components/ui/Avatar'
+import { formatDateTime } from '@/utils/dates'
+import { raTypeTag, TYPE_TAG } from '@/components/ui/dataTable'
+import { raBadgeUrl } from '@/utils/raAssets'
+import AchievementModalFigures from './achievement-modal-figures/AchievementModalFigures'
+import AchievementModalUnlocks from './achievement-modal-unlocks/AchievementModalUnlocks'
+import AchievementModalComments from './achievement-modal-comments/AchievementModalComments'
 
-interface AchievementUnlock {
-  User: string
-  RAPoints: number
-  DateAwarded: string
-  HardcoreMode: string
-}
-
-interface AchievementMeta {
-  ID: number
-  Title: string
-  Description: string
-  Points: number
-  TrueRatio: number
-  Author: string
-  DateCreated: string
-  DateModified: string
-}
-
-interface Comment {
-  User: string
-  Submitted: string
-  CommentText: string
-}
-
-interface AchievementDetail {
-  unlocks: {
-    Achievement: AchievementMeta
-    UnlocksCount: number
-    TotalPlayers: number
-    Unlocks: AchievementUnlock[]
-  } | null
-  comments: {
-    Count: number
-    Total: number
-    Results: Comment[]
-  } | null
-}
-
+/**
+ * An RA achievement's window (`lg`): its head is the Modal's (badge as the icon, name, what it asks for), then what
+ * marks it (type, hardcore, when it was earned, favourite and showcase), the six figures in a row, the recent unlocks
+ * folded in an accordion and the last comments with "See all". What comes from the detail read holds its place
+ * as a skeleton until it arrives.
+ */
 export default function AchievementModal({
   achievement,
   numDistinctPlayers,
@@ -76,246 +47,94 @@ export default function AchievementModal({
 }) {
   const { T, lang } = useLanguage()
   const subject = useSubject()
-  const titleId = useId()
-  const [detail, setDetail] = useState<AchievementDetail | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const [unlocksOpen, setUnlocksOpen] = useState(false)
-  const [commentsPage, setCommentsPage] = useState(0)
-
-  const COMMENTS_PER_PAGE = 50
-
+  const { detail, loading, error } = useAchievementDetail(achievement.ID)
 
   const typeBadge = raTypeTag(achievement.Type, T.achievement)
   const earned = !!achievement.DateEarned
   const earnedHardcore = !!achievement.DateEarnedHardcore
-  const rarityPct = numDistinctPlayers > 0
-    ? decimal(((achievement.NumAwarded / numDistinctPlayers) * 100), lang)
-    : null
-
-  useEffect(() => {
-    fetch(`/api/getAchievementDetail?achievementId=${achievement.ID}`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`Error ${r.status}`)
-        return r.json()
-      })
-      .then(setDetail)
-      .catch(() => setError(true))
-      .finally(() => setLoading(false))
-  }, [achievement.ID])
-
-  const earnedDate = achievement.DateEarned
-    ? formatDateTime(achievement.DateEarned, lang)
-    : null
+  const earnedDate = achievement.DateEarned ? formatDateTime(achievement.DateEarned, lang) : null
+  const showcaseEntry = gameId && gameTitle ? raShowcaseEntry(achievement, gameId, gameTitle) : null
+  const hasMarks = !!(onToggleFavorite || showcaseEntry || typeBadge || earnedHardcore || earnedDate)
 
   return (
-    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="xl" className="gap-4">
-        {/* Header */}
-        <div className="flex items-start gap-4 p-6 border-b border-bg-header">
-          {achievement.BadgeName && (
-            <Image
-              src={raBadgeUrl(achievement.BadgeName)!}
-              alt=""
-              width={80}
-              height={80}
-              className={`w-20 h-20 rounded-tile object-cover shrink-0 ${
-                earnedHardcore ? 'ring-2 ring-warning' : earned ? 'ring-2 ring-info/50' : 'grayscale opacity-50'
-              }`}
+    <Modal
+      isOpen
+      onClose={onClose}
+      size="lg"
+      className="gap-5"
+      icon={
+        achievement.BadgeName ? (
+          <Image
+            src={raBadgeUrl(achievement.BadgeName)!}
+            alt=""
+            width={40}
+            height={40}
+            unoptimized
+            className={`w-full h-full object-cover rounded-control ${earned ? '' : 'grayscale opacity-60'}`}
+          />
+        ) : undefined
+      }
+      title={
+        gameId ? (
+          <Link href={gameHref('ra', gameId, subject)} onClick={onClose} className="hover:underline underline-offset-2">
+            {achievement.Title}
+          </Link>
+        ) : (
+          achievement.Title
+        )
+      }
+      hint={achievement.Description}
+    >
+      {hasMarks && (
+        <div className="flex items-center gap-x-3 gap-y-2 flex-wrap">
+          {onToggleFavorite && (
+            <ToggleButton
+              pressed={isFavorited}
+              onToggle={onToggleFavorite}
+              label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
+              icon={IconStar}
+              pressedIcon={IconStarFilled}
+              size={20}
             />
           )}
-          <div className="flex flex-col gap-1 flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              {onToggleFavorite && (
-                <button
-                  onClick={onToggleFavorite}
-                  aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
-                  aria-pressed={isFavorited}
-                  className={`shrink-0 rounded transition-colors duration-150 focus-ring ${
-                    isFavorited ? 'text-warning hover:text-warning/80' : 'text-text-secondary hover:text-warning'
-                  }`}
-                >
-                  {isFavorited ? <IconStarFilled className="w-5 h-5" aria-hidden="true" /> : <IconStar className="w-5 h-5" aria-hidden="true" />}
-                </button>
-              )}
-              <ShowcaseToggleButton entry={gameId && gameTitle ? raShowcaseEntry(achievement, gameId, gameTitle) : null} size={20} />
-              {gameId ? (
-                <Link
-                  id={titleId}
-                  href={gameHref('ra', gameId, subject)}
-                  onClick={onClose}
-                  className="text-xl font-semibold hover:underline underline-offset-2"
-                >
-                  {achievement.Title}
-                </Link>
-              ) : (
-                <h2 id={titleId} className="text-xl font-semibold">{achievement.Title}</h2>
-              )}
-              {typeBadge && (
-                <span className={`text-xs px-2 py-0.5 rounded-full ${typeBadge.className}`}>
-                  {typeBadge.label}
-                </span>
-              )}
-              {earnedHardcore && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-warning/20 text-warning">{T.achievement.hardcoreShort}</span>
-              )}
-            </div>
-            <p className="text-sm text-text-secondary">{achievement.Description}</p>
-            {earnedDate && (
-              <p className="text-xs text-text-secondary mt-1">{T.achievement.earnedOn} {earnedDate}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Stats + Meta 3x3 grid */}
-        <div className="grid grid-cols-3 divide-x divide-bg-header border-b border-bg-header">
-          <div className="flex flex-col items-center gap-0.5 py-4">
-            <p className="text-lg font-semibold tabular-nums">{achievement.Points}</p>
-            <p className="text-xs text-text-secondary">{T.libraryDetail.pointsShort}</p>
-          </div>
-          <div className="flex flex-col items-center gap-0.5 py-4">
-            <p className="text-lg font-semibold tabular-nums">{achievement.NumAwarded.toLocaleString(lang)}</p>
-            <p className="text-xs text-text-secondary">{T.achievement.players}</p>
-          </div>
-          <div className="flex flex-col items-center gap-0.5 py-4">
-            <p className="text-lg font-semibold tabular-nums">{rarityPct ?? '—'}<span className="text-sm">%</span></p>
-            <p className="text-xs text-text-secondary">{T.achievement.rarity}</p>
-          </div>
-          {detail?.unlocks?.Achievement && <>
-            <div className="flex flex-col items-center gap-0.5 py-4 px-2 border-t border-bg-header">
-              <p className="text-sm font-semibold text-center line-clamp-1 w-full">{detail.unlocks.Achievement.Author}</p>
-              <p className="text-xs text-text-secondary">{T.achievement.author}</p>
-            </div>
-            <div className="flex flex-col items-center gap-0.5 py-4 px-2 border-t border-bg-header">
-              <p className="text-lg font-semibold tabular-nums">{detail.unlocks.Achievement.TrueRatio}</p>
-              <p className="text-xs text-text-secondary">{T.achievement.trueRatio}</p>
-            </div>
-            <div className="flex flex-col items-center gap-0.5 py-4 px-2 border-t border-bg-header">
-              <p className="text-sm font-semibold tabular-nums">{formatDate(detail.unlocks.Achievement.DateCreated, lang)}</p>
-              <p className="text-xs text-text-secondary">{T.achievement.created}</p>
-            </div>
-          </>}
-        </div>
-
-        <div className="flex flex-col gap-6 p-6">
-          {loading && (
-            <div role="status" aria-busy="true" className="flex flex-col gap-2 border border-bg-header rounded-tile p-4">
-              <span className="sr-only">{T.loadingPage.title}</span>
-              {[0, 1, 2, 3].map((i) => (
-                <SkeletonRow key={i} icon="w-7 h-7" radius="circle" figure />
-              ))}
-            </div>
+          {showcaseEntry && <ShowcaseToggleButton entry={showcaseEntry} size={20} />}
+          {typeBadge && <span className={`${TYPE_TAG} ${typeBadge.className}`}>{typeBadge.label}</span>}
+          {earnedHardcore && <Tag tone="hardcore" size="sm">{T.achievement.hardcoreShort}</Tag>}
+          {earnedDate && (
+            <span className="text-xs text-text-secondary">
+              {T.achievement.earnedOn} {earnedDate}
+            </span>
           )}
-
-          {error && <p role="alert" className="text-sm text-danger text-center">{T.achievement.loadError}</p>}
-
-          {!loading && detail && (() => {
-            const sortedComments = detail.comments?.Results
-              ? [...detail.comments.Results].sort(
-                  (a, b) => parseUnlockTime(b.Submitted) - parseUnlockTime(a.Submitted)
-                )
-              : []
-            const totalPages = Math.ceil(sortedComments.length / COMMENTS_PER_PAGE)
-            const pageComments = sortedComments.slice(
-              commentsPage * COMMENTS_PER_PAGE,
-              (commentsPage + 1) * COMMENTS_PER_PAGE,
-            )
-
-            return (
-              <>
-                {/* Recent unlocks — collapsible */}
-                {detail.unlocks?.Unlocks && detail.unlocks.Unlocks.length > 0 && (
-                  <div className="flex flex-col gap-0 border border-bg-header rounded-tile overflow-hidden">
-                    <button
-                      onClick={() => setUnlocksOpen((o) => !o)}
-                      className="flex items-center justify-between px-4 py-3 hover:bg-bg-header/40 transition-colors text-left"
-                    >
-                      <span className="text-sm font-semibold text-text-secondary">
-                        {T.achievement.recentUnlocks} ({detail.unlocks.UnlocksCount.toLocaleString(lang)} / {detail.unlocks.TotalPlayers.toLocaleString(lang)})
-                      </span>
-                      <span className="text-text-secondary text-xs">{unlocksOpen ? '▲' : '▼'}</span>
-                    </button>
-                    {unlocksOpen && (
-                      <div className="flex flex-col gap-2 p-4 border-t border-bg-header">
-                        {detail.unlocks.Unlocks.map((u, i) => (
-                          <div key={i} className="flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-2">
-                              {u.User ? (
-                                <Avatar src={raAvatarUrl(u.User)} name={u.User} size={28} />
-                              ) : (
-                                <div className="w-7 h-7 rounded-full bg-ink/10 shrink-0" />
-                              )}
-                              <p className="text-sm">{u.User}</p>
-                              {u.HardcoreMode === '1' && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-hardcore-deep/60 text-hardcore">{T.achievement.hardcoreShort}</span>
-                              )}
-                            </div>
-                            <p className="text-xs text-text-secondary tabular-nums">
-                              {formatDate(u.DateAwarded, lang)}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Comments */}
-                {sortedComments.length > 0 ? (
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold text-text-secondary">
-                        {T.achievement.comments} ({detail.comments!.Total.toLocaleString(lang)})
-                      </h3>
-                      {totalPages > 1 && (
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => setCommentsPage((p) => Math.max(0, p - 1))}
-                            disabled={commentsPage === 0}
-                            className="px-2 py-0.5 text-xs rounded-tag-sm bg-bg-card disabled:opacity-30 hover:bg-bg-header transition-colors"
-                          >
-                            ←
-                          </button>
-                          <span className="text-xs text-text-secondary tabular-nums">
-                            {commentsPage + 1} / {totalPages}
-                          </span>
-                          <button
-                            onClick={() => setCommentsPage((p) => Math.min(totalPages - 1, p + 1))}
-                            disabled={commentsPage === totalPages - 1}
-                            className="px-2 py-0.5 text-xs rounded-tag-sm bg-bg-card disabled:opacity-30 hover:bg-bg-header transition-colors"
-                          >
-                            →
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-4">
-                      {pageComments.map((c, i) => (
-                        <div key={i} className="flex gap-3">
-                          {c.User ? (
-                            <Avatar src={raAvatarUrl(c.User)} name={c.User} size={32} />
-                          ) : (
-                            <div className="w-8 h-8 rounded-full bg-ink/10 shrink-0" />
-                          )}
-                          <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                            <div className="flex items-baseline gap-2">
-                              <p className="text-sm font-medium">{c.User}</p>
-                              <p className="text-xs text-text-secondary">
-                                {formatDate(c.Submitted, lang)}
-                              </p>
-                            </div>
-                            <p className="text-sm text-text-secondary wrap-break-word">{c.CommentText}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-text-secondary text-center py-2">{T.achievement.noComments}</p>
-                )}
-              </>
-            )
-          })()}
         </div>
-      </Modal>
+      )}
+
+      <AchievementModalFigures
+        points={achievement.Points}
+        players={achievement.NumAwarded}
+        numDistinctPlayers={numDistinctPlayers}
+        meta={detail?.unlocks?.Achievement ?? null}
+        loading={loading}
+      />
+
+      {loading && (
+        <div role="status" aria-busy="true" className="flex flex-col gap-2 border border-bg-header rounded-tile p-4">
+          <span className="sr-only">{T.loadingPage.title}</span>
+          {[0, 1, 2, 3].map((i) => (
+            <SkeletonRow key={i} icon="w-7 h-7" radius="circle" figure />
+          ))}
+        </div>
+      )}
+
+      {error && <p role="alert" className="text-sm text-danger text-center">{T.achievement.loadError}</p>}
+
+      {detail && (
+        <>
+          {detail.unlocks?.Unlocks && detail.unlocks.Unlocks.length > 0 && (
+            <AchievementModalUnlocks unlocks={detail.unlocks.Unlocks} count={detail.unlocks.UnlocksCount} total={detail.unlocks.TotalPlayers} />
+          )}
+          <AchievementModalComments comments={detail.comments?.Results ?? []} total={detail.comments?.Total ?? 0} />
+        </>
+      )}
+    </Modal>
   )
 }
