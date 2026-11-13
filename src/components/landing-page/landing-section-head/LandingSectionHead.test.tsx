@@ -10,9 +10,9 @@ test('a title in the display italic, its paragraph, then what the section adds',
   expect(screen.getByRole('button', { name: 'More' })).toBeInTheDocument()
 })
 
-test('`row` puts the paragraph beside the title on a wide screen', () => {
-  const { container } = render(<LandingSectionHead title="T" text="x" row />)
-  expect(container.firstElementChild).toHaveClass('lg:flex-row')
+test('`end` puts it after its example on a wide screen', () => {
+  const { container } = render(<LandingSectionHead title="T" text="x" end />)
+  expect(container.firstElementChild).toHaveClass('lg:order-last')
 })
 
 test('what the feature does, in short points led by the mark', () => {
