@@ -97,7 +97,10 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   (`T.landing.progressText` / `progressPoints` rewritten in nine languages); the example names it ("Your streak" and `T.streak.pageSub` over the figure),
   the figure in its tier's colour, "From … to today", "Your best streak yet" when it is, and its days in `/racha`'s own `StreakCalendar` (today picked;
   picking a day says its count), the counts fixed per day (`streakDayCounts`). The best-streaks list left this section. Half and half only from `xl`: the
-  calendar's thirteen weeks (about 504 px) do not fit half of a 1024 px page. A tenth group in the band, "Pendientes" (`T.landing.sampleGroupBacklog`:
+  calendar's thirteen weeks (about 504 px) do not fit half of a 1024 px page. **Then** the owner found it a one-to-one copy of their own `/racha`: the
+  section now has its own `landing-streak-calendar/LandingStreakCalendar` (only the weeks the streak spans, each day's achievement count in its square in
+  the streak's tier colour, the days outside it empty squares, nothing made up; one tab stop and the arrows; `T.landing.streakLegend` in nine languages),
+  half and half again from `lg`. A tenth group in the band, "Pendientes" (`T.landing.sampleGroupBacklog`:
   Backlog, Pendentes, À jouer, Noch zu spielen, Da giocare, Отложенные, Do ogrania, 積みゲー): Baldur's Gate 3, Cyberpunk 2077, RDR2, The Witcher 3.
 **Where the drawing gave way to a rule** — No capitals: the platforms line, the name and the tagline are in their own case (drawn in capitals; the guard refuses
 `uppercase`), the wide tracking kept. The name is `BrandMark`'s mixed case, the same signature as the bar and the sign-in; on a 390 px phone it fits one line (the
