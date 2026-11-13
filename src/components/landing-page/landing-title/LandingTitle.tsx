@@ -1,12 +1,10 @@
 'use client'
 
-import Link from 'next/link'
 import { IconArrowDown, IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { REGISTER_HREF } from '@/utils/authLinks'
 import { PLATFORM_NAME } from '@/utils/gameRef'
 import LandingBackdrop from '@/components/landing-page/landing-backdrop/LandingBackdrop'
-import LandingLanguage from '@/components/landing-page/landing-language/LandingLanguage'
 import BrandMark from '@/components/ui/BrandMark'
 import Button from '@/components/ui/Button'
 import Facts from '@/components/ui/Facts'
@@ -21,7 +19,7 @@ const LINK = 'relative tap-target rounded focus-ring text-text-main/80 hover:tex
  * page's `h1` and the largest thing on it, text in the server's HTML, so it is what paints first.
  * `still` and `onStill` are the stop button for the page's motion, small beside the legal line: art that moves by
  * itself for more than five seconds needs a way to stop it (WCAG 2.2.2), so it stays, out of the way.
- * The language is the top bar's first thing, for a visitor whose browser guessed wrong.
+ * The top bar is the page's (`LandingTopBar`, sticky over this screen): this keeps its room clear.
  */
 export default function LandingTitle({ still, onStill }: { still: boolean; onStill: () => void }) {
   const { T } = useLanguage()
@@ -30,16 +28,9 @@ export default function LandingTitle({ still, onStill }: { still: boolean; onSti
     <section className="relative isolate min-h-[100svh] flex flex-col px-4 sm:px-8 lg:px-14 overflow-hidden">
       <LandingBackdrop />
 
-      <div className="flex items-center justify-between gap-4 pt-4 sm:pt-6 short:pt-3">
-        <LandingLanguage />
-        <nav aria-label={T.publicPages.more} className="flex items-center gap-4 sm:gap-7 text-sm sm:text-[0.9375rem] uhd:text-lg font-semibold">
-          <Link href="/rankings" className={LINK}>{T.rankings.title}</Link>
-          <Link href="/rankings/how" className={`${LINK} max-sm:hidden`}>{T.landing.howPoints}</Link>
-          <a href="#faq" className={LINK}>{T.publicPages.faqTitle}</a>
-        </nav>
-      </div>
+      <div aria-hidden="true" className="h-16 short:h-14 shrink-0" />
 
-      <div className="flex flex-col items-center text-center pt-14 sm:pt-[clamp(1.5rem,7svh,5rem)] short:pt-3 enter-rows">
+      <div className="flex flex-col items-center text-center pt-10 sm:pt-[clamp(0.5rem,5svh,4rem)] short:pt-1 enter-rows">
         <p className="text-xs sm:text-sm uhd:text-lg font-bold tracking-[0.2em] text-text-main/75">
           <Facts items={[PLATFORM_NAME.ra, PLATFORM_NAME.steam, PLATFORM_NAME.psn]} />
         </p>

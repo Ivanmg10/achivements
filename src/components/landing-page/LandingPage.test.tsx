@@ -10,12 +10,12 @@ test('opens on the title screen: the name is the one h1, with the platforms and 
   expect(screen.getByText(en.landing.intro)).toBeInTheDocument()
 })
 
-test('offers both ways in, at the top and at the end, pointing at the auth page', () => {
+test('offers both ways in, in the sticky bar, on the title screen and at the end, pointing at the auth page', () => {
   render(<LandingPage />)
   const create = screen.getAllByRole('link', { name: en.landing.createAccount })
   const signIn = screen.getAllByRole('link', { name: en.landing.signIn })
-  expect(create).toHaveLength(2)
-  expect(signIn).toHaveLength(2)
+  expect(create).toHaveLength(3)
+  expect(signIn).toHaveLength(3)
   for (const link of create) expect(link).toHaveAttribute('href', '/authPage?mode=register')
   for (const link of signIn) expect(link).toHaveAttribute('href', '/authPage')
 })

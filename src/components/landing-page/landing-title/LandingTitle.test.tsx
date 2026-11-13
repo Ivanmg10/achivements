@@ -18,11 +18,6 @@ test('the two ways in are the site\'s own buttons: create an account leans, sign
   expect(screen.getByRole('link', { name: en.landing.signIn }).className).not.toContain('skew')
 })
 
-test('names the language shown', () => {
-  render(<LandingTitle still={false} onStill={() => {}} />)
-  expect(screen.getByRole('button', { name: `${en.userConfig.language}: English` })).toBeInTheDocument()
-})
-
 test('the stop button reports its state and asks the page to change it', async () => {
   const onStill = jest.fn()
   const { rerender } = render(<LandingTitle still={false} onStill={onStill} />)

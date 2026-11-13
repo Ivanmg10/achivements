@@ -12,7 +12,7 @@ export default function LandingFaq() {
   const { T } = useLanguage()
 
   return (
-    <section id="faq" aria-labelledby="landing-faq-title" className="grid gap-8 lg:grid-cols-[minmax(0,22.5rem)_minmax(0,1fr)] lg:gap-18 scroll-mt-6">
+    <section id="faq" aria-labelledby="landing-faq-title" className="grid gap-8 lg:grid-cols-[minmax(0,22.5rem)_minmax(0,1fr)] lg:gap-18 scroll-mt-20 short:scroll-mt-6">
       <LandingSectionHead id="landing-faq-title" title={T.publicPages.faqTitle} text={T.landing.faqLead} />
       <dl className="grid gap-x-14 gap-y-6 md:grid-cols-2 lg:gap-y-9">
         {T.landing.faq.map((item) => (

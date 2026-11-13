@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import LandingTopBar from '@/components/landing-page/landing-top-bar/LandingTopBar'
 import LandingTitle from '@/components/landing-page/landing-title/LandingTitle'
 import LandingLibrary from '@/components/landing-page/landing-library/LandingLibrary'
 import LandingGroups from '@/components/landing-page/landing-groups/LandingGroups'
@@ -24,6 +25,7 @@ export default function LandingPage() {
 
   return (
     <div data-motion={still ? 'still' : undefined} className="min-h-[100dvh] bg-bg-main text-text-main flex flex-col">
+      <LandingTopBar />
       <main className="flex flex-col">
         <LandingTitle still={still} onStill={() => setStill((s) => !s)} />
         <div className="w-full max-w-[110rem] mx-auto px-4 sm:px-8 lg:px-24 pt-18 lg:pt-30 pb-20 lg:pb-36 flex flex-col gap-20 lg:gap-40">
