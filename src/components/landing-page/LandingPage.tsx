@@ -1,39 +1,37 @@
 'use client'
 
-import LandingNav from '@/components/landing-page/landing-nav/LandingNav'
-import LandingHero from '@/components/landing-page/landing-hero/LandingHero'
-import LandingBento from '@/components/landing-page/landing-bento/LandingBento'
+import { useState } from 'react'
+import LandingTitle from '@/components/landing-page/landing-title/LandingTitle'
+import LandingLibrary from '@/components/landing-page/landing-library/LandingLibrary'
+import LandingGroups from '@/components/landing-page/landing-groups/LandingGroups'
+import LandingStreak from '@/components/landing-page/landing-streak/LandingStreak'
+import LandingPoints from '@/components/landing-page/landing-points/LandingPoints'
+import LandingFaq from '@/components/landing-page/landing-faq/LandingFaq'
 import LandingClosing from '@/components/landing-page/landing-closing/LandingClosing'
-import FaqList from '@/components/faq-list/FaqList'
 import PublicFooter from '@/components/public-footer/PublicFooter'
-import { useLanguage } from '@/context/LanguageContext'
 
 /**
- * What a visitor sees at the door: what CheevoVault is beside the games it
- * follows, what you get, the questions people ask first, and the way in.
- * Signing in lives in the bar; the page itself asks for one thing, creating
- * an account.
+ * What a visitor sees at the door (#136, canvas page 4): a game's title screen with the two ways in, then
+ * what CheevoVault is, shown with the app's own pieces and labelled examples (the library, groups, the
+ * streak, Vault Points), the questions people ask first, and the art going by at the end with the ways in
+ * again. Its motion (the title's art, the closing band) is CSS; the stop button holds all of it still.
  */
 export default function LandingPage() {
-  const { T } = useLanguage()
+  const [still, setStill] = useState(false)
 
   return (
-    <div className="min-h-[100dvh] bg-bg-main text-text-main flex flex-col">
-      <LandingNav />
-      <LandingHero />
-      <LandingBento />
-
-      <div className="relative max-w-6xl w-full mx-auto px-4 sm:px-6 pb-20">
-        <div aria-hidden="true" className="absolute -top-10 left-0 w-72 h-72 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
-        <div className="relative">
-          <FaqList title={T.publicPages.faqTitle} lead={T.landing.faqLead} items={T.landing.faq} split />
+    <div data-motion={still ? 'still' : undefined} className="min-h-[100dvh] bg-bg-main text-text-main flex flex-col">
+      <main className="flex flex-col">
+        <LandingTitle still={still} onStill={() => setStill((s) => !s)} />
+        <div className="w-full max-w-[110rem] mx-auto px-4 sm:px-8 lg:px-24 pt-18 lg:pt-30 pb-20 lg:pb-36 flex flex-col gap-20 lg:gap-40">
+          <LandingLibrary />
+          <LandingGroups />
+          <LandingStreak />
+          <LandingPoints />
+          <LandingFaq />
         </div>
-      </div>
-
-      <section className="max-w-6xl w-full mx-auto px-4 sm:px-6 pb-20">
         <LandingClosing />
-      </section>
-
+      </main>
       <PublicFooter />
     </div>
   )

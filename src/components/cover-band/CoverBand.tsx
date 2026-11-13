@@ -2,7 +2,7 @@ import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
 
 /**
  * A window onto the art wall (the sliding game covers of the sign-in page): the
- * landing's first screen, and the band over the name on a phone's sign-in. The
+ * band over the name on a phone's sign-in. The
  * edges fade into the page so it reads as a picture, not a box. `className` is
  * for its size and corners.
  */
