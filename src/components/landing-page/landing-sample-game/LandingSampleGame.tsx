@@ -39,7 +39,7 @@ export default function LandingSampleGame({ game, open, onToggle }: { game: Samp
         expanded={open}
         onToggle={onToggle}
       >
-        {game.appId && <LandingSampleExpanded appId={game.appId} total={game.total} minutes={(game.hours ?? 0) * 60} />}
+        {game.appId && <LandingSampleExpanded appId={game.appId} total={game.total} minutes={(game.hours ?? 0) * 60} recentMinutes={(game.recentHours ?? 0) * 60} />}
       </FeedGameCard>
     </li>
   )

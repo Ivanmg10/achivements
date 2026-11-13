@@ -19,7 +19,17 @@ import type { SteamAchievementUnified } from '@/types/steam'
  * the ring with the play time, the unlocks over time, the rarest earned and every achievement in the badge grid, with
  * the same pieces, from the sample's data. Nothing in it links: it is an example.
  */
-export default function LandingSampleExpanded({ appId, total, minutes }: { appId: number; total: number; minutes: number }) {
+export default function LandingSampleExpanded({
+  appId,
+  total,
+  minutes,
+  recentMinutes = 0,
+}: {
+  appId: number
+  total: number
+  minutes: number
+  recentMinutes?: number
+}) {
   const { T, lang } = useLanguage()
   const { achievements, isLoading, error, retry } = useLandingSampleAchievements(appId)
   const earned = isLoading ? 0 : achievements.filter((a) => a.earned).length
@@ -33,7 +43,7 @@ export default function LandingSampleExpanded({ appId, total, minutes }: { appId
       ringExtra={
         <SteamExpandedStats
           playtimeForever={minutes}
-          playtime2Weeks={0}
+          playtime2Weeks={recentMinutes}
           completionPct={count > 0 ? Math.round((earned / count) * 100) : 0}
           remaining={Math.max(0, count - earned)}
         />
