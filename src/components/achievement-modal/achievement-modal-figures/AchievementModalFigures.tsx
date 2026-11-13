@@ -29,12 +29,12 @@ export default function AchievementModalFigures({
 
   return (
     <dl className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-      <Figure term look="tile" label={plural(points, T.plurals.pointsLabel, lang)} value={points} />
-      <Figure term look="tile" label={T.achievement.players} value={players} />
-      <Figure term look="tile" label={T.achievement.rarity} value={rarity} />
-      <Figure term look="tile" label={T.achievement.author} value={meta?.Author || '—'} loading={loading} className="min-w-0 *:max-w-full *:truncate" />
-      <Figure term look="tile" label={T.profileStats.truePoints} value={meta ? meta.TrueRatio.toLocaleString(lang) : '—'} loading={loading} />
-      <Figure term look="tile" label={T.achievement.created} value={meta?.DateCreated ? formatDate(meta.DateCreated, lang) : '—'} loading={loading} />
+      <Figure term look="tile" label={plural(points, T.plurals.pointsLabel, lang)} value={points} className="justify-between" />
+      <Figure term look="tile" label={T.achievement.players} value={players} className="justify-between" />
+      <Figure term look="tile" label={T.achievement.rarity} value={rarity} className="justify-between" />
+      <Figure term look="tile" label={T.achievement.author} value={meta?.Author || '—'} loading={loading} className="justify-between min-w-0 *:max-w-full *:truncate" />
+      <Figure term look="tile" label={T.profileStats.truePoints} value={meta ? meta.TrueRatio.toLocaleString(lang) : '—'} loading={loading} className="justify-between" />
+      <Figure term look="tile" label={T.achievement.created} value={meta?.DateCreated ? formatDate(meta.DateCreated, lang) : '—'} loading={loading} className="justify-between" />
     </dl>
   )
 }

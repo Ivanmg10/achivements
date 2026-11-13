@@ -31,7 +31,7 @@ export default function ShowcasePickerModalGame({
   const earned = choices.filter((c) => c.entry).length
 
   return (
-    <div className="lg:overflow-y-auto lg:overscroll-contain lg:min-h-0 lg:flex-1 flex flex-col gap-3">
+    <div className="lg:overflow-y-auto lg:overscroll-contain lg:min-h-0 lg:flex-1 lg:p-1 lg:-m-1 flex flex-col gap-3">
       {isLoading ? (
         <div aria-busy="true" className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 gap-2">
           {Array.from({ length: 8 }, (_, i) => (

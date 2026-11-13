@@ -25,10 +25,10 @@ export default function AdminUsersTable({
         <thead>
           <tr>
             <th scope="col" className={`${TH} text-left`}>User</th>
-            <th scope="col" className={`${TH} text-left`}>ID</th>
+            <th scope="col" className={`${TH} text-left hidden sm:table-cell`}>ID</th>
             <th scope="col" className={`${TH} text-left hidden md:table-cell`}>Email</th>
-            <th scope="col" className={`${TH} text-left`}>Accounts</th>
-            <th scope="col" className={`${TH} text-left`}>Role</th>
+            <th scope="col" className={`${TH} text-left hidden md:table-cell`}>Accounts</th>
+            <th scope="col" className={`${TH} text-left hidden md:table-cell`}>Role</th>
             <th scope="col" className={`${TH} text-right`}><span className="sr-only">Actions</span></th>
           </tr>
         </thead>

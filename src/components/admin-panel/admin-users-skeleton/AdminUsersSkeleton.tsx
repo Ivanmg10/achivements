@@ -12,10 +12,10 @@ export default function AdminUsersSkeleton() {
         <thead>
           <tr>
             <th className={`${TH} text-left`}><Skeleton className="h-3 w-10" /></th>
-            <th className={`${TH} text-left`}><Skeleton className="h-3 w-6" /></th>
+            <th className={`${TH} text-left hidden sm:table-cell`}><Skeleton className="h-3 w-6" /></th>
             <th className={`${TH} text-left hidden md:table-cell`}><Skeleton className="h-3 w-10" /></th>
-            <th className={`${TH} text-left`}><Skeleton className="h-3 w-14" /></th>
-            <th className={`${TH} text-left`}><Skeleton className="h-3 w-8" /></th>
+            <th className={`${TH} text-left hidden md:table-cell`}><Skeleton className="h-3 w-14" /></th>
+            <th className={`${TH} text-left hidden md:table-cell`}><Skeleton className="h-3 w-8" /></th>
             <th className={TH} />
           </tr>
         </thead>
@@ -28,10 +28,10 @@ export default function AdminUsersSkeleton() {
                   <Skeleton className="h-4 w-28" />
                 </div>
               </td>
-              <td className={TD}><Skeleton className="h-3 w-8" /></td>
+              <td className={`${TD} hidden sm:table-cell`}><Skeleton className="h-3 w-8" /></td>
               <td className={`${TD} hidden md:table-cell`}><Skeleton className="h-3 w-40" /></td>
-              <td className={TD}><Skeleton className="h-4 w-16" /></td>
-              <td className={TD}><Skeleton radius="tag" className="h-5 w-12" /></td>
+              <td className={`${TD} hidden md:table-cell`}><Skeleton className="h-4 w-16" /></td>
+              <td className={`${TD} hidden md:table-cell`}><Skeleton radius="tag" className="h-5 w-12" /></td>
               <td className={TD}><Skeleton radius="button" className="h-8 w-24 ml-auto" /></td>
             </tr>
           ))}

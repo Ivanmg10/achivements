@@ -44,15 +44,16 @@ export default function AdminUserRow({
                   {codeToFlag(country.code)}
                 </span>
               )}
+              {user.admin && <Tag tone="accent" size="sm" className="md:hidden">Admin</Tag>}
               {isSelf && <span className="text-xs text-text-secondary italic">(you)</span>}
             </span>
             <span className="md:hidden text-xs text-text-secondary truncate">{user.email || '—'}</span>
           </div>
         </div>
       </td>
-      <td className={`${TD} text-xs text-text-secondary font-mono`}>#{user.id}</td>
+      <td className={`${TD} hidden sm:table-cell text-xs text-text-secondary font-mono`}>#{user.id}</td>
       <td className={`${TD} hidden md:table-cell text-xs text-text-secondary max-w-56 truncate`}>{user.email || '—'}</td>
-      <td className={TD}>
+      <td className={`${TD} hidden md:table-cell`}>
         {linked.length === 0 ? (
           <span className="text-text-secondary">—</span>
         ) : (
@@ -65,7 +66,7 @@ export default function AdminUserRow({
           </ul>
         )}
       </td>
-      <td className={TD}>{user.admin && <Tag tone="accent" size="sm">Admin</Tag>}</td>
+      <td className={`${TD} hidden md:table-cell`}>{user.admin && <Tag tone="accent" size="sm">Admin</Tag>}</td>
       <td className={TD}>
         <div className="flex items-center justify-end gap-0.5">
           <IconButton

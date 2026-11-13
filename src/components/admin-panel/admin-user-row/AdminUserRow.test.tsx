@@ -58,7 +58,8 @@ test('an admin wears the tag; grants and revokes admin', () => {
   unmount()
 
   row({ ...USER, admin: true })
-  expect(screen.getByText('Admin')).toBeInTheDocument()
+  // In its own column from md, beside the name below it.
+  expect(screen.getAllByText('Admin').length).toBeGreaterThan(0)
   expect(screen.getByRole('button', { name: 'Remove admin from papucarrot' })).toBeInTheDocument()
 })
 
