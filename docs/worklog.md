@@ -93,6 +93,12 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 - *The band, more and slower; the streak on the canvas (2026-11-13, the owner)*: four more groups (Final Fantasy, Metroidvania, Roguelike, Yakuza; Steam
   art, every cover checked to exist), nine in all, so a half is wider than 2560 px with no repeat; 180 s a half (about 19 px/s, half the speed). "Mira cómo
   avanzas" drawn on the canvas (`LandRacha`, page 4, round 6: Hoy, A the streak explained, B your week, C your year); see `docs/designs.md`.
+- *The streak, option A, and a backlog group (2026-11-13, the owner)*: "Mira cómo avanzas" rebuilt as the canvas's A: the text says what a streak is
+  (`T.landing.progressText` / `progressPoints` rewritten in nine languages); the example names it ("Your streak" and `T.streak.pageSub` over the figure),
+  the figure in its tier's colour, "From … to today", "Your best streak yet" when it is, and its days in `/racha`'s own `StreakCalendar` (today picked;
+  picking a day says its count), the counts fixed per day (`streakDayCounts`). The best-streaks list left this section. Half and half only from `xl`: the
+  calendar's thirteen weeks (about 504 px) do not fit half of a 1024 px page. A tenth group in the band, "Pendientes" (`T.landing.sampleGroupBacklog`:
+  Backlog, Pendentes, À jouer, Noch zu spielen, Da giocare, Отложенные, Do ogrania, 積みゲー): Baldur's Gate 3, Cyberpunk 2077, RDR2, The Witcher 3.
 **Where the drawing gave way to a rule** — No capitals: the platforms line, the name and the tagline are in their own case (drawn in capitals; the guard refuses
 `uppercase`), the wide tracking kept. The name is `BrandMark`'s mixed case, the same signature as the bar and the sign-in; on a 390 px phone it fits one line (the
 drawing broke "CHEEVO / VAULT", wider in capitals). "Iniciar sesión" is `T.landing.signIn` ("Entrar" in Spanish). No © year (the line is `T.landing.footer`). The nav's
