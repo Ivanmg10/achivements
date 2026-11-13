@@ -100,7 +100,8 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   calendar's thirteen weeks (about 504 px) do not fit half of a 1024 px page. **Then** the owner found it a one-to-one copy of their own `/racha`: the
   section now has its own `landing-streak-calendar/LandingStreakCalendar` (only the weeks the streak spans, each day's achievement count in its square in
   the streak's tier colour, the days outside it empty squares, nothing made up; one tab stop and the arrows; `T.landing.streakLegend` in nine languages),
-  half and half again from `lg`. A tenth group in the band, "Pendientes" (`T.landing.sampleGroupBacklog`:
+  half and half again from `lg`. **Then, smaller** (the owner: too big, extras out, empty room on the right): one card, the figure (3rem) with its
+  dates and the picked day on the left, the calendar beside it with its weeks sharing the width; no "best yet" tag, no repeated explanation. A tenth group in the band, "Pendientes" (`T.landing.sampleGroupBacklog`:
   Backlog, Pendentes, À jouer, Noch zu spielen, Da giocare, Отложенные, Do ogrania, 積みゲー): Baldur's Gate 3, Cyberpunk 2077, RDR2, The Witcher 3.
 **Where the drawing gave way to a rule** — No capitals: the platforms line, the name and the tagline are in their own case (drawn in capitals; the guard refuses
 `uppercase`), the wide tracking kept. The name is `BrandMark`'s mixed case, the same signature as the bar and the sign-in; on a 390 px phone it fits one line (the
