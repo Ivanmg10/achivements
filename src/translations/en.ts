@@ -431,8 +431,6 @@ export const en = {
       { name: 'No Man Left Behind', text: 'Rescue Woods.' },
       { name: 'Shifting Sands', text: 'Gather intel on Raul Menendez from Mullah Rahmaan.' },
       { name: 'Black Ops II Master', text: 'Complete the campaign on Hardened or Veteran difficulty.' },
-      { name: 'Ten K', text: 'Minimum score of 10k in every mission.' },
-      { name: 'Futurist', text: 'Complete all future levels in veteran.' },
     ],
     otherPlayer: 'Another player',
     progressTitle: 'See how you are doing',

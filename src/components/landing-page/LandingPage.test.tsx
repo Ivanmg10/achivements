@@ -27,9 +27,9 @@ test('says what the app is in its sections, each titled, with no closing card', 
   }
 })
 
-test('every example is labelled as one', () => {
+test('every example is labelled as one, but the library (the owner, 2026-11-13: room for one more game)', () => {
   render(<LandingPage />)
-  expect(screen.getAllByText(en.landing.example)).toHaveLength(5)
+  expect(screen.getAllByText(en.landing.example)).toHaveLength(4)
 })
 
 test('the questions are all open, in the page, as the JSON-LD lists them', () => {

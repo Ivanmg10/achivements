@@ -430,8 +430,6 @@ export const de: Translations = {
       { name: 'Keiner wird zurückgelassen', text: 'Retten Sie Woods.' },
       { name: 'Treibsand', text: 'Erhalten Sie von Mullah Rahmaan Informationen über Raul Menendez.' },
       { name: 'Black Ops II-Meister', text: 'Schließen Sie die Kampagne im Schwierigkeitsgrad Söldner oder Veteran ab.' },
-      { name: 'Zehntausend', text: 'Erreichen Sie mindestens 10.000 Punkte in jeder Mission.' },
-      { name: 'Futurist', text: 'Schließen Sie alle Zukunftslevel auf Veteran ab.' },
     ],
     otherPlayer: 'Eine andere Person',
     progressTitle: 'Sieh deinen Fortschritt',

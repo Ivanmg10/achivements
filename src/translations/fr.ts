@@ -430,8 +430,6 @@ export const fr: Translations = {
       { name: 'On abandonne personne', text: 'Portez secours à Woods.' },
       { name: 'Sable mouvant', text: 'Obtenez des infos sur Raul Menendez par Rahmaan.' },
       { name: 'Maître de Black Ops II', text: 'Terminez la campagne en difficulté Commando ou Vétéran.' },
-      { name: '10 000', text: 'Obtenez un score minimum de 10 000 par mission.' },
-      { name: 'Futuriste', text: 'Terminez tous les niveaux du futur en Vétéran.' },
     ],
     otherPlayer: 'Une autre personne',
     progressTitle: 'Vois ta progression',

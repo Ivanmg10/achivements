@@ -430,8 +430,6 @@ export const pl: Translations = {
       { name: 'Nikogo nie zostawiamy', text: 'Uratuj Woodsa.' },
       { name: 'Ruchome piaski', text: 'Zdobądź informacje o Raulu Menendezie od Mullaha Rahmaana.' },
       { name: 'Mistrz Black Ops II', text: 'Ukończ kampanię na poziomie trudności Doświadczony lub Weteran.' },
-      { name: '10 kółek', text: 'Zdobądź co najmniej 10 tysięcy punktów w każdej misji' },
-      { name: 'Futurysta', text: 'Ukończ wszystkie poziomy w przyszłości na poziomie trudności Weteran' },
     ],
     otherPlayer: 'Inna osoba',
     progressTitle: 'Zobacz swoje postępy',

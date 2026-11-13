@@ -59,7 +59,7 @@ export default function LandingAchievements() {
                 {T.aiExport.open}
               </Button>
             </div>
-            <div role="tabpanel" id={ids.panel} aria-labelledby={ids.tab} className="min-h-[27.5rem] sm:min-h-[26rem]">
+            <div role="tabpanel" id={ids.panel} aria-labelledby={ids.tab} className="min-h-[18.5rem] sm:min-h-[17.5rem]">
               <ul>
                 {listed.map((r) => (
                   <LandingSampleAchievement key={r.icon} icon={r.icon} name={r.name} text={r.text} rarity={r.rarity} earnedAt={r.earnedAt} />

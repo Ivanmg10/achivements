@@ -39,6 +39,7 @@ export const SAMPLE_GAMES: SampleGame[] = [
   { title: 'Pokémon Gold Version', source: 'ra', console: 'Game Boy Color', raId: 576, cover: `${RA_ART}/105481.png`, earned: 25, total: 72 },
   { title: 'Call of Duty: Black Ops II', source: 'steam', appId: 202970, cover: steamAssetUrl(202970, 'cover'), art: steamAssetUrl(202970, 'header'), earned: 16, total: 35, hours: 30 },
   { title: 'Inazuma Eleven: Victory Road', source: 'steam', appId: 2799860, cover: steamAssetUrl(2799860, 'cover'), art: steamAssetUrl(2799860, 'header'), earned: 52, total: 52, hours: 61, recentHours: 4 },
+  { title: 'God of War Ragnarök', source: 'psn', console: 'PS5', trophySet: 'NPWR22392_00', cover: steamAssetUrl(2322010, 'cover'), art: steamAssetUrl(2322010, 'header'), earned: 31, total: 48, hours: 55 },
   { title: 'Super Mario Sunshine', source: 'ra', console: 'GameCube', raId: 6049, cover: `${RA_ART}/081263.png`, earned: 19, total: 148 },
 ]
 
@@ -101,7 +102,7 @@ const BO2_ICONS = 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/
 export const SAMPLE_GAME_PAGE = { title: 'Call of Duty: Black Ops II', source: 'steam' as const, appId: 202970, earned: 16, total: 35 }
 
 /**
- * Six of its achievements, three earned and three to get: their icons and Steam's global rarity (read once,
+ * Four of its achievements, three earned and one to get (the owner, 2026-11-13: a smaller example): their icons and Steam's global rarity (read once,
  * 2026-11-13). Their names and texts are Steam's own, per language, in `T.landing.sampleAchievements` in this
  * order. An earned one is dated `daysAgo` days before the day the page is shown, so the example never ages.
  */
@@ -110,8 +111,6 @@ export const SAMPLE_ACHIEVEMENTS: { icon: string; rarity: number; daysAgo: numbe
   { icon: `${BO2_ICONS}/ab8d4ccecae718e5314300a6716d0c3623ce0dc5.jpg`, rarity: 52.7, daysAgo: 63 },
   { icon: `${BO2_ICONS}/910637c7094876116abbb2e786652120fb4f65f3.jpg`, rarity: 41.2, daysAgo: 41 },
   { icon: `${BO2_ICONS}/9dfd28b4500bdc6a148469ad3576fca079768bc8.jpg`, rarity: 6.4, daysAgo: null },
-  { icon: `${BO2_ICONS}/f6699b8c585d8e0f74d946382dc9a6b944668e1d.jpg`, rarity: 5.5, daysAgo: null },
-  { icon: `${BO2_ICONS}/dc92dcfcab652a8d51315a3e9abc8a2b87db664f.jpg`, rarity: 3.4, daysAgo: null },
 ]
 
 export type RankPeriod = 'all' | 'month' | 'week'

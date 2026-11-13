@@ -6,10 +6,10 @@ import { addDays } from '@/utils/dates'
 
 /**
  * The landing library's examples opened: the three Steam games (Fallout 4, Black Ops II, Inazuma Eleven), read once from
- * Steam's public schema and global percentages, and Assassin's Creed Brotherhood (PS4), read once from PSN's trophy list
- * and rarity, and Pokémon Gold and Super Mario Sunshine, read once from RetroAchievements (2026-11-13, with the owner's
- * key, not kept). Earned are the most common N, N being the example's count (52 of 84, 16 of 35, 52 of 52, 51 of 51, 25
- * of 72, 19 of 148), dated so many days before the day the page is shown; Black Ops II's agree with the "Achievement by
+ * Steam's public schema and global percentages, Assassin's Creed Brotherhood (PS4) and God of War Ragnarök (PS5), read
+ * once from PSN's trophy lists and rarity, and Pokémon Gold and Super Mario Sunshine, read once from RetroAchievements (2026-11-13, with the owner's
+ * key, not kept). Earned are the most common N, N being the example's count (52 of 84, 16 of 35, 52 of 52, 51 of 51, 31 of
+ * 48, 25 of 72, 19 of 148), dated so many days before the day the page is shown; Black Ops II's agree with the "Achievement by
  * achievement" example. Loaded only when a game is opened, the names in the reader's language only (RA has English only).
  */
 
@@ -18,6 +18,9 @@ export type SampleSteamAchievement = [string, string, number | null, boolean, nu
 
 /** [id, grade, group, secret, PSN rarity, icon file, days since earned (null: still to get)]. */
 export type SamplePsnTrophy = [number, TrophyGrade, string, boolean, number | null, string, number | null]
+
+/** A PSN example: where its icons live, then its trophies in order. */
+export type SamplePsnGame = { icons: string; trophies: SamplePsnTrophy[] }
 
 /** [id, title, text, points, badge, type, players with it, in hardcore, days since earned (null: still to get)]. */
 type SampleRaAchievement = [number, string, string, number, string, string | null, number, number, number | null]
@@ -109,10 +112,12 @@ export async function loadSampleAchievements(appId: number, lang: Lang, today: s
   return toSteamAchievements(appId, SAMPLE_STEAM_ACHIEVEMENTS[appId] ?? [], names[appId] ?? [], today)
 }
 
-/** The PSN example's trophies (`set`, its trophy set), in `lang`, the same way. */
+/** A PSN example's trophies (`set`, its trophy set), in `lang`, the same way. */
 export async function loadSampleTrophies(set: string, lang: Lang, today: string): Promise<PsnTrophy[]> {
-  const [{ SAMPLE_PSN_TROPHIES, SAMPLE_PSN_ICONS }, names] = await Promise.all([import('./samplePsnTrophies'), NAMES[lang]()])
-  return toPsnTrophies(SAMPLE_PSN_TROPHIES, SAMPLE_PSN_ICONS, names[set] ?? [], today)
+  const [{ SAMPLE_PSN_GAMES }, names] = await Promise.all([import('./samplePsnTrophies'), NAMES[lang]()])
+  const game = SAMPLE_PSN_GAMES[set]
+  if (!game) throw new Error(`no PSN sample ${set}`)
+  return toPsnTrophies(game.trophies, game.icons, names[set] ?? [], today)
 }
 
 /** An RA example (`gameId`): its players and achievements, one small chunk; RA's names are English in every language. */

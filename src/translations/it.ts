@@ -430,8 +430,6 @@ export const it: Translations = {
       { name: 'Nessuno resta indietro', text: 'Salva Woods.' },
       { name: 'Sabbie mobili', text: 'Raccogli informazioni su Raul Menendez dal mullah Rahmaan.' },
       { name: 'Maestro di Black Ops II', text: 'Completa la campagna a livello Esperto o Veterano.' },
-      { name: 'Diecimila', text: 'Ottieni almeno 10.000 punti in ogni missione.' },
-      { name: 'Futurista', text: 'Completa tutti i livelli nel futuro in Veterano.' },
     ],
     otherPlayer: 'Un’altra persona',
     progressTitle: 'Guarda come procedi',

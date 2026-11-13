@@ -1,6 +1,6 @@
 import { SAMPLE_STEAM_ACHIEVEMENTS } from './sampleSteamAchievements'
 import { SAMPLE_NAMES as ES } from './names/es'
-import { SAMPLE_PSN_ICONS, SAMPLE_PSN_TROPHIES } from './samplePsnTrophies'
+import { SAMPLE_PSN_GAMES } from './samplePsnTrophies'
 import { SAMPLE_RA_GAMES } from './sampleRaAchievements'
 import { loadSampleAchievements, loadSampleTrophies, toRaAchievements, toPsnTrophies, toSteamAchievements } from './landingLibrary'
 import { SAMPLE_ACHIEVEMENTS, SAMPLE_GAMES } from '@/components/landing-page/landingSamples'
@@ -37,17 +37,17 @@ test('loads one game in the reader\'s language', async () => {
   expect(list.map((a) => a.title)).toContain('Futurista')
 })
 
-test('the PSN example earns every trophy, named, with its icon on the PSN host and the platinum last', () => {
-  const game = SAMPLE_GAMES.find((g) => g.trophySet)!
-  const list = toPsnTrophies(SAMPLE_PSN_TROPHIES, SAMPLE_PSN_ICONS, ES[game.trophySet!], TODAY)
-  expect(list).toHaveLength(game.total)
-  expect(list.filter((t) => t.earned)).toHaveLength(game.earned)
-  for (const t of list) {
-    expect(t.name).not.toBe('')
-    expect(t.iconUrl).toMatch(/^https:\/\/image\.api\.playstation\.com\/trophy\/np\//)
+test('each PSN example earns its count, named, with its icons on a PSN host (PS4 and PS5 lists use two)', () => {
+  for (const game of SAMPLE_GAMES.filter((g) => g.trophySet)) {
+    const { trophies, icons } = SAMPLE_PSN_GAMES[game.trophySet!]
+    const list = toPsnTrophies(trophies, icons, ES[game.trophySet!], TODAY)
+    expect(list).toHaveLength(game.total)
+    expect(list.filter((t) => t.earned)).toHaveLength(game.earned)
+    for (const t of list) {
+      expect(t.name).not.toBe('')
+      expect(t.iconUrl).toMatch(/^https:\/\/(image\.api\.playstation\.com\/trophy\/np|psnobj\.prod\.dl\.playstation\.net\/psnobj)\//)
+    }
   }
-  const last = [...list].sort((a, b) => b.earnedAt!.localeCompare(a.earnedAt!))[0]
-  expect(last.type).toBe('platinum')
 })
 
 test('loads the PSN example in the reader language', async () => {

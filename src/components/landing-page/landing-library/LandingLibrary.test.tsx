@@ -4,28 +4,17 @@ import LandingLibrary from './LandingLibrary'
 import { SAMPLE_GAMES } from '@/components/landing-page/landingSamples'
 import { en } from '@/translations/en'
 
-test('says what the library is, beside a labelled example of its list', () => {
+test('says what the library is, beside the example games, every platform at once', () => {
   render(<LandingLibrary />)
   expect(screen.getByRole('heading', { level: 2, name: en.landing.libraryTitle })).toBeInTheDocument()
-  expect(screen.getByText(en.landing.example)).toBeInTheDocument()
-  expect(within(screen.getByRole('tabpanel')).getAllByRole('listitem')).toHaveLength(SAMPLE_GAMES.length)
+  for (const g of SAMPLE_GAMES) expect(screen.getByText(g.title)).toBeInTheDocument()
+  expect(screen.queryByRole('tab')).not.toBeInTheDocument()
 })
 
-test('its platform tabs work: one platform\'s games, then all again', async () => {
+test('a PS5 game among them, and no Xbox while Xbox is admin-only', () => {
   render(<LandingLibrary />)
-  await userEvent.click(screen.getByRole('tab', { name: 'Steam' }))
-  const steam = SAMPLE_GAMES.filter((g) => g.source === 'steam')
-  const panel = screen.getByRole('tabpanel')
-  expect(within(panel).getAllByRole('listitem')).toHaveLength(steam.length)
-  for (const g of steam) expect(within(panel).getByText(g.title)).toBeInTheDocument()
-  expect(panel).toHaveAttribute('aria-labelledby', screen.getByRole('tab', { name: 'Steam' }).id)
-  await userEvent.click(screen.getByRole('tab', { name: en.rankings.allPlatforms }))
-  expect(within(screen.getByRole('tabpanel')).getAllByRole('listitem')).toHaveLength(SAMPLE_GAMES.length)
-})
-
-test('no Xbox tab while Xbox is admin-only', () => {
-  render(<LandingLibrary />)
-  expect(screen.queryByRole('tab', { name: /xbox/i })).not.toBeInTheDocument()
+  expect(screen.getByText('PS5')).toBeInTheDocument()
+  expect(screen.queryByText(/xbox/i)).not.toBeInTheDocument()
 })
 
 test('opening a game hides the others until it closes, as the home feed does', async () => {
@@ -34,5 +23,6 @@ test('opening a game hides the others until it closes, as the home feed does', a
   await userEvent.click(screen.getByRole('button', { name: `${en.cards.showAchievements}: ${first.title}` }))
   for (const g of SAMPLE_GAMES.filter((g) => g !== first)) expect(screen.queryByText(g.title)).not.toBeInTheDocument()
   await userEvent.click(screen.getByRole('button', { name: `${en.cards.hideAchievements}: ${first.title}` }))
-  for (const g of rest) expect(screen.getByText(g.title)).toBeInTheDocument()
+  for (const g of rest) expect(await screen.findByText(g.title)).toBeInTheDocument()
+  expect(within(document.body).getAllByRole('listitem').length).toBeGreaterThanOrEqual(SAMPLE_GAMES.length)
 })

@@ -430,8 +430,6 @@ export const es: Translations = {
       { name: 'Nadie se queda atrás', text: 'Rescata a Woods.' },
       { name: 'Arenas cambiantes', text: 'Reúne la información del ulema Rahmaan sobre Raul Menendez.' },
       { name: 'Maestro de Black Ops II', text: 'Completa la campaña en dificultad curtido o veterano.' },
-      { name: 'Diez mil', text: 'Puntuación mínima de 10.000 en todas las misiones.' },
-      { name: 'Futurista', text: 'Completa todos los niveles del futuro en veterano.' },
     ],
     otherPlayer: 'Otra persona',
     progressTitle: 'Mira cómo avanzas',
