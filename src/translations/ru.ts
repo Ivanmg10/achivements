@@ -1308,6 +1308,11 @@ export const ru: Translations = {
     earnedOf: '{n} из {total} получено',
     gamesLabel: 'Ваши игры с достижениями',
     achievementsLabel: 'Достижения этой игры',
+    pickGame: 'Выберите игру',
+    pickGameHint: 'Выберите игру из списка, чтобы увидеть здесь её достижения.',
+    platformFilter: 'Платформа',
+    slotsLabel: 'Места витрины',
+    removePick: 'Убрать {title}',
   },
   friends: {
     leaderboard: 'Рейтинг',

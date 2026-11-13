@@ -1,58 +1,76 @@
 'use client'
 
-import { useId, useMemo } from 'react'
-import { IconSearch } from '@tabler/icons-react'
+import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { LibraryGame } from '@/utils/library'
+import type { GameSource } from '@/types/game'
 import { normalizeTitle } from '@/utils/gameCandidates'
+import { GAME_SOURCES, PLATFORM_NAME } from '@/utils/gameRef'
 import ShowcasePickerModalGameRow from '../showcase-picker-modal-game-row/ShowcasePickerModalGameRow'
-import { fieldClass } from '@/components/ui/Input'
+import Pill from '@/components/ui/Pill'
+import SearchInput from '@/components/ui/SearchInput'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
 
-/** The picker's first view: the user's games with an achievement earned, searchable, each opening its achievements. */
+export type ShowcasePlatform = GameSource | 'all'
+
+/**
+ * The picker's list of games: the user's games with an achievement earned as rows, searchable and filtered by
+ * platform (the chips only when more than one platform has games), each opening its achievements.
+ */
 export default function ShowcasePickerModalGames({
   games,
   isLoading,
   query,
   onQuery,
+  platform,
+  onPlatform,
   selectedIn,
+  openKey,
   onOpen,
 }: {
   games: LibraryGame[]
   isLoading: boolean
   query: string
   onQuery: (q: string) => void
+  platform: ShowcasePlatform
+  onPlatform: (p: ShowcasePlatform) => void
   /** How many achievements of a game (by its key) are selected. */
   selectedIn: (gameKey: string) => number
+  /** The game whose achievements are showing. */
+  openKey?: string
   onOpen: (game: LibraryGame) => void
 }) {
   const { T } = useLanguage()
-  const searchId = useId()
+  const platforms = useMemo(() => GAME_SOURCES.filter((s) => games.some((g) => g.source === s)), [games])
   const shown = useMemo(() => {
     const q = normalizeTitle(query.trim())
-    return q ? games.filter((g) => normalizeTitle(g.title).includes(q)) : games
-  }, [games, query])
+    return games.filter((g) => (platform === 'all' || g.source === platform) && (!q || normalizeTitle(g.title).includes(q)))
+  }, [games, query, platform])
 
   return (
     <>
-      <div className="p-3 border-b border-bg-header">
-        <label htmlFor={searchId} className="sr-only">{T.showcase.pickerSearch}</label>
-        <div className="relative">
-          <IconSearch size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
-          <input
-            id={searchId}
-            type="search"
-            value={query}
-            onChange={(e) => onQuery(e.target.value)}
-            placeholder={T.showcase.pickerSearch}
-            className={fieldClass({ size: 'sm', icon: true })}
-          />
-        </div>
-      </div>
-      <div className="overflow-y-auto overscroll-contain p-2 flex-1">
+      <div className="flex flex-col gap-2">
         {isLoading ? (
-          <div aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
-            {[0, 1, 2, 3, 4].map((i) => (
+          <Skeleton radius="field" className="h-10" />
+        ) : (
+          <SearchInput value={query} onChange={(e) => onQuery(e.target.value)} placeholder={T.showcase.pickerSearch} aria-label={T.showcase.pickerSearch} />
+        )}
+        {!isLoading && platforms.length > 1 && (
+          <div role="group" aria-label={T.showcase.platformFilter} className="flex flex-wrap gap-1.5">
+            <Pill pressed={platform === 'all'} onClick={() => onPlatform('all')}>{T.libraryFilters.all}</Pill>
+            {platforms.map((s) => (
+              <Pill key={s} pressed={platform === s} count={games.filter((g) => g.source === s).length} onClick={() => onPlatform(s)}>
+                {PLATFORM_NAME[s]}
+              </Pill>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="lg:overflow-y-auto lg:overscroll-contain lg:min-h-0 lg:flex-1 -mx-1 px-1">
+        {isLoading ? (
+          <div aria-busy="true" className="flex flex-col gap-1.5">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
               <SkeletonRow key={i} className="h-14 bg-bg-card rounded-tile px-2 gap-3" />
             ))}
           </div>
@@ -61,10 +79,10 @@ export default function ShowcasePickerModalGames({
         ) : shown.length === 0 ? (
           <p role="status" className="py-10 text-center text-sm text-text-secondary">{T.showcase.pickerNoMatch}</p>
         ) : (
-          <ul aria-label={T.showcase.gamesLabel} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
+          <ul aria-label={T.showcase.gamesLabel} className="flex flex-col gap-1">
             {shown.map((game) => (
               <li key={game.key}>
-                <ShowcasePickerModalGameRow game={game} selected={selectedIn(game.key)} onOpen={() => onOpen(game)} />
+                <ShowcasePickerModalGameRow game={game} selected={selectedIn(game.key)} current={game.key === openKey} onOpen={() => onOpen(game)} />
               </li>
             ))}
           </ul>

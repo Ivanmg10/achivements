@@ -1308,6 +1308,11 @@ export const es: Translations = {
     earnedOf: '{n} de {total} conseguidos',
     gamesLabel: 'Tus juegos con logros',
     achievementsLabel: 'Logros de este juego',
+    pickGame: 'Elige un juego',
+    pickGameHint: 'Elige un juego de la lista para ver aquí sus logros.',
+    platformFilter: 'Plataforma',
+    slotsLabel: 'Huecos de la vitrina',
+    removePick: 'Quitar {title}',
   },
   friends: {
     leaderboard: 'Clasificación',

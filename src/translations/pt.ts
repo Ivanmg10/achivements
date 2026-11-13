@@ -1308,6 +1308,11 @@ export const pt: Translations = {
     earnedOf: '{n} de {total} obtidas',
     gamesLabel: 'Os teus jogos com conquistas',
     achievementsLabel: 'Conquistas deste jogo',
+    pickGame: 'Escolhe um jogo',
+    pickGameHint: 'Escolhe um jogo da lista para ver aqui as suas conquistas.',
+    platformFilter: 'Plataforma',
+    slotsLabel: 'Espaços da vitrine',
+    removePick: 'Remover {title}',
   },
   friends: {
     leaderboard: 'Classificação',

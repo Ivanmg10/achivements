@@ -1309,6 +1309,11 @@ export const en = {
     earnedOf: '{n} of {total} earned',
     gamesLabel: 'Your games with achievements',
     achievementsLabel: 'Achievements of this game',
+    pickGame: 'Pick a game',
+    pickGameHint: 'Choose a game from the list to see its achievements here.',
+    platformFilter: 'Platform',
+    slotsLabel: 'Showcase slots',
+    removePick: 'Remove {title}',
   },
   friends: {
     leaderboard: 'Leaderboard',

@@ -31,9 +31,9 @@ export default function ShowcasePickerModalGame({
   const earned = choices.filter((c) => c.entry).length
 
   return (
-    <div className="overflow-y-auto overscroll-contain p-3 flex-1 flex flex-col gap-3">
+    <div className="lg:overflow-y-auto lg:overscroll-contain lg:min-h-0 lg:flex-1 flex flex-col gap-3">
       {isLoading ? (
-        <div aria-busy="true" className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+        <div aria-busy="true" className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 gap-2">
           {Array.from({ length: 8 }, (_, i) => (
             <Skeleton key={i} radius="tile" className="h-28" />
           ))}
@@ -54,7 +54,7 @@ export default function ShowcasePickerModalGame({
           <p className="text-xs text-text-secondary tabular-nums">
             {T.showcase.earnedOf.replace('{n}', String(earned)).replace('{total}', String(choices.length))}
           </p>
-          <ul aria-label={T.showcase.achievementsLabel} className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+          <ul aria-label={T.showcase.achievementsLabel} className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 gap-2">
             {choices.map((choice) => (
               <li key={choice.key}>
                 <ShowcasePickerModalAchievement

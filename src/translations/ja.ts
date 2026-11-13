@@ -1308,6 +1308,11 @@ export const ja: Translations = {
     earnedOf: '{total}件中{n}件獲得',
     gamesLabel: '実績のあるゲーム',
     achievementsLabel: 'このゲームの実績',
+    pickGame: 'ゲームを選ぶ',
+    pickGameHint: 'リストからゲームを選ぶと、ここに実績が表示されます。',
+    platformFilter: 'プラットフォーム',
+    slotsLabel: 'ショーケースの枠',
+    removePick: '{title}を外す',
   },
   friends: {
     leaderboard: 'ランキング',
