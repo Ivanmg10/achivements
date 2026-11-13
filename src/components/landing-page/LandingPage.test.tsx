@@ -54,7 +54,7 @@ test('the stop button holds all the page\'s motion still, and says so', async ()
 test('links the rankings, how points work and the questions, the public pages and the legal ones; no Xbox anywhere', () => {
   const { container } = render(<LandingPage />)
   expect(screen.getAllByRole('link', { name: en.rankings.title })[0]).toHaveAttribute('href', '/rankings')
-  expect(screen.getByRole('link', { name: en.landing.howPoints })).toHaveAttribute('href', '/rankings/how')
+  expect(screen.getByRole('link', { name: en.rankings.how })).toHaveAttribute('href', '/rankings/how')
   expect(screen.getByRole('link', { name: en.publicPages.faqTitle })).toHaveAttribute('href', '#faq')
   expect(screen.getByRole('link', { name: en.landing.whatIs })).toHaveAttribute('href', '#que-es')
   expect(screen.getByRole('link', { name: 'CheevoVault vs Exophase' })).toHaveAttribute('href', '/compare/exophase')

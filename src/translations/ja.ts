@@ -395,7 +395,6 @@ export const ja: Translations = {
     createAccount: 'アカウントを作成',
     signIn: 'サインイン',
     whatIs: 'CheevoVaultとは',
-    howPoints: 'Vaultポイントの仕組み',
     pointsTitle: 'Vaultポイント',
     pointsText: 'どのプラットフォームも同じ価値で、レアな実績ほど高く評価されます。',
     pointsPoints: [

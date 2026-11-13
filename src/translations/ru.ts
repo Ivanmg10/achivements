@@ -395,7 +395,6 @@ export const ru: Translations = {
     createAccount: 'Создать аккаунт',
     signIn: 'Войти',
     whatIs: 'Что такое CheevoVault',
-    howPoints: 'Как работают очки Vault',
     pointsTitle: 'Очки Vault',
     pointsText: 'Все платформы стоят одинаково, а более редкие достижения ценятся выше.',
     pointsPoints: [

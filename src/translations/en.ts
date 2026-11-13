@@ -396,7 +396,6 @@ export const en = {
     createAccount: 'Create account',
     signIn: 'Sign in',
     whatIs: 'What CheevoVault is',
-    howPoints: 'How Vault Points work',
     pointsTitle: 'Vault Points',
     pointsText: 'Every platform is worth the same, and rarer achievements are worth more.',
     pointsPoints: [

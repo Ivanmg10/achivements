@@ -395,7 +395,6 @@ export const de: Translations = {
     createAccount: 'Konto erstellen',
     signIn: 'Anmelden',
     whatIs: 'Was ist CheevoVault',
-    howPoints: 'So funktionieren Vault-Punkte',
     pointsTitle: 'Vault-Punkte',
     pointsText: 'Jede Plattform zählt gleich viel, und seltenere Erfolge zählen mehr.',
     pointsPoints: [

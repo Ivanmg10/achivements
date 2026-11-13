@@ -32,7 +32,6 @@ export default function LandingTopBar() {
         <LandingLanguage />
         <nav aria-label={T.publicPages.more} className="max-md:hidden ml-auto flex items-center">
           <Link href="/rankings" className={LINK}>{T.rankings.title}</Link>
-          <Link href="/rankings/how" className={`${LINK} max-lg:hidden`}>{T.landing.howPoints}</Link>
           <a href="#faq" className={LINK}>{T.publicPages.faqTitle}</a>
         </nav>
         <div className="max-md:ml-auto md:ml-3 flex items-center gap-2">
