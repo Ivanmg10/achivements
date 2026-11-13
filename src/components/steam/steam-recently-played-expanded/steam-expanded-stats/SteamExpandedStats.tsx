@@ -7,7 +7,7 @@ import GameExpandedStatList from '@/components/game-expanded-stat-list/GameExpan
 /**
  * The stat list beside the progress ring in an expanded Steam game — RA's
  * GameExpandedMobileStats with Steam's numbers: playtime in place of points.
- * Like RA's, beside the ring on a phone, under it on a wide screen (without the
+ * Like RA's, beside the ring in a narrow card, under it in a wide one (without the
  * completion, which the ring already says).
  */
 export default function SteamExpandedStats({

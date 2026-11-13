@@ -41,7 +41,7 @@ export default function PsnCollectionExpanded({ games }: { games: PsnGameProgres
       earned={earned}
       total={total}
       ringLabel={T.psn.trophies}
-      ringExtra={<PsnTrophyCounts earned={sum(games.map((g) => g.earned))} of={sum(games.map((g) => g.defined))} className="flex-col items-start! lg:items-center!" />}
+      ringExtra={<PsnTrophyCounts earned={sum(games.map((g) => g.earned))} of={sum(games.map((g) => g.defined))} className="flex-col items-start! @3xl:items-center!" />}
       gridTitle={T.psn.trophies}
       unlocks={unlocks}
       isLoading={isLoading}
