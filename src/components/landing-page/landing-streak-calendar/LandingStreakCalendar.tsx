@@ -12,7 +12,7 @@ const STEPS: Record<string, number> = { ArrowLeft: -7, ArrowRight: 7, ArrowUp: -
  * The landing's own streak calendar (the owner, 2026-11-13: not `/racha`'s, drawn for this page as on the canvas's A):
  * the weeks the streak spans, a column each, Monday on top, and in each day the number of achievements it had, not its
  * date, filled in the streak's tier colour (`ink`), stronger the busier the day. Days outside it are empty squares. A day
- * is a button (one tab stop, the arrows move a day or a week) that the line under the calendar names.
+ * is a button (one tab stop, the arrows move a day or a week) that the card names. The weeks share the width it is given.
  */
 export default function LandingStreakCalendar({
   days,
@@ -42,14 +42,14 @@ export default function LandingStreakCalendar({
   }
 
   return (
-    <div className="flex flex-col gap-3 min-w-0">
+    <div className="flex-1 flex flex-col gap-3 min-w-0">
       <div
         ref={grid}
         role="group"
         aria-label={T.streak.calendarTitle}
         onKeyDown={onKeyDown}
         className="grid gap-1 sm:gap-1.5 grid-rows-[auto_repeat(7,auto)]"
-        style={{ gridTemplateColumns: `min-content repeat(${weeks}, minmax(0, 2.75rem))` }}
+        style={{ gridTemplateColumns: `min-content repeat(${weeks}, minmax(0, 1fr))` }}
       >
         {Array.from({ length: weeks }, (_, w) => {
           const week = days.slice(w * 7, w * 7 + 7).map((d) => d.day)

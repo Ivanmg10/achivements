@@ -7,14 +7,13 @@ import { en } from '@/translations/en'
 const live = SAMPLE_STREAKS[0]
 const calendarDays = () => screen.getAllByRole('button').filter((b) => b.hasAttribute('data-day'))
 
-test('says what a streak is, then the one going on with its label, its dates and that it is the best yet', () => {
+test('says what a streak is, then the one going on with its label and its dates, no extras', () => {
   render(<LandingStreak />)
   expect(screen.getByRole('heading', { level: 2, name: en.landing.progressTitle })).toBeInTheDocument()
   expect(screen.getByText(en.streak.yourStreak)).toBeInTheDocument()
-  expect(screen.getByText(en.streak.pageSub)).toBeInTheDocument()
   expect(screen.getByText(`${live.days} days`)).toBeInTheDocument()
   expect(screen.getByText(/^From .+ to today, without missing a day\.$/)).toBeInTheDocument()
-  expect(screen.getByText(en.streak.newRecord)).toBeInTheDocument()
+  expect(screen.queryByText(en.streak.newRecord)).not.toBeInTheDocument()
   expect(screen.getByText(en.landing.example)).toBeInTheDocument()
 })
 
