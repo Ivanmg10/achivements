@@ -7,11 +7,13 @@ const live = SAMPLE_STREAKS[0]
 const days = streakCalendarDays(live, live.end)
 const draw = (picked = live.end, onPick = jest.fn()) => render(<LandingStreakCalendar days={days} ink="rgb(251 146 60)" picked={picked} onPick={onPick} />)
 
-test('ten weeks; each past day a button with its count, the streak filled in its colour, the rest of the week empty', () => {
+test('the weeks of the streak; each of its days a button with its count in its colour, the days outside it empty', () => {
   const { container } = draw()
   const buttons = screen.getAllByRole('button')
-  expect(buttons).toHaveLength(days.filter((d) => d.count !== null).length)
-  const first = days.find((d) => d.streak)!
+  expect(buttons).toHaveLength(live.days)
+  expect(days.length % 7).toBe(0)
+  expect(days.length).toBeLessThan(live.days + 14)
+  const first = days.find((d) => d.count !== null)!
   const cell = container.querySelector(`[data-day="${first.day}"]`) as HTMLElement
   expect(cell).toHaveTextContent(String(first.count))
   expect(cell.style.backgroundColor).toContain('color-mix')
@@ -28,9 +30,4 @@ test('one tab stop, the picked day; the arrows move a day or a week', () => {
   expect(onPick).toHaveBeenLastCalledWith(days[days.findIndex((d) => d.day === live.end) - 1].day)
   fireEvent.keyDown(today, { key: 'ArrowLeft' })
   expect(onPick).toHaveBeenLastCalledWith(days[days.findIndex((d) => d.day === live.end) - 7].day)
-})
-
-test('the day the last streak broke is in the calendar, with nothing', () => {
-  const broke = days[days.findIndex((d) => d.streak) - 1]
-  expect(broke).toMatchObject({ count: 0, streak: false })
 })

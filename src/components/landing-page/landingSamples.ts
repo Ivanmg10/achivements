@@ -110,24 +110,23 @@ export function streakDayCounts(streak: Streak): Record<string, number> {
   return Object.fromEntries(daysBetween(streak.start, streak.end).map((day, i) => [day, 1 + ((i * 7 + (i % 5) * 3) % 9)]))
 }
 
-/** A day of the landing's streak calendar: its achievements (null: still to come) and whether it is in the streak. */
-export type SampleCalendarDay = { day: string; count: number | null; streak: boolean }
+/** A day of the landing's streak calendar and its achievements (null: outside the streak, shown empty). */
+export type SampleCalendarDay = { day: string; count: number | null }
 
 /**
- * The landing's streak calendar: `weeks` weeks, Monday first, ending on the week of `today`. The streak's days have their
- * counts; the days before it a few scattered ones, the day before it none (where the last streak broke); the rest of
- * this week is still to come.
+ * The landing's streak calendar: the weeks the streak spans, Monday first, from the week it started to the week of
+ * `today`. Only the streak's days have a count; the days of its first week before it and the rest of this week are
+ * empty (null), so nothing is shown that the example does not have.
  */
-export function streakCalendarDays(streak: Streak, today: string, weeks = 10): SampleCalendarDay[] {
+export function streakCalendarDays(streak: Streak, today: string): SampleCalendarDay[] {
   const counts = streakDayCounts(streak)
-  const lead = (new Date(`${today}T00:00:00Z`).getUTCDay() + 6) % 7
-  const first = addDays(today, -lead - (weeks - 1) * 7)
-  const broke = addDays(streak.start, -1)
-  return Array.from({ length: weeks * 7 }, (_, i) => {
+  const lead = (new Date(`${streak.start}T00:00:00Z`).getUTCDay() + 6) % 7
+  const first = addDays(streak.start, -lead)
+  const tail = 6 - ((new Date(`${today}T00:00:00Z`).getUTCDay() + 6) % 7)
+  const total = daysBetween(first, addDays(today, tail)).length
+  return Array.from({ length: total }, (_, i) => {
     const day = addDays(first, i)
-    if (day > today) return { day, count: null, streak: false }
-    if (day >= streak.start) return { day, count: counts[day], streak: true }
-    return { day, count: day === broke || (i * 5) % 7 < 4 ? 0 : (i % 3) + 1, streak: false }
+    return day < streak.start || day > today ? { day, count: null } : { day, count: counts[day] ?? 0 }
   })
 }
 
