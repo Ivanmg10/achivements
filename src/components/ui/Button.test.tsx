@@ -69,3 +69,12 @@ describe('IconButton', () => {
     expect(screen.getByRole('button', { name: 'Pin' })).toHaveAttribute('aria-pressed', 'true')
   })
 })
+
+describe('Button xl', () => {
+  it('is the biggest size, a title screen\'s ways in, and still fits a phone (smaller there)', () => {
+    const cls = buttonClass('primary', 'xl')
+    expect(cls).toContain('min-h-14')
+    expect(cls).toContain('sm:min-h-16')
+    expect(cls).toContain('sm:text-lg')
+  })
+})
