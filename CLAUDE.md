@@ -316,6 +316,7 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
   or arbitrary values.
 - **Colours with a meaning come from the theme** (danger, success, warning, `hardcore`, `softcore`); no palette
   class of any hue. Platform hues are tokens (`--color-steam`…, `platinum`); tier hues live in their util.
+- **The landing and the sign-in are always the dark theme** (`data-theme="dark"` on their root); the landing's example streak is in the accent.
 - **Streaks are coloured by tier** (`streakTier`) wherever a streak is coloured, never in the accent; the best streaks on
   `/racha` are grey but the one being shown day by day, in its tier's colour (#131).
 - **Every progress bar is `ProgressBar` or `CircularProgress`** in the theme's `--progress`; only a finished

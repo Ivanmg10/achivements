@@ -103,6 +103,13 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   half and half again from `lg`. **Then, smaller** (the owner: too big, extras out, empty room on the right): one card, the figure (3rem) with its
   dates and the picked day on the left, the calendar beside it with its weeks sharing the width; no "best yet" tag, no repeated explanation. A tenth group in the band, "Pendientes" (`T.landing.sampleGroupBacklog`:
   Backlog, Pendentes, À jouer, Noch zu spielen, Da giocare, Отложенные, Do ogrania, 積みゲー): Baldur's Gate 3, Cyberpunk 2077, RDR2, The Witcher 3.
+- *Always dark, no "Example" labels (2026-11-13, the owner)*: the landing and the sign-in carry `data-theme="dark"` on their root, so they are the
+  dark violet theme whatever the visitor's browser or account picked (portals into `body`, such as `LanguageModal`, still follow the browser's theme);
+  the example streak's figure and calendar are in the accent, not the 50+ tier's purple, which clashed (an exception written in `docs/design-system.md`);
+  its left column sits at the top of the card, not centred; the four "Example" kickers are gone, and `T.landing.example` with them (nine languages).
+- *No RA or Steam on the sign-in page (2026-11-13, the owner: "un poco lío")*: "Create account with RetroAchievements" and "Continue with Steam" are
+  gone from both forms; `SteamSignInDivider`, `RegisterUserFormRa`, `useRaSignupCheck` and their strings (`registerForm.ra*` but `raUnavailable`,
+  `steamAuth.or`) deleted. Server routes kept (Steam linking needs them). Steam-only accounts now get in through "forgot password" (`docs/accounts.md`).
 **Where the drawing gave way to a rule** — No capitals: the platforms line, the name and the tagline are in their own case (drawn in capitals; the guard refuses
 `uppercase`), the wide tracking kept. The name is `BrandMark`'s mixed case, the same signature as the bar and the sign-in; on a 390 px phone it fits one line (the
 drawing broke "CHEEVO / VAULT", wider in capitals). "Iniciar sesión" is `T.landing.signIn` ("Entrar" in Spanish). No © year (the line is `T.landing.footer`). The nav's

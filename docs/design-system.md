@@ -254,6 +254,9 @@ flag is read from the database, never the session).
   streaks on `/racha` are grey but the one being shown day by day** (the `none` tier's grey), which is in its tier's colour:
   the live or best one at first, then the one picked (the owner's call, #131). The days of a streak (its calendar, the year) are shaded in the accent by how much was unlocked: that is
   activity, not a streak's colour. A tier's ink keeps `--streak-hue` of its hue (72 %, less on light themes and Steam Retro), so it reads in every theme.
+  **The landing's example streak is the exception:** it is in the accent (the owner, 2026-11-13: the 56-day tier's purple clashed with the page).
+- **The landing and the sign-in are always the dark theme** (`data-theme="dark"` on their root, the owner, 2026-11-13), whatever the browser
+  or the account picked: the door looks the same to everyone. What portals into `body` (a modal, the toasts, the cookie card) still follows the browser's theme.
 
 ### The Layout modal and look transitions
 

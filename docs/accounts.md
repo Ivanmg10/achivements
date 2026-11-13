@@ -15,6 +15,9 @@ requests are both limited per address in the database (`src/lib/attemptLimit.ts`
 
 ### Sign up with RetroAchievements (2026-10-23)
 
+**Off the sign-up page since 2026-11-13** (the owner: too much on the page): the form and `useRaSignupCheck` were deleted; `POST /api/auth/ra/check`
+and the `ra` field of `POST /api/users` are still there. What follows is how it worked, for the day it comes back.
+
 "Create account with RetroAchievements" under the register form (`RegisterUserFormRa`): the RA
 username and Web API key are checked first (`POST /api/auth/ra/check`, signed out, limited per
 address as `ra-check`, refuses a key already in use), RA's name fills the username (unless one was
@@ -30,6 +33,10 @@ welcome's RA step then shows "linked as" (the user's choice: shown, not skipped)
 - The RA username is as unproven as when linking from the account page; `raid` stays unique.
 
 ### Steam: sign up, sign in and link, all through Steam (2026-10-21)
+
+**Signing up and in with Steam left the sign-in page on 2026-11-13** (the owner: too much on the page): `SteamSignInDivider` was deleted. Linking from
+the Steam card still goes through Steam, and the callback, the ticket and `/api/auth/steam/register` are untouched. **Someone who signed up through Steam
+has a random password**: they get in with "forgot password".
 
 "Continue with Steam" under both forms (`SteamSignInDivider`), and "Connect Steam" on the
 Steam card (`UserSteamCardLink`, `/api/auth/steam?intent=link&next=…`). Steam's OpenID 2.0, all
