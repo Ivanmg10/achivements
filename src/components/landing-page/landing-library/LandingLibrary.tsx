@@ -23,9 +23,9 @@ export default function LandingLibrary() {
   const ids = tabIds('landing-library', shown)
 
   return (
-    <section id="que-es" className="grid gap-8 lg:grid-cols-[minmax(0,27.5rem)_minmax(0,1fr)] lg:gap-18 lg:items-center scroll-mt-6">
+    <section id="que-es" className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,27.5rem)_minmax(0,1fr)] lg:gap-18 lg:items-center scroll-mt-6">
       <LandingSectionHead title={T.landing.libraryTitle} text={T.landing.libraryText} points={T.landing.libraryPoints} />
-      <div className="flex flex-col gap-3 bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-3 sm:p-5 lg:p-6">
+      <div className="min-w-0 flex flex-col gap-3 bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-3 sm:p-5 lg:p-6">
         <Kicker>{T.landing.example}</Kicker>
         <Tabs
           id="landing-library"
