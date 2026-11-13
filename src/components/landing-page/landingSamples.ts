@@ -6,7 +6,7 @@ import { addDays } from '@/utils/dates'
 /**
  * What the landing shows of the app, always under an "Example" label: the figures are the owner's own
  * (games, groups, streaks and Vault Points from the captures of 2026-11-07, canvas page 4), the covers come
- * from the art wall's pool, and where the pool has no art for one of the owner's games or groups, a game it
+ * from the art wall's pool or IGDB, and where neither has art for one of the owner's games or groups, a game it
  * has stands in. No Xbox, and nobody else's data.
  */
 
@@ -43,23 +43,25 @@ export type SampleGroup = {
   total: number
 }
 
+/** A box from IGDB at twice its card size (528 × 704), by its image id (IGDB's `cover.image_id`). */
+const igdbCover = (imageId: string) => `https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${imageId}.jpg`
 const steamCovers = (...ids: number[]) => ids.map((id) => steamAssetUrl(id, 'cover'))
 
 export const SAMPLE_GROUPS: SampleGroup[] = [
   // Assassin's Creed 2, Brotherhood, Origins, Unity.
   { name: "Assassin's Creed", covers: steamCovers(33230, 48190, 582160, 289650), games: 4, earned: 141, total: 176 },
-  // MediEvil and Dragon Ball Z (RetroAchievements' boxes), Marvel's Spider-Man (its Steam art, the PS4 game's own), and for
-  // Skate 3 (Xbox 360 and PS3 only, no picture on an allowed host) its sequel on Steam, skate.
+  // MediEvil (PS1), Dragon Ball Z: Budokai 3 (PS2) and Skate 3 (PS3): their boxes from IGDB, the project's source of covers
+  // (images.igdb.com, an allowed host); Marvel's Spider-Man by its Steam art, the PS4 game's own.
   {
     name: 'Juegos noviembre',
     named: 'sampleGroupNovember',
-    covers: [`${RA_ART}/114756.png`, `${RA_ART}/103756.png`, steamAssetUrl(1817070, 'cover'), steamAssetUrl(3354750, 'hero')],
+    covers: [igdbCover('co1tjk'), igdbCover('co6dfo'), steamAssetUrl(1817070, 'cover'), igdbCover('co1o4l')],
     games: 4,
     earned: 77,
     total: 112,
   },
-  // Ruby, Gold, Platinum, Colosseum: RetroAchievements' boxes, drawn no bigger than twice their size.
-  { name: 'Pokémon', covers: [`${RA_ART}/104260.png`, `${RA_ART}/105481.png`, `${RA_ART}/104787.png`, `${RA_ART}/068145.png`], games: 21, earned: 489, total: 2522 },
+  // Ruby, Gold, Platinum, Colosseum: their boxes from IGDB (RetroAchievements' are 96 px squares, blurred in a tall slice).
+  { name: 'Pokémon', covers: ['co1zhq', 'co5pia', 'co8gvp', 'co2tpe'].map(igdbCover), games: 21, earned: 489, total: 2522 },
 ]
 
 const streak = (start: string, end: string, days: number): Streak => ({ start, end, days, achievements: [] })
