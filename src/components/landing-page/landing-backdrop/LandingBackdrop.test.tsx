@@ -7,7 +7,8 @@ test('one picture of the wall that drifts, from the pool\'s small boxes, hidden 
   expect(container.firstElementChild).toHaveAttribute('aria-hidden', 'true')
   expect(container.querySelectorAll('.title-drift')).toHaveLength(1)
   const imgs = Array.from(container.querySelectorAll('img'))
-  expect(imgs).toHaveLength(22)
+  expect(imgs).toHaveLength(100)
+  expect(new Set(imgs.map((img) => img.getAttribute('src'))).size).toBe(40)
   for (const img of imgs) expect(ART_WALL_RA).toContain(img.getAttribute('src'))
 })
 

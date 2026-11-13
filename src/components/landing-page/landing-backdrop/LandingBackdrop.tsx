@@ -1,22 +1,24 @@
 import CoverTile from '@/components/cover-tile/CoverTile'
 import { ART_WALL_RA, WALL_TILTS } from '@/utils/artWall'
 
-/**
- * Where each cover sits on the wall, as on the sign-in's own wall (x, y of a 122 px cover in a
- * 1470 × 1440 picture of it, the one drawn on the canvas as "Fondo").
- */
-const SPOTS = [
-  [165, 5], [902, 68], [1167, 30], [52, 248], [546, 198], [790, 320], [1280, 288], [172, 505], [438, 450], [906, 573], [1172, 537],
-  [58, 755], [550, 706], [793, 825], [1283, 790], [165, 1010], [432, 957], [902, 1082], [1167, 1043], [52, 1262], [542, 1212], [1280, 1300],
-]
-const [WIDE, TALL, COVER] = [1470, 1440, 122]
+// Where each cover sits on a 1470 × 1440 wall of 76 px covers: ten columns, each row shifted half a step, with a
+// fixed nudge per cover so it reads as the sign-in's scattered wall, not a grid. The same everywhere (no random).
+const NUDGE = [[0, 0], [38, -22], [-26, 30], [14, 44], [-40, -10], [30, 18], [-12, -36]]
+const SPOTS = Array.from({ length: 100 }, (_, i) => {
+  const [col, row] = [i % 10, Math.floor(i / 10)]
+  const [dx, dy] = NUDGE[(i * 3) % NUDGE.length]
+  return [20 + col * 142 + (row % 2) * 71 + dx, 20 + row * 138 + dy]
+})
+const [WIDE, TALL, COVER] = [1470, 1440, 76]
+// The pool's first covers, each used two or three times: a repeat costs nothing, the browser has it already.
+const UNIQUE = 40
 const pct = (n: number, of: number) => `${((n / of) * 100).toFixed(2)}%`
 
 /**
  * The title screen's background (#136, "Fondo"): one picture of the art wall, blurred and tinted in the
  * accent, sliding slowly there and back so it never shows a seam, under scan lines and a fade that keeps
- * the title and the buttons readable. The covers are RetroAchievements' small boxes: blurred, a big one
- * would only weigh more. It is CSS: the server's HTML draws it, and the title never waits for it.
+ * the title and the buttons readable. The covers are RetroAchievements' small boxes (blurred, a big one
+ * would only weigh more), forty of them laid a hundred times. It is CSS: the server's HTML draws it, and the title never waits for it.
  * Still under reduced motion or the landing's stop button. Decoration, hidden from assistive tech.
  */
 export default function LandingBackdrop() {
@@ -27,7 +29,7 @@ export default function LandingBackdrop() {
           {SPOTS.map(([x, y], i) => (
             <CoverTile
               key={i}
-              src={ART_WALL_RA[i]}
+              src={ART_WALL_RA[(i * 7) % UNIQUE]}
               size="w-full aspect-square"
               style={{
                 position: 'absolute',

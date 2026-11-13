@@ -52,10 +52,10 @@ export default function LandingTitle({ still, onStill }: { still: boolean; onSti
       <div className="flex-1 min-h-10" />
 
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 sm:gap-12 enter-rise [--i:3]">
-        <p className="max-w-[35rem] uhd:max-w-[44rem] text-[0.9375rem] sm:text-lg short:text-base uhd:text-[1.375rem] leading-relaxed text-text-main/85">{T.landing.intro}</p>
+        <p className="max-w-[35rem] uhd:max-w-[44rem] text-[0.9375rem] sm:text-lg short:text-[0.9375rem] uhd:text-[1.375rem] leading-relaxed text-text-main/85">{T.landing.intro}</p>
         <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:gap-3.5 shrink-0">
-          <Button href={REGISTER_HREF} size="lg">{T.landing.createAccount}</Button>
-          <Button href="/authPage" variant="secondary" size="lg">{T.landing.signIn}</Button>
+          <Button href={REGISTER_HREF} size="xl">{T.landing.createAccount}</Button>
+          <Button href="/authPage" variant="secondary" size="xl">{T.landing.signIn}</Button>
         </div>
       </div>
 
@@ -63,7 +63,7 @@ export default function LandingTitle({ still, onStill }: { still: boolean; onSti
         <span className="order-last sm:order-none sm:col-start-1 sm:row-start-1 short:hidden text-center sm:text-left text-xs sm:text-[0.8125rem] uhd:text-base text-text-secondary">{T.landing.footer}</span>
         {/* The way into the rest of the page, in the middle, its arrow bobbing (still under reduced motion or the stop button).
             Held sideways the legal line gives it its room: the footer says it again. */}
-        <a href="#que-es" className={`${LINK} sm:col-start-2 sm:row-start-1 inline-flex flex-col short:flex-row items-center gap-1 short:gap-2 text-[0.9375rem] sm:text-base uhd:text-xl font-bold`}>
+        <a href="#que-es" className={`${LINK} sm:col-start-2 sm:row-start-1 inline-flex items-center gap-2 text-[0.9375rem] sm:text-base uhd:text-xl font-bold`}>
           {T.landing.whatIs}
           <IconArrowDown size={22} aria-hidden="true" className="hint-bounce text-accent" />
         </a>

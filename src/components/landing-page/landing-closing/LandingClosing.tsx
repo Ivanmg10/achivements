@@ -6,8 +6,8 @@ import { ART_WALL_RA, ART_WALL_STEAM, dealBothPlatforms } from '@/utils/artWall'
 import CoverReel from '@/components/cover-reel/CoverReel'
 import Button from '@/components/ui/Button'
 
-// Two rows of eight, both platforms in turn, none of them the title screen's.
-const COVERS = dealBothPlatforms(ART_WALL_RA.slice(22), ART_WALL_STEAM, 16, 1)
+// Two rows of eight, both platforms in turn, none of them on the title screen.
+const COVERS = dealBothPlatforms(ART_WALL_RA.slice(40), ART_WALL_STEAM, 16, 1)
 
 /**
  * The end of the page, with no card: the art wall's covers going by in two rows, opposite ways, tinted
