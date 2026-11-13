@@ -15,3 +15,12 @@ test.each(['sm', 'md', 'lg'] as const)('%s keeps the logo beside the name', (siz
   const { container } = render(<BrandMark name="CheevoVault" size={size} />)
   expect(container.firstElementChild!.firstElementChild!.tagName.toLowerCase()).toBe('svg')
 })
+
+test('a title puts the logo after the name and may break the name between its words, which stay one word to read', () => {
+  const { container } = render(<BrandMark name="CheevoVault" size="title" logoAfter />)
+  const box = container.firstElementChild!
+  expect(box.lastElementChild!.tagName.toLowerCase()).toBe('svg')
+  const name = screen.getByText('CheevoVault')
+  expect(name.querySelectorAll('wbr')).toHaveLength(1)
+  expect(name.textContent).toBe('CheevoVault')
+})
