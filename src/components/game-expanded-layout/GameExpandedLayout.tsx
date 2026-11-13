@@ -42,7 +42,7 @@ export default function GameExpandedLayout({
   children: ReactNode
 }) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">
+    <div className="grid grid-cols-1 lg:grid-cols-[190px_minmax(0,1.3fr)_minmax(0,1fr)] lg:grid-rows-[20rem_auto] gap-3 w-full">
       <div className={`${PANEL} p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1`}>
         <CircularProgress earned={earned} total={total} label={ringLabel} size={130} />
         {ringExtra}
