@@ -8,13 +8,15 @@ import LandingStreak from '@/components/landing-page/landing-streak/LandingStrea
 import LandingPoints from '@/components/landing-page/landing-points/LandingPoints'
 import LandingFaq from '@/components/landing-page/landing-faq/LandingFaq'
 import LandingClosing from '@/components/landing-page/landing-closing/LandingClosing'
+import EnterOnView from '@/components/ui/EnterOnView'
 import PublicFooter from '@/components/public-footer/PublicFooter'
 
 /**
  * What a visitor sees at the door (#136, canvas page 4): a game's title screen with the two ways in, then
  * what CheevoVault is, shown with the app's own pieces and labelled examples (the library, groups, the
  * streak, Vault Points), the questions people ask first, and the art going by at the end with the ways in
- * again. Its motion (the title's art, the closing band) is CSS; the stop button holds all of it still.
+ * again. Each part below the first screen enters as it is reached (`EnterOnView`). Its motion (the title's art,
+ * the closing band) is CSS; the stop button holds all of it still.
  */
 export default function LandingPage() {
   const [still, setStill] = useState(false)
@@ -24,13 +26,25 @@ export default function LandingPage() {
       <main className="flex flex-col">
         <LandingTitle still={still} onStill={() => setStill((s) => !s)} />
         <div className="w-full max-w-[110rem] mx-auto px-4 sm:px-8 lg:px-24 pt-18 lg:pt-30 pb-20 lg:pb-36 flex flex-col gap-20 lg:gap-40">
-          <LandingLibrary />
-          <LandingGroups />
-          <LandingStreak />
-          <LandingPoints />
-          <LandingFaq />
+          <EnterOnView>
+            <LandingLibrary />
+          </EnterOnView>
+          <EnterOnView>
+            <LandingGroups />
+          </EnterOnView>
+          <EnterOnView>
+            <LandingStreak />
+          </EnterOnView>
+          <EnterOnView>
+            <LandingPoints />
+          </EnterOnView>
+          <EnterOnView>
+            <LandingFaq />
+          </EnterOnView>
         </div>
-        <LandingClosing />
+        <EnterOnView>
+          <LandingClosing />
+        </EnterOnView>
       </main>
       <PublicFooter />
     </div>

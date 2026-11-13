@@ -400,6 +400,7 @@ export const fr: Translations = {
     pointsText: 'Chaque plateforme vaut autant, et les succès plus rares valent plus.',
     example: 'Exemple',
     stopMotion: 'Arrêter le mouvement',
+    sampleGroupNovember: 'Jeux de novembre',
     libraryTitle: 'Une bibliothèque, toutes tes plateformes',
     libraryText: 'Tes jeux rétro, ta bibliothèque Steam et tes trophées PlayStation côte à côte, chacun avec sa progression réelle : succès, points, heures et rareté.',
     organiseTitle: 'Rangé à ta façon',

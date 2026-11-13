@@ -400,6 +400,7 @@ export const it: Translations = {
     pointsText: 'Ogni piattaforma vale lo stesso, e gli obiettivi più rari valgono di più.',
     example: 'Esempio',
     stopMotion: 'Ferma il movimento',
+    sampleGroupNovember: 'Giochi di novembre',
     libraryTitle: 'Una libreria, tutte le piattaforme',
     libraryText: 'I tuoi giochi retro, la tua libreria Steam e i tuoi trofei PlayStation affiancati, ognuno con il progresso reale: obiettivi, punti, ore e rarità.',
     organiseTitle: 'Ordinato a modo tuo',

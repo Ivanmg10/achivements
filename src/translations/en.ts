@@ -401,6 +401,7 @@ export const en = {
     pointsText: 'Every platform is worth the same, and rarer achievements are worth more.',
     example: 'Example',
     stopMotion: 'Stop the motion',
+    sampleGroupNovember: 'November games',
     libraryTitle: 'One library, every platform',
     libraryText: 'Your retro games, your Steam library and your PlayStation trophies side by side, each with its real progress: achievements earned, points, hours and rarity.',
     organiseTitle: 'Sorted your way',

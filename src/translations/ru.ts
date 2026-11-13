@@ -400,6 +400,7 @@ export const ru: Translations = {
     pointsText: 'Все платформы стоят одинаково, а более редкие достижения ценятся выше.',
     example: 'Пример',
     stopMotion: 'Остановить движение',
+    sampleGroupNovember: 'Игры ноября',
     libraryTitle: 'Одна библиотека, все платформы',
     libraryText: 'Ретро-игры, библиотека Steam и трофеи PlayStation рядом, у каждой — реальный прогресс: достижения, очки, часы и редкость.',
     organiseTitle: 'Порядок по-вашему',

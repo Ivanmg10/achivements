@@ -938,12 +938,19 @@ html[data-font="fira"],
   to { transform: translateX(0); }
 }
 .title-drift { animation: title-drift 48s ease-in-out infinite alternate; will-change: transform; }
+/* The title screen's way down: its arrow bobs. */
+@keyframes hint-bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(0.375rem); }
+}
+.hint-bounce { animation: hint-bounce 0.9s ease-in-out infinite alternate; }
 .cover-reel-row { animation: reel-left 60s linear infinite; will-change: transform; }
 .cover-reel-row.cover-reel-back { animation-name: reel-right; animation-duration: 80s; }
-[data-motion="still"] :is(.title-drift, .cover-reel-row) { animation-play-state: paused; }
+[data-motion="still"] :is(.title-drift, .cover-reel-row, .hint-bounce) { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
   .title-drift,
-  .cover-reel-row { animation: none; }
+  .cover-reel-row,
+  .hint-bounce { animation: none; }
 }
 /* Scan lines over the title screen's art, as on a game's start screen; in the page's own ground, so a light theme keeps them light. */
 .scanlines {

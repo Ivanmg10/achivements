@@ -400,6 +400,7 @@ export const es: Translations = {
     pointsText: 'Todas las plataformas valen lo mismo, y los logros más raros valen más.',
     example: 'Ejemplo',
     stopMotion: 'Detener el movimiento',
+    sampleGroupNovember: 'Juegos noviembre',
     libraryTitle: 'Una biblioteca, todas tus plataformas',
     libraryText: 'Tus juegos retro, tu biblioteca de Steam y tus trofeos de PlayStation juntos, cada uno con su progreso real: logros conseguidos, puntos, horas y rareza.',
     organiseTitle: 'Ordenado a tu manera',

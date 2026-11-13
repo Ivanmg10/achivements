@@ -59,11 +59,13 @@ export default function LandingTitle({ still, onStill }: { still: boolean; onSti
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 pt-8 pb-5 sm:pt-12 sm:pb-6 short:pt-5 short:pb-3 text-xs sm:text-[0.8125rem] uhd:text-base text-text-secondary">
-        <span>{T.landing.footer}</span>
-        <a href="#que-es" className={`${LINK} inline-flex items-center gap-1.5 font-semibold`}>
+      <div className="flex flex-col items-center gap-4 pt-7 pb-4 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-end sm:gap-6 sm:pt-8 sm:pb-5 short:pt-3 short:pb-2 short:gap-2">
+        <span className="order-last sm:order-none sm:col-start-1 sm:row-start-1 short:hidden text-center sm:text-left text-xs sm:text-[0.8125rem] uhd:text-base text-text-secondary">{T.landing.footer}</span>
+        {/* The way into the rest of the page, in the middle, its arrow bobbing (still under reduced motion or the stop button).
+            Held sideways the legal line gives it its room: the footer says it again. */}
+        <a href="#que-es" className={`${LINK} sm:col-start-2 sm:row-start-1 inline-flex flex-col short:flex-row items-center gap-1 short:gap-2 text-[0.9375rem] sm:text-base uhd:text-xl font-bold`}>
           {T.landing.whatIs}
-          <IconArrowDown size={14} aria-hidden="true" />
+          <IconArrowDown size={22} aria-hidden="true" className="hint-bounce text-accent" />
         </a>
       </div>
     </section>

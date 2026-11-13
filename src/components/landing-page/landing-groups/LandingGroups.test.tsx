@@ -8,5 +8,5 @@ test('the title with its line, and the example groups in a row', () => {
   expect(screen.getByRole('heading', { level: 2, name: en.landing.organiseTitle })).toBeInTheDocument()
   expect(screen.getByText(en.landing.organiseText)).toBeInTheDocument()
   expect(screen.getByText(en.landing.example)).toBeInTheDocument()
-  expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(SAMPLE_GROUPS.map((g) => g.name))
+  expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(SAMPLE_GROUPS.map((g) => (g.named ? en.landing[g.named] : g.name)))
 })

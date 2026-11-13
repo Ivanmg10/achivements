@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import LandingSampleGame from './LandingSampleGame'
 import { SAMPLE_GAMES } from '@/components/landing-page/landingSamples'
 
-const psn = SAMPLE_GAMES.find((g) => g.source === 'psn' && g.earned < g.total)!
+const psn = SAMPLE_GAMES.find((g) => g.source === 'psn')!
 const done = SAMPLE_GAMES.find((g) => g.earned === g.total)!
 const ra = SAMPLE_GAMES.find((g) => g.source === 'ra')!
 const row = (ui: React.ReactElement) => render(<ul>{ui}</ul>)

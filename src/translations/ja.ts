@@ -400,6 +400,7 @@ export const ja: Translations = {
     pointsText: 'どのプラットフォームも同じ価値で、レアな実績ほど高く評価されます。',
     example: '例',
     stopMotion: '動きを止める',
+    sampleGroupNovember: '11月のゲーム',
     libraryTitle: 'ひとつのライブラリにすべてのプラットフォーム',
     libraryText: 'レトロゲーム、Steamのライブラリ、PlayStationのトロフィーを並べて表示。実績数、ポイント、プレイ時間、レア度まで実際の進捗がわかります。',
     organiseTitle: '自分の使いやすさで整理',

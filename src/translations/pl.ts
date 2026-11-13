@@ -400,6 +400,7 @@ export const pl: Translations = {
     pointsText: 'Każda platforma jest warta tyle samo, a rzadsze osiągnięcia są warte więcej.',
     example: 'Przykład',
     stopMotion: 'Zatrzymaj ruch',
+    sampleGroupNovember: 'Gry z listopada',
     libraryTitle: 'Jedna biblioteka, wszystkie platformy',
     libraryText: 'Twoje gry retro, biblioteka Steam i trofea PlayStation obok siebie, każda z realnym postępem: osiągnięcia, punkty, godziny i rzadkość.',
     organiseTitle: 'Poukładane po twojemu',
