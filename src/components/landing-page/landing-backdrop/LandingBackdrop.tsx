@@ -17,13 +17,13 @@ const pct = (n: number, of: number) => `${((n / of) * 100).toFixed(2)}%`
 /**
  * The title screen's background (#136, "Fondo"): one picture of the art wall, blurred and tinted in the
  * accent, sliding slowly there and back so it never shows a seam, under scan lines and a fade that keeps
- * the title and the buttons readable. The covers are RetroAchievements' small boxes (blurred, a big one
+ * the title and the buttons readable, its foot melting into the page (a mask) so scrolling down shows no edge. The covers are RetroAchievements' small boxes (blurred, a big one
  * would only weigh more), forty of them laid a hundred times. It is CSS: the server's HTML draws it, and the title never waits for it.
  * Still under reduced motion or the landing's stop button. Decoration, hidden from assistive tech.
  */
 export default function LandingBackdrop() {
   return (
-    <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden pointer-events-none select-none">
+    <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden pointer-events-none select-none [mask-image:linear-gradient(to_bottom,black_72%,transparent)]">
       <div className="absolute -inset-8 sm:-inset-10">
         <div className="title-drift absolute top-0 left-0 w-[280%] sm:w-[146%] aspect-[1470/1440] blur-sm brightness-80">
           {SPOTS.map(([x, y], i) => (

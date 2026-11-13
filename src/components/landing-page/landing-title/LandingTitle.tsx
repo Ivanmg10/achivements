@@ -46,7 +46,7 @@ export default function LandingTitle({ still, onStill }: { still: boolean; onSti
         <h1 className="mt-3 sm:mt-2.5">
           <BrandMark name={T.authPage.brand} size="title" logoAfter />
         </h1>
-        <p className="mt-4 sm:mt-[0.4em] text-[0.8125rem] sm:text-[clamp(1.125rem,2.1vw,1.875rem)] font-semibold tracking-[0.18em] text-text-main/90 text-balance">
+        <p className="mt-3 sm:mt-[0.3em] font-display italic font-extrabold text-[1.375rem] sm:text-[clamp(1.75rem,3.1vw,3rem)] uhd:text-[3.5rem] leading-none text-text-main/85 text-balance">
           {T.landing.tagline}
         </p>
       </div>

@@ -24,8 +24,9 @@ const SIZES: Record<Size, string> = {
   sm: 'h-(--h-control-sm) px-3.5 text-sm',
   md: 'h-(--h-control) px-5 text-sm',
   lg: 'min-h-12 px-6 text-[0.9375rem]',
-  // A title screen's two ways in (the landing): as big as the screen lets them be, a phone's two side by side included.
-  xl: 'min-h-14 px-5 text-base sm:min-h-16 sm:px-9 sm:text-lg short:min-h-12 short:px-7 short:text-base uhd:min-h-[4.5rem] uhd:px-11 uhd:text-xl',
+  // A title screen's two ways in (the landing): long rather than tall (the owner, 2026-11-13: the 64 px ones looked chunky),
+  // one width for both from `sm`, a phone's two side by side.
+  xl: 'min-h-12 px-5 text-base sm:min-h-[3.25rem] sm:min-w-[13.5rem] sm:px-10 sm:text-[1.0625rem] short:min-h-11 short:min-w-44 uhd:min-h-16 uhd:min-w-72 uhd:px-14 uhd:text-xl',
 }
 
 /** The classes of a library button, for the rare place that cannot render `Button` itself. */

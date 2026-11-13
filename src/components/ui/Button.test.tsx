@@ -71,10 +71,10 @@ describe('IconButton', () => {
 })
 
 describe('Button xl', () => {
-  it('is the biggest size, a title screen\'s ways in, and still fits a phone (smaller there)', () => {
+  it('is a title screen\'s ways in: long rather than tall, one width for both, smaller on a phone', () => {
     const cls = buttonClass('primary', 'xl')
-    expect(cls).toContain('min-h-14')
-    expect(cls).toContain('sm:min-h-16')
-    expect(cls).toContain('sm:text-lg')
+    expect(cls).toContain('min-h-12')
+    expect(cls).toContain('sm:min-h-[3.25rem]')
+    expect(cls).toContain('sm:min-w-[13.5rem]')
   })
 })
