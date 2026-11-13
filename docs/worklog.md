@@ -90,6 +90,9 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   Soulslike, Steam art; example figures). Revert that commit if the owner does not like it. The zigzag follows the new order: library left, achievements
   right, the band, streak left, points right. **Open:** "Mira cómo avanzas" needs a rework (the owner: a big "56 days" with nothing saying what it is);
   canvas first, as `docs/design-process.md` asks.
+- *The band, more and slower; the streak on the canvas (2026-11-13, the owner)*: four more groups (Final Fantasy, Metroidvania, Roguelike, Yakuza; Steam
+  art, every cover checked to exist), nine in all, so a half is wider than 2560 px with no repeat; 180 s a half (about 19 px/s, half the speed). "Mira cómo
+  avanzas" drawn on the canvas (`LandRacha`, page 4, round 6: Hoy, A the streak explained, B your week, C your year); see `docs/designs.md`.
 **Where the drawing gave way to a rule** — No capitals: the platforms line, the name and the tagline are in their own case (drawn in capitals; the guard refuses
 `uppercase`), the wide tracking kept. The name is `BrandMark`'s mixed case, the same signature as the bar and the sign-in; on a 390 px phone it fits one line (the
 drawing broke "CHEEVO / VAULT", wider in capitals). "Iniciar sesión" is `T.landing.signIn` ("Entrar" in Spanish). No © year (the line is `T.landing.footer`). The nav's
