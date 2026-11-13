@@ -68,3 +68,10 @@ test('the art is decoration, hidden from assistive tech', () => {
   expect(art.length).toBeGreaterThan(20)
   for (const img of art) expect(img).toHaveAttribute('alt', '')
 })
+
+test('each part says what the feature does, in points', () => {
+  render(<LandingPage />)
+  for (const point of [...en.landing.libraryPoints, ...en.landing.organisePoints, ...en.landing.progressPoints, ...en.landing.pointsPoints]) {
+    expect(screen.getByText(point)).toBeInTheDocument()
+  }
+})

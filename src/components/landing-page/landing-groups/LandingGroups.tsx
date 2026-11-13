@@ -17,7 +17,7 @@ export default function LandingGroups() {
 
   return (
     <section className="flex flex-col gap-6 lg:gap-9">
-      <LandingSectionHead title={T.landing.organiseTitle} text={T.landing.organiseText} row />
+      <LandingSectionHead title={T.landing.organiseTitle} text={T.landing.organiseText} points={T.landing.organisePoints} row />
       <div className="flex flex-col gap-3">
         <Kicker>{T.landing.example}</Kicker>
         <div ref={ref} className={`-mx-4 px-4 sm:-mx-8 sm:px-8 lg:mx-0 lg:px-0 flex gap-3.5 overflow-x-auto snap-x [scrollbar-width:none] lg:grid lg:grid-cols-3 lg:gap-7 lg:overflow-visible ${fade}`}>

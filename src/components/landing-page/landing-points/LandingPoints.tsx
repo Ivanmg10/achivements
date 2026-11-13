@@ -22,7 +22,7 @@ export default function LandingPoints() {
 
   return (
     <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,37.5rem)] lg:gap-14 lg:items-center">
-      <LandingSectionHead title={T.landing.pointsTitle} text={T.landing.pointsText}>
+      <LandingSectionHead title={T.landing.pointsTitle} text={T.landing.pointsText} points={T.landing.pointsPoints}>
         <Link href="/rankings/how" className="relative tap-target self-start font-bold underline underline-offset-4 decoration-ink/40 hover:decoration-accent rounded focus-ring">
           {T.rankings.how}
         </Link>
