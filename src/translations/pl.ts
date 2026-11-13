@@ -399,7 +399,7 @@ export const pl: Translations = {
     pointsTitle: 'Punkty Vault',
     pointsText: 'Każda platforma jest warta tyle samo, a rzadsze osiągnięcia są warte więcej.',
     pointsPoints: [
-      'Każda gra jest warta do 1000 punktów, więcej za rzadkie osiągnięcia i wymagające gry.',
+      'Każde osiągnięcie liczy się według tego, jak jest rzadkie i jak wymagająca jest jego gra, a ukończenie całej gry daje premię.',
       'Punkty wyznaczają Twój poziom, który rośnie wraz z kolejnymi.',
       'Umieszczają Cię w rankingach: wszyscy lub osoby, które obserwujesz, od początku, w tym miesiącu lub w tym tygodniu, wszystkie platformy lub jedna.',
     ],

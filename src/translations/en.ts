@@ -400,7 +400,7 @@ export const en = {
     pointsTitle: 'Vault Points',
     pointsText: 'Every platform is worth the same, and rarer achievements are worth more.',
     pointsPoints: [
-      'Each game is worth up to 1,000 points, more for rare achievements and demanding games.',
+      'Each achievement counts for how rare it is and how demanding its game is, and finishing a whole game adds a bonus.',
       'Your points set your level, which climbs as you earn more.',
       'They place you in the rankings: everyone or the people you follow, all time, this month or this week, every platform or just one.',
     ],

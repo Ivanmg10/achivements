@@ -399,7 +399,7 @@ export const it: Translations = {
     pointsTitle: 'Punti Vault',
     pointsText: 'Ogni piattaforma vale lo stesso, e gli obiettivi più rari valgono di più.',
     pointsPoints: [
-      'Ogni gioco vale fino a 1.000 punti, di più per gli obiettivi rari e i giochi impegnativi.',
+      'Ogni obiettivo vale in base a quanto è raro e a quanto è impegnativo il suo gioco, e completare un gioco intero dà un extra.',
       'I tuoi punti fissano il tuo livello, che sale man mano che ne guadagni.',
       'Ti mettono nelle classifiche: tutti o le persone che segui, da sempre, questo mese o questa settimana, tutte le piattaforme o una sola.',
     ],

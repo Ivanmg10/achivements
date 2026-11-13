@@ -399,7 +399,7 @@ export const fr: Translations = {
     pointsTitle: 'Points Vault',
     pointsText: 'Chaque plateforme vaut autant, et les succès plus rares valent plus.',
     pointsPoints: [
-      'Chaque jeu vaut jusqu’à 1 000 points, plus pour les succès rares et les jeux exigeants.',
+      'Chaque succès compte selon sa rareté et l’exigence de son jeu, et terminer un jeu entier rapporte un bonus.',
       'Tes points fixent ton niveau, qui monte à mesure que tu en gagnes.',
       'Ils te placent dans les classements : tout le monde ou les personnes que tu suis, depuis toujours, ce mois-ci ou cette semaine, toutes les plateformes ou une seule.',
     ],

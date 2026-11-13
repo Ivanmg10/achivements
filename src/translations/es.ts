@@ -399,7 +399,7 @@ export const es: Translations = {
     pointsTitle: 'Puntos Vault',
     pointsText: 'Todas las plataformas valen lo mismo, y los logros más raros valen más.',
     pointsPoints: [
-      'Cada juego vale hasta 1.000 puntos, más por los logros raros y los juegos exigentes.',
+      'Cada logro suma según lo raro que es y lo exigente que es su juego, y completar un juego entero da un extra.',
       'Tus puntos marcan tu nivel, que sube a medida que consigues más.',
       'Te colocan en los rankings: global o entre la gente que sigues, histórico, este mes o esta semana, en todas las plataformas o en una.',
     ],

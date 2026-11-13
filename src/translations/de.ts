@@ -399,7 +399,7 @@ export const de: Translations = {
     pointsTitle: 'Vault-Punkte',
     pointsText: 'Jede Plattform zählt gleich viel, und seltenere Erfolge zählen mehr.',
     pointsPoints: [
-      'Jedes Spiel ist bis zu 1.000 Punkte wert, mehr für seltene Erfolge und anspruchsvolle Spiele.',
+      'Jeder Erfolg zählt danach, wie selten er ist und wie anspruchsvoll sein Spiel ist, und ein komplett abgeschlossenes Spiel bringt einen Bonus.',
       'Deine Punkte bestimmen dein Level, das mit jedem Erfolg steigt.',
       'Sie bringen dich in die Ranglisten: alle oder die Leute, denen du folgst, insgesamt, diesen Monat oder diese Woche, alle Plattformen oder nur eine.',
     ],

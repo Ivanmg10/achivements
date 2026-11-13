@@ -399,7 +399,7 @@ export const pt: Translations = {
     pointsTitle: 'Pontos Vault',
     pointsText: 'Todas as plataformas valem o mesmo, e as conquistas mais raras valem mais.',
     pointsPoints: [
-      'Cada jogo vale até 1000 pontos, mais pelas conquistas raras e pelos jogos exigentes.',
+      'Cada conquista soma consoante a sua raridade e a exigência do seu jogo, e completar um jogo inteiro dá um extra.',
       'Os teus pontos definem o teu nível, que sobe à medida que ganhas mais.',
       'Põem-te nos rankings: toda a gente ou as pessoas que segues, desde sempre, este mês ou esta semana, todas as plataformas ou só uma.',
     ],
