@@ -440,6 +440,7 @@ export const de: Translations = {
       'Jeder Tag im Kalender, mit dem, was du freigeschaltet hast.',
       'Dein Jahr auf einen Blick, deine Woche und die Tage, an denen du am meisten spielst.',
     ],
+    streakLegend: 'Jedes Feld ist ein Tag, mit seinen Erfolgen. Die Serie ist farbig.',
     closingTitle: 'Hol deine Spiele her',
     closingText: 'Kostenlos, und du verbindest deine Konten, wann du willst.',
     footer: 'Nicht mit RetroAchievements, Valve oder Sony verbunden.',

@@ -440,6 +440,7 @@ export const pl: Translations = {
       'Każdy dzień w kalendarzu, z tym, co zostało odblokowane.',
       'Cały rok w skrócie, twój tydzień i dni, w które grasz najwięcej.',
     ],
+    streakLegend: 'Każde pole to dzień z liczbą jego osiągnięć. Seria jest w kolorze.',
     closingTitle: 'Przenieś tu swoje gry',
     closingText: 'Za darmo, a konta podłączysz kiedy zechcesz.',
     footer: 'Bez związku z RetroAchievements, Valve ani Sony.',

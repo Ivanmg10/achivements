@@ -441,6 +441,7 @@ export const en = {
       'Every day of it on a calendar, with what you unlocked.',
       'Your year at a glance, your week and the days you play most.',
     ],
+    streakLegend: 'Each square is a day, with how many achievements it had. The streak is in colour.',
     closingTitle: 'Bring your games in',
     closingText: 'Free, and you can connect your accounts whenever you like.',
     footer: 'Not affiliated with RetroAchievements, Valve or Sony.',

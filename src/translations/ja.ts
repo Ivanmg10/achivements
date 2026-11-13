@@ -440,6 +440,7 @@ export const ja: Translations = {
       '毎日をカレンダーで、その日の解除内容と一緒に。',
       '1年の一覧、今週の記録、よく遊ぶ曜日。',
     ],
+    streakLegend: '各マスは1日で、その日の実績数です。連続記録は色付きで表示。',
     closingTitle: 'あなたのゲームを持ち込もう',
     closingText: '無料です。アカウントの連携はいつでもできます。',
     footer: 'RetroAchievements、Valve、Sonyとは無関係です。',

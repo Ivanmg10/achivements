@@ -440,6 +440,7 @@ export const it: Translations = {
       'Ogni giorno in un calendario, con quello che hai sbloccato.',
       'Il tuo anno a colpo d’occhio, la tua settimana e i giorni in cui giochi di più.',
     ],
+    streakLegend: 'Ogni casella è un giorno, con i suoi obiettivi. La serie, a colori.',
     closingTitle: 'Porta qui i tuoi giochi',
     closingText: 'È gratis, e colleghi i tuoi account quando vuoi.',
     footer: 'Non affiliato a RetroAchievements, Valve o Sony.',

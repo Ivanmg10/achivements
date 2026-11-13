@@ -440,6 +440,7 @@ export const pt: Translations = {
       'Cada dia num calendário, com o que desbloqueaste.',
       'O teu ano num relance, a tua semana e os dias em que mais jogas.',
     ],
+    streakLegend: 'Cada quadrado é um dia, com as conquistas que teve. A sequência, a cores.',
     closingTitle: 'Traz os teus jogos',
     closingText: 'É grátis, e ligas as tuas contas quando quiseres.',
     footer: 'Sem ligação ao RetroAchievements, à Valve ou à Sony.',
