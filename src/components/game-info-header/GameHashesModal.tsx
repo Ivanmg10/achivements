@@ -85,7 +85,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
   }, [isOpen, gameId])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" icon={<IconHash size={20} />} title={T.gameInfoPage.hashesCompatible} hint={gameTitle}>
+    <Modal isOpen={isOpen} onClose={onClose} size="lg" icon={<IconHash size={20} />} title={T.gameInfoPage.hashesCompatible} hint={gameTitle}>
       {loading ? (
         <div className="flex flex-col gap-3">
           {[0, 1, 2].map((i) => (

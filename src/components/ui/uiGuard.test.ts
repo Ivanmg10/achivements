@@ -334,3 +334,43 @@ test('the logo is drawn from utils/themeIcon\'s shapes (BrandMark, the favicon):
 test('a theme shown inside another is ThemeScreen (its tokens under data-theme), never a preview drawn by hand (#135)', () => {
   expect(offenders(/data-theme=\{/)).toEqual([])
 })
+
+// A dialog's size is chosen by its kind (#165, docs/design-system.md → Dialogs): it is always said, and a picker is never narrow.
+/** The opening tag of every `<Modal …>` in a source, braces (`=>` in a prop) skipped. */
+function modalTags(text: string): string[] {
+  const tags: string[] = []
+  for (const m of text.matchAll(/<Modal(?=[\s>])/g)) {
+    let depth = 0
+    let end = m.index!
+    for (; end < text.length; end++) {
+      const c = text[end]
+      if (c === '{') depth++
+      else if (c === '}') depth--
+      else if (c === '>' && depth === 0) break
+    }
+    tags.push(text.slice(m.index, end + 1))
+  }
+  return tags
+}
+
+test('every Modal says its size (a panel at the top apart)', () => {
+  const bad = FILES.filter(({ text }) => modalTags(text).some((t) => !/\bsize=/.test(t) && !/placement="top"/.test(t))).map(({ file }) => file)
+  expect(bad).toEqual([])
+})
+
+test('a dialog that picks from a collection is xl or wider, never sm / md', () => {
+  const pickers = [
+    'components/showcase-picker-modal/ShowcasePickerModal.tsx',
+    'components/pin-game-modal/PinGameModal.tsx',
+    'components/pin-achievement-modal/PinAchievementModal.tsx',
+    'components/groups/add-game-modal/AddGameModal.tsx',
+    'components/favorite-game-modal/FavoriteGameModal.tsx',
+    'components/hidden-games-modal/HiddenGamesModal.tsx',
+    'components/avatar-modal/AvatarModal.tsx',
+    'components/main-page/perfect-games-order-modal/PerfectGamesOrderModal.tsx',
+  ]
+  for (const f of pickers) {
+    const text = FILES.find((x) => x.file.split(path.sep).join('/') === f)?.text ?? ''
+    expect({ f, sizes: modalTags(text).map((t) => /\bsize="(xl|2xl)"/.test(t)) }).toEqual({ f, sizes: [true] })
+  }
+})

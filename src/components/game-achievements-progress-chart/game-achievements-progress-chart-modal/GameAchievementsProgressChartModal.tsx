@@ -27,7 +27,7 @@ export default function GameAchievementsProgressChartModal({
   const sorted = [...items].sort((a, b) => (b.earnedAt ?? '').localeCompare(a.earnedAt ?? ''))
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" title={title.charAt(0).toUpperCase() + title.slice(1)} className="gap-3">
+    <Modal isOpen={isOpen} onClose={onClose} size="lg" title={title.charAt(0).toUpperCase() + title.slice(1)} className="gap-3">
       <LibraryDetailList
         title={`${items.length} ${T.dayModal.achievements}`}
         items={sorted}

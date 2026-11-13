@@ -58,14 +58,14 @@ export function PinAchievementModal({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="md" title={T.gameExpanded.pinAchievementModalTitle} className="gap-3">
+    <Modal isOpen={isOpen} onClose={onClose} size="xl" title={T.gameExpanded.pinAchievementModalTitle} className="gap-3">
       {error && (
         <p role="alert" className="text-xs text-danger">
           {T.gameExpanded.loadError}
         </p>
       )}
 
-      <div className="-mx-3 max-h-[60vh] overflow-y-auto">
+      <div className="-mx-3 grid sm:grid-cols-2 gap-x-2 content-start">
         {achievements.length === 0 ? (
           <p className="text-text-secondary text-xs text-center py-6">
             {T.gameExpanded.noUnearned}

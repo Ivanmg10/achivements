@@ -76,7 +76,7 @@ export default function FavoriteGameModal({
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg" title={T.userData.favoriteGame} className="gap-3">
+    <Modal isOpen={isOpen} onClose={onClose} size="xl" title={T.userData.favoriteGame} className="gap-3">
       <SearchInput
         ref={inputRef}
         value={query}
@@ -117,7 +117,7 @@ export default function FavoriteGameModal({
         </p>
       )}
 
-      <div className="-mx-3 max-h-96 overflow-y-auto">
+      <div className="-mx-3 grid sm:grid-cols-2 gap-x-2 content-start">
         {results.length === 0 ? (
           <p className="py-8 text-center text-text-secondary text-sm">
             {query ? T.userData.favoriteGameNoResults : T.userData.favoriteGameNoGames}

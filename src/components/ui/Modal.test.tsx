@@ -89,3 +89,17 @@ test('the footer keeps its actions at the right, under a hairline, at their norm
   const footer = screen.getByRole('button', { name: 'Save' }).parentElement
   expect(footer).toHaveClass('justify-end', 'shadow-hairline-t')
 })
+
+test('a dialog never runs past 85dvh from sm, its head and footer fixed while the body scrolls (#165)', () => {
+  render(<Modal isOpen onClose={jest.fn()} title="Long" footer={<button>Save</button>}><p>Body</p></Modal>)
+  const dialog = screen.getByRole('dialog', { name: 'Long' })
+  expect(dialog).toHaveClass('sm:max-h-[85dvh]', 'flex-col')
+  expect(screen.getByText('Body').parentElement).toHaveClass('overflow-y-auto')
+})
+
+test('below sm a detail, a picker or a tool is a full-screen sheet; a confirmation stays a sheet (#165)', () => {
+  const { rerender } = render(<Modal isOpen onClose={jest.fn()} size="xl" title="Pick"><p>Games</p></Modal>)
+  expect(screen.getByRole('dialog', { name: 'Pick' })).toHaveClass('max-sm:h-dvh')
+  rerender(<Modal isOpen onClose={jest.fn()} size="md" title="Pick"><p>Games</p></Modal>)
+  expect(screen.getByRole('dialog', { name: 'Pick' })).not.toHaveClass('max-sm:h-dvh')
+})

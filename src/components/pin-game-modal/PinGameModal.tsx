@@ -98,7 +98,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size="md"
+      size="xl"
       title={T.pinnedGames.addAria}
       className="gap-3"
       footer={
@@ -118,7 +118,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
       />
 
       {(results.length > 0 || directGameId) && (
-        <div className="-mx-3 max-h-80 overflow-y-auto">
+        <div className="-mx-3 grid sm:grid-cols-2 gap-x-2 content-start">
           {results.map((c) => (
             <GamePickerRow key={c.key} candidate={c} selected={selected.has(c.key)} onToggle={() => toggle(c)} />
           ))}

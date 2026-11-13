@@ -22,11 +22,11 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
   const { hidden, showGame } = useHiddenGames()
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg" icon={<IconEyeOff size={20} />} title={T.userPage.hiddenGames}>
+    <Modal isOpen={isOpen} onClose={onClose} size="xl" icon={<IconEyeOff size={20} />} title={T.userPage.hiddenGames}>
         {hidden.length === 0 ? (
           <p className="text-sm text-text-secondary py-6 text-center">{T.userPage.hiddenEmpty}</p>
         ) : (
-          <ul className="flex flex-col gap-1.5 max-h-[60dvh] overflow-y-auto -mx-1 px-1">
+          <ul className="grid sm:grid-cols-2 gap-1.5">
             {hidden.map((g) => (
               <li key={`${g.source}:${g.id}`} className="flex items-center gap-3 rounded-tile bg-bg-main p-2 pr-1.5">
                 {g.image ? (

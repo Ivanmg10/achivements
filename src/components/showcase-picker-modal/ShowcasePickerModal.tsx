@@ -78,7 +78,7 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
     <Modal
       isOpen={isOpen && !!showcase}
       onClose={onClose}
-      size="md"
+      size="xl"
       title={game ? game.title : T.showcase.pickerTitle}
       hint={game ? undefined : T.showcase.pickerHint}
       footer={

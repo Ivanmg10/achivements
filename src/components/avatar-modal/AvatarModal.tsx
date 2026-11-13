@@ -55,7 +55,8 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={close} size="md" icon={<IconUser size={20} />} title={t.avatarTitle} hint={t.avatarHint}>
+    <Modal isOpen={isOpen} onClose={close} size="xl" icon={<IconUser size={20} />} title={t.avatarTitle} hint={t.avatarHint}>
+      <div className="grid gap-5 md:grid-cols-2 md:items-center">
       <label
         htmlFor={inputId}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
@@ -107,6 +108,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
         />
       </label>
 
+      <div className="flex flex-col gap-5">
       {error && (
         <Notice tone="danger">{error}</Notice>
       )}
@@ -158,6 +160,8 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
           )}
         </div>
       )}
+      </div>
+      </div>
     </Modal>
   )
 }

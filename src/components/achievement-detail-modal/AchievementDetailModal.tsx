@@ -62,7 +62,7 @@ export default function AchievementDetailModal({
   const guideLabel = { youtube: T.achievementDetail.youtube, steamGuides: T.achievementDetail.steamGuides, psnProfiles: T.achievementDetail.psnProfiles, trueAchievements: T.achievementDetail.trueAchievements }
 
   return (
-    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="md" className="gap-4">
+    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="lg" className="gap-4">
         <div className="flex items-start gap-4 p-5 sm:p-6 border-b border-bg-header">
           {iconUrl ? (
             <FadeImage

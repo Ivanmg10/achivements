@@ -14,7 +14,7 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
+  rectSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useLanguage } from '@/context/LanguageContext'
 import { applyPerfectOrder, type PerfectGame } from '@/utils/perfectGames'
@@ -73,13 +73,13 @@ export default function PerfectGamesOrderModal({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      size="md"
+      size="xl"
       title={T.cards.reorderMasteredTitle}
       footer={<Button onClick={handleClose}>{T.cards.close}</Button>}
     >
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={localList.map((g) => g.key)} strategy={verticalListSortingStrategy}>
-          <div className="flex flex-col gap-2">
+        <SortableContext items={localList.map((g) => g.key)} strategy={rectSortingStrategy}>
+          <div className="grid sm:grid-cols-2 gap-2">
             {localList.map((g) => (
               <PerfectGameOrderRow key={g.key} game={g} />
             ))}

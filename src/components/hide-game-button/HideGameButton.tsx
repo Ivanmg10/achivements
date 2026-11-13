@@ -62,6 +62,7 @@ export default function HideGameButton({
       {/* React carries clicks out of a portal to the card around it: stop them here. */}
       <span className="contents" onClick={(e) => e.stopPropagation()}>
       <Modal
+        size="sm"
         isOpen={open}
         onClose={() => setOpen(false)}
         icon={<IconEyeOff size={20} />}

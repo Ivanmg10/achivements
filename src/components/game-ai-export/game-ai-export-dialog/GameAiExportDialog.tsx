@@ -48,7 +48,7 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
     <Modal
       isOpen={true}
       onClose={onClose}
-      size="md"
+      size="lg"
       icon={<IconSparkles size={20} />}
       title={T.aiExport.title}
       hint={T.aiExport.intro.replace('{game}', source.game.title)}
