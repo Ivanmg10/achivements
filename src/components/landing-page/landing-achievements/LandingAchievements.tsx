@@ -34,7 +34,7 @@ export default function LandingAchievements() {
   const listed = rows.filter((r) => shown === 'all' || (shown === 'earned') === (r.earnedAt !== null))
 
   return (
-    <section className="grid gap-8 lg:grid-cols-[minmax(0,25rem)_minmax(0,1fr)] lg:gap-18 lg:items-center">
+    <section className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,25rem)_minmax(0,1fr)] lg:gap-18 lg:items-center">
       <LandingSectionHead title={T.landing.achievementsTitle} points={T.landing.achievementsPoints} />
       <div className="min-w-0 flex flex-col gap-3">
         <Kicker>{T.landing.example}</Kicker>

@@ -26,13 +26,13 @@ export default function LandingPoints() {
   const parts = GAME_SOURCES.filter((s) => SAMPLE_POINTS[s])
 
   return (
-    <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,37.5rem)] lg:gap-14 lg:items-center">
+    <section className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,37.5rem)] lg:gap-14 lg:items-center">
       <LandingSectionHead title={T.landing.pointsTitle} text={T.landing.pointsText} points={T.landing.pointsPoints}>
         <Link href="/rankings/how" className="relative tap-target self-start font-bold underline underline-offset-4 decoration-ink/40 hover:decoration-accent rounded focus-ring">
           {T.rankings.how}
         </Link>
       </LandingSectionHead>
-      <div className="flex flex-col gap-3">
+      <div className="min-w-0 flex flex-col gap-3">
         <Kicker>{T.landing.example}</Kicker>
         <div className="flex flex-col gap-4 lg:gap-5 bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 lg:p-8">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
