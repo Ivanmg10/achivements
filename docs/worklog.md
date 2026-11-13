@@ -80,6 +80,16 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   owner found the opened card too tall (about 600 px to 1,100 at 1440): picked among four ways (full width when open, 40/60, a capped grid), **the panel
   keeps the closed list's height on a wide screen (36.5rem) and the opened game scrolls inside**, as the home's column does, with the scrollbar's room kept
   and a fade where it is cut (`useScrollFade({ axis: 'y' })`, new). On a phone it still grows (a box that scrolls inside a page that scrolls is worse there).
+- *Round six (2026-11-13, the owner)*: the library lost its platform tabs and its "Example" label (`LandingPage.test` now counts four labelled
+  examples) for a seventh game, God of War Ragnarök on PS5 (`NPWR22392_00`, 48 trophies with its DLC group, read once from PSN; the global rarity comes
+  from a public trophy hunter's list, as the app's account has no PS5 game; PS5 icons live on `psnobj.prod.dl.playstation.net`); `samplePsnTrophies` is now
+  keyed by trophy set; the card's fixed height is seven rows (42.625rem). "Logro a logro" shows four achievements ("Ten thousand" and "Futurist" gone, in the
+  nine languages; that change landed in the library's commit by mistake). Achievements now come before the groups, and the groups are **a try**: a band
+  that slides across the page as the closing's covers do (`landing-group-reel/LandingGroupReel`, `.cover-reel-row`, 110 s a half, paused under the pointer
+  and by the stop button, still and scrollable by hand under reduced motion, each group once for a screen reader), with two more groups (Resident Evil,
+  Soulslike, Steam art; example figures). Revert that commit if the owner does not like it. The zigzag follows the new order: library left, achievements
+  right, the band, streak left, points right. **Open:** "Mira cómo avanzas" needs a rework (the owner: a big "56 days" with nothing saying what it is);
+  canvas first, as `docs/design-process.md` asks.
 **Where the drawing gave way to a rule** — No capitals: the platforms line, the name and the tagline are in their own case (drawn in capitals; the guard refuses
 `uppercase`), the wide tracking kept. The name is `BrandMark`'s mixed case, the same signature as the bar and the sign-in; on a 390 px phone it fits one line (the
 drawing broke "CHEEVO / VAULT", wider in capitals). "Iniciar sesión" is `T.landing.signIn` ("Entrar" in Spanish). No © year (the line is `T.landing.footer`). The nav's
