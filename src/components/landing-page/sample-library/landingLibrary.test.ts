@@ -1,7 +1,8 @@
 import { SAMPLE_STEAM_ACHIEVEMENTS } from './sampleSteamAchievements'
 import { SAMPLE_NAMES as ES } from './names/es'
 import { SAMPLE_PSN_ICONS, SAMPLE_PSN_TROPHIES } from './samplePsnTrophies'
-import { loadSampleAchievements, loadSampleTrophies, toPsnTrophies, toSteamAchievements } from './landingLibrary'
+import { SAMPLE_RA_GAMES } from './sampleRaAchievements'
+import { loadSampleAchievements, loadSampleTrophies, toRaAchievements, toPsnTrophies, toSteamAchievements } from './landingLibrary'
 import { SAMPLE_ACHIEVEMENTS, SAMPLE_GAMES } from '@/components/landing-page/landingSamples'
 import { addDays } from '@/utils/dates'
 
@@ -52,4 +53,13 @@ test('the PSN example earns every trophy, named, with its icon on the PSN host a
 test('loads the PSN example in the reader language', async () => {
   const list = await loadSampleTrophies('NPWR11436_00', 'es', TODAY)
   expect(list[0].name).toBe('El César')
+})
+
+test('each RA example earns its count in hardcore, every badge named', () => {
+  for (const game of SAMPLE_GAMES.filter((g) => g.raId)) {
+    const list = toRaAchievements(SAMPLE_RA_GAMES[game.raId!].achievements, TODAY)
+    expect(list).toHaveLength(game.total)
+    expect(list.filter((a) => a.DateEarnedHardcore)).toHaveLength(game.earned)
+    for (const a of list) expect(a.Title && a.BadgeName).toBeTruthy()
+  }
 })

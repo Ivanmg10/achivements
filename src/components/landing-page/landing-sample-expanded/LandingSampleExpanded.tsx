@@ -32,7 +32,8 @@ export default function LandingSampleExpanded({
   recentMinutes?: number
 }) {
   const { T, lang } = useLanguage()
-  const { list: achievements, isLoading, error, retry } = useLandingSample(appId, loadSampleAchievements)
+  const { data, isLoading, error, retry } = useLandingSample(appId, loadSampleAchievements)
+  const achievements = data ?? []
   const earned = isLoading ? 0 : achievements.filter((a) => a.earned).length
   const count = achievements.length || total
 

@@ -27,7 +27,8 @@ const countByGrade = (list: PsnTrophy[], keep: (t: PsnTrophy) => boolean) =>
  */
 export default function LandingSamplePsnExpanded({ set, total }: { set: string; total: number }) {
   const { T, lang } = useLanguage()
-  const { list: trophies, isLoading, error, retry } = useLandingSample(set, loadSampleTrophies)
+  const { data, isLoading, error, retry } = useLandingSample(set, loadSampleTrophies)
+  const trophies = data ?? []
   const earned = trophies.filter((t) => t.earned).length
 
   return (

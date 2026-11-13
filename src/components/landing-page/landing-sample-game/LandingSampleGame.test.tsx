@@ -8,6 +8,10 @@ jest.mock('@/components/landing-page/landing-sample-expanded/LandingSampleExpand
   __esModule: true,
   default: ({ appId }: { appId: number }) => <p>opened {appId}</p>,
 }))
+jest.mock('@/components/landing-page/landing-sample-ra-expanded/LandingSampleRaExpanded', () => ({
+  __esModule: true,
+  default: ({ gameId }: { gameId: number }) => <p>opened {gameId}</p>,
+}))
 jest.mock('@/components/landing-page/landing-sample-psn-expanded/LandingSamplePsnExpanded', () => ({
   __esModule: true,
   default: ({ set }: { set: string }) => <p>opened {set}</p>,
@@ -15,7 +19,7 @@ jest.mock('@/components/landing-page/landing-sample-psn-expanded/LandingSamplePs
 
 const psn = SAMPLE_GAMES.find((g) => g.source === 'psn')!
 const steam = SAMPLE_GAMES.find((g) => g.appId !== undefined)!
-const closed = SAMPLE_GAMES.find((g) => !g.appId && !g.trophySet)!
+const ra = SAMPLE_GAMES.find((g) => g.raId)!
 const row = (game = psn, open = false, onToggle = () => {}) => render(<ul><LandingSampleGame game={game} open={open} onToggle={onToggle} /></ul>)
 
 test('a home feed row: the name, the platform, the bar and what it counts, in trophies on PlayStation', () => {
@@ -26,9 +30,9 @@ test('a home feed row: the name, the platform, the bar and what it counts, in tr
   expect(screen.queryByRole('link')).not.toBeInTheDocument()
 })
 
-test('an example with no achievements in the sample stays closed: no button', () => {
-  row(closed)
-  expect(screen.queryByRole('button')).not.toBeInTheDocument()
+test('an RA example opens on its achievements', () => {
+  row(ra, true)
+  expect(screen.getByText(`opened ${ra.raId}`)).toBeInTheDocument()
 })
 
 test('a Steam example opens on its achievements, and asks the library to', async () => {
