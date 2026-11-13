@@ -109,7 +109,8 @@ export type FeedGameCardView = {
   progress: FeedProgress | null
   /** The line under the bar, joined by the site's mark; empty ones are left out. */
   facts: ReactNode[]
-  expand: ExpandLabels
+  /** What the row's button says; none (an example with nothing to open) leaves the row closed and plain. */
+  expand?: ExpandLabels
   /** The game's pin, outside the expand button; none (a collection) leaves it out. */
   pin?: { gameId: number; source?: GameSource }
   /** Controlled by the feed (one row open at a time) when `expanded` and `onToggle` come; local otherwise. */

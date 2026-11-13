@@ -13,12 +13,23 @@ export type RarestRow = {
   key: string
   name: string
   icon: string | null
-  /** Where it lands on the game's page; stays on the profile being looked at (`gameHref(source, id, subject)`). */
-  href: string
+  /** Where it lands on the game's page; stays on the profile being looked at (`gameHref(source, id, subject)`). None (the landing's example): a plain row. */
+  href?: string
   /** Share of players who have it: what the panel orders by, rarest first. */
   rarity: number
   /** The line under the name, in the platform's own words (grade, `N G`, "x % have it"). */
   subline: ReactNode
+}
+
+const ROW = 'flex items-center gap-3 rounded-box p-1.5'
+
+/** A row's frame: a link when it opens something, a plain row when it does not. */
+function RowFrame({ href, children }: { href?: string; children: ReactNode }) {
+  return href ? (
+    <Link href={href} className={`${ROW} hover:bg-ink/5 transition-colors focus-ring`}>{children}</Link>
+  ) : (
+    <div className={ROW}>{children}</div>
+  )
 }
 
 /**
@@ -58,7 +69,7 @@ export default function RarestEarned({
         <ol className="flex flex-col gap-2">
           {rarest.map((r) => (
             <li key={r.key}>
-              <Link href={r.href} className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-ring">
+              <RowFrame href={r.href}>
                 {r.icon ? (
                   <Image src={r.icon} alt="" width={40} height={40} className={`w-10 h-10 rounded-box object-cover ring-2 ${ring} shrink-0`} unoptimized />
                 ) : (
@@ -68,7 +79,7 @@ export default function RarestEarned({
                   <span className="text-sm font-semibold truncate">{r.name}</span>
                   <span className="text-xs">{r.subline}</span>
                 </span>
-              </Link>
+              </RowFrame>
             </li>
           ))}
         </ol>
