@@ -41,7 +41,7 @@ export default function SeoPage({ page }: { page: SeoPageEntry }) {
           </section>
         ))}
 
-        <FaqList title={T.publicPages.faqTitle} items={text.faq} numbered={false} />
+        <FaqList title={T.publicPages.faqTitle} items={text.faq} />
 
         <SeoPageClosing />
       </main>

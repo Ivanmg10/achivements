@@ -108,7 +108,7 @@ export default function RankingsGuide() {
 
       <RankingsGuideBlock index={8} {...g.updates} />
 
-      <div className="mt-4"><FaqList title={T.publicPages.faqTitle} items={g.faq} numbered={false} /></div>
+      <div className="mt-4"><FaqList title={T.publicPages.faqTitle} items={g.faq} /></div>
     </div>
   )
 }

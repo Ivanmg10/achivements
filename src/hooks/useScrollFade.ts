@@ -5,18 +5,21 @@ import { scrollFadeClass, type ScrollEdges } from '@/components/ui/scrollFade'
  * A strip that scrolls sideways says there is more of it: `ref` goes on the scrolling element,
  * `fade` in its className (`scrollFadeClass`), and the edge with more past it fades out. Kept as
  * it scrolls, as it or its content resizes and as its children change. `fromEnd` opens it scrolled
- * to its end (a year that ends today), so the fade is on its start. Nothing fades while it fits.
+ * to its end (a year that ends today), so the fade is on its start; `axis` y is for a box that scrolls down. Nothing
+ * fades while it fits.
  */
-export function useScrollFade<T extends HTMLElement = HTMLDivElement>({ fromEnd = false }: { fromEnd?: boolean } = {}) {
+export function useScrollFade<T extends HTMLElement = HTMLDivElement>({ fromEnd = false, axis = 'x' }: { fromEnd?: boolean; axis?: 'x' | 'y' } = {}) {
   const [edges, setEdges] = useState<ScrollEdges>({ start: false, end: false })
 
   const ref = useCallback(
     (el: T | null) => {
       if (!el) return
+      const y = axis === 'y'
       if (fromEnd) el.scrollLeft = el.scrollWidth
       const measure = () => {
-        const start = el.scrollLeft > 1
-        const end = el.scrollLeft + el.clientWidth < el.scrollWidth - 1
+        const [at, seen, all] = y ? [el.scrollTop, el.clientHeight, el.scrollHeight] : [el.scrollLeft, el.clientWidth, el.scrollWidth]
+        const start = at > 1
+        const end = at + seen < all - 1
         setEdges((e) => (e.start === start && e.end === end ? e : { start, end }))
       }
       const size = new ResizeObserver(measure)
@@ -37,8 +40,8 @@ export function useScrollFade<T extends HTMLElement = HTMLDivElement>({ fromEnd 
         el.removeEventListener('scroll', measure)
       }
     },
-    [fromEnd],
+    [fromEnd, axis],
   )
 
-  return { ref, fade: scrollFadeClass(edges) }
+  return { ref, fade: scrollFadeClass(edges, axis) }
 }

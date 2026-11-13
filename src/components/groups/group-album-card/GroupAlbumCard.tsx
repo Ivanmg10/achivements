@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { IconLock, IconPlus, IconWorld } from '@tabler/icons-react'
 import { GameGroup } from '@/types/types'
@@ -6,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { plural } from '@/utils/utils'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
+import GroupCoverStrip from '@/components/groups/group-cover-strip/GroupCoverStrip'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
 import GroupFacts from '@/components/groups/group-facts/GroupFacts'
 import Tag from '@/components/ui/Tag'
@@ -30,11 +30,7 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
     >
       <div className="relative h-[9.375rem] overflow-hidden" aria-hidden="true">
         {covers.length > 0 ? (
-          <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${covers.length}, minmax(0, 1fr))` }}>
-            {covers.map((src, i) => (
-              <Image key={i} src={src} alt="" width={240} height={240} className="w-full h-full object-cover" unoptimized />
-            ))}
-          </div>
+          <GroupCoverStrip covers={covers} />
         ) : (
           <div className="absolute inset-0 grid grid-cols-4 gap-2 p-4">
             {[0, 1, 2, 3].map((i) => (

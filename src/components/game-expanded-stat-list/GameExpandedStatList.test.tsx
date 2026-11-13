@@ -20,8 +20,8 @@ test('a long label may wrap, a long value stays whole', () => {
   expect(screen.getByText('12 345 ч')).toHaveClass('whitespace-nowrap', 'text-info')
 })
 
-test('leaves out on a wide screen what the ring already says', () => {
+test('leaves out in a wide card what the ring already says', () => {
   render(<GameExpandedStatList stats={STATS} />)
-  expect(screen.getByText('Completion').parentElement).toHaveClass('lg:hidden')
-  expect(screen.getByText('Последние 2 недели').parentElement).not.toHaveClass('lg:hidden')
+  expect(screen.getByText('Completion').parentElement).toHaveClass('@3xl:hidden')
+  expect(screen.getByText('Последние 2 недели').parentElement).not.toHaveClass('@3xl:hidden')
 })

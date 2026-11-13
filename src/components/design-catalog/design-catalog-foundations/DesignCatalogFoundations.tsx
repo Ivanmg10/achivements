@@ -143,6 +143,9 @@ export default function DesignCatalogFoundations() {
               <BrandMark name="CheevoVault" size={size} />
             </Specimen>
           ))}
+          <Specimen name="size title, logo after (the landing)">
+            <BrandMark name="CheevoVault" size="title" logoAfter className="text-[3rem]! sm:text-[4rem]!" />
+          </Specimen>
         </Panel>
       </DesignCatalogPiece>
 

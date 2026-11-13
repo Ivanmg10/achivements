@@ -293,7 +293,7 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
   `TOOLTIP_SURFACE`, `MENU_SURFACE`, `SURFACE`, `Accordion`, `ShowMore`, `Shelf`, `SectionHead`, `DropSlot`,
   `ToggleButton`, `Kicker` (the small label, sentence case), `Tag`, `Avatar` (with the presence dot), `ListRow`, `Figure`
   (every labelled number; rows that wrap are `FIGURES_BY_THREE` / `_TO_LG`, no mark at a row's start), `DataBar` (a chart bar),
-  `Facts` (facts on one line) and `useScrollFade` (a strip that scrolls sideways fades where it is cut; `Tabs` has it). `className` on them is for layout only,
+  `Facts` (facts on one line) and `useScrollFade` (a strip that scrolls sideways, or a box down with `axis: 'y'`, fades where it is cut; `Tabs` has it). `className` on them is for layout only,
   never colours. **Tokens, not strings:** `focus-ring`, `shadow-hairline-t/-b`, `shadow-sunken`,
   `drop-shadow-done`, and a platform's colour is `text-steam` / `bg-psn/10`…, never a hex. Rules added in #120
   start with the files still to migrate (`ui/uiGuard.pending.json`): the list only shrinks, never add to it.
@@ -316,6 +316,7 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
   or arbitrary values.
 - **Colours with a meaning come from the theme** (danger, success, warning, `hardcore`, `softcore`); no palette
   class of any hue. Platform hues are tokens (`--color-steam`…, `platinum`); tier hues live in their util.
+- **The landing and the sign-in are always the dark theme** (`data-theme="dark"` on their root); the landing's example streak is in the accent.
 - **Streaks are coloured by tier** (`streakTier`) wherever a streak is coloured, never in the accent; the best streaks on
   `/racha` are grey but the one being shown day by day, in its tier's colour (#131).
 - **Every progress bar is `ProgressBar` or `CircularProgress`** in the theme's `--progress`; only a finished

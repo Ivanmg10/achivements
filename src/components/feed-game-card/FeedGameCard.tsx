@@ -52,6 +52,32 @@ export default function FeedGameCard({
   const Logo = platform.source ? PLATFORM_LOGO[platform.source] : null
   const picture = icon(`${ICON_CLASS} ${href ? 'transition-transform duration-300 hover:scale-105' : ''} ${ring ? ICON_RING[ring] : 'ring-1 ring-ink/10'}`)
 
+  // The bar and the facts: inside the expand button when the row opens, plain when it does not (an example).
+  const summary = (opens: boolean) => (
+    <>
+      <span className="flex items-center gap-2 w-full">
+        {progress && (
+          <>
+            <ProgressBar pct={progress.pct} softPct={progress.softPct} label={title} className="flex-1" />
+            <span className={`text-base font-extrabold tabular-nums shrink-0 w-[2.625rem] text-right ${progress.done ? 'text-success' : 'text-text-main'}`}>
+              {progress.percent}%
+            </span>
+          </>
+        )}
+        {opens && (
+          <IconChevronDown
+            size={14}
+            aria-hidden="true"
+            className={`ml-auto shrink-0 text-text-secondary/40 group-hover:text-text-secondary transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          />
+        )}
+      </span>
+      <span className="flex flex-wrap items-center text-[0.8125rem] text-text-secondary">
+        <Facts items={facts} />
+      </span>
+    </>
+  )
+
   return (
     // justify-center: a feed row grows to share the column's height (the profile beside it can be taller), and its content stays in the middle (#114).
     <div className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col justify-center min-h-0 ring-1 ring-ink/[0.04] ${className}`}>
@@ -85,41 +111,27 @@ export default function FeedGameCard({
             </Tag>
           </span>
 
-          <button
-            type="button"
-            onClick={toggle}
-            aria-expanded={open}
-            aria-controls={panelId}
-            aria-label={`${open ? expand.hide : expand.show}: ${title}`}
-            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-ring group"
-          >
-            <span className="flex items-center gap-2 w-full">
-              {progress && (
-                <>
-                  <ProgressBar pct={progress.pct} softPct={progress.softPct} label={title} className="flex-1" />
-                  <span className={`text-base font-extrabold tabular-nums shrink-0 w-[2.625rem] text-right ${progress.done ? 'text-success' : 'text-text-main'}`}>
-                    {progress.percent}%
-                  </span>
-                </>
-              )}
-              <IconChevronDown
-                size={14}
-                aria-hidden="true"
-                className={`ml-auto shrink-0 text-text-secondary/40 group-hover:text-text-secondary transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-              />
-            </span>
-
-            <span className="flex flex-wrap items-center text-[0.8125rem] text-text-secondary">
-              <Facts items={facts} />
-            </span>
-          </button>
+          {expand ? (
+            <button
+              type="button"
+              onClick={toggle}
+              aria-expanded={open}
+              aria-controls={panelId}
+              aria-label={`${open ? expand.hide : expand.show}: ${title}`}
+              className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-ring group"
+            >
+              {summary(true)}
+            </button>
+          ) : (
+            <span className="flex flex-col gap-1 w-full">{summary(false)}</span>
+          )}
         </div>
 
         {/* Outside the expand button (a button inside a button is invalid HTML), and above its stretched hit area. */}
         {pin && <PinToggleButton gameId={pin.gameId} source={pin.source} className="self-center relative z-10" />}
       </div>
 
-      {open && (
+      {open && expand && (
         <div id={panelId} className="flex-1 overflow-y-auto px-3 pb-3 pt-3 min-h-0 w-full">
           {children}
         </div>

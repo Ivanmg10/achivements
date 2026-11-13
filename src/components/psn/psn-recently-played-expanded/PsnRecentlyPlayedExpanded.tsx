@@ -31,7 +31,7 @@ export default function PsnRecentlyPlayedExpanded({ game }: { game: PsnGameProgr
       earned={earned}
       total={total}
       ringLabel={T.psn.trophies}
-      ringExtra={<PsnTrophyCounts earned={game.earned} of={game.defined} className="flex-col items-start! lg:items-center!" />}
+      ringExtra={<PsnTrophyCounts earned={game.earned} of={game.defined} className="flex-col items-start! @3xl:items-center!" />}
       gridTitle={T.psn.trophies}
       unlocks={fromPsn(trophies, game.id)}
       isLoading={isLoading}

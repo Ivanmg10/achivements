@@ -125,6 +125,7 @@ export default function DesignCatalogControls() {
           {VARIANTS.map((v) => (
             <div key={v} className="flex flex-wrap items-center gap-2.5">
               {SIZES.map((s) => <Button key={s} variant={v} size={s}>{v} · {s}</Button>)}
+              <Button variant={v} size="xl">{v} · xl</Button>
               <Button variant={v} loading>Loading</Button>
               <Button variant={v} disabled>Disabled</Button>
             </div>

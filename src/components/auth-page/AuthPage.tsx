@@ -41,7 +41,7 @@ export default function AuthPage({ wantsRegister, steam, form, next = null }: { 
   const registerForm = <RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setHasRegister} />
 
   return (
-    <div className="relative bg-bg-main text-text-main min-h-[100dvh] lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
+    <div data-theme="dark" className="relative bg-bg-main text-text-main min-h-[100dvh] lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
 
       {/* Phone: a band of covers, the name, then the form on its card. */}
       <AuthPhoneFrame>

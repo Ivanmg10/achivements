@@ -919,6 +919,44 @@ html[data-font="fira"],
   }
 }
 
+/*
+   The landing's title screen (#136): one blurred picture of the art wall drifting slowly
+   (.title-drift: there and back, so it never shows a seam), and the closing band's two rows of covers
+   going opposite ways (.cover-reel-row: its covers doubled, so -50% lands on the same frame).
+   The landing's stop button ([data-motion="still"]) and reduced motion hold both still.
+*/
+@keyframes title-drift {
+  from { transform: translate3d(0, -4%, 0); }
+  to { transform: translate3d(-27%, -12%, 0); }
+}
+@keyframes reel-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes reel-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.title-drift { animation: title-drift 48s ease-in-out infinite alternate; will-change: transform; }
+/* The title screen's way down: its arrow bobs. */
+@keyframes hint-bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(0.375rem); }
+}
+.hint-bounce { animation: hint-bounce 0.9s ease-in-out infinite alternate; }
+.cover-reel-row { animation: reel-left 60s linear infinite; will-change: transform; }
+.cover-reel-row.cover-reel-back { animation-name: reel-right; animation-duration: 80s; }
+[data-motion="still"] :is(.title-drift, .cover-reel-row, .hint-bounce) { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .title-drift,
+  .cover-reel-row,
+  .hint-bounce { animation: none; }
+}
+/* Scan lines over the title screen's art, as on a game's start screen; in the page's own ground, so a light theme keeps them light. */
+.scanlines {
+  background-image: repeating-linear-gradient(0deg, rgb(var(--bg-main) / 0.24) 0 1px, transparent 1px 3px);
+}
+
 /* A ring that fills from empty when it appears (CircularProgress animateIn; --ring-from is its full length). */
 @keyframes ring-in {
   from { stroke-dashoffset: var(--ring-from); }
@@ -995,6 +1033,13 @@ html[data-font="fira"],
 :is(.enter-rows, .enter-cards) > :nth-child(12) { --i: 11; }
 /* A hero's title comes first, with whatever sits above it; its facts follow. */
 .enter-rows > :is(h1, :has(h1)):nth-child(n) { --i: 0; }
+
+/*
+   A block that enters when it is scrolled to (useEnterOnView, ui/EnterOnView): hidden only after the script has seen
+   it below the screen, so the server's HTML always shows it. A page that stopped its motion shows it at once.
+*/
+.enter-on-view.enter-wait { opacity: 0; }
+[data-motion="still"] .enter-on-view { opacity: 1; animation: none; }
 
 /*
    The library's shelves keep their own, livelier cascade (the user's call, 2026-10-31):

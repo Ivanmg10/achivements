@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Spinner from './Spinner'
 
 type Variant = 'primary' | 'secondary' | 'quiet' | 'danger'
-type Size = 'sm' | 'md' | 'lg'
+type Size = 'sm' | 'md' | 'lg' | 'xl'
 
 // The shape sits on ::before. Only the primary leans on the design's one angle (identity B, #127); the text stays upright.
 // Its shape is inset by what the slant adds on each side, so a full-width primary
@@ -24,6 +24,9 @@ const SIZES: Record<Size, string> = {
   sm: 'h-(--h-control-sm) px-3.5 text-sm',
   md: 'h-(--h-control) px-5 text-sm',
   lg: 'min-h-12 px-6 text-[0.9375rem]',
+  // A title screen's two ways in (the landing): long rather than tall (the owner, 2026-11-13: the 64 px ones looked chunky),
+  // one width for both from `sm`, a phone's two side by side.
+  xl: 'min-h-12 px-5 text-base sm:min-h-[3.25rem] sm:min-w-[13.5rem] sm:px-10 sm:text-[1.0625rem] short:min-h-11 short:min-w-44 uhd:min-h-16 uhd:min-w-72 uhd:px-14 uhd:text-xl',
 }
 
 /** The classes of a library button, for the rare place that cannot render `Button` itself. */

@@ -137,7 +137,6 @@ test('the radii the designs change come from the tokens, never a fixed value', (
   // What may keep its own radius: art bigger than a card, which is round enough in both designs, and the
   // tiny drawings of a layout inside the preferences, which are not controls or surfaces.
   const allowed = [
-    path.join('components', 'landing-page', 'landing-hero', 'LandingHero.tsx'),
     path.join('components', 'main-page', 'main-page-portada', 'MainPagePortada.tsx'),
     path.join('components', 'status-badge', 'StatusBadge.tsx'),
     path.join('components', 'user-page', 'user-game-card-preference', 'user-game-card-preference-preview', 'UserGameCardPreferencePreview.tsx'),
