@@ -19,7 +19,7 @@ export default function LandingGroup({ group }: { group: SampleGroup }) {
 
   return (
     <article className="relative flex flex-col bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] overflow-hidden">
-      <div className="relative h-32 sm:h-44 lg:h-[14.375rem] overflow-hidden">
+      <div className="relative h-32 sm:h-40 overflow-hidden">
         <GroupCoverStrip covers={group.covers} />
         <div aria-hidden="true" className="absolute inset-0 bg-linear-to-b from-transparent from-40% to-bg-main/90" />
         <div className="absolute inset-x-4 bottom-2.5 lg:inset-x-5 lg:bottom-3.5 flex items-end justify-between gap-3">

@@ -27,3 +27,12 @@ test('no Xbox tab while Xbox is admin-only', () => {
   render(<LandingLibrary />)
   expect(screen.queryByRole('tab', { name: /xbox/i })).not.toBeInTheDocument()
 })
+
+test('opening a game hides the others until it closes, as the home feed does', async () => {
+  render(<LandingLibrary />)
+  const [first, ...rest] = SAMPLE_GAMES.filter((g) => g.appId)
+  await userEvent.click(screen.getByRole('button', { name: `${en.cards.showAchievements}: ${first.title}` }))
+  for (const g of SAMPLE_GAMES.filter((g) => g !== first)) expect(screen.queryByText(g.title)).not.toBeInTheDocument()
+  await userEvent.click(screen.getByRole('button', { name: `${en.cards.hideAchievements}: ${first.title}` }))
+  for (const g of rest) expect(screen.getByText(g.title)).toBeInTheDocument()
+})
