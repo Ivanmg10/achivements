@@ -23,17 +23,10 @@ import { useSubject } from '@/context/SubjectContext'
 import SectionHead from '@/components/ui/SectionHead'
 import { withSubject } from '@/utils/withSubject'
 import { raAchievementList } from '@/utils/gameAchievements'
+import { FEED_VIEW_MOTION, feedViewTransition } from '@/utils/feedViewMotion'
 
 const MAX_GAMES = 6
 
-// The list and an open card are two views. One leaves before the other comes
-// in, so a card never grows over the others while they are still fading out.
-const VIEW_MOTION = {
-  initial: { opacity: 0, y: 8 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -6 },
-}
-const VIEW_EASE = [0.4, 0, 0.2, 1] as const
 // Rows share the column's height; an open card takes all of it.
 const ROW_STYLE = { flex: '1 1 0%' }
 
@@ -115,10 +108,10 @@ export default function RecentlyPlayedFeed({ skipLatest = false }: { skipLatest?
           <AnimatePresence mode="wait">
             <motion.div
               key={expanded ?? 'list'}
-              {...VIEW_MOTION}
+              {...FEED_VIEW_MOTION}
               // The first time the list appears its rows make the entrance; the box only fades between views after that.
-              initial={entered ? VIEW_MOTION.initial : false}
-              transition={{ duration: reduce ? 0 : 0.18, ease: VIEW_EASE }}
+              initial={entered ? FEED_VIEW_MOTION.initial : false}
+              transition={feedViewTransition(reduce)}
               className="home-fit-scroll flex flex-col gap-1.5 flex-1 min-h-0"
             >
             {displayedItems.map((item, i) => {
