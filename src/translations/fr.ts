@@ -419,6 +419,22 @@ export const fr: Translations = {
       'Les jeux épinglés t’attendent sur la page d’accueil.',
       'Succès à obtenir : ceux que tu vises, dans une seule liste.',
     ],
+    achievementsTitle: 'Succès après succès',
+    achievementsPoints: [
+      'Chaque succès avec sa rareté réelle : combien de personnes l’ont.',
+      'Ce qu’il te reste dans chaque jeu, et une IA qui t’explique comment l’obtenir.',
+      'Ta vitrine : cinq succès que tu choisis, sur ton profil.',
+    ],
+    /** Call of Duty: Black Ops II's, as Steam names them in this language (English where Steam has no translation). */
+    sampleAchievements: [
+      { name: 'Juste le début', text: 'Terminez 1 défi dans n\'importe quel niveau.' },
+      { name: 'On abandonne personne', text: 'Portez secours à Woods.' },
+      { name: 'Sable mouvant', text: 'Obtenez des infos sur Raul Menendez par Rahmaan.' },
+      { name: 'Maître de Black Ops II', text: 'Terminez la campagne en difficulté Commando ou Vétéran.' },
+      { name: '10 000', text: 'Obtenez un score minimum de 10 000 par mission.' },
+      { name: 'Futuriste', text: 'Terminez tous les niveaux du futur en Vétéran.' },
+    ],
+    otherPlayer: 'Une autre personne',
     progressTitle: 'Vois ta progression',
     progressText: 'Statistiques, séries de jours, tes succès les plus rares et ce que tu as joué cette semaine sur toutes tes plateformes.',
     progressPoints: [

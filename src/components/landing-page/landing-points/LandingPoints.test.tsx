@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import LandingPoints from './LandingPoints'
-import { SAMPLE_POINTS } from '@/components/landing-page/landingSamples'
+import { SAMPLE_POINTS, SAMPLE_RANKS } from '@/components/landing-page/landingSamples'
 import { en } from '@/translations/en'
 import { levelOf } from '@/utils/vaultLevel'
 
@@ -20,4 +21,13 @@ test('an example: the level from the points, the points, and how they split by p
   expect(document.body).toHaveTextContent(`${total.toLocaleString('en')} VP`)
   expect(screen.getByRole('img', { name: /RA \d+ %, Steam \d+ %, PSN \d+ %/ })).toBeInTheDocument()
   expect(document.body).toHaveTextContent(`Steam ${SAMPLE_POINTS.steam!.toLocaleString('en')}`)
+})
+
+test('and where those points put the player in the rankings, by period', async () => {
+  render(<LandingPoints />)
+  const yours = () => screen.getByText(en.rankings.you).closest('li')!
+  expect(yours()).toHaveTextContent(String(SAMPLE_RANKS.all.first + 1))
+  await userEvent.click(screen.getByRole('button', { name: en.rankings.month }))
+  expect(screen.getByRole('button', { name: en.rankings.month })).toHaveAttribute('aria-pressed', 'true')
+  expect(yours()).toHaveTextContent(SAMPLE_RANKS.month.points[1].toLocaleString('en'))
 })

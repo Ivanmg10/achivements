@@ -419,6 +419,22 @@ export const pl: Translations = {
       'Przypięte gry czekają na stronie głównej.',
       'Osiągnięcia do zdobycia: te, na które polujesz, na jednej liście.',
     ],
+    achievementsTitle: 'Osiągnięcie po osiągnięciu',
+    achievementsPoints: [
+      'Każde osiągnięcie z prawdziwą rzadkością: ile osób je ma.',
+      'Czego brakuje Ci w każdej grze, i AI, które wyjaśni, jak to zdobyć.',
+      'Gablota: pięć wybranych przez Ciebie osiągnięć w Twoim profilu.',
+    ],
+    /** Call of Duty: Black Ops II's, as Steam names them in this language (English where Steam has no translation). */
+    sampleAchievements: [
+      { name: 'Dopiero się rozkręcam', text: 'Ukończ 1 wyzwanie na dowolnym poziomie.' },
+      { name: 'Nikogo nie zostawiamy', text: 'Uratuj Woodsa.' },
+      { name: 'Ruchome piaski', text: 'Zdobądź informacje o Raulu Menendezie od Mullaha Rahmaana.' },
+      { name: 'Mistrz Black Ops II', text: 'Ukończ kampanię na poziomie trudności Doświadczony lub Weteran.' },
+      { name: '10 kółek', text: 'Zdobądź co najmniej 10 tysięcy punktów w każdej misji' },
+      { name: 'Futurysta', text: 'Ukończ wszystkie poziomy w przyszłości na poziomie trudności Weteran' },
+    ],
+    otherPlayer: 'Inna osoba',
     progressTitle: 'Zobacz swoje postępy',
     progressText: 'Statystyki, serie dni, twoje najrzadsze osiągnięcia i aktywność z tego tygodnia na wszystkich platformach.',
     progressPoints: [

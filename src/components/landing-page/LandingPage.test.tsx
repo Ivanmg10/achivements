@@ -22,14 +22,14 @@ test('offers both ways in, at the top and at the end, pointing at the auth page'
 
 test('says what the app is in its sections, each titled, with no closing card', () => {
   render(<LandingPage />)
-  for (const title of [en.landing.libraryTitle, en.landing.organiseTitle, en.landing.progressTitle, en.landing.pointsTitle, en.publicPages.faqTitle, en.landing.closingTitle]) {
+  for (const title of [en.landing.libraryTitle, en.landing.organiseTitle, en.landing.achievementsTitle, en.landing.progressTitle, en.landing.pointsTitle, en.publicPages.faqTitle, en.landing.closingTitle]) {
     expect(screen.getByRole('heading', { level: 2, name: title })).toBeInTheDocument()
   }
 })
 
 test('every example is labelled as one', () => {
   render(<LandingPage />)
-  expect(screen.getAllByText(en.landing.example)).toHaveLength(4)
+  expect(screen.getAllByText(en.landing.example)).toHaveLength(5)
 })
 
 test('the questions are all open, in the page, as the JSON-LD lists them', () => {
@@ -71,7 +71,7 @@ test('the art is decoration, hidden from assistive tech', () => {
 
 test('each part says what the feature does, in points', () => {
   render(<LandingPage />)
-  for (const point of [...en.landing.libraryPoints, ...en.landing.organisePoints, ...en.landing.progressPoints, ...en.landing.pointsPoints]) {
+  for (const point of [...en.landing.libraryPoints, ...en.landing.organisePoints, ...en.landing.achievementsPoints, ...en.landing.progressPoints, ...en.landing.pointsPoints]) {
     expect(screen.getByText(point)).toBeInTheDocument()
   }
 })

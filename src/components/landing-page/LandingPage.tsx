@@ -4,6 +4,7 @@ import { useState } from 'react'
 import LandingTitle from '@/components/landing-page/landing-title/LandingTitle'
 import LandingLibrary from '@/components/landing-page/landing-library/LandingLibrary'
 import LandingGroups from '@/components/landing-page/landing-groups/LandingGroups'
+import LandingAchievements from '@/components/landing-page/landing-achievements/LandingAchievements'
 import LandingStreak from '@/components/landing-page/landing-streak/LandingStreak'
 import LandingPoints from '@/components/landing-page/landing-points/LandingPoints'
 import LandingFaq from '@/components/landing-page/landing-faq/LandingFaq'
@@ -13,8 +14,8 @@ import PublicFooter from '@/components/public-footer/PublicFooter'
 
 /**
  * What a visitor sees at the door (#136, canvas page 4): a game's title screen with the two ways in, then
- * what CheevoVault is, shown with the app's own pieces and labelled examples (the library, groups, the
- * streak, Vault Points), the questions people ask first, and the art going by at the end with the ways in
+ * what CheevoVault is, shown with the app's own pieces and labelled examples (the library, groups, a game's
+ * achievements, the streak, Vault Points and the rankings), the questions people ask first, and the art going by at the end with the ways in
  * again. Each part below the first screen enters as it is reached (`EnterOnView`). Its motion (the title's art,
  * the closing band) is CSS; the stop button holds all of it still.
  */
@@ -31,6 +32,9 @@ export default function LandingPage() {
           </EnterOnView>
           <EnterOnView>
             <LandingGroups />
+          </EnterOnView>
+          <EnterOnView>
+            <LandingAchievements />
           </EnterOnView>
           <EnterOnView>
             <LandingStreak />

@@ -419,6 +419,22 @@ export const ja: Translations = {
       '固定したゲームはホームで待っています。',
       '獲得したい実績：狙っている実績をひとつのリストに。',
     ],
+    achievementsTitle: '実績をひとつずつ',
+    achievementsPoints: [
+      '実績ごとの本当のレア度：何人が持っているか。',
+      '各ゲームの残りの実績と、取り方を教えてくれるAI。',
+      'ショーケース：選んだ5つの実績をプロフィールに。',
+    ],
+    /** Call of Duty: Black Ops II's, as Steam names them in this language (English where Steam has no translation). */
+    sampleAchievements: [
+      { name: 'チャレンジャー', text: 'いずれかのステージでチャレンジを1つクリアする' },
+      { name: '不死身の男', text: 'ウッズの救出に成功する' },
+      { name: '一握の砂', text: 'ムッラ・ラフマーンからラウル・メネンデスの情報を集める' },
+      { name: 'ブラックオプスIIマスター', text: 'ハードまたはベテランの難易度でキャンペーンをクリアする' },
+      { name: '10K', text: '各ミッションで最低でも10000のスコアを達成する' },
+      { name: 'フューチャリスト', text: '難易度ベテランで未来ステージを全てクリアする' },
+    ],
+    otherPlayer: '他のプレイヤー',
     progressTitle: '進み具合がひと目で',
     progressText: '達成率、連続日数、最もレアな実績、今週プレイした内容をすべてのプラットフォームでまとめて確認できます。',
     progressPoints: [

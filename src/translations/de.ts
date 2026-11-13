@@ -419,6 +419,22 @@ export const de: Translations = {
       'Angeheftete Spiele warten auf der Startseite auf dich.',
       'Zu holende Erfolge: die, hinter denen du her bist, in einer Liste.',
     ],
+    achievementsTitle: 'Erfolg für Erfolg',
+    achievementsPoints: [
+      'Jeder Erfolg mit seiner echten Seltenheit: wie viele Leute ihn haben.',
+      'Was dir in jedem Spiel noch fehlt, und eine KI, die dir erklärt, wie du es schaffst.',
+      'Deine Vitrine: fünf Erfolge, die du auswählst, auf deinem Profil.',
+    ],
+    /** Call of Duty: Black Ops II's, as Steam names them in this language (English where Steam has no translation). */
+    sampleAchievements: [
+      { name: 'Jetzt geht\'s los', text: 'Schließen Sie 1 Herausforderung in einem beliebigen Level ab.' },
+      { name: 'Keiner wird zurückgelassen', text: 'Retten Sie Woods.' },
+      { name: 'Treibsand', text: 'Erhalten Sie von Mullah Rahmaan Informationen über Raul Menendez.' },
+      { name: 'Black Ops II-Meister', text: 'Schließen Sie die Kampagne im Schwierigkeitsgrad Söldner oder Veteran ab.' },
+      { name: 'Zehntausend', text: 'Erreichen Sie mindestens 10.000 Punkte in jeder Mission.' },
+      { name: 'Futurist', text: 'Schließen Sie alle Zukunftslevel auf Veteran ab.' },
+    ],
+    otherPlayer: 'Eine andere Person',
     progressTitle: 'Sieh deinen Fortschritt',
     progressText: 'Statistiken, Tagesserien, deine seltensten Erfolge und was du diese Woche auf allen Plattformen gespielt hast.',
     progressPoints: [

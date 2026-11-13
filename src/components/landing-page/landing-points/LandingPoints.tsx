@@ -1,23 +1,28 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
-import { SAMPLE_POINTS } from '@/components/landing-page/landingSamples'
+import { SAMPLE_POINTS, type RankPeriod } from '@/components/landing-page/landingSamples'
 import LandingSectionHead from '@/components/landing-page/landing-section-head/LandingSectionHead'
+import LandingRankSlice from '@/components/landing-page/landing-rank-slice/LandingRankSlice'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import VaultPlatformSplit from '@/components/vault-platform-split/VaultPlatformSplit'
 import Facts from '@/components/ui/Facts'
 import Kicker from '@/components/ui/Kicker'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 import { GAME_SOURCES, PLATFORM_NAME } from '@/utils/gameRef'
 
 const TOTAL = Object.values(SAMPLE_POINTS).reduce((sum, n) => sum + (n ?? 0), 0)
 
 /**
- * Vault Points: what they are, the way to the page that explains them, and an example of a player's
- * level, points and where they came from, drawn with the rankings' own badge and split bar.
+ * Vault Points: what they are, the way to the page that explains them, and an example of a player's level,
+ * points and where they came from, drawn with the rankings' own badge and split bar; under it, where those
+ * points put them in the rankings (round five, "B": the slice around them, its period switch working).
  */
 export default function LandingPoints() {
   const { T, lang } = useLanguage()
+  const [period, setPeriod] = useState<RankPeriod>('all')
   const parts = GAME_SOURCES.filter((s) => SAMPLE_POINTS[s])
 
   return (
@@ -40,6 +45,20 @@ export default function LandingPoints() {
           <p className="text-sm lg:text-[0.9375rem] text-text-secondary">
             <Facts items={parts.map((s) => `${PLATFORM_NAME[s]} ${SAMPLE_POINTS[s]!.toLocaleString(lang)}`)} />
           </p>
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-4 lg:pt-5 shadow-hairline-t">
+            <span className="font-bold">{T.rankings.title}</span>
+            <SegmentedControl
+              aria-label={T.rankings.period}
+              value={period}
+              onChange={setPeriod}
+              options={[
+                { value: 'all', label: T.rankings.all },
+                { value: 'month', label: T.rankings.month },
+                { value: 'week', label: T.rankings.week },
+              ]}
+            />
+          </div>
+          <LandingRankSlice period={period} />
         </div>
       </div>
     </section>

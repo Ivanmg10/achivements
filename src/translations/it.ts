@@ -419,6 +419,22 @@ export const it: Translations = {
       'I giochi fissati ti aspettano nella pagina iniziale.',
       'Obiettivi da ottenere: quelli a cui punti, in un’unica lista.',
     ],
+    achievementsTitle: 'Obiettivo dopo obiettivo',
+    achievementsPoints: [
+      'Ogni obiettivo con la sua rarità reale: quante persone lo hanno.',
+      'Quello che ti manca in ogni gioco, e un’IA che ti spiega come ottenerlo.',
+      'La tua vetrina: cinque obiettivi scelti da te, sul tuo profilo.',
+    ],
+    /** Call of Duty: Black Ops II's, as Steam names them in this language (English where Steam has no translation). */
+    sampleAchievements: [
+      { name: 'È solo l\'inizio', text: 'Completa 1 sfida in qualsiasi livello.' },
+      { name: 'Nessuno resta indietro', text: 'Salva Woods.' },
+      { name: 'Sabbie mobili', text: 'Raccogli informazioni su Raul Menendez dal mullah Rahmaan.' },
+      { name: 'Maestro di Black Ops II', text: 'Completa la campagna a livello Esperto o Veterano.' },
+      { name: 'Diecimila', text: 'Ottieni almeno 10.000 punti in ogni missione.' },
+      { name: 'Futurista', text: 'Completa tutti i livelli nel futuro in Veterano.' },
+    ],
+    otherPlayer: 'Un’altra persona',
     progressTitle: 'Guarda come procedi',
     progressText: 'Statistiche, strisce di giorni, gli obiettivi più rari e cosa hai giocato questa settimana su tutte le piattaforme.',
     progressPoints: [

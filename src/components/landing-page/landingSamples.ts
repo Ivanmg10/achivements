@@ -84,3 +84,34 @@ export function streaksEndingOn(today: string): Streak[] {
 
 /** Vault Points by platform. */
 export const SAMPLE_POINTS: Partial<Record<GameSource, number>> = { ra: 27901, steam: 64094, psn: 22853 }
+
+const BO2_ICONS = 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/202970'
+
+/** Call of Duty: Black Ops II on Steam as a game page's example, with the owner's count (16 of 35). */
+export const SAMPLE_GAME_PAGE = { title: 'Call of Duty: Black Ops II', source: 'steam' as const, appId: 202970, earned: 16, total: 35 }
+
+/**
+ * Six of its achievements, three earned and three to get: their icons and Steam's global rarity (read once,
+ * 2026-11-13). Their names and texts are Steam's own, per language, in `T.landing.sampleAchievements` in this
+ * order. An earned one is dated `daysAgo` days before the day the page is shown, so the example never ages.
+ */
+export const SAMPLE_ACHIEVEMENTS: { icon: string; rarity: number; daysAgo: number | null }[] = [
+  { icon: `${BO2_ICONS}/0133fda3a5fa19b1165259600644d25d981bf479.jpg`, rarity: 53.3, daysAgo: 64 },
+  { icon: `${BO2_ICONS}/ab8d4ccecae718e5314300a6716d0c3623ce0dc5.jpg`, rarity: 52.7, daysAgo: 63 },
+  { icon: `${BO2_ICONS}/910637c7094876116abbb2e786652120fb4f65f3.jpg`, rarity: 41.2, daysAgo: 41 },
+  { icon: `${BO2_ICONS}/9dfd28b4500bdc6a148469ad3576fca079768bc8.jpg`, rarity: 6.4, daysAgo: null },
+  { icon: `${BO2_ICONS}/f6699b8c585d8e0f74d946382dc9a6b944668e1d.jpg`, rarity: 5.5, daysAgo: null },
+  { icon: `${BO2_ICONS}/dc92dcfcab652a8d51315a3e9abc8a2b87db664f.jpg`, rarity: 3.4, daysAgo: null },
+]
+
+export type RankPeriod = 'all' | 'month' | 'week'
+
+/**
+ * Where the example player stands in the rankings, by period: the place of the first row shown and four rows'
+ * points, the player's second. Nobody else is named, real or made up.
+ */
+export const SAMPLE_RANKS: Record<RankPeriod, { first: number; points: number[] }> = {
+  all: { first: 11, points: [120412, 114848, 111603, 107125] },
+  month: { first: 26, points: [9840, 9302, 9015, 8771] },
+  week: { first: 40, points: [2718, 2527, 2490, 2302] },
+}
