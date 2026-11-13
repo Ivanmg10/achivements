@@ -58,3 +58,19 @@ test('fromEnd opens it on its end, so the fade says there is more before it', ()
   render(<Strip fromEnd />)
   expect(screen.getByTestId('strip')).toHaveClass(scrollFadeClass({ start: true, end: false }))
 })
+
+test('a box that scrolls down fades its foot, then its top too once scrolled', () => {
+  expect(scrollFadeClass({ start: false, end: true }, 'y')).toContain('to_bottom')
+  jest.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(300)
+  jest.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(900)
+  const top = jest.spyOn(HTMLElement.prototype, 'scrollTop', 'get').mockReturnValue(0)
+  function Box() {
+    const { ref, fade } = useScrollFade({ axis: 'y' })
+    return <div ref={ref} data-testid="box" className={fade} />
+  }
+  render(<Box />)
+  expect(screen.getByTestId('box').className).toContain('to_bottom,black_calc')
+  top.mockReturnValue(200)
+  fireEvent.scroll(screen.getByTestId('box'))
+  expect(screen.getByTestId('box').className).toContain('transparent,black_2.5rem')
+})

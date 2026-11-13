@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
+import { useScrollFade } from '@/hooks/useScrollFade'
 import { SAMPLE_GAMES } from '@/components/landing-page/landingSamples'
 import LandingSectionHead from '@/components/landing-page/landing-section-head/LandingSectionHead'
 import LandingSampleGame from '@/components/landing-page/landing-sample-game/LandingSampleGame'
@@ -27,6 +28,7 @@ export default function LandingLibrary() {
   // The swap between the list and an opened game animates only once someone has opened one: nothing moves on a load.
   const [toggled, setToggled] = useState(false)
   const reduce = useReducedMotion()
+  const { ref: panel, fade } = useScrollFade({ axis: 'y' })
   const games = SAMPLE_GAMES.filter((g) => (shown === 'all' || g.source === shown) && (open === null || g.title === open))
   const ids = tabIds('landing-library', shown)
 
@@ -50,12 +52,14 @@ export default function LandingLibrary() {
           ]}
         />
         {/* On a wide screen the panel keeps the closed list's height and an opened game scrolls inside it, as in the home's
-            column (the owner, 2026-11-13: the card grew to twice its height), the scrollbar's room kept so nothing shifts. */}
+            column (the owner, 2026-11-13: the card grew to twice its height), the scrollbar's room kept so nothing shifts,
+            fading where it is cut. */}
         <div
           role="tabpanel"
           id={ids.panel}
           aria-labelledby={ids.tab}
-          className="min-h-[31.5rem] lg:h-[36.5rem] lg:overflow-y-auto lg:overscroll-contain lg:[scrollbar-gutter:stable] [scrollbar-width:thin]"
+          ref={panel}
+          className={`min-h-[31.5rem] lg:h-[36.5rem] lg:overflow-y-auto lg:overscroll-contain lg:[scrollbar-gutter:stable] [scrollbar-width:thin] ${fade}`}
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.ul
