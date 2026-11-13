@@ -289,7 +289,8 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   **`SegmentedControl`** (a sliding pill leaning on the one angle), **`Pill`** / `pillClass` for filter chips.
 - **A strip that scrolls sideways says there is more** (#134): `useScrollFade` (`src/hooks/`) gives the scrolling element a `ref`
   and a `fade` class (`ui/scrollFade.ts`, a mask, so it fades into any ground) that fades the edge it is cut at, start, end or both,
-  and nothing while it fits; `fromEnd` opens it on its end (the streak's year, which ends today). Every `Tabs` row has it built in
+  and nothing while it fits; `fromEnd` opens it on its end (the streak's year, which ends today); `axis: 'y'` does the same for a box
+  that scrolls down (the landing library's opened example). Every `Tabs` row has it built in
   (the profile tabs, the stats rail on a phone, the library's platforms); the group's status filters, a game's achievement filters
   and the streak's year use the hook. A new sideways strip uses it too. `lg` tabs (a card's title that is its own switch) are
   15 px on one line on a phone (measured: the longest pair, Russian, is 312 px of the 319 a 375 px screen leaves) and scroll with the fade; from `sm` they are `text-xl` and may wrap.

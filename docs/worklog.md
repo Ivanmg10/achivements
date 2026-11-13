@@ -70,6 +70,16 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   `useLandingSample(id, load)` for both. **Found:** Sony answers `pt-PT` in English for this game and `pt-BR` in Portuguese; the sample uses `pt-BR`, the app
   (`psnLanguage`) still asks `pt-PT`, so a Portuguese reader sees English trophy names: worth a fallback, not done. **Open:** the two RA examples stay closed;
   there is no RA key on this machine (keys are per user, in the database) and the owner has not given one.
+- *Zigzag, the RA examples, the opened game held (2026-11-13, the owner)*: on a wide screen the sections alternate: the groups and the streak put their
+  text on the right (`LandingSectionHead end`, which replaced the unused `row`; on a phone the text still comes first). Pokémon Gold (RA 576) and Super Mario
+  Sunshine (RA 6049) open on their achievements (`LandingSampleRaExpanded`: the ring with points, the chart, the rarest earned where the home shows the pinned
+  ones, which need an account, the badge grid in hardcore), read once from RA with a key the owner pasted for it, **not stored anywhere** (passed in the
+  environment of one command); RA names them in English only. Their counts follow RA's real totals (72 and 148 achievements, not 49 and 70): 25 and 19
+  earned, the same share, dated 60 to 6 and 90 to 20 days ago so the chart has them. `useLandingSample` now returns what its loader returns (`data`).
+  Opening an example swaps the views as the home does (the list leaves, the game comes in): the home feed's motion moved to `utils/feedViewMotion`. The
+  owner found the opened card too tall (about 600 px to 1,100 at 1440): picked among four ways (full width when open, 40/60, a capped grid), **the panel
+  keeps the closed list's height on a wide screen (36.5rem) and the opened game scrolls inside**, as the home's column does, with the scrollbar's room kept
+  and a fade where it is cut (`useScrollFade({ axis: 'y' })`, new). On a phone it still grows (a box that scrolls inside a page that scrolls is worse there).
 **Where the drawing gave way to a rule** — No capitals: the platforms line, the name and the tagline are in their own case (drawn in capitals; the guard refuses
 `uppercase`), the wide tracking kept. The name is `BrandMark`'s mixed case, the same signature as the bar and the sign-in; on a 390 px phone it fits one line (the
 drawing broke "CHEEVO / VAULT", wider in capitals). "Iniciar sesión" is `T.landing.signIn` ("Entrar" in Spanish). No © year (the line is `T.landing.footer`). The nav's
