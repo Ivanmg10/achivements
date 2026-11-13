@@ -4,7 +4,6 @@ import { useLanguage } from '@/context/LanguageContext'
 import { SAMPLE_GROUPS } from '@/components/landing-page/landingSamples'
 import LandingSectionHead from '@/components/landing-page/landing-section-head/LandingSectionHead'
 import LandingGroupReel from '@/components/landing-page/landing-group-reel/LandingGroupReel'
-import Kicker from '@/components/ui/Kicker'
 
 /**
  * "Sorted your way": the text, then the example groups going by in a band across the page, as the closing's covers do
@@ -18,7 +17,6 @@ export default function LandingGroups() {
     <section className="flex flex-col gap-8 lg:gap-12">
       <LandingSectionHead title={T.landing.organiseTitle} points={T.landing.organisePoints} />
       <div className="flex flex-col gap-3">
-        <Kicker>{T.landing.example}</Kicker>
         <div className="-mx-4 sm:-mx-8 lg:-mx-24">
           <LandingGroupReel groups={SAMPLE_GROUPS} />
         </div>

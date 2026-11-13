@@ -9,7 +9,6 @@ import LandingRankSlice from '@/components/landing-page/landing-rank-slice/Landi
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import VaultPlatformSplit from '@/components/vault-platform-split/VaultPlatformSplit'
 import Facts from '@/components/ui/Facts'
-import Kicker from '@/components/ui/Kicker'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import { GAME_SOURCES, PLATFORM_NAME } from '@/utils/gameRef'
 
@@ -33,7 +32,6 @@ export default function LandingPoints() {
         </Link>
       </LandingSectionHead>
       <div className="min-w-0 flex flex-col gap-3">
-        <Kicker>{T.landing.example}</Kicker>
         <div className="flex flex-col gap-4 lg:gap-5 bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 lg:p-8">
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <VaultLevelBadge points={TOTAL} size="lg" />

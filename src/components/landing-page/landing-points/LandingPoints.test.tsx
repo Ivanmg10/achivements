@@ -16,7 +16,6 @@ test('what Vault Points are, and the way to how they are counted', () => {
 
 test('an example: the level from the points, the points, and how they split by platform, in words too', () => {
   render(<LandingPoints />)
-  expect(screen.getByText(en.landing.example)).toBeInTheDocument()
   expect(screen.getByText(`Lv ${levelOf(total)}`)).toBeInTheDocument()
   expect(document.body).toHaveTextContent(`${total.toLocaleString('en')} VP`)
   expect(screen.getByRole('img', { name: /RA \d+ %, Steam \d+ %, PSN \d+ %/ })).toBeInTheDocument()

@@ -14,7 +14,6 @@ test('says what a streak is, then the one going on with its label and its dates,
   expect(screen.getByText(`${live.days} days`)).toBeInTheDocument()
   expect(screen.getByText(/^From .+ to today, without missing a day\.$/)).toBeInTheDocument()
   expect(screen.queryByText(en.streak.newRecord)).not.toBeInTheDocument()
-  expect(screen.getByText(en.landing.example)).toBeInTheDocument()
 })
 
 test('its days in the streak calendar: today picked at first, another day picked shows its count', async () => {

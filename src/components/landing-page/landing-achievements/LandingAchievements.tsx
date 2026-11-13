@@ -8,7 +8,6 @@ import LandingSectionHead from '@/components/landing-page/landing-section-head/L
 import LandingSampleGameHead from '@/components/landing-page/landing-sample-game-head/LandingSampleGameHead'
 import LandingSampleAchievement from '@/components/landing-page/landing-sample-achievement/LandingSampleAchievement'
 import Button from '@/components/ui/Button'
-import Kicker from '@/components/ui/Kicker'
 import Tabs, { tabIds } from '@/components/ui/Tabs'
 import { REGISTER_HREF } from '@/utils/authLinks'
 import { addDays, utcDay } from '@/utils/dates'
@@ -37,7 +36,6 @@ export default function LandingAchievements() {
     <section className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,25rem)] lg:gap-18 lg:items-center">
       <LandingSectionHead title={T.landing.achievementsTitle} points={T.landing.achievementsPoints} end />
       <div className="min-w-0 flex flex-col gap-3">
-        <Kicker>{T.landing.example}</Kicker>
         <div className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] overflow-hidden">
           <LandingSampleGameHead />
           <div className="px-4 sm:px-6 pb-3 sm:pb-4 flex flex-col">

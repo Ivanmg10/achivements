@@ -24,7 +24,7 @@ export default function LandingPage() {
   const [still, setStill] = useState(false)
 
   return (
-    <div data-motion={still ? 'still' : undefined} className="min-h-[100dvh] bg-bg-main text-text-main flex flex-col">
+    <div data-theme="dark" data-motion={still ? 'still' : undefined} className="min-h-[100dvh] bg-bg-main text-text-main flex flex-col">
       <LandingTopBar />
       <main className="flex flex-col">
         <LandingTitle still={still} onStill={() => setStill((s) => !s)} />
