@@ -1,7 +1,7 @@
 import { steamAssetUrl } from '@/lib/steamAssets'
 import type { GameSource } from '@/types/game'
 import type { Streak } from '@/types/types'
-import { addDays } from '@/utils/dates'
+import { addDays, daysBetween } from '@/utils/dates'
 
 /**
  * What the landing shows of the app, always under an "Example" label: the figures are the owner's own
@@ -103,6 +103,11 @@ export const SAMPLE_STREAKS: Streak[] = [
 export function streaksEndingOn(today: string): Streak[] {
   const shift = Math.round((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${SAMPLE_STREAKS[0].end}T00:00:00Z`)) / 864e5)
   return SAMPLE_STREAKS.map((s) => ({ ...s, start: addDays(s.start, shift), end: addDays(s.end, shift) }))
+}
+
+/** How many achievements each day of a streak had (1 to 9): fixed per day of the streak, so the example never changes. */
+export function streakDayCounts(streak: Streak): Record<string, number> {
+  return Object.fromEntries(daysBetween(streak.start, streak.end).map((day, i) => [day, 1 + ((i * 7 + (i % 5) * 3) % 9)]))
 }
 
 /** Vault Points by platform. */

@@ -5,25 +5,24 @@ import { SAMPLE_STREAKS } from '@/components/landing-page/landingSamples'
 import { en } from '@/translations/en'
 
 const live = SAMPLE_STREAKS[0]
+const calendarDays = () => screen.getAllByRole('button').filter((b) => b.hasAttribute('data-day'))
 
-test('the streak going on in big, with its dates, beside the best streaks as /racha draws them', () => {
+test('says what a streak is, then the one going on with its label, its dates and that it is the best yet', () => {
   render(<LandingStreak />)
   expect(screen.getByRole('heading', { level: 2, name: en.landing.progressTitle })).toBeInTheDocument()
+  expect(screen.getByText(en.streak.yourStreak)).toBeInTheDocument()
+  expect(screen.getByText(en.streak.pageSub)).toBeInTheDocument()
   expect(screen.getByText(`${live.days} days`)).toBeInTheDocument()
-  expect(screen.getByText(/^From .+ to .+, without missing a day\.$/)).toBeInTheDocument()
-  expect(screen.getByRole('heading', { name: en.streak.chartTitle })).toBeInTheDocument()
+  expect(screen.getByText(/^From .+ to today, without missing a day\.$/)).toBeInTheDocument()
+  expect(screen.getByText(en.streak.newRecord)).toBeInTheDocument()
   expect(screen.getByText(en.landing.example)).toBeInTheDocument()
 })
 
-test('grey but the one shown: the live one at first, another when picked, none when picked again', async () => {
+test('its days in the streak calendar: today picked at first, another day picked shows its count', async () => {
   render(<LandingStreak />)
-  const pressed = () => screen.queryAllByRole('button', { pressed: true })
-  expect(pressed()).toHaveLength(1)
-  expect(pressed()[0]).toHaveAccessibleName(new RegExp(en.streak.ongoing))
-  const second = screen.getAllByRole('button', { pressed: false })[0]
-  await userEvent.click(second)
-  expect(second).toHaveAttribute('aria-pressed', 'true')
-  expect(pressed()).toHaveLength(1)
-  await userEvent.click(second)
-  expect(pressed()).toHaveLength(0)
+  const days = calendarDays()
+  expect(days.filter((d) => d.getAttribute('aria-pressed') === 'true')).toHaveLength(1)
+  await userEvent.click(days[0])
+  expect(calendarDays()[0]).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByText((_, el) => el?.tagName === 'P' && /^\w+, \w+ \d+: \d achievements?$/.test(el.textContent ?? ''))).toBeInTheDocument()
 })
