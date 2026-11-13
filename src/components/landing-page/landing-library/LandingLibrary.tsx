@@ -49,7 +49,14 @@ export default function LandingLibrary() {
             ...(['ra', 'steam', 'psn'] as const).map((s) => ({ value: s, label: PLATFORM_NAME[s] })),
           ]}
         />
-        <div role="tabpanel" id={ids.panel} aria-labelledby={ids.tab} className="min-h-[31.5rem]">
+        {/* On a wide screen the panel keeps the closed list's height and an opened game scrolls inside it, as in the home's
+            column (the owner, 2026-11-13: the card grew to twice its height), the scrollbar's room kept so nothing shifts. */}
+        <div
+          role="tabpanel"
+          id={ids.panel}
+          aria-labelledby={ids.tab}
+          className="min-h-[31.5rem] lg:h-[36.5rem] lg:overflow-y-auto lg:overscroll-contain lg:[scrollbar-gutter:stable] [scrollbar-width:thin]"
+        >
           <AnimatePresence mode="wait" initial={false}>
             <motion.ul
               key={open ?? 'list'}
