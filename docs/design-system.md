@@ -227,8 +227,16 @@ flag is read from the database, never the session).
   are in `ui/`; a `DropSlot` is a dashed border and nothing else (no stripes, #130); the big faint icon behind a hero card's title is
   `GhostIcon` (one size and opacity, whole inside its card at the title's line; never an oversized icon cut by the edge); a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **The signature:** `BrandMark` (the logo in the accent from `themeIcon`'s own shapes, `LOGO_PATHS`, and the name in the display italic) is the one way the
-  site signs itself: the visitors' bar and the sign-in screens. A second drawing of the logo is refused by `uiGuard.test.ts`. `CoverBand` (not in `ui/`: it draws the
-  sign-in art wall) is the window onto the covers: the landing's first screen and the band over the name on a phone's sign-in.
+  site signs itself: the visitors' bar, the sign-in screens and the landing's title (`size="title" logoAfter`: the name as big as the screen allows, the logo
+  after it, under it on a phone). A second drawing of the logo is refused by `uiGuard.test.ts`.
+- **The art wall's covers** (#136) come from one pool, `utils/artWall.ts`, and are drawn one way, `cover-tile/CoverTile` (the framed, tilted box; decoration,
+  lazy, low priority, hidden when dead): the sign-in's sliding columns (`AuthCollagePanel`), the landing's blurred backdrop (`LandingBackdrop`) and its closing
+  band (`cover-reel/CoverReel`, a row sliding sideways in two identical halves). `CoverBand` is the window onto the sign-in's wall over the name on a phone.
+  Endless motion on a public page is CSS (`.title-drift`, `.cover-reel-row` in `globals.css`), still under reduced motion and with a stop button
+  (`[data-motion="still"]` on the page, a `ToggleButton`).
+- **The landing** (#136, canvas page 4) is a game's title screen, then what the site does drawn with the app's own pieces and data labelled "Example"
+  (`T.landing.example`), never a drawing of a piece by hand and never a figure that is not an example or real. Its FAQ is open (`LandingFaq`, a `dl`), the same
+  list as its `FAQPage` JSON-LD; `FaqList` (questions that open in place) is the comparisons' and the rankings guide's.
   The 2560 px screen is the `uhd` breakpoint (`--breakpoint-uhd`): an arbitrary `min-[2560px]:` sorts before `xl:` and loses to it.
 - **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
   `GameCardBackdrop` is the one place that draws it, so every game card follows it.

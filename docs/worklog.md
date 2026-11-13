@@ -33,6 +33,44 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-12 — The new landing: the title screen with "Fondo" (`feat/136-landing`, #136)
+
+**Did** — Canvas page 4 ("LandH1b", "LandPagina" with "Fondo", "LandMovil"), cut from `origin/develop` (with #129–#135, #134, #114/#115 in). One commit per point:
+- *Shared art wall* (`refactor(ui)`): the covers' pool moved out of `AuthCollagePanel` into `utils/artWall.ts` (`ART_WALL_RA`, `ART_WALL_STEAM`, `WALL_TILTS`,
+  `dealBothPlatforms`, tested); one drawing of a cover, `cover-tile/CoverTile` (frame, tilt, lazy, low priority, hides when dead), used by the sign-in's wall too.
+- *The title* (`feat(ui)`): `BrandMark size="title" logoAfter`: the name as big as the screen allows (`clamp(4.5rem, min(13vw, 24svh), 16rem)`), the logo after it,
+  under it on a phone, a `<wbr>` between "Cheevo" and "Vault" so a narrow screen breaks there while the text stays one word. Specimen in `/design`.
+- *The landing* (`feat(landing)`): `LandingTitle` (the platforms with `Facts`, the `h1`, the tagline, the intro and the library's `Button`s, "Qué es CheevoVault",
+  a nav to the rankings, how points work and the FAQ) over `LandingBackdrop` (22 RA boxes laid as the sign-in's wall, blurred, tinted with the accent,
+  `.title-drift` there and back in 48 s, `.scanlines`, a fade in `bg-main`); then `LandingLibrary` (`Tabs` that filter six example games; `LandingSampleGame`:
+  `GameCardBackdrop`, a 56 px cover, `LibraryPlatformBadge`, `ProgressBar`, `Facts`; a cover grid on a phone), `LandingGroups` / `LandingGroup` (shelf art header,
+  `ProgressBar`, a strip with `useScrollFade` below `lg`), `LandingStreak` (the live streak in big in its tier beside `/racha`'s own `StreakChart`, picking works),
+  `LandingPoints` (`VaultLevelBadge`, `VaultPlatformSplit`, `Facts`, the link to `/rankings/how`), `LandingFaq` (open `dl`, two columns) and `LandingClosing`
+  rewritten (two `CoverReel` rows going opposite ways, no card). One stop button (`ToggleButton`, `data-motion="still"` on the page) holds the drift and the
+  band; reduced motion holds them and hides the button. Example data in `landing-page/landingSamples.ts`, every example under `T.landing.example`. New strings
+  in nine languages: `whatIs`, `howPoints`, `pointsTitle`, `pointsText`, `example`, `stopMotion`; `platformsLead` is gone. Deleted: `LandingHero`, `LandingBento`,
+  `LandingFeature` and their tests, and the hero's place on the guard's radius list.
+- *FAQ list* (`refactor(ui)`): with the landing on its own open FAQ, `FaqList` lost `split`, `lead` and `numbered` (every caller left passed `numbered={false}`),
+  and `FaqListItem` its `index`. `/compare`, `/track` and `/rankings/how` render as before.
+**Where the drawing gave way to a rule** — No capitals: the platforms line, the name and the tagline are in their own case (drawn in capitals; the guard refuses
+`uppercase`), the wide tracking kept. The name is `BrandMark`'s mixed case, the same signature as the bar and the sign-in; on a 390 px phone it fits one line (the
+drawing broke "CHEEVO / VAULT", wider in capitals). "Iniciar sesión" is `T.landing.signIn` ("Entrar" in Spanish). No © year (the line is `T.landing.footer`). The nav's
+"Preguntas" is `T.publicPages.faqTitle`.
+**Decisions** — Example games and groups use covers the art wall's pool has: the owner's PS4 games show their Steam art, "Pokémon Sapphire" became Pokémon Gold,
+the groups "Octubre" / "Noviembre" became "Assassin's Creed" / "Spider-Man" (month names would not translate); the figures are the owner's, and all of it says
+"Ejemplo". On a phone the closing keeps its two rows of covers and both buttons (LandMovil still had the older blurred art and one button). The streak list's
+caption ("the one you are on, in colour…") was left out: the list shows it. The backdrop uses RA's small boxes only (blurred, a Steam cover would only weigh more);
+the closing band repeats eight covers per row, so a half is wider than 2560 px with 16 downloads in all.
+**How it was seen** — `next dev` on port 3136 with a throwaway secret and no database, signed out in fresh Playwright contexts (touch on up to 1280 px): 390 × 844,
+375 × 812, 1280 × 800, 800 × 450, 760 × 360, 1920 × 1080, 2560 × 1440 in Chromium, 1920 and 1280 in Firefox. No horizontal scroll at any size (one found and fixed:
+the `sr-only` comma of `Facts` inside a sideways strip escaped it; the group card is `relative` now). The drift and the band move, stop with the button and stay
+still under reduced motion, in both browsers.
+**Open / watch out** — For the owner: 2560 px (the backdrop's covers are big and sparse, the drawing scaled up; the name is 256 px) and the Thor at 760 × 360 (the
+footer line sits under the fold). The closing band's covers are lazy: a full-page screenshot taken without scrolling shows empty frames. The landing no longer uses
+`LandingNav`, which stays in `landing-page/landing-nav/` for `PublicShell` and `SeoPage`. The example dates are 2026's: from 2027 they show the year.
+
+---
+
 ## 2026-11-12 — Recently played off-centre and the handhelds (`fix/115-handhelds`, #114 + #115)
 
 **Did** — Stacked on `feat/134-phone` (PR #161, not merged). One commit per point:
