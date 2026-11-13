@@ -1028,6 +1028,13 @@ html[data-font="fira"],
 .enter-rows > :is(h1, :has(h1)):nth-child(n) { --i: 0; }
 
 /*
+   A block that enters when it is scrolled to (useEnterOnView, ui/EnterOnView): hidden only after the script has seen
+   it below the screen, so the server's HTML always shows it. A page that stopped its motion shows it at once.
+*/
+.enter-on-view.enter-wait { opacity: 0; }
+[data-motion="still"] .enter-on-view { opacity: 1; animation: none; }
+
+/*
    The library's shelves keep their own, livelier cascade (the user's call, 2026-10-31):
    shelf after shelf, each one's title slides in, its cards lift and settle with a
    bounce, and "see all" closes it. The next shelf is already arriving while the cards
