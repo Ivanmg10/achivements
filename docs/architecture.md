@@ -173,7 +173,8 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   (#119): `dates.ts` (the platforms' UTC dates, day keys, dates in the reader's language),
   `raAssets.ts` (RA's picture URLs, as `lib/steamAssets.ts` is Steam's), `gameRef.ts`
   (`GAME_SOURCES`, `PLATFORM_NAME`, `raGameId`, game keys and pages), `gameAchievements.ts`
-  (one game's achievements on any platform, through the routes its page uses). The types
+  (one game's achievements on any platform, through the routes its page uses), `artWall.ts` (the art wall's
+  covers, which the sign-in's wall, the landing's backdrop and its closing band deal from). The types
   every platform shares are in `src/types/game.ts`.
 - **Server helpers** (`src/lib/`, #119): `secrets.ts` (the app secret, HMAC, constant-time
   compares, the cookie reader, the cron check; each caller's key derivation is pinned by its
