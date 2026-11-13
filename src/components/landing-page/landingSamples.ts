@@ -46,7 +46,7 @@ export const SAMPLE_GAMES: SampleGame[] = [
 export type SampleGroup = {
   /** The group's name, or the key of one in `T.landing` (a name in the reader's language). */
   name: string
-  named?: 'sampleGroupNovember'
+  named?: 'sampleGroupNovember' | 'sampleGroupBacklog'
   /** Its games' covers, the band split between them as a real group's card does. */
   covers: string[]
   games: number
@@ -71,6 +71,9 @@ export const SAMPLE_GROUPS: SampleGroup[] = [
     earned: 77,
     total: 112,
   },
+  // "Backlog" (the owner, 2026-11-13): long games barely started, named in the reader's language. Baldur's Gate 3, Cyberpunk
+  // 2077, Red Dead Redemption 2, The Witcher 3: their Steam art.
+  { name: 'Pendientes', named: 'sampleGroupBacklog', covers: steamCovers(1086940, 1091500, 1174180, 292030), games: 4, earned: 21, total: 241 },
   // Resident Evil 2, 3, 4 and Village; Dark Souls Remastered, Dark Souls III, Sekiro and Elden Ring: their Steam art.
   { name: 'Resident Evil', covers: steamCovers(883710, 952060, 2050650, 1196590), games: 4, earned: 132, total: 177 },
   { name: 'Soulslike', covers: steamCovers(570940, 374320, 814380, 1245620), games: 4, earned: 97, total: 160 },

@@ -405,6 +405,7 @@ export const it: Translations = {
     example: 'Esempio',
     stopMotion: 'Ferma il movimento',
     sampleGroupNovember: 'Giochi di novembre',
+    sampleGroupBacklog: 'Da giocare',
     libraryTitle: 'Una libreria, tutte le piattaforme',
     libraryText: 'I tuoi giochi retro, la tua libreria Steam e i tuoi trofei PlayStation affiancati, ognuno con il progresso reale: obiettivi, punti, ore e rarità.',
     libraryPoints: [

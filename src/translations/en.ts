@@ -406,6 +406,7 @@ export const en = {
     example: 'Example',
     stopMotion: 'Stop the motion',
     sampleGroupNovember: 'November games',
+    sampleGroupBacklog: 'Backlog',
     libraryTitle: 'One library, every platform',
     libraryText: 'Your retro games, your Steam library and your PlayStation trophies side by side, each with its real progress: achievements earned, points, hours and rarity.',
     libraryPoints: [

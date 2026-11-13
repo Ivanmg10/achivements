@@ -405,6 +405,7 @@ export const ru: Translations = {
     example: 'Пример',
     stopMotion: 'Остановить движение',
     sampleGroupNovember: 'Игры ноября',
+    sampleGroupBacklog: 'Отложенные',
     libraryTitle: 'Одна библиотека, все платформы',
     libraryText: 'Ретро-игры, библиотека Steam и трофеи PlayStation рядом, у каждой — реальный прогресс: достижения, очки, часы и редкость.',
     libraryPoints: [

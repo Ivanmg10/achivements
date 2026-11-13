@@ -405,6 +405,7 @@ export const ja: Translations = {
     example: '例',
     stopMotion: '動きを止める',
     sampleGroupNovember: '11月のゲーム',
+    sampleGroupBacklog: '積みゲー',
     libraryTitle: 'ひとつのライブラリにすべてのプラットフォーム',
     libraryText: 'レトロゲーム、Steamのライブラリ、PlayStationのトロフィーを並べて表示。実績数、ポイント、プレイ時間、レア度まで実際の進捗がわかります。',
     libraryPoints: [
