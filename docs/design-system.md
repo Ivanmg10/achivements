@@ -124,7 +124,12 @@ One set of CSS classes in `globals.css` for the whole site (issue #61; families 
 - **Retune in one place:** `--enter-duration`, `--enter-ease`, `--enter-stagger`, `--enter-rise`, `--enter-scale`, `--enter-grow`. Reduced motion only restates those tokens, so every entrance becomes a 200 ms fade with no movement and no delay; `CountUp` stays on its final number.
 - **`backwards`, never `both`.** A fill that stays would keep a transform on the element: it traps `position: fixed` inside and fights a sortable row's own transform.
 - **A list plays once.** `useEntrancesOnce` (mounted by `ShapeSync`) sets `data-entered` when its rows finish, because moving a node restarts its animation: measured 2026-10-31, 12 rows replayed on a reorder without the mark, 0 with it. It only ever switches an entrance off; nothing waits for it to show.
-- **Only for what appears on its own.** A list that is mounted with its skeleton inside would play on the skeleton: keep the skeleton outside. What opens on a click may stay in Framer (dialogs, toasts, the library's swaps and opened rows); the guard in `uiGuard.test.ts` lists those. No `whileInView`: entrances are not scroll-triggered.
+- **A part of a long page that is scrolled to** enters as it is reached (#136): `ui/EnterOnView` (`useEnterOnView`) gives it one of
+  these classes the first time it comes into view. It is never hidden before the script has run and seen it wholly below the screen
+  (`.enter-on-view.enter-wait`), so the server's HTML and a browser without JavaScript show everything; one already on screen or
+  passed plays nothing. A page with `data-motion="still"` (the landing's stop button) shows it at once. This is the one exception to
+  "no scroll triggers" below, and only for whole sections under a first screen (the landing).
+- **Only for what appears on its own.** A list that is mounted with its skeleton inside would play on the skeleton: keep the skeleton outside. What opens on a click may stay in Framer (dialogs, toasts, the library's swaps and opened rows); the guard in `uiGuard.test.ts` lists those. No `whileInView`: entrances are not scroll-triggered, but for `EnterOnView` above.
 - **The library's shelves keep their own cascade** (`.enter-shelves` on their root, the user's call, 2026-10-31): each shelf 160 ms after the last, its title sliding in, its cards lifting and settling with a bounce 55 ms apart, "see all" closing it. The general `.enter-cards` was too plain there. It is built on the same tokens, so reduced motion needs nothing more, and its progress bars do not grow.
 - The home's left card (`ViewEntrance`) and profile column (`MainPageProfile.module.css`) came first and keep their own keyframes (the user confirmed it on 2026-10-31). The welcome keeps its own too (`WelcomePage.module.css`): they are timed to its curtain.
 
@@ -229,6 +234,9 @@ flag is read from the database, never the session).
 - **The signature:** `BrandMark` (the logo in the accent from `themeIcon`'s own shapes, `LOGO_PATHS`, and the name in the display italic) is the one way the
   site signs itself: the visitors' bar, the sign-in screens and the landing's title (`size="title" logoAfter`: the name as big as the screen allows, the logo
   after it, under it on a phone). A second drawing of the logo is refused by `uiGuard.test.ts`.
+- **A group's banner** is `groups/group-cover-strip/GroupCoverStrip`: the band split between its games' covers (up to four), on the
+  album card and the landing's example groups. A cover too small for its slice (`sharpEnough`, never stretched past twice its size: an
+  RA box of 96 px) is drawn at that size over a blurred copy of itself, so the slice is full and nothing is smeared.
 - **The art wall's covers** (#136) come from one pool, `utils/artWall.ts`, and are drawn one way, `cover-tile/CoverTile` (the framed, tilted box; decoration,
   lazy, low priority, hidden when dead): the sign-in's sliding columns (`AuthCollagePanel`), the landing's blurred backdrop (`LandingBackdrop`) and its closing
   band (`cover-reel/CoverReel`, a row sliding sideways in two identical halves). `CoverBand` is the window onto the sign-in's wall over the name on a phone.
@@ -261,7 +269,7 @@ flag is read from the database, never the session).
   what opens on a click may stay in Framer), and never hide an element until a frame, idle callback or observer.
 - A block that waits for a fetch holds its exact room, measured, or the same element unseen: the account page's level
   and rankings switch did not, and the page jumped 118 px when they landed. `useVaultMe`'s `isLoading` covers the session read.
-- Entrance-only: no scroll triggers, no loops. The library's shelves and the home keep their own keyframes: do not fold
+- Entrance-only: no scroll triggers (but `EnterOnView`, the sections under the landing's first screen), no loops. The library's shelves and the home keep their own keyframes: do not fold
   them into the general families.
 
 ### The library's pieces (`src/components/ui`, 2026-10-24)
