@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 
 /**
  * The admin panel, opened from the account card instead of sitting at the
- * bottom of the page. Wide on desktop, a sheet from the bottom on a phone.
+ * bottom of the page. `2xl` once unlocked (a working tool, with Tabs: Users, PlayStation, Rankings, Log), `md` while locked; full screen on a phone.
  * The panel's own modals (create, edit, delete) open over it.
  *
  * Escape closes it only when it is the top dialog (the library's Modal sees to it):
@@ -21,7 +21,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
  * Admin panel copy is English only, like the rest of the panel.
  */
 export default function AdminPanelModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  // Medium while it is only the password door (and while it is not known), wide once there are users to show.
+  // Medium while it is only the password door (and while it is not known), 2xl once there is a tool to show.
   const [mode, setMode] = useState<AdminPanelMode>('loading')
 
   const waiting = mode === 'loading'
@@ -31,7 +31,7 @@ export default function AdminPanelModal({ isOpen, onClose }: { isOpen: boolean; 
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size={mode === 'open' ? 'xl' : 'md'}
+      size={mode === 'open' ? '2xl' : 'md'}
       icon={waiting ? <span className="size-5" /> : locked ? <IconLock size={20} /> : <IconShield size={20} />}
       title={
         waiting ? (

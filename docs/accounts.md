@@ -179,6 +179,17 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   Without it the endpoints answer `403 reauth-required` and the panel shows the
   password form, so a stolen or unattended session reads no one's data.
   Do not add an admin endpoint that skips `requireAdmin(req)`.
+- **The panel is a working tool in a dialog (#165, 2026-11-13).** `AdminPanelModal` is `md` while locked (the lock flow is untouched) and `2xl`
+  once unlocked, with `Tabs` across the top: **Users**, **PlayStation**, **Rankings**, **Log** (one tab's content at a time, each with its own skeleton,
+  loaded when the tab opens). The toolbar belongs to the tab's head, never `sticky` inside the padded scroll box (the cards scrolled through it).
+  - *Users*: search and "New user" first. With no search, the 10 most recent sign-ups (highest ids: the list has no sign-up date) in a dense table
+    (`ui/dataTable.ts`: picture, name, id, email, linked platforms as logos, role, actions) with a soft fade and "See all (N)"; a search shows every
+    match. The list and the actions live in `hooks/useAdminUsers`; `AdminEditUserModal` / `AdminCreateUserModal` and every route are as before.
+  - *PlayStation*: a list of the app's PlayStation accounts, one row each (who, days left and until when, set by whom and when, "Renew" opens the
+    NPSSO field). Today there is one account (`/api/admin/psn` has one NPSSO); the rows are the shape for the accounts the PSN spike (#51) will bring,
+    with no backend for several yet.
+  - *Rankings*: the balance table and the flagged unlock tools; *Log*: `admin_actions`, read when the tab opens (`hooks/useAdminActionLog`).
+  - The Xbox explorer is gone (`/api/admin/xbox`, its hooks and tests). Xbox stays admin-only everywhere else (`XBOX_ADMIN_ONLY` untouched).
 - **Everything is logged** in `admin_actions` (`migrations/020_admin_actions.sql`,
   run 2026-10-02): who, what, to whom, when, with names copied in. Kept a year.
   New admin actions must call `logAdminAction`. Readable from the panel.

@@ -1,5 +1,6 @@
-jest.mock('./admin-psn-token/AdminPsnToken', () => ({ __esModule: true, default: () => null }))
-jest.mock('./admin-rankings/AdminRankings', () => ({ __esModule: true, default: () => null }))
+jest.mock('./admin-psn-token/AdminPsnToken', () => ({ __esModule: true, default: () => <p>psn tab</p> }))
+jest.mock('./admin-rankings/AdminRankings', () => ({ __esModule: true, default: () => <p>rankings tab</p> }))
+jest.mock('./admin-action-log/AdminActionLog', () => ({ __esModule: true, default: () => <p>log tab</p> }))
 jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import AdminPanel from './AdminPanel'
@@ -9,15 +10,7 @@ import { notify } from '@/lib/notify'
 
 jest.mock('./AdminCreateUserModal', () => ({ __esModule: true, default: () => null }))
 jest.mock('./AdminEditUserModal', () => ({ __esModule: true, default: () => null }))
-jest.mock('./admin-user-card/AdminUserCard', () => ({
-  __esModule: true,
-  default: ({ user, onDelete }: { user: { username: string }; onDelete: () => void }) => (
-    <li>
-      {user.username}
-      <button onClick={onDelete}>delete {user.username}</button>
-    </li>
-  ),
-}))
+jest.mock('next/image', () => ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />)
 
 const USERS = [
   { id: 3, username: 'ivanxmarine', email: 'hi@test.com', admin: true, rausername: 'PalmeraMiami', steamusername: 'Palmera' },
@@ -30,6 +23,32 @@ beforeEach(() => {
   global.fetch = jest.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(USERS) })
 })
 
+test('the sections are tabs, the users first; one tab shows at a time', async () => {
+  render(<AdminPanel />)
+  await screen.findByText('ivanxmarine')
+  const tabs = screen.getAllByRole('tab').map((t) => t.textContent)
+  expect(tabs).toEqual(['Users2', 'PlayStation', 'Rankings', 'Log'])
+  expect(screen.getByRole('tab', { name: /Users/ })).toHaveAttribute('aria-selected', 'true')
+  expect(screen.queryByText('psn tab')).not.toBeInTheDocument()
+
+  fireEvent.click(screen.getByRole('tab', { name: 'PlayStation' }))
+  expect(screen.getByText('psn tab')).toBeInTheDocument()
+  expect(screen.queryByText('ivanxmarine')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('tab', { name: 'Rankings' }))
+  expect(screen.getByText('rankings tab')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('tab', { name: 'Log' }))
+  expect(screen.getByText('log tab')).toBeInTheDocument()
+  expect(screen.queryByRole('tab', { name: /Xbox/ })).not.toBeInTheDocument()
+})
+
+test('the toolbar is in the tab, not stuck inside the scrolling body', async () => {
+  render(<AdminPanel />)
+  await screen.findByText('ivanxmarine')
+  const search = screen.getByRole('searchbox', { name: 'Search users' })
+  expect(search.closest('[class*="sticky"]')).toBeNull()
+  expect(screen.getByRole('button', { name: 'New user' }).closest('[role="tabpanel"]')).not.toBeNull()
+})
+
 test('lists every user once loaded', async () => {
   render(<AdminPanel />)
   expect(await screen.findByText('ivanxmarine')).toBeInTheDocument()
@@ -39,7 +58,7 @@ test('lists every user once loaded', async () => {
 test('the search box filters by name, email, id or linked account', async () => {
   render(<AdminPanel />)
   await screen.findByText('ivanxmarine')
-  const search = screen.getByRole('textbox', { name: 'Search users' })
+  const search = screen.getByRole('searchbox', { name: 'Search users' })
 
   fireEvent.change(search, { target: { value: 'papu@test' } })
   expect(screen.queryByText('ivanxmarine')).not.toBeInTheDocument()
@@ -55,7 +74,7 @@ test('the search box filters by name, email, id or linked account', async () => 
 test('says so when nothing matches', async () => {
   render(<AdminPanel />)
   await screen.findByText('ivanxmarine')
-  fireEvent.change(screen.getByRole('textbox', { name: 'Search users' }), { target: { value: 'zzz' } })
+  fireEvent.change(screen.getByRole('searchbox', { name: 'Search users' }), { target: { value: 'zzz' } })
   expect(screen.getByText('No users match that search')).toBeInTheDocument()
 })
 
@@ -69,7 +88,7 @@ describe('deleting a user', () => {
   async function openConfirm() {
     render(<AdminPanel />)
     await screen.findByText('papucarrot')
-    fireEvent.click(screen.getByRole('button', { name: 'delete papucarrot' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Delete papucarrot' }))
   }
 
   test('asks first, then removes the user from the list', async () => {
@@ -114,7 +133,7 @@ describe('the unlock', () => {
     render(<AdminPanel />)
     expect(await screen.findByLabelText('Your password')).toBeInTheDocument()
     expect(screen.queryByText('ivanxmarine')).not.toBeInTheDocument()
-    expect(screen.queryByRole('textbox', { name: 'Search users' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('searchbox', { name: 'Search users' })).not.toBeInTheDocument()
   })
 
   test('the right password unlocks it and the users load', async () => {
@@ -145,7 +164,7 @@ test('deleting a user says who went', async () => {
   render(<AdminPanel />)
   await screen.findByText('papucarrot')
   ;(global.fetch as jest.Mock).mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve({ ok: true }) })
-  fireEvent.click(screen.getByRole('button', { name: 'delete papucarrot' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Delete papucarrot' }))
   fireEvent.click(await screen.findByRole('button', { name: 'Delete user' }))
   await waitFor(() => expect(notify.success).toHaveBeenCalledWith('papucarrot deleted'))
 })
