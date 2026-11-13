@@ -2,41 +2,45 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import type { SampleGame } from '@/components/landing-page/landingSamples'
-import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import LibraryPlatformBadge from '@/components/library-platform-badge/LibraryPlatformBadge'
-import { ProgressBar } from '@/components/ui/ProgressBar'
-import Facts from '@/components/ui/Facts'
+import type { FeedRing } from '@/types/gameCard'
+import type { GameSource } from '@/types/game'
+import FeedGameCard from '@/components/feed-game-card/FeedGameCard'
+import FeedGameCardPlaytime from '@/components/feed-game-card/feed-game-card-playtime/FeedGameCardPlaytime'
+import LandingSampleExpanded from '@/components/landing-page/landing-sample-expanded/LandingSampleExpanded'
+import { PLATFORM_NAME } from '@/utils/gameRef'
+
+// The ring a finished game gets, as each platform's feed row gives it (RaGameItem, SteamGameItem, PsnGameItem).
+const DONE_RING: Partial<Record<GameSource, FeedRing>> = { ra: 'warning', steam: 'warning', psn: 'platinum' }
 
 /**
- * One example game, drawn as the library's list draws a game: its cover at the cover's own size on the
- * game's colour, its name and platform, its progress, and what it counts. Not a link: it is an example.
+ * One example game, drawn as the home's feed draws a game (`FeedGameCard`): its art behind it, its cover, name and
+ * platform, its bar and what it counts. A Steam example opens like the home's (`LandingSampleExpanded`, one at a time,
+ * the library says which); the others stay closed, as their achievements are not in the sample. Not a link: an example.
  */
-export default function LandingSampleGame({ game }: { game: SampleGame }) {
+export default function LandingSampleGame({ game, open, onToggle }: { game: SampleGame; open: boolean; onToggle: () => void }) {
   const { T, lang } = useLanguage()
   const pct = Math.round((game.earned / game.total) * 100)
+  const done = game.earned >= game.total
   const counted = (game.source === 'psn' ? T.gameInfoPage.ofTrophies : T.gameInfoPage.ofAchievements)
     .replace('{n}', game.earned.toLocaleString(lang))
     .replace('{total}', game.total.toLocaleString(lang))
 
   return (
-    <li className="relative isolate flex items-center gap-3 p-2.5 sm:gap-4 sm:p-3 rounded-tile">
-      <span className="rounded-[inherit]">
-        <GameCardBackdrop src={game.cover} surface="main" />
-      </span>
-      <img src={game.cover} alt="" loading="lazy" decoding="async" className="w-14 h-14 shrink-0 object-cover rounded-box shadow-[0_6px_16px_rgb(0_0_0/0.45)]" />
-      <div className="flex flex-col gap-1.5 min-w-0 flex-1">
-        <span className="flex items-center gap-2 min-w-0">
-          <span className="font-bold truncate">{game.title}</span>
-          <LibraryPlatformBadge source={game.source} size="tag" />
-        </span>
-        <span className="flex items-center gap-2.5">
-          <ProgressBar pct={pct} label={game.title} className="flex-1" />
-          <span className={`w-10 text-right text-[0.8125rem] font-extrabold tabular-nums ${pct >= 100 ? 'text-success' : ''}`}>{pct}%</span>
-        </span>
-        <span className="text-xs text-text-secondary truncate">
-          <Facts items={[game.console, counted, game.hours && `${game.hours.toLocaleString(lang)} ${T.steam.hoursShort}`]} />
-        </span>
-      </div>
+    <li>
+      <FeedGameCard
+        title={game.title}
+        backdrop={game.art ?? game.cover}
+        icon={(cls) => <img src={game.cover} alt="" loading="lazy" decoding="async" className={`${cls} object-cover`} />}
+        ring={done ? DONE_RING[game.source] : undefined}
+        platform={{ source: game.source === 'ra' ? undefined : game.source, label: game.console ?? PLATFORM_NAME[game.source] }}
+        progress={{ pct, percent: pct, done }}
+        facts={[<span key="n" className="whitespace-nowrap">{counted}</span>, game.hours ? <FeedGameCardPlaytime key="h" minutes={game.hours * 60} /> : null]}
+        expand={game.appId ? { show: T.cards.showAchievements, hide: T.cards.hideAchievements } : undefined}
+        expanded={open}
+        onToggle={onToggle}
+      >
+        {game.appId && <LandingSampleExpanded appId={game.appId} total={game.total} minutes={(game.hours ?? 0) * 60} />}
+      </FeedGameCard>
     </li>
   )
 }

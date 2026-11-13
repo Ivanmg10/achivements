@@ -13,18 +13,21 @@ import type { GameSource } from '@/types/game'
 type Shown = 'all' | GameSource
 
 /**
- * "One library, every platform": the text, and beside it an example of the library's list with its
- * platform tabs, which work, the same list on a phone as on a desk (the owner, 2026-11-13: as in the app itself). The list keeps its room whichever tab is on, so the page never jumps.
+ * "One library, every platform": the title with its line and points beside it, then an example of the library across
+ * the page with its platform tabs, which work. Its games are the home's rows (the owner, 2026-11-13: "lo mismo que se ve
+ * en la main page"): a Steam one opens on its achievements as the home's do, one at a time, so the example takes the
+ * page's width (the opened layout needs it).
  */
 export default function LandingLibrary() {
   const { T } = useLanguage()
   const [shown, setShown] = useState<Shown>('all')
+  const [open, setOpen] = useState<string | null>(null)
   const games = SAMPLE_GAMES.filter((g) => shown === 'all' || g.source === shown)
   const ids = tabIds('landing-library', shown)
 
   return (
-    <section id="que-es" className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,27.5rem)_minmax(0,1fr)] lg:gap-18 lg:items-center scroll-mt-20 short:scroll-mt-6">
-      <LandingSectionHead title={T.landing.libraryTitle} text={T.landing.libraryText} points={T.landing.libraryPoints} />
+    <section id="que-es" className="flex flex-col gap-6 lg:gap-9 scroll-mt-20 short:scroll-mt-6">
+      <LandingSectionHead title={T.landing.libraryTitle} text={T.landing.libraryText} points={T.landing.libraryPoints} row />
       <div className="min-w-0 flex flex-col gap-3 bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-3 sm:p-5 lg:p-6">
         <Kicker>{T.landing.example}</Kicker>
         <Tabs
@@ -39,9 +42,9 @@ export default function LandingLibrary() {
           ]}
         />
         <div role="tabpanel" id={ids.panel} aria-labelledby={ids.tab} className="min-h-[31.5rem]">
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-2.5">
             {games.map((g) => (
-              <LandingSampleGame key={g.title} game={g} />
+              <LandingSampleGame key={g.title} game={g} open={open === g.title} onToggle={() => setOpen((o) => (o === g.title ? null : g.title))} />
             ))}
           </ul>
         </div>
