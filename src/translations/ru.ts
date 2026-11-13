@@ -394,7 +394,6 @@ export const ru: Translations = {
     intro: 'Подключите RetroAchievements, Steam и PlayStation и увидите реальную картину: что пройдено, что брошено на половине и что ещё предстоит взять.',
     createAccount: 'Создать аккаунт',
     signIn: 'Войти',
-    free: 'Бесплатно. Платной версии нет.',
     whatIs: 'Что такое CheevoVault',
     howPoints: 'Как работают очки Vault',
     pointsTitle: 'Очки Vault',

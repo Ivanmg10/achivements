@@ -55,12 +55,9 @@ export default function LandingTitle({ still, onStill }: { still: boolean; onSti
 
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 sm:gap-12 enter-rise [--i:3]">
         <p className="max-w-[35rem] uhd:max-w-[44rem] text-[0.9375rem] sm:text-lg short:text-[0.9375rem] uhd:text-[1.375rem] leading-relaxed text-text-main/85">{T.landing.intro}</p>
-        <div className="flex flex-col gap-2.5 sm:items-end shrink-0">
-          <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:gap-3.5">
-            <Button href={REGISTER_HREF} size="xl">{T.landing.createAccount}</Button>
-            <Button href="/authPage" variant="secondary" size="xl">{T.landing.signIn}</Button>
-          </div>
-          <p className="max-sm:text-center text-sm uhd:text-lg font-semibold text-text-main/85 short:hidden">{T.landing.free}</p>
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:gap-3.5 shrink-0">
+          <Button href={REGISTER_HREF} size="xl">{T.landing.createAccount}</Button>
+          <Button href="/authPage" variant="secondary" size="xl">{T.landing.signIn}</Button>
         </div>
       </div>
 

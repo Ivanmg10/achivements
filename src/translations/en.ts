@@ -395,7 +395,6 @@ export const en = {
     intro: 'Connect RetroAchievements, Steam and PlayStation and see where you actually stand: what you have finished, what you left half-played, and what is left to hunt.',
     createAccount: 'Create account',
     signIn: 'Sign in',
-    free: 'Free. No paid plan.',
     whatIs: 'What CheevoVault is',
     howPoints: 'How Vault Points work',
     pointsTitle: 'Vault Points',

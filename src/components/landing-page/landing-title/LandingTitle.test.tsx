@@ -18,9 +18,8 @@ test('the two ways in are the site\'s own buttons: create an account leans, sign
   expect(screen.getByRole('link', { name: en.landing.signIn }).className).not.toContain('skew')
 })
 
-test('says it is free beside the ways in, and names the language shown', () => {
+test('names the language shown', () => {
   render(<LandingTitle still={false} onStill={() => {}} />)
-  expect(screen.getByText(en.landing.free)).toBeInTheDocument()
   expect(screen.getByRole('button', { name: `${en.userConfig.language}: English` })).toBeInTheDocument()
 })
 

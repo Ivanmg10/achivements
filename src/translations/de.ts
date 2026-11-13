@@ -394,7 +394,6 @@ export const de: Translations = {
     intro: 'Verbinde RetroAchievements, Steam und PlayStation und sieh, wo du wirklich stehst: was du durchhast, was halb liegen blieb und was noch zu holen ist.',
     createAccount: 'Konto erstellen',
     signIn: 'Anmelden',
-    free: 'Kostenlos. Keine Bezahlversion.',
     whatIs: 'Was ist CheevoVault',
     howPoints: 'So funktionieren Vault-Punkte',
     pointsTitle: 'Vault-Punkte',

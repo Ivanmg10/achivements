@@ -394,7 +394,6 @@ export const ja: Translations = {
     intro: 'RetroAchievements、Steam、PlayStationを連携すると、今どこまで進んだのかがはっきり見えます。クリアした作品、途中で止まった作品、これから狙う実績まで。',
     createAccount: 'アカウントを作成',
     signIn: 'サインイン',
-    free: '無料。有料プランはありません。',
     whatIs: 'CheevoVaultとは',
     howPoints: 'Vaultポイントの仕組み',
     pointsTitle: 'Vaultポイント',
