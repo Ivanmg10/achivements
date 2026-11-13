@@ -74,6 +74,12 @@ export const SAMPLE_GROUPS: SampleGroup[] = [
   // Resident Evil 2, 3, 4 and Village; Dark Souls Remastered, Dark Souls III, Sekiro and Elden Ring: their Steam art.
   { name: 'Resident Evil', covers: steamCovers(883710, 952060, 2050650, 1196590), games: 4, earned: 132, total: 177 },
   { name: 'Soulslike', covers: steamCovers(570940, 374320, 814380, 1245620), games: 4, earned: 97, total: 160 },
+  // Final Fantasy VII Remake, X/X-2, XV and XVI; Hollow Knight, Ori, Dead Cells, Blasphemous; Hades, Slay the Spire, Balatro,
+  // Vampire Survivors; Yakuza 0, Kiwami, Like a Dragon, Infinite Wealth: their Steam art, so the band has more to show.
+  { name: 'Final Fantasy', covers: steamCovers(1462040, 359870, 637650, 2515020), games: 4, earned: 168, total: 241 },
+  { name: 'Metroidvania', covers: steamCovers(367520, 1057090, 588650, 774361), games: 4, earned: 141, total: 158 },
+  { name: 'Roguelike', covers: steamCovers(1145360, 646570, 2379780, 1794680), games: 4, earned: 203, total: 287 },
+  { name: 'Yakuza', covers: steamCovers(638970, 834530, 1235140, 2072450), games: 4, earned: 112, total: 204 },
   // Ruby, Gold, Platinum, Colosseum: their boxes from IGDB (RetroAchievements' are 96 px squares, blurred in a tall slice).
   { name: 'Pokémon', covers: ['co1zhq', 'co5pia', 'co8gvp', 'co2tpe'].map(igdbCover), games: 21, earned: 489, total: 2522 },
 ]

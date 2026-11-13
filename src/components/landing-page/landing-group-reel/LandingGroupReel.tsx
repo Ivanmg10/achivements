@@ -1,8 +1,8 @@
 import type { SampleGroup } from '@/components/landing-page/landingSamples'
 import LandingGroup from '@/components/landing-page/landing-group/LandingGroup'
 
-/** How many times the groups repeat in each half: a half must be wider than a 2560 px screen. */
-const REPEAT = 2
+/** How many times the groups repeat in each half: a half must be wider than a 2560 px screen (nine groups are, once). */
+const REPEAT = 1
 
 /**
  * The example groups going by sideways forever, as the closing band's covers do (`.cover-reel-row`): two identical halves,
@@ -15,7 +15,7 @@ export default function LandingGroupReel({ groups }: { groups: SampleGroup[] }) 
 
   return (
     <div className="overflow-hidden motion-reduce:overflow-x-auto [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
-      <ul className="cover-reel-row hover:[animation-play-state:paused] [animation-duration:110s] flex w-max gap-4 pr-4 lg:gap-6 lg:pr-6 py-1">
+      <ul className="cover-reel-row hover:[animation-play-state:paused] [animation-duration:180s] flex w-max gap-4 pr-4 lg:gap-6 lg:pr-6 py-1">
         {[...half, ...half].map((g, i) => {
           const copy = i >= groups.length
           return (
