@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { REGISTER_HREF } from '@/utils/authLinks'
 import { PLATFORM_NAME } from '@/utils/gameRef'
 import LandingBackdrop from '@/components/landing-page/landing-backdrop/LandingBackdrop'
+import LandingLanguage from '@/components/landing-page/landing-language/LandingLanguage'
 import BrandMark from '@/components/ui/BrandMark'
 import Button from '@/components/ui/Button'
 import Facts from '@/components/ui/Facts'
@@ -18,7 +19,9 @@ const LINK = 'relative tap-target rounded focus-ring text-text-main/80 hover:tex
  * "LandH1b" with "Fondo"): the platforms, the name in big with the logo after it and the line under it on
  * top; the drifting art behind; what the site does and the two ways in at the bottom. The title is the
  * page's `h1` and the largest thing on it, text in the server's HTML, so it is what paints first.
- * `still` and `onStill` are the stop button for the page's motion.
+ * `still` and `onStill` are the stop button for the page's motion, small beside the legal line: art that moves by
+ * itself for more than five seconds needs a way to stop it (WCAG 2.2.2), so it stays, out of the way.
+ * The language is the top bar's first thing, for a visitor whose browser guessed wrong.
  */
 export default function LandingTitle({ still, onStill }: { still: boolean; onStill: () => void }) {
   const { T } = useLanguage()
@@ -28,8 +31,7 @@ export default function LandingTitle({ still, onStill }: { still: boolean; onSti
       <LandingBackdrop />
 
       <div className="flex items-center justify-between gap-4 pt-4 sm:pt-6 short:pt-3">
-        {/* Nothing moves under reduced motion, so there is nothing to stop. */}
-        <ToggleButton pressed={still} onToggle={onStill} label={T.landing.stopMotion} icon={IconPlayerPause} pressedIcon={IconPlayerPlay} size={18} className="p-2 motion-reduce:invisible" />
+        <LandingLanguage />
         <nav aria-label={T.publicPages.more} className="flex items-center gap-4 sm:gap-7 text-sm sm:text-[0.9375rem] uhd:text-lg font-semibold">
           <Link href="/rankings" className={LINK}>{T.rankings.title}</Link>
           <Link href="/rankings/how" className={`${LINK} max-sm:hidden`}>{T.landing.howPoints}</Link>
@@ -53,14 +55,21 @@ export default function LandingTitle({ still, onStill }: { still: boolean; onSti
 
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 sm:gap-12 enter-rise [--i:3]">
         <p className="max-w-[35rem] uhd:max-w-[44rem] text-[0.9375rem] sm:text-lg short:text-[0.9375rem] uhd:text-[1.375rem] leading-relaxed text-text-main/85">{T.landing.intro}</p>
-        <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:gap-3.5 shrink-0">
-          <Button href={REGISTER_HREF} size="xl">{T.landing.createAccount}</Button>
-          <Button href="/authPage" variant="secondary" size="xl">{T.landing.signIn}</Button>
+        <div className="flex flex-col gap-2.5 sm:items-end shrink-0">
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:gap-3.5">
+            <Button href={REGISTER_HREF} size="xl">{T.landing.createAccount}</Button>
+            <Button href="/authPage" variant="secondary" size="xl">{T.landing.signIn}</Button>
+          </div>
+          <p className="max-sm:text-center text-sm uhd:text-lg font-semibold text-text-main/85 short:hidden">{T.landing.free}</p>
         </div>
       </div>
 
       <div className="flex flex-col items-center gap-4 pt-7 pb-4 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-end sm:gap-6 sm:pt-8 sm:pb-5 short:pt-3 short:pb-2 short:gap-2">
-        <span className="order-last sm:order-none sm:col-start-1 sm:row-start-1 short:hidden text-center sm:text-left text-xs sm:text-[0.8125rem] uhd:text-base text-text-secondary">{T.landing.footer}</span>
+        <div className="order-last sm:order-none sm:col-start-1 sm:row-start-1 flex items-center gap-2">
+          {/* Nothing moves under reduced motion, so there is nothing to stop. */}
+          <ToggleButton pressed={still} onToggle={onStill} label={T.landing.stopMotion} icon={IconPlayerPause} pressedIcon={IconPlayerPlay} size={16} className="p-1.5 motion-reduce:hidden" />
+          <span className="short:hidden text-xs sm:text-[0.8125rem] uhd:text-base text-text-secondary">{T.landing.footer}</span>
+        </div>
         {/* The way into the rest of the page, in the middle, its arrow bobbing (still under reduced motion or the stop button).
             Held sideways the legal line gives it its room: the footer says it again. */}
         <a href="#que-es" className={`${LINK} sm:col-start-2 sm:row-start-1 inline-flex items-center gap-2 text-[0.9375rem] sm:text-base uhd:text-xl font-bold`}>

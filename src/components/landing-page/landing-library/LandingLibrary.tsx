@@ -14,7 +14,7 @@ type Shown = 'all' | GameSource
 
 /**
  * "One library, every platform": the text, and beside it an example of the library's list with its
- * platform tabs, which work. The list keeps its room whichever tab is on, so the page never jumps.
+ * platform tabs, which work, the same list on a phone as on a desk (the owner, 2026-11-13: as in the app itself). The list keeps its room whichever tab is on, so the page never jumps.
  */
 export default function LandingLibrary() {
   const { T } = useLanguage()
@@ -25,7 +25,7 @@ export default function LandingLibrary() {
   return (
     <section id="que-es" className="grid gap-8 lg:grid-cols-[minmax(0,27.5rem)_minmax(0,1fr)] lg:gap-18 lg:items-center scroll-mt-6">
       <LandingSectionHead title={T.landing.libraryTitle} text={T.landing.libraryText} points={T.landing.libraryPoints} />
-      <div className="flex flex-col gap-3 sm:bg-bg-card sm:rounded-card sm:ring-1 sm:ring-inset sm:ring-ink/[0.06] sm:p-5 lg:p-6">
+      <div className="flex flex-col gap-3 bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-3 sm:p-5 lg:p-6">
         <Kicker>{T.landing.example}</Kicker>
         <Tabs
           id="landing-library"
@@ -37,10 +37,9 @@ export default function LandingLibrary() {
             { value: 'all', label: T.rankings.allPlatforms },
             ...(['ra', 'steam', 'psn'] as const).map((s) => ({ value: s, label: PLATFORM_NAME[s] })),
           ]}
-          className="max-sm:hidden"
         />
-        <div role="tabpanel" id={ids.panel} aria-labelledby={ids.tab} className="sm:min-h-[31.5rem]">
-          <ul className="grid grid-cols-3 gap-x-3 gap-y-4 sm:flex sm:flex-col sm:gap-2">
+        <div role="tabpanel" id={ids.panel} aria-labelledby={ids.tab} className="min-h-[31.5rem]">
+          <ul className="flex flex-col gap-2">
             {games.map((g) => (
               <LandingSampleGame key={g.title} game={g} />
             ))}

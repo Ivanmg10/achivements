@@ -394,6 +394,7 @@ export const it: Translations = {
     intro: 'Collega RetroAchievements, Steam e PlayStation e guarda davvero a che punto sei: cosa hai finito, cosa hai lasciato a metà e cosa ti resta da prendere.',
     createAccount: 'Crea un account',
     signIn: 'Accedi',
+    free: 'Gratis. Nessuna versione a pagamento.',
     whatIs: "Cos'è CheevoVault",
     howPoints: 'Come funzionano i Punti Vault',
     pointsTitle: 'Punti Vault',
@@ -401,7 +402,7 @@ export const it: Translations = {
     pointsPoints: [
       'Ogni obiettivo vale in base a quanto è raro e a quanto è impegnativo il suo gioco, e completare un gioco intero dà un extra.',
       'I tuoi punti fissano il tuo livello, che sale man mano che ne guadagni.',
-      'Ti mettono nelle classifiche: tutti o le persone che segui, da sempre, questo mese o questa settimana, tutte le piattaforme o una sola.',
+      'Ti mettono nelle classifiche: tutti o le persone che segui, per periodo e per piattaforma.',
     ],
     example: 'Esempio',
     stopMotion: 'Ferma il movimento',
@@ -414,7 +415,6 @@ export const it: Translations = {
       'Nascondi i giochi e le console che non vuoi vedere.',
     ],
     organiseTitle: 'Ordinato a modo tuo',
-    organiseText: 'Raggruppa i giochi come vuoi, fissa quelli che stai giocando e tieni sott’occhio gli obiettivi che insegui.',
     organisePoints: [
       'Un gruppo mescola piattaforme, può essere pubblico o privato e mostra a che punto sei in tutto.',
       'I giochi fissati ti aspettano nella pagina iniziale.',
@@ -437,6 +437,7 @@ export const it: Translations = {
       { q: 'Cosa serve per collegare ogni piattaforma?', a: 'RetroAchievements: il tuo nome utente e la tua chiave API web, in Settings → Keys sul suo sito. Steam: l’accesso tramite Steam, con «Dettagli di gioco» su Pubblico. PlayStation: il tuo ID online, con i trofei visibili a chiunque.' },
       { q: 'Cambia qualcosa nei miei account?', a: 'No, li legge soltanto. Steam conferma l’account sulla sua pagina, quindi la tua password non ci arriva mai, e a PlayStation basta il tuo ID.' },
       { q: 'Posso eliminare il mio account?', a: 'Sì, dalla pagina del tuo account, con la tua password. I tuoi dati se ne vanno con lui, come spiega l’informativa sulla privacy.' },
+      { q: 'Chi può vedere il mio profilo?', a: 'Chiunque, a meno che tu non lo renda privato nelle preferenze. Gli obiettivi che insegui non vengono mostrati a nessun altro.' },
     ],
   },
   publicPages: {

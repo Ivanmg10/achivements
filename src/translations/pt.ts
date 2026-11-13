@@ -394,6 +394,7 @@ export const pt: Translations = {
     intro: 'Liga o RetroAchievements, a Steam e a PlayStation e vê mesmo onde estás: o que terminaste, o que ficou a meio e o que falta apanhar.',
     createAccount: 'Criar conta',
     signIn: 'Entrar',
+    free: 'Grátis. Sem versão paga.',
     whatIs: 'O que é o CheevoVault',
     howPoints: 'Como funcionam os Pontos Vault',
     pointsTitle: 'Pontos Vault',
@@ -401,7 +402,7 @@ export const pt: Translations = {
     pointsPoints: [
       'Cada conquista soma consoante a sua raridade e a exigência do seu jogo, e completar um jogo inteiro dá um extra.',
       'Os teus pontos definem o teu nível, que sobe à medida que ganhas mais.',
-      'Põem-te nos rankings: toda a gente ou as pessoas que segues, desde sempre, este mês ou esta semana, todas as plataformas ou só uma.',
+      'Põem-te nos rankings: toda a gente ou as pessoas que segues, por período e por plataforma.',
     ],
     example: 'Exemplo',
     stopMotion: 'Parar o movimento',
@@ -414,7 +415,6 @@ export const pt: Translations = {
       'Esconde os jogos e as consolas que não queres ver.',
     ],
     organiseTitle: 'Arrumado à tua maneira',
-    organiseText: 'Agrupa os jogos como quiseres, fixa os que estás a jogar e mantém à vista as conquistas que persegues.',
     organisePoints: [
       'Um grupo mistura plataformas, pode ser público ou privado e mostra quanto já fizeste de tudo.',
       'Os jogos fixados esperam por ti na página inicial.',
@@ -437,6 +437,7 @@ export const pt: Translations = {
       { q: 'O que é preciso para ligar cada plataforma?', a: 'RetroAchievements: o teu utilizador e a tua própria chave de API web, em Settings → Keys no site. Steam: iniciar sessão pela Steam, com «Detalhes dos jogos» em Público. PlayStation: o teu ID online, com os troféus visíveis para qualquer pessoa.' },
       { q: 'Muda alguma coisa nas minhas contas?', a: 'Não, só as lê. A Steam confirma a conta na sua própria página, por isso a tua palavra-passe nunca nos chega, e a PlayStation só precisa do teu ID.' },
       { q: 'Posso apagar a minha conta?', a: 'Sim, na página da tua conta, com a tua palavra-passe. Os teus dados vão com ela, como explica a política de privacidade.' },
+      { q: 'Quem pode ver o meu perfil?', a: 'Qualquer pessoa, a não ser que o tornes privado nas preferências. As conquistas que persegues não são mostradas a mais ninguém.' },
     ],
   },
   publicPages: {

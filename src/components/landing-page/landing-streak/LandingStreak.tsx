@@ -3,24 +3,26 @@
 import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { Streak } from '@/types/types'
-import { SAMPLE_STREAKS } from '@/components/landing-page/landingSamples'
+import { SAMPLE_STREAKS, streaksEndingOn } from '@/components/landing-page/landingSamples'
 import LandingSectionHead from '@/components/landing-page/landing-section-head/LandingSectionHead'
 import StreakChart from '@/components/streak-page/streak-chart/StreakChart'
 import Kicker from '@/components/ui/Kicker'
 import { streakInk, streakTier } from '@/utils/streakTier'
-import { formatDay } from '@/utils/dates'
+import { formatDay, utcDay } from '@/utils/dates'
 import { plural } from '@/utils/utils'
 
-const LIVE = SAMPLE_STREAKS[0]
 const AVERAGE = SAMPLE_STREAKS.reduce((sum, s) => sum + s.days, 0) / SAMPLE_STREAKS.length
 
 /**
  * "See how you are doing", at its moment: the streak going on in big, in its tier's colour, with its dates,
  * and beside it the streak page's own list of the best streaks, grey but the one shown (the live one at
- * first; picking another shows it, picking it again lets go), as on `/racha`. An example.
+ * first; picking another shows it, picking it again lets go), as on `/racha`. An example, its dates moved so the
+ * streak going on ends today (the UTC day, the same on the server and in the browser).
  */
 export default function LandingStreak() {
   const { T, lang } = useLanguage()
+  const [streaks] = useState(() => streaksEndingOn(utcDay(Date.now())))
+  const LIVE = streaks[0]
   const [picked, setPicked] = useState<Streak | null>(LIVE)
 
   return (
@@ -39,7 +41,7 @@ export default function LandingStreak() {
       <div className="flex flex-col gap-3 min-h-[29rem] lg:self-stretch">
         <Kicker>{T.landing.example}</Kicker>
         <StreakChart
-          streaks={SAMPLE_STREAKS}
+          streaks={streaks}
           selectedStreak={picked}
           activeStreak={LIVE}
           avgStreak={AVERAGE}

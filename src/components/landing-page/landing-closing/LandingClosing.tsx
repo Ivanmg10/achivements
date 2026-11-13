@@ -11,14 +11,14 @@ const COVERS = dealBothPlatforms(ART_WALL_RA.slice(40), ART_WALL_STEAM, 16, 1)
 
 /**
  * The end of the page, with no card: the art wall's covers going by in two rows, opposite ways, tinted
- * in the accent under scan lines, and over them the last line and the two ways in.
+ * in the accent under scan lines, fading into the page above and below (no edge), and over them the last line and the two ways in.
  */
 export default function LandingClosing() {
   const { T } = useLanguage()
 
   return (
     <section aria-labelledby="landing-closing-title" className="relative isolate overflow-hidden min-h-[22rem] sm:min-h-[26.25rem] flex items-center justify-center px-4 py-16">
-      <div aria-hidden="true" className="absolute inset-0 -z-10 pointer-events-none select-none">
+      <div aria-hidden="true" className="absolute inset-0 -z-10 pointer-events-none select-none [mask-image:linear-gradient(to_bottom,transparent,black_22%,black_78%,transparent)]">
         <div className="absolute inset-0 flex flex-col justify-center gap-5 sm:gap-6 opacity-50">
           <CoverReel covers={COVERS.slice(0, 8)} />
           <CoverReel covers={COVERS.slice(8)} back />

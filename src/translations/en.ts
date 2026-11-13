@@ -395,6 +395,7 @@ export const en = {
     intro: 'Connect RetroAchievements, Steam and PlayStation and see where you actually stand: what you have finished, what you left half-played, and what is left to hunt.',
     createAccount: 'Create account',
     signIn: 'Sign in',
+    free: 'Free. No paid plan.',
     whatIs: 'What CheevoVault is',
     howPoints: 'How Vault Points work',
     pointsTitle: 'Vault Points',
@@ -402,7 +403,7 @@ export const en = {
     pointsPoints: [
       'Each achievement counts for how rare it is and how demanding its game is, and finishing a whole game adds a bonus.',
       'Your points set your level, which climbs as you earn more.',
-      'They place you in the rankings: everyone or the people you follow, all time, this month or this week, every platform or just one.',
+      'They place you in the rankings: everyone or the people you follow, by period and by platform.',
     ],
     example: 'Example',
     stopMotion: 'Stop the motion',
@@ -415,7 +416,6 @@ export const en = {
       'Hide the games and the consoles you do not want to see.',
     ],
     organiseTitle: 'Sorted your way',
-    organiseText: 'Group games however you like, pin the ones you are playing, and keep the achievements you are chasing where you can see them.',
     organisePoints: [
       'A group mixes platforms, can be public or private, and shows how far along all of it is.',
       'Pinned games wait for you on the home page.',
@@ -438,6 +438,7 @@ export const en = {
       { q: 'What do I need to connect each platform?', a: 'RetroAchievements: your username and your own Web API key, from Settings → Keys on its site. Steam: sign in through Steam, with Game details set to Public. PlayStation: your online ID, with your trophies visible to anyone.' },
       { q: 'Does it change anything on my accounts?', a: 'No, it only reads them. Steam confirms the account on its own page, so your password never reaches us, and PlayStation needs nothing but your ID.' },
       { q: 'Can I delete my account?', a: 'Yes, from your account page, with your password. Your data goes with it, as the privacy policy explains.' },
+      { q: 'Who can see my profile?', a: 'Anyone, unless you make it private in your preferences. The achievements you are chasing are never shown to anyone else.' },
     ],
   },
   publicPages: {

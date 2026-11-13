@@ -394,6 +394,7 @@ export const de: Translations = {
     intro: 'Verbinde RetroAchievements, Steam und PlayStation und sieh, wo du wirklich stehst: was du durchhast, was halb liegen blieb und was noch zu holen ist.',
     createAccount: 'Konto erstellen',
     signIn: 'Anmelden',
+    free: 'Kostenlos. Keine Bezahlversion.',
     whatIs: 'Was ist CheevoVault',
     howPoints: 'So funktionieren Vault-Punkte',
     pointsTitle: 'Vault-Punkte',
@@ -401,7 +402,7 @@ export const de: Translations = {
     pointsPoints: [
       'Jeder Erfolg zählt danach, wie selten er ist und wie anspruchsvoll sein Spiel ist, und ein komplett abgeschlossenes Spiel bringt einen Bonus.',
       'Deine Punkte bestimmen dein Level, das mit jedem Erfolg steigt.',
-      'Sie bringen dich in die Ranglisten: alle oder die Leute, denen du folgst, insgesamt, diesen Monat oder diese Woche, alle Plattformen oder nur eine.',
+      'Sie bringen dich in die Ranglisten: alle oder die Leute, denen du folgst, nach Zeitraum und Plattform.',
     ],
     example: 'Beispiel',
     stopMotion: 'Bewegung anhalten',
@@ -414,7 +415,6 @@ export const de: Translations = {
       'Blende die Spiele und Konsolen aus, die du nicht sehen willst.',
     ],
     organiseTitle: 'Nach deiner Ordnung',
-    organiseText: 'Gruppiere Spiele frei, hefte an, was du gerade spielst, und behalte die Erfolge im Blick, hinter denen du her bist.',
     organisePoints: [
       'Eine Gruppe mischt Plattformen, ist öffentlich oder privat und zeigt, wie weit du insgesamt bist.',
       'Angeheftete Spiele warten auf der Startseite auf dich.',
@@ -437,6 +437,7 @@ export const de: Translations = {
       { q: 'Was brauche ich, um jede Plattform zu verbinden?', a: 'RetroAchievements: deinen Benutzernamen und deinen eigenen Web-API-Schlüssel, unter Settings → Keys auf der Website. Steam: die Anmeldung über Steam, mit „Spieldetails“ auf Öffentlich. PlayStation: deine Online-ID, mit Trophäen, die alle sehen dürfen.' },
       { q: 'Ändert es etwas an meinen Konten?', a: 'Nein, es liest sie nur. Steam bestätigt das Konto auf seiner eigenen Seite, dein Passwort erreicht uns also nie, und PlayStation braucht nur deine ID.' },
       { q: 'Kann ich mein Konto löschen?', a: 'Ja, auf deiner Kontoseite, mit deinem Passwort. Deine Daten werden mitgelöscht, wie die Datenschutzerklärung erklärt.' },
+      { q: 'Wer kann mein Profil sehen?', a: 'Alle, es sei denn, du stellst es in deinen Einstellungen auf privat. Die Erfolge, hinter denen du her bist, sieht niemand sonst.' },
     ],
   },
   publicPages: {

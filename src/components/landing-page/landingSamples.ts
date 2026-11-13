@@ -1,6 +1,7 @@
 import { steamAssetUrl } from '@/lib/steamAssets'
 import type { GameSource } from '@/types/game'
 import type { Streak } from '@/types/types'
+import { addDays } from '@/utils/dates'
 
 /**
  * What the landing shows of the app, always under an "Example" label: the figures are the owner's own
@@ -72,6 +73,12 @@ export const SAMPLE_STREAKS: Streak[] = [
   streak('2026-02-14', '2026-02-25', 12),
   streak('2026-04-13', '2026-04-24', 12),
 ]
+
+/** The same streaks moved so the one going on ends on `today` ("YYYY-MM-DD"): an example that never goes stale. */
+export function streaksEndingOn(today: string): Streak[] {
+  const shift = Math.round((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${SAMPLE_STREAKS[0].end}T00:00:00Z`)) / 864e5)
+  return SAMPLE_STREAKS.map((s) => ({ ...s, start: addDays(s.start, shift), end: addDays(s.end, shift) }))
+}
 
 /** Vault Points by platform. */
 export const SAMPLE_POINTS: Partial<Record<GameSource, number>> = { ra: 27901, steam: 64094, psn: 22853 }

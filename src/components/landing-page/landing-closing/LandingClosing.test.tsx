@@ -12,4 +12,5 @@ test('no card: the last line and the two ways in over the covers going by in two
   expect(rows).toHaveLength(2)
   expect(rows[1]).toHaveClass('cover-reel-back')
   expect(container.querySelector('.bg-bg-card')).toBeNull()
+  expect(container.querySelector('[class*="mask-image"]')).toContainElement(rows[0] as HTMLElement)
 })

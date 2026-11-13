@@ -394,6 +394,7 @@ export const es: Translations = {
     intro: 'Conecta RetroAchievements, Steam y PlayStation y mira de verdad por dónde vas: lo que te has terminado, lo que dejaste a medias y lo que te queda por cazar.',
     createAccount: 'Crear cuenta',
     signIn: 'Entrar',
+    free: 'Gratis. Sin versión de pago.',
     whatIs: 'Qué es CheevoVault',
     howPoints: 'Cómo funcionan los Puntos Vault',
     pointsTitle: 'Puntos Vault',
@@ -401,7 +402,7 @@ export const es: Translations = {
     pointsPoints: [
       'Cada logro suma según lo raro que es y lo exigente que es su juego, y completar un juego entero da un extra.',
       'Tus puntos marcan tu nivel, que sube a medida que consigues más.',
-      'Te colocan en los rankings: global o entre la gente que sigues, histórico, este mes o esta semana, en todas las plataformas o en una.',
+      'Te colocan en los rankings: global o entre la gente que sigues, por periodo y por plataforma.',
     ],
     example: 'Ejemplo',
     stopMotion: 'Detener el movimiento',
@@ -414,7 +415,6 @@ export const es: Translations = {
       'Oculta los juegos y las consolas que no quieras ver.',
     ],
     organiseTitle: 'Ordenado a tu manera',
-    organiseText: 'Agrupa los juegos como quieras, fija los que estás jugando y ten a la vista los logros que persigues.',
     organisePoints: [
       'Un grupo mezcla plataformas, puede ser público o privado y muestra cuánto llevas de todo él.',
       'Los juegos fijados te esperan en la página de inicio.',
@@ -437,6 +437,7 @@ export const es: Translations = {
       { q: '¿Qué hace falta para conectar cada plataforma?', a: 'RetroAchievements: tu usuario y tu propia clave de API web, en Settings → Keys de su web. Steam: iniciar sesión con Steam, con los detalles del juego públicos. PlayStation: tu ID online, con los trofeos visibles para cualquiera.' },
       { q: '¿Cambia algo en mis cuentas?', a: 'No, solo las lee. Steam confirma la cuenta en su propia página, así que tu contraseña nunca pasa por aquí, y PlayStation solo necesita tu ID.' },
       { q: '¿Puedo borrar mi cuenta?', a: 'Sí, desde tu cuenta y con tu contraseña. Tus datos se borran con ella, como explica la política de privacidad.' },
+      { q: '¿Quién puede ver mi perfil?', a: 'Cualquiera, salvo que lo pongas privado en tus preferencias. Los logros que persigues no se enseñan a nadie más.' },
     ],
   },
   publicPages: {

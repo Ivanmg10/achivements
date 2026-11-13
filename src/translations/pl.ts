@@ -394,6 +394,7 @@ export const pl: Translations = {
     intro: 'Połącz RetroAchievements, Steam i PlayStation i zobacz, na czym naprawdę stoisz: co skończone, co porzucone w połowie i co zostało do zdobycia.',
     createAccount: 'Załóż konto',
     signIn: 'Zaloguj się',
+    free: 'Za darmo. Bez płatnej wersji.',
     whatIs: 'Czym jest CheevoVault',
     howPoints: 'Jak działają Punkty Vault',
     pointsTitle: 'Punkty Vault',
@@ -401,7 +402,7 @@ export const pl: Translations = {
     pointsPoints: [
       'Każde osiągnięcie liczy się według tego, jak jest rzadkie i jak wymagająca jest jego gra, a ukończenie całej gry daje premię.',
       'Punkty wyznaczają Twój poziom, który rośnie wraz z kolejnymi.',
-      'Umieszczają Cię w rankingach: wszyscy lub osoby, które obserwujesz, od początku, w tym miesiącu lub w tym tygodniu, wszystkie platformy lub jedna.',
+      'Umieszczają Cię w rankingach: wszyscy lub osoby, które obserwujesz, według okresu i platformy.',
     ],
     example: 'Przykład',
     stopMotion: 'Zatrzymaj ruch',
@@ -414,7 +415,6 @@ export const pl: Translations = {
       'Ukryj gry i konsole, których nie chcesz widzieć.',
     ],
     organiseTitle: 'Poukładane po twojemu',
-    organiseText: 'Grupuj gry jak chcesz, przypinaj te, w które grasz, i trzymaj na widoku osiągnięcia, na które polujesz.',
     organisePoints: [
       'Grupa łączy platformy, może być publiczna lub prywatna i pokazuje postęp całości.',
       'Przypięte gry czekają na stronie głównej.',
@@ -437,6 +437,7 @@ export const pl: Translations = {
       { q: 'Czego potrzeba, by połączyć każdą platformę?', a: 'RetroAchievements: nazwy użytkownika i własnego klucza Web API, z Settings → Keys na jej stronie. Steam: logowania przez Steam, z „Szczegółami gier” ustawionymi na Publiczne. PlayStation: ID online i trofeów widocznych dla wszystkich.' },
       { q: 'Czy zmienia coś na moich kontach?', a: 'Nie, tylko je odczytuje. Steam potwierdza konto na własnej stronie, więc hasło nigdy do nas nie trafia, a PlayStation potrzebuje tylko ID.' },
       { q: 'Czy mogę usunąć konto?', a: 'Tak, na stronie konta, podając hasło. Dane znikają razem z nim, jak wyjaśnia polityka prywatności.' },
+      { q: 'Kto może zobaczyć mój profil?', a: 'Każdy, chyba że ustawisz go jako prywatny w preferencjach. Osiągnięć, na które polujesz, nie widzi nikt inny.' },
     ],
   },
   publicPages: {

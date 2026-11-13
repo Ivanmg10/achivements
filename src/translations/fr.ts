@@ -394,6 +394,7 @@ export const fr: Translations = {
     intro: 'Connecte RetroAchievements, Steam et PlayStation et vois vraiment où tu en es : ce que tu as terminé, ce que tu as laissé en plan et ce qu’il te reste à décrocher.',
     createAccount: 'Créer un compte',
     signIn: 'Se connecter',
+    free: 'Gratuit. Aucune version payante.',
     whatIs: "Qu'est-ce que CheevoVault",
     howPoints: 'Comment fonctionnent les Points Vault',
     pointsTitle: 'Points Vault',
@@ -401,7 +402,7 @@ export const fr: Translations = {
     pointsPoints: [
       'Chaque succès compte selon sa rareté et l’exigence de son jeu, et terminer un jeu entier rapporte un bonus.',
       'Tes points fixent ton niveau, qui monte à mesure que tu en gagnes.',
-      'Ils te placent dans les classements : tout le monde ou les personnes que tu suis, depuis toujours, ce mois-ci ou cette semaine, toutes les plateformes ou une seule.',
+      'Ils te placent dans les classements : tout le monde ou les personnes que tu suis, par période et par plateforme.',
     ],
     example: 'Exemple',
     stopMotion: 'Arrêter le mouvement',
@@ -414,7 +415,6 @@ export const fr: Translations = {
       'Masque les jeux et les consoles que tu ne veux pas voir.',
     ],
     organiseTitle: 'Rangé à ta façon',
-    organiseText: 'Regroupe les jeux comme tu veux, épingle ceux que tu joues et garde sous les yeux les succès que tu vises.',
     organisePoints: [
       'Un groupe mélange les plateformes, peut être public ou privé et montre où tu en es dans l’ensemble.',
       'Les jeux épinglés t’attendent sur la page d’accueil.',
@@ -437,6 +437,7 @@ export const fr: Translations = {
       { q: 'Que faut-il pour connecter chaque plateforme ?', a: 'RetroAchievements : votre nom d’utilisateur et votre propre clé d’API web, dans Settings → Keys sur son site. Steam : la connexion via Steam, avec « Détails des jeux » en Public. PlayStation : votre ID en ligne, avec des trophées visibles par tout le monde.' },
       { q: 'Est-ce que cela modifie mes comptes ?', a: 'Non, il les lit seulement. Steam confirme le compte sur sa propre page, votre mot de passe ne nous parvient donc jamais, et PlayStation n’a besoin que de votre ID.' },
       { q: 'Puis-je supprimer mon compte ?', a: 'Oui, depuis la page de votre compte, avec votre mot de passe. Vos données partent avec lui, comme l’explique la politique de confidentialité.' },
+      { q: 'Qui peut voir mon profil ?', a: 'Tout le monde, sauf si tu le rends privé dans tes préférences. Les succès que tu vises ne sont montrés à personne d’autre.' },
     ],
   },
   publicPages: {
