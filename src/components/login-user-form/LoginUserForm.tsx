@@ -8,7 +8,6 @@ import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import AuthTitle from '@/components/auth-title/AuthTitle'
-import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import Button from '@/components/ui/Button'
 import Notice from '@/components/ui/Notice'
@@ -117,8 +116,6 @@ export default function LoginUserForm({
           )}
         </Button>
       </form>
-
-      <SteamSignInDivider />
 
       <p className="text-center mt-4">
         <button

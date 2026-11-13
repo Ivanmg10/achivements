@@ -7,14 +7,10 @@ import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import AuthTitle from '@/components/auth-title/AuthTitle'
-import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
 import WelcomeEntryCurtain from '@/components/welcome-entry-curtain/WelcomeEntryCurtain'
-import RegisterUserFormRa from '@/components/register-user-form/register-user-form-ra/RegisterUserFormRa'
-import RaLogo from '@/components/ra-logo/RaLogo'
 import { useWelcomeEntry } from '@/hooks/useWelcomeEntry'
-import type { RaSignupAccount } from '@/hooks/useRaSignupCheck'
 import { signupError } from '@/utils/apiErrors'
-import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, suggestUsername, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
+import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
 import Notice from '@/components/ui/Notice'
 
@@ -31,9 +27,6 @@ export default function RegisterUserForm({
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string; email?: string }>({})
   const [submitting, setSubmitting] = useState(false)
-  // Signing up with RetroAchievements: the section is open, and the account it checked.
-  const [raOpen, setRaOpen] = useState(false)
-  const [raAccount, setRaAccount] = useState<RaSignupAccount | null>(null)
   const { T } = useLanguage()
   const entry = useWelcomeEntry()
   const [entering, setEntering] = useState(false)
@@ -76,7 +69,6 @@ export default function RegisterUserForm({
           username: username.trim(),
           password,
           email: email.trim(),
-          ...(raAccount ? { ra: { username: raAccount.username, apiKey: raAccount.apiKey } } : {}),
         }),
       })
 
@@ -111,22 +103,6 @@ export default function RegisterUserForm({
 
       {error && (
         <Notice tone="danger" className="mb-5">{error}</Notice>
-      )}
-
-      {raOpen && (
-        <RegisterUserFormRa
-          account={raAccount}
-          onChange={(account) => {
-            setRaAccount(account)
-            // RA's name as the username, unless one was already typed.
-            if (account && !username.trim()) setUsername(suggestUsername(account.user))
-          }}
-          onClose={() => {
-            setRaOpen(false)
-            setRaAccount(null)
-          }}
-          disabled={submitting}
-        />
       )}
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
@@ -180,8 +156,6 @@ export default function RegisterUserForm({
         <Button
           type="submit"
           loading={submitting}
-          // With the RA section open, its account is checked first (or the section closed).
-          disabled={raOpen && !raAccount}
           size="lg" className="w-full mt-2"
         >
           {submitting ? (T.registerForm.creating) : (
@@ -192,15 +166,6 @@ export default function RegisterUserForm({
           )}
         </Button>
       </form>
-
-      <SteamSignInDivider />
-
-      {!raOpen && (
-        <Button variant="secondary" size="lg" onClick={() => setRaOpen(true)} className="mt-3 w-full">
-          <RaLogo height={16} />
-          {T.registerForm.raCta}
-        </Button>
-      )}
 
       <p className="text-text-secondary text-xs text-center mt-4">
         {T.registerForm.acceptTerms.split(/(\{terms\}|\{privacy\})/).map((part, i) =>
