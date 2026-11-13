@@ -20,6 +20,8 @@ export type SampleGame = {
   art?: string
   /** A Steam example's app: its row opens on its achievements (`sample-library/`). */
   appId?: number
+  /** A PSN example's trophy set: its row opens on its trophies (`sample-library/`). */
+  trophySet?: string
   earned: number
   total: number
   hours?: number
@@ -31,7 +33,7 @@ const RA_ART = 'https://media.retroachievements.org/Images'
 
 export const SAMPLE_GAMES: SampleGame[] = [
   { title: 'Fallout 4', source: 'steam', appId: 377160, cover: steamAssetUrl(377160, 'cover'), art: steamAssetUrl(377160, 'header'), earned: 52, total: 84, hours: 120, recentHours: 6 },
-  { title: "Assassin's Creed Brotherhood", source: 'psn', console: 'PS4', cover: steamAssetUrl(48190, 'cover'), art: steamAssetUrl(48190, 'header'), earned: 51, total: 51, hours: 82 },
+  { title: "Assassin's Creed Brotherhood", source: 'psn', console: 'PS4', trophySet: 'NPWR11436_00', cover: steamAssetUrl(48190, 'cover'), art: steamAssetUrl(48190, 'header'), earned: 51, total: 51, hours: 82 },
   { title: 'Pokémon Gold Version', source: 'ra', console: 'Game Boy Color', cover: `${RA_ART}/105481.png`, earned: 17, total: 49 },
   { title: 'Call of Duty: Black Ops II', source: 'steam', appId: 202970, cover: steamAssetUrl(202970, 'cover'), art: steamAssetUrl(202970, 'header'), earned: 16, total: 35, hours: 30 },
   { title: 'Inazuma Eleven: Victory Road', source: 'steam', appId: 2799860, cover: steamAssetUrl(2799860, 'cover'), art: steamAssetUrl(2799860, 'header'), earned: 52, total: 52, hours: 61, recentHours: 4 },

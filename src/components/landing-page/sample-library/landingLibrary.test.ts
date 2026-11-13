@@ -1,6 +1,7 @@
 import { SAMPLE_STEAM_ACHIEVEMENTS } from './sampleSteamAchievements'
 import { SAMPLE_NAMES as ES } from './names/es'
-import { loadSampleAchievements, toSteamAchievements } from './landingLibrary'
+import { SAMPLE_PSN_ICONS, SAMPLE_PSN_TROPHIES } from './samplePsnTrophies'
+import { loadSampleAchievements, loadSampleTrophies, toPsnTrophies, toSteamAchievements } from './landingLibrary'
 import { SAMPLE_ACHIEVEMENTS, SAMPLE_GAMES } from '@/components/landing-page/landingSamples'
 import { addDays } from '@/utils/dates'
 
@@ -33,4 +34,22 @@ test('loads one game in the reader\'s language', async () => {
   const list = await loadSampleAchievements(202970, 'es', TODAY)
   expect(list).toHaveLength(35)
   expect(list.map((a) => a.title)).toContain('Futurista')
+})
+
+test('the PSN example earns every trophy, named, with its icon on the PSN host and the platinum last', () => {
+  const game = SAMPLE_GAMES.find((g) => g.trophySet)!
+  const list = toPsnTrophies(SAMPLE_PSN_TROPHIES, SAMPLE_PSN_ICONS, ES[game.trophySet!], TODAY)
+  expect(list).toHaveLength(game.total)
+  expect(list.filter((t) => t.earned)).toHaveLength(game.earned)
+  for (const t of list) {
+    expect(t.name).not.toBe('')
+    expect(t.iconUrl).toMatch(/^https:\/\/image\.api\.playstation\.com\/trophy\/np\//)
+  }
+  const last = [...list].sort((a, b) => b.earnedAt!.localeCompare(a.earnedAt!))[0]
+  expect(last.type).toBe('platinum')
+})
+
+test('loads the PSN example in the reader language', async () => {
+  const list = await loadSampleTrophies('NPWR11436_00', 'es', TODAY)
+  expect(list[0].name).toBe('El César')
 })

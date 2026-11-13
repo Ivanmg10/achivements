@@ -1,7 +1,8 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
-import { useLandingSampleAchievements } from '@/hooks/useLandingSampleAchievements'
+import { useLandingSample } from '@/hooks/useLandingSample'
+import { loadSampleAchievements } from '@/components/landing-page/sample-library/landingLibrary'
 import { fromSteam } from '@/utils/gameInsights'
 import { formatRarity } from '@/utils/steamFeed'
 import { formatDate } from '@/utils/dates'
@@ -31,7 +32,7 @@ export default function LandingSampleExpanded({
   recentMinutes?: number
 }) {
   const { T, lang } = useLanguage()
-  const { achievements, isLoading, error, retry } = useLandingSampleAchievements(appId)
+  const { list: achievements, isLoading, error, retry } = useLandingSample(appId, loadSampleAchievements)
   const earned = isLoading ? 0 : achievements.filter((a) => a.earned).length
   const count = achievements.length || total
 
