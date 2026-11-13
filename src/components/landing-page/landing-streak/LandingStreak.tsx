@@ -26,8 +26,8 @@ export default function LandingStreak() {
   const [picked, setPicked] = useState<Streak | null>(LIVE)
 
   return (
-    <section className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-16 lg:items-center">
-      <LandingSectionHead title={T.landing.progressTitle} text={T.landing.progressText} points={T.landing.progressPoints} end>
+    <section className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16 lg:items-center">
+      <LandingSectionHead title={T.landing.progressTitle} text={T.landing.progressText} points={T.landing.progressPoints}>
         <p className="flex flex-col gap-2 mt-2 lg:mt-4">
           <span className="font-display italic font-extrabold text-[5rem] lg:text-[9.375rem] leading-[0.85] tabular-nums" style={{ color: streakInk(streakTier(LIVE.days)) }}>
             {plural(LIVE.days, T.plurals.days, lang)}

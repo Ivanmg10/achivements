@@ -15,8 +15,8 @@ import PublicFooter from '@/components/public-footer/PublicFooter'
 
 /**
  * What a visitor sees at the door (#136, canvas page 4): a game's title screen with the two ways in, then
- * what CheevoVault is, shown with the app's own pieces and labelled examples (the library, groups, a game's
- * achievements, the streak, Vault Points and the rankings), the questions people ask first, and the art going by at the end with the ways in
+ * what CheevoVault is, shown with the app's own pieces and labelled examples (the library, a game's achievements, the
+ * groups going by, the streak, Vault Points and the rankings), the questions people ask first, and the art going by at the end with the ways in
  * again. Each part below the first screen enters as it is reached (`EnterOnView`). Its motion (the title's art,
  * the closing band) is CSS; the stop button holds all of it still.
  */
@@ -33,10 +33,10 @@ export default function LandingPage() {
             <LandingLibrary />
           </EnterOnView>
           <EnterOnView>
-            <LandingGroups />
+            <LandingAchievements />
           </EnterOnView>
           <EnterOnView>
-            <LandingAchievements />
+            <LandingGroups />
           </EnterOnView>
           <EnterOnView>
             <LandingStreak />

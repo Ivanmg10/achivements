@@ -26,8 +26,8 @@ export default function LandingPoints() {
   const parts = GAME_SOURCES.filter((s) => SAMPLE_POINTS[s])
 
   return (
-    <section className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,37.5rem)] lg:gap-14 lg:items-center">
-      <LandingSectionHead title={T.landing.pointsTitle} text={T.landing.pointsText} points={T.landing.pointsPoints}>
+    <section className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,37.5rem)_minmax(0,1fr)] lg:gap-14 lg:items-center">
+      <LandingSectionHead title={T.landing.pointsTitle} text={T.landing.pointsText} points={T.landing.pointsPoints} end>
         <Link href="/rankings/how" className="relative tap-target self-start font-bold underline underline-offset-4 decoration-ink/40 hover:decoration-accent rounded focus-ring">
           {T.rankings.how}
         </Link>

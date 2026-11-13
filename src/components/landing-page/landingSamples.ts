@@ -71,6 +71,9 @@ export const SAMPLE_GROUPS: SampleGroup[] = [
     earned: 77,
     total: 112,
   },
+  // Resident Evil 2, 3, 4 and Village; Dark Souls Remastered, Dark Souls III, Sekiro and Elden Ring: their Steam art.
+  { name: 'Resident Evil', covers: steamCovers(883710, 952060, 2050650, 1196590), games: 4, earned: 132, total: 177 },
+  { name: 'Soulslike', covers: steamCovers(570940, 374320, 814380, 1245620), games: 4, earned: 97, total: 160 },
   // Ruby, Gold, Platinum, Colosseum: their boxes from IGDB (RetroAchievements' are 96 px squares, blurred in a tall slice).
   { name: 'Pokémon', covers: ['co1zhq', 'co5pia', 'co8gvp', 'co2tpe'].map(igdbCover), games: 21, earned: 489, total: 2522 },
 ]
