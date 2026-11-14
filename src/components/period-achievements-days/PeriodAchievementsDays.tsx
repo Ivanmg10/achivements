@@ -47,11 +47,12 @@ export default function PeriodAchievementsDays({
               <button
                 type="button"
                 aria-pressed={on}
+                data-step-key={day.date}
                 onClick={() => onSelect(day.date)}
                 className={`w-full flex flex-col gap-1.5 px-3 py-2 rounded-tile text-left transition-colors focus-ring ${on ? 'bg-ink/[0.07]' : 'hover:bg-bg-card'}`}
               >
                 <span className="flex items-baseline justify-between gap-3">
-                  <span className={`flex items-center text-sm min-w-0 ${on ? 'font-semibold' : 'font-medium'}`}>
+                  <span className={`flex items-center gap-1.5 text-sm min-w-0 ${on ? 'font-semibold' : 'font-medium'}`}>
                     <TabMark on={on} keepRoom />
                     <span className="truncate">{formatWeekdayDay(day.date, lang)}</span>
                   </span>

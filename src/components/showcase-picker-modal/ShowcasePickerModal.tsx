@@ -6,6 +6,7 @@ import { useActivityHeatmapYear } from '@/context/ActivityHeatmapYearContext'
 import { useOwnShowcase } from '@/context/ShowcaseContext'
 import { useProfileLibrary } from '@/hooks/useProfileLibrary'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useStepFocus } from '@/hooks/useStepFocus'
 import { gameKey, GAME_SOURCES } from '@/utils/gameRef'
 import type { LibraryGame } from '@/utils/library'
 import { SHOWCASE_MAX, showcaseKey, type ShowcaseEntry } from '@/utils/showcase'
@@ -34,6 +35,7 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
   const [platform, setPlatform] = useState<ShowcasePlatform>('all')
   const [selected, setSelected] = useState<ShowcaseEntry[]>([])
   const [saving, setSaving] = useState(false)
+  const { detail, list } = useStepFocus(game?.key ?? null)
 
   // Opening starts it over; state, so while rendering.
   useWhenChanged([isOpen], () => {
@@ -110,7 +112,7 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
       }
     >
       <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:h-[max(16rem,calc(85dvh-19rem))]">
-        <div className={`${game ? 'hidden lg:flex' : 'flex'} flex-col gap-3 min-w-0 lg:min-h-0`}>
+        <div ref={list} className={`${game ? 'hidden lg:flex' : 'flex'} flex-col gap-3 min-w-0 lg:min-h-0`}>
           <ShowcasePickerModalGames
             games={withEarned}
             isLoading={isLoading}
@@ -129,6 +131,7 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
             blocked={selected.length >= free}
             onToggle={toggle}
             onBack={() => setGame(null)}
+            headingRef={detail}
           />
         </div>
       </div>

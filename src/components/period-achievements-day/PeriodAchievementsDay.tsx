@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import type { ReactNode, Ref } from 'react'
 import { IconArrowLeft } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useScrollFade } from '@/hooks/useScrollFade'
@@ -21,12 +21,15 @@ export default function PeriodAchievementsDay({
   onBack,
   hideHead = false,
   above,
+  headingRef,
 }: {
   day: DayGroup
   onNavigate: () => void
   onBack?: () => void
   hideHead?: boolean
   above?: ReactNode
+  /** The day's heading takes the focus when the day opens below `lg` (`useStepFocus`). */
+  headingRef?: Ref<HTMLHeadingElement>
 }) {
   const { T, lang } = useLanguage()
   const { ref, fade } = useScrollFade({ axis: 'y' })
@@ -45,7 +48,7 @@ export default function PeriodAchievementsDay({
       )}
       {!hideHead && (
         <div>
-          <h3 className="text-base font-bold leading-snug">{formatWeekdayDay(day.date, lang)}</h3>
+          <h3 ref={headingRef} tabIndex={-1} className="text-base font-bold leading-snug outline-none">{formatWeekdayDay(day.date, lang)}</h3>
           <p className="flex flex-wrap items-center text-xs text-text-secondary">
             <Facts items={[plural(day.count, T.plurals.achievements, lang), day.hasPoints && plural(day.points, T.plurals.points, lang)]} />
           </p>

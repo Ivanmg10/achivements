@@ -1,5 +1,6 @@
 'use client'
 
+import type { Ref } from 'react'
 import { IconArrowLeft, IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { LibraryGame } from '@/utils/library'
@@ -17,6 +18,7 @@ export default function ShowcasePickerModalDetail({
   blocked,
   onToggle,
   onBack,
+  headingRef,
 }: {
   game: LibraryGame | null
   isSelected: (entry: ShowcaseEntry) => boolean
@@ -24,6 +26,8 @@ export default function ShowcasePickerModalDetail({
   blocked: boolean
   onToggle: (entry: ShowcaseEntry) => void
   onBack: () => void
+  /** The title takes the focus when a game opens below `lg` (`useStepFocus`). */
+  headingRef?: Ref<HTMLHeadingElement>
 }) {
   const { T } = useLanguage()
 
@@ -47,7 +51,7 @@ export default function ShowcasePickerModalDetail({
         <IconArrowLeft size={14} aria-hidden="true" />
         {T.showcase.back}
       </button>
-      <h3 className="text-base font-bold leading-snug wrap-break-word">{game.title}</h3>
+      <h3 ref={headingRef} tabIndex={-1} className="text-base font-bold leading-snug wrap-break-word outline-none">{game.title}</h3>
       <ShowcasePickerModalGame game={game} isSelected={isSelected} inShowcase={inShowcase} blocked={blocked} onToggle={onToggle} />
     </>
   )

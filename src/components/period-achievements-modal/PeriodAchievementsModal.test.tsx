@@ -113,3 +113,11 @@ test('says so when empty, and closes', () => {
   fireEvent.click(screen.getByRole('button', { name: 'Close' }))
   expect(onClose).toHaveBeenCalled()
 })
+
+test('opening a day moves the focus to its heading, and back returns it to that day\'s button (#165, H7)', () => {
+  render(<PeriodAchievementsModal title="x" achievements={[ach('2020-01-15'), ach('2020-01-16')]} onClose={jest.fn()} />)
+  fireEvent.click(dayButton(/Wednesday, Jan 15, 2020/))
+  expect(screen.getByRole('heading', { name: 'Wednesday, Jan 15, 2020' })).toHaveFocus()
+  fireEvent.click(screen.getByRole('button', { name: en.dayModal.back }))
+  expect(dayButton(/Wednesday, Jan 15, 2020/)).toHaveFocus()
+})

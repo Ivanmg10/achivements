@@ -35,3 +35,9 @@ test('clicking a day chooses it', () => {
   fireEvent.click(screen.getAllByRole('button')[1])
   expect(onSelect).toHaveBeenCalledWith('2020-01-15')
 })
+
+test('the mark has its usual gap before the weekday (#165, H5)', () => {
+  render(<PeriodAchievementsDays days={days} selected="2020-01-16" onSelect={jest.fn()} />)
+  const mark = screen.getAllByRole('button')[0].querySelector('[aria-hidden="true"].font-extrabold')!
+  expect(mark.parentElement).toHaveClass('gap-1.5')
+})

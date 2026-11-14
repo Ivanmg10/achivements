@@ -165,3 +165,12 @@ test('while the library loads, the list is a skeleton on the real boxes', () => 
   expect(screen.queryByRole('list', { name: en.showcase.gamesLabel })).not.toBeInTheDocument()
   expect(container).toBeEmptyDOMElement()
 })
+
+test('opening a game moves the focus to its title, and back returns it to the game\'s row (#165, H7)', () => {
+  setup()
+  render(<ShowcasePickerModal isOpen onClose={jest.fn()} />)
+  fireEvent.click(row(/Metroid/))
+  expect(screen.getByRole('heading', { name: /Metroid/ })).toHaveFocus()
+  fireEvent.click(screen.getByRole('button', { name: en.showcase.back }))
+  expect(row(/Metroid/)).toHaveFocus()
+})

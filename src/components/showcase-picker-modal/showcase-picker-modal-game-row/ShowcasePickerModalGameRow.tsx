@@ -32,6 +32,7 @@ export default function ShowcasePickerModalGameRow({
     <button
       type="button"
       onClick={onOpen}
+      data-step-key={game.key}
       aria-current={current ? 'true' : undefined}
       className={`w-full flex items-center gap-3 px-3 py-2 rounded-tile text-left transition-colors focus-ring ${
         on ? 'bg-accent/10 ring-1 ring-accent/60' : current ? 'bg-ink/[0.07]' : 'hover:bg-bg-card'
