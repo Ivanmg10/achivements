@@ -1,7 +1,6 @@
 'use client'
 
 import { RetroAchievement } from '@/types/types'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
@@ -10,7 +9,7 @@ import { gameHref } from '@/utils/gameRef'
 import { IconStar, IconStarFilled } from '@tabler/icons-react'
 import { raShowcaseEntry } from '@/utils/showcase'
 import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseToggleButton'
-import Modal from '@/components/ui/Modal'
+import AchievementWindow from '@/components/achievement-window/AchievementWindow'
 import Tag from '@/components/ui/Tag'
 import ToggleButton from '@/components/ui/ToggleButton'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
@@ -22,10 +21,9 @@ import AchievementModalUnlocks from './achievement-modal-unlocks/AchievementModa
 import AchievementModalComments from './achievement-modal-comments/AchievementModalComments'
 
 /**
- * An RA achievement's window (`lg`): its head is the Modal's (badge as the icon, name, what it asks for), then what
- * marks it (type, hardcore, when it was earned, favourite and showcase), the six figures in a row, the recent unlocks
- * folded in an accordion and the last comments with "See all". What comes from the detail read holds its place
- * as a skeleton until it arrives.
+ * An RA achievement's window: the `AchievementWindow` shell with RA's marks (type, hardcore, when it was earned, favourite
+ * and showcase), its six figures, the recent unlocks folded in an accordion and the last comments with "See all". What
+ * comes from the detail read holds its place as a skeleton until it arrives.
  */
 export default function AchievementModal({
   achievement,
@@ -57,23 +55,10 @@ export default function AchievementModal({
   const hasMarks = !!(onToggleFavorite || showcaseEntry || typeBadge || earnedHardcore || earnedDate)
 
   return (
-    <Modal
-      isOpen
+    <AchievementWindow
       onClose={onClose}
-      size="lg"
-      className="gap-5"
-      icon={
-        achievement.BadgeName ? (
-          <Image
-            src={raBadgeUrl(achievement.BadgeName)!}
-            alt=""
-            width={40}
-            height={40}
-            unoptimized
-            className={`w-full h-full object-cover rounded-control ${earned ? '' : 'grayscale opacity-60'}`}
-          />
-        ) : undefined
-      }
+      iconUrl={achievement.BadgeName ? (raBadgeUrl(achievement.BadgeName) ?? null) : null}
+      earned={earned}
       title={
         gameId ? (
           <Link href={gameHref('ra', gameId, subject)} onClick={onClose} className="hover:underline underline-offset-2">
@@ -83,39 +68,42 @@ export default function AchievementModal({
           achievement.Title
         )
       }
-      hint={achievement.Description}
+      description={achievement.Description}
+      marks={
+        hasMarks && (
+          <>
+            {onToggleFavorite && (
+              <ToggleButton
+                pressed={isFavorited}
+                onToggle={onToggleFavorite}
+                label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
+                icon={IconStar}
+                pressedIcon={IconStarFilled}
+                size={20}
+              />
+            )}
+            {showcaseEntry && <ShowcaseToggleButton entry={showcaseEntry} size={20} />}
+            {typeBadge && <span className={`${TYPE_TAG} ${typeBadge.className}`}>{typeBadge.label}</span>}
+            {earnedHardcore && <Tag tone="hardcore" size="sm">{T.achievement.hardcoreShort}</Tag>}
+            {earnedDate && (
+              <span className="text-xs text-text-secondary">
+                {T.achievement.earnedOn} {earnedDate}
+              </span>
+            )}
+          </>
+        )
+      }
+      figureColumns={6}
+      figures={
+        <AchievementModalFigures
+          points={achievement.Points}
+          players={achievement.NumAwarded}
+          numDistinctPlayers={numDistinctPlayers}
+          meta={detail?.unlocks?.Achievement ?? null}
+          loading={loading}
+        />
+      }
     >
-      {hasMarks && (
-        <div className="flex items-center gap-x-3 gap-y-2 flex-wrap">
-          {onToggleFavorite && (
-            <ToggleButton
-              pressed={isFavorited}
-              onToggle={onToggleFavorite}
-              label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
-              icon={IconStar}
-              pressedIcon={IconStarFilled}
-              size={20}
-            />
-          )}
-          {showcaseEntry && <ShowcaseToggleButton entry={showcaseEntry} size={20} />}
-          {typeBadge && <span className={`${TYPE_TAG} ${typeBadge.className}`}>{typeBadge.label}</span>}
-          {earnedHardcore && <Tag tone="hardcore" size="sm">{T.achievement.hardcoreShort}</Tag>}
-          {earnedDate && (
-            <span className="text-xs text-text-secondary">
-              {T.achievement.earnedOn} {earnedDate}
-            </span>
-          )}
-        </div>
-      )}
-
-      <AchievementModalFigures
-        points={achievement.Points}
-        players={achievement.NumAwarded}
-        numDistinctPlayers={numDistinctPlayers}
-        meta={detail?.unlocks?.Achievement ?? null}
-        loading={loading}
-      />
-
       {loading && (
         <div role="status" aria-busy="true" className="flex flex-col gap-2 border border-bg-header rounded-tile p-4">
           <span className="sr-only">{T.loadingPage.title}</span>
@@ -135,6 +123,6 @@ export default function AchievementModal({
           <AchievementModalComments comments={detail.comments?.Results ?? []} total={detail.comments?.Total ?? 0} />
         </>
       )}
-    </Modal>
+    </AchievementWindow>
   )
 }
