@@ -27,6 +27,8 @@ type CtxType = {
   isLoading: boolean
   isHidden: (id: number, source: GameSource) => boolean
   hideGame: (game: HiddenGame) => Promise<void>
+  /** Hides several games with one toast; resolves with the ones the server refused (already rolled back). */
+  hideGames: (games: HiddenGame[]) => Promise<HiddenGame[]>
   showGame: (id: number, source: GameSource) => Promise<void>
 }
 
@@ -36,8 +38,27 @@ const Ctx = createContext<CtxType>({
   isLoading: false,
   isHidden: () => false,
   hideGame: async () => {},
+  hideGames: async () => [],
   showGame: async () => {},
 })
+
+const sameGame = (a: HiddenGame, b: HiddenGame) => a.source === b.source && a.id === b.id
+
+/** One POST per game: the route takes one. True when the server kept it. */
+async function postHidden(game: HiddenGame): Promise<boolean> {
+  try {
+    const res = await fetch('/api/hiddenGames', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: game.source, gameId: game.id, title: game.title, image: game.image }),
+    })
+    if (!res.ok) throw new Error(`hide ${res.status}`)
+    return true
+  } catch (err) {
+    console.error('[HiddenGames] hide', err)
+    return false
+  }
+}
 
 /**
  * Games the user has hidden from their status lists. Hiding and showing
@@ -78,21 +99,30 @@ export function HiddenGamesProvider({ children, initialKeys }: { children: React
 
   const hideGame = useCallback(
     async (game: HiddenGame) => {
-      setHidden((list) => [game, ...list.filter((g) => !(g.source === game.source && g.id === game.id))])
-      try {
-        const res = await fetch('/api/hiddenGames', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ source: game.source, gameId: game.id, title: game.title, image: game.image }),
-        })
-        if (!res.ok) throw new Error(`hide ${res.status}`)
+      setHidden((list) => [game, ...list.filter((g) => !sameGame(g, game))])
+      if (await postHidden(game)) {
         setRevision((n) => n + 1)
         notify.success(T.toast.gameHidden)
-      } catch (err) {
-        console.error('[HiddenGames] hide', err)
-        setHidden((list) => list.filter((g) => !(g.source === game.source && g.id === game.id)))
+      } else {
+        setHidden((list) => list.filter((g) => !sameGame(g, game)))
         notify.error(T.toast.gameHideFailed)
       }
+    },
+    [T],
+  )
+
+  const hideGames = useCallback(
+    async (games: HiddenGame[]) => {
+      setHidden((list) => [...games, ...list.filter((g) => !games.some((n) => sameGame(n, g)))])
+      // One after another: each save rebuilds the user's rankings on the server.
+      const failed: HiddenGame[] = []
+      for (const game of games) if (!(await postHidden(game))) failed.push(game)
+      if (failed.length < games.length) setRevision((n) => n + 1)
+      if (failed.length) {
+        setHidden((list) => list.filter((g) => !failed.some((f) => sameGame(f, g))))
+        notify.error(T.toast.gamesHideFailed)
+      } else notify.success(T.toast.gamesHidden)
+      return failed
     },
     [T],
   )
@@ -117,7 +147,7 @@ export function HiddenGamesProvider({ children, initialKeys }: { children: React
 
   // One object per change of what it holds, so a re-render of the provider (the session updating)
   // does not re-render everything that reads it.
-  const value = useMemo(() => ({ hidden, revision, isLoading, isHidden, hideGame, showGame }), [hidden, revision, isLoading, isHidden, hideGame, showGame])
+  const value = useMemo(() => ({ hidden, revision, isLoading, isHidden, hideGame, hideGames, showGame }), [hidden, revision, isLoading, isHidden, hideGame, hideGames, showGame])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

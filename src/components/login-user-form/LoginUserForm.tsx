@@ -3,34 +3,31 @@
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import AuthTitle from '@/components/auth-title/AuthTitle'
-import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import Button from '@/components/ui/Button'
 import Notice from '@/components/ui/Notice'
-
-// Downloaded the first time it is opened, not with the page.
-const ForgotPasswordModal = dynamic(() => import('@/components/forgot-password-modal/ForgotPasswordModal'), { loading: () => null })
 
 export default function LoginUserForm({
   setIsLogin,
   isRegister,
   next = null,
+  onForgot,
 }: {
   setIsLogin: React.Dispatch<React.SetStateAction<boolean>>
   isRegister: boolean
   /** The own-site path the visitor was going to (see `safeNext`): said above the form, and where to go after signing in. */
   next?: string | null
+  /** Opens the forgot-password dialog, which the page holds: this form is unmounted when the layout changes width. */
+  onForgot: () => void
 }) {
   const router = useRouter()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [forgotOpen, setForgotOpen] = useState(false)
   const { T } = useLanguage()
 
   async function handleSubmit(e: React.FormEvent) {
@@ -120,7 +117,7 @@ export default function LoginUserForm({
       <p className="text-center mt-4">
         <button
           type="button"
-          onClick={() => setForgotOpen(true)}
+          onClick={onForgot}
           className="relative tap-target text-text-secondary hover:text-text-main text-sm underline underline-offset-2 transition-colors rounded focus-ring"
         >
           {T.passwordReset.forgotLink}
@@ -137,10 +134,6 @@ export default function LoginUserForm({
           {T.loginForm.noAccountAction}
         </button>
       </p>
-
-      <LazyWhenOpened open={forgotOpen}>
-        <ForgotPasswordModal isOpen={forgotOpen} onClose={() => setForgotOpen(false)} />
-      </LazyWhenOpened>
     </div>
   )
 }

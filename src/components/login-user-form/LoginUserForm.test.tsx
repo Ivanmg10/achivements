@@ -9,8 +9,9 @@ jest.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush, refres
 
 function renderForm(isRegister = false) {
   const setIsLogin = jest.fn()
-  render(<LoginUserForm setIsLogin={setIsLogin} isRegister={isRegister} />)
-  return { setIsLogin }
+  const onForgot = jest.fn()
+  render(<LoginUserForm setIsLogin={setIsLogin} isRegister={isRegister} onForgot={onForgot} />)
+  return { setIsLogin, onForgot }
 }
 
 const fill = (username = 'ivan', password = 'secret') => {
@@ -116,7 +117,7 @@ test('when the server has had too many failures, it says to wait instead of blam
 
 describe('arriving from a page that needs an account (the proxy\'s `next`)', () => {
   test('says so above the form, and after signing in goes back to where the person was going', async () => {
-    render(<LoginUserForm setIsLogin={jest.fn()} isRegister={false} next="/groups?tab=2" />)
+    render(<LoginUserForm setIsLogin={jest.fn()} isRegister={false} onForgot={jest.fn()} next="/groups?tab=2" />)
     expect(screen.getByRole('status')).toHaveTextContent(en.loginForm.needsAccount)
     fill()
     fireEvent.click(screen.getByRole('button', { name: new RegExp(en.loginForm.signIn, 'i') }))
@@ -130,4 +131,10 @@ describe('arriving from a page that needs an account (the proxy\'s `next`)', () 
     fireEvent.click(screen.getByRole('button', { name: new RegExp(en.loginForm.signIn, 'i') }))
     await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/'))
   })
+})
+
+test('"forgot your password" asks the page to open its dialog', () => {
+  const { onForgot } = renderForm()
+  fireEvent.click(screen.getByRole('button', { name: en.passwordReset.forgotLink }))
+  expect(onForgot).toHaveBeenCalledTimes(1)
 })

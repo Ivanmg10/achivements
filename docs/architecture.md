@@ -35,7 +35,7 @@ page (src/app/(main)/…)            client component
 | RetroAchievements | `get*` (gameData, recentAchievements, activityHeatmapYear…), `updateRaUser`, `unlinkRaUser` | Older flat names; keep them, the client calls them |
 | Steam | `steam/*` (ownedGames, achievements, recentlyPlayed…, unlink) | Linked through Steam sign-in (`auth/steam?intent=link`); admins by name (`src/lib/steamAccount.ts`) |
 | PlayStation | `psn/*` (link, titles, trophies, details…) | One app account, `src/lib/psnClient.ts` |
-| Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}`, `admin/xbox`, `admin/xbox/achievements` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
+| Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
 | Me (start-up) | `me/bootstrap`, `me/streak`, `follows/cards` | #101: the viewer's own; bootstrap reads only our DB, streak and cards reuse the platforms' loaders and routes |
@@ -225,6 +225,7 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
 ## Design system (see `design-system.md`)
 
 - `src/app/globals.css`: the themes' colours and the design's tokens (shapes, sizes, motion); the round design is `:root[data-shape="round"]`.
+- `src/components/game-picker/GamePicker.tsx` (+ `-footer`, `-id-row`, `-tile`, `-chip`, `hooks/useGamePicker`): the one "pick games from your library" dialog behind pin game, add game to a group and favourite game; `utils/raGameId.ts` reads a pasted RA id or link (the search uses it too). `country-list/CountryList` is the one country list (the location dialog and the admin's editor). `achievement-window/AchievementWindow` is the shell of RA's and the other platforms' achievement windows (`docs/platform-shells.md`). `period-achievements-modal/` is the dialog of a week, a month or any stretch (the week's days come from `utcWeekDays`; `week-achievements-modal/` is gone): two panes of `period-achievements-days/` (the days) and `period-achievements-day/` (a day by game, `-game-group/` each game), which `day-achievements-modal/` (the heatmap's day, with `day-achievements-awards/`) reuses; the day → game grouping is `utils/periodDays.ts`.
 - `src/components/ui/`: the library; `ui/shape.ts` (`SLANT_PLATE`, `MARK`) is how a big piece leans on the one angle and how the mark is drawn (#127).
 - `src/components/shape-sync/ShapeSync.tsx` (mounted in `app/providers.tsx`) puts `shape-style` on `<html>`; `app/layout.tsx` has the script that applies it before paint.
 - `src/app/(main)/design/page.tsx` + `src/components/design-catalog/`: the catalogue, admins only.

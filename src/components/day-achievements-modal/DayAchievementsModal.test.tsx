@@ -27,7 +27,7 @@ beforeEach(() => {
 test('lists the day’s RA unlocks with points and the day’s mastery awards', () => {
   render(<DayAchievementsModal date={DAY} achievements={[ach(), ach({ AchievementID: 2, Date: '2024-01-16 10:00:00' })]} onClose={jest.fn()} />)
   expect(screen.getByText('Triforce')).toBeInTheDocument()
-  expect(screen.getByText('25 pts')).toBeInTheDocument()
+  expect(screen.getByText('25 points')).toBeInTheDocument()
   expect(screen.getByText(en.streak.mastery)).toBeInTheDocument()
   expect(screen.getByRole('link', { name: /Triforce/ }).getAttribute('href')).toBe('/gameInfo/1')
   expect(screen.getByRole('img', { name: 'Triforce' }).getAttribute('src')).toBe('https://media.retroachievements.org/Badge/123.png')
@@ -37,7 +37,7 @@ test('mixes Steam unlocks in: no points for them, and RA awards still show', () 
   const steam = ach({ Title: 'Win', GameID: 620, GameTitle: 'Portal 2', Points: 0, BadgeName: '', Source: 'steam', BadgeUrl: 'https://cdn/win.jpg' })
   render(<DayAchievementsModal date={DAY} achievements={[ach(), steam]} onClose={jest.fn()} />)
   expect(screen.queryByText('0pts')).not.toBeInTheDocument()
-  expect(screen.getByText('25 pts')).toBeInTheDocument()
+  expect(screen.getByText('25 points')).toBeInTheDocument()
   expect(screen.getByText(en.streak.mastery)).toBeInTheDocument()
   expect(screen.getByRole('link', { name: /Win/ }).getAttribute('href')).toBe('/steamGame/620')
   expect(screen.getByRole('img', { name: 'Win' }).getAttribute('src')).toBe('https://cdn/win.jpg')
@@ -50,4 +50,27 @@ test('says so on an empty day, and closes', () => {
   expect(screen.getByText(en.dayModal.empty)).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: 'Close' }))
   expect(onClose).toHaveBeenCalled()
+})
+
+test('the head names the day with its weekday in the one format, and the footer counts in the right plural', () => {
+  render(<DayAchievementsModal date={DAY} achievements={[ach()]} onClose={jest.fn()} />)
+  expect(screen.getByText('Monday, Jan 15, 2024')).toBeInTheDocument()
+  const footer = [...document.querySelectorAll('p.text-xs')].pop()!
+  expect(footer).toHaveTextContent('1 achievement, 1 completion')
+  expect(footer).not.toHaveTextContent(/1 achievements|1 completions/)
+})
+
+test('the mastery award is a Tag in the hardcore tone; its picture has no alt (the title is beside it)', () => {
+  render(<DayAchievementsModal date={DAY} achievements={[ach()]} onClose={jest.fn()} />)
+  expect(screen.getByText(en.streak.mastery).className).toMatch(/text-hardcore/)
+  expect(screen.getByText(en.achievement.hardcoreShort).className).toMatch(/text-hardcore/)
+  expect(screen.queryByRole('img', { name: 'Zelda' })).not.toBeInTheDocument()
+})
+
+test('the day is grouped by game: each game once with its platform, its achievements under it without repeating it', () => {
+  const steam = ach({ AchievementID: 3, Title: 'Win', GameID: 620, GameTitle: 'Portal 2', Points: 0, BadgeName: '', Source: 'steam' })
+  render(<DayAchievementsModal date={DAY} achievements={[ach(), ach({ AchievementID: 2, Title: 'Sword' }), steam]} onClose={jest.fn()} />)
+  expect(screen.getAllByRole('heading', { level: 4 }).map((h) => h.textContent).sort()).toEqual(['Portal 2', 'Zelda'])
+  expect(screen.getByRole('region', { name: 'Zelda' })).toHaveTextContent('SNES')
+  expect(screen.getByRole('region', { name: 'Portal 2' })).toHaveTextContent('Steam')
 })

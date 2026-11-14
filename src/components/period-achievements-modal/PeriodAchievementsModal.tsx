@@ -1,79 +1,78 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { formatDay } from '@/utils/dates'
-import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
+import { useStepFocus } from '@/hooks/useStepFocus'
+import { allRa, groupDays } from '@/utils/periodDays'
+import { plural } from '@/utils/utils'
+import PeriodAchievementsDays from '@/components/period-achievements-days/PeriodAchievementsDays'
+import PeriodAchievementsDay from '@/components/period-achievements-day/PeriodAchievementsDay'
 import Modal from '@/components/ui/Modal'
+import Facts from '@/components/ui/Facts'
 
 interface Props {
   title: string
+  /** A line under the title (the week's first day). */
+  hint?: string
+  /** What the empty state says. */
+  empty?: string
   achievements: RecentAchievement[]
   onClose: () => void
 }
 
-export default function PeriodAchievementsModal({ title, achievements, onClose }: Props) {
+/**
+ * The unlocks of a week, a month or any stretch: the one dialog the best-period cards open. From `lg` two panes,
+ * the days (newest first, the newest chosen on open) and the chosen day grouped by game; below `lg` the same as
+ * steps, the days first and a day with a way back. The footer keeps the period's total.
+ */
+export default function PeriodAchievementsModal({ title, hint, empty, achievements, onClose }: Props) {
   const { T, lang } = useLanguage()
-  // Steam unlocks have no points; a mixed list still totals the RA ones.
-  const hasPoints = achievements.some(a => !a.Source || a.Source === 'ra')
-
-  const days = useMemo(() => {
-    const byDay: Record<string, RecentAchievement[]> = {}
-    for (const a of achievements) {
-      const key = a.Date.split(' ')[0]
-      if (!byDay[key]) byDay[key] = []
-      byDay[key].push(a)
-    }
-    return Object.entries(byDay)
-      .sort((a, b) => b[0].localeCompare(a[0]))
-      .map(([date, dayAchs]) => ({
-        date,
-        label: formatDay(date, lang, { weekday: 'long', month: 'short', day: 'numeric' }),
-        achievements: dayAchs,
-        pts: dayAchs.reduce((s, a) => s + a.Points, 0),
-      }))
-  }, [achievements, lang])
-
-  const totalPts = days.reduce((s, d) => s + d.pts, 0)
-  const totalAch = days.reduce((s, d) => s + d.achievements.length, 0)
+  const [chosen, setChosen] = useState<string | null>(null)
+  // Below `lg` only one pane shows: the days, or the day just tapped.
+  const [step, setStep] = useState<'days' | 'day'>('days')
+  const days = useMemo(() => groupDays(achievements), [achievements])
+  const day = days.find((d) => d.date === chosen) ?? days[0]
+  const { detail, list } = useStepFocus(day && step === 'day' ? day.date : null)
+  const points = achievements.reduce((sum, a) => sum + a.Points, 0)
 
   return (
     <Modal
       isOpen
       onClose={onClose}
-      size="lg"
+      size="xl"
       title={title}
-      className="gap-3"
+      hint={hint}
+      className="gap-4"
       footer={
-        totalAch > 0 ? (
-          <p className="text-xs text-text-secondary">
-            {totalAch} {T.dayModal.achievements}{hasPoints && ` · ${totalPts.toLocaleString(lang)} ${T.libraryDetail.pointsShort}`}
+        achievements.length > 0 ? (
+          <p className="flex flex-wrap items-center text-xs text-text-secondary">
+            <Facts items={[plural(achievements.length, T.plurals.achievements, lang), allRa(achievements) && plural(points, T.plurals.points, lang)]} />
           </p>
         ) : undefined
       }
     >
-        <div className="flex flex-col gap-4 overflow-y-auto flex-1 min-h-0">
-          {days.length === 0 ? (
-            <p className="text-sm text-text-secondary text-center py-6">{T.cards.noData}</p>
-          ) : (
-            days.map(day => (
-              <div key={day.date} className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-text-main capitalize">{day.label}</span>
-                  <span className="text-[10px] text-text-secondary">
-                    {hasPoints && `${day.pts.toLocaleString(lang)} ${T.libraryDetail.pointsShort} · `}{day.achievements.length} {T.dayModal.achievements}
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {day.achievements.map(ach => (
-                    <RecentAchievementRow key={ach.AchievementID} ach={ach} onNavigate={onClose} />
-                  ))}
-                </div>
-              </div>
-            ))
-          )}
+      {!day ? (
+        <p className="text-sm text-text-secondary text-center py-6">{empty ?? T.cards.noData}</p>
+      ) : (
+        // Its height is what the screen leaves (the head and footer take about 13rem), and never more than a
+        // wide dialog: at 2560x1300 and 1920x1080 it stays wider than tall.
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:h-[max(16rem,min(44rem,calc(85dvh-13rem)))]">
+          <div ref={list} className={`${step === 'day' ? 'hidden lg:flex' : 'flex'} flex-col min-w-0 lg:min-h-0`}>
+            <PeriodAchievementsDays
+              days={days}
+              selected={day.date}
+              onSelect={(date) => {
+                setChosen(date)
+                setStep('day')
+              }}
+            />
+          </div>
+          <div className={`${step === 'day' ? 'flex' : 'hidden lg:flex'} flex-col gap-3 min-w-0 lg:min-h-0 lg:pl-4 lg:shadow-hairline-l`}>
+            <PeriodAchievementsDay key={day.date} day={day} onNavigate={onClose} onBack={() => setStep('days')} headingRef={detail} />
+          </div>
         </div>
+      )}
     </Modal>
   )
 }

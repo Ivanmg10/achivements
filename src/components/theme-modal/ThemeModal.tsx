@@ -7,6 +7,7 @@ import { useThemeChoice } from '@/hooks/useThemeChoice'
 import type { Theme } from '@/types/types'
 import { lookTransition, spreadFrom } from '@/utils/lookTransition'
 import ThemeModalPicker from './theme-modal-picker/ThemeModalPicker'
+import Facts from '@/components/ui/Facts'
 
 interface Props {
   isOpen: boolean
@@ -44,7 +45,7 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
       size="2xl"
       backdrop="dim"
       title={T.userTheme.theme}
-      hint={<span role="status">{savedTheme === theme ? `${name} · ${T.toast.saved}` : name}</span>}
+      hint={<span role="status"><Facts items={[name, savedTheme === theme && T.toast.saved]} /></span>}
     >
       <ThemeModalPicker theme={theme} onSelect={pick} />
       {saveError && (

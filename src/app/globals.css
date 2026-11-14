@@ -1,6 +1,19 @@
 @import "tailwindcss";
 
 /*
+   Country flags: Windows has no flag emoji (Chrome and Edge draw "ES" for the Spanish one), so a flag-only font
+   comes first in the stacks below. `unicode-range` is the regional indicators (and the black flag with its tags),
+   so it never touches another character and the file (78 KB) only downloads when a flag is on screen.
+   Twemoji Country Flags, Twemoji graphics under CC BY 4.0: the credit is in the README. docs/performance.md.
+*/
+@font-face {
+  font-family: "Twemoji Country Flags";
+  src: url("/fonts/TwemojiCountryFlags.woff2") format("woff2");
+  unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E0063, U+E0065, U+E0067, U+E006C, U+E006E, U+E0073-E0074, U+E0077, U+E007F;
+  font-display: swap;
+}
+
+/*
    Tokens que Tailwind convierte en utilidades. Inline: cada utilidad lleva
    rgb(var(--x)) dentro, así que un elemento con su propio data-theme (la vista
    previa del selector) se pinta con los colores de ese tema.
@@ -9,8 +22,8 @@
 @theme inline {
   /* The 2560 px screen the owner works on: a breakpoint of its own, so it sorts after xl (an arbitrary min-[2560px] sorts before it and loses). */
   --breakpoint-uhd: 160rem;
-  --font-sans: var(--font-face), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-face-display), var(--font-face), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Twemoji Country Flags", var(--font-face), ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Twemoji Country Flags", var(--font-face-display), var(--font-face), ui-sans-serif, system-ui, sans-serif;
 
   --color-bg-main: rgb(var(--bg-main));
   --color-bg-header: rgb(var(--bg-header));
@@ -68,6 +81,7 @@
   --shadow-hairline-t: inset 0 1px 0 rgb(var(--ink) / 0.1);
   --shadow-hairline-b: inset 0 -1px 0 rgb(var(--ink) / 0.1);
   --shadow-hairline-b-soft: inset 0 -1px 0 rgb(var(--ink) / 0.05);
+  --shadow-hairline-l: inset 1px 0 0 rgb(var(--ink) / 0.1);
   /* What you type into sits below the card. */
   --shadow-sunken: inset 0 2px 4px rgb(0 0 0 / 0.22);
   /* The one glow: a finished bar or ring (`drop-shadow-done`). */
@@ -181,6 +195,9 @@
 
 :root,
 [data-theme] {
+  /* Native scrollbars, date pickers and form controls follow the theme (light below): a dark page never gets a white scrollbar. */
+  color-scheme: dark;
+  scrollbar-color: rgb(var(--ink) / 0.3) transparent;
   --ink: 255 255 255;
   --bg-main: 15 16 20;
   --bg-header: 10 10 14;
@@ -426,6 +443,7 @@ html[data-font="fira"],
 [data-theme="light-black"],
 [data-theme="sakura"],
 [data-theme="arctic"] {
+  color-scheme: light;
   --hardcore: 161 98 7;
   --softcore: 29 78 216;
   --streak-hue: 42%;

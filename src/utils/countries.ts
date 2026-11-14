@@ -100,3 +100,16 @@ export function countryName(code: string, lang: string): string {
   }
   return findCountry(code)?.name ?? code
 }
+
+const plain = (s: string, lang: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLocaleLowerCase(lang)
+
+/**
+ * The countries to pick from, named in the reader's language and sorted by that name. A search matches the
+ * translated name, the English one and the code, ignoring case and accents ("alemania", "germany", "de", "espana").
+ */
+export function searchCountries(query: string, lang: string): Country[] {
+  const q = plain(query.trim(), lang)
+  return COUNTRIES.filter((c) => !q || [countryName(c.code, lang), c.name, c.code].some((n) => plain(n, lang).includes(q)))
+    .map((c) => ({ code: c.code, name: countryName(c.code, lang) }))
+    .sort((a, b) => a.name.localeCompare(b.name, lang))
+}

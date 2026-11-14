@@ -24,10 +24,8 @@ export default function SearchModalUserResults({
   const { T } = useLanguage()
   if (!users.active) return null
 
-  const title = users.isLoading || users.error ? T.search.people : `${T.search.people} · ${users.results.length}`
-
   return (
-    <SearchModalGroup title={title}>
+    <SearchModalGroup title={T.search.people} count={users.isLoading || users.error ? undefined : users.results.length}>
       {users.isLoading ? (
         <div aria-busy="true" className="flex flex-col">
           {[0, 1].map((i) => (

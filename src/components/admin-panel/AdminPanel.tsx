@@ -1,23 +1,19 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { IconLock, IconPlus, IconSearch } from '@tabler/icons-react'
+import { IconLock } from '@tabler/icons-react'
 import { useSession } from 'next-auth/react'
-import AdminUserCard from './admin-user-card/AdminUserCard'
+import { useAdminUsers } from '@/hooks/useAdminUsers'
 import AdminUnlock from './admin-unlock/AdminUnlock'
 import AdminActionLog from './admin-action-log/AdminActionLog'
 import AdminPsnToken from './admin-psn-token/AdminPsnToken'
-import AdminXbox from './admin-xbox/AdminXbox'
 import AdminRankings from './admin-rankings/AdminRankings'
+import AdminUsersTab from './admin-users-tab/AdminUsersTab'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
-import { normalizeTitle } from '@/utils/gameCandidates'
-import { ADMIN_LOCKED_EVENT, adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
-import { notify } from '@/lib/notify'
 import Button from '@/components/ui/Button'
-import { fieldClass } from '@/components/ui/Input'
-import AdminUsersSkeleton from './admin-users-skeleton/AdminUsersSkeleton'
+import Tabs, { tabIds } from '@/components/ui/Tabs'
 
 const AdminCreateUserModal = dynamic(() => import('./AdminCreateUserModal'), { loading: () => null })
 const AdminEditUserModal = dynamic(() => import('./AdminEditUserModal'), { loading: () => null })
@@ -26,205 +22,103 @@ const DeleteConfirmDialog = dynamic(() => import('@/components/groups/delete-con
 /** What the panel is showing, for a container that sizes itself to it. */
 export type AdminPanelMode = 'loading' | 'locked' | 'open'
 
+type AdminTab = 'users' | 'psn' | 'rankings' | 'log'
+
+const TABS_ID = 'admin-tabs'
+
 export default function AdminPanel({
   onModeChange,
 }: {
   onModeChange?: (mode: AdminPanelMode) => void
 } = {}) {
   const { data: session } = useSession()
-  const [users, setUsers] = useState<AdminUser[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const currentAdminId = Number(session?.user?.id)
+  const { users, loading, error, locked, reload, unlocked, lockNow, created, changed, toggleAdmin, remove } = useAdminUsers(currentAdminId)
+  const [tab, setTab] = useState<AdminTab>('users')
   const [createOpen, setCreateOpen] = useState(false)
   const [editUser, setEditUser] = useState<AdminUser | null>(null)
-  const [query, setQuery] = useState('')
   const [deleteUser, setDeleteUser] = useState<AdminUser | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
-  // Whether the panel must be unlocked with the admin's password first (see adminAuth).
-  const [locked, setLocked] = useState(false)
-
-  const currentAdminId = Number(session?.user?.id)
 
   const mode: AdminPanelMode = locked ? 'locked' : loading && users.length === 0 ? 'loading' : 'open'
   useEffect(() => {
     onModeChange?.(mode)
   }, [mode, onModeChange])
 
-  // Name, email, id or a linked account — whatever an admin has to hand.
-  const visible = useMemo(() => {
-    const q = normalizeTitle(query.trim())
-    if (!q) return users
-    return users.filter((u) =>
-      [u.username, u.email, String(u.id), u.rausername, u.ra_display, u.steamusername, u.psnusername, u.xboxgamertag].some(
-        (field) => field && normalizeTitle(field).includes(q),
-      ),
-    )
-  }, [users, query])
-
-  // State only changes once the answer is in, so the first load can run from an effect.
-  const fetchUsers = useCallback(() => {
-    adminFetch('/api/admin/users')
-      .then(async (r) => {
-        const data = await r.json().catch(() => null)
-        if (r.status === 403 && data?.error === 'reauth-required') return setLocked(true)
-        if (!r.ok || !Array.isArray(data)) throw new Error('Failed to load users')
-        setUsers(data)
-      })
-      .catch(() => setError('Failed to load users'))
-      .finally(() => setLoading(false))
-  }, [])
-
-  const loadUsers = () => {
-    setLoading(true)
-    setError(null)
-    fetchUsers()
-  }
-
-  useEffect(() => {
-    fetchUsers()
-    // Any admin call that finds the unlock expired sends the panel back to the door.
-    const lock = () => {
-      setLocked(true)
-      setUsers([])
-      setEditUser(null)
-    }
-    window.addEventListener(ADMIN_LOCKED_EVENT, lock)
-    return () => window.removeEventListener(ADMIN_LOCKED_EVENT, lock)
-  }, [fetchUsers])
-
-  const handleUnlocked = () => {
-    setLocked(false)
-    loadUsers()
-  }
-
-  const lockNow = async () => {
-    await fetch('/api/admin/unlock', { method: 'DELETE' }).catch(() => null)
-    window.dispatchEvent(new Event(ADMIN_LOCKED_EVENT))
-  }
-
-  const handleCreated = (user: AdminUser) => {
-    setUsers((prev) => [...prev, user])
-  }
-
   const handleChanged = (userId: number, changes: Partial<AdminUser>) => {
-    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, ...changes } : u)))
-    if (editUser?.id === userId) {
-      setEditUser((prev) => (prev ? { ...prev, ...changes } : prev))
-    }
+    changed(userId, changes)
+    setEditUser((prev) => (prev?.id === userId ? { ...prev, ...changes } : prev))
   }
 
-  const handleUpdated = (userId: number, field: string, value: unknown) =>
-    handleChanged(userId, { [field]: value } as Partial<AdminUser>)
-
-  const toggleAdmin = async (user: AdminUser) => {
-    if (user.id === currentAdminId) return
-    const next = !user.admin
-    const res = await adminFetch('/api/admin/users', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: user.id, field: 'admin', value: next }),
-    })
-    if (res.ok) {
-      handleUpdated(user.id, 'admin', next)
-      notify.success(next ? `${user.username} is now an admin` : `${user.username} is no longer an admin`)
-    } else {
-      notify.error(`Could not change ${user.username}'s role`)
-    }
-  }
+  const handleUpdated = (userId: number, field: string, value: unknown) => handleChanged(userId, { [field]: value } as Partial<AdminUser>)
 
   const confirmDelete = async () => {
     if (!deleteUser) return
     setDeleteError(null)
-    try {
-      const res = await adminFetch(`/api/admin/users?id=${deleteUser.id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        setDeleteError(data.error ?? 'Failed to delete user')
-        return
-      }
-      setUsers((prev) => prev.filter((u) => u.id !== deleteUser.id))
-      notify.success(`${deleteUser.username} deleted`)
-    } catch {
-      setDeleteError('Failed to delete user')
-    } finally {
-      setDeleteUser(null)
-    }
+    const failed = await remove(deleteUser)
+    if (failed) setDeleteError(failed)
+    setDeleteUser(null)
   }
 
+  const panel = (value: AdminTab, children: React.ReactNode) => (
+    <div role="tabpanel" id={tabIds(TABS_ID, value).panel} aria-labelledby={tabIds(TABS_ID, value).tab} tabIndex={0} className="outline-none focus-visible:ring-2 focus-visible:ring-accent/60 rounded-tile">
+      {children}
+    </div>
+  )
+
   return (
-    <section className="w-full pb-6 flex flex-col gap-4">
-      {/* Sticks to the top of the modal, so search and lock stay at hand in a long list. */}
-      {!locked && (
-        <div className="sticky top-0 z-10 -mx-1 px-1 pb-3 bg-bg-header flex items-center gap-2 flex-wrap">
-          <span className="text-xs bg-accent text-bg-main font-bold px-2 py-0.5 rounded-full">{users.length}</span>
-          <div className="flex items-center gap-2 flex-wrap ml-auto">
-            <div className="relative">
-              <IconSearch
-                size={15}
-                aria-hidden="true"
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none"
-              />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search users…"
-                aria-label="Search users"
-                className={fieldClass({ size: 'sm', icon: true }, 'w-56!')}
-              />
-            </div>
-            <Button size="sm" onClick={() => setCreateOpen(true)}>
-              <IconPlus size={14} aria-hidden="true" />
-              New user
-            </Button>
-            <button
-              onClick={lockNow}
-              className="flex items-center gap-1.5 px-3 py-2 bg-bg-card text-text-secondary text-sm rounded-tile hover:text-text-main transition-colors"
-            >
+    <section className="w-full pb-2 flex flex-col gap-5">
+      {locked ? (
+        <AdminUnlock onUnlocked={unlocked} />
+      ) : (
+        <>
+          <div className="flex items-end gap-3">
+            <Tabs
+              id={TABS_ID}
+              aria-label="Admin sections"
+              value={tab}
+              onChange={setTab}
+              className="flex-1 min-w-0"
+              tabs={[
+                { value: 'users', label: 'Users', count: loading || error ? undefined : users.length },
+                { value: 'psn', label: 'PlayStation' },
+                { value: 'rankings', label: 'Rankings' },
+                { value: 'log', label: 'Log' },
+              ]}
+            />
+            <Button variant="quiet" size="sm" onClick={lockNow} className="mb-1">
               <IconLock size={14} aria-hidden="true" />
               Lock
-            </button>
+            </Button>
           </div>
-        </div>
+
+          {tab === 'users' &&
+            panel(
+              'users',
+              <>
+                <AdminUsersTab
+                  users={users}
+                  loading={loading}
+                  error={error}
+                  currentAdminId={currentAdminId}
+                  onRetry={reload}
+                  onCreate={() => setCreateOpen(true)}
+                  onEdit={setEditUser}
+                  onToggleAdmin={toggleAdmin}
+                  onDelete={setDeleteUser}
+                />
+                {deleteError && (
+                  <p role="alert" className="mt-3 text-sm text-danger">
+                    {deleteError}
+                  </p>
+                )}
+              </>,
+            )}
+          {tab === 'psn' && panel('psn', <AdminPsnToken />)}
+          {tab === 'rankings' && panel('rankings', <AdminRankings />)}
+          {tab === 'log' && panel('log', <AdminActionLog />)}
+        </>
       )}
-
-      {locked ? <AdminUnlock onUnlocked={handleUnlocked} /> : <>
-      <AdminPsnToken />
-      <AdminXbox />
-      <AdminRankings />
-      <div>
-        {loading && (
-          <AdminUsersSkeleton />
-        )}
-        {error && (
-          <div className="flex items-center justify-center py-12 text-danger text-sm">{error}</div>
-        )}
-        {!loading && !error && visible.length === 0 && (
-          <p className="py-12 text-center text-text-secondary text-sm">No users match that search</p>
-        )}
-        {!loading && !error && visible.length > 0 && (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 items-stretch">
-            {visible.map((user) => (
-              <AdminUserCard
-                key={user.id}
-                user={user}
-                isSelf={user.id === currentAdminId}
-                onEdit={() => setEditUser(user)}
-                onToggleAdmin={() => toggleAdmin(user)}
-                onDelete={() => setDeleteUser(user)}
-              />
-            ))}
-          </ul>
-        )}
-      </div>
-
-      {deleteError && (
-        <p role="alert" className="text-sm text-danger">
-          {deleteError}
-        </p>
-      )}
-
-      <AdminActionLog />
-      </>}
 
       <LazyWhenOpened open={deleteUser !== null}>
         <DeleteConfirmDialog
@@ -237,10 +131,10 @@ export default function AdminPanel({
       </LazyWhenOpened>
 
       <LazyWhenOpened open={createOpen}>
-        <AdminCreateUserModal isOpen={createOpen} onClose={() => setCreateOpen(false)} onCreated={handleCreated} />
+        <AdminCreateUserModal isOpen={createOpen} onClose={() => setCreateOpen(false)} onCreated={created} />
       </LazyWhenOpened>
 
-      {editUser && (
+      {editUser && !locked && (
         <AdminEditUserModal
           // A new user is a new form: the key starts it from that user's values.
           key={editUser.id}
@@ -255,4 +149,3 @@ export default function AdminPanel({
     </section>
   )
 }
-

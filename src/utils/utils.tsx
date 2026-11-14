@@ -27,8 +27,8 @@ export const groupByDays = (achievements: RecentAchievement[], totalDays: number
 export type DatedUnlock = { earnedAt: string | null }
 
 /**
- * A game's unlocks counted per week (the last 8) or month (the last 6), in local
- * time, each bucket with its achievements and when it starts.
+ * A game's unlocks counted per week (the last 8, Monday to Sunday, as everywhere in the app) or month (the
+ * last 6), in local time, each bucket with its achievements and when it starts.
  */
 export function groupGameAchievementsByPeriod<T extends DatedUnlock>(
   achievements: T[],
@@ -47,12 +47,10 @@ export function groupGameAchievementsByPeriod<T extends DatedUnlock>(
           return { label: localDay(start).slice(0, 7), start: start.getTime(), end: end.getTime() - 1 }
         })
       : Array.from({ length: 8 }, (_, i) => {
-          const end = new Date()
-          end.setHours(0, 0, 0, 0)
-          end.setDate(end.getDate() - (7 - i) * 7)
-          const start = new Date(end)
-          start.setDate(start.getDate() - 6)
-          return { label: localDay(start).slice(5), start: start.getTime(), end: end.getTime() + 86399999 }
+          const today = new Date()
+          const start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - ((today.getDay() + 6) % 7) - (7 - i) * 7)
+          const next = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 7)
+          return { label: localDay(start).slice(5), start: start.getTime(), end: next.getTime() - 1 }
         })
 
   return ranges.map(({ label, start, end }) => {

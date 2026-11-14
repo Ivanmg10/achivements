@@ -11,7 +11,7 @@ test('an RA unlock links to the RA page, with its badge and points', () => {
   render(<RecentAchievementRow ach={RA} onNavigate={jest.fn()} />)
   expect(screen.getByRole('link').getAttribute('href')).toBe('/gameInfo/1')
   expect(screen.getByRole('img', { name: 'Triforce' }).getAttribute('src')).toBe('https://media.retroachievements.org/Badge/123.png')
-  expect(screen.getByText('25 pts').className).toContain('text-warning')
+  expect(screen.getByText('25 points').className).toContain('text-warning')
 })
 
 test('a Steam unlock links to the Steam page, with its full badge URL and no points', () => {
@@ -19,7 +19,7 @@ test('a Steam unlock links to the Steam page, with its full badge URL and no poi
   render(<RecentAchievementRow ach={steam} onNavigate={jest.fn()} />)
   expect(screen.getByRole('link').getAttribute('href')).toBe('/steamGame/620')
   expect(screen.getByRole('img', { name: 'Win' }).getAttribute('src')).toBe('https://cdn/w.jpg')
-  expect(screen.queryByText(/pts$/)).not.toBeInTheDocument()
+  expect(screen.queryByText(/points$/)).not.toBeInTheDocument()
 })
 
 test('shows a placeholder without a badge, and reports navigation', () => {
@@ -28,4 +28,25 @@ test('shows a placeholder without a badge, and reports navigation', () => {
   expect(container.querySelector('img')).toBeNull()
   fireEvent.click(screen.getByRole('link'))
   expect(onNavigate).toHaveBeenCalled()
+})
+
+test('showGame={false} leaves the game out, where a group already names it', () => {
+  const { rerender } = render(<RecentAchievementRow ach={RA} onNavigate={jest.fn()} />)
+  expect(screen.getByText('Zelda')).toBeInTheDocument()
+  rerender(<RecentAchievementRow ach={RA} onNavigate={jest.fn()} showGame={false} />)
+  expect(screen.queryByText('Zelda')).not.toBeInTheDocument()
+  expect(screen.getByRole('link').getAttribute('href')).toBe('/gameInfo/1')
+})
+
+test('one point is "1 point", never "1 pts" (#165, H12)', () => {
+  render(<RecentAchievementRow ach={{ ...RA, Points: 1 }} onNavigate={jest.fn()} />)
+  expect(screen.getByText('1 point')).toBeInTheDocument()
+})
+
+test('the row has the focus ring and, when its badge does not load, the placeholder tile (#165, H6, H12)', () => {
+  const { container } = render(<RecentAchievementRow ach={RA} onNavigate={jest.fn()} />)
+  expect(screen.getByRole('link')).toHaveClass('focus-ring')
+  fireEvent.error(container.querySelector('img')!)
+  expect(container.querySelector('img')).toBeNull()
+  expect(container.querySelector('a > span[aria-hidden="true"]')).toHaveClass('bg-ink/10')
 })

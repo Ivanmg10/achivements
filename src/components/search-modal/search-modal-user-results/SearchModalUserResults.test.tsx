@@ -15,7 +15,7 @@ const FOUND = {
 test('each user with country, a line of their bio and their platforms, under a counted group', () => {
   const onSelect = jest.fn()
   render(<SearchModalUserResults users={FOUND} onSelect={onSelect} />)
-  expect(screen.getByRole('region', { name: `${en.search.people} · 2` })).toBeInTheDocument()
+  expect(screen.getByRole('region', { name: `${en.search.people}, 2` })).toBeInTheDocument()
   const first = screen.getByRole('button', { name: /ivan/ })
   expect(first).toHaveTextContent('Retro fan')
   expect(first).toHaveAttribute('data-search-option')

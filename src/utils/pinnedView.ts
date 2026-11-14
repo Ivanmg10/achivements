@@ -1,6 +1,6 @@
 import type { PinnedAchievement } from '@/types/types'
 import type { Translations } from '@/translations/en'
-import { pinnedKey } from '@/utils/utils'
+import { pinnedKey, plural } from '@/utils/utils'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import { steamAchievementAnchor } from '@/utils/steamTitles'
@@ -30,7 +30,7 @@ export type PinnedView = {
  * A pinned achievement as its tile shows it. A hidden or secret one not yet
  * earned keeps its name and description concealed, as on its game's page.
  */
-export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView {
+export function pinnedView(fav: PinnedAchievement, T: Translations, lang = 'en'): PinnedView {
   const base = { key: pinnedKey(fav), source: fav.source, gameId: fav.game_id, gameTitle: fav.game_title }
   if (fav.source === 'steam') {
     const a = fav.snapshot
@@ -86,7 +86,7 @@ export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView 
     iconUrl: raBadgeUrl(a.BadgeName) ?? null,
     earned: Boolean(a.DateEarned || a.DateEarnedHardcore),
     anchor: null,
-    value: `${a.Points} ${T.libraryDetail.pointsShort}`,
+    value: plural(a.Points, T.plurals.points, lang),
     valueClass: 'text-accent',
     rarity: fav.num_distinct_players > 0 ? (a.NumAwarded / fav.num_distinct_players) * 100 : null,
   }

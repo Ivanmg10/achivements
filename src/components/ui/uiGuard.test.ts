@@ -212,8 +212,7 @@ const OWN_COLOURS = [
 ]
 
 test('no label in capitals: a kicker, a figure\'s label and a table head are in sentence case (identity B, #127)', () => {
-  // The hash modal's chips name dump groups (Redump, TOSEC, No-Intro) from RA's lowercase ids: capitals there are the names.
-  expect(newOffenders('kicker', NEW_RULES.kicker, ['components/game-info-header/GameHashesModal.tsx'])).toEqual([])
+  expect(newOffenders('kicker', NEW_RULES.kicker)).toEqual([])
 })
 
 test('a tag comes from Tag, never a tinted rounded-tag box by hand', () => {
@@ -333,4 +332,48 @@ test('the logo is drawn from utils/themeIcon\'s shapes (BrandMark, the favicon):
 
 test('a theme shown inside another is ThemeScreen (its tokens under data-theme), never a preview drawn by hand (#135)', () => {
   expect(offenders(/data-theme=\{/)).toEqual([])
+})
+
+// A dialog's size is chosen by its kind (#165, docs/design-system.md → Dialogs): it is always said, and a picker is never narrow.
+/** The opening tag of every `<Modal …>` in a source, braces (`=>` in a prop) skipped. */
+function modalTags(text: string): string[] {
+  const tags: string[] = []
+  for (const m of text.matchAll(/<Modal(?=[\s>])/g)) {
+    let depth = 0
+    let end = m.index!
+    for (; end < text.length; end++) {
+      const c = text[end]
+      if (c === '{') depth++
+      else if (c === '}') depth--
+      else if (c === '>' && depth === 0) break
+    }
+    tags.push(text.slice(m.index, end + 1))
+  }
+  return tags
+}
+
+test('every Modal says its size (a panel at the top apart)', () => {
+  const bad = FILES.filter(({ text }) => modalTags(text).some((t) => !/\bsize=/.test(t) && !/placement="top"/.test(t))).map(({ file }) => file)
+  expect(bad).toEqual([])
+})
+
+test('a dialog that picks from a collection is xl or wider, never sm / md', () => {
+  const pickers = [
+    'components/showcase-picker-modal/ShowcasePickerModal.tsx',
+    'components/pin-achievement-modal/PinAchievementModal.tsx',
+    'components/game-picker/GamePicker.tsx', // pin game, add game to a group and favourite game are this picker
+    'components/hidden-games-modal/HiddenGamesModal.tsx',
+    'components/main-page/perfect-games-order-modal/PerfectGamesOrderModal.tsx',
+  ]
+  for (const f of pickers) {
+    const text = FILES.find((x) => x.file.split(path.sep).join('/') === f)?.text ?? ''
+    expect({ f, sizes: modalTags(text).map((t) => /\bsize="(xl|2xl)"/.test(t)) }).toEqual({ f, sizes: [true] })
+  }
+})
+
+// A picker's search is the Modal's `toolbar`, fixed outside the scroll box (#165, E5): a `sticky` bar inside the
+// body lets the rows show through above it. LayoutModal's `sticky` is its preview, not a bar over a list.
+test('no sticky bar inside a dialog: a fixed one is the Modal\'s toolbar', () => {
+  const found = FILES.filter(({ text }) => /<Modal\b/.test(text) && /\bsticky\b/.test(text)).map(({ file }) => file.split(path.sep).join('/'))
+  expect(found.filter((f) => !f.endsWith('components/layout-modal/LayoutModal.tsx'))).toEqual([])
 })

@@ -9,12 +9,11 @@ import MainPageBestPeriodRow from './main-page-best-period-row/MainPageBestPerio
 import { getBestMonth } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
-import { formatDay, parseUnlockTime, utcDay } from '@/utils/dates'
+import { formatDay, parseUnlockTime, utcDay, utcWeekDays } from '@/utils/dates'
 import Kicker from '@/components/ui/Kicker'
 
 // Downloaded the first time it opens, not with the page.
 const DayAchievementsModal = dynamic(() => import('@/components/day-achievements-modal/DayAchievementsModal'), { loading: () => null })
-const WeekAchievementsModal = dynamic(() => import('@/components/week-achievements-modal/WeekAchievementsModal'), { loading: () => null })
 const PeriodAchievementsModal = dynamic(() => import('@/components/period-achievements-modal/PeriodAchievementsModal'), { loading: () => null })
 
 type Metric = 'pts' | 'ach'
@@ -78,6 +77,13 @@ export default function MainPageBestPeriod({
   /** The line under the period: when it was, with RA's unlock count alongside. */
   const when = (p: { pts: number; ach: number }, date: string) =>
     isSteam ? date : `${p.ach} ${T.lineChart.achievements} · ${date}`
+
+  // The week's seven days are UTC ones, as the card counted them.
+  const weekAchievements = useMemo(() => {
+    if (!selectedWeek) return []
+    const days = new Set(utcWeekDays(selectedWeek))
+    return achievements.filter((a) => days.has(a.Date.split(' ')[0]))
+  }, [achievements, selectedWeek])
 
   const closeDayModal = useCallback(() => setSelectedDay(null), [])
   const closeWeekModal = useCallback(() => setSelectedWeek(null), [])
@@ -151,9 +157,11 @@ export default function MainPageBestPeriod({
           />
         )}
         {selectedWeek && (
-          <WeekAchievementsModal
-            startDate={selectedWeek}
-            achievements={achievements}
+          <PeriodAchievementsModal
+            title={T.cards.bestWeek}
+            hint={T.cards.weekOf.replace('{date}', formatDay(selectedWeek, lang))}
+            empty={T.dayModal.empty}
+            achievements={weekAchievements}
             onClose={closeWeekModal}
           />
         )}

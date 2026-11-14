@@ -80,14 +80,10 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
             <IconCopy className="w-4 h-4" aria-hidden="true" />
             {T.aiExport.copy}
           </Button>
-          <button
-            type="button"
-            onClick={download}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-tile bg-ink/8 hover:bg-ink/12 text-text-main text-sm font-semibold transition-colors focus-ring"
-          >
+          <Button type="button" variant="secondary" onClick={download} className="flex-1">
             <IconDownload className="w-4 h-4" aria-hidden="true" />
             {T.aiExport.download}
-          </button>
+          </Button>
         </div>
 
         {copy === 'copied' && (

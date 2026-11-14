@@ -10,23 +10,18 @@ beforeEach(() => {
   global.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve(ENTRIES) })
 })
 
-test('loads nothing until opened', () => {
+test('the tab reads who did what to whom, loaded as it opens, with a skeleton meanwhile', async () => {
   render(<AdminActionLog />)
-  expect(global.fetch).not.toHaveBeenCalled()
-  expect(screen.getByRole('button', { name: 'Action log' })).toHaveAttribute('aria-expanded', 'false')
-})
-
-test('opened, it reads who did what to whom', async () => {
-  render(<AdminActionLog />)
-  fireEvent.click(screen.getByRole('button', { name: 'Action log' }))
+  expect(screen.getByRole('status')).toHaveTextContent('Loading')
   expect(await screen.findByText(/email: a@x.com → b@x.com/)).toBeInTheDocument()
   expect(screen.getByText(/unlocked the panel/)).toBeInTheDocument()
   expect(global.fetch).toHaveBeenCalledWith('/api/admin/actions', undefined)
 })
 
-test('a failed load says so', async () => {
-  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500, json: () => Promise.resolve({}) })
+test('a failed load says so and can be asked again', async () => {
+  ;(global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 500, json: () => Promise.resolve({}) })
   render(<AdminActionLog />)
-  fireEvent.click(screen.getByRole('button', { name: 'Action log' }))
   expect(await screen.findByRole('alert')).toHaveTextContent('Could not load the action log')
+  fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+  expect(await screen.findByText(/unlocked the panel/)).toBeInTheDocument()
 })

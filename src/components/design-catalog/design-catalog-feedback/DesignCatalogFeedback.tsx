@@ -5,6 +5,7 @@ import { IconInbox } from '@tabler/icons-react'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import Notice from '@/components/ui/Notice'
+import SearchInput from '@/components/ui/SearchInput'
 import Spinner from '@/components/ui/Spinner'
 import ErrorRetry from '@/components/ui/ErrorRetry'
 import { notify } from '@/lib/notify'
@@ -18,7 +19,7 @@ import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-
 
 /** What the site says back: notices, toasts, dialogs, menus, tooltips and the empty state. */
 export default function DesignCatalogFeedback() {
-  const [open, setOpen] = useState<'default' | 'danger' | 'top' | null>(null)
+  const [open, setOpen] = useState<'default' | 'danger' | 'top' | 'toolbar' | null>(null)
 
   return (
     <>
@@ -65,12 +66,26 @@ export default function DesignCatalogFeedback() {
             <Button size="sm" variant="secondary" onClick={() => setOpen('default')}>Open a modal</Button>
             <Button size="sm" variant="danger" onClick={() => setOpen('danger')}>Open a danger modal</Button>
           </Specimen>
+          <Specimen name="toolbar: a picker's search, fixed between the head and the scrolling body">
+            <Button size="sm" variant="secondary" onClick={() => setOpen('toolbar')}>Open a picker</Button>
+          </Specimen>
           <Specimen name="placement=&quot;top&quot;: a command panel or a menu">
             <Button size="sm" variant="secondary" onClick={() => setOpen('top')}>Open a panel near the top</Button>
           </Specimen>
         </Panel>
         <Modal isOpen={open === 'default'} onClose={() => setOpen(null)} title="A modal" hint="Escape and a click outside close it; focus stays inside." size="sm">
           <p className="text-sm text-text-secondary">A dialog on the page, a sheet on a phone.</p>
+        </Modal>
+        <Modal
+          isOpen={open === 'toolbar'}
+          onClose={() => setOpen(null)}
+          title="A picker"
+          size="md"
+          toolbar={<SearchInput aria-label="Search" placeholder="Search" />}
+        >
+          {Array.from({ length: 24 }, (_, i) => (
+            <p key={i} className="text-sm text-text-secondary">Row {i + 1}: the list scrolls under the search, which never moves.</p>
+          ))}
         </Modal>
         <Modal isOpen={open === 'top'} onClose={() => setOpen(null)} placement="top" title="A panel near the top" size="md">
           <p className="text-sm text-text-secondary">Near the top on every screen, never a sheet: the search and the phone menu.</p>

@@ -5,6 +5,7 @@ import { IconMail } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import { useLanguage } from '@/context/LanguageContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useForgotPassword } from '@/hooks/useForgotPassword'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 
@@ -19,45 +20,19 @@ import Modal from '@/components/ui/Modal'
 export default function ForgotPasswordModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { T } = useLanguage()
   const [email, setEmail] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [error, setError] = useState('')
+  const { send, submitting, sent, error, reset } = useForgotPassword()
 
   // Closing starts it over; state, so while rendering.
   useWhenChanged([isOpen], () => {
     if (!isOpen) {
       setEmail('')
-      setSent(false)
-      setError('')
-      setSubmitting(false)
+      reset()
     }
   })
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!email.trim()) return
-    setSubmitting(true)
-    setError('')
-
-    try {
-      const res = await fetch('/api/auth/forgotPassword', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim() }),
-      })
-
-      if (res.ok) {
-        setSent(true)
-      } else {
-        const data = await res.json().catch(() => ({}))
-        if (data.error === 'email-not-configured') setError(T.passwordReset.notConfigured)
-        else if (res.status === 429) setError(T.passwordReset.tooMany)
-        else setError(T.passwordReset.failed)
-      }
-    } catch {
-      setError(T.passwordReset.failed)
-    }
-    setSubmitting(false)
+    if (email.trim()) await send(email)
   }
 
   return (
@@ -92,7 +67,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: { isOpen: boole
               disabled={submitting}
             />
             <Button type="submit" loading={submitting} className="w-full">
-              {submitting ? T.passwordReset.sending : T.passwordReset.send}
+              {T.passwordReset.send}
             </Button>
           </form>
         </>

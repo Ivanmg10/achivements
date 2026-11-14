@@ -49,7 +49,7 @@ test('suggests games before anything is typed, and searches after', () => {
   expect(screen.getByRole('button', { name: /Zelda/ })).toBeInTheDocument()
 
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'xyz' } })
-  expect(screen.getByText(en.userData.favoriteGameNoResults)).toBeInTheDocument()
+  expect(screen.getByText('No games match “xyz”')).toBeInTheDocument()
 })
 
 test('picking a game saves it and closes', async () => {
@@ -79,7 +79,7 @@ test('closing it clears the search, so the next opening starts from the suggesti
   const props = { source: 'ra' as const, current: null, onClose: jest.fn(), onSave: jest.fn() }
   const { rerender } = render(<FavoriteGameModal isOpen {...props} />)
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'xyz' } })
-  expect(screen.getByText(en.userData.favoriteGameNoResults)).toBeInTheDocument()
+  expect(screen.getByText('No games match “xyz”')).toBeInTheDocument()
 
   rerender(<FavoriteGameModal isOpen={false} {...props} />)
   rerender(<FavoriteGameModal isOpen {...props} />)

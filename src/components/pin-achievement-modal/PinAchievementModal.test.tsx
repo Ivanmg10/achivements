@@ -129,3 +129,29 @@ test('a failure from last time is not still showing when it opens again', async 
   rerender(<PinAchievementModal isOpen {...props} />)
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 })
+
+test('each row says which achievement it is (title, description) and its points in the right plural', () => {
+  render(
+    <PinAchievementModal
+      isOpen
+      onClose={jest.fn()}
+      achievements={[unearned, { ...unearned, ID: 2, Title: 'Other', Points: 1 }]}
+      gameId={1}
+      gameTitle="Game"
+      numDistinctPlayers={1}
+      onPinned={jest.fn()}
+    />,
+  )
+  expect(screen.getAllByText('Do the thing')).toHaveLength(2)
+  expect(screen.getByText('10 points')).toBeInTheDocument()
+  expect(screen.getByText('1 point')).toBeInTheDocument()
+})
+
+test('a failed pin says it was the pin that failed, not the load', async () => {
+  ;(fetch as jest.Mock).mockResolvedValue({ ok: false })
+  render(
+    <PinAchievementModal isOpen onClose={jest.fn()} achievements={[unearned]} gameId={1} gameTitle="Game" numDistinctPlayers={1} onPinned={jest.fn()} />,
+  )
+  fireEvent.click(screen.getByText('Locked achievement'))
+  expect(await screen.findByRole('alert')).toHaveTextContent('Could not pin this achievement')
+})

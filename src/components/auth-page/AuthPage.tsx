@@ -2,8 +2,10 @@
 
 import { useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import LoginUserForm from '@/components/login-user-form/LoginUserForm'
 import RegisterUserForm from '@/components/register-user-form/RegisterUserForm'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import LegalLinks from '@/components/legal-links/LegalLinks'
 import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
 import AuthPhoneFrame from '@/components/auth-phone-frame/AuthPhoneFrame'
@@ -13,6 +15,9 @@ import SteamSignupForm from '@/components/steam-signup-form/SteamSignupForm'
 import { formTransition } from '@/lib/animations'
 import { useIsClient } from '@/hooks/useIsClient'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+
+// Downloaded the first time it is opened, not with the page.
+const ForgotPasswordModal = dynamic(() => import('@/components/forgot-password-modal/ForgotPasswordModal'), { loading: () => null })
 
 const fromRight = { initial: { opacity: 0, x: 60 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: 60 } }
 const fromLeft  = { initial: { opacity: 0, x: -60 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -60 } }
@@ -30,6 +35,8 @@ const WIDE = '(min-width: 1024px)'
 export default function AuthPage({ wantsRegister, steam, form, next = null }: { wantsRegister: boolean; steam: string | null; form?: ReactNode; next?: string | null }) {
   const [isLogin, setIsLogin] = useState(!wantsRegister)
   const [hasRegister, setHasRegister] = useState(false)
+  // Held here, above the phone / desktop switch: the form under it unmounts when the window crosses `lg`, and the dialog (open, with the typed email) must not.
+  const [forgotOpen, setForgotOpen] = useState(false)
 
   // Both layouts are in the page (CSS shows one), but the forms mount in the one in use only, so there is
   // one form with one state. Until the browser can say which, both hold it, as the server printed them.
@@ -37,7 +44,7 @@ export default function AuthPage({ wantsRegister, steam, form, next = null }: { 
   const isWide = useMediaQuery(WIDE)
   const inPhone = !isClient || !isWide
   const inDesktop = !isClient || isWide
-  const signInForm = form ?? (steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} next={next} />)
+  const signInForm = form ?? (steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} next={next} onForgot={() => setForgotOpen(true)} />)
   const registerForm = <RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setHasRegister} />
 
   return (
@@ -102,6 +109,9 @@ export default function AuthPage({ wantsRegister, steam, form, next = null }: { 
           <LegalLinks />
         </div>
       </div>
+      <LazyWhenOpened open={forgotOpen}>
+        <ForgotPasswordModal isOpen={forgotOpen} onClose={() => setForgotOpen(false)} />
+      </LazyWhenOpened>
     </div>
   )
 }

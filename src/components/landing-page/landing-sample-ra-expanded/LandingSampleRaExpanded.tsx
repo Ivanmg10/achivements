@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
+import { plural } from '@/utils/utils'
 import { useLandingSample } from '@/hooks/useLandingSample'
 import { loadSampleRaGame } from '@/components/landing-page/sample-library/landingLibrary'
 import { fromRa } from '@/utils/gameInsights'
@@ -93,7 +94,7 @@ export default function LandingSampleRaExpanded({ gameId, total }: { gameId: num
               description: a.Description,
               chips: (
                 <>
-                  <span className="text-xs text-text-secondary">{a.Points} {T.libraryDetail.pointsShort}</span>
+                  <span className="text-xs text-text-secondary">{plural(a.Points, T.plurals.points, lang)}</span>
                   {tag && <span className={`text-xs px-1.5 py-0.5 rounded-full ${tag.className}`}>{tag.label}</span>}
                   <BadgeEarnedChip earned={!!a.DateEarnedHardcore} label={T.achievement.hardcore} className="bg-warning/20 text-warning" />
                 </>

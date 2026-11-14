@@ -6,6 +6,7 @@ import { IconAlertTriangle } from '@tabler/icons-react'
 import dynamic from 'next/dynamic'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import { plural } from '@/utils/utils'
 import { useAchievementPins, RA_PINS } from '@/hooks/useAchievementPins'
 import { formatDate } from '@/utils/dates'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -134,7 +135,7 @@ export const AchievementGrid = memo(function AchievementGrid({
             description: a.Description,
             chips: (
               <>
-                <span className="text-xs text-text-secondary">{a.Points} {T.libraryDetail.pointsShort}</span>
+                <span className="text-xs text-text-secondary">{plural(a.Points, T.plurals.points, lang)}</span>
                 {tag && <span className={`text-xs px-1.5 py-0.5 rounded-full ${tag.className}`}>{tag.label}</span>}
                 {a.DateEarnedHardcore ? (
                   <BadgeEarnedChip earned label={T.achievement.hardcore} className="bg-warning/20 text-warning" />

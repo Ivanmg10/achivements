@@ -126,3 +126,20 @@ export function daysBetween(start: string, end: string): string[] {
   }
   return out
 }
+
+/** The seven day keys ("YYYY-MM-DD") of the week that starts on `monday`, in UTC: the weeks the best-week card counts. */
+export function utcWeekDays(monday: string): string[] {
+  const [y, m, d] = monday.split('-').map(Number)
+  return Array.from({ length: 7 }, (_, i) => utcDay(Date.UTC(y, m - 1, d + i)))
+}
+
+/** `text` with only its first letter in capitals ("noviembre de 2026" → "Noviembre de 2026"): a name that starts a line, never the CSS `capitalize` that does it to every word. */
+export function upperFirst(text: string, lang: string): string {
+  return `${text.charAt(0).toLocaleUpperCase(lang)}${text.slice(1)}`
+}
+
+/** A day with its weekday ("Friday, Nov 13", "Viernes, 13 nov"): the weekday in the reader's language with only its first letter capital, then the one format. */
+export function formatWeekdayDay(day: string, lang: string): string {
+  const weekday = formatDay(day, lang, { weekday: 'long' })
+  return `${upperFirst(weekday, lang)}, ${formatDay(day, lang)}`
+}

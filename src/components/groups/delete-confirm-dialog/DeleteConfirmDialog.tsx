@@ -21,6 +21,7 @@ export default function DeleteConfirmDialog({
 
   return (
     <Modal
+      size="sm"
       isOpen={isOpen}
       onClose={onClose}
       tone="danger"

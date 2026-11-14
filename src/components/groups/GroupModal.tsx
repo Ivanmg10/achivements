@@ -118,8 +118,8 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
           <Button type="button" onClick={onClose} variant="quiet">
             {T.groups.cancel}
           </Button>
-          <Button type="submit" form={formId} disabled={saving}>
-            {saving ? '…' : submitLabel}
+          <Button type="submit" form={formId} loading={saving}>
+            {submitLabel}
           </Button>
         </>
       }

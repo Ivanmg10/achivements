@@ -1,0 +1,40 @@
+'use client'
+
+import { useLanguage } from '@/context/LanguageContext'
+import type { AchievementMeta } from '@/hooks/useAchievementDetail'
+import { formatDate } from '@/utils/dates'
+import { decimal, plural } from '@/utils/utils'
+import Figure from '@/components/ui/Figure'
+
+/**
+ * An RA achievement's six figures, the `Figure`s of the window's row (`AchievementWindow` lays them out): points, players and rarity (known
+ * from the game's list), then author, true points and creation date, which come with the detail and hold their
+ * place as `loading` figures until it arrives (a dash when it could not be read).
+ */
+export default function AchievementModalFigures({
+  points,
+  players,
+  numDistinctPlayers,
+  meta,
+  loading,
+}: {
+  points: number
+  players: number
+  numDistinctPlayers: number
+  meta: AchievementMeta | null
+  loading: boolean
+}) {
+  const { T, lang } = useLanguage()
+  const rarity = numDistinctPlayers > 0 ? `${decimal((players / numDistinctPlayers) * 100, lang)}%` : '—'
+
+  return (
+    <>
+      <Figure term look="tile" label={plural(points, T.plurals.pointsLabel, lang)} value={points} className="justify-between" />
+      <Figure term look="tile" label={T.achievement.players} value={players} className="justify-between" />
+      <Figure term look="tile" label={T.achievement.rarity} value={rarity} className="justify-between" />
+      <Figure term look="tile" label={T.achievement.author} value={meta?.Author || '—'} loading={loading} className="justify-between min-w-0 *:max-w-full *:truncate" />
+      <Figure term look="tile" label={T.profileStats.truePoints} value={meta ? meta.TrueRatio.toLocaleString(lang) : '—'} loading={loading} className="justify-between" />
+      <Figure term look="tile" label={T.achievement.created} value={meta?.DateCreated ? formatDate(meta.DateCreated, lang) : '—'} loading={loading} className="justify-between" />
+    </>
+  )
+}

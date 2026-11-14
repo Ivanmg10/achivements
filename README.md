@@ -138,6 +138,10 @@ Short version — the full rules are in [`CLAUDE.md`](CLAUDE.md) → Git:
 - **Write down what you did** in [`docs/worklog.md`](docs/worklog.md), and
   update its area doc in `docs/` (and `CLAUDE.md`, if every task must obey it) when a rule or invariant changes.
 
+## Credits
+
+- **Country flags** are drawn by the "Twemoji Country Flags" font (`public/fonts/TwemojiCountryFlags.woff2`, from the `country-flag-emoji-polyfill` package, MIT), because Windows has no flag emoji. The flag artwork is [Twemoji](https://github.com/twitter/twemoji), © Twitter, Inc. and other contributors, used under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It only loads when a flag is on screen (`docs/performance.md`).
+
 ## Documentation
 
 | File | For |

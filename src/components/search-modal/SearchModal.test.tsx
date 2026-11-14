@@ -66,7 +66,7 @@ test('before typing: the games played last, and where to go with your place and 
 test('finds RA and Steam games alike, in one group with its count', () => {
   render(<SearchModal isOpen onClose={jest.fn()} />)
   type('a')
-  const games = screen.getByRole('region', { name: `${en.search.yourGames} · 2` })
+  const games = screen.getByRole('region', { name: `${en.search.yourGames}, 2` })
   expect(within(games).getByRole('button', { name: /Zelda/ })).toBeInTheDocument()
   expect(within(games).getByRole('button', { name: /Portal 2/ })).toBeInTheDocument()
   expect(screen.getByRole('status')).toHaveTextContent('2 results')

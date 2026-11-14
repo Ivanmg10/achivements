@@ -1,15 +1,9 @@
-import { useState } from 'react'
-import { IconChevronDown, IconHistory } from '@tabler/icons-react'
-import { adminFetch } from '@/utils/adminFetch'
+'use client'
 
-type Entry = {
-  id: number
-  admin_username: string
-  target_username: string | null
-  action: string
-  detail: Record<string, unknown> | null
-  created_at: string
-}
+import { IconHistory } from '@tabler/icons-react'
+import { useAdminActionLog, type AdminActionEntry as Entry } from '@/hooks/useAdminActionLog'
+import ErrorRetry from '@/components/ui/ErrorRetry'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const LABELS: Record<string, string> = {
   unlock: 'unlocked the panel',
@@ -48,62 +42,47 @@ function describe(entry: Entry): string | null {
   return null
 }
 
-/** The last admin actions, loaded when opened: who did what, to whom, when. */
+/** The log tab: the last admin actions, who did what, to whom, when. */
 export default function AdminActionLog() {
-  const [open, setOpen] = useState(false)
-  const [entries, setEntries] = useState<Entry[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  const toggle = async () => {
-    const next = !open
-    setOpen(next)
-    if (!next) return
-    setError(null)
-    try {
-      const res = await adminFetch('/api/admin/actions')
-      if (!res.ok) throw new Error(`actions ${res.status}`)
-      setEntries(await res.json())
-    } catch {
-      setError('Could not load the action log')
-    }
-  }
+  const { entries, error, retry } = useAdminActionLog()
 
   return (
-    <section className="bg-bg-card rounded-card">
-      <button
-        onClick={toggle}
-        aria-expanded={open}
-        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-left focus-ring rounded-card"
-      >
+    <section aria-labelledby="admin-log-title" className="flex flex-col gap-3">
+      <h3 id="admin-log-title" className="flex items-center gap-2 text-sm font-semibold">
         <IconHistory size={16} className="text-accent" aria-hidden="true" />
-        <span className="flex-1">Action log</span>
-        <IconChevronDown size={16} aria-hidden="true" className={`transition-transform ${open ? 'rotate-180' : ''}`} />
-      </button>
-      {open && (
-        <div className="px-4 pb-4">
-          {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-          {!error && entries === null && <p className="text-sm text-text-secondary">Loading…</p>}
-          {entries?.length === 0 && <p className="text-sm text-text-secondary">Nothing yet.</p>}
-          {entries && entries.length > 0 && (
-            <ol className="flex flex-col divide-y divide-ink/5 text-sm">
-              {entries.map((entry) => {
-                const what = describe(entry)
-                return (
-                  <li key={entry.id} className="py-2 flex flex-col sm:flex-row sm:items-baseline gap-x-3">
-                    <time dateTime={entry.created_at} className="text-xs text-text-secondary shrink-0 tabular-nums">
-                      {new Date(entry.created_at).toLocaleString()}
-                    </time>
-                    <span className="min-w-0 break-words">
-                      <strong>{entry.admin_username}</strong> {LABELS[entry.action] ?? entry.action}
-                      {entry.target_username && <> <strong>{entry.target_username}</strong></>}
-                      {what && <span className="text-text-secondary"> — {what}</span>}
-                    </span>
-                  </li>
-                )
-              })}
-            </ol>
-          )}
+        Action log
+      </h3>
+      {error && <ErrorRetry message="Could not load the action log" retryLabel="Retry" onRetry={retry} />}
+      {!error && entries === null && (
+        <div role="status" aria-busy="true" className="flex flex-col gap-3">
+          <span className="sr-only">Loading…</span>
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex gap-3">
+              <Skeleton className="h-4 w-32 shrink-0" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+          ))}
         </div>
+      )}
+      {entries?.length === 0 && <p className="text-sm text-text-secondary">Nothing yet.</p>}
+      {entries && entries.length > 0 && (
+        <ol className="flex flex-col divide-y divide-ink/5 text-sm">
+          {entries.map((entry) => {
+            const what = describe(entry)
+            return (
+              <li key={entry.id} className="py-2 flex flex-col sm:flex-row sm:items-baseline gap-x-3">
+                <time dateTime={entry.created_at} className="text-xs text-text-secondary shrink-0 tabular-nums">
+                  {new Date(entry.created_at).toLocaleString()}
+                </time>
+                <span className="min-w-0 break-words">
+                  <strong>{entry.admin_username}</strong> {LABELS[entry.action] ?? entry.action}
+                  {entry.target_username && <> <strong>{entry.target_username}</strong></>}
+                  {what && <span className="text-text-secondary"> — {what}</span>}
+                </span>
+              </li>
+            )
+          })}
+        </ol>
       )}
     </section>
   )

@@ -94,8 +94,9 @@ achievements) were applied 2026-10-15. Plan and measured findings:
 - `/privacy` says what Xbox keeps and who receives it (gamertag, XUID, OpenXBL, Microsoft)
   in all 9 languages; the landing text, site title and meta description still say
   "RetroAchievements, Steam and PlayStation" on purpose: change them when Xbox opens to everyone.
-- Admin explorer lookups and linking are logged (`xbox-lookup`, `link-xbox`,
-  `unlink-xbox`). Do not add a second Xbox provider without asking.
+- Linking is logged (`link-xbox`, `unlink-xbox`). The admin panel's gamertag explorer (`/api/admin/xbox`, `/api/admin/xbox/achievements`,
+  `useAdminXbox`) was removed on 2026-11-13 (#165): it had served to try OpenXBL out before any user could link it. Its old log entries
+  (`xbox-lookup`, `xbox-achievements`) still read in the log. Do not add a second Xbox provider without asking.
 - **Quota/failure hardening (2026-10-30, #87):** `xboxCall` has a 5 s timeout
   (504 `timeout`), a per-instance 429 cooldown and feed scans stop scheduling
   games on 429. `steam_cache` can serve the last success stale only for

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { IconPlayerPlay, IconHeart, IconCheck, IconLayoutGrid, IconFolder, IconUsers, IconListDetails, IconTrophy, IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -22,7 +23,6 @@ const itemClass = (active: boolean, inset: string) =>
 export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps) {
   const { T } = useLanguage()
   const [statusOpen, setStatusOpen] = useState(false)
-  const router = useRouter()
   const pathname = usePathname()
   const { data: session } = useSession()
 
@@ -44,10 +44,8 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
     if (!isOpen) setStatusOpen(false)
   })
 
-  const handleNavigate = (href: string) => {
-    router.push(session ? href : '/authPage')
-    onClose()
-  }
+  // Signed out, every entry leads to the sign-in. They are links: they open in a new tab and are read as links.
+  const to = (href: string) => (session ? href : '/authPage')
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} placement="top" title={T.header.menu} className="gap-0">
@@ -64,10 +62,10 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
             <ul>
               {statusItems.map(({ href, label, icon: Icon }) => (
                 <li key={href}>
-                  <button type="button" onClick={() => handleNavigate(href)} className={itemClass(pathname === href, 'pl-[3.25rem] pr-6 py-2.5')}>
+                  <Link href={to(href)} onClick={onClose} aria-current={pathname === href ? 'page' : undefined} className={itemClass(pathname === href, 'pl-[3.25rem] pr-6 py-2.5')}>
                     <Icon className="w-4 h-4 shrink-0" aria-hidden />
                     <span className="text-sm">{label}</span>
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -75,10 +73,10 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
         </li>
         {navItems.map(({ href, label, icon: Icon }) => (
           <li key={href}>
-            <button type="button" onClick={() => handleNavigate(href)} className={itemClass(pathname === href, 'px-6 py-3')}>
+            <Link href={to(href)} onClick={onClose} aria-current={pathname === href ? 'page' : undefined} className={itemClass(pathname === href, 'px-6 py-3')}>
               <Icon className="w-5 h-5 shrink-0" aria-hidden />
               <span className="text-sm font-medium">{label}</span>
-            </button>
+            </Link>
           </li>
         ))}
       </ul>

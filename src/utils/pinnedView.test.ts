@@ -14,7 +14,7 @@ test('RA: points, its rarity among the game players, and no anchor (it opens its
   )
   expect(v).toMatchObject({
     key: 'ra:5', source: 'ra', gameId: 7423, title: 'Win', description: 'Win it', earned: true, anchor: null,
-    value: '10 pts', rarity: 25, iconUrl: 'https://media.retroachievements.org/Badge/123.png',
+    value: '10 points', rarity: 25, iconUrl: 'https://media.retroachievements.org/Badge/123.png',
   })
 })
 

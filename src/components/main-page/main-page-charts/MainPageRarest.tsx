@@ -55,7 +55,7 @@ export default function MainPageRarest({
         title: a.Title,
         subtitle: a.GameTitle,
         stat: String(a.TrueRatio),
-        statLabel: T.cards.trueRatio,
+        statLabel: T.profileStats.truePoints,
       }))
     const steam: Row[] = steamAchievements
       .filter((a): a is SteamRecentAchievement & { globalPct: number } => typeof a.globalPct === 'number')
