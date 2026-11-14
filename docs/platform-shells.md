@@ -19,6 +19,8 @@ disconnect button) with `UserRaCard` as RA's adapter, the admin panel's rows on 
 routes' link and unlink SQL in `lib/platformLinks.ts` (`docs/accounts.md`). All nine families of #125 are done
 (`docs/worklog.md`, entry of #125); a new per-platform copy goes into its family's shell.
 
+**The achievement window is a shell too** (#165, E6, 2026-11-14): `achievement-window/AchievementWindow.tsx` draws the Modal's own head (the badge as the icon, the name, the text as the hint), the marks row, the row of `Figure` tiles (`figureColumns`: 1, 2, 3 or 6) and the platform's sections as children. RA's `AchievementModal` (marks: favourite, showcase, type, hardcore, when; six figures; recent unlocks and comments) and `AchievementDetailModal`, which Steam, PSN and Xbox share (marks: pin, showcase, their tags; rarity when known and when earned; guide buttons), are its adapters. The contract suite is `AchievementWindow.contract.test.tsx` (`describe.each` over the four platforms). A new platform's window is an adapter; it never draws its own head or padding.
+
 ## Where things live
 
 | Piece | Where | The table's |

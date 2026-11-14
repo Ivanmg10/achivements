@@ -298,6 +298,7 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
   `drop-shadow-done`, and a platform's colour is `text-steam` / `bg-psn/10`…, never a hex. Rules added in #120
   start with the files still to migrate (`ui/uiGuard.pending.json`): the list only shrinks, never add to it.
 - **A dialog's size is chosen by its kind** (#165): a confirmation or short form `sm`-`md` (never wider), a picker `xl` with two panes, a detail `lg`, a working tool `2xl`; `Modal` always gets its `size`, and from `sm` a dialog stays under 85dvh with a scrolling body (`docs/design-system.md` → Dialogs).
+- **A picker's search and filters are the Modal's `toolbar`** (fixed between the head and the scrolling body), never a `sticky` bar inside the body (the rows show through above it; the guard refuses it). One game picker (`GamePicker`) serves pin game, add game and favourite game; one achievement window shell (`AchievementWindow`) serves every platform (`docs/platform-shells.md`). **Country flags are the flag-only font** first in the font stacks (`docs/performance.md`), and each theme states its `color-scheme` (`docs/design-system.md`).
 - **A component never reads the look choice** (`data-shape`, `data-font`): it reads tokens. **Never a literal
   `polygon(...)` or `skew-*-[..]`**; no theme overrides a shape token. The welcome curtain's fixed clip paths are
   the documented exception.

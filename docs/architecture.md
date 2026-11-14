@@ -225,6 +225,7 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
 ## Design system (see `design-system.md`)
 
 - `src/app/globals.css`: the themes' colours and the design's tokens (shapes, sizes, motion); the round design is `:root[data-shape="round"]`.
+- `src/components/game-picker/GamePicker.tsx` (+ `-footer`, `-id-row`, `-tile`, `-chip`, `hooks/useGamePicker`): the one "pick games from your library" dialog behind pin game, add game to a group and favourite game; `utils/raGameId.ts` reads a pasted RA id or link (the search uses it too). `country-list/CountryList` is the one country list (the location dialog and the admin's editor). `achievement-window/AchievementWindow` is the shell of RA's and the other platforms' achievement windows (`docs/platform-shells.md`). `period-achievements-modal/` is the dialog of a week, a month or any stretch (the week's days come from `utcWeekDays`); `week-achievements-modal/` is gone.
 - `src/components/ui/`: the library; `ui/shape.ts` (`SLANT_PLATE`, `MARK`) is how a big piece leans on the one angle and how the mark is drawn (#127).
 - `src/components/shape-sync/ShapeSync.tsx` (mounted in `app/providers.tsx`) puts `shape-style` on `<html>`; `app/layout.tsx` has the script that applies it before paint.
 - `src/app/(main)/design/page.tsx` + `src/components/design-catalog/`: the catalogue, admins only.

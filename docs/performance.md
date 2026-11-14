@@ -9,6 +9,7 @@ this file has every rule with its measurement. Steam's owned list, batch counts 
 - **Nothing the first paint needs waits for JavaScript (audit v1.7, 2026-10-30).** No Framer `initial`
   with opacity 0 on what a visitor reads first; use CSS keyframes, or `AnimatePresence initial={false}`.
   That one change took the landing's LCP from 12.8 s to 1.4 s under the audit's throttling.
+- **Country flags are a 78 KB flag-only font, and it only downloads when a flag is on screen (#165, F2, the owner's choice, 2026-11-14).** `public/fonts/TwemojiCountryFlags.woff2` (Twemoji Country Flags, the woff2 of `country-flag-emoji-polyfill`, taken once with `npm pack`; the package is not a dependency) is declared in `globals.css` with a `unicode-range` of the regional indicators (U+1F1E6-1F1FF) and the black flag's tags, and `font-display: swap`; it is first in `--font-sans` / `--font-display`. A browser fetches a `unicode-range` face only when a character in the page falls in the range, so a page with no flag pays nothing, and no other character ever uses it. It also draws the flags on systems that have their own (one look everywhere). The alternative, small SVG flags, was not taken. Credit is in the README (CC BY 4.0).
 - **Code the browser loads must not reach `pg`.** `steamClient` and `fetchRA` are server code; picture
   and page URLs live in `steamAssets.ts` (pure). Reaching the database from something a client imports
   breaks the build even through a dynamic import.
