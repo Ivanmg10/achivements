@@ -27,6 +27,8 @@ export type ModalProps = {
   icon?: React.ReactNode
   /** Its own row under a hairline: the actions. */
   footer?: React.ReactNode
+  /** A bar that stays put between the head and the scrolling body, outside the scroll box: a picker's search and filters. Never a `sticky` bar inside the body (the content shows through above it). */
+  toolbar?: React.ReactNode
   size?: keyof typeof SIZES
   /** A confirmation that destroys something: `alertdialog`, the icon in the danger colour. */
   tone?: 'default' | 'danger'
@@ -59,6 +61,7 @@ export default function Modal({
   hint,
   icon,
   footer,
+  toolbar,
   size = 'sm',
   tone = 'default',
   backdrop = 'default',
@@ -92,8 +95,8 @@ export default function Modal({
         panel.setAttribute('aria-labelledby', heading.id)
       }
     }
-    // The dialog itself takes focus (its name is read first), or a field marked autoFocus.
-    ;(panel?.querySelector<HTMLElement>('[autofocus]') ?? panel)?.focus()
+    // The dialog itself takes focus (its name is read first), unless a field with autoFocus already has it (React focused it on mount).
+    if (panel && !panel.contains(document.activeElement)) (panel.querySelector<HTMLElement>('[autofocus]') ?? panel).focus()
 
     function onKey(e: KeyboardEvent) {
       // Only the dialog on top answers (one opened from another stays open under it).
@@ -186,8 +189,12 @@ export default function Modal({
               </div>
             )}
 
+            {toolbar && (
+              <div className={`flex flex-col gap-3 px-6 pb-4 shadow-hairline-b ${title ? 'pt-4' : 'pt-6 pr-14'}`}>{toolbar}</div>
+            )}
+
             {children != null && (
-              <div className={`flex flex-col overflow-y-auto ${flush ? '' : `px-6 ${title ? 'pt-5' : 'pt-6'} ${footer ? 'pb-5' : 'pb-6'}`} ${className}`}>{children}</div>
+              <div className={`flex flex-col overflow-y-auto ${flush ? '' : `px-6 ${toolbar ? 'pt-4' : title ? 'pt-5' : 'pt-6'} ${footer ? 'pb-5' : 'pb-6'}`} ${className}`}>{children}</div>
             )}
 
             {footer && (

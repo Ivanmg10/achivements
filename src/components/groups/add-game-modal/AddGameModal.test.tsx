@@ -48,21 +48,21 @@ test('renders nothing when closed', () => {
 
 test('has a labelled search box and a close button', () => {
   const { onClose } = renderModal()
-  expect(screen.getByRole('textbox', { name: en.groups.searchGames })).toBeInTheDocument()
+  expect(screen.getByRole('searchbox', { name: en.groups.searchGames })).toBeInTheDocument()
   fireEvent.click(screen.getByLabelText('Close'))
   expect(onClose).toHaveBeenCalled()
 })
 
 test('finds RA and Steam games, even with the same id', () => {
   renderModal()
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'a' } })
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'a' } })
   expect(screen.getByRole('button', { name: /Zelda/ })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: /Portal 2/ })).toBeInTheDocument()
 })
 
 test('does not offer games already in the group', () => {
   renderModal({ existingKeys: new Set(['steam:620']) })
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'a' } })
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'a' } })
   expect(screen.getByRole('button', { name: /Zelda/ })).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: /Portal 2/ })).not.toBeInTheDocument()
 })
@@ -72,7 +72,7 @@ test('adds a Steam game with its platform, then closes', async () => {
   ;(global.fetch as jest.Mock).mockReturnValue(ok(item))
   const { onAdded, onClose } = renderModal()
 
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'portal' } })
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'portal' } })
   fireEvent.click(screen.getByRole('button', { name: /^Portal 2/ }))
   fireEvent.click(screen.getByRole('button', { name: 'Add 1 game' }))
 
@@ -91,7 +91,7 @@ test('keeps failed games selected and says so', async () => {
   )
   const { onAdded, onClose } = renderModal()
 
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'a' } })
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'a' } })
   fireEvent.click(screen.getByRole('button', { name: /^Zelda/ }))
   fireEvent.click(screen.getByRole('button', { name: /^Portal 2/ }))
   fireEvent.click(screen.getByRole('button', { name: 'Add 2 games' }))
@@ -107,7 +107,7 @@ test('treats a network error like a failed add', async () => {
   jest.spyOn(console, 'error').mockImplementation(() => {})
   const { onAdded } = renderModal()
 
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'zelda' } })
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'zelda' } })
   fireEvent.click(screen.getByRole('button', { name: /^Zelda/ }))
   fireEvent.click(screen.getByRole('button', { name: 'Add 1 game' }))
 
@@ -118,7 +118,7 @@ test('treats a network error like a failed add', async () => {
 test('a pasted RA id offers that RA game', async () => {
   ;(fetchRaCandidateById as jest.Mock).mockResolvedValue(candidate('ra', 1234, 'Metroid'))
   renderModal()
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: '1234' } })
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: '1234' } })
   fireEvent.click(screen.getByRole('button', { name: new RegExp(`${en.search.openById} #1234`) }))
   expect(await screen.findByText('Metroid')).toBeInTheDocument()
   expect(fetchRaCandidateById).toHaveBeenCalledWith(1234)
@@ -127,24 +127,24 @@ test('a pasted RA id offers that RA game', async () => {
 test('an RA id that cannot be looked up says so, next to the id, and not for another id (B-02)', async () => {
   ;(fetchRaCandidateById as jest.Mock).mockResolvedValue(null)
   renderModal()
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: '9999' } })
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: '9999' } })
   fireEvent.click(screen.getByRole('button', { name: new RegExp(`${en.search.openById} #9999`) }))
   expect(await screen.findByRole('alert')).toHaveTextContent(en.search.noResults)
 
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: '8888' } })
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: '8888' } })
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 })
 
 test('opening it again starts over: no search and nothing selected from last time', () => {
   const props = { onClose: jest.fn(), groupId: 3, existingKeys: new Set<string>(), onAdded: jest.fn() }
   const { rerender } = render(<AddGameModal isOpen {...props} />)
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'zel' } })
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'zel' } })
   fireEvent.click(screen.getByRole('button', { name: /^Zelda/ }))
   expect(screen.getByText('Add 1 game')).toBeInTheDocument()
 
   rerender(<AddGameModal isOpen={false} {...props} />)
   rerender(<AddGameModal isOpen {...props} />)
-  expect(screen.getByRole('textbox')).toHaveValue('')
+  expect(screen.getByRole('searchbox')).toHaveValue('')
   expect(screen.queryByText('Add 1 game')).not.toBeInTheDocument()
 })
 
@@ -169,7 +169,7 @@ test('narrows to one platform', () => {
 test('says when nothing matches, and the add button waits for a pick', () => {
   renderModal()
   expect(screen.getByRole('button', { name: en.groups.addGames })).toBeDisabled()
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'xyz' } })
+  fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'xyz' } })
   expect(screen.getByText('No games match “xyz”')).toBeInTheDocument()
 })
 

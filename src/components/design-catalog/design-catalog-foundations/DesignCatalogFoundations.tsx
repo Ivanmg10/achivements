@@ -57,7 +57,7 @@ const CONSOLES: [string, string][] = [
   ['console-dreamcast', 'bg-console-dreamcast/40 text-console-dreamcast-ink'],
 ]
 const LINES: [string, string][] = [
-  ['shadow-hairline-t / -b', 'shadow-hairline-b'],
+  ['shadow-hairline-t / -b / -l', 'shadow-hairline-b'],
   ['shadow-hairline-b-soft', 'shadow-hairline-b-soft'],
   ['shadow-sunken', 'shadow-sunken'],
 ]

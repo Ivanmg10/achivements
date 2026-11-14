@@ -29,7 +29,7 @@ export default function ShowcasePickerModalDetail({
 
   if (!game) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center rounded-card bg-bg-main/60 ring-1 ring-ink/[0.06] p-8">
+      <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center p-8">
         <IconTrophy size={32} aria-hidden="true" className="text-text-secondary" />
         <p className="font-semibold">{T.showcase.pickGame}</p>
         <p className="text-sm text-text-secondary max-w-xs">{T.showcase.pickGameHint}</p>

@@ -6,10 +6,11 @@ import { useActivityHeatmapYear } from '@/context/ActivityHeatmapYearContext'
 import { useOwnShowcase } from '@/context/ShowcaseContext'
 import { useProfileLibrary } from '@/hooks/useProfileLibrary'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
-import { gameKey } from '@/utils/gameRef'
+import { gameKey, GAME_SOURCES } from '@/utils/gameRef'
 import type { LibraryGame } from '@/utils/library'
 import { SHOWCASE_MAX, showcaseKey, type ShowcaseEntry } from '@/utils/showcase'
-import ShowcasePickerModalGames, { type ShowcasePlatform } from './showcase-picker-modal-games/ShowcasePickerModalGames'
+import ShowcasePickerModalGames from './showcase-picker-modal-games/ShowcasePickerModalGames'
+import ShowcasePickerModalFilters, { type ShowcasePlatform } from './showcase-picker-modal-filters/ShowcasePickerModalFilters'
 import ShowcasePickerModalDetail from './showcase-picker-modal-detail/ShowcasePickerModalDetail'
 import ShowcasePickerModalSlots from './showcase-picker-modal-slots/ShowcasePickerModalSlots'
 import Button from '@/components/ui/Button'
@@ -57,6 +58,11 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
       .sort((a, b) => (latest.get(b.key) ?? '').localeCompare(latest.get(a.key) ?? '') || a.title.localeCompare(b.title))
   }, [games, year])
 
+  const counts = useMemo(
+    () => GAME_SOURCES.map((s) => [s, withEarned.filter((g) => g.source === s).length] as [typeof s, number]).filter(([, n]) => n > 0),
+    [withEarned],
+  )
+
   const free = Math.max(0, SHOWCASE_MAX - (showcase?.items.length ?? 0))
   const keys = useMemo(() => new Set(selected.map(showcaseKey)), [selected])
   const perGame = useMemo(() => {
@@ -85,6 +91,7 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
       title={T.showcase.pickerTitle}
       hint={T.showcase.pickerHint}
       className="gap-4"
+      toolbar={<ShowcasePickerModalFilters isLoading={isLoading} query={query} onQuery={setQuery} platform={platform} onPlatform={setPlatform} counts={counts} />}
       footer={
         <>
           <ShowcasePickerModalSlots taken={showcase?.items ?? []} picked={selected} onRemove={toggle} onBrowse={() => setGame(null)} />
@@ -102,21 +109,19 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
         </>
       }
     >
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:h-[min(34rem,58dvh)]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:h-[max(16rem,calc(85dvh-19rem))]">
         <div className={`${game ? 'hidden lg:flex' : 'flex'} flex-col gap-3 min-w-0 lg:min-h-0`}>
           <ShowcasePickerModalGames
             games={withEarned}
             isLoading={isLoading}
             query={query}
-            onQuery={setQuery}
             platform={platform}
-            onPlatform={setPlatform}
             selectedIn={(k) => perGame.get(k) ?? 0}
             openKey={game?.key}
             onOpen={setGame}
           />
         </div>
-        <div className={`${game ? 'flex' : 'hidden lg:flex'} flex-col gap-3 min-w-0 lg:min-h-0`}>
+        <div className={`${game ? 'flex' : 'hidden lg:flex'} flex-col gap-3 min-w-0 lg:min-h-0 lg:pl-4 lg:shadow-hairline-l`}>
           <ShowcasePickerModalDetail
             game={game}
             isSelected={(e) => keys.has(showcaseKey(e))}

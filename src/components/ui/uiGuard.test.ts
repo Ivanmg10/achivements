@@ -361,16 +361,20 @@ test('every Modal says its size (a panel at the top apart)', () => {
 test('a dialog that picks from a collection is xl or wider, never sm / md', () => {
   const pickers = [
     'components/showcase-picker-modal/ShowcasePickerModal.tsx',
-    'components/pin-game-modal/PinGameModal.tsx',
     'components/pin-achievement-modal/PinAchievementModal.tsx',
-    'components/groups/add-game-modal/AddGameModal.tsx',
-    'components/favorite-game-modal/FavoriteGameModal.tsx',
+    'components/game-picker/GamePicker.tsx', // pin game, add game to a group and favourite game are this picker
     'components/hidden-games-modal/HiddenGamesModal.tsx',
-    'components/avatar-modal/AvatarModal.tsx',
     'components/main-page/perfect-games-order-modal/PerfectGamesOrderModal.tsx',
   ]
   for (const f of pickers) {
     const text = FILES.find((x) => x.file.split(path.sep).join('/') === f)?.text ?? ''
     expect({ f, sizes: modalTags(text).map((t) => /\bsize="(xl|2xl)"/.test(t)) }).toEqual({ f, sizes: [true] })
   }
+})
+
+// A picker's search is the Modal's `toolbar`, fixed outside the scroll box (#165, E5): a `sticky` bar inside the
+// body lets the rows show through above it. LayoutModal's `sticky` is its preview, not a bar over a list.
+test('no sticky bar inside a dialog: a fixed one is the Modal\'s toolbar', () => {
+  const found = FILES.filter(({ text }) => /<Modal\b/.test(text) && /\bsticky\b/.test(text)).map(({ file }) => file.split(path.sep).join('/'))
+  expect(found.filter((f) => !f.endsWith('components/layout-modal/LayoutModal.tsx'))).toEqual([])
 })

@@ -1,31 +1,32 @@
 'use client'
 
-import { useState, useEffect, useId, useRef, useMemo } from 'react'
-import { IconSearch, IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useHiddenGames } from '@/context/HiddenGamesContext'
 import type { GameGroupItem } from '@/types/types'
-import { useGameCandidates } from '@/hooks/useGameCandidates'
-import { useWhenChanged } from '@/hooks/useWhenChanged'
-import { fetchRaCandidateById } from '@/utils/apiCallsUtils'
-import { candidateToGroupItemBody, searchCandidates, suggestCandidates, GameCandidate } from '@/utils/gameCandidates'
-import { gameKey, GAME_SOURCES } from '@/utils/gameRef'
+import { candidateToGroupItemBody, type GameCandidate } from '@/utils/gameCandidates'
 import { plural } from '@/utils/utils'
-import GamePickerTile from '@/components/game-picker/game-picker-tile/GamePickerTile'
-import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
-import AddGameModalPlatforms from '@/components/groups/add-game-modal-platforms/AddGameModalPlatforms'
+import GamePicker from '@/components/game-picker/GamePicker'
 import { notify } from '@/lib/notify'
-import Button from '@/components/ui/Button'
-import { fieldClass } from '@/components/ui/Input'
-import Modal from '@/components/ui/Modal'
-import type { GameSource } from '@/types/game'
 
-const RESULTS_MAX = 40
+async function addToGroup(groupId: number, c: GameCandidate): Promise<GameGroupItem | null> {
+  try {
+    const res = await fetch(`/api/groups/${groupId}/games`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(candidateToGroupItemBody(c)),
+    })
+    if (!res.ok) {
+      console.error('[AddGameModal] add failed', res.status, c.key)
+      return null
+    }
+    return (await res.json()) as GameGroupItem
+  } catch (err) {
+    console.error('[AddGameModal] add failed', err)
+    return null
+  }
+}
 
 /**
- * Add games to a group, every platform alike. Opens on suggestions (what is
- * being played, then wanted), narrows by title and platform, or finds an RA
- * game by a pasted id or link. Games are picked as covers and added together;
+ * Add games to a group, every platform alike: the game picker with the group's way of saving.
  * `existingKeys` are the group's games as gameKey()s, so they are not offered.
  */
 export default function AddGameModal({
@@ -44,222 +45,33 @@ export default function AddGameModal({
   onAdded: (items: GameGroupItem[]) => void
 }) {
   const { T, lang } = useLanguage()
-  const candidates = useGameCandidates(isOpen)
-  const { isHidden } = useHiddenGames()
-  const [query, setQuery] = useState('')
-  const [source, setSource] = useState<GameSource | null>(null)
-  const [selected, setSelected] = useState<Map<string, GameCandidate>>(new Map())
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState(false)
-  // The id whose lookup failed: the notice is for that id only, so it goes when another is typed.
-  const [failedId, setFailedId] = useState<number | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const hintId = useId()
 
-  // Opening starts it over; state, so while rendering. Focus is a side effect, so below.
-  useWhenChanged([isOpen], () => {
-    if (isOpen) {
-      setQuery('')
-      setSource(null)
-      setSelected(new Map())
-      setError(false)
-      setFailedId(null)
-    }
-  })
-
-  useEffect(() => {
-    if (!isOpen) return
-    const t = setTimeout(() => inputRef.current?.focus(), 50)
-    return () => clearTimeout(t)
-  }, [isOpen])
-
-  /** A pasted RA id or game URL opens that RA game directly. */
-  const directGameId = useMemo(() => {
-    const q = query.trim()
-    const id = /^\d{3,}$/.test(q) ? parseInt(q) : q.match(/retroachievements\.org\/game\/(\d+)/i)?.[1]
-    const parsed = typeof id === 'string' ? parseInt(id) : id
-    return parsed && !isHidden(parsed, 'ra') ? parsed : null
-  }, [query, isHidden])
-
-  const offered = useMemo(() => candidates.filter((c) => !existingKeys.has(c.key)), [candidates, existingKeys])
-  const sources = useMemo(() => GAME_SOURCES.filter((s) => offered.some((c) => c.source === s)), [offered])
-  const pool = useMemo(() => (source ? offered.filter((c) => c.source === source) : offered), [offered, source])
-  const searching = query.trim() !== ''
-  const shown = useMemo(
-    () => (directGameId ? [] : searching ? searchCandidates(pool, query, undefined, RESULTS_MAX) : suggestCandidates(pool)),
-    [pool, query, searching, directGameId],
-  )
-
-  function toggle(c: GameCandidate) {
-    setSelected((prev) => {
-      const next = new Map(prev)
-      if (next.has(c.key)) next.delete(c.key)
-      else next.set(c.key, c)
-      return next
-    })
-  }
-
-  async function addDirectById(id: number) {
-    setFailedId(null)
-    const c = await fetchRaCandidateById(id)
-    if (!c) {
-      setFailedId(id)
-      return
-    }
-    toggle(c)
-    setQuery('')
-  }
-
-  async function addToGroup(c: GameCandidate): Promise<GameGroupItem | null> {
-    try {
-      const res = await fetch(`/api/groups/${groupId}/games`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(candidateToGroupItemBody(c)),
-      })
-      if (!res.ok) {
-        console.error('[AddGameModal] add failed', res.status, c.key)
-        return null
-      }
-      return (await res.json()) as GameGroupItem
-    } catch (err) {
-      console.error('[AddGameModal] add failed', err)
-      return null
-    }
-  }
-
-  /** Adds what it can; the games that failed stay selected, to retry. */
-  async function handleConfirm() {
-    if (selected.size === 0) return
-    setSaving(true)
-    setError(false)
+  /** Adds what it can; resolves with the games that failed, to be retried. */
+  async function handleConfirm(picked: GameCandidate[]): Promise<GameCandidate[]> {
     const added: GameGroupItem[] = []
-    const failed = new Map<string, GameCandidate>()
-    for (const c of selected.values()) {
-      const item = await addToGroup(c)
+    const failed: GameCandidate[] = []
+    for (const c of picked) {
+      const item = await addToGroup(groupId, c)
       if (item) added.push(item)
-      else failed.set(c.key, c)
+      else failed.push(c)
     }
-    setSaving(false)
     if (added.length) onAdded(added)
-    if (failed.size) {
-      setSelected(failed)
-      setError(true)
-      return
-    }
-    notify.success(T.toast.gamesAdded)
-    onClose()
+    if (!failed.length) notify.success(T.toast.gamesAdded)
+    return failed
   }
-
-  const directKey = directGameId ? gameKey('ra', directGameId) : null
 
   return (
-    <Modal
+    <GamePicker
       isOpen={isOpen}
       onClose={onClose}
-      size="xl"
       title={T.groups.addGames}
       hint={groupTitle ? T.groups.addTo.replace('{group}', groupTitle) : undefined}
-      className="gap-4"
-      footer={
-        <div className="w-full flex flex-col gap-2">
-          {selected.size > 0 && (
-            <div className="flex gap-1.5 overflow-x-auto pb-1">
-              {Array.from(selected.values()).map((c) => (
-                <GamePickerChip key={c.key} candidate={c} removeLabel={`${T.groups.removeGame} ${c.title}`} onRemove={() => toggle(c)} />
-              ))}
-            </div>
-          )}
-          {error && (
-            <p role="alert" className="text-xs text-danger">
-              {T.groups.addError}
-            </p>
-          )}
-          <div className="flex items-center gap-3">
-            <p role="status" className="text-xs text-text-secondary flex-1 min-w-0">
-              {selected.size > 0 ? T.groups.selectedCount.replace('{n}', String(selected.size)) : T.groups.pickToAdd}
-            </p>
-            {selected.size > 0 && (
-              <button
-                type="button"
-                onClick={() => setSelected(new Map())}
-                className="text-xs text-text-secondary hover:text-text-main rounded focus-ring"
-              >
-                {T.groups.clearSelection}
-              </button>
-            )}
-            <Button
-              type="button"
-              onClick={handleConfirm}
-              disabled={saving || selected.size === 0}
-            >
-              {saving ? '…' : selected.size > 0 ? T.groups.addSelected.replace('{games}', plural(selected.size, T.plurals.games, lang)) : T.groups.addGames}
-            </Button>
-          </div>
-        </div>
-      }
-    >
-      <div className="sticky top-0 z-10 -mt-1 pb-3 bg-bg-header flex flex-col gap-3">
-        <div className="relative">
-          <IconSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" aria-hidden />
-          <input
-            ref={inputRef}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={T.groups.searchGames}
-            aria-label={T.groups.searchGames}
-            aria-describedby={hintId}
-            className={fieldClass({ size: 'sm', icon: true })}
-          />
-        </div>
-        <p id={hintId} className="text-[11px] text-text-secondary -mt-1">{T.groups.searchHint}</p>
-
-        {sources.length > 1 && <AddGameModalPlatforms sources={sources} value={source} onChange={setSource} />}
-      </div>
-
-      <div>
-        {directGameId && directKey && !existingKeys.has(directKey) ? (
-          <>
-          <button
-            type="button"
-            onClick={() => addDirectById(directGameId)}
-            aria-pressed={selected.has(directKey)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-tile ring-1 transition-colors text-left focus-ring ${selected.has(directKey) ? 'ring-accent bg-accent/10' : 'ring-ink/10 hover:bg-bg-main'}`}
-          >
-            <span aria-hidden="true" className="w-10 h-10 rounded-box bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">ID</span>
-            <span className="flex-1 min-w-0 text-sm font-medium text-text-main">
-              {T.search.openById} #{directGameId}
-            </span>
-            {selected.has(directKey) && <IconCheck className="w-4 h-4 text-accent" aria-hidden />}
-          </button>
-          {failedId === directGameId && (
-            <p role="alert" className="text-xs text-danger mt-2">
-              {T.search.noResults}
-            </p>
-          )}
-          </>
-        ) : shown.length > 0 ? (
-          <>
-            {!searching && (
-              <div className="mb-3">
-                <h3 className="text-sm font-semibold text-text-main">{T.groups.suggestions}</h3>
-                <p className="text-xs text-text-secondary">{T.groups.suggestionsHint}</p>
-              </div>
-            )}
-            <ul className="grid gap-x-3 gap-y-4 grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))]">
-              {shown.map((c) => (
-                <li key={c.key} className="min-w-0 flex">
-                  <GamePickerTile candidate={c} selected={selected.has(c.key)} onToggle={() => toggle(c)} />
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <p className="text-sm text-text-secondary text-center py-12">
-            {searching ? T.groups.noMatches.replace('{q}', query.trim()) : T.groups.nothingToSuggest}
-          </p>
-        )}
-      </div>
-    </Modal>
+      searchLabel={T.groups.searchGames}
+      excludeKeys={existingKeys}
+      onConfirm={handleConfirm}
+      confirmLabel={(n) => (n > 0 ? T.groups.addSelected.replace('{games}', plural(n, T.plurals.games, lang)) : T.groups.addGames)}
+      pickPrompt={T.groups.pickToAdd}
+      errorText={T.groups.addError}
+    />
   )
 }

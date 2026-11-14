@@ -68,6 +68,7 @@
   --shadow-hairline-t: inset 0 1px 0 rgb(var(--ink) / 0.1);
   --shadow-hairline-b: inset 0 -1px 0 rgb(var(--ink) / 0.1);
   --shadow-hairline-b-soft: inset 0 -1px 0 rgb(var(--ink) / 0.05);
+  --shadow-hairline-l: inset 1px 0 0 rgb(var(--ink) / 0.1);
   /* What you type into sits below the card. */
   --shadow-sunken: inset 0 2px 4px rgb(0 0 0 / 0.22);
   /* The one glow: a finished bar or ring (`drop-shadow-done`). */

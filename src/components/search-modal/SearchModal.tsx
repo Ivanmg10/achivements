@@ -14,6 +14,7 @@ import { useRecentSearches } from '@/hooks/useRecentSearches'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { searchCandidates } from '@/utils/gameCandidates'
 import { gameHref, GameRef } from '@/utils/gameRef'
+import { parseRaGameId } from '@/utils/raGameId'
 import { plural } from '@/utils/utils'
 import { canUseXbox } from '@/utils/xboxAccess'
 import IconButton from '@/components/ui/IconButton'
@@ -65,12 +66,8 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   const users = useUserSearch(query, isOpen)
   const results = useMemo(() => searchCandidates(candidates, query), [candidates, query])
 
-  const directGameId = useMemo(() => {
-    if (!raLinked) return null
-    const id = /^\d{3,}$/.test(typed) ? parseInt(typed) : typed.match(/retroachievements\.org\/game\/(\d+)/i)?.[1]
-    const parsed = typeof id === 'string' ? parseInt(id) : id
-    return parsed && !isHidden(parsed, 'ra') ? parsed : null
-  }, [typed, raLinked, isHidden])
+  const parsedId = raLinked ? parseRaGameId(typed) : null
+  const directGameId = parsedId && !isHidden(parsedId, 'ra') ? parsedId : null
 
   // What the box searches, by name: only the platforms this person can use.
   const platforms = ['RetroAchievements', 'Steam', 'PlayStation', ...(canUseXbox(session?.user?.admin) ? ['Xbox'] : [])]
@@ -166,7 +163,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
         ) : (
           <>
             {(results.length > 0 || directGameId) && (
-              <SearchModalGroup title={`${T.search.yourGames} · ${results.length}`}>
+              <SearchModalGroup title={T.search.yourGames} count={results.length}>
                 <ul>
                   {results.map((game) => (
                     <li key={game.key}>

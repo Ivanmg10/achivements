@@ -103,3 +103,24 @@ test('below sm a detail, a picker or a tool is a full-screen sheet; a confirmati
   rerender(<Modal isOpen onClose={jest.fn()} size="md" title="Pick"><p>Games</p></Modal>)
   expect(screen.getByRole('dialog', { name: 'Pick' })).not.toHaveClass('max-sm:h-dvh')
 })
+
+test('a toolbar sits between the head and the scrolling body, outside the scroll box (#165)', () => {
+  render(
+    <Modal isOpen onClose={jest.fn()} title="Pick" toolbar={<input aria-label="Search" />}>
+      <p>The list</p>
+    </Modal>,
+  )
+  const bar = screen.getByRole('textbox', { name: 'Search' }).parentElement!
+  const body = screen.getByText('The list').parentElement!
+  expect(body).toHaveClass('overflow-y-auto')
+  expect(body.contains(bar)).toBe(false)
+  // Order in the panel: head, toolbar, body.
+  const kids = [...screen.getByRole('dialog').children]
+  expect(kids.indexOf(bar)).toBeGreaterThan(kids.indexOf(screen.getByRole('heading', { name: 'Pick' }).parentElement!.parentElement!))
+  expect(kids.indexOf(bar)).toBeLessThan(kids.indexOf(body))
+})
+
+test('a field with autoFocus keeps the focus the dialog would otherwise take', () => {
+  render(<Modal isOpen onClose={jest.fn()} title="Search"><input aria-label="Query" autoFocus /></Modal>)
+  expect(screen.getByRole('textbox', { name: 'Query' })).toHaveFocus()
+})
