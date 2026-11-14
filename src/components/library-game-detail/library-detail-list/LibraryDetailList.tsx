@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { plural } from '@/utils/utils'
 import { formatRarity } from '@/utils/steamFeed'
 import type { InsightAchievement } from '@/utils/gameInsights'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
@@ -71,7 +72,7 @@ export default function LibraryDetailList({
                   ) : (
                     <>
                       {a.rarity !== null && <span>{T.libraryDetail.rarityOf.replace('{n}', formatRarity(a.rarity, lang))}</span>}
-                      {a.points !== null && <span className="text-text-main font-medium">{a.points} {T.libraryDetail.pointsShort}</span>}
+                      {a.points !== null && <span className="text-text-main font-medium">{plural(a.points, T.plurals.points, lang)}</span>}
                     </>
                   )}
                 </span>

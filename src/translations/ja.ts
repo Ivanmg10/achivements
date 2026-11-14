@@ -126,6 +126,7 @@ export const ja: Translations = {
     error: 'ピン留めを更新できませんでした。もう一度お試しください。',
     addAria: 'Pin a game',
     searchPlaceholder: 'Search a game to pin…',
+    pickToPin: 'ピン留めするゲームを選んでください',
     confirmPin: 'Pin',
   },
   userData: {

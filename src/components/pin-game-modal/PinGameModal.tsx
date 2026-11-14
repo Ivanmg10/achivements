@@ -36,7 +36,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
       excludeKeys={pinnedKeys}
       onConfirm={handleConfirm}
       confirmLabel={(n) => `${T.pinnedGames.confirmPin}${n > 0 ? ` (${n})` : ''}`}
-      pickPrompt={T.groups.pickToAdd}
+      pickPrompt={T.pinnedGames.pickToPin}
       errorText={T.pinnedGames.error}
     />
   )

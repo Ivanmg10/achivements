@@ -225,3 +225,8 @@ test('a failure part way keeps the games not pinned yet chosen, to try again', a
   expect(await screen.findByRole('alert')).toBeInTheDocument()
   expect(screen.getByText('Pin (1)')).toBeInTheDocument()
 })
+
+test('before anything is picked, the footer talks about pinning, not adding (#165, H8)', () => {
+  render(<PinGameModal isOpen={true} onClose={jest.fn()} />)
+  expect(screen.getByRole('status')).toHaveTextContent('Pick games to pin them')
+})

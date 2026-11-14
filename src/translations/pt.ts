@@ -126,6 +126,7 @@ export const pt: Translations = {
     error: 'Não foi possível atualizar a fixação. Tenta novamente.',
     addAria: 'Pin a game',
     searchPlaceholder: 'Search a game to pin…',
+    pickToPin: 'Escolha jogos para fixar',
     confirmPin: 'Pin',
   },
   userData: {

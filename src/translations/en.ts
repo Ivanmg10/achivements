@@ -127,6 +127,7 @@ export const en = {
     error: 'Could not update the pin. Try again.',
     addAria: 'Pin a game',
     searchPlaceholder: 'Search a game to pin…',
+    pickToPin: 'Pick games to pin them',
     confirmPin: 'Pin',
   },
   userData: {

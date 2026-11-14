@@ -126,6 +126,7 @@ export const es: Translations = {
     error: 'No se pudo actualizar el fijado. Inténtalo de nuevo.',
     addAria: 'Fijar un juego',
     searchPlaceholder: 'Buscar un juego para fijar…',
+    pickToPin: 'Elige juegos para fijarlos',
     confirmPin: 'Fijar',
   },
   userData: {

@@ -29,10 +29,10 @@ const GRID = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 aut
  * change it). RA's open their detail modal, as everywhere.
  */
 export default function MainPagePinnedSectionAchievements() {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const { pinned, isLoading, error, refetch, unpin, reorder } = usePinnedAchievements()
   const [selected, setSelected] = useState<RaPin | null>(null)
-  const views = useMemo(() => pinned.map((fav) => ({ fav, view: pinnedView(fav, T) })), [pinned, T])
+  const views = useMemo(() => pinned.map((fav) => ({ fav, view: pinnedView(fav, T, lang) })), [pinned, T, lang])
   const earned = views.filter(({ view }) => view.earned).length
 
   return (

@@ -126,6 +126,7 @@ export const it: Translations = {
     error: 'Impossibile aggiornare il gioco fissato. Riprova.',
     addAria: 'Pin a game',
     searchPlaceholder: 'Search a game to pin…',
+    pickToPin: 'Scegli i giochi da fissare',
     confirmPin: 'Pin',
   },
   userData: {

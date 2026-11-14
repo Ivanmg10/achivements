@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
+import { plural } from '@/utils/utils'
 import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import type { AchievementColumn } from '@/types/achievementTable'
 import { useAchievementPins, RA_PINS } from '@/hooks/useAchievementPins'
@@ -43,7 +44,7 @@ export default function GameInfoTable({ gameData }: { gameData?: RetroAchievemen
     end: true,
     sort: { first: 'desc', value: ({ item }) => item.Points },
     cell: ({ item }) => <span className="text-base font-extrabold">{item.Points}</span>,
-    card: ({ item }) => <span className="font-semibold text-text-main">{item.Points} {T.libraryDetail.pointsShort}</span>,
+    card: ({ item }) => <span className="font-semibold text-text-main">{plural(item.Points, T.plurals.points, lang)}</span>,
   }
   const typeTag = ({ item }: { item: RetroAchievement }) => {
     const tag = raTypeTag(item.Type, T.achievement)

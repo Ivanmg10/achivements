@@ -126,6 +126,7 @@ export const de: Translations = {
     error: 'Das Anheften konnte nicht aktualisiert werden. Versuch es erneut.',
     addAria: 'Pin a game',
     searchPlaceholder: 'Search a game to pin…',
+    pickToPin: 'Wähle Spiele zum Anheften',
     confirmPin: 'Pin',
   },
   userData: {

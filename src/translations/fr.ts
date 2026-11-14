@@ -126,6 +126,7 @@ export const fr: Translations = {
     error: 'Impossible de mettre à jour l’épinglage. Réessaie.',
     addAria: 'Pin a game',
     searchPlaceholder: 'Search a game to pin…',
+    pickToPin: 'Choisis des jeux à épingler',
     confirmPin: 'Pin',
   },
   userData: {

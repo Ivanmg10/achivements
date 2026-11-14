@@ -126,6 +126,7 @@ export const pl: Translations = {
     error: 'Nie udało się zaktualizować przypięcia. Spróbuj ponownie.',
     addAria: 'Pin a game',
     searchPlaceholder: 'Search a game to pin…',
+    pickToPin: 'Wybierz gry do przypięcia',
     confirmPin: 'Pin',
   },
   userData: {

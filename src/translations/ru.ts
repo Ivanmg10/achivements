@@ -126,6 +126,7 @@ export const ru: Translations = {
     error: 'Не удалось обновить закрепление. Попробуйте ещё раз.',
     addAria: 'Pin a game',
     searchPlaceholder: 'Search a game to pin…',
+    pickToPin: 'Выберите игры, чтобы закрепить их',
     confirmPin: 'Pin',
   },
   userData: {
