@@ -924,8 +924,6 @@ export const en = {
   dayModal: {
     title: 'Achievements earned',
     empty: 'No achievements this day',
-    achievements: 'achievements',
-    completions: 'completions',
   },
   cards: {
     showAchievements: 'Show achievements',
@@ -1638,7 +1636,9 @@ export const en = {
     games: { one: '{n} game', other: '{n} games' } as PluralForms,
     achievements: { one: '{n} achievement', other: '{n} achievements' } as PluralForms,
     achievementsWord: { one: 'achievement', other: 'achievements' } as PluralForms,
+    completions: { one: '{n} completion', other: '{n} completions' } as PluralForms,
     pointsLabel: { one: 'Point', other: 'Points' } as PluralForms,
+    points: { one: '{n} point', other: '{n} points' } as PluralForms,
     days: { one: '{n} day', other: '{n} days' } as PluralForms,
     results: { one: '{n} result', other: '{n} results' } as PluralForms,
     missables: { one: '{n} missable', other: '{n} missable' } as PluralForms,

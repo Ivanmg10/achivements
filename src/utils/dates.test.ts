@@ -1,4 +1,4 @@
-import { addDays, dateFormat, formatDate, formatDateTime, formatDay, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay } from './dates'
+import { addDays, dateFormat, formatDate, formatDateTime, formatDay, formatWeekdayDay, upperFirst, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay, utcWeekDays } from './dates'
 
 describe('parseUnlockTime', () => {
   test('a zone-less platform date is UTC, whatever the browser zone is', () => {
@@ -92,5 +92,35 @@ describe('addDays', () => {
     expect(addDays('2026-06-29', 3)).toBe('2026-07-02')
     expect(addDays('2026-01-01', -1)).toBe('2025-12-31')
     expect(addDays('2026-03-10', 0)).toBe('2026-03-10')
+  })
+})
+
+describe('utcWeekDays', () => {
+  const OLD_TZ = process.env.TZ
+  afterEach(() => { process.env.TZ = OLD_TZ })
+
+  test('the seven days from a Monday, whatever the browser zone is', () => {
+    for (const tz of ['UTC', 'Europe/Madrid', 'America/Los_Angeles', 'Pacific/Auckland']) {
+      process.env.TZ = tz
+      expect(utcWeekDays('2026-10-05')).toEqual(['2026-10-05', '2026-10-06', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11'])
+    }
+  })
+
+  test('crosses a month and a year', () => {
+    expect(utcWeekDays('2026-12-28')).toEqual(['2026-12-28', '2026-12-29', '2026-12-30', '2026-12-31', '2027-01-01', '2027-01-02', '2027-01-03'])
+  })
+})
+
+describe('formatWeekdayDay', () => {
+  test('the weekday with a capital, then the one format', () => {
+    expect(formatWeekdayDay('2020-11-13', 'en')).toBe('Friday, Nov 13, 2020')
+    expect(formatWeekdayDay('2020-11-13', 'es')).toMatch(/^Viernes, 13 nov/)
+  })
+})
+
+describe('upperFirst', () => {
+  test('capitalises the first letter only', () => {
+    expect(upperFirst('noviembre de 2026', 'es')).toBe('Noviembre de 2026')
+    expect(upperFirst('', 'es')).toBe('')
   })
 })

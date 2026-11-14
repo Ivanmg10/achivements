@@ -4,6 +4,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { InsightAchievement } from '@/utils/gameInsights'
 import LibraryDetailList from '@/components/library-game-detail/library-detail-list/LibraryDetailList'
 import Modal from '@/components/ui/Modal'
+import { plural } from '@/utils/utils'
 import DateText from '@/components/ui/DateText'
 
 /**
@@ -22,14 +23,14 @@ export default function GameAchievementsProgressChartModal({
   items: InsightAchievement[]
   onClose: () => void
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   const sorted = [...items].sort((a, b) => (b.earnedAt ?? '').localeCompare(a.earnedAt ?? ''))
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg" title={title.charAt(0).toUpperCase() + title.slice(1)} className="gap-3">
+    <Modal isOpen={isOpen} onClose={onClose} size="lg" title={title} className="gap-3">
       <LibraryDetailList
-        title={`${items.length} ${T.dayModal.achievements}`}
+        title={plural(items.length, T.plurals.achievements, lang)}
         items={sorted}
         empty={T.gameExpanded.noActivity}
         meta={(a) => <DateText value={a.earnedAt} />}

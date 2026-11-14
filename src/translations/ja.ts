@@ -923,8 +923,6 @@ export const ja: Translations = {
   dayModal: {
     title: '獲得した実績',
     empty: 'この日の実績はありません',
-    achievements: '実績',
-    completions: '達成',
   },
   cards: {
     showAchievements: '実績を表示',
@@ -1637,7 +1635,9 @@ export const ja: Translations = {
     games: { other: '{n}本のゲーム' },
     achievements: { other: '{n}個の実績' },
     achievementsWord: { other: '実績' },
+    completions: { other: '{n} 達成' },
     pointsLabel: { other: 'ポイント' },
+    points: { other: '{n} ポイント' },
     days: { other: '{n}日' },
     results: { other: '{n}件' },
     missables: { other: '取り逃し{n}件' },

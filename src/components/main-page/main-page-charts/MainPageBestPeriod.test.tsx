@@ -2,13 +2,11 @@ jest.mock('@/components/day-achievements-modal/DayAchievementsModal', () => ({
   __esModule: true,
   default: ({ date }: { date: string }) => <div data-testid="day-modal">{date}</div>,
 }))
-jest.mock('@/components/week-achievements-modal/WeekAchievementsModal', () => ({
-  __esModule: true,
-  default: ({ startDate }: { startDate: string }) => <div data-testid="week-modal">{startDate}</div>,
-}))
 jest.mock('@/components/period-achievements-modal/PeriodAchievementsModal', () => ({
   __esModule: true,
-  default: ({ title, achievements }: { title: string; achievements: unknown[] }) => <div data-testid="month-modal">{`${title}:${achievements.length}`}</div>,
+  default: ({ title, hint, achievements }: { title: string; hint?: string; achievements: { Date: string }[] }) => (
+    <div data-testid={hint ? 'week-modal' : 'month-modal'}>{`${title}:${achievements.length}:${achievements.map((a) => a.Date.slice(0, 10)).join(',')}`}</div>
+  ),
 }))
 
 import { render, screen, fireEvent } from '@testing-library/react'
@@ -51,7 +49,7 @@ test('opens the best day, week and month in a modal', async () => {
   fireEvent.click(card(en.cards.bestDay))
   expect(await screen.findByTestId('day-modal')).toHaveTextContent('2024-01-10')
   fireEvent.click(card(en.cards.bestWeek))
-  expect(await screen.findByTestId('week-modal')).toBeInTheDocument()
+  expect(await screen.findByTestId('week-modal')).toHaveTextContent(`${en.cards.bestWeek}:2`)
   fireEvent.click(card(en.cards.bestMonth))
   // Only that month's unlocks, not December's.
   expect(await screen.findByTestId('month-modal')).toHaveTextContent(`${en.cards.bestMonth} · January 2024:2`)
@@ -62,4 +60,18 @@ test('says so without data, and shows placeholders while loading', () => {
   expect(screen.getAllByText(en.cards.noData)).toHaveLength(3)
   rerender(<MainPageBestPeriod achievements={[]} isLoading />)
   expect(screen.queryByText(en.cards.noData)).not.toBeInTheDocument()
+})
+
+test('the best week lists its Monday-to-Sunday UTC days, even east of UTC (a local week was off by a day)', async () => {
+  const OLD_TZ = process.env.TZ
+  process.env.TZ = 'Europe/Madrid'
+  try {
+    // Week of Mon 2026-10-05: the Sunday before (4th) and the Monday after (12th) are not in it, the Sunday 11th is.
+    const list = [ach('2026-10-04', 5), ach('2026-10-05', 5), ach('2026-10-11', 30), ach('2026-10-12', 5)]
+    render(<MainPageBestPeriod achievements={list} />)
+    fireEvent.click(card(en.cards.bestWeek))
+    expect(await screen.findByTestId('week-modal')).toHaveTextContent(`${en.cards.bestWeek}:2:2026-10-05,2026-10-11`)
+  } finally {
+    process.env.TZ = OLD_TZ
+  }
 })

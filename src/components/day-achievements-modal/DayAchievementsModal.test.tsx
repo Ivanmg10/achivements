@@ -51,3 +51,18 @@ test('says so on an empty day, and closes', () => {
   fireEvent.click(screen.getByRole('button', { name: 'Close' }))
   expect(onClose).toHaveBeenCalled()
 })
+
+test('the head names the day with its weekday in the one format, and the footer counts in the right plural', () => {
+  render(<DayAchievementsModal date={DAY} achievements={[ach()]} onClose={jest.fn()} />)
+  expect(screen.getByText('Monday, Jan 15, 2024')).toBeInTheDocument()
+  const footer = document.querySelector('p.text-xs')!
+  expect(footer).toHaveTextContent('1 achievement, 1 completion')
+  expect(footer).not.toHaveTextContent(/1 achievements|1 completions/)
+})
+
+test('the mastery award is a Tag in the hardcore tone; its picture has no alt (the title is beside it)', () => {
+  render(<DayAchievementsModal date={DAY} achievements={[ach()]} onClose={jest.fn()} />)
+  expect(screen.getByText(en.streak.mastery).className).toMatch(/text-hardcore/)
+  expect(screen.getByText(en.achievement.hardcoreShort).className).toMatch(/text-hardcore/)
+  expect(screen.queryByRole('img', { name: 'Zelda' })).not.toBeInTheDocument()
+})

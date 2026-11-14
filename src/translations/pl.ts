@@ -923,8 +923,6 @@ export const pl: Translations = {
   dayModal: {
     title: 'Zdobyte osiągnięcia',
     empty: 'Brak osiągnięć w tym dniu',
-    achievements: 'osiągnięć',
-    completions: 'ukończenia',
   },
   cards: {
     showAchievements: 'Pokaż osiągnięcia',
@@ -1637,7 +1635,9 @@ export const pl: Translations = {
     games: { one: '{n} gra', few: '{n} gry', many: '{n} gier', other: '{n} gry' },
     achievements: { one: '{n} osiągnięcie', few: '{n} osiągnięcia', many: '{n} osiągnięć', other: '{n} osiągnięcia' },
     achievementsWord: { one: 'osiągnięcie', few: 'osiągnięcia', many: 'osiągnięć', other: 'osiągnięcia' },
+    completions: { one: '{n} ukończenie', few: '{n} ukończenia', many: '{n} ukończeń', other: '{n} ukończenia' },
     pointsLabel: { one: 'Punkt', few: 'Punkty', many: 'Punktów', other: 'Punktu' },
+    points: { one: '{n} punkt', few: '{n} punkty', many: '{n} punktów', other: '{n} punktu' },
     days: { one: '{n} dzień', few: '{n} dni', many: '{n} dni', other: '{n} dnia' },
     results: { one: '{n} wynik', few: '{n} wyniki', many: '{n} wyników', other: '{n} wyniku' },
     missables: { one: '{n} do przegapienia', few: '{n} do przegapienia', many: '{n} do przegapienia', other: '{n} do przegapienia' },

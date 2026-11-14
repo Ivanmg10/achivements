@@ -923,8 +923,6 @@ export const fr: Translations = {
   dayModal: {
     title: 'Succès obtenus',
     empty: 'Aucun succès ce jour',
-    achievements: 'succès',
-    completions: 'complétions',
   },
   cards: {
     showAchievements: 'Voir les succès',
@@ -1637,7 +1635,9 @@ export const fr: Translations = {
     games: { one: '{n} jeu', other: '{n} jeux' },
     achievements: { one: '{n} succès', other: '{n} succès' },
     achievementsWord: { one: 'succès', other: 'succès' },
+    completions: { one: '{n} complétion', other: '{n} complétions' },
     pointsLabel: { one: 'Point', other: 'Points' },
+    points: { one: '{n} point', other: '{n} points' },
     days: { one: '{n} jour', other: '{n} jours' },
     results: { one: '{n} résultat', other: '{n} résultats' },
     missables: { one: '{n} manquable', other: '{n} manquables' },

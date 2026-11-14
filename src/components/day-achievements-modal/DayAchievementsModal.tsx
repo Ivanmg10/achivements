@@ -11,7 +11,10 @@ import { IconStar, IconCheck } from '@tabler/icons-react'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import Modal from '@/components/ui/Modal'
-import { formatDay, utcDay } from '@/utils/dates'
+import Tag from '@/components/ui/Tag'
+import Facts from '@/components/ui/Facts'
+import { formatWeekdayDay, utcDay } from '@/utils/dates'
+import { plural } from '@/utils/utils'
 import { raImageUrl } from '@/utils/raAssets'
 
 interface Props {
@@ -31,9 +34,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
   const subject = useSubject()
   const { awards } = useUserAwards()
   const dayAchs = achievements.filter(a => a.Date.startsWith(date))
-  const formatted = formatDay(date, lang, {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-  })
+  const formatted = formatWeekdayDay(date, lang)
 
   const dayAwards = useMemo(() => {
     // Mastery/beaten awards are RA's; Steam unlocks in the list simply have none.
@@ -53,9 +54,8 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
       className="gap-3"
       footer={
         dayAchs.length > 0 || dayAwards.length > 0 ? (
-          <p className="text-xs text-text-secondary">
-            {dayAchs.length} {T.dayModal.achievements}
-            {dayAwards.length > 0 && ` · ${dayAwards.length} ${T.dayModal.completions}`}
+          <p className="flex flex-wrap items-center text-xs text-text-secondary">
+            <Facts items={[plural(dayAchs.length, T.plurals.achievements, lang), dayAwards.length > 0 && plural(dayAwards.length, T.plurals.completions, lang)]} />
           </p>
         ) : undefined
       }
@@ -78,7 +78,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                       {award.ImageIcon ? (
                         <Image
                           src={raImageUrl(award.ImageIcon)!}
-                          alt={award.Title}
+                          alt=""
                           width={36}
                           height={36}
                           className="w-9 h-9 rounded-box object-cover"
@@ -87,10 +87,10 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                       ) : (
                         <div className="w-9 h-9 rounded-box bg-ink/5" />
                       )}
-                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${isMastery ? 'bg-hardcore' : 'bg-success'}`}>
+                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-bg-main ring-1 ring-ink/10 flex items-center justify-center ${isMastery ? 'text-hardcore' : 'text-success'}`}>
                         {isMastery
-                          ? <IconStar className="w-2.5 h-2.5 text-black" aria-hidden />
-                          : <IconCheck className="w-2.5 h-2.5 text-white" aria-hidden />
+                          ? <IconStar className="w-2.5 h-2.5" aria-hidden />
+                          : <IconCheck className="w-2.5 h-2.5" aria-hidden />
                         }
                       </div>
                     </div>
@@ -99,10 +99,8 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                       <span className="text-[10px] text-text-secondary">{award.ConsoleName}</span>
                     </div>
                     <div className="flex flex-col items-end gap-1 shrink-0">
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isMastery ? 'bg-hardcore/15 text-hardcore' : 'bg-success/15 text-success'}`}>
-                        {isMastery ? T.streak.mastery : T.streak.beaten}
-                      </span>
-                      {isHardcore && <span className="text-[10px] text-warning font-semibold">{T.achievement.hardcoreShort}</span>}
+                      <Tag tone={isMastery ? 'hardcore' : 'success'} size="xs">{isMastery ? T.streak.mastery : T.streak.beaten}</Tag>
+                      {isHardcore && <span className="text-[10px] text-hardcore font-semibold">{T.achievement.hardcoreShort}</span>}
                     </div>
                   </Link>
                 )
@@ -112,9 +110,9 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
           )}
 
           {/* Achievement grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {dayAchs.length === 0 && dayAwards.length === 0 ? (
-              <p className="col-span-3 text-sm text-text-secondary text-center py-6">{T.dayModal.empty}</p>
+              <p className="col-span-full text-sm text-text-secondary text-center py-6">{T.dayModal.empty}</p>
             ) : (
               dayAchs.map(ach => (
                 <RecentAchievementRow key={ach.AchievementID} ach={ach} onNavigate={onClose} />

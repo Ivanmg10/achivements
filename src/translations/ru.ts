@@ -923,8 +923,6 @@ export const ru: Translations = {
   dayModal: {
     title: 'Полученные достижения',
     empty: 'Нет достижений в этот день',
-    achievements: 'достижений',
-    completions: 'прохождения',
   },
   cards: {
     showAchievements: 'Показать достижения',
@@ -1637,7 +1635,9 @@ export const ru: Translations = {
     games: { one: '{n} игра', few: '{n} игры', many: '{n} игр', other: '{n} игры' },
     achievements: { one: '{n} достижение', few: '{n} достижения', many: '{n} достижений', other: '{n} достижения' },
     achievementsWord: { one: 'достижение', few: 'достижения', many: 'достижений', other: 'достижения' },
+    completions: { one: '{n} прохождение', few: '{n} прохождения', many: '{n} прохождений', other: '{n} прохождения' },
     pointsLabel: { one: 'Очко', few: 'Очка', many: 'Очков', other: 'Очка' },
+    points: { one: '{n} очко', few: '{n} очка', many: '{n} очков', other: '{n} очка' },
     days: { one: '{n} день', few: '{n} дня', many: '{n} дней', other: '{n} дня' },
     results: { one: '{n} результат', few: '{n} результата', many: '{n} результатов', other: '{n} результата' },
     missables: { one: '{n} можно упустить', few: '{n} можно упустить', many: '{n} можно упустить', other: '{n} можно упустить' },

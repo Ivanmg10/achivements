@@ -923,8 +923,6 @@ export const it: Translations = {
   dayModal: {
     title: 'Obiettivi ottenuti',
     empty: 'Nessun obiettivo in questo giorno',
-    achievements: 'obiettivi',
-    completions: 'completamenti',
   },
   cards: {
     showAchievements: 'Mostra obiettivi',
@@ -1637,7 +1635,9 @@ export const it: Translations = {
     games: { one: '{n} gioco', other: '{n} giochi' },
     achievements: { one: '{n} obiettivo', other: '{n} obiettivi' },
     achievementsWord: { one: 'obiettivo', other: 'obiettivi' },
+    completions: { one: '{n} completamento', other: '{n} completamenti' },
     pointsLabel: { one: 'Punto', other: 'Punti' },
+    points: { one: '{n} punto', other: '{n} punti' },
     days: { one: '{n} giorno', other: '{n} giorni' },
     results: { one: '{n} risultato', other: '{n} risultati' },
     missables: { one: '{n} perdibile', other: '{n} perdibili' },
