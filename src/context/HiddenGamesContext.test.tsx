@@ -45,6 +45,41 @@ test('a refused hide rolls back and says so', async () => {
   expect(notify.error).toHaveBeenCalledWith(en.toast.gameHideFailed)
 })
 
+test('hiding several saves one request each and gives one toast', async () => {
+  fetchMock.mockReturnValueOnce(ok([])).mockReturnValueOnce(ok()).mockReturnValueOnce(ok())
+  const { result } = renderHook(() => useHiddenGames(), { wrapper })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  let failed: unknown[] = [{}]
+  await act(async () => {
+    failed = await result.current.hideGames([
+      { source: 'steam', id: 620, title: 'Portal 2', image: null },
+      { source: 'ra', id: 5, title: 'Zelda', image: null },
+    ])
+  })
+  expect(failed).toEqual([])
+  expect(result.current.isHidden(620, 'steam') && result.current.isHidden(5, 'ra')).toBe(true)
+  expect(fetchMock).toHaveBeenCalledTimes(3)
+  expect(notify.success).toHaveBeenCalledTimes(1)
+  expect(notify.success).toHaveBeenCalledWith(en.toast.gamesHidden)
+})
+
+test('in a batch only the refused games roll back, and they are returned', async () => {
+  fetchMock.mockReturnValueOnce(ok([])).mockReturnValueOnce(ok()).mockReturnValueOnce(Promise.resolve({ ok: false, status: 500 }))
+  const { result } = renderHook(() => useHiddenGames(), { wrapper })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  const good = { source: 'steam' as const, id: 620, title: 'Portal 2', image: null }
+  const bad = { source: 'ra' as const, id: 5, title: 'Zelda', image: null }
+  let failed: unknown[] = []
+  await act(async () => {
+    failed = await result.current.hideGames([good, bad])
+  })
+  expect(failed).toEqual([bad])
+  expect(result.current.isHidden(620, 'steam')).toBe(true)
+  expect(result.current.isHidden(5, 'ra')).toBe(false)
+  expect(notify.error).toHaveBeenCalledWith(en.toast.gamesHideFailed)
+  expect(notify.success).not.toHaveBeenCalled()
+})
+
 test('showing again removes it; a refusal puts it back and says so', async () => {
   fetchMock.mockReturnValueOnce(ok([{ source: 'ra', game_id: 5, title: 'Zelda', image: null }]))
   const { result } = renderHook(() => useHiddenGames(), { wrapper })
