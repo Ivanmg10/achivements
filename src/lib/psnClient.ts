@@ -1,4 +1,5 @@
 import { countUpstream } from '@/lib/upstreamCount'
+import { recordPsnCall, type PsnFunction } from '@/lib/psnCallStats'
 import { NextResponse } from 'next/server'
 import {
   exchangeAccessCodeForAuthTokens,
@@ -141,7 +142,7 @@ function unwrap<T>(res: T): T {
 let cooldownUntil = 0
 
 /** One request to Sony: within the app's budget, and never longer than the deadline. */
-async function attempt<T>(call: () => Promise<T>): Promise<T> {
+async function attempt<T>(fn: PsnFunction, call: () => Promise<T>): Promise<T> {
   if (Date.now() < cooldownUntil) throw new PsnError('too many requests (cooling down)')
   const budget = await (await import('@/lib/attemptLimit')).reserveAttempt('psn-upstream', 'app')
   if (!budget.allowed) {
@@ -149,6 +150,7 @@ async function attempt<T>(call: () => Promise<T>): Promise<T> {
     throw new PsnError('too many requests (app budget)')
   }
   countUpstream('psn')
+  recordPsnCall(fn)
   let timer: ReturnType<typeof setTimeout> | undefined
   const deadline = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new PsnError('PSN did not answer in time')), CALL_TIMEOUT_MS)
@@ -161,20 +163,20 @@ async function attempt<T>(call: () => Promise<T>): Promise<T> {
 }
 
 /**
- * One Sony call, unwrapped. When Sony says "too many requests" it waits a
+ * One Sony call, unwrapped and counted under `fn` (psnCallStats). When Sony says "too many requests" it waits a
  * moment and asks once more; a second refusal is thrown (psnFailure answers
  * 429) and this instance stops asking for a minute: one account serves everyone,
  * so insisting is what would take PSN away from all of them. Any other error is
  * thrown at once: retrying a hidden profile helps no one.
  */
-export async function psnCall<T>(call: () => Promise<T>): Promise<T> {
+export async function psnCall<T>(fn: PsnFunction, call: () => Promise<T>): Promise<T> {
   try {
-    return await attempt(call)
+    return await attempt(fn, call)
   } catch (err) {
     if (!(err instanceof PsnError && err.isRateLimited) || /cooling down|app budget/.test(err.message)) throw err
     await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_WAIT_MS))
     try {
-      return await attempt(call)
+      return await attempt(fn, call)
     } catch (again) {
       if (again instanceof PsnError && again.isRateLimited) cooldownUntil = Date.now() + COOLDOWN_MS
       throw again
@@ -208,6 +210,7 @@ async function newTokens(): Promise<PsnTokens> {
 
   if (known && known.refreshExpiresAt - MARGIN_MS > now) {
     try {
+      recordPsnCall('auth')
       const refreshed = toTokens(await exchangeRefreshTokenForAuthTokens(known.refreshToken))
       // Sony hands back the same refresh token with the same deadline; keep that deadline.
       refreshed.refreshExpiresAt = Math.min(refreshed.refreshExpiresAt, known.refreshExpiresAt)
@@ -226,9 +229,17 @@ async function newTokens(): Promise<PsnTokens> {
       console.error('[psn] could not store the NPSSO', err),
     )
   }
-  const fresh = toTokens(await exchangeAccessCodeForAuthTokens(await exchangeNpssoForAccessCode(npsso)))
+  const fresh = await exchangeNpsso(npsso)
   await savePsnTokens(fresh).catch((err) => console.error('[psn] could not store tokens', err))
   return fresh
+}
+
+/** The two requests that turn an NPSSO into tokens. */
+async function exchangeNpsso(npsso: string): Promise<PsnTokens> {
+  recordPsnCall('auth')
+  const code = await exchangeNpssoForAccessCode(npsso)
+  recordPsnCall('auth')
+  return toTokens(await exchangeAccessCodeForAuthTokens(code))
 }
 
 async function authorization(): Promise<AuthorizationPayload> {
@@ -249,7 +260,7 @@ export function forgetPsnTokens(): void {
 
 /** Exchanges an NPSSO once, to prove it works before it is stored. */
 export async function verifyNpsso(npsso: string): Promise<PsnTokens> {
-  return toTokens(await exchangeAccessCodeForAuthTokens(await exchangeNpssoForAccessCode(npsso)))
+  return exchangeNpsso(npsso)
 }
 
 /** Sony's icons come as http:// at times, which the site's CSP (and any https page) refuses. */
@@ -259,7 +270,7 @@ function https(url: string): string {
 
 /** The account with exactly this online ID (any case), or null. */
 export async function findPsnAccount(username: string): Promise<{ accountId: string; onlineId: string } | null> {
-  const res = await psnCall(async () => makeUniversalSearch(await authorization(), username, 'SocialAllAccounts'))
+  const res = await psnCall('search', async () => makeUniversalSearch(await authorization(), username, 'SocialAllAccounts'))
   const wanted = username.toLowerCase()
   const match = res.domainResponses?.[0]?.results?.find((r) => r.socialMetadata.onlineId.toLowerCase() === wanted)
   return match ? { accountId: match.socialMetadata.accountId, onlineId: match.socialMetadata.onlineId } : null
@@ -293,9 +304,9 @@ export async function psnSummary(accountId: string, userId: string | null = null
     async () => {
       const auth = await authorization()
       const [summary, titles, profile] = await Promise.all([
-        psnCall(() => getUserTrophyProfileSummary(auth, accountId)),
-        psnCall(() => getUserTitles(auth, accountId, { limit: 1 })),
-        psnCall(() => getProfileFromAccountId(auth, accountId)),
+        psnCall('summary', () => getUserTrophyProfileSummary(auth, accountId)),
+        psnCall('titleCount', () => getUserTitles(auth, accountId, { limit: 1 })),
+        psnCall('profile', () => getProfileFromAccountId(auth, accountId)),
       ])
       return {
         onlineId: profile.onlineId,
@@ -380,6 +391,8 @@ async function playedGames(accountId: string): Promise<PlayedGame[]> {
   const auth = await authorization()
   const games: PlayedGame[] = []
   for (let offset = 0; ; offset += PLAYED_PAGE) {
+    // Not through psnCall (no budget, no deadline, no retry), as before; only counted.
+    recordPsnCall('played')
     const page = await getUserPlayedGames(auth, accountId, { limit: PLAYED_PAGE, offset })
     const titles = page.titles ?? []
     for (const t of titles) {
@@ -417,7 +430,7 @@ async function trophySetsOf(accountId: string, titleIds: string[], userId: strin
   const batches: string[][] = []
   for (let i = 0; i < missing.length; i += LOOKUP_BATCH) batches.push(missing.slice(i, i + LOOKUP_BATCH))
   const answers = await mapLimit(batches, PARALLEL, async (batch) => {
-    const res = await psnCall(() => getUserTrophiesForSpecificTitle(auth, accountId, { npTitleIds: batch.join(',') }))
+    const res = await psnCall('sets', () => getUserTrophiesForSpecificTitle(auth, accountId, { npTitleIds: batch.join(',') }))
     const answered = new Map((res.titles ?? []).map((t) => [t.npTitleId, (t.trophyTitles ?? []).map((tt) => tt.npCommunicationId)]))
     for (const id of batch) {
       const sets = answered.get(id) ?? []
@@ -495,8 +508,8 @@ export async function psnGameGroups(
     async () => {
       const auth = await authorization()
       const [defined, earned] = await Promise.all([
-        psnCall(() => getTitleTrophyGroups(auth, game.titleId, { npServiceName: game.service, headerOverrides: { 'Accept-Language': language } })),
-        psnCall(() => getUserTrophyGroupEarningsForTitle(auth, accountId, game.titleId, { npServiceName: game.service })),
+        psnCall('gameGroups', () => getTitleTrophyGroups(auth, game.titleId, { npServiceName: game.service, headerOverrides: { 'Accept-Language': language } })),
+        psnCall('gameGroups', () => getUserTrophyGroupEarningsForTitle(auth, accountId, game.titleId, { npServiceName: game.service })),
       ])
       const earnedById = new Map((earned.trophyGroups ?? []).map((g) => [g.trophyGroupId, g]))
       const none: TrophyCounts = { bronze: 0, silver: 0, gold: 0, platinum: 0 }
@@ -530,7 +543,7 @@ export async function psnTitles(accountId: string, userId: string | null = null)
       const auth = await authorization()
       const games: PsnGameProgress[] = []
       for (let offset = 0; ; offset += TITLES_PAGE) {
-        const page = await psnCall(() => getUserTitles(auth, accountId, { limit: TITLES_PAGE, offset }))
+        const page = await psnCall('titles', () => getUserTitles(auth, accountId, { limit: TITLES_PAGE, offset }))
         const titles = page.trophyTitles ?? []
         for (const t of titles) {
           const game = toPsnGameProgress(t)
@@ -598,8 +611,8 @@ export async function psnGameTrophies(
       const auth = await authorization()
       const options = { npServiceName: game.service }
       const [defined, earned] = await Promise.all([
-        psnCall(() => getTitleTrophies(auth, game.titleId, 'all', { ...options, headerOverrides: { 'Accept-Language': language } })),
-        psnCall(() => getUserTrophiesEarnedForTitle(auth, accountId, game.titleId, 'all', options)),
+        psnCall('gameTrophies', () => getTitleTrophies(auth, game.titleId, 'all', { ...options, headerOverrides: { 'Accept-Language': language } })),
+        psnCall('gameTrophies', () => getUserTrophiesEarnedForTitle(auth, accountId, game.titleId, 'all', options)),
       ])
       const earnedById = new Map((earned.trophies ?? []).map((t) => [t.trophyId, t]))
       return (defined.trophies ?? []).map((t): PsnTrophy => {
