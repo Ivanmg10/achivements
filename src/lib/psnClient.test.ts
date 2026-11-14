@@ -54,6 +54,7 @@ import {
   psnCall,
 } from './psnClient'
 import { psnGameFixture } from '@/test-utils/psnFixtures'
+import { psnCallTotals, resetPsnCallStats } from './psnCallStats'
 
 const mock = (fn: unknown) => fn as jest.Mock
 
@@ -272,6 +273,15 @@ describe('when Sony says too many requests', () => {
     await waitOut()
     await expect(pending).resolves.toMatchObject({ onlineId: 'Hakoom' })
     expect(mock(psn.getUserTitles)).toHaveBeenCalledTimes(2)
+  })
+
+  test('each request is counted under its function (the retry and the sign-in too)', async () => {
+    resetPsnCallStats()
+    mock(psn.getUserTitles).mockResolvedValueOnce(tooMany as never)
+    const pending = psnSummary('42', '7')
+    await waitOut()
+    await pending
+    expect(psnCallTotals()).toEqual({ auth: 2, summary: 1, profile: 1, titleCount: 2 })
   })
 
   test('a second refusal is thrown, and psnFailure answers 429 with a Retry-After', async () => {
@@ -577,7 +587,7 @@ describe('the budget for Sony', () => {
   test('a call past the budget is refused without reaching Sony, as a rate limit', async () => {
     reserveAttempt.mockResolvedValue({ allowed: false, release })
     const call = jest.fn()
-    const failure = (await psnCall(call).catch((err: unknown) => err)) as PsnError
+    const failure = (await psnCall('summary', call).catch((err: unknown) => err)) as PsnError
     expect(failure.isRateLimited).toBe(true)
     expect(call).not.toHaveBeenCalled()
     expect(release).toHaveBeenCalled()
@@ -585,7 +595,7 @@ describe('the budget for Sony', () => {
 
   test('a call Sony never answers ends at the deadline', async () => {
     jest.useFakeTimers()
-    const pending = psnCall(() => new Promise(() => {})).catch((err: unknown) => err as PsnError)
+    const pending = psnCall('summary', () => new Promise(() => {})).catch((err: unknown) => err as PsnError)
     await jest.advanceTimersByTimeAsync(8_000)
     expect(((await pending) as PsnError).message).toContain('did not answer')
     jest.useRealTimers()

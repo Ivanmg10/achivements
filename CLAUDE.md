@@ -421,7 +421,7 @@ with its tests; it is the part that decides whether the answers are any good.
 - **Steam:** the owned list only through `loadOwnedGames` (never `getOwnedGames` from a route); keep the
   per-game probe that makes the batch counts trustworthy (`batchCountsFor`).
 - **PSN: one app account (the NPSSO), not the user's**; `psnaccountid` is deliberately **not unique**. Every call
-  through `psnCall()`. **Do not try to automate Sony's sign-in.** A game counts by its whole set, DLC included.
+  through `psnCall(fn, …)` (`fn` is the counter's name, `src/lib/psnCallStats.ts`; the baseline is in `docs/platforms/psn.md`). **Do not try to automate Sony's sign-in.** A game counts by its whole set, DLC included.
 - **Xbox stays admin-only on purpose, and the reason is money** (OpenXBL's free plan, 150 calls an hour for the
   whole app). **Do not set `XBOX_ADMIN_ONLY` to `false`, and do not suggest it as a next step**, until the user says
   they will pay for a plan. The gate is enforced in three places that must keep holding (routes, UI, and every

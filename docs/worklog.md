@@ -33,6 +33,41 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-14 — PSN phase 0: the call baseline (`chore/175-psn-call-baseline`, #175, epic #174)
+
+**Did**
+- `psnCall(fn, call)` now names the Sony endpoint and counts every request under it (`src/lib/psnCallStats.ts`): per function and per minute, in memory, a log line per busy minute, no ids or secrets. The `played` pages and the token exchange (`auth`) do not go through `psnCall`: they are counted by hand, behaviour unchanged. `recordPsnCall`, `psnCallTotals`, `psnCallsPerMinute` are what phase 5 builds on.
+- `src/lib/psnCallBaseline.test.ts`: the real `psnClient` against a fake `psn-api` (`test-utils/fakePsn.ts`) and an in-memory cache with real TTLs and in-flight sharing (`test-utils/memorySteamCache.ts`). No network, no database. `PSN_BASELINE=1 npx jest src/lib/psnCallBaseline --coverage=false` prints the tables.
+- "Call baseline" section in `docs/platforms/psn.md` (model, tables, wins); the `psnCall(fn, …)` rule in `CLAUDE.md` → Platforms.
+
+**Why** — phases 2 to 4 promise "a cold profile in about 10 calls" and "no Sony call in a read"; this is the yardstick.
+
+**Baseline** (500 / 1,000 games; model in `docs/platforms/psn.md`)
+
+| scenario | 500 games | 1,000 games |
+|---|--:|--:|
+| cold home (summary, library, latest, 60 days, year) | 356 | 709 |
+| of which per-game fan-out (`gameTrophies`) | 280 | 560 |
+| of which `sets` lookups | 70 | 140 |
+| background score fill, on top | 790 | 1,580 |
+| refresh after 15 min, nothing new | 6 | 9 |
+| refresh, one game with a new trophy | 8 | 11 |
+| navigation home, game (this year), game (old), library, warm | 0, 2, 4, 0 | 0, 2, 4, 0 |
+
+The ~300 is the per-game fan-out: 2 requests (defined trophies + earned) for each game in the completion dates, the latest 3, the last 60 days and the last year. Top wins for #177: share the defined trophies and groups across users; the year and streak need only the earned request; key the earned side without the language; detect change from the summary instead of re-reading titles and played every 15 min (and drop `titleCount`); move the `sets` lookups off the first read and put `played` and `auth` under the budget.
+
+**Decisions**
+- The per-account vs per-IP 429 check needs a second account and Sony: not done here. Moved to phase 3 as a point in #178.
+- Counted per Sony endpoint, not per reader (`recent`, `history`, `score` are readers that fan out into `gameTrophies`): the table attributes them by code path. An origin tag is left to phase 5 if it needs one.
+- The `played` pages and `auth` are counted but not wrapped in `psnCall`: wrapping would add a budget, a deadline and a retry, a behaviour change this task must not make.
+- The numbers are asserted in the test from the fake library's shape, so a phase that changes a call count has to update the test and the table together.
+
+**Open** — the model (70 % played, 25 % in the year, 20 % DLC) is a guess shaped on the spike's figures, not a real account's; check one real profile with the new per-minute log when convenient. The log is per instance and in memory (a restart empties it).
+
+**Watch out** — `psnCall` takes the function name as its first argument now. `upstreamCount` still counts the day's total across instances; `psnCallStats` is the detail.
+
+---
+
 ## 2026-11-14 — Dialogs review, part H: details seen rendered after G (`fix/165-dialogs-review`, #165)
 
 **Did** — H1 to H12 of the issue, from what the owner saw rendered. Nothing could be seen rendered by this session (no account, no sign-in), so all of it is checked by tests, the build and the compiled CSS (`short:sticky`, `short:overflow-visible`, `short:hidden`, `short:overflow-y-auto` are in it).
