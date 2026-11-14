@@ -33,6 +33,37 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-14 — Dialogs review, part H: details seen rendered after G (`fix/165-dialogs-review`, #165)
+
+**Did** — H1 to H12 of the issue, from what the owner saw rendered. Nothing could be seen rendered by this session (no account, no sign-in), so all of it is checked by tests, the build and the compiled CSS (`short:sticky`, `short:overflow-visible`, `short:hidden`, `short:overflow-y-auto` are in it).
+- *H1.* `Modal`'s body is `flex-1 min-h-0`: a full-screen sheet (`lg` / `xl` / `2xl` below `sm`) keeps its footer at the bottom. The `sm` / `md` sheets have no fixed height, so they are as before (a test pins the classes).
+- *H2.* A `Modal` with a `toolbar` scrolls **as a whole on `short:`** (the panel `short:overflow-y-auto`, the body `short:flex-none short:overflow-visible`, the footer `short:sticky short:bottom-0`), so the head and toolbar go away with the list; `GamePicker`'s help line is `short:hidden`; `AddGameModalPlatforms` (the picker's chips) is one row with `useScrollFade` at every width. The showcase picker and the location dialog have a toolbar too and follow the same rule.
+- *H3.* `GamePickerTile`'s button is `w-full` and the art `absolute inset-0 object-cover`: the tile's width no longer depends on its title and the art covers the square whatever its ratio.
+- *H4.* `MainPagePeriodStats`: "this week" is today and the 6 days before, "last 30 days" today and the 29 before, keyed by `utcDay` (the card and the dialog read the same list). Test with `TZ=Pacific/Auckland` and a fixed clock.
+- *H5.* The day button's mark and weekday have `gap-1.5`, as the tabs.
+- *H6.* `RecentAchievementRow` uses `FadeImage` with the placeholder tile as its `fallback`, so a badge that does not load leaves the same tile as a row with no badge, never a hole.
+- *H7.* New `hooks/useStepFocus` (+ test): below `lg`, opening a day (period dialogs) or a game (showcase picker) moves the focus to its heading (`tabIndex={-1}`), and "back" returns it to that item's button (`data-step-key`). Only when the focus was lost, so on `lg` the arrows keep their place.
+- *H8.* New `pinnedGames.pickToPin` ("Pick games to pin them") in the nine languages for `PinGameModal`; the other callers' prompts were already their own.
+- *H9.* `PerfectGameOrderRow`: `PlatformLogo` for every platform (RA included, with its name) and, for RA, a `Tag` that says Hardcore (`hardcore` tone) or Softcore (`muted`), in words. The warning-coloured dot is gone.
+- *H10.* `groupGameAchievementsByPeriod`: weeks are Monday to Sunday, the last one the current week (it was the 7 days ending today, so it started on whatever weekday today is). Test with a fixed Sunday.
+- *H11.* `AuthPage` holds the forgot-password dialog (`forgotOpen`, `LazyWhenOpened`, the dynamic import); `LoginUserForm` takes `onForgot`. The form under the phone / desktop switch unmounts when the window crosses `lg`, the dialog and its typed email do not (test that crosses the breakpoint).
+- *H12.* "N pts" with a count is `plural(n, T.plurals.points, lang)` in `RecentAchievementRow`, `AchievementGrid`, `GameInfoTable`, `GameCompareTableRow`, `LibraryDetailList`, the landing's sample and `pinnedView` (new `lang` argument, default `en`). Kept as the abbreviation where it is a unit beside a figure or a range (`MainPageBestPeriod`, `RaGameItem` "x/y", the pinned tile's unit label). `RecentAchievementRow` has `focus-ring`.
+
+**Why** — the owner's pass over the dialogs at 2560, 1920, 1280, 800x450, 760x360 and 390 after G.
+
+**Decisions**
+- H2: scroll the whole panel on `short:` only for dialogs with a `toolbar`, in `Modal` itself, rather than moving the toolbar into the body in `GamePicker` (it would have needed a JS media query) or only tightening the head (it still left the list under 100 px). The close button scrolls with the head there (Escape and a scroll up still close it); change it to sticky if the owner minds.
+- H4 keeps the UTC day keys the rest of the home uses, so the week is a UTC calendar window; the average per day still divides by 30.
+- H7: the focus goes to the heading, not the back button, as the issue's first option; Shift+Tab reaches the back button.
+- H9: the tag says "Hardcore" / "Softcore" in full (no new string, `achievement.hardcore` / `softcore`), not "HC" / "SC", which a screen reader cannot read.
+- H12: the plural form ("25 points") is longer than "25 pts"; the rows it sits in (`RecentAchievementRow` at half the right pane's width) have room, but it is the thing to look at on a narrow card.
+
+**Open** — to see rendered: pin game, add game, hide games and favourite game at 760x360, 800x450 and 390 (H2, H3: tiles in two columns at 390); hidden games at 390 (H1: footer at the bottom); the week and month at 390 with the keyboard or a screen reader (H7); the perfect-games order with one RA hardcore, one RA softcore, Steam, PSN (H9); the game chart's week labels (Mondays, H10); sign-in at 390, open forgot, widen to 1280 (H11).
+
+**Watch out** — most files in the working tree are CRLF (`core.autocrlf`); a scripted multi-line replace must normalise line endings first. `PeriodAchievementsDay` and `ShowcasePickerModalDetail` take a `headingRef` that is only meaningful with `useStepFocus`.
+
+---
+
 ## 2026-11-14 — Dialogs review, part G: hide games in bulk, the period dialogs as two panes (`fix/165-dialogs-review`, #165)
 
 **Did** — two commits for the owner's review of the branch (G1, G2). Nothing could be seen rendered with real data (no account, no database), so both are checked by tests, the build and the compiled CSS only.
