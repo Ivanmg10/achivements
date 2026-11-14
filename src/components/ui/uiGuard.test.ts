@@ -212,8 +212,7 @@ const OWN_COLOURS = [
 ]
 
 test('no label in capitals: a kicker, a figure\'s label and a table head are in sentence case (identity B, #127)', () => {
-  // The hash modal's chips name dump groups (Redump, TOSEC, No-Intro) from RA's lowercase ids: capitals there are the names.
-  expect(newOffenders('kicker', NEW_RULES.kicker, ['components/game-info-header/GameHashesModal.tsx'])).toEqual([])
+  expect(newOffenders('kicker', NEW_RULES.kicker)).toEqual([])
 })
 
 test('a tag comes from Tag, never a tinted rounded-tag box by hand', () => {
