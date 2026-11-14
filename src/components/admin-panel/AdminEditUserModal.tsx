@@ -4,8 +4,9 @@ import { useState } from 'react'
 import Modal from '@/components/ui/Modal'
 import AdminLinkedAccounts from './admin-linked-accounts/AdminLinkedAccounts'
 import { adminFetch } from '@/utils/adminFetch'
-import { codeToFlag, findCountry, COUNTRIES } from '@/utils/countries'
-import type { Country } from '@/utils/countries'
+import { codeToFlag, findCountry, searchCountries } from '@/utils/countries'
+import CountryList from '@/components/country-list/CountryList'
+import SearchInput from '@/components/ui/SearchInput'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
 import Button from '@/components/ui/Button'
@@ -60,11 +61,6 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
       setSaving(null)
     }
   }
-
-  const filteredCountries = COUNTRIES.filter((c: Country) =>
-    c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
-    c.code.toLowerCase().includes(countrySearch.toLowerCase())
-  )
 
   const currentLocation = values.location as string
 
@@ -130,8 +126,9 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
           {!showCountryPicker ? (
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={() => setShowCountryPicker(true)}
-                className="flex-1 bg-bg-main rounded-tile px-4 py-2.5 text-sm text-left flex items-center gap-2"
+                className="flex-1 bg-bg-main rounded-tile px-4 py-2.5 text-sm text-left flex items-center gap-2 focus-ring"
               >
                 {currentLocation ? (
                   <>
@@ -146,36 +143,31 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
                 <SaveButton saving={saving === 'location'} onClick={() => patch('location', currentLocation || null)} />
               )}
               {currentLocation && (
-                <button onClick={() => { setValues(v => ({ ...v, location: '' })); patch('location', null) }}
-                  className="text-xs text-danger hover:text-danger px-2 py-1">Clear</button>
+                <Button variant="quiet" size="sm" onClick={() => { setValues(v => ({ ...v, location: '' })); patch('location', null) }}>Clear</Button>
               )}
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              <input
+              <SearchInput
                 autoFocus
                 value={countrySearch}
                 onChange={e => setCountrySearch(e.target.value)}
                 placeholder="Search country..."
-                className={fieldClass({ size: 'sm' })}
+                aria-label="Search country"
               />
-              <div className="max-h-40 overflow-y-auto flex flex-col gap-0.5">
-                {filteredCountries.map((c: Country) => (
-                  <button key={c.code}
-                    onClick={() => {
-                      setValues(v => ({ ...v, location: c.code }))
-                      setShowCountryPicker(false)
-                      patch('location', c.code)
-                    }}
-                    className="flex items-center gap-3 px-3 py-2 rounded-box hover:bg-bg-card text-sm text-left"
-                  >
-                    <span className="text-base" aria-hidden="true">{codeToFlag(c.code)}</span>
-                    <span>{c.name}</span>
-                  </button>
-                ))}
+              <div className="max-h-56 overflow-y-auto">
+                <CountryList
+                  countries={searchCountries(countrySearch, 'en')}
+                  value={currentLocation}
+                  empty="No results"
+                  onPick={(code) => {
+                    setValues(v => ({ ...v, location: code }))
+                    setShowCountryPicker(false)
+                    patch('location', code)
+                  }}
+                />
               </div>
-              <button onClick={() => setShowCountryPicker(false)}
-                className="text-xs text-text-secondary hover:text-text-main text-left px-1">Cancel</button>
+              <Button variant="quiet" size="sm" className="self-start" onClick={() => setShowCountryPicker(false)}>Cancel</Button>
             </div>
           )}
           {errors.location && <span className="text-xs text-danger">{errors.location}</span>}
@@ -208,9 +200,8 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
 
 function SaveButton({ saving, onClick }: { saving: boolean; onClick: () => void }) {
   return (
-    <Button onClick={onClick} disabled={saving}
-      size="sm" className="shrink-0">
-      {saving ? '...' : 'Save'}
+    <Button onClick={onClick} loading={saving} size="sm" className="shrink-0">
+      Save
     </Button>
   )
 }

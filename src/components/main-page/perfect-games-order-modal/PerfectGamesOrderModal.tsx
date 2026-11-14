@@ -75,7 +75,8 @@ export default function PerfectGamesOrderModal({
       onClose={handleClose}
       size="xl"
       title={T.cards.reorderMasteredTitle}
-      footer={<Button onClick={handleClose}>{T.cards.close}</Button>}
+      hint={T.cards.reorderMasteredHint}
+      footer={<Button onClick={handleClose}>{T.cards.done}</Button>}
     >
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={localList.map((g) => g.key)} strategy={rectSortingStrategy}>

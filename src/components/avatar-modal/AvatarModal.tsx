@@ -7,13 +7,9 @@ import Modal from '@/components/ui/Modal'
 import { useAvatarUpload } from '@/hooks/useAvatarUpload'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
 import { useLanguage } from '@/context/LanguageContext'
-import Button, { buttonClass } from '@/components/ui/Button'
+import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import Notice from '@/components/ui/Notice'
-
-const BUTTON = 'flex-1'
-const PRIMARY = buttonClass('primary', 'md', BUTTON)
-const SECONDARY = buttonClass('secondary', 'md', `${BUTTON} cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/70`)
 
 /**
  * The profile picture, on its own: the picture as it will look, big and
@@ -55,8 +51,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={close} size="xl" icon={<IconUser size={20} />} title={t.avatarTitle} hint={t.avatarHint}>
-      <div className="grid gap-5 md:grid-cols-2 md:items-center">
+    <Modal isOpen={isOpen} onClose={close} size="md" icon={<IconUser size={20} />} title={t.avatarTitle} hint={t.avatarHint}>
       <label
         htmlFor={inputId}
         onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
@@ -108,19 +103,14 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
         />
       </label>
 
-      <div className="flex flex-col gap-5">
       {error && (
         <Notice tone="danger">{error}</Notice>
       )}
 
       {upload.picked && (
         <div className="flex gap-2.5">
-          <Button onClick={saveUpload} loading={upload.busy} className={BUTTON}>
-            {upload.busy ? t.saving : t.uploadSave}
-          </Button>
-          <button type="button" onClick={upload.reset} disabled={upload.busy} className={SECONDARY}>
-            {t.cancel}
-          </button>
+          <Button onClick={saveUpload} loading={upload.busy} className="flex-1">{t.uploadSave}</Button>
+          <Button variant="secondary" onClick={upload.reset} disabled={upload.busy} className="flex-1">{t.cancel}</Button>
         </div>
       )}
 
@@ -152,16 +142,12 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
                   onChange={(e) => { setUrl(e.target.value); setLinkBroken(false); link.clearError() }}
                   className={fieldClass({ size: 'sm' }, 'flex-1 min-w-0')}
                 />
-                <button type="submit" disabled={!linkValid || linkBroken || link.saving} className={`${PRIMARY} flex-none`}>
-                  {link.saving ? t.saving : t.avatarLinkSave}
-                </button>
+                <Button type="submit" disabled={!linkValid || linkBroken} loading={link.saving} className="flex-none">{t.avatarLinkSave}</Button>
               </div>
             </form>
           )}
         </div>
       )}
-      </div>
-      </div>
     </Modal>
   )
 }

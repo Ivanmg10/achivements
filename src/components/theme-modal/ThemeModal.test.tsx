@@ -31,7 +31,7 @@ test('saves the theme, says so and stays open to try another', async () => {
   await waitFor(() => expect(update).toHaveBeenCalledWith())
   on('dark-blue')
   rerender(<ThemeModal isOpen onClose={onClose} />)
-  expect(await screen.findByRole('status')).toHaveTextContent(`${t['name_dark-blue']} · ${en.toast.saved}`)
+  expect(await screen.findByRole('status')).toHaveTextContent(`${t['name_dark-blue']}, ${en.toast.saved}`)
   expect(onClose).not.toHaveBeenCalled()
 })
 

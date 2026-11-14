@@ -56,7 +56,7 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
 
   return (
     <Modal isOpen={isOpen} onClose={close} size="2xl" backdrop="opaque" title={T.homeLayout.layoutLabel} hint={T.homeLayout.modalHint} className="gap-0">
-      <div ref={body} className="flex flex-col gap-5 lg:grid lg:h-[min(30rem,calc(92dvh-8rem))] lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[minmax(0,1fr)] lg:gap-5">
+      <div ref={body} className="flex flex-col gap-5 lg:grid lg:h-[min(30rem,calc(85dvh-8rem))] lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[minmax(0,1fr)] lg:gap-5">
         <div className="sticky -top-5 z-10 -mt-5 h-[17.5rem] shrink-0 bg-bg-header pt-5 pb-3 lg:static lg:mt-0 lg:h-auto lg:min-h-0 lg:p-0 min-w-0">
           <LayoutModalPreview font={shownFont} />
         </div>

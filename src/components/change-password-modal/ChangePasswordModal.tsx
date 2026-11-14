@@ -79,8 +79,8 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
           <Button onClick={handleClose} disabled={loading} variant="quiet">
             {T.editProfileModal.cancel}
           </Button>
-          <Button onClick={handleSubmit} disabled={!canSubmit || success}>
-            {loading ? T.editProfileModal.saving : T.editProfileModal.save}
+          <Button onClick={handleSubmit} disabled={!canSubmit || success} loading={loading}>
+            {T.editProfileModal.save}
           </Button>
         </>
       }

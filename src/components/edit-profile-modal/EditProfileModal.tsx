@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { useSession } from 'next-auth/react'
 import Modal from '@/components/ui/Modal'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSaveProfileField } from '@/hooks/useSaveProfileField'
 import Button from '@/components/ui/Button'
 import { Field, fieldClass } from '@/components/ui/Input'
+import PasswordInput from '@/components/ui/PasswordInput'
 import Notice from '@/components/ui/Notice'
 import Kicker from '@/components/ui/Kicker'
-import { profileFieldError } from '@/utils/apiErrors'
 
 /** The avatar has its own modal (`AvatarModal`). */
 export type EditProfileField = 'name' | 'email'
@@ -26,64 +26,34 @@ const API_FIELD_MAP: Record<EditProfileField, string> = {
 }
 
 export default function EditProfileModal({ isOpen, onClose, field, currentValue }: Props) {
-  const { update } = useSession()
   const { T } = useLanguage()
+  const { save, saving, error, clearError } = useSaveProfileField()
 
   const [newValue, setNewValue] = useState('')
   const [confirmValue, setConfirmValue] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
 
-  const label = T.editProfileModal.fields[field]
-  const mismatch = newValue.length > 0 && confirmValue.length > 0 && newValue !== confirmValue
+  const texts = T.editProfileModal.fields[field]
+  // Only the address asks to be typed twice: a typo in it locks the account's recovery away.
+  const confirmLabel = 'confirmLabel' in texts ? texts.confirmLabel : null
+  const mismatch = confirmLabel !== null && newValue.length > 0 && confirmValue.length > 0 && newValue !== confirmValue
   // The recovery address is the key to the account, so changing it takes the password.
   const needsPassword = field === 'email'
   const canSubmit =
-    newValue.trim().length > 0 && newValue === confirmValue && (!needsPassword || password.length > 0) && !loading
+    newValue.trim().length > 0 && (confirmLabel === null || newValue === confirmValue) && (!needsPassword || password.length > 0) && !saving
 
   const handleClose = () => {
     setNewValue('')
     setConfirmValue('')
     setPassword('')
-    setError(null)
-    setSuccess(false)
+    clearError()
     onClose()
   }
 
   const handleSubmit = async () => {
     if (!canSubmit) return
-    setLoading(true)
-    setError(null)
-
-    try {
-      const res = await fetch('/api/updateUserProfile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          field: API_FIELD_MAP[field],
-          value: newValue.trim(),
-          ...(needsPassword && { currentPassword: password }),
-        }),
-      })
-
-      const data = await res.json().catch(() => ({}))
-
-      if (!res.ok) {
-        setError(profileFieldError(data.error, T))
-        return
-      }
-
-      // The server re-reads the saved profile into the session.
-      await update()
-      setSuccess(true)
-      setTimeout(handleClose, 1000)
-    } catch {
-      setError(T.editProfileModal.errorGeneric)
-    } finally {
-      setLoading(false)
-    }
+    // The hook toasts the success and re-reads the session; the dialog closes on it.
+    if (await save(API_FIELD_MAP[field], newValue.trim(), needsPassword ? { currentPassword: password } : {})) handleClose()
   }
 
   return (
@@ -91,14 +61,14 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
       isOpen={isOpen}
       onClose={handleClose}
       size="md"
-      title={`${T.editProfileModal.title} ${label}`}
+      title={texts.title}
       footer={
         <>
-          <Button onClick={handleClose} disabled={loading} variant="quiet">
+          <Button onClick={handleClose} disabled={saving} variant="quiet">
             {T.editProfileModal.cancel}
           </Button>
-          <Button onClick={handleSubmit} disabled={!canSubmit || success}>
-            {loading ? T.editProfileModal.saving : T.editProfileModal.save}
+          <Button onClick={handleSubmit} disabled={!canSubmit} loading={saving}>
+            {T.editProfileModal.save}
           </Button>
         </>
       }
@@ -115,59 +85,46 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
       </div>
 
       {/* New value */}
-      <Field label={`${T.editProfileModal.newLabel} ${label}`}>
+      <Field label={texts.newLabel}>
         {(control) => (
           <input
             {...control}
             type={field === 'email' ? 'email' : 'text'}
             value={newValue}
-            onChange={(e) => { setNewValue(e.target.value); setError(null) }}
+            onChange={(e) => { setNewValue(e.target.value); clearError() }}
             className={fieldClass()}
-            disabled={loading || success}
+            disabled={saving}
             autoFocus
           />
         )}
       </Field>
 
       {/* Confirm value */}
-      <Field label={`${T.editProfileModal.confirmLabel} ${label}`} error={mismatch ? T.editProfileModal.mismatch : undefined}>
-        {(control) => (
-          <input
-            {...control}
-            type={field === 'email' ? 'email' : 'text'}
-            value={confirmValue}
-            onChange={(e) => { setConfirmValue(e.target.value); setError(null) }}
-            className={fieldClass({ invalid: mismatch })}
-            disabled={loading || success}
-          />
-        )}
-      </Field>
-
-      {needsPassword && (
-        <Field label={T.changePassword.current}>
+      {confirmLabel !== null && (
+        <Field label={confirmLabel} error={mismatch ? T.editProfileModal.mismatch : undefined}>
           {(control) => (
             <input
               {...control}
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setError(null) }}
-              className={fieldClass()}
-              disabled={loading || success}
+              type="email"
+              value={confirmValue}
+              onChange={(e) => { setConfirmValue(e.target.value); clearError() }}
+              className={fieldClass({ invalid: mismatch })}
+              disabled={saving}
             />
           )}
         </Field>
       )}
 
-      {/* Error */}
-      {error && (
-        <Notice tone="danger">{error}</Notice>
+      {needsPassword && (
+        <PasswordInput
+          label={T.changePassword.current}
+          value={password}
+          onChange={(v) => { setPassword(v); clearError() }}
+          disabled={saving}
+        />
       )}
 
-      {/* Success */}
-      {success && (
-        <Notice tone="success">{T.editProfileModal.success}</Notice>
-      )}
+      {error && <Notice tone="danger">{error}</Notice>}
     </Modal>
   )
 }

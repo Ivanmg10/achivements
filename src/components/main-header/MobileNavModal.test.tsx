@@ -1,13 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import MobileNavModal from './MobileNavModal'
 
-const push = jest.fn()
-
 beforeEach(() => {
   jest.clearAllMocks()
-  ;(useRouter as jest.Mock).mockReturnValue({ push })
   ;(usePathname as jest.Mock).mockReturnValue('/')
   ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan' } } })
 })
@@ -32,21 +29,29 @@ test('expands the Status group to reveal the 3 status links', () => {
   expect(screen.getByText('Completed')).toBeInTheDocument()
 })
 
-test('navigates to a status route and closes the modal when signed in', () => {
+test('the entries are links: a status route closes the modal when signed in', () => {
   const onClose = jest.fn()
   render(<MobileNavModal isOpen={true} onClose={onClose} />)
   fireEvent.click(screen.getByText('Library'))
-  fireEvent.click(screen.getByText('In progress'))
-  expect(push).toHaveBeenCalledWith('/playing')
+  const link = screen.getByRole('link', { name: 'In progress' })
+  expect(link).toHaveAttribute('href', '/playing')
+  fireEvent.click(link)
   expect(onClose).toHaveBeenCalled()
 })
 
-test('redirects to authPage when navigating a status route without a session', () => {
+test('without a session every link leads to the sign-in', () => {
   ;(useSession as jest.Mock).mockReturnValue({ data: null })
   render(<MobileNavModal isOpen={true} onClose={jest.fn()} />)
   fireEvent.click(screen.getByText('Library'))
-  fireEvent.click(screen.getByText('In progress'))
-  expect(push).toHaveBeenCalledWith('/authPage')
+  expect(screen.getByRole('link', { name: 'In progress' })).toHaveAttribute('href', '/authPage')
+  expect(screen.getByRole('link', { name: 'Groups' })).toHaveAttribute('href', '/authPage')
+})
+
+test('the page you are on is marked with aria-current', () => {
+  ;(usePathname as jest.Mock).mockReturnValue('/groups')
+  render(<MobileNavModal isOpen={true} onClose={jest.fn()} />)
+  expect(screen.getByRole('link', { name: 'Groups' })).toHaveAttribute('aria-current', 'page')
+  expect(screen.getByRole('link', { name: 'Following' })).not.toHaveAttribute('aria-current')
 })
 
 test('collapses the Status group again when isOpen becomes false and reopens', () => {
@@ -70,5 +75,6 @@ test('Following is a top-level item that opens who you follow', () => {
   const onClose = jest.fn()
   render(<MobileNavModal isOpen={true} onClose={onClose} />)
   fireEvent.click(screen.getByText('Following'))
-  expect(push).toHaveBeenCalledWith('/following')
+  expect(screen.getByRole('link', { name: 'Following' })).toHaveAttribute('href', '/following')
+  expect(onClose).toHaveBeenCalled()
 })
