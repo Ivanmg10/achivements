@@ -104,6 +104,11 @@ test('below sm a detail, a picker or a tool is a full-screen sheet; a confirmati
   expect(screen.getByRole('dialog', { name: 'Pick' })).not.toHaveClass('max-sm:h-dvh')
 })
 
+test('the body fills the panel so a full-screen sheet keeps its footer at the bottom (#165, H1)', () => {
+  render(<Modal isOpen onClose={jest.fn()} size="lg" title="Hidden" footer={<button>Done</button>}><p>Short</p></Modal>)
+  expect(screen.getByText('Short').parentElement).toHaveClass('flex-1', 'min-h-0')
+})
+
 test('a toolbar sits between the head and the scrolling body, outside the scroll box (#165)', () => {
   render(
     <Modal isOpen onClose={jest.fn()} title="Pick" toolbar={<input aria-label="Search" />}>
@@ -123,4 +128,16 @@ test('a toolbar sits between the head and the scrolling body, outside the scroll
 test('a field with autoFocus keeps the focus the dialog would otherwise take', () => {
   render(<Modal isOpen onClose={jest.fn()} title="Search"><input aria-label="Query" autoFocus /></Modal>)
   expect(screen.getByRole('textbox', { name: 'Query' })).toHaveFocus()
+})
+
+test('on a short screen a dialog with a toolbar scrolls as a whole, its footer stuck at the bottom (#165, H2)', () => {
+  render(<Modal isOpen onClose={jest.fn()} title="Pick" toolbar={<input aria-label="Search" />} footer={<button>Save</button>}><p>The list</p></Modal>)
+  expect(screen.getByRole('dialog', { name: 'Pick' })).toHaveClass('short:overflow-y-auto')
+  expect(screen.getByText('The list').parentElement).toHaveClass('short:overflow-visible', 'short:flex-none')
+  expect(screen.getByRole('button', { name: 'Save' }).parentElement).toHaveClass('short:sticky', 'short:bottom-0')
+})
+
+test('without a toolbar a short screen keeps the usual scrolling body', () => {
+  render(<Modal isOpen onClose={jest.fn()} title="Plain"><p>Body</p></Modal>)
+  expect(screen.getByRole('dialog', { name: 'Plain' })).not.toHaveClass('short:overflow-y-auto')
 })

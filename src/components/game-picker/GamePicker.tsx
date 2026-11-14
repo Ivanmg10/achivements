@@ -111,7 +111,7 @@ export default function GamePicker(props: Multi | Single) {
             aria-describedby={hintId}
             disabled={busy}
           />
-          <p id={hintId} className="text-[11px] text-text-secondary -mt-1">{T.groups.searchHint}</p>
+          <p id={hintId} className="text-[11px] text-text-secondary -mt-1 short:hidden">{T.groups.searchHint}</p>
           {sources.length > 1 && <AddGameModalPlatforms sources={sources} value={source} onChange={setSource} />}
         </>
       }

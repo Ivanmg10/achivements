@@ -27,7 +27,7 @@ export type ModalProps = {
   icon?: React.ReactNode
   /** Its own row under a hairline: the actions. */
   footer?: React.ReactNode
-  /** A bar that stays put between the head and the scrolling body, outside the scroll box: a picker's search and filters. Never a `sticky` bar inside the body (the content shows through above it). */
+  /** A bar that stays put between the head and the scrolling body, outside the scroll box: a picker's search and filters. On a `short:` screen the panel scrolls as a whole instead (head, toolbar and list together, the footer stuck at the bottom), so the list is not left with 30 px. Never a `sticky` bar inside the body (the content shows through above it). */
   toolbar?: React.ReactNode
   size?: keyof typeof SIZES
   /** A confirmation that destroys something: `alertdialog`, the icon in the danger colour. */
@@ -154,7 +154,7 @@ export default function Modal({
             aria-labelledby={title ? titleId : labelledBy}
             aria-describedby={hint ? hintId : undefined}
             tabIndex={-1}
-            className={`relative w-full ${SIZES[size]} flex flex-col bg-bg-header text-text-main ${place.panel} ${placement === 'center' && FULL_ON_PHONE.has(size) ? 'max-sm:h-dvh max-sm:max-h-dvh max-sm:rounded-none' : ''} ring-1 ring-ink/[0.08] shadow-2xl shadow-black/50 outline-none`}
+            className={`relative w-full ${SIZES[size]} flex flex-col bg-bg-header text-text-main ${place.panel} ${toolbar ? 'short:overflow-y-auto' : ''} ${placement === 'center' && FULL_ON_PHONE.has(size) ? 'max-sm:h-dvh max-sm:max-h-dvh max-sm:rounded-none' : ''} ring-1 ring-ink/[0.08] shadow-2xl shadow-black/50 outline-none`}
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: place.from, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: place.to, scale: 0.98 }}
@@ -194,11 +194,11 @@ export default function Modal({
             )}
 
             {children != null && (
-              <div className={`flex flex-col overflow-y-auto ${flush ? '' : `px-6 ${toolbar ? 'pt-4' : title ? 'pt-5' : 'pt-6'} ${footer ? 'pb-5' : 'pb-6'}`} ${className}`}>{children}</div>
+              <div className={`flex flex-col flex-1 min-h-0 overflow-y-auto ${toolbar ? 'short:flex-none short:overflow-visible' : ''} ${flush ? '' : `px-6 ${toolbar ? 'pt-4' : title ? 'pt-5' : 'pt-6'} ${footer ? 'pb-5' : 'pb-6'}`} ${className}`}>{children}</div>
             )}
 
             {footer && (
-              <div className="flex flex-wrap items-center justify-end gap-2 px-6 py-4 shadow-hairline-t">{footer}</div>
+              <div className={`flex flex-wrap items-center justify-end gap-2 px-6 py-4 shadow-hairline-t ${toolbar ? 'short:sticky short:bottom-0 short:z-10 short:bg-bg-header' : ''}`}>{footer}</div>
             )}
           </motion.div>
         </motion.div>
