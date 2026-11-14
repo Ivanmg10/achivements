@@ -311,6 +311,19 @@ describe('groupGameAchievementsByPeriod', () => {
     expect(months[5]).toMatchObject({ count: 1, items: [today] })
   })
 
+  test('weeks start on Monday and the last one is the current week, even when today is a Sunday', () => {
+    jest.useFakeTimers({ now: new Date(2026, 10, 15, 12) }) // Sunday 15 Nov 2026, local
+    try {
+      const weeks = groupGameAchievementsByPeriod([{ earnedAt: new Date(2026, 10, 9, 8).toISOString() }, { earnedAt: new Date(2026, 10, 8, 23).toISOString() }], 'week')
+      expect(weeks.map((w) => new Date(w.start).getDay())).toEqual(Array(8).fill(1))
+      expect(new Date(weeks[7].start).getDate()).toBe(9) // Monday 9 Nov
+      expect(weeks[7].count).toBe(1)
+      expect(weeks[6].count).toBe(1) // Sunday 8 Nov belongs to the week of Monday 2 Nov
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
   test('labels the month in local time, so the first of the month is not the month before', () => {
     const now = new Date()
     const first = new Date(now.getFullYear(), now.getMonth(), 1, 0, 30)

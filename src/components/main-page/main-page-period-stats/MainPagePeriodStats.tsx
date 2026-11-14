@@ -17,7 +17,7 @@ const PeriodAchievementsModal = dynamic(() => import('@/components/period-achiev
 const DAY_MS = 86_400_000
 
 /**
- * The home's summary of activity: today, the last 7 days, the last 30, the average per day and the
+ * The home's summary of activity: today, the last 7 calendar days (today and the 6 before), the last 30 (today and the 29 before), the average per day and the
  * streak, counting unlocks of every platform together whichever tab is open (#128). The account's
  * totals (level, platinum, gamerscore, rank) are on each platform's profile card, not here.
  * `streak` null leaves the streak out (the cover has its own card for it).
@@ -43,13 +43,17 @@ export default function MainPagePeriodStats({
 
   const stats = useMemo(() => {
     const date = new Date()
-    const now = date.getTime()
     const todayKey = utcDay(date)
+    // Calendar days keyed as the rest of the home keys them (UTC): today and the 6 before, today and the 29 before.
+    const inLast = (days: number) => {
+      const since = utcDay(date.getTime() - (days - 1) * DAY_MS)
+      return (a: RecentAchievement) => utcDay(parseUnlockTime(a.Date)) >= since
+    }
     return {
       todayKey,
       today: achievements.filter((a) => a.Date.startsWith(todayKey)),
-      week: achievements.filter((a) => parseUnlockTime(a.Date) >= now - 7 * DAY_MS),
-      month: monthSource.filter((a) => parseUnlockTime(a.Date) >= now - 30 * DAY_MS),
+      week: achievements.filter(inLast(7)),
+      month: monthSource.filter(inLast(30)),
       avg: calcAvgPerDay(monthSource, 30),
     }
   }, [achievements, monthSource])

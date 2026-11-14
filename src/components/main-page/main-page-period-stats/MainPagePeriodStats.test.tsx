@@ -81,3 +81,22 @@ test.each([0, null])('while loading, the same figures in the same order as loade
   expect(order()).toEqual(loaded)
   expect(pill(en.pointsStats.today).querySelector('.bg-skeleton')).toBeInTheDocument()
 })
+
+test('the week is today and the 6 days before, the 30 days today and the 29 before, in calendar days (#165, H4)', () => {
+  const OLD_TZ = process.env.TZ
+  process.env.TZ = 'Pacific/Auckland'
+  jest.useFakeTimers({ now: new Date('2026-11-14T08:30:00Z') })
+  try {
+    const at = (day: string) => ({ ...unlock(0), Date: `${day} 23:59:00` }) as RecentAchievement
+    // Sat 14 is today: the week starts on Sun 8 (Sat 7 is out, which a rolling 7 x 24 h would have kept), the 30 days on Oct 16.
+    const list = [at('2026-11-14'), at('2026-11-08'), at('2026-11-07'), at('2026-10-16'), at('2026-10-15')]
+    render(<MainPagePeriodStats achievements={list} monthSource={list} streak={0} />)
+    expect(pill(en.pointsStats.thisWeek)).toHaveTextContent('2')
+    expect(pill(en.pointsStats.last30Days)).toHaveTextContent('4')
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(en.pointsStats.thisWeek) }))
+    expect(screen.getByTestId('period-modal')).toHaveTextContent(`${en.pointsStats.thisWeek}:2`)
+  } finally {
+    jest.useRealTimers()
+    process.env.TZ = OLD_TZ
+  }
+})
