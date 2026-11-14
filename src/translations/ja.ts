@@ -923,6 +923,8 @@ export const ja: Translations = {
   dayModal: {
     title: '獲得した実績',
     empty: 'この日の実績はありません',
+    back: '日の一覧に戻る',
+    daysLabel: '実績のある日',
   },
   cards: {
     showAchievements: '実績を表示',

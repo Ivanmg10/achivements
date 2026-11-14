@@ -924,6 +924,8 @@ export const en = {
   dayModal: {
     title: 'Achievements earned',
     empty: 'No achievements this day',
+    back: 'Back to the days',
+    daysLabel: 'Days with achievements',
   },
   cards: {
     showAchievements: 'Show achievements',

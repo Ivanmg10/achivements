@@ -923,6 +923,8 @@ export const fr: Translations = {
   dayModal: {
     title: 'Succès obtenus',
     empty: 'Aucun succès ce jour',
+    back: 'Retour aux jours',
+    daysLabel: 'Jours avec des succès',
   },
   cards: {
     showAchievements: 'Voir les succès',

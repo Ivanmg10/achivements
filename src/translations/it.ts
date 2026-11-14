@@ -923,6 +923,8 @@ export const it: Translations = {
   dayModal: {
     title: 'Obiettivi ottenuti',
     empty: 'Nessun obiettivo in questo giorno',
+    back: 'Torna ai giorni',
+    daysLabel: 'Giorni con obiettivi',
   },
   cards: {
     showAchievements: 'Mostra obiettivi',

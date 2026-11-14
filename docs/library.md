@@ -64,6 +64,7 @@ nothing is deleted.
 - A hidden game is excluded from every listing and listing-derived aggregate, for its
   owner and on public/other-user views, keyed by `source:id` (`src/utils/gameVisibility.ts`).
   The hidden-games modal is the only intentional exception, so showing the game again stays possible.
+- **Hiding several at once** (#165, G1): that modal's "Hide games" opens the shared `GamePicker` in multi mode (`excludeKeys` = the hidden ones), and `HiddenGamesContext.hideGames(games)` saves them: optimistic, **one `POST /api/hiddenGames` per game, one after another** (the route takes one and every save rebuilds the user's periods), one toast for the batch, and only the games the server refused roll back (returned, so the picker keeps them picked to retry).
 - **Two boundaries, one rule.** Listing BFF routes filter after their canonical upstream/cache read
   (`src/lib/gameVisibility.ts`) and answer with `max-age=0`; shared client providers/selectors filter
   again so optimistic hide/show is immediate and a warm response cannot leak. Raw upstream caches need

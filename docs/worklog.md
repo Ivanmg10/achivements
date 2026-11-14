@@ -33,6 +33,29 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-14 — Dialogs review, part G: hide games in bulk, the period dialogs as two panes (`fix/165-dialogs-review`, #165)
+
+**Did** — two commits for the owner's review of the branch (G1, G2). Nothing could be seen rendered with real data (no account, no database), so both are checked by tests, the build and the compiled CSS only.
+- *G1.* `HiddenGamesModal` has a "Hide games" button in its footer that opens the shared `GamePicker` in multi mode (`excludeKeys` = the hidden games' keys; the picked ones go in with `candidateIconUrl` as their image, as a full URL). New `HiddenGamesContext.hideGames(games)`: optimistic, one `POST /api/hiddenGames` per game (the route takes one), **one toast** (`toast.gamesHidden`, or `toast.gamesHideFailed` when any failed), and only the refused games roll back; they come back as the failed list, so the picker keeps them picked and shows its inline error. `hideGame` shares the POST (`postHidden`). New strings `userPage.hideGamesButton / hidePickerHint / hideSelected / pickToHide / hideError` and the two toasts, in nine languages.
+- *G2.* `PeriodAchievementsModal` (week, month, any stretch) is `xl` with two panes from `lg`: `period-achievements-days/` (a button per day, newest first and chosen on open, weekday and date through `formatWeekdayDay`, the count in its plural, an upright `DataBar` as long as its share of the busiest day, `aria-pressed` plus a `TabMark`, arrows / Home / End move the focus) and `period-achievements-day/` (the chosen day: head with its count and points only when every row is RA, then `period-achievements-game-group/` per game: cover, title, platform logo and console once, its achievements as a grid through `RecentAchievementRow showGame={false}`, each still a link to its game). Split with `shadow-hairline-l`, no card. Below `lg` the same as steps (days, then a day with a back button), like the showcase picker. The footer keeps the period's total. `DayAchievementsModal` (the heatmap's day, still `lg`) uses the same `PeriodAchievementsDay` (`hideHead`, its awards in `above`, the awards' JSX extracted to `day-achievements-awards/`). The grouping (day → game → achievements) is `utils/periodDays.ts` with tests. New `dayModal.back` and `dayModal.daysLabel` in nine languages. Tests for each new part and the util; the period and day tests adapted.
+
+**Why** — the owner: no way to hide more games from the hidden games dialog; the month dialog was ~30 day blocks in one column, taller than wide, repeating the game's name on every row and leaving half the rows' right side empty.
+
+**Decisions**
+- One request per game, **sequentially**: the route accepts one, and every save rebuilds the user's `score_periods`, so parallel POSTs would race. A batch route was not added (the brief said one per request is fine).
+- Partial failure: the saved games stay hidden, the failed ones roll back and come back to the picker (as `AddGameModal` does); the toast is the error one only, since "never both for the same outcome".
+- Arrow keys move the **focus**, not the choice: selecting on arrow would, below `lg`, swap the pane under the user's hands. Enter or a click chooses.
+- Inside a day, the games go in order of their latest unlock (newest first) and a game's achievements newest first, as the days themselves.
+- The panes' height is `max(16rem, min(44rem, 85dvh - 13rem))`: the 44rem cap keeps the dialog (head 5rem, footer, paddings about 13rem) at about 870 px against its 1024 px width at 2560x1300 and 1920x1080; it is the number to tune if the owner sees it taller than wide.
+- The heatmap's day stays `lg` and one pane (it is one day; the issue only asks it to share the right pane).
+- The hairline between awards and the achievements in the day dialog was dropped (the gap carries it).
+
+**Open** — the owner should look at both rendered: week and month at 2560x1300 and 1920x1080 (the height rule), 1280x800 and 390 (steps and back button), the days list with 30 rows (scroll fade, arrows), a month that mixes platforms (no points), a Steam-only day. On a phone the focus is lost when a day is tapped (its button leaves the screen), as in the showcase picker. `rebuildPeriods` runs once per game in a big batch (hiding 30 games is 30 rebuilds): a batch route would fix it if it is slow.
+
+**Watch out** — `PeriodAchievementsDay` is also the whole body of the day dialog, so its scroll box only scrolls from `lg` and when its parent has a height (the period grid gives it one; the day dialog's body scrolls instead). `RecentAchievementRow` is also used by the public profile's recent unlocks: `showGame` defaults to true.
+
+---
+
 ## 2026-11-14 — Dialogs review, round 2: sections E and F of #165 (`fix/165-dialogs-review`, #165)
 
 **Did** — five commits on top of the first four, from the owner's per-dialog review of 2026-11-14 (E) and what he saw rendered (F). Built from the issue, no canvas round; nothing could be seen with real data (no account, no database).

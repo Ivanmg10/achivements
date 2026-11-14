@@ -29,3 +29,11 @@ test('shows a placeholder without a badge, and reports navigation', () => {
   fireEvent.click(screen.getByRole('link'))
   expect(onNavigate).toHaveBeenCalled()
 })
+
+test('showGame={false} leaves the game out, where a group already names it', () => {
+  const { rerender } = render(<RecentAchievementRow ach={RA} onNavigate={jest.fn()} />)
+  expect(screen.getByText('Zelda')).toBeInTheDocument()
+  rerender(<RecentAchievementRow ach={RA} onNavigate={jest.fn()} showGame={false} />)
+  expect(screen.queryByText('Zelda')).not.toBeInTheDocument()
+  expect(screen.getByRole('link').getAttribute('href')).toBe('/gameInfo/1')
+})

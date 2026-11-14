@@ -923,6 +923,8 @@ export const pt: Translations = {
   dayModal: {
     title: 'Conquistas obtidas',
     empty: 'Sem conquistas neste dia',
+    back: 'Voltar aos dias',
+    daysLabel: 'Dias com conquistas',
   },
   cards: {
     showAchievements: 'Ver conquistas',

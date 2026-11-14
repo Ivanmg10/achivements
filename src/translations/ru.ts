@@ -923,6 +923,8 @@ export const ru: Translations = {
   dayModal: {
     title: 'Полученные достижения',
     empty: 'Нет достижений в этот день',
+    back: 'Назад к дням',
+    daysLabel: 'Дни с достижениями',
   },
   cards: {
     showAchievements: 'Показать достижения',

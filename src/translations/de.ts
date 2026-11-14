@@ -923,6 +923,8 @@ export const de: Translations = {
   dayModal: {
     title: 'Errungenschaften erhalten',
     empty: 'Keine Errungenschaften an diesem Tag',
+    back: 'Zurück zu den Tagen',
+    daysLabel: 'Tage mit Erfolgen',
   },
   cards: {
     showAchievements: 'Erfolge anzeigen',

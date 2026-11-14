@@ -923,6 +923,8 @@ export const es: Translations = {
   dayModal: {
     title: 'Logros conseguidos',
     empty: 'Sin logros este día',
+    back: 'Volver a los días',
+    daysLabel: 'Días con logros',
   },
   cards: {
     showAchievements: 'Ver logros',

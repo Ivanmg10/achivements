@@ -9,9 +9,18 @@ import { useLanguage } from '@/context/LanguageContext'
 /**
  * One unlock in the day / week / period modals: badge, title, game, and RA's
  * points (hardcore in the warning colour). Links to the game's page on its own
- * platform; Steam unlocks have no points, so none are shown.
+ * platform; Steam unlocks have no points, so none are shown. `showGame={false}` leaves the game's title out.
  */
-export default function RecentAchievementRow({ ach, onNavigate }: { ach: RecentAchievement; onNavigate: () => void }) {
+export default function RecentAchievementRow({
+  ach,
+  onNavigate,
+  showGame = true,
+}: {
+  ach: RecentAchievement
+  onNavigate: () => void
+  /** Off where the game is already named above (a game's group in the day dialogs). */
+  showGame?: boolean
+}) {
   const subject = useSubject()
   const { T, lang } = useLanguage()
   const badge = achievementBadgeUrl(ach)
@@ -32,7 +41,7 @@ export default function RecentAchievementRow({ ach, onNavigate }: { ach: RecentA
         <span className="text-xs font-semibold text-text-main group-hover:text-accent transition-colors line-clamp-2">
           {ach.Title}
         </span>
-        <span className="text-[10px] text-text-secondary line-clamp-1">{ach.GameTitle}</span>
+        {showGame && <span className="text-[10px] text-text-secondary line-clamp-1">{ach.GameTitle}</span>}
       </div>
       {!isSteam && (
         <span className={`text-xs shrink-0 ${ach.HardcoreMode === '1' ? 'text-warning font-semibold' : 'text-text-secondary'}`}>

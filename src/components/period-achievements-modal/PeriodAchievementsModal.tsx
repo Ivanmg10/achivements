@@ -1,11 +1,12 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { formatWeekdayDay } from '@/utils/dates'
+import { allRa, groupDays } from '@/utils/periodDays'
 import { plural } from '@/utils/utils'
-import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
+import PeriodAchievementsDays from '@/components/period-achievements-days/PeriodAchievementsDays'
+import PeriodAchievementsDay from '@/components/period-achievements-day/PeriodAchievementsDay'
 import Modal from '@/components/ui/Modal'
 import Facts from '@/components/ui/Facts'
 
@@ -19,61 +20,56 @@ interface Props {
   onClose: () => void
 }
 
-/** The unlocks of a week, a month or any stretch, grouped by day, newest day first: the one dialog the best-period cards open. */
+/**
+ * The unlocks of a week, a month or any stretch: the one dialog the best-period cards open. From `lg` two panes,
+ * the days (newest first, the newest chosen on open) and the chosen day grouped by game; below `lg` the same as
+ * steps, the days first and a day with a way back. The footer keeps the period's total.
+ */
 export default function PeriodAchievementsModal({ title, hint, empty, achievements, onClose }: Props) {
   const { T, lang } = useLanguage()
-  // Points are RA's only: a list that mixes platforms shows counts, not a total that leaves some rows out.
-  const hasPoints = achievements.every(a => !a.Source || a.Source === 'ra')
-
-  const days = useMemo(() => {
-    const byDay: Record<string, RecentAchievement[]> = {}
-    for (const a of achievements) {
-      const key = a.Date.split(' ')[0]
-      if (!byDay[key]) byDay[key] = []
-      byDay[key].push(a)
-    }
-    return Object.entries(byDay)
-      .sort((a, b) => b[0].localeCompare(a[0]))
-      .map(([date, dayAchs]) => ({ date, achievements: dayAchs, pts: dayAchs.reduce((s, a) => s + a.Points, 0) }))
-  }, [achievements])
-
-  const totalPts = days.reduce((s, d) => s + d.pts, 0)
-  const points = (pts: number) => plural(pts, T.plurals.points, lang)
+  const [chosen, setChosen] = useState<string | null>(null)
+  // Below `lg` only one pane shows: the days, or the day just tapped.
+  const [step, setStep] = useState<'days' | 'day'>('days')
+  const days = useMemo(() => groupDays(achievements), [achievements])
+  const day = days.find((d) => d.date === chosen) ?? days[0]
+  const points = achievements.reduce((sum, a) => sum + a.Points, 0)
 
   return (
     <Modal
       isOpen
       onClose={onClose}
-      size="lg"
+      size="xl"
       title={title}
       hint={hint}
       className="gap-4"
       footer={
         achievements.length > 0 ? (
           <p className="flex flex-wrap items-center text-xs text-text-secondary">
-            <Facts items={[plural(achievements.length, T.plurals.achievements, lang), hasPoints && points(totalPts)]} />
+            <Facts items={[plural(achievements.length, T.plurals.achievements, lang), allRa(achievements) && plural(points, T.plurals.points, lang)]} />
           </p>
         ) : undefined
       }
     >
-      {days.length === 0 ? (
+      {!day ? (
         <p className="text-sm text-text-secondary text-center py-6">{empty ?? T.cards.noData}</p>
       ) : (
-        days.map(day => (
-          <div key={day.date} className="flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xs font-semibold text-text-main">{formatWeekdayDay(day.date, lang)}</span>
-              <span className="flex flex-wrap items-center justify-end text-[10px] text-text-secondary">
-                <Facts items={[hasPoints && points(day.pts), plural(day.achievements.length, T.plurals.achievements, lang)]} />
-              </span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {day.achievements.map(ach => (
-                <RecentAchievementRow key={ach.AchievementID} ach={ach} onNavigate={onClose} />
-              ))}
-            </div>
+        // Its height is what the screen leaves (the head and footer take about 13rem), and never more than a
+        // wide dialog: at 2560x1300 and 1920x1080 it stays wider than tall.
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:h-[max(16rem,min(44rem,calc(85dvh-13rem)))]">
+          <div className={`${step === 'day' ? 'hidden lg:flex' : 'flex'} flex-col min-w-0 lg:min-h-0`}>
+            <PeriodAchievementsDays
+              days={days}
+              selected={day.date}
+              onSelect={(date) => {
+                setChosen(date)
+                setStep('day')
+              }}
+            />
           </div>
-        ))
+          <div className={`${step === 'day' ? 'flex' : 'hidden lg:flex'} flex-col gap-3 min-w-0 lg:min-h-0 lg:pl-4 lg:shadow-hairline-l`}>
+            <PeriodAchievementsDay key={day.date} day={day} onNavigate={onClose} onBack={() => setStep('days')} />
+          </div>
+        </div>
       )}
     </Modal>
   )

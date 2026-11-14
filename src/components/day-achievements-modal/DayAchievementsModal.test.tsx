@@ -55,7 +55,7 @@ test('says so on an empty day, and closes', () => {
 test('the head names the day with its weekday in the one format, and the footer counts in the right plural', () => {
   render(<DayAchievementsModal date={DAY} achievements={[ach()]} onClose={jest.fn()} />)
   expect(screen.getByText('Monday, Jan 15, 2024')).toBeInTheDocument()
-  const footer = document.querySelector('p.text-xs')!
+  const footer = [...document.querySelectorAll('p.text-xs')].pop()!
   expect(footer).toHaveTextContent('1 achievement, 1 completion')
   expect(footer).not.toHaveTextContent(/1 achievements|1 completions/)
 })
@@ -65,4 +65,12 @@ test('the mastery award is a Tag in the hardcore tone; its picture has no alt (t
   expect(screen.getByText(en.streak.mastery).className).toMatch(/text-hardcore/)
   expect(screen.getByText(en.achievement.hardcoreShort).className).toMatch(/text-hardcore/)
   expect(screen.queryByRole('img', { name: 'Zelda' })).not.toBeInTheDocument()
+})
+
+test('the day is grouped by game: each game once with its platform, its achievements under it without repeating it', () => {
+  const steam = ach({ AchievementID: 3, Title: 'Win', GameID: 620, GameTitle: 'Portal 2', Points: 0, BadgeName: '', Source: 'steam' })
+  render(<DayAchievementsModal date={DAY} achievements={[ach(), ach({ AchievementID: 2, Title: 'Sword' }), steam]} onClose={jest.fn()} />)
+  expect(screen.getAllByRole('heading', { level: 4 }).map((h) => h.textContent).sort()).toEqual(['Portal 2', 'Zelda'])
+  expect(screen.getByRole('region', { name: 'Zelda' })).toHaveTextContent('SNES')
+  expect(screen.getByRole('region', { name: 'Portal 2' })).toHaveTextContent('Steam')
 })
