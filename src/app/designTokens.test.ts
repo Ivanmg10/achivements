@@ -160,3 +160,16 @@ test('Tailwind sees the colours and radii', () => {
     expect(css).toContain(`${name}:`)
   }
 })
+
+test('country flags: a self-hosted flag-only font comes first in the stacks and only covers the regional indicators (F2)', () => {
+  const face = css.match(/@font-face \{\s*font-family: "Twemoji Country Flags";([^}]*)\}/)![1]
+  expect(face).toContain('/fonts/TwemojiCountryFlags.woff2')
+  expect(face).toContain('font-display: swap')
+  // The flags' letters (U+1F1E6-1F1FF) and the black flag with its tags, nothing a sentence is written with.
+  const ranges = face.match(/unicode-range:([^;]*);/)![1].split(',').map((r) => r.trim())
+  for (const r of ranges) expect(r).toMatch(/^U\+(1F1E6-1F1FF|1F3F4|E00[0-7][0-9A-F](-E00[0-7][0-9A-F])?)$/)
+  expect(css).toMatch(/--font-sans: "Twemoji Country Flags", var\(--font-face\)/)
+  expect(css).toMatch(/--font-display: "Twemoji Country Flags", var\(--font-face-display\)/)
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  expect(require('fs').existsSync(require('path').join(__dirname, '../../public/fonts/TwemojiCountryFlags.woff2'))).toBe(true)
+})

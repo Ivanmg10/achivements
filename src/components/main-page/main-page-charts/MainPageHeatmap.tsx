@@ -113,17 +113,13 @@ export default function MainPageHeatmap({
   const gridWidth = weeks * cellWidth + (weeks - 1) * GAP
   const today = utcDay(new Date())
 
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const cellEl = (e.target as HTMLElement).closest('[data-date]') as HTMLElement | null
+  /** Shows the day's tooltip at (x, y) of the grid's box; a mouse gives its pointer, a focused cell its own corner. */
+  function showTooltip(cellEl: HTMLElement | null, x: number, y: number) {
     const tooltip = tooltipRef.current
-    const container = containerRef.current
-    if (!cellEl || !tooltip || !container) {
+    if (!cellEl || !tooltip) {
       if (tooltip) tooltip.style.display = 'none'
       return
     }
-    const rect = container.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
     const date = cellEl.dataset.date ?? ''
     const count = cellEl.dataset.count ?? '0'
     const formatted = formatDay(date, lang, {
@@ -135,14 +131,40 @@ export default function MainPageHeatmap({
     tooltip.style.top = `${y - 36}px`
   }
 
-  function handleMouseLeave() {
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = containerRef.current?.getBoundingClientRect()
+    const cellEl = (e.target as HTMLElement).closest<HTMLElement>('[data-date]')
+    if (rect) showTooltip(cellEl, e.clientX - rect.left, e.clientY - rect.top)
+  }
+
+  function handleFocus(e: React.FocusEvent<HTMLDivElement>) {
+    const rect = containerRef.current?.getBoundingClientRect()
+    const cellEl = (e.target as HTMLElement).closest<HTMLElement>('[data-date]')
+    if (!rect || !cellEl) return
+    const cell = cellEl.getBoundingClientRect()
+    showTooltip(cellEl, cell.left - rect.left, cell.top - rect.top)
+  }
+
+  function hideTooltip() {
     if (tooltipRef.current) tooltipRef.current.style.display = 'none'
+  }
+
+  /** The days with unlocks are buttons: arrows move between them in the order of the calendar, as Tab does. */
+  function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    const next = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]
+    if (next === undefined && e.key !== 'Home' && e.key !== 'End') return
+    const days = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>('button[data-date]'))
+    const at = days.indexOf(e.target as HTMLButtonElement)
+    if (at < 0) return
+    e.preventDefault()
+    const to = e.key === 'Home' ? 0 : e.key === 'End' ? days.length - 1 : Math.min(days.length - 1, Math.max(0, at + (next ?? 0)))
+    days[to].focus()
   }
 
   return (
     <div
       className="flex flex-col w-full flex-1 min-h-0"
-      role="img"
+      role="group"
       aria-label={`${title ?? `${T.cards.activityLabel} — ${label}`}: ${totalAch} ${T.lineChart.achievements}`}
     >
       {/* header */}
@@ -182,11 +204,11 @@ export default function MainPageHeatmap({
               ref={containerRef}
               className="relative flex flex-col gap-1"
               style={{ width: gridWidth }}
-              aria-hidden="true"
             >
               {/* tooltip */}
               <div
                 ref={tooltipRef}
+                aria-hidden="true"
                 className="pointer-events-none absolute z-10 px-2 py-1 rounded text-[11px] text-text-main whitespace-nowrap"
                 style={{
                   display: 'none',
@@ -201,7 +223,7 @@ export default function MainPageHeatmap({
                 wider than the column its month starts in, and a grid cell
                 clipped it to a couple of letters.
               */}
-              <div className="relative" style={{ height: MONTH_ROW }}>
+              <div className="relative" style={{ height: MONTH_ROW }} aria-hidden="true">
                 {monthLabels.map(({ label, col }) => (
                   <span
                     key={col}
@@ -220,7 +242,10 @@ export default function MainPageHeatmap({
               */}
               <div
                 onMouseMove={isLoading ? undefined : handleMouseMove}
-                onMouseLeave={isLoading ? undefined : handleMouseLeave}
+                onMouseLeave={isLoading ? undefined : hideTooltip}
+                onFocus={isLoading ? undefined : handleFocus}
+                onBlur={isLoading ? undefined : hideTooltip}
+                onKeyDown={isLoading ? undefined : handleKeyDown}
                 style={{ ...gridStyle, gridTemplateRows: `repeat(7, ${cell}px)`, gridAutoFlow: 'column' }}
               >
                 {Array.from({ length: weeks }).flatMap((_, wi) =>
@@ -228,18 +253,31 @@ export default function MainPageHeatmap({
                     const day = isLoading ? null : columns[wi]?.[di] ?? null
                     const count = day?.count ?? 0
                     const isToday = day?.date === today
+                    const style = { backgroundColor: isLoading ? undefined : LEVEL_BG[heatLevel(count, best)], '--col': wi, '--row': di } as React.CSSProperties
+                    const key = `${wi}-${di}`
+                    // A day with unlocks is a button (it opens the day) named by its date and count; the rest is only paint.
+                    if (day && count > 0) {
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          aria-label={`${formatDay(day.date, lang)}: ${plural(count, T.plurals.achievements, lang)}`}
+                          className={`heat-cell rounded-cell transition-transform hover:scale-125 hover:ring-1 hover:ring-text-main/40 focus-ring${isToday ? ' ring-1 ring-text-main/70' : ''}`}
+                          style={style}
+                          data-date={day.date}
+                          data-count={count}
+                          onClick={() => setSelectedDate(day.date)}
+                        />
+                      )
+                    }
                     return (
                       <div
-                        key={`${wi}-${di}`}
-                        className={
-                          isLoading
-                            ? 'heat-loading rounded-cell'
-                            : `heat-cell rounded-cell transition-transform${count > 0 ? ' cursor-pointer hover:scale-125 hover:ring-1 hover:ring-text-main/40' : ''}${isToday ? ' ring-1 ring-text-main/70' : ''}`
-                        }
-                        style={{ backgroundColor: isLoading ? undefined : LEVEL_BG[heatLevel(count, best)], '--col': wi, '--row': di } as React.CSSProperties}
+                        key={key}
+                        aria-hidden="true"
+                        className={isLoading ? 'heat-loading rounded-cell' : `heat-cell rounded-cell${isToday ? ' ring-1 ring-text-main/70' : ''}`}
+                        style={style}
                         data-date={day?.date}
                         data-count={count}
-                        onClick={() => day && count > 0 && setSelectedDate(day.date)}
                       />
                     )
                   })
@@ -247,7 +285,7 @@ export default function MainPageHeatmap({
               </div>
 
               {/* legend */}
-              <div className="flex items-center justify-end gap-1" style={{ height: LEGEND_ROW }}>
+              <div className="flex items-center justify-end gap-1" style={{ height: LEGEND_ROW }} aria-hidden="true">
                 <span className="text-[9px] text-text-secondary">{T.cards.heatLess}</span>
                 {Array.from({ length: HEAT_LEVELS + 1 }, (_, level) => (
                   <div key={level} className="w-2.5 h-2.5 rounded-cell" style={{ backgroundColor: LEVEL_BG[level] }} />

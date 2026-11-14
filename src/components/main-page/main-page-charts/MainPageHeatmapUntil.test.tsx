@@ -40,7 +40,7 @@ describe('a calendar that ends before today', () => {
   test('has the title it was given, and says it to assistive technology', () => {
     render(<MainPageHeatmap achievements={[unlock('2024-06-12')]} until={until} title="Activity in this game" />)
     expect(screen.getAllByText('Activity in this game').length).toBeGreaterThan(0)
-    expect(screen.getByRole('img', { name: /^Activity in this game: 1/ })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /^Activity in this game: 1/ })).toBeInTheDocument()
   })
 })
 

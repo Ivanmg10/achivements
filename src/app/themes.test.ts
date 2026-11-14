@@ -99,3 +99,19 @@ describe.each(THEMES)('%s reads', (theme) => {
     for (const meaning of ['--success', '--danger', '--info']) expect(t[meaning]).not.toBe(t['--accent'])
   })
 })
+
+// The browser draws scrollbars, date pickers and form controls from `color-scheme`; a dark page left on the light one got white scrollbars.
+describe.each(THEMES)('%s tells the browser its colour scheme', (theme) => {
+  const light = new RegExp(String.raw`\[data-theme="${theme}"\][^{]*\{[^}]*color-scheme: light`)
+  const isLight = light.test(css)
+
+  test('light themes say light, every other one inherits the dark base', () => {
+    const lightThemes = ['light', 'light-red', 'light-green', 'light-blue', 'light-black', 'sakura', 'arctic']
+    expect(isLight).toBe(lightThemes.includes(theme))
+    expect(css).toMatch(/:root,\n\[data-theme\] \{[^}]*color-scheme: dark;/)
+  })
+})
+
+test('the scrollbar is coloured from the theme\'s ink, so it follows each theme', () => {
+  expect(css).toMatch(/:root,\n\[data-theme\] \{[^}]*scrollbar-color: rgb\(var\(--ink\) \/ 0\.3\) transparent;/)
+})
