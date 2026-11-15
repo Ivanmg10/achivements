@@ -1454,7 +1454,10 @@ export const de: Translations = {
     verification: {
       title: 'Bestätige dein PlayStation-Konto',
       body: 'Füge diesen Code in „Über mich“ deines PlayStation-Profils ein, speichere ihn und drücke dann den Button. So ist belegt, dass das Konto dir gehört, und den Code kannst du danach wieder löschen.',
-      counts: 'Die Trophäen werden hier angezeigt, zählen aber erst nach der Bestätigung für die Vault-Punkte.',
+      whyTitle: 'Warum bestätigen?',
+      whyAnyone: 'Sony zeigt die Trophäen jedes öffentlichen Profils. Deshalb könnte jede Person dein PlayStation-Konto hier verknüpfen und deine Trophäen als eigene ausgeben. Der Code belegt, dass das Konto dir gehört, denn nur du kannst dein „Über mich“ ändern.',
+      whyCounts: 'Darum werden die Trophäen eines unbestätigten Kontos angezeigt, bringen aber keine Vault-Punkte und zählen nicht in den Ranglisten. Und ein PlayStation-Konto kann nur von einem einzigen CheevoVault-Konto bestätigt werden.',
+      whyPrivacy: 'Wir lesen dein „Über mich“ nur einmal, wenn du den Button drückst. Wir fragen nie nach deinem Passwort und melden uns nie in deinem Konto an, und nach der Bestätigung kannst du den Code löschen.',
       codeLabel: 'Dein Code',
       validFor: '24 Stunden gültig.',
       copy: 'Code kopieren',

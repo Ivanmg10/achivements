@@ -40,7 +40,7 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   - That button opens `PsnVerificationModal` (`md`): the code, Copy, "Open my PlayStation profile", "Later" and "check".
   - The welcome's PSN step gets the same line.
   - `usePsnVerification({ active })` asks for the code only while the dialog is open.
-  - `verifiedNote` is gone from the nine languages.
+  - `verifiedNote` is gone from the nine languages. `counts` became "Why verify it?" (`PsnVerificationWhy`, under the code): anyone could link any public profile and pass its trophies off as theirs, so only a proven account adds Vault Points (one user per account), and only the About Me is read, once, with no password and no sign-in. The owner asked for a fuller why (2026-11-15).
 - **Why:** the owner, on the real page: the open panel made the PSN card taller than the others in its row.
 - **Watch out:**
   - The profile link sits in the body, not the footer: the guard refuses a ringed button in a dialog's footer (#132).

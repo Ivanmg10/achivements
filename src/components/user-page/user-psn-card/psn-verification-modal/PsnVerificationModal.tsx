@@ -10,6 +10,7 @@ import ErrorRetry from '@/components/ui/ErrorRetry'
 import Modal from '@/components/ui/Modal'
 import Notice from '@/components/ui/Notice'
 import PsnVerificationCode from '@/components/user-page/user-psn-card/psn-verification-code/PsnVerificationCode'
+import PsnVerificationWhy from '@/components/user-page/user-psn-card/psn-verification-why/PsnVerificationWhy'
 
 /**
  * Proving the linked PlayStation account is yours (#176): the code to paste in its About Me and a button
@@ -45,7 +46,6 @@ export default function PsnVerificationModal({ isOpen, onClose, onlineId }: { is
         </>
       }
     >
-      <p className="text-sm text-text-secondary">{V.counts}</p>
       {loadError ? (
         <ErrorRetry message={psnVerifyError(loadError, T)} retryLabel={T.psn.retry} onRetry={retry} />
       ) : (
@@ -67,6 +67,7 @@ export default function PsnVerificationModal({ isOpen, onClose, onlineId }: { is
         </Button>
       )}
       {error && <Notice tone="danger" size="sm">{psnVerifyError(error, T)}</Notice>}
+      <PsnVerificationWhy />
     </Modal>
   )
 }

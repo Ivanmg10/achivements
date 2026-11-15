@@ -1454,7 +1454,10 @@ export const es: Translations = {
     verification: {
       title: 'Verifica tu cuenta de PlayStation',
       body: 'Pega este código en «Sobre mí» de tu perfil de PlayStation, guárdalo y pulsa el botón. Así se demuestra que la cuenta es tuya, y después puedes quitar el código.',
-      counts: 'Sus trofeos se ven aquí, pero no cuentan en los Puntos Vault hasta que esté verificada.',
+      whyTitle: '¿Por qué hay que verificarla?',
+      whyAnyone: 'Sony deja ver los trofeos de cualquier perfil público, así que cualquiera podría vincular aquí tu cuenta de PlayStation y hacer pasar tus trofeos por suyos. El código demuestra que la cuenta es tuya, porque solo tú puedes cambiar tu «Sobre mí».',
+      whyCounts: 'Por eso los trofeos de una cuenta sin verificar se ven, pero no suman Puntos Vault ni cuentan en los rankings. Y una cuenta de PlayStation solo puede estar verificada en un usuario de CheevoVault.',
+      whyPrivacy: 'Solo leemos tu «Sobre mí» una vez, al pulsar el botón. Nunca te pedimos la contraseña ni entramos en tu cuenta, y en cuanto esté verificada puedes borrar el código.',
       codeLabel: 'Tu código',
       validFor: 'Válido durante 24 horas.',
       copy: 'Copiar código',

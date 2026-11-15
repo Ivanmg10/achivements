@@ -29,7 +29,10 @@ test('the code, why it matters, and a link to the PSN profile, in a dialog named
   render(<PsnVerificationModal isOpen onClose={onClose} onlineId="Hakoom" />)
   expect(screen.getByRole('dialog', { name: V.title })).toBeInTheDocument()
   expect(screen.getByText('CV-ABCD2345')).toBeInTheDocument()
-  expect(screen.getByText(V.counts)).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: V.whyTitle })).toBeInTheDocument()
+  expect(screen.getByText(V.whyAnyone)).toBeInTheDocument()
+  expect(screen.getByText(V.whyCounts)).toBeInTheDocument()
+  expect(screen.getByText(V.whyPrivacy)).toBeInTheDocument()
   expect(screen.getByRole('link', { name: V.openProfile })).toHaveAttribute('href', 'https://profile.playstation.com/Hakoom')
 })
 

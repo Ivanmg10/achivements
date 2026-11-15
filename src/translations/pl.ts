@@ -1454,7 +1454,10 @@ export const pl: Translations = {
     verification: {
       title: 'Zweryfikuj swoje konto PlayStation',
       body: 'Wklej ten kod w sekcji „O mnie” swojego profilu PlayStation, zapisz go i naciśnij przycisk. To dowodzi, że konto należy do Ciebie, a potem możesz usunąć kod.',
-      counts: 'Jego trofea widać tutaj, ale nie liczą się do Punktów Vault, dopóki konto nie zostanie zweryfikowane.',
+      whyTitle: 'Po co weryfikacja?',
+      whyAnyone: 'Sony pokazuje trofea każdego publicznego profilu, więc każdy mógłby połączyć tutaj Twoje konto PlayStation i podawać Twoje trofea za własne. Kod dowodzi, że konto należy do Ciebie, bo tylko Ty możesz zmienić swoją sekcję „O mnie”.',
+      whyCounts: 'Dlatego trofea niezweryfikowanego konta widać, ale nie dają Punktów Vault i nie liczą się w rankingach. A jedno konto PlayStation może zweryfikować tylko jeden użytkownik CheevoVault.',
+      whyPrivacy: 'Sekcję „O mnie” czytamy tylko raz, gdy naciśniesz przycisk. Nigdy nie prosimy o hasło ani nie logujemy się na Twoje konto, a po weryfikacji możesz usunąć kod.',
       codeLabel: 'Twój kod',
       validFor: 'Ważny przez 24 godziny.',
       copy: 'Kopiuj kod',

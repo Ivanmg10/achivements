@@ -1455,7 +1455,10 @@ export const en = {
     verification: {
       title: 'Verify your PlayStation account',
       body: 'Paste this code in the About Me of your PlayStation profile, save it, then press the button. It proves the account is yours, and you can remove the code afterwards.',
-      counts: 'Its trophies show here, but they do not count in Vault Points until it is verified.',
+      whyTitle: 'Why verify it?',
+      whyAnyone: 'Sony shows the trophies of any public profile, so anyone could link your PlayStation account here and pass your trophies off as theirs. The code proves the account is yours, because only you can change your About Me.',
+      whyCounts: 'That is why an unverified account\'s trophies show, but add no Vault Points and do not count in the rankings. And a PlayStation account can be verified by one CheevoVault user only.',
+      whyPrivacy: 'We read your About Me once, when you press the button. We never ask for your password or sign in to your account, and once it is verified you can delete the code.',
       codeLabel: 'Your code',
       validFor: 'Valid for 24 hours.',
       copy: 'Copy code',
