@@ -1,27 +1,16 @@
-import type { PsnGameProgress, PsnTrophy } from '@/types/psn'
-import { psnBaseCompletedAt, validCompletionDate } from '@/utils/completionDates'
-import { mapLimit } from '@/utils/utils'
+import type { PsnGameProgress } from '@/types/psn'
+import { validCompletionDate } from '@/utils/completionDates'
 
-const COMPLETION_PARALLEL = 2
-const needsBaseTrophies = (game: PsnGameProgress) => game.hasDlc && (game.pctWon >= 100 || game.earned.platinum > 0)
+/** A complete game with DLC: its base-game completion date needs its trophies read (psnBaseCompletedAt). */
+export const needsBaseTrophies = (game: PsnGameProgress) => game.hasDlc && (game.pctWon >= 100 || game.earned.platinum > 0)
 
-/** Add nullable base dates without caching a partial enrichment or changing activity fields. */
-export async function withPsnCompletionDates(
-  games: PsnGameProgress[],
-  loadTrophies: (game: PsnGameProgress) => Promise<PsnTrophy[]>,
-): Promise<PsnGameProgress[]> {
-  const eligible = games.filter(needsBaseTrophies)
-  const results = await mapLimit(eligible, COMPLETION_PARALLEL, async (game) => psnBaseCompletedAt(await loadTrophies(game)))
-  const dates = new Map<number, string | null>()
-  results.forEach((result, index) => {
-    if (result.status === 'fulfilled') dates.set(eligible[index].id, result.value)
-    else {
-      console.error('[psn] completion date unavailable', eligible[index].titleId, result.reason)
-      dates.set(eligible[index].id, null)
-    }
-  })
+/**
+ * Each game's completion date: a complete game without DLC from its last trophy; one with DLC from `known` (its
+ * base game's date, read in the background; null until then). Activity fields are left alone.
+ */
+export function withCompletion(games: PsnGameProgress[], known: (game: PsnGameProgress) => string | null): PsnGameProgress[] {
   return games.map((game) => {
-    if (needsBaseTrophies(game)) return { ...game, completedAt: dates.get(game.id) ?? null }
+    if (needsBaseTrophies(game)) return { ...game, completedAt: known(game) }
     if (!game.hasDlc && game.pctWon >= 100) return { ...game, completedAt: validCompletionDate(game.lastTrophyAt) }
     return game
   })

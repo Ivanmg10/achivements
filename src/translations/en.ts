@@ -1433,6 +1433,8 @@ export const en = {
     retry: 'Retry',
     profileError: 'Could not load your PlayStation profile',
     viewOnPsn: 'View on PSN',
+    syncedAgo: 'Updated {when}',
+    nextSync: 'next update {when}',
     recentTrophies: 'Recent trophies',
     total: 'total',
     rarestEarned: 'Rarest earned',

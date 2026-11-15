@@ -66,6 +66,46 @@ export async function readCache<T>(key: string, maxAgeMs?: number): Promise<T | 
   }
 }
 
+/** An entry younger than `maxAgeMs`, live or expired, with how old it is: what serving stale data (#177) reads. */
+export async function readCacheEntry<T>(key: string, maxAgeMs: number): Promise<{ data: T; ageMs: number; live: boolean } | null> {
+  try {
+    const { rows } = await pool.query(
+      `SELECT cache_data, expires_at > NOW() AS live, EXTRACT(EPOCH FROM (NOW() - created_at)) * 1000 AS age_ms
+         FROM steam_cache WHERE cache_key = $1 AND created_at > NOW() - ($2 || ' milliseconds')::interval`,
+      [key, String(maxAgeMs)],
+    )
+    const row = rows[0]
+    return row ? { data: row.cache_data as T, ageMs: Number(row.age_ms), live: row.live === true } : null
+  } catch (err) {
+    console.error('[steamCache] read entry', cacheLogKey(key), err)
+    return null
+  }
+}
+
+/**
+ * A lease on `key` for `ms`: true when this caller holds it. A row that expires, not a session lock, so it holds
+ * no connection while the work runs and a crashed holder lets go on its own. A database that will not answer
+ * grants it (the work runs, as it would have without a lease).
+ */
+export async function takeLease(key: string, ms: number): Promise<boolean> {
+  try {
+    const { rowCount } = await pool.query(
+      `INSERT INTO steam_cache (cache_key, cache_data, expires_at) VALUES ($1, 'true', NOW() + ($2 || ' milliseconds')::interval)
+       ON CONFLICT (cache_key) DO UPDATE SET expires_at = EXCLUDED.expires_at, created_at = NOW()
+         WHERE steam_cache.expires_at <= NOW()`,
+      [key, String(ms)],
+    )
+    return rowCount === 1
+  } catch (err) {
+    console.error('[steamCache] lease', cacheLogKey(key), err)
+    return true
+  }
+}
+
+export async function dropLease(key: string): Promise<void> {
+  await pool.query('DELETE FROM steam_cache WHERE cache_key = $1', [key]).catch((err: unknown) => console.error('[steamCache] drop lease', cacheLogKey(key), err))
+}
+
 /** The last successful value, even expired. Only used after an allowed upstream failure. */
 async function readStaleCache<T>(key: string): Promise<T | null> {
   try {
@@ -205,11 +245,12 @@ export async function clearUserCache(userId: string): Promise<void> {
 
 /**
  * Deletes expired rows; run daily by /api/cron/sweepCache. Xbox rows stay for
- * 30 days so stale-if-error still has a last good value. Throws on failure.
+ * 30 days so stale-if-error still has a last good value, PSN's 7 (served stale, #177). Throws on failure.
  */
 export async function sweepExpired(): Promise<number> {
   const result = await pool.query(`DELETE FROM steam_cache
     WHERE expires_at <= NOW()
-      AND (cache_key NOT LIKE 'xbox:%' OR expires_at <= NOW() - INTERVAL '30 days')`)
+      AND (cache_key NOT LIKE 'xbox:%' OR expires_at <= NOW() - INTERVAL '30 days')
+      AND (cache_key NOT LIKE 'psn:%' OR expires_at <= NOW() - INTERVAL '7 days')`)
   return result.rowCount ?? 0
 }

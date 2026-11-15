@@ -1432,6 +1432,8 @@ export const ru: Translations = {
     retry: 'Повторить',
     profileError: 'Не удалось загрузить профиль PlayStation',
     viewOnPsn: 'Открыть в PSN',
+    syncedAgo: 'Обновлено {when}',
+    nextSync: 'следующее обновление {when}',
     recentTrophies: 'Недавние трофеи',
     total: 'всего',
     rarestEarned: 'Самые редкие полученные',

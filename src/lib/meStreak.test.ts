@@ -1,6 +1,6 @@
 jest.mock('@/lib/raYear', () => ({ loadRaYear: jest.fn() }))
 jest.mock('@/lib/steamUnlockYear', () => ({ loadSteamYear: jest.fn() }))
-jest.mock('@/lib/psnClient', () => ({ psnLanguage: (l: string) => l, psnRecentTrophies: jest.fn(), psnTitles: jest.fn() }))
+jest.mock('@/lib/psnClient', () => ({ psnLanguage: (l: string) => l, psnRecentTrophies: jest.fn(), psnTitlesCore: jest.fn() }))
 jest.mock('@/lib/xboxClient', () => ({ xboxLanguage: (l: string) => l, xboxRecentAchievements: jest.fn(), xboxLibrary: jest.fn() }))
 jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
 jest.mock('@/utils/psnMappers', () => ({ psnToRecentAchievement: (t: { gameId: number; date: string }) => ({ Date: t.date, GameID: t.gameId, Source: 'psn' }) }))
@@ -10,7 +10,7 @@ jest.mock('@/utils/steamMappers', () => ({ toRecentAchievement: (a: { appId: num
 import { loadStreak, parseHiddenConsoles, StreakUnavailable } from './meStreak'
 import { loadRaYear } from '@/lib/raYear'
 import { loadSteamYear } from '@/lib/steamUnlockYear'
-import { psnRecentTrophies, psnTitles } from '@/lib/psnClient'
+import { psnRecentTrophies, psnTitlesCore } from '@/lib/psnClient'
 import { xboxRecentAchievements } from '@/lib/xboxClient'
 import { visibleGamesForUser } from '@/lib/gameVisibility'
 
@@ -58,14 +58,14 @@ test('nothing linked is no streak, without asking anyone', async () => {
 test('unticked consoles leave the count; PSN looks its games up only then', async () => {
   ;(loadRaYear as jest.Mock).mockResolvedValue([ra('2026-11-02', 'Game Boy')])
   ;(psnRecentTrophies as jest.Mock).mockResolvedValue([{ gameId: 5, date: '2026-11-01 08:00:00' }])
-  ;(psnTitles as jest.Mock).mockResolvedValue([{ id: 5, consoleName: 'PS3' }])
+  ;(psnTitlesCore as jest.Mock).mockResolvedValue([{ id: 5, consoleName: 'PS3' }])
   const owner = { id: '1', rausername: 'me', raid: 'k', psnaccountid: 'p' }
   const result = await loadStreak(owner, 'en', { ra: new Set(['Game Boy']), psn: new Set(['PS3']) }, NOW)
   expect(result.active).toBeNull()
 
-  ;(psnTitles as jest.Mock).mockClear()
+  ;(psnTitlesCore as jest.Mock).mockClear()
   await loadStreak(owner, 'en', {}, NOW)
-  expect(psnTitles).not.toHaveBeenCalled()
+  expect(psnTitlesCore).not.toHaveBeenCalled()
 })
 
 test('Xbox only for whoever may use it', async () => {

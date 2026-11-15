@@ -12,6 +12,7 @@ import MainPageProfileLinked from '../../main-page-profile-linked/MainPageProfil
 import MainPageProfilePsnStats from '../main-page-profile-psn-stats/MainPageProfilePsnStats'
 import MainPageProfilePsnGame from '../main-page-profile-psn-game/MainPageProfilePsnGame'
 import MainPageProfilePsnTrophies from '../main-page-profile-psn-trophies/MainPageProfilePsnTrophies'
+import MainPageProfilePsnSync from '../main-page-profile-psn-sync/MainPageProfilePsnSync'
 import MainPageProfileGameSkeleton from '../../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
 import Tag from '@/components/ui/Tag'
 
@@ -79,6 +80,7 @@ export default function MainPageProfilePsnLinked({
               {summary.isPlus && <Tag tone="hardcore">PS Plus</Tag>}
             </div>
             {summary.aboutMe && <p className="text-[0.8125rem] text-text-secondary line-clamp-2">{summary.aboutMe}</p>}
+            <MainPageProfilePsnSync syncedAt={summary.syncedAt} nextSyncAt={summary.nextSyncAt} />
           </>
         ),
       }}

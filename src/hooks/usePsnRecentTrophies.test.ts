@@ -50,3 +50,15 @@ test("on a public profile (an account id with a colon in it) it still asks for t
   await waitFor(() => expect(result.current.trophies).toEqual(TROPHIES))
   expect(global.fetch).toHaveBeenCalledWith('/api/psn/recentTrophies?scope=year&lang=en&user=ivan', { cache: 'no-store' })
 })
+
+test('while the server builds the year (202) it stays loading, and asks again after the time it was told', async () => {
+  setSession({ id: '7', psnaccountid: '42' })
+  ;(global.fetch as jest.Mock)
+    .mockResolvedValueOnce({ ok: true, status: 202, headers: new Headers({ 'Retry-After': '0.05' }), json: async () => ({ status: 'syncing' }) })
+    .mockResolvedValue({ ok: true, status: 200, json: async () => TROPHIES })
+  const { result } = renderHook(() => usePsnRecentTrophies('year'))
+  await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1))
+  expect(result.current).toMatchObject({ trophies: [], isLoading: true, error: null })
+  await waitFor(() => expect(result.current.trophies).toEqual(TROPHIES))
+  expect(global.fetch).toHaveBeenCalledTimes(2)
+})

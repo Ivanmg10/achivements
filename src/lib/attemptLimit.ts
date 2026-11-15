@@ -30,8 +30,15 @@ import pool from '@/lib/db'
  *
  * 'psn-score' counts the PSN games read for Vault Points, for the whole app
  * (address 'app'): PSN is one app account for everyone, so the score fill goes
- * gently whoever it is for. 300 games is 600 calls to Sony in 15 minutes.
+ * gently whoever it is for. 200 games is at most 400 calls to Sony in 15 minutes (fewer once a game's
+ * defined trophies are shared, #177), under the background share of 'psn-upstream'.
  */
+/**
+ * Every request to Sony, for the whole app, in 15 minutes (#177): the one number to tune. Reported limits are about
+ * 300 per 15 minutes per endpoint plus an unknown per-address one (docs/platforms/psn.md), so 600 across them.
+ */
+export const PSN_CALLS_PER_WINDOW = 600
+
 export type AttemptScope = 'totp' | 'psn-upstream' | 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'ra-borrowed' | 'avatar' | 'user-search' | 'follow' | 'psn-score' | 'psn-verify' | 'xbox-upstream' | 'ra-check'
 
 const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
@@ -45,10 +52,10 @@ const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   avatar: { max: 20, windowMinutes: 60 },
   'user-search': { max: 60, windowMinutes: 5 },
   follow: { max: 60, windowMinutes: 5 },
-  'psn-score': { max: 300, windowMinutes: 15 },
+  'psn-score': { max: 200, windowMinutes: 15 },
   'psn-verify': { max: 6, windowMinutes: 15 },
-  // Every call to Sony, for the whole app: scoring's 600 and room for people browsing.
-  'psn-upstream': { max: 900, windowMinutes: 15 },
+  // Every call to Sony, for the whole app (psnBudget.ts keeps a share of it for people browsing).
+  'psn-upstream': { max: PSN_CALLS_PER_WINDOW, windowMinutes: 15 },
   // One OpenXBL key and plan are shared by every route and score job in this environment.
   'xbox-upstream': { max: 150, windowMinutes: 60 },
   // Checking an RA key before signing up: signed out, so per address, and few, or it would test stolen keys.
@@ -103,7 +110,7 @@ export type Reservation = { allowed: boolean; release: () => Promise<void> }
  * refused, so hammering does not lengthen the wait). A database that will not
  * answer must not lock people out, so a failure here lets them through.
  */
-export async function reserveAttempt(scope: AttemptScope, address: string): Promise<Reservation> {
+export async function reserveAttempt(scope: AttemptScope, address: string, max = LIMITS[scope].max): Promise<Reservation> {
   let id: number | null = null
   const release = async () => {
     if (id === null) return
@@ -112,7 +119,7 @@ export async function reserveAttempt(scope: AttemptScope, address: string): Prom
   try {
     const { rows } = await pool.query('INSERT INTO signup_attempts (scope, address) VALUES ($1, $2) RETURNING id', [scope, address])
     id = rows[0]?.id ?? null
-    return { allowed: (await recentAttempts(scope, address, false)) <= LIMITS[scope].max, release }
+    return { allowed: (await recentAttempts(scope, address, false)) <= max, release }
   } catch (err) {
     console.error('[attemptLimit]', scope, err)
     return { allowed: true, release }

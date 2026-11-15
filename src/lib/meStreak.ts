@@ -1,6 +1,6 @@
 import { loadRaYear } from '@/lib/raYear'
 import { loadSteamYear } from '@/lib/steamUnlockYear'
-import { psnLanguage, psnRecentTrophies, psnTitles } from '@/lib/psnClient'
+import { psnLanguage, psnRecentTrophies, psnTitlesCore } from '@/lib/psnClient'
 import { xboxLanguage, xboxLibrary, xboxRecentAchievements } from '@/lib/xboxClient'
 import { visibleGamesForUser } from '@/lib/gameVisibility'
 import { canUseXbox } from '@/utils/xboxAccess'
@@ -97,7 +97,7 @@ export async function loadStreak(owner: StreakOwner, lang: string, hidden: Hidde
     reads.push(['psn', async () => {
       const [year, off] = await Promise.all([
         psnRecentTrophies(accountId, 366, id, psnLanguage(lang)),
-        hiddenIds(hidden.psn, () => psnTitles(accountId, id)),
+        hiddenIds(hidden.psn, () => psnTitlesCore(accountId, id)),
       ])
       const visible = await visibleGamesForUser(id, year, 'psn', (t) => t.gameId)
       return visible.map(psnToRecentAchievement).filter((a) => !off?.has(a.GameID))

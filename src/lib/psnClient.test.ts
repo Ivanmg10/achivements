@@ -23,7 +23,13 @@ jest.mock('@/lib/psnCredentials', () => ({
 jest.mock('@/lib/steamCache', () => ({
   withSteamCache: jest.fn((_key: string, _ttl: number, fetcher: () => Promise<unknown>) => fetcher()),
   readCacheMany: jest.fn(async () => new Map()),
+  readCache: jest.fn(async () => null),
   writeCache: jest.fn(),
+}))
+// The account-level cache has its own tests (psnCache.test.ts): here it always fetches.
+jest.mock('@/lib/psnCache', () => ({
+  psnCached: jest.fn((_key: string, _ttl: number, fetcher: () => Promise<unknown>) => fetcher()),
+  psnSyncedAt: jest.fn(async () => null),
 }))
 jest.mock('@/lib/igdbClient', () => ({
   ...jest.requireActual('@/lib/igdbClient'),
@@ -33,7 +39,8 @@ jest.mock('@/lib/igdbClient', () => ({
 
 import * as psn from 'psn-api'
 import { igdbArt, igdbConfigured } from '@/lib/igdbClient'
-import { readCacheMany, withSteamCache, writeCache } from '@/lib/steamCache'
+import { readCache, readCacheMany, withSteamCache, writeCache } from '@/lib/steamCache'
+import { psnCached } from '@/lib/psnCache'
 import { loadPsnCredentials, savePsnNpsso, savePsnTokens } from '@/lib/psnCredentials'
 import {
   durationMinutes,
@@ -49,8 +56,11 @@ import {
   psnRecentTrophies,
   psnAboutMe,
   psnSummary,
-  psnTitles,
+  psnTitlesCore,
+  psnLibrary,
   PsnError,
+  PsnBusyError,
+  PsnSyncing,
   withPlayData,
   psnCall,
 } from './psnClient'
@@ -118,7 +128,8 @@ test('reuses the access token instead of exchanging the NPSSO on every call', as
   expect(mock(psn.exchangeNpssoForAccessCode).mock.calls.length).toBeLessThanOrEqual(1)
 })
 
-test('sums up level, trophies, games and the largest avatar', async () => {
+test("sums up level, trophies, games (the core library's, no request of its own) and the largest avatar", async () => {
+  mock(psn.getUserTitles).mockResolvedValue({ trophyTitles: [title('NPWR00001_00'), title('NPWR00002_00')], totalItemCount: 2 })
   expect(await psnSummary('42', '7')).toEqual({
     onlineId: 'Hakoom',
     avatarUrl: 'https://x/big.png',
@@ -128,12 +139,12 @@ test('sums up level, trophies, games and the largest avatar', async () => {
     levelProgress: 40,
     trophyLevel: 412,
     earned: { bronze: 100, silver: 30, gold: 10, platinum: 3 },
-    games: 87,
+    games: 2,
   })
-  expect(withSteamCache).toHaveBeenCalledWith('psn:summary:v3:42', expect.any(Number), expect.any(Function), {
-    userId: '7',
-    refreshable: true,
-  })
+  expect(psnCached).toHaveBeenCalledWith('psn:summary:v4:42', expect.any(Number), expect.any(Function), { accountId: '42', userId: '7' })
+  expect(psnCached).toHaveBeenCalledWith('psn:titles:core:v1:42', expect.any(Number), expect.any(Function), { accountId: '42', userId: '7' })
+  // One page of titles, shared with the library: no request of one game just for the count.
+  expect(mock(psn.getUserTitles)).toHaveBeenCalledTimes(1)
 })
 
 test('reads About Me fresh, counted as a profile call; a missing one is an empty string', async () => {
@@ -181,7 +192,7 @@ test('walks every page of the trophy list, into the unified game model', async (
   mock(psn.getUserTitles)
     .mockResolvedValueOnce({ trophyTitles: [title('NPWR00001_00'), { ...title('BAD'), npCommunicationId: 'CUSA1' }], nextOffset: 800 })
     .mockResolvedValueOnce({ trophyTitles: [title('NPWR00002_00')] })
-  const games = await psnTitles('42', '7')
+  const games = await psnTitlesCore('42', '7')
   // An ID that is not NPWR cannot be numbered, so it is left out.
   expect(games.map((g) => g.titleId)).toEqual(['NPWR00001_00', 'NPWR00002_00'])
   expect(games[0]).toEqual({
@@ -226,7 +237,7 @@ function trophies() {
   })
 }
 
-test("merges a game's trophies with what the account earned, cached until the game changes", async () => {
+test("merges a game's trophies with what the account earned: the defined half shared by everyone, the earned half until the game changes", async () => {
   trophies()
   const game = { titleId: 'NPWR00001_00', service: 'trophy' as const, lastTrophyAt: '2026-01-01T00:00:00Z' }
   const list = await psnGameTrophies('42', game, '7')
@@ -237,20 +248,26 @@ test("merges a game's trophies with what the account earned, cached until the ga
     'all',
     { npServiceName: 'trophy', headerOverrides: { 'Accept-Language': 'en-US' } },
   ])
-  expect(withSteamCache).toHaveBeenCalledWith(
-    'psn:trophies:v2:42:NPWR00001_00:2026-01-01T00:00:00Z:en-US',
-    expect.any(Number),
-    expect.any(Function),
-    { userId: '7' },
-  )
+  expect(withSteamCache).toHaveBeenCalledWith('psn:defs:v1:NPWR00001_00:en-US', expect.any(Number), expect.any(Function))
+  expect(withSteamCache).toHaveBeenCalledWith('psn:earned:v1:42:NPWR00001_00:2026-01-01T00:00:00Z', expect.any(Number), expect.any(Function), { userId: '7' })
 })
 
-test('recent trophies come only from games played inside the window, newest first', async () => {
+test('a DLC added after the shared definitions were kept is caught by its ids, and they are read again', async () => {
   trophies()
-  mock(psn.getUserTitles).mockResolvedValue({ trophyTitles: [title('NPWR00001_00', ago(2)), title('NPWR00002_00', ago(90))] })
+  mock(psn.getUserTrophiesEarnedForTitle).mockResolvedValue({ trophies: [{ trophyId: 0, earned: true }, { trophyId: 1, earned: false }, { trophyId: 7, earned: false }] })
+  const game = { titleId: 'NPWR00001_00', service: 'trophy' as const, lastTrophyAt: '2026-01-01T00:00:00Z' }
+  await psnGameTrophies('42', game, '7')
+  expect(mock(psn.getTitleTrophies)).toHaveBeenCalledTimes(2)
+  expect(writeCache).toHaveBeenCalledWith('psn:defs:v1:NPWR00001_00:en-US', expect.any(Array), expect.any(Number))
+})
+
+test('recent trophies are the year, built from the games played inside it, cut to the window, newest first', async () => {
+  trophies()
+  mock(psn.getUserTitles).mockResolvedValue({ trophyTitles: [title('NPWR00001_00', ago(2)), title('NPWR00002_00', ago(400))] })
   const recent = await psnRecentTrophies('42', 60, '7')
-  // The old game is never asked for.
+  // The game older than a year is never asked for.
   expect(mock(psn.getTitleTrophies)).toHaveBeenCalledTimes(1)
+  expect(psnCached).toHaveBeenCalledWith('psn:year:v1:42:en-US', expect.any(Number), expect.any(Function), { accountId: '42', userId: '7', cold: 'background' })
   expect(recent).toHaveLength(1)
   expect(recent[0]).toMatchObject({ gameId: 100, titleId: 'NPWR00001_00', gameTitle: 'Game NPWR00001_00', trophyId: 0, type: 'platinum' })
 })
@@ -292,7 +309,7 @@ describe('when Sony says too many requests', () => {
     const pending = psnSummary('42', '7')
     await waitOut()
     await pending
-    expect(psnCallTotals()).toEqual({ auth: 2, summary: 1, profile: 1, titleCount: 2 })
+    expect(psnCallTotals()).toEqual({ auth: 2, summary: 1, profile: 1, titles: 2 })
   })
 
   test('a second refusal is thrown, and psnFailure answers 429 with a Retry-After', async () => {
@@ -357,7 +374,7 @@ test('play time, last session and store art come from the played-games list, mat
   mock(psn.getUserTrophiesForSpecificTitle).mockResolvedValue({
     titles: [{ npTitleId: 'CUSA1', trophyTitles: [{ npCommunicationId: 'NPWR00001_00' }] }],
   })
-  const games = await psnTitles('42', '7')
+  const games = await psnLibrary('42', '7')
   // The session moves the game above one with a newer trophy.
   expect(games.map((g) => g.titleId)).toEqual(['NPWR00001_00', 'NPWR00002_00'])
   expect(games[0]).toMatchObject({
@@ -371,7 +388,8 @@ test('play time, last session and store art come from the played-games list, mat
     heroUrl: 'https://hero.png',
   })
   expect(games[1].playtimeMinutes).toBeNull()
-  expect(writeCache).toHaveBeenCalledWith('psn:sets:CUSA1', ['NPWR00001_00'], expect.any(Number), '7')
+  // A game's trophy sets are the same for every player: kept for everyone.
+  expect(writeCache).toHaveBeenCalledWith('psn:sets:CUSA1', ['NPWR00001_00'], expect.any(Number))
 })
 
 test('a PS4 game has no portrait: its 16:9 hub art is the backdrop, not the cover, and MASTER the icon', async () => {
@@ -385,7 +403,7 @@ test('a PS4 game has no portrait: its 16:9 hub art is the backdrop, not the cove
   mock(psn.getUserTrophiesForSpecificTitle).mockResolvedValue({
     titles: [{ npTitleId: 'CUSA1', trophyTitles: [{ npCommunicationId: 'NPWR00001_00' }] }],
   })
-  const [game] = await psnTitles('42')
+  const [game] = await psnLibrary('42')
   expect(game).toMatchObject({ coverUrl: null, heroUrl: 'https://hub.jpg', imageIcon: 'https://master.jpg' })
 })
 
@@ -395,7 +413,7 @@ test('the trophy-set lookup goes five ids at a time, and skips what is cached', 
     titles: Array.from({ length: 12 }, (_, i) => played(`CUSA${i}`, '2026-01-01T00:00:00Z', 'PT1H')),
   })
   mock(readCacheMany).mockResolvedValueOnce(new Map([['psn:sets:CUSA0', []]]))
-  await psnTitles('42')
+  await psnLibrary('42')
   const batches = mock(psn.getUserTrophiesForSpecificTitle).mock.calls.map((c) => c[2].npTitleIds.split(',').length)
   expect(batches).toEqual([5, 5, 1])
 })
@@ -404,7 +422,7 @@ test('a hidden played-games list leaves the trophies as they are', async () => {
   jest.spyOn(console, 'error').mockImplementation(() => {})
   mock(psn.getUserTitles).mockResolvedValue({ trophyTitles: [title('NPWR00001_00')] })
   mock(psn.getUserPlayedGames).mockRejectedValue(new Error('Not permitted'))
-  const games = await psnTitles('42')
+  const games = await psnLibrary('42')
   expect(games).toHaveLength(1)
   expect(games[0].playtimeMinutes).toBeNull()
   ;(console.error as jest.Mock).mockRestore()
@@ -534,7 +552,7 @@ describe('DLC', () => {
     mock(psn.getUserTitles).mockResolvedValue({
       trophyTitles: [{ ...title('NPWR07410_00'), hasTrophyGroups: true, progress: 80, earnedTrophies: { bronze: 10, silver: 2, gold: 1, platinum: 1 }, definedTrophies: { bronze: 15, silver: 2, gold: 1, platinum: 1 } }],
     })
-    const [game] = await psnTitles('42')
+    const [game] = await psnLibrary('42')
     expect(game).toMatchObject({ hasDlc: true, pctWon: 80, numAwarded: 14, maxPossible: 19 })
     expect(game.earned).toEqual({ bronze: 10, silver: 2, gold: 1, platinum: 1 })
     expect(game.defined).toEqual({ bronze: 15, silver: 2, gold: 1, platinum: 1 })
@@ -542,7 +560,7 @@ describe('DLC', () => {
 
   test('the groups of a game are not asked for to list it: one call less per game with DLC', async () => {
     mock(psn.getUserTitles).mockResolvedValue({ trophyTitles: [{ ...title('NPWR07410_00'), hasTrophyGroups: true, progress: 80 }] })
-    await psnTitles('42')
+    await psnLibrary('42')
     expect(mock(psn.getTitleTrophyGroups)).not.toHaveBeenCalled()
   })
 })
@@ -572,7 +590,7 @@ test('PS3/Vita games take their cover and backdrop from IGDB; a failed lookup le
     ],
   })
   mock(psn.getUserPlayedGames).mockResolvedValue({ titles: [] })
-  const games = await psnTitles('42')
+  const games = await psnLibrary('42')
   expect(games[0]).toMatchObject({ coverUrl: 'https://igdb/cover.jpg', heroUrl: 'https://igdb/hero.jpg' })
   expect(games[1]).toMatchObject({ coverUrl: null, heroUrl: null })
   // A PS5 game is never looked up: the Store has its art.
@@ -610,5 +628,65 @@ describe('the budget for Sony', () => {
     await jest.advanceTimersByTimeAsync(8_000)
     expect(((await pending) as PsnError).message).toContain('did not answer')
     jest.useRealTimers()
+  })
+})
+
+describe('phase 2 (#177)', () => {
+  test("Sony's own 429 body is read as a rate limit by its code", () => {
+    expect(new PsnError('Whatever', 2138635).isRateLimited).toBe(true)
+  })
+
+  test('the app budget spent is a PsnBusyError, answered 429 busy; a year being built is a 202', () => {
+    const busy = psnFailure(new PsnBusyError(), 'test')
+    expect(busy.status).toBe(429)
+    expect((busy as unknown as { data: unknown }).data).toEqual({ error: 'busy' })
+    const syncing = psnFailure(new PsnSyncing(), 'test')
+    expect(syncing.status).toBe(202)
+    expect(syncing.headers.get('Retry-After')).toBe('15')
+  })
+
+  test('an online ID nobody has is remembered for an hour, and not asked again', async () => {
+    mock(psn.makeUniversalSearch).mockResolvedValue(search('someone_else'))
+    expect(await findPsnAccount('Nobody')).toBeNull()
+    expect(writeCache).toHaveBeenCalledWith('psn:notfound:nobody', true, 60 * 60 * 1000)
+    mock(readCache).mockResolvedValueOnce(true)
+    mock(psn.makeUniversalSearch).mockClear()
+    expect(await findPsnAccount('NOBODY')).toBeNull()
+    expect(mock(psn.makeUniversalSearch)).not.toHaveBeenCalled()
+  })
+
+  test('the library is the core alone while the enrichment is being built, never an error', async () => {
+    mock(psnCached).mockImplementation(async (key: string, _ttl: number, fetcher: () => Promise<unknown>) => {
+      if (key.startsWith('psn:enriched:')) throw new PsnSyncing()
+      return fetcher()
+    })
+    mock(psn.getUserTitles).mockResolvedValue({ trophyTitles: [title('NPWR00001_00')] })
+    const games = await psnLibrary('42', '7')
+    expect(games.map((g) => g.titleId)).toEqual(['NPWR00001_00'])
+    expect(mock(psn.getUserPlayedGames)).not.toHaveBeenCalled()
+    mock(psnCached).mockImplementation((_key: string, _ttl: number, fetcher: () => Promise<unknown>) => fetcher())
+  })
+
+  test('an enrichment pass looks up the trophy sets of 20 games at most, most recently played first', async () => {
+    mock(psn.getUserTitles).mockResolvedValue({ trophyTitles: [] })
+    mock(psn.getUserPlayedGames).mockResolvedValue({
+      titles: Array.from({ length: 30 }, (_, i) => played(`CUSA${i}`, `2026-01-${String(i + 1).padStart(2, '0')}T00:00:00Z`, 'PT1H')),
+    })
+    await psnLibrary('42', '7')
+    const asked = mock(psn.getUserTrophiesForSpecificTitle).mock.calls.flatMap((c) => c[2].npTitleIds.split(','))
+    expect(asked).toHaveLength(20)
+    expect(asked[0]).toBe('CUSA29')
+  })
+
+  test('the played-games list goes through the budget like any other call', async () => {
+    const { reserveAttempt } = jest.requireMock('@/lib/attemptLimit') as { reserveAttempt: jest.Mock }
+    reserveAttempt.mockClear()
+    resetPsnCallStats()
+    mock(psn.getUserTitles).mockResolvedValue({ trophyTitles: [] })
+    await psnLibrary('42', '7')
+    const totals = psnCallTotals()
+    expect(totals.played).toBe(1)
+    // Every request counted took its share of the budget first.
+    expect(reserveAttempt).toHaveBeenCalledTimes(Object.values(totals).reduce((a, b) => a + b, 0))
   })
 })
