@@ -4,8 +4,9 @@ Moved out of `CLAUDE.md` on 2026-11-07 (#124). How PSN fails: `README.md` here.
 
 Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient.ts`.
 
-- **One app account, not the user's.** Every call is made as the PSN account
-  whose NPSSO the app holds; it can read any profile with public trophies.
+- **The app's own accounts, never the user's.** Every call is made as one of the
+  service accounts of the pool (#178, "Service-account pool" below); any of them can
+  read any profile with public trophies.
   Users link by typing their online ID — nothing proves it is theirs, so
   `psnaccountid` is deliberately **not unique** (a squatter must not lock the
   owner out). `/privacy` and `/terms` say so.
@@ -29,10 +30,11 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   while the dialog is open, since asking makes one. Then `PsnUnverifiedLine` where Vault Points show, and a "Verified" tag on the public profile's PSN chip.
 - **The NPSSO dies 60 days after sign-in, and nothing extends it** (measured:
   refreshing returns the same 10-day refresh token; psn-api issue #171; Sony's
-  sign-in has a captcha). It lives encrypted in `psn_credentials`
-  (`migrations/026`, `src/lib/psnCredentials.ts`, `secretBox`), is renewed by
-  pasting a new one in the admin panel, and `/api/cron/psnToken` mails the
-  admins from 7 days before. `PSN_NPSSO` only seeds the first setup.
+  sign-in has a captcha). Each account's lives sealed in `psn_service_accounts`
+  (`migrations/047`, `src/lib/psnAccounts.ts`), is renewed by a person in the admin
+  panel's guided "Renew", and Telegram (or, without it, `/api/cron/psnToken`'s mail)
+  warns before. `PSN_NPSSO` only seeds PSN-1 of an empty pool. `psn_credentials`
+  (`migrations/026`) is no longer read except to seed an empty pool; drop it after one release.
   **Do not** try to automate Sony's sign-in.
 - **Games are keyed like RA and Steam**: source `'psn'`, and the trophy set's
   number as id (`NPWR20188_00` ↔ `2018800`, `psnNumericId`/`psnTitleId`).
@@ -73,8 +75,9 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   title from the user's list, never by text from the request). English only;
   a 404 just means the page goes without them.
 - Sony returns errors as bodies, not throws: every call goes through
-  `psnCall(fn, call)` (`fn` names the endpoint for the call counters, see Call baseline; `unwrap()` plus one retry after 2 s when Sony says "too many
-  requests" — psn-api hides the HTTP status and `Retry-After`, so it goes by
+  `psnCall(fn, (auth) => …)` (`fn` names the endpoint for the call counters, see Call baseline; `unwrap()`, and the pool's
+  retries, `withPsnAccount`: a "too many requests" runs again on another account, or after 2 s on the same one when it is
+  the only one — psn-api hides the HTTP status and `Retry-After`, so it goes by
   the message, or Sony's code `2138635`). `psnFailure()` maps them to 202 `syncing` (built in the background),
   503 / 403 (private) / 429 `busy` (the app's own budget is spent) / 429 `rate-limited` (Sony refused; both with
   `Retry-After: 60`) / 502. The client reads a 429 as a plain failure with a retry button. `psnAboutMe` (verification, counted as `profile`) is one more call of the kind: a hidden profile answers 403 `private`.
@@ -254,8 +257,9 @@ in the background, under one budget. Code: `src/lib/psnClient.ts`, `psnCache.ts`
   fill) may spend only **three quarters** (450); the rest is kept for pages. Past it, `PsnBusyError`: nothing is
   asked, routes answer 429 `busy`, a background fetch is not tried again for 30 to 90 s (jitter), the score
   fill stops its pass as `busy` and resumes on the next. `psn-score` went from 300 to 200 games per 15 minutes
-  to fit under the background share. **When Sony itself refuses twice**, `psnRateLimited` writes
-  `psn:cooldown` for 60 s: no instance asks until then.
+  to fit under the background share. **When Sony itself refuses twice**, `psnRateLimited` wrote
+  `psn:cooldown` for 60 s. *Since #178 the budget and the cooldown are per service account* (`account:<id>`,
+  `cooldown_until` on its row; Service-account pool below).
 - **What Sony's limit is said to be** (community reports, no Sony document): a 429 with the body
   `{"error":{"code":2138635,"message":"Rate limit exceeded"}}`, about 300 requests per 15 minutes, per account
   **and per kind of request** (trophy titles, profile...), plus an unknown per-address limit. Some clients see an
@@ -284,3 +288,75 @@ cache, now with the background queued and run apart; the test asserts them):
 The background is still the year game by game (2 requests per game the first time anyone reads it, 1 after);
 phase 4 (#179) makes it free with stored snapshots. The score fill reads the defined trophies in English while
 pages read them in the reader's language: one language for the score is a follow-up.
+
+## Service-account pool (#178, phase 3, 2026-11-16)
+
+Several PlayStation accounts read Sony instead of one. **Built for one account and working with it alone** (the owner's
+decision): today's NPSSO is PSN-1, and the owner adds PSN-2.. from the panel when they have them; no code changes then.
+
+**Data** (`migrations/047_psn_account_pool.sql`): `psn_service_accounts` (one row per account: label, hint, online ID,
+sealed NPSSO and tokens, status `active` / `paused` / `draining` / `quarantined`, weight, concurrency 4, `rate_per_min` 40,
+cooldown, canary, renewal), `psn_account_leases` (a slot per concurrent call, frees itself after 30 s), `psn_account_stats`
+(calls, ok, 429, auth and server errors per account and minute, 14 days), `psn_alert_state` (Telegram dedup) and
+`psn_sync_jobs` (phase 4's queue, empty). The migration copies `psn_credentials` into PSN-1 when the pool is empty
+(sealed values as they are); `psnAccounts.seedPsnPool` runs the same copy, then `PSN_NPSSO`, on first use of an empty pool.
+No `psn_account_budget` table: the budget per account is phase 2's `psnBudget` keyed by account (the owner's call: one limiter).
+
+**A call** (`src/lib/psnPool.ts`, `withPsnAccount`): a weighted pick (`-ln(random) / weight`) of a free slot on an active
+account out of cooldown, then the account's sign-in (`psnTokens.ts`) and budget (`psnBudget.ts`, `rate_per_min` × 15 per
+15 minutes, `account:<id>` in `signup_attempts`; background work three quarters of it). On failure:
+- 429 / 5xx / no answer: another account, **two retries at most**; with one account, the old behaviour (wait 2 s, ask once more).
+  Two 429s in a row rest the account 60 s, doubling to 5 min.
+- Sony refuses the token: the tokens are dropped and the call goes to another account (or the same, signing in again). A
+  sign-in that is refused (refresh token and NPSSO both) **quarantines** the account. Softer than the issue's "a 401
+  quarantines": a stale token must not take the only account out.
+- The account's own budget spent: another account, its health untouched.
+- A hidden profile (403) or not found: never retried, no fault of the account.
+- All slots taken: waits up to ~3 s for one. None usable: `PsnBusyError` (429 `busy`).
+
+With one account the call counts are unchanged (`psnCallBaseline.test.ts` runs through the real pool with one fake account).
+
+**Tokens** (`psnTokens.ts`), per account, under `SELECT … FOR UPDATE` on its row (`psnAccounts.lockPsnTokens`): the access
+token is replaced at ~50 minutes, the refresh token (10 days, never renewed) at ~7 days by a new NPSSO exchange.
+
+**Upkeep** (`psnMaintenance.ts`): a draining account with nothing in flight is paused, the canaries due run (every 30 min per
+active account, two accounts at a time with a pause: it reads its own profile with its own token, `summary('me')` + `profile`,
+which also refreshes its tokens ahead), then the alerts. It runs from `/api/cron/psn-alerts` (daily at 09:15 UTC in
+`vercel.json`) and **after PSN traffic, at most every 15 minutes for the app** (a `psn:maintenance` lease): Vercel's daily
+crons alone would leave the canary a day old. On a Pro plan the cron can be made `*/15 * * * *`.
+
+**Admin** (English, `requireAdmin` + `logAdminAction` on every action, never a secret in an answer or a log):
+`GET`/`POST /api/admin/psn/accounts`, `PATCH`/`DELETE /api/admin/psn/accounts/[id]`, `POST …/[id]/test`,
+`POST …/[id]/rotate`, `GET /api/admin/psn/pool`. The PlayStation tab (`admin-psn-accounts/`) has the pool at a glance and the
+next suggested renewal (`utils/psnPool.ts`: the first to die, on the latest day whose new 60 days end ≥ 12 days from the
+others; sign-ins within 7 days of each other are flagged), a row per account (label, state, online ID, days left and date,
+renewed when and by whom, weight, calls in the last hour, canary) with Renew, Test, Drain, Pause / Resume, Remove, and
+"Add account". Renew and Add are one guided dialog (`AdminPsnRenewModal`): a private window or a browser profile per account,
+sign in at playstation.com as that account (its label and the owner's hint), open
+`https://ca.account.sony.com/api/v1/ssocookie` in that window, paste `npsso`: it is kept only if Sony gives its expiry,
+the sign-in works and the account reads its own profile (`psnAccountCheck.tryPsnNpsso`). Weight, concurrency and rate are
+changed through the PATCH route (the panel sets the weight when adding).
+
+**Secrets**: with `PSN_SECRET_KEY` set, values are sealed under `psn-account:v1` with that key and stored with a `v1:` prefix;
+without the prefix they are the old derivation (`NEXTAUTH_SECRET`, `psn-credentials`), still read and sealed again with the
+new key when next written. `secrets.test.ts` pins both. Never change either.
+
+**Alerts** (`psnAlerts.ts`, texts in Spanish in `psnAlertMessages.ts`): an NPSSO at 14 / 7 / 3 / 1 days (once per sign-in),
+a quarantine (daily while it lasts), 429s above 5 % of ≥ 20 calls in the last hour, fewer than two usable accounts **only
+when two or more are meant to serve** (active or quarantined: silent with one account, or after one is paused or removed),
+sync failures above 5 % of ≥ 20 jobs, and the digest after 09:00 UTC. **Only production sends**, one message per
+environment: its own pool tagged `[PRO]`, and pre's tagged `[PRE]`, read from pre's database through
+`PREVIEW_DATABASE_URL` set in Production (a second pool, `src/lib/preDb.js`, inside `BEGIN TRANSACTION READ ONLY`; db.js
+ignores the variable in production). Pre's dedup lives in production's `psn_alert_state` under a `pre:` prefix. Pre itself
+never sends; its tokens refresh on use, and its canaries run after its own traffic. **Send-only**: the bot is the owner's
+(Hermes polls it), so never `setWebhook`, `getUpdates` or `deleteWebhook`. Without Telegram, `/api/cron/psnToken` mails
+the admins about every account with 7 days or less.
+
+**Status for the owner's agent**: `GET /api/ops/psn/status` with `Authorization: Bearer $PSN_STATUS_TOKEN` (404 without
+the variable, 401 for a wrong token, `psn-status` limit 30 per 15 minutes per address counted before the check). It answers
+the environment and, per account, label, state, cooldown, days left, calls and 429s in the last hour, canary; never the hint,
+the online ID, a token or an NPSSO.
+
+**Pending until a second account exists**: whether Sony's 429 is per account or per IP (load one account while another sits
+idle; record it in Call baseline above and the worklog), and the issue's "Done when" checks that need PSN-1..3 (one account's
+429 or 401 invisible to users, the pool-down alert).

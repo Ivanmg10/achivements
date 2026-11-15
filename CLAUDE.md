@@ -420,11 +420,14 @@ with its tests; it is the part that decides whether the answers are any good.
   shape changes (same for `psn:` and `xbox:` keys).
 - **Steam:** the owned list only through `loadOwnedGames` (never `getOwnedGames` from a route); keep the
   per-game probe that makes the batch counts trustworthy (`batchCountsFor`).
-- **PSN: one app account (the NPSSO), not the user's**; `psnaccountid` is deliberately **not unique**, but **only a
+- **PSN: a pool of the app's own service accounts, never the user's** (#178; `psnPool.ts`, `docs/platforms/psn.md` → Service-account pool); `psnaccountid` is deliberately **not unique**, but **only a
   verified PSN account counts in Vault Points, and one user at most has a given account verified** (#176: a code in its
   About Me, `users.psn_verified_at`, a partial unique index; linking or unlinking clears it). Every call
-  through `psnCall(fn, …)` (`fn` is the counter's name, `src/lib/psnCallStats.ts`; the baseline is in `docs/platforms/psn.md`), which spends
-  the one app budget (`psnBudget.ts`, `PSN_CALLS_PER_WINDOW`; background work inside `psnBackground`). **A page waits for at most
+  through `psnCall(fn, (auth) => …)` (`fn` is the counter's name, `src/lib/psnCallStats.ts`; the baseline is in `docs/platforms/psn.md`), which runs on
+  an account through `withPsnAccount` (429/5xx on another account twice at most, a refused token drops it, a hidden profile never retries) and
+  spends that account's budget (`psnBudget.ts`, `rate_per_min` × 15; background work inside `psnBackground`): never a second limiter, never
+  Sony called around the pool. The NPSSOs and tokens are sealed (`psnAccounts.sealPsn`, `PSN_SECRET_KEY`) and **never answered, logged or sent**
+  (Telegram alerts are send-only and carry labels and numbers). **A page waits for at most
   ~10 Sony calls (#177):** a reader takes `psnTitlesCore` unless it needs play data (`psnLibrary`), an account-level cache goes
   through `psnCached` (stale up to 7 days, one fetch per key, refreshed after the answer), anything costlier is built in the
   background and answered 202; a game's defined trophies are cached per game and language, for everyone, apart from the
