@@ -24,6 +24,11 @@ const LABELS: Record<string, string> = {
   'link-xbox': 'linked Xbox for',
   'unlink-xbox': 'unlinked Xbox from',
   'psn-token': 'renewed the PSN token',
+  'psn-account-add': 'added a PSN account',
+  'psn-account-renew': 'renewed a PSN account',
+  'psn-account-test': 'tested a PSN account',
+  'psn-account-update': 'changed a PSN account',
+  'psn-account-remove': 'removed a PSN account',
   'xbox-lookup': 'looked up Xbox gamertag',
   'ranking-flag': 'reviewed a flagged game of',
 }
@@ -40,6 +45,7 @@ function describe(entry: Entry): string | null {
   if (entry.action === 'xbox-lookup') return String(d.gamertag ?? '')
   if (entry.action === 'ranking-flag') return `${d.title ?? d.gameId} → ${d.flag === 'cleared' ? 'counts' : 'kept out'}`
   if (entry.action === 'psn-token' && typeof d.expiresAt === 'string') return `valid until ${d.expiresAt.slice(0, 10)}`
+  if (entry.action.startsWith('psn-account-')) return [d.label, typeof d.expiresAt === 'string' ? `valid until ${d.expiresAt.slice(0, 10)}` : null, d.status, d.ok === false ? 'failed' : null].filter(Boolean).join(', ')
   return null
 }
 

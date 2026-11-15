@@ -34,7 +34,7 @@ page (src/app/(main)/…)            client component
 |---|---|---|
 | RetroAchievements | `get*` (gameData, recentAchievements, activityHeatmapYear…), `updateRaUser`, `unlinkRaUser` | Older flat names; keep them, the client calls them |
 | Steam | `steam/*` (ownedGames, achievements, recentlyPlayed…, unlink) | Linked through Steam sign-in (`auth/steam?intent=link`); admins by name (`src/lib/steamAccount.ts`) |
-| PlayStation | `psn/*` (link, titles, trophies, details, `verify`…) | One app account, `src/lib/psnClient.ts` (its caches `psnCache.ts`, its call budget `psnBudget.ts`, errors `psnErrors.ts`, #177); `verify` proves the account is the user's (`src/lib/psnVerification.ts`, #176) and `src/lib/vaultGate.ts` lets only verified PSN count in Vault Points |
+| PlayStation | `psn/*` (link, titles, trophies, details, `verify`…) | A pool of the app's service accounts (#178: `psnPool.ts` picks one per call, `psnAccounts.ts` its SQL and sealing, `psnTokens.ts` each sign-in, `psnAccountCheck.ts` the canary, `psnMaintenance.ts` / `psnAlerts.ts` / `telegram.ts` the upkeep and alerts), `src/lib/psnClient.ts` (its caches `psnCache.ts`, the budget per account `psnBudget.ts`, errors `psnErrors.ts`, #177); `verify` proves the account is the user's (`src/lib/psnVerification.ts`, #176) and `src/lib/vaultGate.ts` lets only verified PSN count in Vault Points |
 | Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
@@ -42,7 +42,9 @@ page (src/app/(main)/…)            client component
 | Rankings | `rankings` (public), `rankings/me`, `rankings/fill`, `admin/rankings` | Read stored scores; `fill` runs a pass. See Vault Points below |
 | Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | `auth/ra/check`: an RA key checked before signing up with it (signed out, rate limited) |
 | Admin | `admin/*` | Every one starts with `requireAdmin(req)` |
-| Cron | `cron/sweepCache` (04:00), `cron/scores` (05:00), `cron/psnToken` (09:00) | Scheduled in `vercel.json`, need `CRON_SECRET` |
+| Cron | `cron/sweepCache` (04:00), `cron/scores` (05:00), `cron/psnToken` (09:00, mail when Telegram is not set), `cron/psn-alerts` (09:15, PSN pool upkeep and Telegram; also run after PSN traffic every 15 min) | Scheduled in `vercel.json` (production only), need `CRON_SECRET` |
+| Ops | `ops/psn/status` | The PSN pool's state for the owner's agent, `Bearer PSN_STATUS_TOKEN`, nothing secret |
+| Admin PSN | `admin/psn/accounts` (+ `[id]`, `[id]/test`, `[id]/rotate`), `admin/psn/pool` | The PSN service accounts, `requireAdmin` + `logAdminAction` |
 
 Routes answer structured errors with real status codes (400 bad input, 401/403
 auth, 429 rate limited, 502/503 upstream).

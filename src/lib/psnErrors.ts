@@ -4,6 +4,10 @@ export const PRIVATE_CODE = 2240526
 export const RATE_LIMIT_CODE = 2138635
 /** The code a PsnError carries when the app has no PSN sign-in at all. */
 export const NOT_CONFIGURED = -1
+/** A service account's sign-in was refused: its NPSSO or tokens no longer work (#178). */
+export const AUTH_FAILED = -2
+/** Sony did not answer before the deadline. */
+export const TIMED_OUT = -3
 
 export class PsnError extends Error {
   constructor(message: string, readonly code?: number) {
@@ -14,6 +18,10 @@ export class PsnError extends Error {
   }
   get isPrivate() {
     return this.code === PRIVATE_CODE || /access control|privacy/i.test(this.message)
+  }
+  /** The account's sign-in was refused (Sony's 401 "invalid token", or a failed token exchange): the account's fault, not the profile's. */
+  get isAuth() {
+    return this.code === AUTH_FAILED || /invalid token|expired token|token (has )?expired|unauthori[sz]ed|invalid_grant/i.test(this.message)
   }
   /** Sony's "too many requests". psn-api hides the HTTP status, so the code and the message are all there is. */
   get isRateLimited() {

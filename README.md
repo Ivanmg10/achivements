@@ -23,7 +23,7 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
 - **Three platforms, linked by the user**
   - *RetroAchievements* — with the user's own Web API key (never a shared one).
   - *Steam* — by signing in on Steam (proves the account is yours; game details must be public).
-  - *PlayStation* — by online ID, read through one app PSN account; PS3/Vita art from IGDB. Anyone sees the
+  - *PlayStation* — by online ID, read through a pool of the app's own PSN accounts (added and renewed in the admin panel); PS3/Vita art from IGDB. Anyone sees the
     trophies, but **PSN counts in Vault Points only once the account is verified** (a code pasted in its About Me;
     one verified owner per account). Needs `migrations/046`.
 - **Library** — recently played, playing, want to play, completed, all games;
@@ -81,13 +81,35 @@ missing:
 | Without | What stops working |
 |---|---|
 | `STEAM_API_KEY` | Steam linking and data |
-| `PSN_NPSSO` | PSN linking answers `not-configured` |
+| `PSN_NPSSO` | Nothing once the PSN pool has an account (add them in the admin panel's PlayStation tab); with an empty pool, PSN linking answers `not-configured` |
+| `PSN_SECRET_KEY` | The pool's NPSSOs and tokens are sealed from `NEXTAUTH_SECRET`, as before #178 |
+| `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | No Telegram alerts about the PSN pool; expiring sign-ins are mailed to the admins instead |
+| `PSN_STATUS_TOKEN` | `GET /api/ops/psn/status` (the pool's state for the owner's agent) is a 404 |
 | `OPENXBL_API_KEY` | Xbox (admin-only for now) answers `not-configured` |
 | `TWITCH_CLIENT_ID` / `_SECRET` | PS3/Vita games keep their trophy icon, no IGDB details |
 | `RESEND_API_KEY` (+ `EMAIL_FROM`) | Password recovery and verification mail — see `docs/accounts.md` → Email |
 | `CRON_SECRET` | The cron routes refuse to run |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | `/privacy` has no contact address (required before going public) |
 | `NEXT_PUBLIC_GA_ID` | No analytics and no cookie banner (that is fine) |
+
+### PSN accounts, alerts and the status route
+
+PSN is read through the app's own PlayStation accounts (never a user's, never a daily-use one), managed in the
+admin panel's **PlayStation** tab: *Add account* or *Renew* walks through signing in by hand in a private window,
+opening Sony's NPSSO page and pasting the value, which is tested before it is kept. Details: `docs/platforms/psn.md`
+→ Service-account pool.
+
+- **Telegram** (optional): set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` to the owner's existing bot (the one
+  Hermes uses) and chat, in every Vercel environment. Only production sends: production's pool tagged `[PRO]`, and
+  pre's tagged `[PRE]` when `PREVIEW_DATABASE_URL` is also set in Production. The app only calls `sendMessage`.
+- **Status for an agent**: set `PSN_STATUS_TOKEN`, then
+
+  ```bash
+  curl -s -H "Authorization: Bearer $PSN_STATUS_TOKEN" https://www.cheevovault.com/api/ops/psn/status
+  curl -s -H "Authorization: Bearer $PSN_STATUS_TOKEN" https://dev.cheevovault.com/api/ops/psn/status   # pre
+  ```
+
+  Labels, states, days left, calls, 429s, canary and cooldowns only; 30 reads per 15 minutes per address.
 
 ### Database
 

@@ -8,23 +8,23 @@ import { appSecret } from '@/lib/secrets'
  * and the caller treats it as missing.
  */
 
-function key(purpose: string): Buffer {
-  return crypto.createHash('sha256').update(`${appSecret()}:${purpose}`).digest()
+function key(purpose: string, secret: string): Buffer {
+  return crypto.createHash('sha256').update(`${secret}:${purpose}`).digest()
 }
 
-/** "iv.tag.ciphertext", base64url each. */
-export function seal(plain: string, purpose: string): string {
+/** "iv.tag.ciphertext", base64url each. `secret` is the app secret unless a dedicated one is given (PSN_SECRET_KEY). */
+export function seal(plain: string, purpose: string, secret: string = appSecret()): string {
   const iv = crypto.randomBytes(12)
-  const cipher = crypto.createCipheriv('aes-256-gcm', key(purpose), iv)
+  const cipher = crypto.createCipheriv('aes-256-gcm', key(purpose, secret), iv)
   const data = Buffer.concat([cipher.update(plain, 'utf8'), cipher.final()])
   return [iv, cipher.getAuthTag(), data].map((b) => b.toString('base64url')).join('.')
 }
 
-export function open(sealed: string | null | undefined, purpose: string): string | null {
+export function open(sealed: string | null | undefined, purpose: string, secret?: string): string | null {
   if (!sealed) return null
   try {
     const [iv, tag, data] = sealed.split('.').map((p) => Buffer.from(p, 'base64url'))
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key(purpose), iv)
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key(purpose, secret ?? appSecret()), iv)
     decipher.setAuthTag(tag)
     return Buffer.concat([decipher.update(data), decipher.final()]).toString('utf8')
   } catch {

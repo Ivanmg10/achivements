@@ -185,9 +185,12 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   - *Users*: search and "New user" first. With no search, the 10 most recent sign-ups (highest ids: the list has no sign-up date) in a dense table
     (`ui/dataTable.ts`: picture, name, id, email, linked platforms as logos, role, actions) with a soft fade and "See all (N)"; a search shows every
     match. The list and the actions live in `hooks/useAdminUsers`; `AdminEditUserModal` / `AdminCreateUserModal` and every route are as before.
-  - *PlayStation*: a list of the app's PlayStation accounts, one row each (who, days left and until when, set by whom and when, "Renew" opens the
-    NPSSO field). Today there is one account (`/api/admin/psn` has one NPSSO); the rows are the shape for the accounts the PSN spike (#51) will bring,
-    with no backend for several yet.
+  - *PlayStation* (#178): the pool of PSN service accounts (`admin-psn-accounts/`, `hooks/useAdminPsnAccounts`): the pool at a glance and the
+    next suggested renewal, a row per account (label, state, the online ID read from Sony with its own token, days left and until when, renewed when
+    and by whom, weight, calls in the last hour, canary) with Renew, Test, Drain, Pause / Resume and Remove, and "Add account". Renew and Add are
+    one guided dialog (private window, sign in by hand, Sony's NPSSO page, paste; tested before it is kept). Routes under `/api/admin/psn/accounts`
+    and `/api/admin/psn/pool`, each with `requireAdmin` and `logAdminAction` (`psn-account-add`, `-renew`, `-test`, `-update`, `-remove`); the
+    NPSSO is never answered back, logged or sent. `/api/admin/psn` (one NPSSO) is gone. Details: `docs/platforms/psn.md` → Service-account pool.
   - *Rankings*: the balance table and the flagged unlock tools; *Log*: `admin_actions`, read when the tab opens (`hooks/useAdminActionLog`).
   - The Xbox explorer is gone (`/api/admin/xbox`, its hooks and tests). Xbox stays admin-only everywhere else (`XBOX_ADMIN_ONLY` untouched).
 - **Everything is logged** in `admin_actions` (`migrations/020_admin_actions.sql`,
