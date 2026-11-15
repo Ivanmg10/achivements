@@ -57,13 +57,13 @@ const STEAM_ID = '76561198000000000'
 const UNLINK_SQL = {
   ra: 'UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL, raid_hash = NULL WHERE id = $1',
   steam: 'UPDATE users SET steamid = NULL, steamusername = NULL, steam_login_id = NULL WHERE id = $1',
-  psn: 'UPDATE users SET psnaccountid = NULL, psnusername = NULL WHERE id = $1',
+  psn: 'UPDATE users SET psnaccountid = NULL, psnusername = NULL, psn_verified_at = NULL, psn_verification_code = NULL, psn_verification_expires_at = NULL WHERE id = $1',
   xbox: 'UPDATE users SET xboxxuid = NULL, xboxgamertag = NULL WHERE id = $1',
 }
 const LINK_SQL = {
   ra: 'UPDATE users SET "raUser" = $1, rausername = $2, raid = $3, raid_hash = $4 WHERE id = $5',
   steam: 'UPDATE users SET steamid = $1, steamusername = $2 WHERE id = $3',
-  psn: 'UPDATE users SET psnaccountid = $1, psnusername = $2 WHERE id = $3',
+  psn: 'UPDATE users SET psnaccountid = $1, psnusername = $2, psn_verified_at = NULL, psn_verification_code = NULL, psn_verification_expires_at = NULL WHERE id = $3',
   xbox: 'UPDATE users SET xboxxuid = $1, xboxgamertag = $2 WHERE id = $3',
 }
 

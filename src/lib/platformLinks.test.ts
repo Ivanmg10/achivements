@@ -19,7 +19,7 @@ beforeEach(() => {
 test.each([
   ['ra', 'UPDATE users SET "raUser" = $1, rausername = $2, raid = $3, raid_hash = $4 WHERE id = $5'],
   ['steam', 'UPDATE users SET steamid = $1, steamusername = $2 WHERE id = $3'],
-  ['psn', 'UPDATE users SET psnaccountid = $1, psnusername = $2 WHERE id = $3'],
+  ['psn', 'UPDATE users SET psnaccountid = $1, psnusername = $2, psn_verified_at = NULL, psn_verification_code = NULL, psn_verification_expires_at = NULL WHERE id = $3'],
   ['xbox', 'UPDATE users SET xboxxuid = $1, xboxgamertag = $2 WHERE id = $3'],
 ] as const)('the %s link writes the same SQL as before', (platform, sql) => {
   expect(linkSql(platform)).toBe(sql)
@@ -28,7 +28,7 @@ test.each([
 test.each([
   ['ra', 'UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL, raid_hash = NULL WHERE id = $1'],
   ['steam', 'UPDATE users SET steamid = NULL, steamusername = NULL, steam_login_id = NULL WHERE id = $1'],
-  ['psn', 'UPDATE users SET psnaccountid = NULL, psnusername = NULL WHERE id = $1'],
+  ['psn', 'UPDATE users SET psnaccountid = NULL, psnusername = NULL, psn_verified_at = NULL, psn_verification_code = NULL, psn_verification_expires_at = NULL WHERE id = $1'],
   ['xbox', 'UPDATE users SET xboxxuid = NULL, xboxgamertag = NULL WHERE id = $1'],
 ] as const)('the %s unlink clears the same columns as before', (platform, sql) => {
   expect(unlinkSql(platform)).toBe(sql)

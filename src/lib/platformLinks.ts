@@ -22,12 +22,24 @@ const LINK_COLUMNS: Record<GameSource, string[]> = {
   xbox: ['xboxxuid', 'xboxgamertag'],
 }
 
-/** What an unlink clears: the link, and for Steam the sign-in that came with it (audit SEC-01). */
-const UNLINK_COLUMNS: Record<GameSource, string[]> = { ...LINK_COLUMNS, steam: [...LINK_COLUMNS.steam, 'steam_login_id'] }
+/** A PSN account is proven by a code in its About Me (#176): linking or unlinking one starts that over. */
+const PSN_VERIFICATION = ['psn_verified_at', 'psn_verification_code', 'psn_verification_expires_at']
+
+/** What an unlink clears: the link, for Steam the sign-in that came with it (audit SEC-01), for PSN its verification. */
+const UNLINK_COLUMNS: Record<GameSource, string[]> = {
+  ...LINK_COLUMNS,
+  steam: [...LINK_COLUMNS.steam, 'steam_login_id'],
+  psn: [...LINK_COLUMNS.psn, ...PSN_VERIFICATION],
+}
+
+/** What a link resets besides what it stores: a PSN account must be verified again, even the same one. */
+const LINK_RESETS: Partial<Record<GameSource, string[]>> = { psn: PSN_VERIFICATION }
 
 export function linkSql(platform: GameSource): string {
   const columns = LINK_COLUMNS[platform]
-  return `UPDATE users SET ${columns.map((c, i) => `${c} = $${i + 1}`).join(', ')} WHERE id = $${columns.length + 1}`
+  const set = columns.map((c, i) => `${c} = $${i + 1}`)
+  for (const c of LINK_RESETS[platform] ?? []) set.push(`${c} = NULL`)
+  return `UPDATE users SET ${set.join(', ')} WHERE id = $${columns.length + 1}`
 }
 
 /** `returning` reads back who to mail (Steam's unlink notice). */

@@ -51,10 +51,17 @@ test('returns who they are and which platforms they have, and nothing private', 
   expect((res as unknown as { data: unknown }).data).toEqual({
     username: 'ivan', avatar: 'https://x/a.png', description: 'Hi', location: 'ES', ra: 'IvanRA', steam: true, psn: false, xbox: false,
     // A PSN name with no linked account is a leftover, not a link.
-    steamName: 'ivan_st', psnName: null, xboxName: null, isSelf: false, theme: 'dark', gender: null,
+    steamName: 'ivan_st', psnName: null, psnVerified: false, xboxName: null, isSelf: false, theme: 'dark', gender: null,
     favorites: { ra: ROW.favorite_game, steam: null, psn: null, xbox: null },
     hiddenGames: ['ra:9'], groups: [GROUP], following: false, vaultPoints: 1234,
   })
+})
+
+test('a PSN account is verified only while it is linked', async () => {
+  ;(findPublicUser as jest.Mock).mockResolvedValue({ ...ROW, psnaccountid: '42', psnVerified: true })
+  expect((await body(get())).psnVerified).toBe(true)
+  ;(findPublicUser as jest.Mock).mockResolvedValue({ ...ROW, psnaccountid: null, psnVerified: true })
+  expect((await body(get())).psnVerified).toBe(false)
 })
 
 test('only their public groups are listed', async () => {

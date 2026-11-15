@@ -7,8 +7,10 @@
  *
  * Bump RULES_VERSION whenever a number here changes: stored scores carry it,
  * and the refresh recomputes every game scored under another one.
+ * 4: only a verified PSN account counts (#176). The gate is in the reads (src/lib/vaultGate.ts), not in a game's
+ * score, so verifying needs no new read; the bump only makes each user's next refresh score their games again.
  */
-export const RULES_VERSION = 3
+export const RULES_VERSION = 4
 
 /** One achievement as the score sees it, whatever the platform. */
 export type ScoreAchievement = {

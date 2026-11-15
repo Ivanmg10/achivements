@@ -47,6 +47,7 @@ import {
   psnGameTrophies,
   psnLatestTrophies,
   psnRecentTrophies,
+  psnAboutMe,
   psnSummary,
   psnTitles,
   PsnError,
@@ -133,6 +134,16 @@ test('sums up level, trophies, games and the largest avatar', async () => {
     userId: '7',
     refreshable: true,
   })
+})
+
+test('reads About Me fresh, counted as a profile call; a missing one is an empty string', async () => {
+  resetPsnCallStats()
+  expect(await psnAboutMe('42')).toBe('hi')
+  mock(psn.getProfileFromAccountId).mockResolvedValue({ onlineId: 'Hakoom' })
+  expect(await psnAboutMe('42')).toBe('')
+  expect(psn.getProfileFromAccountId).toHaveBeenCalledTimes(2)
+  expect(psnCallTotals().profile).toBe(2)
+  expect(withSteamCache).not.toHaveBeenCalled()
 })
 
 test('turns a Sony error body into a PsnError that knows a hidden profile', async () => {

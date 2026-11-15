@@ -324,6 +324,16 @@ export async function psnSummary(accountId: string, userId: string | null = null
   )
 }
 
+/**
+ * The text of an account's About Me, read now and never cached: verification (#176) asks once, when the user
+ * presses "check", and the answer must be what the profile says this second. Throws as any call does.
+ */
+export async function psnAboutMe(accountId: string): Promise<string> {
+  const auth = await authorization()
+  const profile = await psnCall('profile', () => getProfileFromAccountId(auth, accountId))
+  return profile.aboutMe ?? ''
+}
+
 /** One of Sony's trophy titles in the unified game model. Null for an ID that is not NPWR (never seen, but not trusted). */
 export function toPsnGameProgress(t: TrophyTitle): PsnGameProgress | null {
   const id = psnNumericId(t.npCommunicationId)

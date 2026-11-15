@@ -2,7 +2,7 @@ jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }
 jest.mock('@/lib/steamCache', () => ({ readCache: jest.fn(async () => 0), writeCache: jest.fn() }))
 
 import pool from '@/lib/db'
-import { loadRanking, profileTeaser, rankByStreak, rankEntries, streakOf, streaksOf, takeWeeklySnapshot, vaultTotals, vaultTotalsOrNone, weekStartRanks, type RankEntry } from './rankings'
+import { loadRanking, profileTeaser, rankByStreak, rankEntries, streakOf, streaksOf, takeWeeklySnapshot, vaultTotals, vaultTotalsOrNone, weeklyTrend, weekStartRanks, type RankEntry } from './rankings'
 import { readCache } from '@/lib/steamCache'
 
 const query = pool.query as jest.Mock
@@ -201,5 +201,37 @@ describe('profileTeaser', () => {
   it('is null for a private, opted-out or missing user', async () => {
     query.mockResolvedValue({ rows: [] })
     expect(await profileTeaser('ghost')).toBeNull()
+  })
+})
+
+describe('only a verified PSN account counts (#176)', () => {
+  const JOINED = "(g.source <> 'psn' OR u.psn_verified_at IS NOT NULL)"
+  const PERIODS = "(source <> 'psn' OR EXISTS (SELECT 1 FROM users pv WHERE pv.id = user_id AND pv.psn_verified_at IS NOT NULL))"
+
+  const sqlOf = async (read: () => Promise<unknown>) => {
+    query.mockReset()
+    query.mockResolvedValue({ rows: [] })
+    await read()
+    return query.mock.calls.map(([sql]) => sql as string)
+  }
+
+  it.each([
+    ['the global list read for a viewer', () => loadRanking({ scope: 'global', period: 'all', source: 'all', viewerId: 5, xbox: false }), JOINED],
+    ['the following list', () => loadRanking({ scope: 'following', period: 'all', source: 'all', viewerId: 3, xbox: false }), JOINED],
+    ['the totals of the header, profiles and follows', () => vaultTotals([1], false), JOINED],
+    ['the streaks', () => streaksOf([1], 'all', false), JOINED],
+    ['the public teaser', () => profileTeaser('ana'), JOINED],
+    ['the weekly snapshot', () => takeWeeklySnapshot(new Date('2030-01-01')), JOINED],
+  ])('%s leaves unverified PSN points out', async (_name, read, gate) => {
+    const sqls = (await sqlOf(read)).filter((sql) => sql.includes('score_games'))
+    expect(sqls.length).toBeGreaterThan(0)
+    for (const sql of sqls) expect(sql).toContain(gate)
+  })
+
+  it('the week and month lists and the trend read the same gate', async () => {
+    const week = await sqlOf(() => loadRanking({ scope: 'global', period: 'week', source: 'all', viewerId: null, xbox: false }))
+    expect(week.find((sql) => sql.includes('score_periods'))).toContain(PERIODS)
+    const trend = await sqlOf(() => weeklyTrend([1], 'all', false))
+    expect(trend[0]).toContain(PERIODS)
   })
 })

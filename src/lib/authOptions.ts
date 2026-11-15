@@ -27,6 +27,7 @@ function tokenFields(row: UserRecord) {
     steamusername: row.steamusername ?? undefined,
     psnaccountid: row.psnaccountid ?? undefined,
     psnusername: row.psnusername ?? undefined,
+    psnVerified: Boolean(row.psn_verified_at),
     xboxxuid: row.xboxxuid ?? undefined,
     xboxgamertag: row.xboxgamertag ?? undefined,
     email: row.email ?? undefined,
@@ -144,6 +145,7 @@ export const authOptions: NextAuthOptions = {
         session.user.steamusername = token.steamusername;
         session.user.psnaccountid = token.psnaccountid;
         session.user.psnusername = token.psnusername;
+        session.user.psnVerified = token.psnVerified === true;
         session.user.xboxxuid = token.xboxxuid;
         session.user.xboxgamertag = token.xboxgamertag;
         session.user.email = token.email ?? undefined;
