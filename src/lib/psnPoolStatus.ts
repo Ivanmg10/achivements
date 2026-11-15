@@ -35,7 +35,7 @@ export function psnPoolEnv(env: Env = process.env): PsnAlertEnv | null {
 export async function prePoolStatus(now = Date.now(), env: Env = process.env): Promise<PsnPoolStatus | null> {
   const url = env.PREVIEW_DATABASE_URL?.trim()
   if (env.VERCEL_ENV !== 'production' || !url || url === env.DATABASE_URL?.trim()) return null
-  const client = await preDatabase(url).connect()
+  const client = await (await preDatabase(url)).connect()
   try {
     await client.query('BEGIN TRANSACTION READ ONLY')
     const status = await psnPoolStatus(now, client)

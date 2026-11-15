@@ -33,7 +33,7 @@ describe("pre's pool, read from production", () => {
   const client = { query: jest.fn(), release: jest.fn() }
   beforeEach(() => {
     client.query.mockReset().mockResolvedValue({ rows: [{ failed: 0, total: 0 }] })
-    ;(preDatabase as jest.Mock).mockReturnValue({ connect: async () => client })
+    ;(preDatabase as jest.Mock).mockResolvedValue({ connect: async () => client })
   })
 
   test('only on production, with its own URL set there', async () => {
