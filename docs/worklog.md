@@ -33,6 +33,10 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-16 — The admin unlock focuses the authenticator code (`fix/185-admin-code-focus`)
+
+**Did** — `AdminUnlockTotp`'s code field takes focus (`autoFocus`) when it appears after the password, with a test (#185).
+**Why** — the owner had to click the field before typing the code.
 ## 2026-11-16 — PSN phase 3: the service-account pool, its admin panel and Telegram alerts (`feat/178-psn-account-pool`, #178, epic #174)
 
 **Did**
