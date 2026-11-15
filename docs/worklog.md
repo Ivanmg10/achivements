@@ -33,6 +33,21 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-15 — PSN verification as a dialog (`feat/176-psn-verification`, #176)
+
+- **Did:**
+  - The verification panel left the PSN card. The card now shows one line: "Sin verificar" / "Verificada" as a `Tag`, and "Verificar cuenta" while unverified.
+  - That button opens `PsnVerificationModal` (`md`): the code, Copy, "Open my PlayStation profile", "Later" and "check".
+  - The welcome's PSN step gets the same line.
+  - `usePsnVerification({ active })` asks for the code only while the dialog is open.
+  - `verifiedNote` is gone from the nine languages.
+- **Why:** the owner, on the real page: the open panel made the PSN card taller than the others in its row.
+- **Watch out:**
+  - The profile link sits in the body, not the footer: the guard refuses a ringed button in a dialog's footer (#132).
+  - A local dev server that cannot reach Google Fonts draws every page in "Barlow Fallback", which looks bold. The fix is restarting `npm run dev`, not code. The log says "Failed to download Barlow from Google Fonts".
+
+---
+
 ## 2026-11-15 — PSN phase 1: verify the account; only verified PSN counts in Vault Points (`feat/176-psn-verification`, #176, epic #174)
 
 **Did**

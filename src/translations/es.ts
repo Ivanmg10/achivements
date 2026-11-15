@@ -1466,7 +1466,6 @@ export const es: Translations = {
       verify: 'Verificar cuenta',
       verified: 'Verificada',
       unverified: 'Sin verificar',
-      verifiedNote: 'Esta cuenta es tuya y sus trofeos cuentan en tus Puntos Vault. Ya puedes quitar el código de «Sobre mí».',
       vaultLine: 'Verifica tu cuenta de PlayStation para que sus trofeos cuenten.',
       vaultAction: 'Verificar',
       publicVerified: 'Cuenta de PlayStation verificada',

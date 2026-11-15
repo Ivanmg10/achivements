@@ -1466,7 +1466,6 @@ export const de: Translations = {
       verify: 'Konto bestätigen',
       verified: 'Bestätigt',
       unverified: 'Nicht bestätigt',
-      verifiedNote: 'Dieses Konto gehört dir und seine Trophäen zählen für deine Vault-Punkte. Den Code kannst du jetzt aus „Über mich“ löschen.',
       vaultLine: 'Bestätige dein PlayStation-Konto, damit seine Trophäen zählen.',
       vaultAction: 'Bestätigen',
       publicVerified: 'Bestätigtes PlayStation-Konto',

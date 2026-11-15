@@ -61,7 +61,7 @@ test('already linked, it only goes on', () => {
 test('linked: offers verifying it, optional, and going on is never blocked by it', () => {
   const { onNext } = renderStep({ isLinked: true, username: 'Kirby_92' })
   expect(screen.getByText(T.psn.verify)).toBeInTheDocument()
-  expect(screen.getByText('CV-ABCD2345')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: en.psn.verification.verify })).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: new RegExp(T.next) }))
   expect(onNext).toHaveBeenCalled()
 })

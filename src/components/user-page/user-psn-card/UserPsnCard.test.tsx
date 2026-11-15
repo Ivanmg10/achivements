@@ -63,8 +63,9 @@ test('linked and not verified: offers the verification under the account', () =>
   setLink({ accountId: '42', username: 'Hakoom', isLinked: true })
   setVerification({ linked: true, code: 'CV-ABCD2345' })
   render(<UserPsnCard />)
-  expect(screen.getByRole('region', { name: en.psn.verification.title })).toBeInTheDocument()
-  expect(screen.getByText('CV-ABCD2345')).toBeInTheDocument()
+  // One line on the card; the code is in the dialog its button opens.
+  expect(screen.getByText(en.psn.verification.unverified)).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: en.psn.verification.verify })).toBeInTheDocument()
 })
 
 test('not linked: no verification to offer', () => {

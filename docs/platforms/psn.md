@@ -24,7 +24,9 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   admin's link or unlink clear the verification** (`platformLinks.ts`: a new account, even the same one, must be verified
   again); the admin's "Clear verification" (users tab, `DELETE /api/admin/users/psnVerification`, logged) is for disputes.
   The gate on the points is `src/lib/vaultGate.ts` (see `docs/social.md`). The UI is `PsnVerification` on the account page's PSN
-  card and in the welcome's PSN step, `PsnUnverifiedLine` where Vault Points show, and a "Verified" tag on the public profile's PSN chip.
+  card and in the welcome's PSN step: one line (a tag in words, "Verify account") that opens `PsnVerificationModal` with the
+  code (a dialog, the owner's call on 2026-11-15: an open panel stretched the row of platform cards). The code is asked for only
+  while the dialog is open, since asking makes one. Then `PsnUnverifiedLine` where Vault Points show, and a "Verified" tag on the public profile's PSN chip.
 - **The NPSSO dies 60 days after sign-in, and nothing extends it** (measured:
   refreshing returns the same 10-day refresh token; psn-api issue #171; Sony's
   sign-in has a captcha). It lives encrypted in `psn_credentials`

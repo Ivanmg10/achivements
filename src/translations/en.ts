@@ -1467,7 +1467,6 @@ export const en = {
       verify: 'Verify account',
       verified: 'Verified',
       unverified: 'Not verified',
-      verifiedNote: 'This account is yours and its trophies count in your Vault Points. You can remove the code from About Me now.',
       vaultLine: 'Verify your PlayStation account so its trophies count.',
       vaultAction: 'Verify',
       publicVerified: 'Verified PlayStation account',

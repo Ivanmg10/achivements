@@ -1466,7 +1466,6 @@ export const ru: Translations = {
       verify: 'Подтвердить аккаунт',
       verified: 'Подтверждён',
       unverified: 'Не подтверждён',
-      verifiedNote: 'Этот аккаунт ваш, и его трофеи учитываются в ваших очках Vault. Код из «Обо мне» теперь можно убрать.',
       vaultLine: 'Подтвердите аккаунт PlayStation, чтобы его трофеи учитывались.',
       vaultAction: 'Подтвердить',
       publicVerified: 'Подтверждённый аккаунт PlayStation',

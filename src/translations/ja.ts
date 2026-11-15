@@ -1466,7 +1466,6 @@ export const ja: Translations = {
       verify: 'アカウントを確認する',
       verified: '確認済み',
       unverified: '未確認',
-      verifiedNote: 'このアカウントはあなたのもので、トロフィーはVaultポイントに加算されます。「自己紹介」のコードは消して構いません。',
       vaultLine: 'PlayStationアカウントを確認すると、トロフィーがポイントに加算されます。',
       vaultAction: '確認する',
       publicVerified: '確認済みのPlayStationアカウント',

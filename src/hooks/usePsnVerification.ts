@@ -16,9 +16,10 @@ const SPEC = { tag: 'usePsnVerification', errorFrom: codeFrom }
 /**
  * Whether the linked PSN account is proven to be the user's (#176): the code to paste in its About Me and
  * `check`, which asks the server to read it. The state is the session's (`psnVerified`, rebuilt from the row);
- * the code is asked for only while the account is not verified, since asking makes one.
+ * the code is asked for only while the account is not verified, and only when `active` (the dialog is open),
+ * since asking makes one.
  */
-export function usePsnVerification() {
+export function usePsnVerification({ active = true }: { active?: boolean } = {}) {
   const { data: session, update } = useSession()
   const accountId = session?.user?.psnaccountid ?? null
   const sessionVerified = Boolean(accountId) && session?.user?.psnVerified === true
@@ -32,7 +33,7 @@ export function usePsnVerification() {
     setError(null)
   })
 
-  const read = usePlatformRead<Issued, string>(accountId && !sessionVerified && !confirmed ? '/api/psn/verify' : null, SPEC)
+  const read = usePlatformRead<Issued, string>(active && accountId && !sessionVerified && !confirmed ? '/api/psn/verify' : null, SPEC)
   const { retry } = read
   const verified = sessionVerified || confirmed || read.data?.verified === true
 
