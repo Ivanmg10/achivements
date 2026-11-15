@@ -115,6 +115,12 @@ only when verified); Following counts everything and marks the unverified; the p
 shows a tick per verified platform. Nothing else is gated, in the spirit of the soft email
 verification. `/privacy` must say what is read during a check.
 
+**Decided 2026-11-14 (#176, built):** PSN has verification by a code in About Me, and **only a verified PSN account
+counts in Vault Points and the rankings** (Steam, RA and Xbox are unchanged here). The gate is applied at the totals
+(`src/lib/vaultGate.ts`), not in the scoring, so verifying needs no read of Sony; one verified owner per PSN account is
+a partial unique index (`migrations/046`), not the `account_verifications` table sketched above. `RULES_VERSION` 4.
+Details: `docs/platforms/psn.md`, `docs/social.md`.
+
 ## As built (2026-10-20), where it differs from the design
 
 - **RA rarity** uses everyone who loaded the game (`NumAwarded / NumDistinctPlayers`) for

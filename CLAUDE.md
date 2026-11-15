@@ -420,7 +420,9 @@ with its tests; it is the part that decides whether the answers are any good.
   shape changes (same for `psn:` and `xbox:` keys).
 - **Steam:** the owned list only through `loadOwnedGames` (never `getOwnedGames` from a route); keep the
   per-game probe that makes the batch counts trustworthy (`batchCountsFor`).
-- **PSN: one app account (the NPSSO), not the user's**; `psnaccountid` is deliberately **not unique**. Every call
+- **PSN: one app account (the NPSSO), not the user's**; `psnaccountid` is deliberately **not unique**, but **only a
+  verified PSN account counts in Vault Points, and one user at most has a given account verified** (#176: a code in its
+  About Me, `users.psn_verified_at`, a partial unique index; linking or unlinking clears it). Every call
   through `psnCall(fn, …)` (`fn` is the counter's name, `src/lib/psnCallStats.ts`; the baseline is in `docs/platforms/psn.md`). **Do not try to automate Sony's sign-in.** A game counts by its whole set, DLC included.
 - **Xbox stays admin-only on purpose, and the reason is money** (OpenXBL's free plan, 150 calls an hour for the
   whole app). **Do not set `XBOX_ADMIN_ONLY` to `false`, and do not suggest it as a next step**, until the user says
@@ -460,6 +462,8 @@ with its tests; it is the part that decides whether the answers are any good.
   (`PresenceDot`, `PresenceLabel`); never on your own.
 - **Who follows whom is shown to nobody else**: no follower list or count on public profiles without asking.
 - **The showcase is public; "achievements to get" are private**: never a place that shows them to anyone else.
+- **Only verified PSN counts in Vault Points** (#176): every read that adds up `score_games` or `score_periods` carries
+  `src/lib/vaultGate.ts`, a new one too; the scoring itself is untouched, so verifying needs no Sony read.
 - **Vault Points are computed ahead, never on a read**; the rankings routes never call a platform. Keep
   `vaultScore.test.ts` passing and bump `RULES_VERSION` when a number changes; read each platform at `PACE`
   (`src/lib/scoreRefresh.ts`), not faster. A profile's public card shows only what the rankings show.

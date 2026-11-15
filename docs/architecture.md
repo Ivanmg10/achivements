@@ -34,7 +34,7 @@ page (src/app/(main)/…)            client component
 |---|---|---|
 | RetroAchievements | `get*` (gameData, recentAchievements, activityHeatmapYear…), `updateRaUser`, `unlinkRaUser` | Older flat names; keep them, the client calls them |
 | Steam | `steam/*` (ownedGames, achievements, recentlyPlayed…, unlink) | Linked through Steam sign-in (`auth/steam?intent=link`); admins by name (`src/lib/steamAccount.ts`) |
-| PlayStation | `psn/*` (link, titles, trophies, details…) | One app account, `src/lib/psnClient.ts` |
+| PlayStation | `psn/*` (link, titles, trophies, details, `verify`…) | One app account, `src/lib/psnClient.ts`; `verify` proves the account is the user's (`src/lib/psnVerification.ts`, #176) and `src/lib/vaultGate.ts` lets only verified PSN count in Vault Points |
 | Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
