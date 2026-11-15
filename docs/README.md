@@ -15,6 +15,13 @@ What to read, and when.
 | [`library.md`](library.md) | Before touching a list of games: synced preferences, consoles to show, hidden games, completion dates. |
 | [`social.md`](social.md) | Before touching presence, follows, the showcase, Vault Points or the rankings. |
 | [`rankings-plan.md`](rankings-plan.md) | Before changing the Vault Points formula, levels or account verification: the decisions and balance tests. |
+| [`psn-scaling-and-rate-limits.md`](psn-scaling-and-rate-limits.md) | Before touching PSN sync, the single NPSSO, onboarding at scale or rate limits. |
+| [`psn-multi-account-pool.md`](psn-multi-account-pool.md) | Before adding more PSN service accounts, designing the pool or the sync UX. |
+| [`psn-implementation-brief.md`](psn-implementation-brief.md) | When another agent is going to implement the PSN verification, pool, queue or UX work. |
+| [`psn-scale-roadmap.md`](psn-scale-roadmap.md) | When planning growth from 1k to 100k users: accounts, DB, queue, CDN and ops. |
+| [`psn-account-operations.md`](psn-account-operations.md) | Before adding many PSN service accounts, automating token refresh or wiring Telegram alerts. |
+| [`psn-5-account-agent-brief.md`](psn-5-account-agent-brief.md) | The concrete 5-account rollout brief to hand to the implementing agent. |
+| [`exophase-psn-analysis.md`](exophase-psn-analysis.md) | Competitive analysis of Exophase's PSN model and what CheevoVault can borrow. |
 | [`welcome.md`](welcome.md) | Before touching `/welcome`, and whenever a change adds a platform, a feature, a profile field or a preference (the welcome follows the app). |
 | [`i18n.md`](i18n.md) | Before touching how a language is picked or loaded, adding a language, or naming a thing in the UI (the vocabulary). |
 | [`releases.md`](releases.md) | Before a release, a migration or an environment change: milestones, release gates, environments, the migrations table. |
