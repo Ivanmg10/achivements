@@ -12,6 +12,8 @@ export interface AdminUser {
   steamusername?: string | null;
   psnaccountid?: string | null;
   psnusername?: string | null;
+  /** The linked PSN account was proven theirs (a code in its About Me). */
+  psnVerified?: boolean;
   xboxxuid?: string | null;
   xboxgamertag?: string | null;
 }

@@ -65,7 +65,7 @@ test('closes on escape and on the close button', () => {
   const { onClose } = open()
   fireEvent.click(screen.getByLabelText('Close'))
   expect(onClose).toHaveBeenCalled()
-  fireEvent.keyDown(window, { key: 'Escape' })
+  fireEvent.keyDown(document, { key: 'Escape' })
   expect(onClose).toHaveBeenCalledTimes(2)
 })
 

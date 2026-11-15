@@ -1,6 +1,6 @@
 import type { PsnGameProgress, TrophyCounts } from '@/types/psn'
-
-export type PsnCategory = 'wantToPlay' | 'playing' | 'completed'
+import type { GameStatus } from '@/types/game'
+import type { TagTone } from '@/components/ui/Tag'
 
 const TITLE_ID = /^NPWR(\d{5})_(\d{2})$/
 
@@ -31,7 +31,7 @@ export function isPsnTitleId(value: string): boolean {
  * too when the user chose that: see `platinumCompletes`), and "no achievements" when it was launched
  * but nothing earned yet.
  */
-export function classifyPsnGame(game: Pick<PsnGameProgress, 'pctWon' | 'platinumCompletes'>): PsnCategory {
+export function classifyPsnGame(game: Pick<PsnGameProgress, 'pctWon' | 'platinumCompletes'>): GameStatus {
   if (game.pctWon >= 100 || game.platinumCompletes) return 'completed'
   if (game.pctWon > 0) return 'playing'
   return 'wantToPlay'
@@ -46,18 +46,18 @@ export const TROPHY_GRADES = ['platinum', 'gold', 'silver', 'bronze'] as const
 
 /** Text colour per grade. Always shown with the grade's name, never as the only cue. */
 export const TROPHY_GRADE_COLOR: Record<(typeof TROPHY_GRADES)[number], string> = {
-  platinum: 'text-sky-300',
-  gold: 'text-yellow-400',
-  silver: 'text-zinc-400',
-  bronze: 'text-orange-400',
+  platinum: 'text-platinum',
+  gold: 'text-hardcore',
+  silver: 'text-silver',
+  bronze: 'text-warning',
 }
 
 /** Ring colour around an earned trophy's icon, per grade. */
 export const TROPHY_GRADE_RING: Record<(typeof TROPHY_GRADES)[number], string> = {
-  platinum: 'ring-sky-300',
-  gold: 'ring-yellow-400',
-  silver: 'ring-zinc-400',
-  bronze: 'ring-orange-400',
+  platinum: 'ring-platinum',
+  gold: 'ring-hardcore',
+  silver: 'ring-silver',
+  bronze: 'ring-warning',
 }
 
 /** The widest art there is for a game's backdrop: store hero art, then box art, then the trophy icon. */
@@ -74,17 +74,17 @@ export function psnPlatformName(raw: string): string {
 }
 
 /**
- * The platform chip's colours, after each console: PS5 white, PS4 the
+ * The platform tag's tone, after each console: PS5 white, PS4 the
  * PlayStation blue, PS3 piano black, Vita light blue. A cross-buy list takes
- * its first platform's. The name is always written in the chip too, so the
+ * its first platform's. The name is always written in the tag too, so the
  * colour is never the only cue.
  */
-export function psnPlatformChip(consoleName: string): string {
+export function psnPlatformTone(consoleName: string): TagTone {
   const first = consoleName.split('·')[0].trim().toUpperCase()
-  if (first === 'PS5') return 'bg-zinc-100 text-zinc-900'
-  if (first === 'PS3') return 'bg-black text-zinc-100 ring-1 ring-zinc-500'
-  if (first.includes('VITA')) return 'bg-sky-300 text-sky-950'
-  return 'bg-[#003791] text-white'
+  if (first === 'PS5') return 'white'
+  if (first === 'PS3') return 'black'
+  if (first.includes('VITA')) return 'sky'
+  return 'psn'
 }
 
 /** The id a trophy's row carries on its game page, so a link can jump to it. */

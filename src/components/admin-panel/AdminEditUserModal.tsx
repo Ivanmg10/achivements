@@ -1,14 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
-import CommonModal from '../common-modal/CommonModal'
+import Modal from '@/components/ui/Modal'
 import AdminLinkedAccounts from './admin-linked-accounts/AdminLinkedAccounts'
 import { adminFetch } from '@/utils/adminFetch'
-import { codeToFlag, findCountry, COUNTRIES } from '@/utils/countries'
-import type { Country } from '@/utils/countries'
+import { codeToFlag, findCountry, searchCountries } from '@/utils/countries'
+import CountryList from '@/components/country-list/CountryList'
+import SearchInput from '@/components/ui/SearchInput'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
+import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
+import Switch from '@/components/ui/Switch'
+import Kicker from '@/components/ui/Kicker'
+import Avatar from '@/components/ui/Avatar'
 
 interface Props {
   isOpen: boolean
@@ -57,30 +62,10 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
     }
   }
 
-  const filteredCountries = COUNTRIES.filter((c: Country) =>
-    c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
-    c.code.toLowerCase().includes(countrySearch.toLowerCase())
-  )
-
   const currentLocation = values.location as string
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose}>
-      <div className="flex items-center gap-3 mb-1 pt-2">
-        {user.avatar ? (
-          <Image src={user.avatar} alt={user.username} width={40} height={40}
-            className="rounded-full w-10 h-10 object-cover shrink-0" unoptimized />
-        ) : (
-          <div className="rounded-full w-10 h-10 bg-bg-main flex items-center justify-center shrink-0">
-            <span className="text-xs text-text-secondary font-bold">{user.username[0]?.toUpperCase()}</span>
-          </div>
-        )}
-        <div>
-          <h2 className="text-xl font-bold">{user.username}</h2>
-          <p className="text-xs text-text-secondary font-mono">ID: {user.id}</p>
-        </div>
-      </div>
-
+    <Modal isOpen={isOpen} onClose={onClose} size="md" icon={<Avatar src={user.avatar} name={user.username} />} title={user.username} hint={`ID: ${user.id}`}>
       <div className="flex flex-col gap-4">
 
         {/* Username */}
@@ -94,7 +79,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
           <input
             value={values.username as string ?? ''}
             onChange={e => setValues(v => ({ ...v, username: e.target.value }))}
-            className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+            className={fieldClass({ size: 'sm' })}
           />
         </FieldRow>
 
@@ -110,7 +95,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
             type="email"
             value={values.email as string ?? ''}
             onChange={e => setValues(v => ({ ...v, email: e.target.value }))}
-            className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+            className={fieldClass({ size: 'sm' })}
           />
         </FieldRow>
 
@@ -126,25 +111,24 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
             <input
               value={values.avatar as string ?? ''}
               onChange={e => setValues(v => ({ ...v, avatar: e.target.value }))}
-              className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent flex-1"
+              className={fieldClass({ size: 'sm' }, 'flex-1')}
               placeholder="https://..."
             />
             {(values.avatar as string) && (
-              <Image src={values.avatar as string} alt="Avatar preview" width={32} height={32}
-                className="rounded-full w-8 h-8 object-cover shrink-0" unoptimized
-                onError={() => {}} />
+              <Avatar src={values.avatar as string} name={user.username} size={32} />
             )}
           </div>
         </FieldRow>
 
         {/* Location */}
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-text-secondary uppercase tracking-wider">Location</span>
+          <Kicker as="span" size="md">Location</Kicker>
           {!showCountryPicker ? (
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={() => setShowCountryPicker(true)}
-                className="flex-1 bg-bg-main rounded-xl px-4 py-2.5 text-sm text-left flex items-center gap-2"
+                className="flex-1 bg-bg-main rounded-tile px-4 py-2.5 text-sm text-left flex items-center gap-2 focus-ring"
               >
                 {currentLocation ? (
                   <>
@@ -159,85 +143,66 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
                 <SaveButton saving={saving === 'location'} onClick={() => patch('location', currentLocation || null)} />
               )}
               {currentLocation && (
-                <button onClick={() => { setValues(v => ({ ...v, location: '' })); patch('location', null) }}
-                  className="text-xs text-red-400 hover:text-red-300 px-2 py-1">Clear</button>
+                <Button variant="quiet" size="sm" onClick={() => { setValues(v => ({ ...v, location: '' })); patch('location', null) }}>Clear</Button>
               )}
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              <input
+              <SearchInput
                 autoFocus
                 value={countrySearch}
                 onChange={e => setCountrySearch(e.target.value)}
                 placeholder="Search country..."
-                className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+                aria-label="Search country"
               />
-              <div className="max-h-40 overflow-y-auto flex flex-col gap-0.5">
-                {filteredCountries.map((c: Country) => (
-                  <button key={c.code}
-                    onClick={() => {
-                      setValues(v => ({ ...v, location: c.code }))
-                      setShowCountryPicker(false)
-                      patch('location', c.code)
-                    }}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-bg-card text-sm text-left"
-                  >
-                    <span className="text-base" aria-hidden="true">{codeToFlag(c.code)}</span>
-                    <span>{c.name}</span>
-                  </button>
-                ))}
+              <div className="max-h-56 overflow-y-auto">
+                <CountryList
+                  countries={searchCountries(countrySearch, 'en')}
+                  value={currentLocation}
+                  empty="No results"
+                  onPick={(code) => {
+                    setValues(v => ({ ...v, location: code }))
+                    setShowCountryPicker(false)
+                    patch('location', code)
+                  }}
+                />
               </div>
-              <button onClick={() => setShowCountryPicker(false)}
-                className="text-xs text-text-secondary hover:text-text-main text-left px-1">Cancel</button>
+              <Button variant="quiet" size="sm" className="self-start" onClick={() => setShowCountryPicker(false)}>Cancel</Button>
             </div>
           )}
-          {errors.location && <span className="text-xs text-red-400">{errors.location}</span>}
+          {errors.location && <span className="text-xs text-danger">{errors.location}</span>}
         </div>
 
         {/* Admin toggle */}
         <div className="flex items-center justify-between">
-          <span className="text-xs text-text-secondary uppercase tracking-wider">Admin</span>
+          <Kicker as="span" size="md">Admin</Kicker>
           <div className="flex items-center gap-3">
             {user.id === currentAdminId && (
               <span className="text-xs text-text-secondary italic">Can&apos;t remove own admin</span>
             )}
-            <button
-              type="button"
-              role="switch"
-              aria-checked={values.admin as boolean}
+            <Switch
+              checked={values.admin as boolean}
               aria-label="Admin privileges"
               disabled={user.id === currentAdminId}
-              onClick={() => {
-                const next = !(values.admin as boolean)
+              onChange={(next) => {
                 setValues(v => ({ ...v, admin: next }))
                 patch('admin', next)
               }}
-              className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${
-                user.id === currentAdminId ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
-              } ${values.admin ? 'bg-accent' : 'bg-bg-main'}`}
-            >
-              <div className={`w-4 h-4 rounded-full bg-white transition-transform ${values.admin ? 'translate-x-4' : 'translate-x-0'}`} aria-hidden="true" />
-            </button>
+            />
           </div>
         </div>
 
         <AdminLinkedAccounts user={user} onUpdated={onChanged} />
       </div>
-
-      <button onClick={onClose}
-        className="w-full bg-bg-main text-text-secondary rounded-xl py-3 hover:text-text-main transition-colors text-sm mt-1">
-        Close
-      </button>
-    </CommonModal>
+    </Modal>
   )
 }
 
 function SaveButton({ saving, onClick }: { saving: boolean; onClick: () => void }) {
   return (
-    <button onClick={onClick} disabled={saving}
-      className="shrink-0 bg-accent text-bg-main text-xs font-bold px-3 py-2 rounded-xl hover:opacity-90 disabled:opacity-40">
-      {saving ? '...' : 'Save'}
-    </button>
+    <Button onClick={onClick} loading={saving} size="sm" className="shrink-0">
+      Save
+    </Button>
   )
 }
 
@@ -253,12 +218,12 @@ function FieldRow({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-xs text-text-secondary uppercase tracking-wider">{label}</span>
+      <Kicker as="span" size="md">{label}</Kicker>
       <div className="flex items-center gap-2">
         <div className="flex-1">{children}</div>
         {canSave && <SaveButton saving={saving} onClick={onSave} />}
       </div>
-      {error && <span className="text-xs text-red-400">{error}</span>}
+      {error && <span className="text-xs text-danger">{error}</span>}
     </div>
   )
 }

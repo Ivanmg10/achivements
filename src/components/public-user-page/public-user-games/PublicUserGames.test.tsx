@@ -18,7 +18,8 @@ const titles = () => screen.getAllByRole('listitem').map((li) => li.textContent)
 test('furthest along first, or by name', () => {
   render(<PublicUserGames games={GAMES} isLoading={false} />)
   expect(titles()).toEqual(['Portal', 'Astro', 'Zelda'])
-  fireEvent.change(screen.getByLabelText(en.userProfile.sortBy), { target: { value: 'name' } })
+  fireEvent.click(screen.getByRole('combobox', { name: en.userProfile.sortBy }))
+  fireEvent.click(screen.getByRole('option', { name: en.userProfile.sortName }))
   expect(titles()).toEqual(['Astro', 'Portal', 'Zelda'])
 })
 

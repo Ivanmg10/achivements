@@ -25,3 +25,9 @@ test('picked is announced', () => {
   render(<GamePickerTile candidate={c} selected onToggle={jest.fn()} />)
   expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true')
 })
+
+test('every tile is the same square, whatever the art ratio or the title length (#165, H3)', () => {
+  const { container } = render(<GamePickerTile candidate={c} selected={false} onToggle={jest.fn()} />)
+  expect(screen.getByRole('button')).toHaveClass('w-full')
+  expect(container.querySelector('img')!.parentElement).toHaveClass('aspect-square')
+})

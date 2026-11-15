@@ -1,108 +1,5 @@
-import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath } from "./utils";
+import { activityKpis, calcAvgPerDay, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, matchParts, decimal, asCategory } from "./utils";
 import type { RecentAchievement } from '@/types/types'
-
-describe("getRandomGameIds", () => {
-  test("returns correct count", () => {
-    const ids = getRandomGameIds(3);
-    expect(ids.length).toBe(3);
-  });
-
-  test("returns 5 by default", () => {
-    const ids = getRandomGameIds();
-    expect(ids.length).toBe(5);
-  });
-
-  test("returns strings", () => {
-    const ids = getRandomGameIds(1);
-    expect(typeof ids[0]).toBe("string");
-  });
-});
-
-describe("groupByDay", () => {
-  test("always returns 7 entries", () => {
-    const result = groupByDay([]);
-    expect(result.length).toBe(7);
-  });
-
-  test("counts achievements that fall within last 7 days", () => {
-    const today = new Date().toISOString().split("T")[0];
-    const achievements = [
-      { Date: `${today} 10:00:00` } as never,
-      { Date: `${today} 12:00:00` } as never,
-    ];
-    const result = groupByDay(achievements);
-    const todayEntry = result.find((r) => r.date === today);
-    expect(todayEntry?.count).toBe(2);
-  });
-
-  test("returns zero counts for non-array input", () => {
-    const result = groupByDay(null as never);
-    expect(result.length).toBe(7);
-    result.forEach((r) => expect(r.count).toBe(0));
-  });
-
-  test("returns zero counts for empty input", () => {
-    const result = groupByDay([]);
-    result.forEach((r) => expect(r.count).toBe(0));
-  });
-
-  test("dates are in ascending order", () => {
-    const result = groupByDay([]);
-    for (let i = 1; i < result.length; i++) {
-      expect(result[i].date >= result[i - 1].date).toBe(true);
-    }
-  });
-});
-
-describe("groupByConsole", () => {
-  test("groups games by console", () => {
-    const games = [
-      { ConsoleName: "PS2", GameID: 1 },
-      { ConsoleName: "PS2", GameID: 2 },
-      { ConsoleName: "GBA", GameID: 3 },
-    ] as never;
-    const result = groupByConsole(games);
-    expect(result).toContainEqual({ name: "PS2", value: 2 });
-    expect(result).toContainEqual({ name: "GBA", value: 1 });
-  });
-
-  test("excludes Events console", () => {
-    const games = [
-      { ConsoleName: "Events", GameID: 1 },
-      { ConsoleName: "PS2", GameID: 2 },
-    ] as never;
-    const result = groupByConsole(games);
-    expect(result).not.toContainEqual(expect.objectContaining({ name: "Events" }));
-    expect(result).toContainEqual({ name: "PS2", value: 1 });
-  });
-});
-
-describe("calcStreak", () => {
-  test("returns 0 for empty array", () => {
-    expect(calcStreak([])).toBe(0);
-  });
-
-  test("counts consecutive days ending today", () => {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-    const achievements = [
-      { Date: today.toISOString().split("T")[0] + " 10:00:00" } as never,
-      { Date: yesterday.toISOString().split("T")[0] + " 10:00:00" } as never,
-    ];
-    expect(calcStreak(achievements)).toBe(2);
-  });
-
-  test("stops at gap", () => {
-    const today = new Date();
-    const twoDaysAgo = new Date(today);
-    twoDaysAgo.setDate(today.getDate() - 2);
-    const achievements = [
-      { Date: twoDaysAgo.toISOString().split("T")[0] + " 10:00:00" } as never,
-    ];
-    expect(calcStreak(achievements)).toBe(0);
-  });
-});
 
 describe("getBestMonth", () => {
   test("returns null for empty array", () => {
@@ -414,6 +311,19 @@ describe('groupGameAchievementsByPeriod', () => {
     expect(months[5]).toMatchObject({ count: 1, items: [today] })
   })
 
+  test('weeks start on Monday and the last one is the current week, even when today is a Sunday', () => {
+    jest.useFakeTimers({ now: new Date(2026, 10, 15, 12) }) // Sunday 15 Nov 2026, local
+    try {
+      const weeks = groupGameAchievementsByPeriod([{ earnedAt: new Date(2026, 10, 9, 8).toISOString() }, { earnedAt: new Date(2026, 10, 8, 23).toISOString() }], 'week')
+      expect(weeks.map((w) => new Date(w.start).getDay())).toEqual(Array(8).fill(1))
+      expect(new Date(weeks[7].start).getDate()).toBe(9) // Monday 9 Nov
+      expect(weeks[7].count).toBe(1)
+      expect(weeks[6].count).toBe(1) // Sunday 8 Nov belongs to the week of Monday 2 Nov
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
   test('labels the month in local time, so the first of the month is not the month before', () => {
     const now = new Date()
     const first = new Date(now.getFullYear(), now.getMonth(), 1, 0, 30)
@@ -441,5 +351,40 @@ describe('gameSourceFromPath', () => {
     expect(gameSourceFromPath('/nope')).toBeNull()
     expect(gameSourceFromPath('/')).toBeNull()
     expect(gameSourceFromPath(null)).toBeNull()
+  })
+})
+
+describe('matchParts', () => {
+  test('cuts the text around its first match, ignoring case', () => {
+    expect(matchParts("Marvel's Spider-Man", 'spi')).toEqual([
+      { text: "Marvel's ", match: false },
+      { text: 'Spi', match: true },
+      { text: 'der-Man', match: false },
+    ])
+  })
+  test('no match, or no query: the text whole', () => {
+    expect(matchParts('Halo', 'zelda')).toEqual([{ text: 'Halo', match: false }])
+    expect(matchParts('Halo', '  ')).toEqual([{ text: 'Halo', match: false }])
+  })
+  test('a match at the start leaves no empty part', () => {
+    expect(matchParts('Halo', 'ha')).toEqual([{ text: 'Ha', match: true }, { text: 'lo', match: false }])
+  })
+})
+
+describe('decimal', () => {
+  test('one decimal by default, in the language of the reader', () => {
+    expect(decimal(0.8, 'es')).toBe('0,8')
+    expect(decimal(2, 'en')).toBe('2.0')
+    expect(decimal(1.234, 'de', 2)).toBe('1,23')
+  })
+})
+
+describe("asCategory", () => {
+  test("a page category is a status; anything else reads as playing", () => {
+    expect(asCategory("wantToPlay")).toBe("wantToPlay")
+    expect(asCategory("completed")).toBe("completed")
+    expect(asCategory("playing")).toBe("playing")
+    expect(asCategory(undefined)).toBe("playing")
+    expect(asCategory("something-else")).toBe("playing")
   })
 })

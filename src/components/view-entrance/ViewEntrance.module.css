@@ -1,0 +1,29 @@
+/*
+   The home's left card, the first time a list appears: recently played rows run in
+   from the left one after another, pinned tiles rise and settle (--i is the position;
+   past 8 they come together). CSS, not Framer: it runs on the compositor, so a busy
+   first load does not make it stutter. A fade under reduced motion.
+*/
+@keyframes feed-in {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes tile-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+.feed {
+  animation: feed-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(min(var(--i, 0), 8) * 80ms);
+}
+.tile {
+  animation: tile-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(min(var(--i, 0), 8) * 90ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .feed, .tile { animation: fade-in 0.2s ease-out both; }
+}

@@ -1,9 +1,9 @@
 import type { CategoryGame } from '@/hooks/useGamesByCategory'
-import type { GameSource, SteamGameProgress } from '@/types/steam'
+import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
-import { PSN_PLATFORM } from '@/utils/psnMappers'
 import type { XboxGameProgress } from '@/types/xbox'
-import { XBOX_PLATFORM } from '@/utils/xboxMappers'
+import { raGameId } from '@/utils/gameRef'
+import type { GameSource } from '@/types/game'
 
 /**
  * A game shown in a folded section's preview: enough to draw a small card
@@ -14,6 +14,7 @@ export type PreviewGame = {
   source: GameSource
   id: number
   title: string
+  /** The console (RA's, PS4, Xbox 360), never the platform its section already names; empty for Steam. */
   subtitle: string
   /** RA: image path on retroachievements.org. Steam: library icon URL (fallback art). PSN: icon URL. */
   imageRef: string
@@ -34,7 +35,7 @@ function byProgress(list: PreviewGame[]): PreviewGame[] {
 
 export function raPreviewGames(games: CategoryGame[], count = PREVIEW_MAX): PreviewGame[] {
   return byProgress(games.map((g): PreviewGame => {
-    const id = 'GameID' in g && g.GameID ? g.GameID : (g as { ID: number }).ID
+    const id = raGameId(g)
     const pctWon = 'PctWon' in g ? parseFloat(g.PctWon) : NaN
     return {
       key: `ra:${id}`,
@@ -54,7 +55,7 @@ export function steamPreviewGames(games: SteamGameProgress[], count = PREVIEW_MA
     source: 'steam',
     id: g.id,
     title: g.title,
-    subtitle: 'Steam',
+    subtitle: '',
     imageRef: g.imageIcon,
     pct: g.achievementsLoaded && g.maxPossible > 0 ? g.pctWon : null,
   }))).slice(0, count)
@@ -66,7 +67,7 @@ export function psnPreviewGames(games: PsnGameProgress[], count = PREVIEW_MAX): 
     source: 'psn',
     id: g.id,
     title: g.title,
-    subtitle: PSN_PLATFORM,
+    subtitle: g.consoleName,
     imageRef: g.imageIcon,
     pct: g.pctWon,
   }))).slice(0, count)
@@ -78,7 +79,7 @@ export function xboxPreviewGames(games: XboxGameProgress[], count = PREVIEW_MAX)
     source: 'xbox',
     id: g.id,
     title: g.title,
-    subtitle: XBOX_PLATFORM,
+    subtitle: g.consoleName,
     imageRef: g.imageIcon,
     pct: g.pctWon,
   }))).slice(0, count)

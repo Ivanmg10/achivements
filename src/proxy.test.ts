@@ -8,6 +8,24 @@ const request = (path: string) => new NextRequest(`http://localhost:3000${path}`
 
 beforeEach(() => jest.clearAllMocks())
 
+describe('a write to the API', () => {
+  const write = (origin: string, method = 'POST') =>
+    proxy(new NextRequest('http://localhost:3000/api/updateTheme', { method, headers: { origin, host: 'localhost:3000' } }))
+
+  test('from this site goes through', async () => {
+    expect((await write('http://localhost:3000')).status).toBe(200)
+  })
+
+  test.each(['https://evil.example', 'https://dev.localhost:3000', 'null'])('from %s is refused', async (origin) => {
+    expect((await write(origin)).status).toBe(403)
+    expect((await write(origin, 'DELETE')).status).toBe(403)
+  })
+
+  test('a read is left alone', async () => {
+    expect((await write('https://evil.example', 'GET')).status).toBe(200)
+  })
+})
+
 test('the landing, the auth page, the legal pages and the images other sites fetch are open to anyone', async () => {
   for (const path of ['/', '/authPage', '/privacy', '/terms', '/opengraph-image', '/apple-icon', '/rankings', '/rankings/how']) {
     const res = await proxy(request(path))
@@ -40,7 +58,16 @@ test('the app needs an account: a visitor is sent to sign in', async () => {
   ;(getToken as jest.Mock).mockResolvedValue(null)
   const res = await proxy(request('/groups'))
   expect(res.status).toBe(307)
-  expect(res.headers.get('location')).toBe('http://localhost:3000/authPage')
+  expect(res.headers.get('location')).toBe('http://localhost:3000/authPage?next=%2Fgroups')
+})
+
+test('the sign-in is told where the visitor was going, with the query, and never a place off this site', async () => {
+  ;(getToken as jest.Mock).mockResolvedValue(null)
+  expect((await proxy(request('/groups?tab=2'))).headers.get('location')).toBe('http://localhost:3000/authPage?next=%2Fgroups%3Ftab%3D2')
+  // A path that does not exist is the same: the sign-in cannot tell, and says so.
+  expect((await proxy(request('/no-such-page'))).headers.get('location')).toBe('http://localhost:3000/authPage?next=%2Fno-such-page')
+  // Nothing to remember for a path that is not a place (a double slash is read as a host by a browser).
+  expect((await proxy(request('//evil.com'))).headers.get('location')).toBe('http://localhost:3000/authPage')
 })
 
 test('someone signed in goes where they asked', async () => {

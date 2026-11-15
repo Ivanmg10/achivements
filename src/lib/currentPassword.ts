@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import { isLimited, recordAttempt } from '@/lib/attemptLimit'
+import { reserveAttempt } from '@/lib/attemptLimit'
 import { loadUser } from '@/lib/userRecord'
 
 export type PasswordCheck = 'ok' | 'wrong' | 'too-many' | 'no-user'
@@ -10,15 +10,19 @@ export type PasswordCheck = 'ok' | 'wrong' | 'too-many' | 'no-user'
  * recovery email). Wrong guesses are counted per account.
  */
 export async function checkCurrentPassword(userId: string, password: unknown): Promise<PasswordCheck> {
-  const key = `user:${userId}`
-  if (await isLimited('password-check', key)) return 'too-many'
+  const attempt = await reserveAttempt('password-check', `user:${userId}`)
+  if (!attempt.allowed) {
+    await attempt.release()
+    return 'too-many'
+  }
 
   const row = await loadUser(userId, { fresh: true })
-  if (!row) return 'no-user'
-
-  if (typeof password !== 'string' || !password || !(await bcrypt.compare(password, row.password))) {
-    await recordAttempt('password-check', key)
-    return 'wrong'
+  if (!row) {
+    await attempt.release()
+    return 'no-user'
   }
+
+  if (typeof password !== 'string' || !password || !(await bcrypt.compare(password, row.password))) return 'wrong'
+  await attempt.release()
   return 'ok'
 }

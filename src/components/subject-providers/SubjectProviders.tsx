@@ -13,6 +13,7 @@ import { PsnGamesDataProvider } from '@/context/PsnGamesDataContext'
 import { XboxGamesDataProvider } from '@/context/XboxGamesDataContext'
 import { MainPlatformProvider } from '@/context/MainPlatformContext'
 import { usePublicUserProfile } from '@/hooks/usePublicUserProfile'
+import { HiddenGamesProvider } from '@/context/HiddenGamesContext'
 import type { CheevoUser } from '@/hooks/useCheevoUser'
 
 /**
@@ -63,6 +64,7 @@ export default function SubjectProviders({ user, children }: { user: CheevoUser;
   return (
     <SubjectContext.Provider value={user.username}>
       <SessionContext.Provider value={session}>
+        <HiddenGamesProvider initialKeys={user.hiddenGames ?? []}>
         <RecentAchievementsProvider>
           <RecentlyPlayedGamesProvider>
             <ActivityHeatmapYearProvider>
@@ -78,6 +80,7 @@ export default function SubjectProviders({ user, children }: { user: CheevoUser;
             </ActivityHeatmapYearProvider>
           </RecentlyPlayedGamesProvider>
         </RecentAchievementsProvider>
+        </HiddenGamesProvider>
       </SessionContext.Provider>
     </SubjectContext.Provider>
   )

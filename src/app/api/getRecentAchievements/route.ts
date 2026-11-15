@@ -4,22 +4,26 @@ import { dataOwner } from '@/lib/apiAuth'
 import { withCache } from '@/lib/raCache'
 import { cachedJson } from '@/lib/httpCache'
 import { getUserRecentAchievements } from '@/lib/raClient'
+import { visibleGamesForUser } from '@/lib/gameVisibility'
+import { slimUnlock } from '@/lib/raYear'
+import type { RecentAchievement } from '@/types/types'
+import { parseUnlockTime } from '@/utils/dates'
 
 const TTL = 60 * 1000
 
-function sortDesc(arr: { Date: string }[]) {
+function sortDesc(arr: RecentAchievement[]) {
   return [...arr].sort(
     (a, b) =>
-      new Date(b.Date.replace(' ', 'T')).getTime() -
-      new Date(a.Date.replace(' ', 'T')).getTime(),
+      parseUnlockTime(b.Date) -
+      parseUnlockTime(a.Date),
   )
 }
 
-function normalizeRaw(raw: unknown): { Date: string }[] {
-  if (Array.isArray(raw)) return sortDesc(raw as { Date: string }[])
+function normalizeRaw(raw: unknown): RecentAchievement[] {
+  if (Array.isArray(raw)) return sortDesc(raw as RecentAchievement[])
   const obj = raw as Record<string, unknown>
-  if (Array.isArray(obj?.Results)) return sortDesc(obj.Results as { Date: string }[])
-  if (Array.isArray(obj?.Data)) return sortDesc(obj.Data as { Date: string }[])
+  if (Array.isArray(obj?.Results)) return sortDesc(obj.Results as RecentAchievement[])
+  if (Array.isArray(obj?.Data)) return sortDesc(obj.Data as RecentAchievement[])
   return []
 }
 
@@ -35,7 +39,7 @@ export async function GET(req?: Request) {
   }
 
   try {
-    const data = await withCache(
+    const data = await withCache<RecentAchievement[]>(
       `recentAch_v2:${id}`,
       TTL,
       async () => {
@@ -45,7 +49,8 @@ export async function GET(req?: Request) {
       (d) => Array.isArray(d),
       { refreshable: true },
     )
-    return cachedJson(data, TTL)
+    const visible = await visibleGamesForUser(id, data, 'ra', (achievement) => achievement.GameID)
+    return cachedJson(visible.map(slimUnlock), 0)
   } catch (err) {
     return raUnavailable(err)
   }

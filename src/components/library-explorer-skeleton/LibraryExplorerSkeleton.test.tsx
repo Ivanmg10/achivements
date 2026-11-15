@@ -15,21 +15,21 @@ describe('the skeleton of the list screen', () => {
     const { container } = render(<LibraryExplorerSkeleton layout="list" />)
     // eight rows, each with its icon; one panel with its ring
     expect(container.querySelectorAll('[class*="w-[52px]"]')).toHaveLength(8)
-    expect(container.querySelectorAll('[class*="border-[9px]"]')).toHaveLength(1)
+    expect(container.querySelectorAll('.w-32.h-32')).toHaveLength(1)
   })
 
   test('the shelves draw titles and cards instead, with no panel', () => {
     const { container } = render(<LibraryExplorerSkeleton layout="shelves" />)
     // the first shelf runs over two rows, the second starts below
     expect(container.querySelectorAll('.aspect-video')).toHaveLength(12)
-    expect(container.querySelector('[class*="border-[9px]"]')).toBeNull()
+    expect(container.querySelector('.w-32.h-32')).toBeNull()
   })
 
   test('draws the header the page has: title with platform tabs, count, search and view buttons', () => {
     const { container } = render(<LibraryExplorerSkeleton layout="shelves" />)
-    expect(container.querySelectorAll('[class*="rounded-full"][class*="h-[38px]"]')).toHaveLength(1)
-    expect(container.querySelectorAll('[class*="h-[34px]"]')).toHaveLength(1)
-    expect(container.querySelectorAll('[class*="w-[13.5rem]"]')).toHaveLength(1)
+    expect(container.querySelectorAll('.rounded-full.w-\\[30rem\\]')).toHaveLength(1)
+    expect(container.querySelectorAll('[class*="w-[21.25rem]"]')).toHaveLength(1)
+    expect(container.querySelectorAll('[class*="w-[18.375rem]"]')).toHaveLength(1)
   })
 
   test('everything but the announcement is hidden from assistive technology', () => {

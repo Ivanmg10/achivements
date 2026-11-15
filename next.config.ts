@@ -36,6 +36,8 @@ const SECURITY_HEADERS = [
   { key: "Content-Security-Policy", value: CSP },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
+  // Steam's sign-in is a full redirect, not a window: nothing here needs an opener.
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   // Cross-site requests get the origin only, so a reset link's token never leaks in a Referer.
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()" },

@@ -158,3 +158,9 @@ test('session.update() flips the status to loading and back: a finished load is 
   expect(result.current.games).toEqual(games)
   expect(fetchWithRetry).toHaveBeenCalledTimes(1)
 })
+
+test('nothing is asked until something reads the list (#101)', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { rausername: 'Ivan' } } })
+  renderHook(() => null, { wrapper })
+  expect(fetchWithRetry).not.toHaveBeenCalled()
+})

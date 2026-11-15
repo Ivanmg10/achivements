@@ -5,8 +5,8 @@ import { IconPin, IconPinFilled } from '@tabler/icons-react'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
-import type { GameSource } from '@/types/steam'
 import { notify } from '@/lib/notify'
+import type { GameSource } from '@/types/game'
 
 export function PinToggleButton({
   gameId,
@@ -48,7 +48,7 @@ export function PinToggleButton({
         onClick={handleClick}
         aria-label={pinned ? T.pinnedGames.unpinAria : T.pinnedGames.pinAria}
         aria-pressed={pinned}
-        className={`p-1.5 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0 ${
+        className={`relative tap-target p-1.5 rounded-chip transition-colors focus-ring shrink-0 ${
           hasError
             ? 'text-danger'
             : pinned

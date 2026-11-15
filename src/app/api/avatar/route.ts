@@ -1,7 +1,6 @@
-import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
-import { authOptions } from '@/lib/authOptions'
 import { forgetUser } from '@/lib/userRecord'
 import { allowAttempt } from '@/lib/attemptLimit'
 import { AVATAR_MAX_BYTES, avatarUrl, sniffImageType } from '@/lib/avatarImage'
@@ -18,9 +17,9 @@ const FORM_OVERHEAD = 16 * 1024
  */
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    const userId = session?.user?.id
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireSession({ error: 'Unauthorized' })
+    if (!auth.ok) return auth.response
+    const userId = auth.id
 
     // Refuse an oversized body before reading it, when the client says its size.
     const declared = Number(req.headers.get('content-length') ?? 0)

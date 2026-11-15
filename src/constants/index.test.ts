@@ -1,4 +1,4 @@
-import { CONSOLES, CATEGORIES } from "./index";
+import { CONSOLES } from "./index";
 
 test("CONSOLES entries have required fields", () => {
   expect(CONSOLES.length).toBeGreaterThan(8);
@@ -9,8 +9,3 @@ test("CONSOLES entries have required fields", () => {
   }
 });
 
-test("CATEGORIES has 3 entries", () => {
-  expect(CATEGORIES.length).toBe(3);
-  expect(CATEGORIES[0]).toHaveProperty("label");
-  expect(CATEGORIES[0]).toHaveProperty("slug");
-});

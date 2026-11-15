@@ -17,6 +17,15 @@ test('one card per platform with games, with its counts and average', () => {
   expect(items[1]).toHaveTextContent('PlayStation')
 })
 
+test('the "at 100%" count is green only when there is one', () => {
+  render(<PublicUserPlatforms games={[game('ra:1', 100), game('psn:3', 10)]} isLoading={false} />)
+  const completed = screen.getAllByText(en.userProfile.completed).map((dt) => dt.parentElement!.querySelector('dd')!)
+  expect(completed[0]).toHaveTextContent('1')
+  expect(completed[0].className).toContain('text-success')
+  expect(completed[1]).toHaveTextContent('0')
+  expect(completed[1].className).not.toContain('text-success')
+})
+
 test('no games says so, and loading shows placeholders', () => {
   const { unmount } = render(<PublicUserPlatforms games={[]} isLoading={false} />)
   expect(screen.getByText(en.userProfile.noGames)).toBeInTheDocument()

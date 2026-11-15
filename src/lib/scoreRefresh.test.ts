@@ -6,8 +6,15 @@ jest.mock('@/lib/steamCache', () => ({
   readCache: jest.fn(),
   writeCache: jest.fn(),
 }))
-jest.mock('@/lib/steamProgress', () => ({ fetchPlayerAchievements: jest.fn(), isNoStats: () => false, loadGlobalPct: jest.fn(async () => new Map()) }))
+jest.mock('@/lib/steamProgress', () => ({
+  fetchPlayerAchievements: jest.fn(),
+  isNoStats: () => false,
+  loadGlobalPct: jest.fn(async () => new Map()),
+  withLastPlayed: jest.fn(async (_auth: unknown, data: unknown) => data),
+}))
+jest.mock('@/lib/rankings', () => ({ vaultTotals: jest.fn() }))
 jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn(async () => true) }))
+jest.mock('@/lib/upstreamCount', () => ({ steamBudgetLow: jest.fn(async () => false) }))
 jest.mock('@/lib/psnClient', () => {
   class PsnError extends Error {
     get isPrivate() {
@@ -17,19 +24,31 @@ jest.mock('@/lib/psnClient', () => {
       return /too many requests/.test(this.message)
     }
   }
-  return { PsnError, psnTitles: jest.fn(), psnGameTrophies: jest.fn() }
+  return { PsnError, psnTitlesCore: jest.fn(), psnGameTrophies: jest.fn() }
 })
-jest.mock('@/lib/xboxClient', () => ({ xboxLibrary: jest.fn(), xboxGameAchievements: jest.fn() }))
+jest.mock('@/lib/xboxClient', () => {
+  class XboxError extends Error {
+    kind: string
+    constructor(kind: string, message: string) {
+      super(message)
+      this.kind = kind
+    }
+  }
+  return { XboxError, xboxLibrary: jest.fn(), xboxGameAchievements: jest.fn() }
+})
 
 import pool from '@/lib/db'
 import { readCache, writeCache } from '@/lib/steamCache'
 import { allowAttempt } from '@/lib/attemptLimit'
-import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
+import { vaultTotals } from '@/lib/rankings'
+import { PsnError, psnGameTrophies, psnTitlesCore } from '@/lib/psnClient'
+import { XboxError, xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
+import { xboxGameFixture } from '@/test-utils/xboxFixtures'
 import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raClient'
 import { getOwnedGames } from '@/lib/steamClient'
-import { fetchPlayerAchievements } from '@/lib/steamProgress'
+import { fetchPlayerAchievements, withLastPlayed } from '@/lib/steamProgress'
 import { RULES_VERSION } from '@/utils/vaultScore'
-import { classifyFailure, continueFill, onPlatformLinked, refreshScore, refreshScoreIfStale, runScorePass } from './scoreRefresh'
+import { classifyFailure, continueFill, onPlatformLinked, PACE, refreshScore, refreshScoreIfStale, runScorePass } from './scoreRefresh'
 
 const query = pool.query as jest.Mock
 const client = { query: jest.fn(), release: jest.fn() }
@@ -42,7 +61,7 @@ const trophy = (earned: boolean, rarity: number) => ({ id: 1, name: '', detail: 
 const user = (over: Record<string, unknown>) => ({ id: 7, rausername: null, raid: null, steamid: null, psnaccountid: null, xboxxuid: null, preferences: {}, ...over })
 
 let stored: Record<string, unknown>[]
-let writes: { game_id: number; provisional: boolean; points: number }[]
+let writes: { game_id: number; provisional: boolean; points: number; unlocks: [number, number][] }[]
 let kept: number[] | null
 let userRow: Record<string, unknown>
 
@@ -59,9 +78,10 @@ beforeEach(() => {
   ;(pool.connect as jest.Mock).mockResolvedValue(client)
   client.query.mockResolvedValue({ rows: [] })
   ;(allowAttempt as jest.Mock).mockResolvedValue(true)
+  ;(vaultTotals as jest.Mock).mockResolvedValue(new Map([[7, 1234]]))
   query.mockImplementation(async (sql: string, params: unknown[]) => {
     if (sql.includes('FROM users WHERE id')) return { rows: [userRow] }
-    if (sql.includes('FROM hidden_games')) return { rows: [{ source: 'psn', game_id: 3 }] }
+    if (sql.includes('SELECT source, game_id FROM hidden_games')) return { rows: [{ source: 'psn', game_id: 3 }] }
     if (sql.includes('SELECT game_id, account')) return { rows: stored }
     if (sql.includes('INSERT INTO score_games')) {
       writes = JSON.parse(params[4] as string)
@@ -71,11 +91,10 @@ beforeEach(() => {
       kept = params[2] as number[]
       return { rowCount: 1 }
     }
-    if (sql.includes('SUM(points * stack_factor)')) return { rows: [{ points: 1234.4 }] }
     if (sql.includes('UPDATE users SET score_refreshed_at')) return { rowCount: 1 }
     return { rows: [], rowCount: 0 }
   })
-  ;(psnTitles as jest.Mock).mockResolvedValue([game(1, 'PS5', 'k1-new'), game(2, 'PS4', 'k2'), game(3, 'PS5', 'k3'), game(4, 'PS3', 'k4')])
+  ;(psnTitlesCore as jest.Mock).mockResolvedValue([game(1, 'PS5', 'k1-new'), game(2, 'PS4', 'k2'), game(3, 'PS5', 'k3'), game(4, 'PS3', 'k4')])
   ;(psnGameTrophies as jest.Mock).mockResolvedValue([trophy(true, 60), trophy(true, 30), trophy(false, 5), trophy(false, 2), trophy(false, 1)])
 })
 
@@ -92,6 +111,26 @@ describe('refreshScore', () => {
     expect(client.query).toHaveBeenCalledWith('COMMIT')
   })
 
+  it('keeps the PSN completion bonus on the old platinum day when a later DLC sync lands', async () => {
+    stored = []
+    ;(psnTitlesCore as jest.Mock).mockResolvedValue([game(1, 'PS5', '2026-03-01T00:00:00Z')])
+    ;(psnGameTrophies as jest.Mock).mockResolvedValue([
+      { ...trophy(true, 2), type: 'platinum', groupId: 'default', earnedAt: '2021-05-10T10:00:00Z' },
+      { ...trophy(true, 30), id: 2, groupId: '001', earnedAt: '2026-03-01T00:00:00Z' },
+    ])
+
+    await refreshScore(7, Date.now() + 10_000)
+    const times = writes[0].unlocks.map(([time]) => time)
+    expect(times).toContain(Math.floor(Date.parse('2021-05-10T00:00:00Z') / 1000))
+    expect(times).toContain(Math.floor(Date.parse('2026-03-01T00:00:00Z') / 1000))
+  })
+
+  it('keeps hidden score rows so unhide restores their aggregates without an upstream read', async () => {
+    stored.push({ game_id: '3', account: 'acc', title: 'Game 3', points: 200, change_key: 'k3', rules_version: RULES_VERSION, provisional: false, flag: null })
+    await refreshScore(7, Date.now() + 10_000)
+    expect([...(kept ?? [])].sort()).toEqual([1, 2, 3])
+  })
+
   it('out of time, a moved game stands in from the list and the fill is unfinished', async () => {
     stored = []
     const result = await refreshScore(7, Date.now() - 1)
@@ -102,7 +141,7 @@ describe('refreshScore', () => {
   })
 
   it('a private platform keeps its scores and settles as an error to show', async () => {
-    ;(psnTitles as jest.Mock).mockRejectedValue(new PsnError('privacy settings'))
+    ;(psnTitlesCore as jest.Mock).mockRejectedValue(new PsnError('privacy settings'))
     const result = await refreshScore(7, Date.now() + 10_000)
     expect(writes).toEqual([])
     expect(kept).toBeNull()
@@ -112,7 +151,7 @@ describe('refreshScore', () => {
   it('PSN goes gently: 100 games a pass, and stops when Sony or the app-wide budget says so', async () => {
     stored = []
     userRow = user({ psnaccountid: 'acc' })
-    ;(psnTitles as jest.Mock).mockResolvedValue(Array.from({ length: 130 }, (_, i) => game(100 + i, 'PS5', `k${i}`)))
+    ;(psnTitlesCore as jest.Mock).mockResolvedValue(Array.from({ length: 130 }, (_, i) => game(100 + i, 'PS5', `k${i}`)))
     let result = await refreshScore(7, Date.now() + 10_000)
     expect(psnGameTrophies).toHaveBeenCalledTimes(100)
     expect(result.platforms.psn).toMatchObject({ read: 100, total: 130, state: 'reading' })
@@ -171,6 +210,27 @@ describe('refreshScore', () => {
     delete process.env.STEAM_API_KEY
   })
 
+  it('a Steam game moves with its minutes, though Steam sends no date (#113)', async () => {
+    userRow = user({ steamid: 's1' })
+    process.env.STEAM_API_KEY = 'key'
+    const row = (id: number, key: string) => ({ game_id: String(id), account: 's1', title: `G${id}`, points: 10, change_key: key, rules_version: RULES_VERSION, provisional: false, flag: null })
+    // Scored before the fix: an empty key for every game of an account that is not the key's owner.
+    stored = [row(1, '1874:0'), row(2, '')]
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { game_count: 3, games: [
+      { appid: 1, name: 'Portal 2', playtime_forever: 1874, has_community_visible_stats: true },
+      { appid: 2, name: 'Hades', playtime_forever: 3410, playtime_2weeks: 95, has_community_visible_stats: true },
+      { appid: 3, name: 'Terraria', playtime_forever: 610, has_community_visible_stats: true },
+    ] } })
+    ;(fetchPlayerAchievements as jest.Mock).mockResolvedValue([{ apiname: 'A', achieved: 1, unlocktime: 1_760_000_000 }])
+
+    await refreshScore(7, Date.now() + 10_000)
+    expect((fetchPlayerAchievements as jest.Mock).mock.calls.map(([, appId]) => appId).sort()).toEqual([2, 3])
+    expect(writes.map((w) => w.game_id).sort()).toEqual([2, 3])
+    // The library read keeps the hours seen, for the dates.
+    expect(withLastPlayed).toHaveBeenCalledWith({ id: '7', steamid: 's1', apiKey: 'key' }, expect.anything())
+    delete process.env.STEAM_API_KEY
+  })
+
   it('a Steam library that reads as empty is a private profile', async () => {
     userRow = user({ steamid: 's1' })
     process.env.STEAM_API_KEY = 'key'
@@ -199,11 +259,30 @@ describe('refreshScore', () => {
   })
 })
 
+test("Xbox's spent quota does not hold the fill up: its estimate stands (the ring stuck at 99 %)", async () => {
+  userRow = user({ psnaccountid: 'acc', xboxxuid: 'xuid' })
+  ;(xboxLibrary as jest.Mock).mockResolvedValue([xboxGameFixture({ id: 11 }), xboxGameFixture({ id: 12 })])
+  ;(xboxGameAchievements as jest.Mock).mockRejectedValue(new XboxError('rate-limited', 'quota'))
+  let result = await refreshScore(7, Date.now() + 10_000)
+  expect(result.platforms.xbox).toMatchObject({ state: 'estimated', error: 'busy' })
+  expect(result.complete).toBe(true)
+
+  ;(xboxLibrary as jest.Mock).mockRejectedValue(new XboxError('rate-limited', 'quota'))
+  result = await refreshScore(7, Date.now() + 10_000)
+  expect(result.platforms.xbox).toMatchObject({ state: 'estimated', error: 'busy' })
+  expect(result.complete).toBe(true)
+})
+
+test('Xbox score reads at most two changed games per pass', () => {
+  expect(PACE.xbox).toMatchObject({ concurrency: 1, perPass: 2 })
+})
+
 describe('classifyFailure', () => {
   it('tells what the user can fix from what to wait out', () => {
     expect(classifyFailure('ra', { status: 401 })).toBe('key')
     expect(classifyFailure('ra', { status: 429 })).toBe('busy')
     expect(classifyFailure('psn', new PsnError('privacy'))).toBe('private')
+    expect(classifyFailure('xbox', new XboxError('rate-limited', 'quota'))).toBe('busy')
     expect(classifyFailure('xbox', new Error('down'))).toBe('unavailable')
   })
 })
@@ -219,6 +298,18 @@ describe('passes and their status', () => {
     expect(query.mock.calls.some(([sql]) => sql === 'UPDATE users SET score_refreshed_at = now() WHERE id = $1')).toBe(true)
   })
 
+  it("the total a pass reports is the header's: vaultTotals, Xbox only for an admin (LB-02)", async () => {
+    ;(readCache as jest.Mock).mockResolvedValue(null)
+    ;(vaultTotals as jest.Mock).mockResolvedValue(new Map([[7, 800]]))
+    userRow = user({ psnaccountid: 'acc', admin: true })
+    expect(await runScorePass(7, 10_000)).toMatchObject({ points: 800 })
+    expect(vaultTotals).toHaveBeenLastCalledWith([7], true)
+
+    userRow = user({ psnaccountid: 'acc', admin: false })
+    await runScorePass(7, 10_000)
+    expect(vaultTotals).toHaveBeenLastCalledWith([7], false)
+  })
+
   it('an unfinished pass leaves the row free for the next one', async () => {
     stored = []
     ;(readCache as jest.Mock).mockResolvedValue(null)
@@ -229,12 +320,12 @@ describe('passes and their status', () => {
   it('continueFill answers a fresh, complete status without a pass, and never runs two at once', async () => {
     ;(readCache as jest.Mock).mockResolvedValue({ complete: true, running: false, points: 9, updatedAt: new Date().toISOString(), platforms: {} })
     await continueFill(7, 10_000)
-    expect(psnTitles).not.toHaveBeenCalled()
+    expect(psnTitlesCore).not.toHaveBeenCalled()
 
     ;(readCache as jest.Mock).mockResolvedValue({ complete: false, running: true, points: 9, updatedAt: new Date().toISOString(), platforms: {} })
     query.mockImplementationOnce(async () => ({ rowCount: 0 }))
     expect(await continueFill(7, 10_000)).toMatchObject({ running: true })
-    expect(psnTitles).not.toHaveBeenCalled()
+    expect(psnTitlesCore).not.toHaveBeenCalled()
   })
 
   it('a platform just linked says "calculating" at once', async () => {

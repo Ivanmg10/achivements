@@ -1,0 +1,147 @@
+'use client'
+
+import { useState } from 'react'
+import { IconInbox } from '@tabler/icons-react'
+import Button from '@/components/ui/Button'
+import Modal from '@/components/ui/Modal'
+import Notice from '@/components/ui/Notice'
+import SearchInput from '@/components/ui/SearchInput'
+import Spinner from '@/components/ui/Spinner'
+import ErrorRetry from '@/components/ui/ErrorRetry'
+import { notify } from '@/lib/notify'
+import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
+import { MENU_SURFACE, menuItemClass } from '@/components/ui/menu'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
+import { SURFACE } from '@/components/ui/surface'
+import EmptyState from '@/components/empty-state/EmptyState'
+import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
+
+/** What the site says back: notices, toasts, dialogs, menus, tooltips and the empty state. */
+export default function DesignCatalogFeedback() {
+  const [open, setOpen] = useState<'default' | 'danger' | 'top' | 'toolbar' | null>(null)
+
+  return (
+    <>
+      <DesignCatalogPiece id="notice">
+        <Panel>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Notice tone="info">Your points are being calculated. You can keep using the site.</Notice>
+            <Notice tone="success">Steam linked. You can see your games.</Notice>
+            <Notice tone="warning" title="Your email is not confirmed" action={<Button size="sm" variant="secondary">Resend</Button>}>Check your inbox.</Notice>
+            <Notice tone="danger">That could not be saved.</Notice>
+          </div>
+        </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="error-retry">
+        <Compare>
+          <ErrorRetry message="Could not load the trophies." retryLabel="Retry" onRetry={() => {}} />
+          <ErrorRetry message="Could not load the trophies." hint="The profile is private: make the trophies public on PlayStation and try again." retryLabel="Retry" onRetry={() => {}} />
+        </Compare>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="spinner">
+        <Panel>
+          <Specimen name="sm · md · inside a loading Button">
+            <Spinner size="sm" />
+            <Spinner />
+            <Button loading>Saving…</Button>
+          </Specimen>
+        </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="toast">
+        <Panel>
+          <Specimen name="notify.success / notify.error">
+            <Button size="sm" variant="secondary" onClick={() => notify.success('Saved')}>Success toast</Button>
+            <Button size="sm" variant="secondary" onClick={() => notify.error('Could not save')}>Error toast</Button>
+          </Specimen>
+        </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="modal">
+        <Panel>
+          <Specimen name="default and tone=&quot;danger&quot;">
+            <Button size="sm" variant="secondary" onClick={() => setOpen('default')}>Open a modal</Button>
+            <Button size="sm" variant="danger" onClick={() => setOpen('danger')}>Open a danger modal</Button>
+          </Specimen>
+          <Specimen name="toolbar: a picker's search, fixed between the head and the scrolling body">
+            <Button size="sm" variant="secondary" onClick={() => setOpen('toolbar')}>Open a picker</Button>
+          </Specimen>
+          <Specimen name="placement=&quot;top&quot;: a command panel or a menu">
+            <Button size="sm" variant="secondary" onClick={() => setOpen('top')}>Open a panel near the top</Button>
+          </Specimen>
+        </Panel>
+        <Modal isOpen={open === 'default'} onClose={() => setOpen(null)} title="A modal" hint="Escape and a click outside close it; focus stays inside." size="sm">
+          <p className="text-sm text-text-secondary">A dialog on the page, a sheet on a phone.</p>
+        </Modal>
+        <Modal
+          isOpen={open === 'toolbar'}
+          onClose={() => setOpen(null)}
+          title="A picker"
+          size="md"
+          toolbar={<SearchInput aria-label="Search" placeholder="Search" />}
+        >
+          {Array.from({ length: 24 }, (_, i) => (
+            <p key={i} className="text-sm text-text-secondary">Row {i + 1}: the list scrolls under the search, which never moves.</p>
+          ))}
+        </Modal>
+        <Modal isOpen={open === 'top'} onClose={() => setOpen(null)} placement="top" title="A panel near the top" size="md">
+          <p className="text-sm text-text-secondary">Near the top on every screen, never a sheet: the search and the phone menu.</p>
+        </Modal>
+        <Modal
+          isOpen={open === 'danger'}
+          onClose={() => setOpen(null)}
+          tone="danger"
+          title="Delete it?"
+          hint="It cannot be undone."
+          size="sm"
+          footer={<><Button variant="quiet" size="sm" onClick={() => setOpen(null)}>Cancel</Button><Button variant="danger" size="sm" onClick={() => setOpen(null)}>Delete</Button></>}
+        >
+          <p className="text-sm text-text-secondary">A confirmation that destroys something is an alert dialog.</p>
+        </Modal>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="skeleton">
+        <Compare>
+          <div className="flex flex-col gap-4">
+            <Specimen name="radius: line · tag · tile · card · circle">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton radius="tag" className="h-6 w-16" />
+              <Skeleton radius="tile" className="h-12 w-12" />
+              <Skeleton radius="card" className="h-12 w-20" />
+              <Skeleton radius="circle" className="h-12 w-12" />
+            </Specimen>
+            <div className={`${SURFACE} p-4 flex items-center gap-3`}>
+              <Skeleton radius="circle" className="w-12 h-12 shrink-0" />
+              <div className="flex flex-col gap-2 flex-1">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-3 w-1/3" />
+              </div>
+            </div>
+            <GameRowSkeleton />
+          </div>
+        </Compare>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="menu">
+        <Panel>
+          <div className="flex flex-wrap items-start gap-8">
+            <Specimen name="MENU_SURFACE · menuItemClass">
+              <div className={`${MENU_SURFACE} w-48`}>
+                <span className={menuItemClass(true)}>Pin to home</span>
+                <span className={menuItemClass()}>Add to a group</span>
+              </div>
+            </Specimen>
+            <Specimen name="TOOLTIP_SURFACE"><span className={`${TOOLTIP_SURFACE} px-2.5 py-1.5 text-xs`}>Pin to home</span></Specimen>
+          </div>
+        </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="empty">
+        <Panel><EmptyState icon={<IconInbox className="w-6 h-6" />} title="Nothing here yet" subtitle="An empty state says what is missing and what to do." size="compact" /></Panel>
+      </DesignCatalogPiece>
+    </>
+  )
+}

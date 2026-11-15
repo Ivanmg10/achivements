@@ -43,11 +43,21 @@ describe('buildShelves, in progress', () => {
   })
 })
 
-test('completed: the latest nine on show, the rest as earlier ones', () => {
-  const list = Array.from({ length: 11 }, (_, d) => steam(`c${d}`, 100, d * 40))
+test('completed: the latest nine base dates on show, the rest as earlier ones', () => {
+  const list = Array.from({ length: 11 }, (_, d) => ({ ...steam(`c${d}`, 100, 0), completedAt: daysAgo(d * 40) }))
   const s = shelves(list, 'completed')
   expect(s.recent).toEqual(['c0', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8'])
   expect(s.older).toEqual(['c9', 'c10'])
+})
+
+test('completed: unknown base dates stay out of recent even after newer activity', () => {
+  const list = [
+    { ...steam('dated', 100, 200), completedAt: daysAgo(200) },
+    steam('undated-recent-activity', 100, 0),
+  ]
+  const s = shelves(list, 'completed')
+  expect(s.recent).toEqual(['dated'])
+  expect(s.older).toEqual(['undated-recent-activity'])
 })
 
 test('want to play: the shortest games first, the rest by name', () => {
@@ -57,6 +67,22 @@ test('want to play: the shortest games first, the rest by name', () => {
   expect(s.backlog).toBeUndefined()
   const many = Array.from({ length: 11 }, (_, i) => steam(`g${i}`, null, null, { maxPossible: 10 + i }))
   expect(shelves(many, 'wantToPlay').backlog).toEqual(['g10', 'g9'])
+})
+
+test('all games: what was played this week, then one shelf per status, each opening its own filter', () => {
+  const list = [
+    steam('recent', 50, 2, {}),
+    steam('old-play', 30, 40),
+    steam('done', 100, 100),
+    steam('pending', null, null),
+  ]
+  const [recent, oldPlay, done, pending] = list
+  Object.assign(recent, { status: 'playing' })
+  Object.assign(oldPlay, { status: 'playing' })
+  Object.assign(done, { status: 'completed', completedAt: daysAgo(100) })
+  Object.assign(pending, { status: 'wantToPlay' })
+  expect(shelves(list, 'all')).toEqual({ continue: ['recent'], playing: ['old-play'], completed: ['done'], wantToPlay: ['pending'] })
+  expect(buildShelves(list, 'all', NOW).map((s) => s.quick)).toEqual(['all', 'playing', 'completed', 'wantToPlay'])
 })
 
 describe('entries of any platform', () => {

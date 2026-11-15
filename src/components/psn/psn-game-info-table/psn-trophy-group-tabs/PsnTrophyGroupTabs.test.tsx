@@ -62,6 +62,6 @@ test('a complete group shows its count in the "done" colour; the selected one is
   const [, base, dlc] = screen.getAllByRole('tab')
   expect(base.querySelector('.tabular-nums')!.className).toContain('text-success')
   expect(dlc.querySelector('.tabular-nums')!.className).not.toContain('text-success')
-  expect(dlc.className).toContain('font-semibold')
-  expect(base.className).not.toContain('font-semibold')
+  expect(dlc.className).toContain('ring-accent/50')
+  expect(base.className).not.toContain('ring-accent/50')
 })

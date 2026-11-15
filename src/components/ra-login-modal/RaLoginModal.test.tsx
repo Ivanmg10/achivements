@@ -27,22 +27,22 @@ test('does not render when closed', () => {
 
 test('renders form when open', () => {
   render(<RaLoginModal isOpen={true} setIsOpen={jest.fn()} />)
-  expect(screen.getByPlaceholderText('Username')).toBeInTheDocument()
+  expect(screen.getByLabelText(en.raLoginModal.username)).toBeInTheDocument()
   expect(screen.getByLabelText(en.raLoginModal.apiKey)).toBeInTheDocument()
 })
 
 test('submitting with empty fields does nothing', async () => {
   render(<RaLoginModal isOpen={true} setIsOpen={jest.fn()} />)
-  fireEvent.click(screen.getByText('Sign in'))
+  fireEvent.click(screen.getByText('Connect'))
   expect(fetch).not.toHaveBeenCalled()
 })
 
 test('successful login closes modal', async () => {
   const setIsOpen = jest.fn()
   render(<RaLoginModal isOpen={true} setIsOpen={setIsOpen} />)
-  fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'ivan' } })
+  fireEvent.change(screen.getByLabelText(en.raLoginModal.username), { target: { value: 'ivan' } })
   fireEvent.change(screen.getByLabelText(en.raLoginModal.apiKey), { target: { value: 'apikey123' } })
-  fireEvent.click(screen.getByText('Sign in'))
+  fireEvent.click(screen.getByText('Connect'))
   await waitFor(() => expect(setIsOpen).toHaveBeenCalledWith(false))
 })
 
@@ -55,9 +55,9 @@ test('closes modal via backdrop (onClose)', () => {
 })
 
 function submit(apiKey = 'apikey123') {
-  fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'ivan' } })
+  fireEvent.change(screen.getByLabelText(en.raLoginModal.username), { target: { value: 'ivan' } })
   fireEvent.change(screen.getByLabelText(en.raLoginModal.apiKey), { target: { value: apiKey } })
-  fireEvent.click(screen.getByText('Sign in'))
+  fireEvent.click(screen.getByText('Connect'))
 }
 
 test('sends only the username and key, to the route that asks RA itself, then re-reads the session', async () => {
@@ -84,7 +84,7 @@ test.each([
   expect(await screen.findByRole('alert')).toHaveTextContent(message)
   expect(setIsOpen).not.toHaveBeenCalled()
   expect(mockUpdate).not.toHaveBeenCalled()
-  expect(screen.getByText('Sign in')).toBeInTheDocument()
+  expect(screen.getByText('Connect')).toBeInTheDocument()
 })
 
 test('says it failed when the network is down, and the button comes back', async () => {
@@ -93,7 +93,7 @@ test('says it failed when the network is down, and the button comes back', async
   render(<RaLoginModal isOpen={true} setIsOpen={jest.fn()} />)
   submit()
   expect(await screen.findByRole('alert')).toHaveTextContent(en.raLoginModal.error)
-  expect(screen.getByText('Sign in')).toBeInTheDocument()
+  expect(screen.getByText('Connect')).toBeInTheDocument()
 })
 
 test('says where the RetroAchievements key lives, with a link to it', () => {
@@ -102,4 +102,17 @@ test('says where the RetroAchievements key lives, with a link to it', () => {
   expect(screen.getByRole('link', { name: en.connect.raKeyHelp }).getAttribute('href')).toBe(
     'https://retroachievements.org/settings',
   )
+})
+
+test('the key is a secret: a password field with a visible label, and the username has its label too', () => {
+  render(<RaLoginModal isOpen={true} setIsOpen={jest.fn()} />)
+  expect(screen.getByLabelText(en.raLoginModal.apiKey)).toHaveAttribute('type', 'password')
+  expect(screen.getByLabelText(en.raLoginModal.username)).not.toHaveAttribute('placeholder')
+})
+
+test('Connect is the primary action of the footer, with a quiet Cancel beside it', () => {
+  const setIsOpen = jest.fn()
+  render(<RaLoginModal isOpen={true} setIsOpen={setIsOpen} />)
+  fireEvent.click(screen.getByRole('button', { name: en.editProfileModal.cancel }))
+  expect(setIsOpen).toHaveBeenCalledWith(false)
 })

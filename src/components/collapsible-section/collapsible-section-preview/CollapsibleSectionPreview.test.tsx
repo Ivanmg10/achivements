@@ -26,7 +26,7 @@ test('no bar when there is no progress to show', () => {
 
 test('placeholders while loading, nothing when empty', () => {
   const { container, rerender } = render(<CollapsibleSectionPreview games={[]} loading />)
-  expect(container.querySelectorAll('.animate-pulse')).toHaveLength(3)
+  expect(container.querySelector('[aria-busy="true"]')!.children).toHaveLength(3)
   rerender(<CollapsibleSectionPreview games={[]} />)
   expect(container.innerHTML).toBe('')
 })

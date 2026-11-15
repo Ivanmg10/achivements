@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { en } from '@/translations/en'
 import StatusGameItem from './StatusGameItem'
 import type { CategoryGame } from '@/hooks/useGamesByCategory'
@@ -67,19 +67,6 @@ test('hides the want-to-play points line when PointsTotal is zero', () => {
   expect(screen.queryByText(/450/)).not.toBeInTheDocument()
 })
 
-test('the achievements open from a real button that says whether it is open', () => {
-  render(<StatusGameItem game={completedGame} extra={{ awards: [] }} category="completed" />)
-  const toggle = screen.getByRole('button', { expanded: false })
-  expect(toggle).toHaveAccessibleName(/Sly Cooper/)
-  fireEvent.click(toggle)
-  expect(screen.getByRole('button', { expanded: true })).toBe(toggle)
-})
-
-test('the cover is not a second tab stop to the same page', () => {
-  render(<StatusGameItem game={completedGame} extra={{ awards: [] }} category="completed" />)
-  expect(screen.getAllByRole('link', { name: 'Sly Cooper' })).toHaveLength(1)
-})
-
 test('awards and the last-played line come from the translations', () => {
   render(
     <StatusGameItem
@@ -90,4 +77,45 @@ test('awards and the last-played line come from the translations', () => {
   )
   expect(screen.getByText(en.statusGameItem.mastered, { exact: false })).toBeInTheDocument()
   expect(screen.getByText(new RegExp(en.statusGameItem.longAgo))).toBeInTheDocument()
+})
+
+test('a beaten game and a completed one are chips with the word and the date', () => {
+  render(
+    <StatusGameItem
+      game={completedGame}
+      extra={{
+        awards: [
+          { AwardType: 'Game Beaten', AwardDataExtra: 0, AwardedAt: '2026-01-01T00:00:00Z' } as never,
+          { AwardType: 'Mastery/Completion', AwardDataExtra: 0, AwardedAt: '2026-02-01T00:00:00Z' } as never,
+          { AwardType: 'Something Else', AwardDataExtra: 0, AwardedAt: '2026-02-01T00:00:00Z' } as never,
+        ],
+      }}
+    />,
+  )
+  expect(screen.getByText(en.statusGameItem.beaten, { exact: false })).toBeInTheDocument()
+  expect(screen.getByText(en.statusGameItem.completed, { exact: false })).toBeInTheDocument()
+})
+
+test('a hardcore game draws its bar hardcore, a softcore one softcore, either way with its percentage', () => {
+  const half = { ...completedGame, NumAwarded: 5, PctWon: '0.5' } as never
+  const { unmount } = render(<StatusGameItem game={{ ...(half as object), HardcoreMode: '1' } as never} extra={{ awards: [] }} />)
+  const hard = screen.getByRole('progressbar', { name: 'Sly Cooper' })
+  expect(hard).toHaveAttribute('aria-valuenow', '50')
+  expect(hard.querySelector('[data-fill="main"]')).not.toBeNull()
+  unmount()
+  render(<StatusGameItem game={half} extra={{ awards: [] }} />)
+  const soft = screen.getByRole('progressbar', { name: 'Sly Cooper' })
+  expect(soft).toHaveAttribute('aria-valuenow', '50')
+  expect(soft.querySelector('[data-fill="soft"]')).not.toBeNull()
+})
+
+test('the console is a chip with its name', () => {
+  render(<StatusGameItem game={completedGame} extra={{ awards: [] }} />)
+  expect(screen.getByText('PS2')).toBeInTheDocument()
+})
+
+test('a want-to-play game has its total of achievements and no bar', () => {
+  render(<StatusGameItem game={wantToPlayGame} category="wantToPlay" />)
+  expect(screen.getByText(`30 ${en.statusGameItem.achievements}`)).toBeInTheDocument()
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
 })

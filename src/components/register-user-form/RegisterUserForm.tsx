@@ -2,12 +2,17 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { signIn } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
-import Spinner from '@/components/main-spinner/Spinner'
-import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
+import AuthTitle from '@/components/auth-title/AuthTitle'
+import WelcomeEntryCurtain from '@/components/welcome-entry-curtain/WelcomeEntryCurtain'
+import { useWelcomeEntry } from '@/hooks/useWelcomeEntry'
+import { signupError } from '@/utils/apiErrors'
 import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
+import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
 
 export default function RegisterUserForm({
   setIsLogin,
@@ -23,6 +28,8 @@ export default function RegisterUserForm({
   const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string; email?: string }>({})
   const [submitting, setSubmitting] = useState(false)
   const { T } = useLanguage()
+  const entry = useWelcomeEntry()
+  const [entering, setEntering] = useState(false)
 
   const usernameRule = T.registerForm.usernameRule
     .replace('{min}', String(USERNAME_MIN))
@@ -58,16 +65,29 @@ export default function RegisterUserForm({
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password, email: email.trim() }),
+        body: JSON.stringify({
+          username: username.trim(),
+          password,
+          email: email.trim(),
+        }),
       })
 
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setError(data.error === 'email-taken' ? T.registerForm.emailTaken : data.error || T.registerForm.errorCreating)
+        setError(signupError(data.error, T))
         setSubmitting(false)
         return
       }
 
+      // Signed in at once and on to the welcome; if that sign-in fails, the account
+      // exists all the same, so the login form says so and asks for it.
+      const signedIn = await signIn('credentials', { username: username.trim(), password, redirect: false }).catch(() => null)
+      if (signedIn?.ok) {
+        // Into the welcome under the curtain; the button stays busy until the page goes.
+        setEntering(true)
+        entry.go()
+        return
+      }
       setIsLogin(true)
       setIsRegister(true)
     } catch {
@@ -78,15 +98,11 @@ export default function RegisterUserForm({
 
   return (
     <div className="w-full max-w-sm mx-auto">
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-text-main">{T.registerForm.title}</h1>
-        <div className="mt-2 h-0.5 w-10 bg-accent mx-auto rounded-full" />
-      </div>
+      {entering && entry.animate && <WelcomeEntryCurtain phase="leaving" />}
+      <AuthTitle>{T.registerForm.title}</AuthTitle>
 
       {error && (
-        <div role="alert" className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3">
-          <p className="text-sm text-danger">{error}</p>
-        </div>
+        <Notice tone="danger" className="mb-5">{error}</Notice>
       )}
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
@@ -137,26 +153,19 @@ export default function RegisterUserForm({
           disabled={submitting}
         />
 
-        <button
+        <Button
           type="submit"
-          disabled={submitting}
-          className="bg-accent text-bg-main w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main"
+          loading={submitting}
+          size="lg" className="w-full mt-2"
         >
-          {submitting ? (
-            <>
-              <Spinner size={16} />
-              {T.registerForm.creating}
-            </>
-          ) : (
+          {submitting ? (T.registerForm.creating) : (
             <>
               {T.registerForm.createAccount}
               <IconArrowRight size={16} aria-hidden="true" />
             </>
           )}
-        </button>
+        </Button>
       </form>
-
-      <SteamSignInDivider />
 
       <p className="text-text-secondary text-xs text-center mt-4">
         {T.registerForm.acceptTerms.split(/(\{terms\}|\{privacy\})/).map((part, i) =>
@@ -175,7 +184,7 @@ export default function RegisterUserForm({
         <button
           type="button"
           onClick={() => setIsLogin(true)}
-          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-ring"
         >
           {T.registerForm.alreadyHaveAccountAction}
         </button>

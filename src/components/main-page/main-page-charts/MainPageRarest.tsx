@@ -10,11 +10,14 @@ import { gameHref } from '@/utils/gameRef'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import { useLanguage } from '@/context/LanguageContext'
-import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { steamAchievementAnchor } from '@/utils/steamTitles'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { useSubject } from '@/context/SubjectContext'
+import { decimal } from '@/utils/utils'
+import { raBadgeUrl } from '@/utils/raAssets'
+import Kicker from '@/components/ui/Kicker'
 
 const SHOWN = 6
 
@@ -39,7 +42,7 @@ export default function MainPageRarest({
   xboxAchievements?: XboxRecentAchievement[]
   isLoading?: boolean
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   const rows = useMemo(() => {
     const ra: Row[] = achievements
@@ -48,22 +51,22 @@ export default function MainPageRarest({
       .map((a) => ({
         key: `ra:${a.AchievementID}`,
         href: a.GameID ? gameHref('ra', a.GameID, subject) : '#',
-        imageUrl: `https://media.retroachievements.org/Badge/${a.BadgeName}.png`,
+        imageUrl: raBadgeUrl(a.BadgeName),
         title: a.Title,
         subtitle: a.GameTitle,
         stat: String(a.TrueRatio),
-        statLabel: T.cards.trueRatio,
+        statLabel: T.profileStats.truePoints,
       }))
     const steam: Row[] = steamAchievements
       .filter((a): a is SteamRecentAchievement & { globalPct: number } => typeof a.globalPct === 'number')
       .sort((a, b) => a.globalPct - b.globalPct)
       .map((a) => ({
         key: `steam:${a.appId}:${a.apiname}`,
-        href: `${gameHref('steam', a.appId, subject)}#${achievementAnchor(a.apiname)}`,
+        href: `${gameHref('steam', a.appId, subject)}#${steamAchievementAnchor(a.apiname)}`,
         imageUrl: a.badgeUrl || undefined,
         title: a.title,
         subtitle: a.gameTitle,
-        stat: `${a.globalPct.toFixed(1)}%`,
+        stat: `${decimal(a.globalPct, lang)}%`,
         statLabel: T.cards.steamRarityLabel,
       }))
     const psn: Row[] = psnTrophies
@@ -75,7 +78,7 @@ export default function MainPageRarest({
         imageUrl: t.iconUrl || undefined,
         title: t.name,
         subtitle: t.gameTitle,
-        stat: `${t.rarity.toFixed(1)}%`,
+        stat: `${decimal(t.rarity, lang)}%`,
         statLabel: T.cards.steamRarityLabel,
       }))
     const xbox: Row[] = xboxAchievements
@@ -87,7 +90,7 @@ export default function MainPageRarest({
         imageUrl: a.iconUrl || undefined,
         title: a.name,
         subtitle: a.gameTitle,
-        stat: `${a.rarity.toFixed(1)}%`,
+        stat: `${decimal(a.rarity, lang)}%`,
         statLabel: T.cards.steamRarityLabel,
       }))
     const lists = [ra, steam, psn, xbox]
@@ -96,14 +99,14 @@ export default function MainPageRarest({
       for (const list of lists) if (i < list.length && merged.length < SHOWN) merged.push(list[i])
     }
     return merged
-  }, [achievements, steamAchievements, psnTrophies, xboxAchievements, T, subject])
+  }, [achievements, steamAchievements, psnTrophies, xboxAchievements, T, lang, subject])
 
-  if (isLoading) return <SkeletonGameList count={4} />
+  if (isLoading) return <SkeletonGameList count={7} />
 
   if (rows.length === 0) {
     return (
       <div className="flex flex-col gap-2 h-full">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.rarestUnlocks}</p>
+        <Kicker>{T.cards.rarestUnlocks}</Kicker>
         <EmptyState
           icon={<IconSparkles className="w-6 h-6" />}
           title={T.cards.noRarityData}
@@ -117,10 +120,10 @@ export default function MainPageRarest({
 
   return (
     <div className="flex flex-col gap-2 flex-1">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.rarestUnlocks}</p>
-      <div className="flex flex-col gap-2 flex-1">
+      <Kicker>{T.cards.rarestUnlocks}</Kicker>
+      <div className="flex flex-col gap-2 flex-1 enter-rows">
         {rows.map(({ key, ...row }) => (
-          <GameListRow key={key} {...row} statClassName="text-yellow-400" />
+          <GameListRow key={key} {...row} statClassName="text-hardcore" />
         ))}
       </div>
     </div>

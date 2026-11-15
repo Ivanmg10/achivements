@@ -3,6 +3,12 @@ import { useLibraryPrefs } from './useLibraryPrefs'
 
 beforeEach(() => localStorage.clear())
 
+test('the mixed Completed list opens on when each game was completed; RA\'s own keeps its order', () => {
+  const { result } = renderHook(() => useLibraryPrefs('completed'))
+  expect(result.current.allSortState).toEqual({ key: 'completed', dir: 'desc' })
+  expect(result.current.sortState).toEqual({ key: 'lastPlayed', dir: 'desc' })
+})
+
 test('starts from the category\'s default order, two columns, platforms apart', () => {
   const { result } = renderHook(() => useLibraryPrefs('playing'))
   expect(result.current.sortState).toEqual({ key: 'lastPlayed', dir: 'desc' })

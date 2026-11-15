@@ -9,3 +9,10 @@ test('all, then each platform; the current one pressed', () => {
   expect(onChange).toHaveBeenCalledWith('steam')
   expect(screen.getByRole('button', { name: /RetroAchievements/ })).toBeInTheDocument()
 })
+
+test('the chips are one row that scrolls sideways, never two rows (#165, H2)', () => {
+  render(<AddGameModalPlatforms sources={['ra', 'steam', 'psn']} value={null} onChange={jest.fn()} />)
+  const row = screen.getByRole('group')
+  expect(row).toHaveClass('overflow-x-auto')
+  expect(row).not.toHaveClass('flex-wrap')
+})

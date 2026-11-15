@@ -4,15 +4,16 @@ import { profileTeaser } from '@/lib/rankings'
 import { levelOf, tierOf } from '@/utils/vaultLevel'
 import { en } from '@/translations/en'
 import SiteImage from '@/app/opengraph-image'
+import { PLATFORM_NAME } from '@/utils/gameRef'
 
 export const alt = 'A CheevoVault profile: level and Vault Points'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
 const PLATFORMS = [
-  { source: 'ra', name: 'RetroAchievements', color: 'rgb(167 139 250)' },
-  { source: 'steam', name: 'Steam', color: '#66c0f4' },
-  { source: 'psn', name: 'PlayStation', color: '#0070d1' },
+  { source: 'ra', name: PLATFORM_NAME.ra, color: 'rgb(167 139 250)' },
+  { source: 'steam', name: PLATFORM_NAME.steam, color: '#66c0f4' },
+  { source: 'psn', name: PLATFORM_NAME.psn, color: '#0070d1' },
 ] as const
 
 /**

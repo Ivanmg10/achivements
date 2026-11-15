@@ -36,9 +36,18 @@ test('playing: the unlocks chart, the next targets easiest first, and what is le
   expect(screen.getByTestId('grid')).toBeInTheDocument()
 })
 
+test('playing: the story achievements are counted in words, and a beaten game says so', () => {
+  const story = [a('s1', { earned: true, earnedAt: daysAgo(3), kind: 'progression' }), a('s2', { kind: 'win_condition' })]
+  const { unmount } = render(<LibraryGameDetail {...base} category="playing" items={story} />)
+  expect(screen.getByText(L.beaten).nextSibling).toHaveTextContent('1 of 2')
+  unmount()
+  render(<LibraryGameDetail {...base} category="playing" items={[story[0], { ...story[1], earned: true, earnedAt: daysAgo(1) }, a('extra')]} />)
+  expect(screen.getByText(L.beaten).nextSibling).toHaveTextContent(L.storyDone)
+})
+
 test('completed: the rarest earned, when it was finished and how long it took', () => {
   const done = inProgress.slice(0, 3)
-  render(<LibraryGameDetail {...base} category="completed" items={done} ring={{ ...base.ring, earned: 3 }} />)
+  render(<LibraryGameDetail {...base} category="completed" items={done} completedAt={daysAgo(2)} ring={{ ...base.ring, earned: 3 }} />)
   expect(screen.getByTestId('chart')).toBeInTheDocument()
   const rarest = within(screen.getByText(L.rarestEarned).parentElement!).getAllByRole('link')
   expect(rarest.map((l) => l.getAttribute('href'))).toEqual(['/g#done1', '/g#done3', '/g#done2'])
@@ -47,6 +56,12 @@ test('completed: the rarest earned, when it was finished and how long it took', 
   // Nothing is left to do, so no remaining count or pace.
   expect(screen.queryByText(en.gameExpanded.remaining)).not.toBeInTheDocument()
   expect(screen.queryByText(L.pace)).not.toBeInTheDocument()
+})
+
+test('completed: no Finished fact is invented from the latest achievement when the base date is unknown', () => {
+  const done = inProgress.slice(0, 3)
+  render(<LibraryGameDetail {...base} category="completed" items={done} ring={{ ...base.ring, earned: 3 }} />)
+  expect(screen.queryByText(L.finished)).not.toBeInTheDocument()
 })
 
 test('wantToPlay: how hard it is and the easiest way in, no chart, points in total', () => {

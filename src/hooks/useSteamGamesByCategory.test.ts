@@ -54,6 +54,11 @@ test('games with unknown progress appear in no category', () => {
   expect(all.map((g) => g.title)).not.toContain('Unknown')
 })
 
+test('"all" is every game whose status is known, latest played first', () => {
+  const { result } = renderHook(() => useSteamGamesByCategory('all'))
+  expect(result.current.games.map((g) => g.title)).toEqual(['Recent half', 'All done', 'Half done', 'Zeta backlog', 'Alpha backlog'])
+})
+
 test('an unknown category yields nothing', () => {
   const { result } = renderHook(() => useSteamGamesByCategory('bogus'))
   expect(result.current.games).toEqual([])

@@ -2,6 +2,7 @@ jest.mock('@/components/library-entry-cover/LibraryEntryCover', () => ({
   __esModule: true,
   default: ({ entry, shared }: { entry: { key: string }; shared?: boolean }) => <span data-testid="cover" data-shared={String(!!shared)}>{entry.key}</span>,
   entryBackdrop: () => null,
+  entryIcon: () => null,
 }))
 jest.mock('@/components/library-entry-detail/LibraryEntryDetail', () => ({
   __esModule: true,
@@ -65,7 +66,7 @@ describe('the height of the list and of the panel of the game', () => {
   test('until measured, a guess that fits most screens; the panel is a column that scrolls inside', () => {
     render(<LibraryList {...base} selected={entries[0]} wide />)
     expect(aside()).toHaveClass('lg:h-[calc(100dvh-2rem)]', 'lg:flex', 'lg:flex-col', 'lg:overflow-y-auto')
-    expect(list()).toHaveClass('lg:max-h-[calc(100dvh-16rem)]', 'lg:overflow-y-auto')
+    expect(list()).toHaveClass('lg:max-h-[calc(100dvh-16rem)]', 'lg:overflow-y-auto', 'lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)]')
   })
 
   test('once measured, both take what is left of the screen from where they start, the same', () => {

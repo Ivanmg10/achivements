@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
+import { useCallback, useEffect, useMemo } from 'react'
+import { keepAnswer } from '@/lib/lastAnswers'
+import { useAuthSession } from '@/hooks/useAuthSession'
+import { useRetryingRead } from '@/hooks/useRetryingRead'
 import { pinnedKey } from '@/utils/utils'
 import type { PinnedAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 /**
  * The user's own pinned achievements (their goals, "achievements to get") across RA,
@@ -14,59 +17,29 @@ import { notify } from '@/lib/notify'
  * up, `error` is set so the card can say so and offer a retry. Unpinning is
  * optimistic and puts the row back if the request fails.
  */
+const PINS_URL = '/api/favorites?source=all'
+const NONE: PinnedAchievement[] = []
+const asPins = (data: unknown) => (Array.isArray(data) ? (data as PinnedAchievement[]) : NONE)
+
 export function usePinnedAchievements() {
   const { T } = useLanguage()
-  const [pinned, setPinned] = useState<PinnedAchievement[]>([])
-  /** Which load the answer (data or final failure) belongs to; loading is any other being asked for. */
-  const [loadedKey, setLoadedKey] = useState<number | null>(null)
-  const [failed, setFailed] = useState(false)
-  const [reloadKey, setReloadKey] = useState(0)
-  const attemptRef = useRef(0)
+  const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
+  const user = useAuthSession().data?.user?.id
+  const read = useRetryingRead(PINS_URL, { parse: asPins, keepFor: user })
+  const pinned = read.data ?? NONE
+  const { setData: setPinned, refetch } = read
 
+  // What is shown is what the next visit starts from, an unpin or a new order included.
   useEffect(() => {
-    let current = true
-    // This run's own retry timer, cleared when the run is replaced or unmounted.
-    const retryTimer: { current: ReturnType<typeof setTimeout> | undefined } = { current: undefined }
-    attemptRef.current = 0
-
-    function load() {
-      fetchWithRetry('/api/favorites?source=all')
-        .then((data) => {
-          if (!current) return
-          setPinned(Array.isArray(data) ? (data as PinnedAchievement[]) : [])
-          setFailed(false)
-          setLoadedKey(reloadKey)
-          attemptRef.current = 0
-        })
-        .catch((err) => {
-          if (!current) return
-          console.error('[usePinnedAchievements]', err)
-          if (!scheduleRetry(attemptRef, retryTimer, load, err)) {
-            setFailed(true)
-            setLoadedKey(reloadKey)
-          }
-        })
-    }
-
-    load()
-    return () => {
-      current = false
-      clearTimeout(retryTimer.current)
-    }
-  }, [reloadKey])
-
-  const refetch = useCallback(() => {
-    setPinned([])
-    setFailed(false)
-    setReloadKey((k) => k + 1)
-  }, [])
+    if (read.data && !read.error) keepAnswer(user, PINS_URL, read.data)
+  }, [read.data, read.error, user])
 
   const unpin = useCallback(async (fav: PinnedAchievement) => {
     const key = pinnedKey(fav)
     let removedAt = -1
     setPinned((prev) => {
-      removedAt = prev.findIndex((p) => pinnedKey(p) === key)
-      return prev.filter((p) => pinnedKey(p) !== key)
+      removedAt = (prev ?? NONE).findIndex((p) => pinnedKey(p) === key)
+      return (prev ?? NONE).filter((p) => pinnedKey(p) !== key)
     })
     const url =
       fav.source === 'steam'
@@ -84,13 +57,13 @@ export function usePinnedAchievements() {
       console.error('[usePinnedAchievements] unpin', key, err)
       notify.error(T.toast.achievementsFailed)
       setPinned((prev) => {
-        if (prev.some((p) => pinnedKey(p) === key)) return prev
-        const next = [...prev]
+        if (prev?.some((p) => pinnedKey(p) === key)) return prev
+        const next = [...(prev ?? NONE)]
         next.splice(removedAt < 0 ? next.length : removedAt, 0, fav)
         return next
       })
     }
-  }, [T])
+  }, [T, setPinned])
 
   /** Puts the pins in a new order at once, and back (saying so) if it could not be saved. */
   const reorder = useCallback(async (next: PinnedAchievement[]) => {
@@ -108,8 +81,8 @@ export function usePinnedAchievements() {
       notify.error(T.toast.orderFailed)
       setPinned(before)
     }
-  }, [pinned, T])
+  }, [pinned, T, setPinned])
 
-  const answered = loadedKey === reloadKey
-  return { pinned, isLoading: !answered, error: answered && failed, refetch, unpin, reorder }
+  const visible = useMemo(() => hiddenLoading ? [] : pinned.filter((item) => !isHidden(item.game_id, item.source)), [pinned, isHidden, hiddenLoading])
+  return { pinned: visible, isLoading: hiddenLoading || read.isLoading, error: read.error, refetch, unpin, reorder }
 }

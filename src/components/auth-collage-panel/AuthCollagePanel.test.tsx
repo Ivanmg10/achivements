@@ -93,3 +93,13 @@ test('a dead image hides itself instead of leaving a broken icon', () => {
   fireEvent.error(img)
   expect(img.style.visibility).toBe('hidden')
 })
+
+test('the sign-in page\'s wall takes bigger covers, shorter gaps and the page\'s ground from 2560 px; a window keeps its size', () => {
+  const window = render(<AuthCollagePanel />).container
+  expect(window.querySelector('img')!.className).not.toContain('uhd')
+  expect(window.querySelector('.marquee-column')!.className).not.toContain('uhd')
+  const wall = render(<AuthCollagePanel wall />).container
+  expect(wall.querySelector('img')!.className).toContain('uhd:w-32')
+  expect(wall.querySelector('.marquee-column')!.className).toContain('uhd:gap-28')
+  expect((wall.firstElementChild as HTMLElement).className).toContain('uhd:bg-bg-main')
+})

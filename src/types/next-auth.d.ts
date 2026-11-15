@@ -1,8 +1,7 @@
 import { DefaultSession } from "next-auth";
 import { JWT as DefaultJWT } from "next-auth/jwt";
 import { RetroAchievementsUserProfile } from "./types";
-
-type SavedGame = { id: number; title: string; imageIcon: string } | null;
+import type { SavedGame } from "./game";
 
 /** What a session knows about its user. */
 type SessionUserFields = {
@@ -22,6 +21,8 @@ type SessionUserFields = {
   /** Typed in by username, not proven to be the user's; see migrations/024_psn_columns.sql. */
   psnaccountid?: string;
   psnusername?: string;
+  /** A code in the PSN account's About Me proved it is theirs: only then do its trophies count in Vault Points. */
+  psnVerified?: boolean;
   /** Typed in by gamertag, not proven to be the user's; see migrations/033_xbox_columns.sql. Admin-only for now. */
   xboxxuid?: string;
   xboxgamertag?: string;

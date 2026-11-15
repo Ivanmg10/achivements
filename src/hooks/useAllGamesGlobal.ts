@@ -1,8 +1,9 @@
 import { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
-import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
-import { useSession } from 'next-auth/react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo } from 'react'
+import { useAuthSession } from '@/hooks/useAuthSession'
+import { useRetryingRead } from '@/hooks/useRetryingRead'
 import { useGamesData } from '@/context/GamesDataContext'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 export type AllGamesGlobal = {
   wantToPlay: WantToPlayGame[]
@@ -13,54 +14,27 @@ export type AllGamesGlobal = {
   refetch: () => void
 }
 
+const WANT_URL = '/api/getWantPlayGames'
+const NONE: WantToPlayGame[] = []
+const wantResults = (data: unknown) => (data as { Results?: WantToPlayGame[] } | null)?.Results ?? NONE
+
 export function useAllGamesGlobal(): AllGamesGlobal {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useAuthSession()
   const rausername = session?.user?.rausername
+  const { isHidden } = useHiddenGames()
   // Completed/in-progress games are fetched once and shared app-wide via
   // GamesDataContext — don't re-fetch /api/getGamesCompleted here too.
   const { all: allCompleted, isLoading: completedLoading, error: completedError, refetch: refetchCompleted } = useGamesData()
-  const [wantToPlay, setWantToPlay] = useState<WantToPlayGame[]>([])
-  const [wantLoading, setWantLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const fetched = useRef(false)
-  const attemptRef = useRef(0)
-  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
-
-  const doFetch = useCallback(() => {
-    // Named, so a retry can call it again.
-    const run = () => {
-      if (status !== 'authenticated' || !rausername) return
-      const onFail = (err?: unknown) => {
-        if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setWantLoading(false) }
-      }
-      fetchWithRetry('/api/getWantPlayGames')
-        .then((wantData) => {
-          const wantResults: WantToPlayGame[] = (wantData as { Results?: WantToPlayGame[] })?.Results ?? []
-          setWantToPlay(wantResults)
-          setWantLoading(false)
-          attemptRef.current = 0
-        })
-        .catch(onFail)
-    }
-    run()
-  }, [status, rausername])
-
-  useEffect(() => {
-    if (status === 'loading' || status === 'unauthenticated' || fetched.current) return
-    fetched.current = true
-    doFetch()
-  }, [status, doFetch])
-
-  useEffect(() => () => clearTimeout(retryTimer.current), [])
+  // Keyed by the RA account too: another one linked never paints the last one's answers.
+  const user = session?.user?.id ? `${session.user.id}:${session.user.rausername ?? ''}` : undefined
+  const want = useRetryingRead(status === 'authenticated' && rausername ? WANT_URL : null, { parse: wantResults, keepFor: user })
+  const wantToPlay = want.data ?? NONE
+  const refetchWant = want.refetch
 
   const refetch = useCallback(() => {
-    clearTimeout(retryTimer.current)
-    attemptRef.current = 0
-    setWantLoading(true)
-    setError(false)
-    doFetch()
+    refetchWant()
     if (completedError) refetchCompleted()
-  }, [doFetch, completedError, refetchCompleted])
+  }, [refetchWant, completedError, refetchCompleted])
 
   const startedIds = useMemo(
     () => new Set(allCompleted.filter((g) => g.NumAwarded > 0).map((g) => g.GameID)),
@@ -68,8 +42,8 @@ export function useAllGamesGlobal(): AllGamesGlobal {
   )
 
   const filteredWantToPlay = useMemo(
-    () => wantToPlay.filter((g) => !startedIds.has(g.ID ?? g.GameID!) && g.ConsoleName !== 'Events'),
-    [wantToPlay, startedIds],
+    () => wantToPlay.filter((g) => !startedIds.has(g.ID ?? g.GameID!) && g.ConsoleName !== 'Events' && !isHidden(g.ID ?? g.GameID!, 'ra')),
+    [wantToPlay, startedIds, isHidden],
   )
 
   const playing = useMemo(() => {
@@ -95,7 +69,6 @@ export function useAllGamesGlobal(): AllGamesGlobal {
   }, [allCompleted])
 
   // Signed out, or with no RA account, there is no want-to-play list to wait for.
-  const noWantList = status === 'unauthenticated' || (status === 'authenticated' && !rausername)
-
-  return { wantToPlay: filteredWantToPlay, playing, completed, loading: (wantLoading && !noWantList) || completedLoading, error: error || completedError, refetch }
+  const wantLoading = status === 'loading' || want.isLoading
+  return { wantToPlay: filteredWantToPlay, playing, completed, loading: wantLoading || completedLoading, error: want.error || completedError, refetch }
 }

@@ -61,7 +61,7 @@ test('clicking close saves the current order and closes', async () => {
       onSaveOrder={onSaveOrder}
     />,
   )
-  fireEvent.click(screen.getByText('Close'))
+  fireEvent.click(screen.getByText('Done'))
   await Promise.resolve()
   expect(onSaveOrder).toHaveBeenCalledWith(['steam:620', 'ra:1'])
   expect(onClose).toHaveBeenCalled()
@@ -80,7 +80,7 @@ test('still closes when saving the order fails', async () => {
       onSaveOrder={onSaveOrder}
     />,
   )
-  fireEvent.click(screen.getByText('Close'))
+  fireEvent.click(screen.getByText('Done'))
   await Promise.resolve()
   await Promise.resolve()
   expect(onClose).toHaveBeenCalled()

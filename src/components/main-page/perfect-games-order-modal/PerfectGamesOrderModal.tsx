@@ -14,14 +14,15 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
+  rectSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useLanguage } from '@/context/LanguageContext'
 import { applyPerfectOrder, type PerfectGame } from '@/utils/perfectGames'
-import CommonModal from '@/components/common-modal/CommonModal'
+import Modal from '@/components/ui/Modal'
 import PerfectGameOrderRow from './perfect-game-order-row/PerfectGameOrderRow'
 import { notify } from '@/lib/notify'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import Button from '@/components/ui/Button'
 
 export default function PerfectGamesOrderModal({
   isOpen,
@@ -69,23 +70,23 @@ export default function PerfectGamesOrderModal({
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={handleClose} className="max-w-lg max-h-[80vh] overflow-y-auto">
-      <h2 className="text-lg font-semibold">{T.cards.reorderMasteredTitle}</h2>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      size="xl"
+      title={T.cards.reorderMasteredTitle}
+      hint={T.cards.reorderMasteredHint}
+      footer={<Button onClick={handleClose}>{T.cards.done}</Button>}
+    >
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={localList.map((g) => g.key)} strategy={verticalListSortingStrategy}>
-          <div className="flex flex-col gap-2">
+        <SortableContext items={localList.map((g) => g.key)} strategy={rectSortingStrategy}>
+          <div className="grid sm:grid-cols-2 gap-2">
             {localList.map((g) => (
               <PerfectGameOrderRow key={g.key} game={g} />
             ))}
           </div>
         </SortableContext>
       </DndContext>
-      <button
-        onClick={handleClose}
-        className="mt-4 self-end px-4 py-2 rounded-lg bg-accent text-bg-main text-sm font-medium cursor-pointer"
-      >
-        {T.cards.close}
-      </button>
-    </CommonModal>
+    </Modal>
   )
 }

@@ -12,6 +12,11 @@ import RachaLoading from './racha/loading'
 import FollowingLoading from './following/loading'
 import CategoryLoading from './[category]/(list)/loading'
 import CategoryConsoleLoading from './[category]/[consoleId]/loading'
+import XboxLoading from './xboxGame/[id]/loading'
+import UserGameLoading from './user/[username]/[platform]/[id]/loading'
+import RankingsLoading from './rankings/loading'
+import RankingsHowLoading from './rankings/how/loading'
+import DesignLoading from './design/loading'
 
 test.each([
   ['the home', HomeLoading],
@@ -27,6 +32,11 @@ test.each([
   ['who you follow', FollowingLoading],
   ['a category', CategoryLoading],
   ['a category by console', CategoryConsoleLoading],
+  ['an Xbox game', XboxLoading],
+  ['a game as a user has it', UserGameLoading],
+  ['the rankings', RankingsLoading],
+  ['how the rankings work', RankingsHowLoading],
+  ['the design catalogue', DesignLoading],
 ])('%s shows its own skeleton, announced as loading', (_name, Loading) => {
   render(<Loading />)
 

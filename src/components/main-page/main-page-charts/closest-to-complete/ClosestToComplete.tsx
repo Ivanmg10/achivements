@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { GameListRow } from '@/components/ui/GameListRow'
+import Kicker from '@/components/ui/Kicker'
 
 export type ClosestGame = {
   /** Unique within the list — game ids repeat across platforms. */
@@ -21,9 +22,9 @@ export const CLOSEST_SHOWN = 3
 /**
  * The started games nearest to finished — the ones worth picking back up.
  *
- * Both mastery cards show it, so both feed it the same shape: what counts as
- * "complete" differs between platforms (a mastery on RA, every achievement on
- * Steam) but "how far along am I" does not.
+ * Every platform feeds it the same shape: what counts as "complete" differs
+ * between platforms (a mastery on RA, every achievement on Steam) but "how far
+ * along am I" does not.
  */
 export default function ClosestToComplete({
   games,
@@ -37,8 +38,8 @@ export default function ClosestToComplete({
   if (games.length === 0) return null
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <p className="text-[10px] text-text-secondary uppercase tracking-widest">{T.cards.closestToPerfect}</p>
+    <div className="flex flex-col gap-1.5 enter-rows">
+      <Kicker>{T.cards.closestToPerfect}</Kicker>
       {games.map((game) => (
         <GameListRow
           key={game.key}

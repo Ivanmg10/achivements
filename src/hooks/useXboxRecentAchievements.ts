@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { xboxErrorFrom, type XboxLinkError } from '@/hooks/useXboxLink'
@@ -7,6 +7,7 @@ import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import type { XboxRecentAchievement } from '@/types/xbox'
 import { fetchShared } from '@/lib/fetchShared'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 export type XboxAchievementScope = 'recent' | 'activity' | 'year'
 
@@ -20,6 +21,7 @@ export function useXboxRecentAchievements(scope: XboxAchievementScope | null = '
   const { data: session } = useSession()
   const enabled = useXboxEnabled()
   const subject = useSubject()
+  const { isHidden } = useHiddenGames()
   const xuid = enabled ? (session?.user?.xboxxuid ?? null) : null
   const { lang } = useLanguage()
   const key = xuid && scope ? `${xuid}:${scope}:${lang}` : null
@@ -80,8 +82,9 @@ export function useXboxRecentAchievements(scope: XboxAchievementScope | null = '
   }, [key, request, settle])
 
   const ready = Boolean(key) && loadedKey === key
+  const visible = useMemo(() => achievements.filter((achievement) => !isHidden(achievement.gameId, 'xbox')), [achievements, isHidden])
   return {
-    achievements: ready ? achievements : [],
+    achievements: ready ? visible : [],
     isLoading: Boolean(key) && (isLoading || !ready),
     error: ready ? error : null,
     retry,

@@ -1,0 +1,28 @@
+/*
+   The profile column's entrance, on load and on each platform tab: the card's
+   blocks (header, stats, playing now, recent achievements…) come down into place
+   one after another, from the top, as a column is read. Every profile is a card
+   whose children are those blocks, hence `> * > *`. CSS, like the left card's
+   (ViewEntrance), so a busy first load does not make it stutter. A fade under
+   reduced motion.
+*/
+@keyframes block-in {
+  from { opacity: 0; transform: translateY(-14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+.enter > * > * {
+  animation: block-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.enter > * > :nth-child(2) { animation-delay: 80ms; }
+.enter > * > :nth-child(3) { animation-delay: 160ms; }
+.enter > * > :nth-child(4) { animation-delay: 240ms; }
+.enter > * > :nth-child(5) { animation-delay: 320ms; }
+.enter > * > :nth-child(n + 6) { animation-delay: 400ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .enter > * > * { animation: fade-in 0.2s ease-out both; animation-delay: 0ms; }
+}

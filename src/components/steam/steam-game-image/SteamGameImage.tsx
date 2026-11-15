@@ -3,7 +3,8 @@
 import { useCallback, useState } from 'react'
 import Image from 'next/image'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
-import { steamAssetUrl, gameIconUrl, SteamAsset } from '@/lib/steamClient'
+import { steamAssetUrl, gameIconUrl, SteamAsset } from '@/lib/steamAssets'
+import { SKELETON_PULSE } from '@/components/ui/Skeleton'
 
 /**
  * Official Steam artwork for a game, falling back when an asset is missing.
@@ -54,9 +55,9 @@ export default function SteamGameImage({
         role={alt ? 'img' : undefined}
         aria-label={alt || undefined}
         aria-hidden={alt ? undefined : true}
-        className={`bg-[#1b2838] flex items-center justify-center ${className}`}
+        className={`bg-steam-dark flex items-center justify-center ${className}`}
       >
-        <SteamLogo size={Math.round(size / 2)} className="text-[#66c0f4]" aria-hidden="true" />
+        <SteamLogo size={Math.round(size / 2)} className="text-steam" aria-hidden="true" />
       </div>
     )
   }
@@ -71,7 +72,7 @@ export default function SteamGameImage({
       height={size}
       // A portrait cover cut to a square keeps its top, where the title is printed.
       ref={ref}
-      className={`object-cover ${art === 'cover' && sources[index] === steamAssetUrl(appId, 'cover') ? 'object-top' : ''} ${loaded ? '' : 'bg-ink/[0.06] animate-pulse motion-reduce:animate-none'} ${className}`}
+      className={`object-cover ${art === 'cover' && sources[index] === steamAssetUrl(appId, 'cover') ? 'object-top' : ''} ${loaded ? '' : `bg-skeleton ${SKELETON_PULSE}`} ${className}`}
       onLoad={() => setLoaded(true)}
       onError={() => {
         setLoaded(false)

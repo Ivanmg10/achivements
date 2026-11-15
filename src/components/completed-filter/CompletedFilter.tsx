@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
+import { pillClass } from '@/components/ui/Pill'
 
 export type CompletedMode = 'all' | 'softcore' | 'hardcore'
 
@@ -27,11 +28,7 @@ export default function CompletedFilter({
           key={mode}
           onClick={() => onChange(mode)}
           aria-pressed={value === mode}
-          className={`text-sm px-3 py-1 rounded-lg transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-            value === mode
-              ? 'bg-accent text-bg-main font-medium'
-              : 'bg-bg-card text-text-secondary hover:text-text-main'
-          }`}
+          className={pillClass(value === mode)}
         >
           {LABELS[mode]}
         </button>

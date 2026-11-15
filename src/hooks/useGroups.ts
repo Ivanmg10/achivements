@@ -1,13 +1,18 @@
 'use client'
 
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { GameGroup } from '@/types/types'
+import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
+
+const GROUPS_URL = '/api/groups'
 
 export function useGroups() {
-  const { status } = useSession()
-  const [groups, setGroups] = useState<GameGroup[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { status, data: session } = useAuthSession()
+  const user = session?.user?.id
+  // Coming back to a page: the groups as they showed, at once, while they are read again (lastAnswers).
+  const [groups, setGroups] = useState<GameGroup[]>(() => lastAnswer<GameGroup[]>(user, GROUPS_URL) ?? [])
+  const [isLoading, setIsLoading] = useState(() => lastAnswer(user, GROUPS_URL) === undefined)
   const [error, setError] = useState<string | null>(null)
   const fetched = useRef(false)
 
@@ -19,12 +24,18 @@ export function useGroups() {
       const data = await res.json()
       setGroups(Array.isArray(data) ? data : [])
       setError(null)
-    } catch {
+    } catch (err) {
+      console.error('[useGroups] read', err)
       setError('Error loading groups')
     } finally {
       setIsLoading(false)
     }
   }, [status])
+
+  // What is shown is what the next visit starts from, edits included.
+  useEffect(() => {
+    if (!isLoading) keepAnswer(user, GROUPS_URL, groups)
+  }, [groups, isLoading, user])
 
   useEffect(() => {
     if (status !== 'authenticated' || fetched.current) return
@@ -45,7 +56,7 @@ export function useGroups() {
     })
     if (!res.ok) {
       const err = await res.json()
-      throw new Error(err.message ?? 'Error')
+      throw new Error(err.error ?? 'error')
     }
     const group: GameGroup = await res.json()
     setGroups((prev) => [...prev, group])
@@ -65,7 +76,7 @@ export function useGroups() {
     })
     if (!res.ok) {
       const err = await res.json().catch(() => ({}))
-      throw new Error(err.message ?? 'Error')
+      throw new Error(err.error ?? 'error')
     }
     const updated: GameGroup = await res.json()
     setGroups((prev) => prev.map((g) => (g.id === id ? { ...g, ...updated } : g)))

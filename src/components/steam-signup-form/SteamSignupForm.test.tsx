@@ -17,7 +17,7 @@ beforeEach(() => jest.clearAllMocks())
 test('says it is signing in while it checks', () => {
   hook({ state: { status: 'loading' } })
   render(<SteamSignupForm outcome="1" />)
-  expect(screen.getByRole('status')).toHaveTextContent(en.steamAuth.checking)
+  expect(screen.getByRole('status', { name: en.steamAuth.checking })).toHaveAttribute('aria-busy', 'true')
 })
 
 test('an error is named, with a way to try again and a way back', () => {

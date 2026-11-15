@@ -1,91 +1,46 @@
 import type { RecentAchievement, RetroAchievement } from '@/types/types'
-import type { GameSource, SteamAchievementUnified } from '@/types/steam'
+import type { SteamAchievementUnified } from '@/types/steam'
+import type { GameAchievement, GameSource } from '@/types/game'
 import type { PsnTrophy } from '@/types/psn'
-import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { steamAchievementAnchor } from '@/utils/steamTitles'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
 import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
+import { raCompareItem, steamCompareItem, psnCompareItem, xboxCompareItem, type CompareAchievement } from '@/utils/gameCompare'
 
 /** An achievement or trophy of any platform, reduced to what a library card tells. */
-export type InsightAchievement = {
-  id: string
-  title: string
-  description: string
-  earned: boolean
-  earnedAt: string | null
-  /** Share of players who have it, 0–100; null when the platform does not say. */
-  rarity: number | null
+export type InsightAchievement = GameAchievement & {
   /** RA points; the other platforms have none. */
   points: number | null
   /** RA tags: what the game needs to be beaten, and what can be missed for good. */
   kind: 'progression' | 'win_condition' | 'missable' | null
-  iconUrl: string | null
   href: string
 }
 
 const KINDS = ['progression', 'win_condition', 'missable'] as const
 
+/** The platform's own mapper (`gameCompare`) gives the row; a library card adds its points, its kind and where it links. */
+const insight = (row: CompareAchievement, points: number | null, kind: InsightAchievement['kind'], href: string): InsightAchievement => ({
+  ...row,
+  points,
+  kind,
+  href,
+})
+
 export function fromRa(list: RetroAchievement[], players: number, gameId: number | string): InsightAchievement[] {
-  return list.map((a) => {
-    const at = a.DateEarnedHardcore ?? a.DateEarned ?? null
-    const kind = KINDS.find((k) => k === a.Type) ?? null
-    return {
-      id: String(a.ID),
-      title: a.Title,
-      description: a.Description,
-      earned: !!at,
-      earnedAt: at,
-      rarity: players > 0 ? Math.min(100, (a.NumAwarded / players) * 100) : null,
-      points: a.Points,
-      kind,
-      iconUrl: a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : null,
-      href: `/gameInfo/${gameId}`,
-    }
-  })
+  const row = raCompareItem(players)
+  return list.map((a) => insight(row(a), a.Points, KINDS.find((k) => k === a.Type) ?? null, `/gameInfo/${gameId}`))
 }
 
 export const fromSteam = (list: SteamAchievementUnified[], appId: number): InsightAchievement[] =>
-  list.map((a) => ({
-    id: a.apiname,
-    title: a.title,
-    description: a.description,
-    earned: a.earned,
-    earnedAt: a.dateEarned,
-    rarity: a.globalPct,
-    points: null,
-    kind: null,
-    iconUrl: a.badgeUrl || null,
-    href: `/steamGame/${appId}#${achievementAnchor(a.apiname)}`,
-  }))
+  list.map((a) => insight(steamCompareItem(a), null, null, `/steamGame/${appId}#${steamAchievementAnchor(a.apiname)}`))
 
 export const fromPsn = (list: PsnTrophy[], gameId: number): InsightAchievement[] =>
-  list.map((t) => ({
-    id: String(t.id),
-    title: t.name,
-    description: t.detail,
-    earned: t.earned,
-    earnedAt: t.earnedAt,
-    rarity: t.rarity,
-    points: null,
-    kind: null,
-    iconUrl: t.iconUrl,
-    href: `${gameHref('psn', gameId)}#${psnTrophyAnchor(t.id)}`,
-  }))
+  list.map((t) => insight(psnCompareItem(t), null, null, `${gameHref('psn', gameId)}#${psnTrophyAnchor(t.id)}`))
 
 export const fromXbox = (list: XboxAchievement[], gameId: number): InsightAchievement[] =>
-  list.map((a) => ({
-    id: a.id,
-    title: a.name,
-    description: a.description,
-    earned: a.unlocked,
-    earnedAt: a.unlockedAt,
-    rarity: a.rarity,
-    points: null,
-    kind: null,
-    iconUrl: a.iconUrl,
-    href: `${gameHref('xbox', gameId)}#${xboxAchievementAnchor(a.id)}`,
-  }))
+  list.map((a) => insight(xboxCompareItem(a), null, null, `${gameHref('xbox', gameId)}#${xboxAchievementAnchor(a.id)}`))
 
 /** Most common first; a band holds everything from its floor up to the previous band's. */
 export const RARITY_BANDS = [
@@ -145,13 +100,6 @@ export function beatenProgress(items: InsightAchievement[]): { done: number; tot
 
 /** Missable achievements still not earned. */
 export const missablesLeft = (items: InsightAchievement[]) => items.filter((a) => a.kind === 'missable' && !a.earned).length
-
-/** When the last achievement fell, for a game with every one earned. */
-export function finishedAt(items: InsightAchievement[]): string | null {
-  if (items.length === 0 || items.some((a) => !a.earned)) return null
-  const times = items.map((a) => (a.earnedAt ? Date.parse(a.earnedAt) : NaN)).filter((t) => !Number.isNaN(t))
-  return times.length ? new Date(Math.max(...times)).toISOString() : null
-}
 
 /** What was earned last, newest first. */
 export const recentEarned = (items: InsightAchievement[], n = 5) =>

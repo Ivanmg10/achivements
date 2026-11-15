@@ -1,4 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import RegisterUserForm from './RegisterUserForm'
 import { en } from '@/translations/en'
 
@@ -18,10 +20,11 @@ function fill({ username = 'ivan', password = 'secret12', email = 'ivan@test.com
   fireEvent.change(screen.getByLabelText(en.passwordReset.email), { target: { value: email } })
 }
 
-const submit = () => fireEvent.click(screen.getByRole('button', { name: new RegExp(en.registerForm.createAccount, 'i') }))
+const submit = () => fireEvent.click(screen.getByRole('button', { name: en.registerForm.createAccount }))
 
 beforeEach(() => {
   jest.clearAllMocks()
+  ;(signIn as jest.Mock).mockResolvedValue(undefined)
   global.fetch = jest.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ id: 1, username: 'ivan' }) })
 })
 
@@ -91,14 +94,14 @@ test('while creating the account the button says so and cannot be pressed again'
 })
 
 test('a refusal from the server is reported and the form stays usable', async () => {
-  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'Username ya en uso' }) })
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'username-taken' }) })
   const { setIsLogin } = renderForm()
   fill()
   submit()
 
-  expect(await screen.findByRole('alert')).toHaveTextContent('Username ya en uso')
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.steamAuth.usernameTaken)
   expect(setIsLogin).not.toHaveBeenCalled()
-  expect(screen.getByRole('button', { name: new RegExp(en.registerForm.createAccount, 'i') })).not.toBeDisabled()
+  expect(screen.getByRole('button', { name: en.registerForm.createAccount })).not.toBeDisabled()
 })
 
 test('the sign-in link reads as a link and switches form', () => {
@@ -144,4 +147,27 @@ test('says that signing up accepts the terms and the privacy policy, and links b
   renderForm()
   expect(screen.getByRole('link', { name: en.terms.link })).toHaveAttribute('href', '/terms')
   expect(screen.getByRole('link', { name: en.privacy.link })).toHaveAttribute('href', '/privacy')
+})
+
+test('once the account exists it signs in with what was typed and goes to the welcome', async () => {
+  ;(signIn as jest.Mock).mockResolvedValue({ ok: true })
+  const { setIsLogin } = renderForm()
+  fill()
+  submit()
+
+  // Under the curtain first: the page goes once it covers the screen.
+  await waitFor(() => expect(useRouter().push).toHaveBeenCalledWith('/welcome'), { timeout: 3000 })
+  expect(sessionStorage.getItem('welcome-entry')).toBe('1')
+  expect(signIn).toHaveBeenCalledWith('credentials', { username: 'ivan', password: 'secret12', redirect: false })
+  expect(setIsLogin).not.toHaveBeenCalled()
+})
+
+test('if that sign-in fails, the login form asks for it, as before', async () => {
+  ;(signIn as jest.Mock).mockRejectedValue(new Error('offline'))
+  const { setIsLogin, setIsRegister } = renderForm()
+  fill()
+  submit()
+
+  await waitFor(() => expect(setIsLogin).toHaveBeenCalledWith(true))
+  expect(setIsRegister).toHaveBeenCalledWith(true)
 })

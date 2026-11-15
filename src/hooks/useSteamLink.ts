@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
@@ -19,7 +19,6 @@ export function useSteamLink() {
   const { T } = useLanguage()
   const pathname = usePathname()
   const hash = useLocationHash()
-  const [isUnlinking, setIsUnlinking] = useState(false)
   const handled = useRef(false)
 
   useEffect(() => {
@@ -39,7 +38,6 @@ export function useSteamLink() {
   }, [hash, update, T])
 
   const unlink = useCallback(async (): Promise<boolean> => {
-    setIsUnlinking(true)
     try {
       const res = await fetch('/api/steam/unlink', { method: 'POST' })
       if (!res.ok) throw new Error(`Failed to unlink Steam (${res.status})`)
@@ -50,8 +48,6 @@ export function useSteamLink() {
     } catch (err) {
       console.error('[useSteamLink] unlink', err)
       return false
-    } finally {
-      setIsUnlinking(false)
     }
   }, [update])
 
@@ -61,6 +57,5 @@ export function useSteamLink() {
     isLinked: Boolean(session?.user?.steamid),
     linkHref: `/api/auth/steam?intent=link&next=${encodeURIComponent(pathname || '/user')}`,
     unlink,
-    isUnlinking,
   }
 }

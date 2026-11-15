@@ -1,16 +1,13 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { requireSession } from '@/lib/apiAuth'
 import pool from "@/lib/db";
-import { authOptions } from "@/lib/authOptions";
 import { forgetUser } from "@/lib/userRecord";
 import { isTheme } from "@/types/types";
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: "No autorizado" }, { status: 401 });
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const { theme } = (await req.json().catch(() => null)) ?? {};
     if (!isTheme(theme)) {
@@ -19,10 +16,10 @@ export async function POST(req: Request) {
 
     await pool.query(`UPDATE users SET theme = $1 WHERE id = $2`, [
       theme,
-      session.user.id,
+      auth.id,
     ]);
 
-    forgetUser(session.user.id);
+    forgetUser(auth.id);
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('[updateTheme POST]', err)

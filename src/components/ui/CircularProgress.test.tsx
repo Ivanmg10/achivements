@@ -25,5 +25,5 @@ test('draws in the theme colour, and a finished one glows', () => {
 
   rerender(<CircularProgress earned={10} total={10} />)
   expect(screen.getByRole('img')).toHaveAttribute('data-complete', 'true')
-  expect(screen.getByRole('img').querySelector('svg')!.getAttribute('style')).toContain('drop-shadow')
+  expect(screen.getByRole('img').querySelector('svg')!.getAttribute('class')).toContain('drop-shadow-done')
 })

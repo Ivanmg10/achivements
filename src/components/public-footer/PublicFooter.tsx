@@ -3,6 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import PublicPageLinks from '@/components/public-page-links/PublicPageLinks'
 import LegalLinks from '@/components/legal-links/LegalLinks'
+import { APP_VERSION } from '@/lib/version'
 
 /** The footer of the pages a visitor can open without an account: who we are not, and where else to read. */
 export default function PublicFooter({ current, note }: { current?: string; note?: string }) {
@@ -14,6 +15,7 @@ export default function PublicFooter({ current, note }: { current?: string; note
       <span>{T.landing.footer}</span>
       <PublicPageLinks current={current} />
       <LegalLinks />
+      <span className="tabular-nums">v{APP_VERSION}</span>
     </footer>
   )
 }

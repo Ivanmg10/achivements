@@ -1,9 +1,10 @@
 import { titleMatches } from '@/utils/gameCandidates'
-import { gameHref } from '@/utils/gameRef'
+import { gameHref, raGameId } from '@/utils/gameRef'
 import { matchesQuick, type LibraryEntry, type QuickFilter } from '@/utils/libraryInsights'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
-export type ShelfId = 'continue' | 'almost' | 'stalled' | 'rest' | 'recent' | 'older' | 'start' | 'backlog'
+/** The shelves of a status page, and on "all games" one per status after "continue". */
+export type ShelfId = 'continue' | 'almost' | 'stalled' | 'rest' | 'recent' | 'older' | 'start' | 'backlog' | 'playing' | 'completed' | 'wantToPlay'
 
 export type Shelf = {
   id: ShelfId
@@ -20,7 +21,7 @@ export const SHELF_CAP = 9
 export const CONTINUE_DAYS = 7
 const DAY = 86_400_000
 
-export const entryId = (e: LibraryEntry): number => (e.kind === 'ra' ? ('GameID' in e.game && e.game.GameID ? e.game.GameID : (e.game as { ID: number }).ID) : e.game.id)
+export const entryId = (e: LibraryEntry): number => (e.kind === 'ra' ? raGameId(e.game) : e.game.id)
 export const entryHref = (e: LibraryEntry) => gameHref(e.kind, entryId(e))
 
 /** How many achievements the game has, for ordering a backlog; RA's want-to-play list reports it differently. */
@@ -51,6 +52,11 @@ const time = (e: LibraryEntry) => {
   return Number.isNaN(t) ? -Infinity : t
 }
 const recentFirst = (a: LibraryEntry, b: LibraryEntry) => time(b) - time(a) || a.title.localeCompare(b.title)
+const completedTime = (e: LibraryEntry) => {
+  const t = e.completedAt ? Date.parse(e.completedAt) : NaN
+  return Number.isNaN(t) ? -Infinity : t
+}
+const completedFirst = (a: LibraryEntry, b: LibraryEntry) => completedTime(b) - completedTime(a) || a.title.localeCompare(b.title)
 const closestFirst = (a: LibraryEntry, b: LibraryEntry) => (b.pct ?? -1) - (a.pct ?? -1) || recentFirst(a, b)
 
 /**
@@ -63,11 +69,21 @@ export function buildShelves(entries: LibraryEntry[], category: string, now = Da
   const take = (list: LibraryEntry[]) => list.filter((e) => !taken.has(e.key) && (taken.add(e.key), true))
   const shelf = (id: ShelfId, list: LibraryEntry[], quick: QuickFilter = 'all'): Shelf => ({ id, entries: list, quick, cap: SHELF_CAP })
 
+  const byStatus = (status: 'playing' | 'completed' | 'wantToPlay') => entries.filter((e) => e.status === status)
+  const shortestFirst = (a: LibraryEntry, b: LibraryEntry) => entryTotal(a) - entryTotal(b) || a.title.localeCompare(b.title)
+
   const out: Shelf[] =
-    category === 'completed'
+    category === 'all'
       ? [
-          shelf('recent', take([...entries].sort(recentFirst).slice(0, SHELF_CAP))),
-          shelf('older', take([...entries].sort(recentFirst))),
+          shelf('continue', take(entries.filter((e) => now - time(e) <= CONTINUE_DAYS * DAY).sort(recentFirst))),
+          shelf('playing', take(byStatus('playing').sort(recentFirst)), 'playing'),
+          shelf('completed', take(byStatus('completed').sort(completedFirst)), 'completed'),
+          shelf('wantToPlay', take(byStatus('wantToPlay').sort(shortestFirst)), 'wantToPlay'),
+        ]
+      : category === 'completed'
+      ? [
+          shelf('recent', take(entries.filter((e) => e.completedAt).sort(completedFirst).slice(0, SHELF_CAP))),
+          shelf('older', take([...entries].sort(completedFirst))),
         ]
       : category === 'wantToPlay'
         ? [

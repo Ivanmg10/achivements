@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { formatDate } from '@/utils/dates'
 import { GameComment } from '@/app/api/getGameComments/route'
-import Image from 'next/image'
 import Link from 'next/link'
-import { IconMessageCircle, IconChevronDown, IconChevronUp } from '@tabler/icons-react'
+import { IconChevronUp } from '@tabler/icons-react'
+import { SURFACE } from '@/components/ui/surface'
+import { buttonClass } from '@/components/ui/Button'
+import IconButton from '@/components/ui/IconButton'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
+import { raAvatarUrl } from '@/utils/raAssets'
+import Tag from '@/components/ui/Tag'
+import Avatar from '@/components/ui/Avatar'
 
-const PREVIEW_COUNT = 5
+const PREVIEW_COUNT = 2
 
 export default function GameInfoComments({ gameId }: { gameId: number }) {
   const { T } = useLanguage()
@@ -17,6 +25,7 @@ export default function GameInfoComments({ gameId }: { gameId: number }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  const [open, setOpen] = useState(true)
 
   // Another game starts the load over; state, so while rendering. The fetch is the effect.
   useWhenChanged([gameId], () => {
@@ -49,19 +58,31 @@ export default function GameInfoComments({ gameId }: { gameId: number }) {
     }
   }, [gameId])
 
+  const shell = `${SURFACE} p-5 sm:p-6 flex flex-col gap-3.5`
+
   if (loading) {
     return (
-      <section className="bg-bg-card p-5 rounded-xl w-[95%] mb-5">
-        <p className="text-sm text-text-secondary animate-pulse">{T.gameComments.loading}</p>
-      </section>
+      <Wrap>
+        <section className={shell}>
+          <div role="status" aria-busy="true" className="flex flex-col">
+            <span className="sr-only">{T.gameComments.loading}</span>
+            <Skeleton className="h-6 w-40" />
+            {[0, 1, 2].map((i) => (
+              <SkeletonRow key={i} radius="circle" className="gap-3 py-3" />
+            ))}
+          </div>
+        </section>
+      </Wrap>
     )
   }
 
   if (error) {
     return (
-      <section className="bg-bg-card p-5 rounded-xl w-[95%] mb-5">
-        <p className="text-sm text-red-400" role="alert">{T.gameComments.error}</p>
-      </section>
+      <Wrap>
+        <section className={shell}>
+          <p className="text-sm text-danger" role="alert">{T.gameComments.error}</p>
+        </section>
+      </Wrap>
     )
   }
 
@@ -70,52 +91,57 @@ export default function GameInfoComments({ gameId }: { gameId: number }) {
   const visible = expanded ? comments : comments.slice(0, PREVIEW_COUNT)
 
   return (
-    <section className="bg-bg-card p-5 rounded-xl w-[95%] mb-5 flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <IconMessageCircle className="w-4 h-4 text-text-secondary" aria-hidden="true" />
-        <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">
-          {T.gameComments.title}
-          <span className="ml-2 text-text-secondary font-normal normal-case">({total})</span>
-        </h2>
-      </div>
+    <Wrap>
+      <section aria-labelledby="game-comments-title" className={shell}>
+        <div className="flex items-center gap-2.5">
+          <h2 id="game-comments-title" className="text-xl font-bold">{T.gameComments.title}</h2>
+          <Tag size="lg" className="tabular-nums">{total}</Tag>
+          <IconButton
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
+            aria-controls="game-comments-list"
+            aria-label={open ? T.gameComments.fold : T.gameComments.unfold}
+            size="sm"
+            className="ml-auto"
+          >
+            <IconChevronUp className={`w-4 h-4 transition-transform duration-(--motion-hover) ${open ? '' : 'rotate-180'}`} aria-hidden="true" />
+          </IconButton>
+        </div>
 
-      <div className="flex flex-col gap-3">
-        {visible.map((c, i) => (
-          <CommentRow key={i} comment={c} />
-        ))}
-      </div>
+        {open && (
+          <>
+            <div id="game-comments-list" className="flex flex-col">
+              {visible.map((c, i) => (
+                <CommentRow key={i} comment={c} last={i === visible.length - 1} />
+              ))}
+            </div>
 
-      {comments.length > PREVIEW_COUNT && (
-        <button
-          onClick={() => setExpanded((e) => !e)}
-          className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-main transition-colors self-start"
-        >
-          {expanded ? (
-            <>
-              <IconChevronUp className="w-3.5 h-3.5" />
-              {T.gameComments.collapse}
-            </>
-          ) : (
-            <>
-              <IconChevronDown className="w-3.5 h-3.5" />
-              {T.gameComments.showMore} ({comments.length - PREVIEW_COUNT})
-            </>
-          )}
-        </button>
-      )}
-    </section>
+            {comments.length > PREVIEW_COUNT && (
+              <button type="button" onClick={() => setExpanded((e) => !e)} aria-expanded={expanded} className={buttonClass('secondary', 'md', 'self-start')}>
+                {expanded
+                  ? T.gameComments.collapse
+                  : // RA sends the newest hundred at most: past that, the button says they are the latest.
+                    (total > comments.length ? T.gameComments.showLatest : T.gameComments.showAll).replace('{n}', String(comments.length))}
+              </button>
+            )}
+          </>
+        )}
+      </section>
+    </Wrap>
   )
 }
 
-function CommentRow({ comment }: { comment: GameComment }) {
-  const date = new Date(comment.Submitted).toLocaleDateString(undefined, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
+/** The page's side margins, as the achievements' card above. */
+function Wrap({ children }: { children: React.ReactNode }) {
+  return <div className="w-full px-4 sm:px-8 lg:px-14 mb-10">{children}</div>
+}
+
+function CommentRow({ comment, last }: { comment: GameComment; last: boolean }) {
+  const { lang } = useLanguage()
+  const date = formatDate(comment.Submitted, lang)
 
   return (
-    <div className="flex items-start gap-3">
+    <div className={`flex items-start gap-3 py-3 ${last ? '' : 'shadow-hairline-b-soft'}`}>
       <Link
         href={`https://retroachievements.org/user/${encodeURIComponent(comment.User)}`}
         target="_blank"
@@ -124,13 +150,7 @@ function CommentRow({ comment }: { comment: GameComment }) {
         tabIndex={-1}
         aria-hidden="true"
       >
-        <Image
-          src={`https://media.retroachievements.org/UserPic/${comment.User}.png`}
-          alt={comment.User}
-          width={32}
-          height={32}
-          className="w-8 h-8 rounded-full object-cover bg-bg-header"
-        />
+        <Avatar src={raAvatarUrl(comment.User)} name={comment.User} size={34} />
       </Link>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
@@ -138,13 +158,13 @@ function CommentRow({ comment }: { comment: GameComment }) {
             href={`https://retroachievements.org/user/${encodeURIComponent(comment.User)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-medium hover:underline"
+            className="text-sm font-bold hover:underline"
           >
             {comment.User}
           </Link>
-          <span className="text-xs text-text-secondary">{date}</span>
+          <span className="text-[0.8125rem] text-text-secondary">· {date}</span>
         </div>
-        <p className="text-sm text-text-secondary mt-0.5 wrap-break-word">{comment.CommentText}</p>
+        <p className="text-sm leading-normal mt-0.5 wrap-break-word">{comment.CommentText}</p>
       </div>
     </div>
   )

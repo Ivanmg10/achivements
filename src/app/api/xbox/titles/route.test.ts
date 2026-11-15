@@ -1,11 +1,11 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/steamCache', () => ({ withSteamCache: jest.fn() }))
-jest.mock('@/lib/xboxClient', () => ({ ...jest.requireActual('@/lib/xboxClient'), xboxLibrary: jest.fn() }))
+jest.mock('@/lib/xboxClient', () => ({ ...jest.requireActual('@/lib/xboxClient'), xboxTitlesWithCompletion: jest.fn() }))
 
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
-import { XboxError, xboxLibrary } from '@/lib/xboxClient'
+import { XboxError, xboxTitlesWithCompletion } from '@/lib/xboxClient'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
 
 const call = async () => {
@@ -17,7 +17,7 @@ beforeEach(() => {
   jest.clearAllMocks()
   jest.spyOn(console, 'error').mockImplementation(() => {})
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7', admin: true, xboxxuid: '25354', xboxgamertag: 'TestPlayer' } })
-  ;(xboxLibrary as jest.Mock).mockResolvedValue([xboxGameFixture()])
+  ;(xboxTitlesWithCompletion as jest.Mock).mockResolvedValue([xboxGameFixture()])
 })
 
 afterEach(() => (console.error as jest.Mock).mockRestore())
@@ -32,17 +32,17 @@ test('403 for a non-admin and 400 with no account linked', async () => {
   expect((await call()).status).toBe(403)
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7', admin: true } })
   expect((await call()).status).toBe(400)
-  expect(xboxLibrary).not.toHaveBeenCalled()
+  expect(xboxTitlesWithCompletion).not.toHaveBeenCalled()
 })
 
 test("the linked account's library", async () => {
   expect(await call()).toEqual({ status: 200, body: [xboxGameFixture()] })
-  expect(xboxLibrary).toHaveBeenCalledWith('25354', '7')
+  expect(xboxTitlesWithCompletion).toHaveBeenCalledWith('25354', '7')
 })
 
 test('failures are structured', async () => {
-  ;(xboxLibrary as jest.Mock).mockRejectedValueOnce(new XboxError('not-configured', 'x'))
+  ;(xboxTitlesWithCompletion as jest.Mock).mockRejectedValueOnce(new XboxError('not-configured', 'x'))
   expect(await call()).toEqual({ status: 503, body: { error: 'not-configured' } })
-  ;(xboxLibrary as jest.Mock).mockRejectedValueOnce(new Error('boom'))
+  ;(xboxTitlesWithCompletion as jest.Mock).mockRejectedValueOnce(new Error('boom'))
   expect((await call()).status).toBe(502)
 })

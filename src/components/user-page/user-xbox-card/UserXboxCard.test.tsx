@@ -1,14 +1,12 @@
-jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 jest.mock('@/hooks/useXboxLink', () => ({ useXboxLink: jest.fn() }))
 jest.mock('@/hooks/useXboxSummary', () => ({ useXboxSummary: jest.fn() }))
 jest.mock('@/context/XboxGamesDataContext', () => ({ useXboxGamesData: jest.fn() }))
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import UserXboxCard from './UserXboxCard'
 import { useXboxLink } from '@/hooks/useXboxLink'
 import { useXboxSummary } from '@/hooks/useXboxSummary'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
-import { notify } from '@/lib/notify'
 import { en } from '@/translations/en'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
 
@@ -17,7 +15,7 @@ const unlink = jest.fn()
 
 function setLink(overrides: Record<string, unknown> = {}) {
   ;(useXboxLink as jest.Mock).mockReturnValue({
-    enabled: true, xuid: null, gamertag: null, isLinked: false, link, isLinking: false, error: null, unlink, isUnlinking: false,
+    enabled: true, xuid: null, gamertag: null, isLinked: false, link, isLinking: false, error: null, unlink,
     ...overrides,
   })
 }
@@ -39,28 +37,6 @@ test('for someone who may not use Xbox it is not there at all', () => {
   expect(container).toBeEmptyDOMElement()
 })
 
-test('not linked: says what linking is for and asks for the gamertag', () => {
-  render(<UserXboxCard />)
-  expect(screen.getByText(en.xbox.connectHint)).toBeInTheDocument()
-  expect(screen.getByLabelText(en.xbox.gamertagLabel)).toBeInTheDocument()
-})
-
-test('a successful link is announced with a toast', async () => {
-  link.mockResolvedValue(true)
-  render(<UserXboxCard />)
-  fireEvent.change(screen.getByLabelText(en.xbox.gamertagLabel), { target: { value: 'TestPlayer' } })
-  fireEvent.click(screen.getByRole('button', { name: en.xbox.connect }))
-  await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.xboxLinked))
-  expect(link).toHaveBeenCalledWith('TestPlayer')
-})
-
-test('a failed link is shown in the card, not as a toast', () => {
-  setLink({ error: 'private' })
-  render(<UserXboxCard />)
-  expect(screen.getByRole('alert')).toHaveTextContent(en.xbox.errors.private)
-  expect(notify.error).not.toHaveBeenCalled()
-})
-
 test('linked: shows the account, that it is admin-only, and its numbers', () => {
   setLink({ xuid: '25354', gamertag: 'testplayer', isLinked: true })
   setSummary({ summary: { gamertag: 'TestPlayer', avatarUrl: null, bio: '', tier: 'Silver', gamerscore: 10242, achievementsUnlocked: 593, games: 135 } })
@@ -73,7 +49,9 @@ test('linked: shows the account, that it is admin-only, and its numbers', () => 
   expect(screen.getByText('10,242')).toBeInTheDocument()
   expect(screen.getByText('135')).toBeInTheDocument()
   expect(screen.getByText('593')).toBeInTheDocument()
-  expect(screen.getByText('Silver')).toBeInTheDocument()
+  // The tier is the account's kind ("Account Silver"), and its achievements are labelled like Steam's.
+  expect(screen.getByText('Silver').parentElement).toHaveTextContent(en.xbox.tier)
+  expect(screen.getByText(en.userStats.achievements)).toBeInTheDocument()
   expect(screen.getByText(en.xbox.adminOnly)).toBeInTheDocument()
   // One game under way of the three.
   expect(screen.getByText(en.steam.playtime).parentElement).toHaveTextContent('—')
@@ -86,14 +64,3 @@ test('linked but unreadable: says why', () => {
   expect(screen.getByRole('alert')).toHaveTextContent(en.xbox.errors['rate-limited'])
 })
 
-test('unlinking says how it went', async () => {
-  setLink({ xuid: '25354', gamertag: 'TestPlayer', isLinked: true })
-  unlink.mockResolvedValueOnce(true).mockResolvedValueOnce(false)
-  render(<UserXboxCard />)
-  const button = screen.getByRole('button', { name: en.xbox.disconnect })
-
-  fireEvent.click(button)
-  await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.xboxUnlinked))
-  fireEvent.click(button)
-  await waitFor(() => expect(notify.error).toHaveBeenCalledWith(en.toast.unlinkFailed))
-})

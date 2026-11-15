@@ -6,7 +6,7 @@ import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import { useLanguage } from '@/context/LanguageContext'
 import { candidateIconUrl } from '@/utils/gameCandidates'
 import type { FavoriteGame } from '@/components/favorite-game-modal/FavoriteGameModal'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 function FavoriteValue({ game, source, empty }: { game: FavoriteGame | null; source: GameSource; empty: string }) {
   if (!game) return <span className="text-base text-text-secondary italic truncate">{empty}</span>
@@ -14,7 +14,7 @@ function FavoriteValue({ game, source, empty }: { game: FavoriteGame | null; sou
   return (
     <span className="flex items-center gap-1.5 min-w-0">
       {icon && (
-        <Image src={icon} alt="" width={32} height={32} className="w-8 h-8 rounded-lg object-cover shrink-0" unoptimized />
+        <Image src={icon} alt="" width={32} height={32} className="w-8 h-8 rounded-box object-cover shrink-0" unoptimized />
       )}
       <span className="text-base font-medium truncate">{game.title}</span>
     </span>

@@ -6,7 +6,7 @@ import {
   psnBackdrop,
   psnNumericId,
   psnPlatformName,
-  psnPlatformChip,
+  psnPlatformTone,
   psnTitleId,
   psnTrophyAnchor,
   totalPlaytime,
@@ -76,11 +76,11 @@ test('psnPlatformName writes Sony codes as people do', () => {
   expect(psnPlatformName('PS3,PSVITA')).toBe('PS3 · PS Vita')
 })
 
-test('psnPlatformChip colours each console its own way; a cross-buy list by its first', () => {
-  const chips = ['PS5', 'PS4', 'PS3', 'PS Vita'].map(psnPlatformChip)
-  expect(new Set(chips).size).toBe(4)
-  expect(psnPlatformChip('PS3 · PS Vita')).toBe(psnPlatformChip('PS3'))
-  expect(psnPlatformChip('PS4')).toContain('#003791')
+test('psnPlatformTone colours each console its own way; a cross-buy list by its first', () => {
+  const tones = ['PS5', 'PS4', 'PS3', 'PS Vita'].map(psnPlatformTone)
+  expect(new Set(tones).size).toBe(4)
+  expect(psnPlatformTone('PS3 · PS Vita')).toBe(psnPlatformTone('PS3'))
+  expect(psnPlatformTone('PS4')).toBe('psn')
 })
 
 describe('classifyPsnGame with platinumCompletes', () => {

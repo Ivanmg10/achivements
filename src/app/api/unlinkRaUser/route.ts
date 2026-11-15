@@ -1,25 +1,16 @@
-import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
-import pool from '@/lib/db'
-import { authOptions } from '@/lib/authOptions'
-import { forgetUser } from '@/lib/userRecord'
+import { requireSession } from '@/lib/apiAuth'
+import { unlinkPlatform } from '@/lib/platformLinks'
 
 export async function POST() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) {
-    return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-  }
+  const auth = await requireSession()
+  if (!auth.ok) return auth.response
 
   try {
-    await pool.query(
-      `UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL WHERE id = $1`,
-      [session.user.id],
-    )
+    await unlinkPlatform(auth.id, 'ra')
   } catch (err) {
     console.error('[unlinkRaUser]', err)
     return NextResponse.json({ message: 'Could not unlink RA account' }, { status: 500 })
   }
-
-  forgetUser(session.user.id)
   return NextResponse.json({ ok: true })
 }

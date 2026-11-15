@@ -3,12 +3,14 @@
  */
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/publicUser', () => ({ findSubject: jest.fn() }))
+jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn().mockResolvedValue(true) }))
 
 import fs from 'fs'
 import path from 'path'
 import { getServerSession } from 'next-auth'
 import { dataOwner, requireRaSession, requireSteamSession, requirePsnSession } from './apiAuth'
 import { findSubject } from '@/lib/publicUser'
+import { allowAttempt } from '@/lib/attemptLimit'
 
 const ME = { id: '1', rausername: 'MeRA', raid: 'my-key', steamid: '111', psnaccountid: 'psn-me' }
 const BOB = { id: 7, username: 'bob', rausername: 'BobRA', raid: 'bob-key', steamid: '765', psnaccountid: null, profilePublic: true }
@@ -127,4 +129,31 @@ test('no write handler can answer for another user', () => {
   }
   walk(root)
   expect(offenders).toEqual([])
+})
+
+describe('a viewer with no RA key', () => {
+  beforeEach(() => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1' } })
+    ;(findSubject as jest.Mock).mockResolvedValue(BOB)
+    ;(allowAttempt as jest.Mock).mockReset()
+  })
+
+  test('reads through the owner\'s key within a limit, and is marked as borrowing it', async () => {
+    ;(allowAttempt as jest.Mock).mockResolvedValue(true)
+    expect(await dataOwner(req('?user=bob'))).toMatchObject({ raid: 'bob-key', borrowedKey: true })
+    expect(allowAttempt).toHaveBeenCalledWith('ra-borrowed', 'user:1')
+  })
+
+  test('past the limit the key is left alone, and the page goes on without RA', async () => {
+    ;(allowAttempt as jest.Mock).mockResolvedValue(false)
+    const owner = await dataOwner(req('?user=bob'))
+    expect(owner?.raid).toBeUndefined()
+    expect(owner?.id).toBe('7')
+  })
+
+  test('a viewer with their own key spends no one else\'s and is not counted', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: ME })
+    expect((await dataOwner(req('?user=bob')))?.raid).toBe('my-key')
+    expect(allowAttempt).not.toHaveBeenCalled()
+  })
 })

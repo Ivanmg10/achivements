@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
+import { steamFailure } from '@/lib/steamFailure'
 import { withSteamCache, TTL } from '@/lib/steamCache'
 import { enrichWithAchievementCounts, isPrivateLibrary, loadOwnedGames, SteamPrivateError } from '@/lib/steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
@@ -28,8 +29,8 @@ export async function GET(req?: Request) {
   try {
     let complete = true
     const games = await withSteamCache<SteamGameProgress[]>(
-      // v2: games carry lastUnlock. A shared DB lets an older build rewrite the old shape under the old key.
-      `steamOwned2:${steamid}`,
+      // v3: games Steam does not date are dated by us (#113). A shared DB lets an older build rewrite the old shape under the old key.
+      `steamOwned3:${steamid}`,
       TTL.ownedGames,
       async () => {
         const data = await loadOwnedGames(auth.session)
@@ -52,6 +53,6 @@ export async function GET(req?: Request) {
   } catch (err) {
     if (err instanceof SteamPrivateError) return NextResponse.json({ error: 'private' }, { status: 403 })
     console.error('[steam/ownedGames]', err)
-    return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })
+    return steamFailure(err)
   }
 }

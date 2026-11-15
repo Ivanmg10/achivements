@@ -7,14 +7,13 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { GameGroupItem } from '@/types/types'
 import type { ItemProgress } from '@/utils/groupItems'
 import { gameHref } from '@/utils/gameRef'
-import { ProgressBar } from '@/components/ui/ProgressBar'
 import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 
-const OVERLAY = 'absolute z-10 p-1.5 rounded-lg bg-bg-main/80 text-text-secondary transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2'
+const OVERLAY = 'absolute z-10 p-1.5 rounded-chip bg-bg-main/80 text-text-secondary transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2'
 
 /**
  * A game of a group as a cover: the art (a finished one ringed and marked),
- * its name, a bar and how much is left. The cover and name open the game; the
+ * its name, its percentage and how much is left. The cover and name open the game; the
  * handle (when the list can be reordered) and the remove button sit on the art.
  */
 export default function GroupCoverTile({
@@ -49,7 +48,7 @@ export default function GroupCoverTile({
           href={href}
           tabIndex={-1}
           aria-hidden="true"
-          className={`block aspect-square rounded-2xl overflow-hidden bg-bg-card ring-2 transition-all ${done ? 'ring-progress' : 'ring-transparent group-hover:ring-ink/30'}`}
+          className={`block aspect-square rounded-card overflow-hidden bg-bg-card ring-2 transition-all ${done ? 'ring-progress' : 'ring-transparent group-hover:ring-ink/30'}`}
         >
           {src && <Image src={src} alt="" width={240} height={240} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" unoptimized />}
         </Link>
@@ -80,16 +79,14 @@ export default function GroupCoverTile({
         </button>
       </div>
 
-      <Link href={href} title={item.title} className="text-sm font-semibold truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+      {item.console_name && <span className="-mb-1.5 text-[0.6875rem] text-text-secondary truncate">{item.console_name}</span>}
+      <Link href={href} title={item.title} className="text-[0.9375rem] font-bold truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-ring">
         {item.title}
       </Link>
-      <div className="flex items-center gap-2">
-        <ProgressBar pct={progress.hard != null ? progress.hard * 100 : pct} softPct={progress.hard != null ? pct : 0} label={item.title} className="flex-1" />
-        <span className={`text-[11px] tabular-nums ${done ? 'text-success font-semibold' : 'text-text-secondary'}`}>{pct}%</span>
-      </div>
-      <span className="text-[11px] text-text-secondary truncate">
-        {item.console_name ? `${item.console_name} · ` : ''}
-        {status}
+      {/* No bar under the cover (the user's choice, 2026-10-24): the percentage and what is left. */}
+      <span className="flex items-baseline gap-1 min-w-0 text-xs -mt-1">
+        <span className={`tabular-nums font-extrabold ${done ? 'text-success' : 'text-text-main'}`}>{pct}%</span>
+        <span className="text-text-secondary truncate">· {status}</span>
       </span>
     </li>
   )

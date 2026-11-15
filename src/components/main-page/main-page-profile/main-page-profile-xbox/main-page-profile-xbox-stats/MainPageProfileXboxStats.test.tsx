@@ -6,7 +6,7 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import type { XboxSummary } from '@/types/xbox'
 
 const SUMMARY: XboxSummary = { gamertag: 'T', avatarUrl: null, bio: '', tier: 'Gold', gamerscore: 10242, achievementsUnlocked: 593, games: 135 }
-const PLAYED = formatPlaytime(3409 + 60, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en')
+const PLAYED = formatPlaytime(3409 + 60, en.steam, 'en')
 
 test('games, play time, gamerscore and achievements', () => {
   const library = [xboxGameFixture({ playtimeMinutes: 3409 }), xboxGameFixture({ id: 2, playtimeMinutes: 60 }), xboxGameFixture({ id: 3, playtimeMinutes: null })]
@@ -19,9 +19,10 @@ test('games, play time, gamerscore and achievements', () => {
   expect(screen.getByText(en.xbox.gamerscore)).toBeInTheDocument()
 })
 
-test('a dash for the play time while loading, and when Xbox gave none', () => {
-  const { rerender } = render(<MainPageProfileXboxStats summary={SUMMARY} library={[xboxGameFixture({ playtimeMinutes: 3409 })]} isLoading />)
-  expect(screen.getByText('—')).toBeInTheDocument()
+test('the play time is a skeleton while loading, a dash only when Xbox gave none (B-05)', () => {
+  const { container, rerender } = render(<MainPageProfileXboxStats summary={SUMMARY} library={[xboxGameFixture({ playtimeMinutes: 3409 })]} isLoading />)
+  expect(screen.queryByText('—')).not.toBeInTheDocument()
+  expect(container.querySelector('.bg-skeleton')).not.toBeNull()
   rerender(<MainPageProfileXboxStats summary={SUMMARY} library={[xboxGameFixture({ playtimeMinutes: null })]} isLoading={false} />)
   expect(screen.getByText('—')).toBeInTheDocument()
 })

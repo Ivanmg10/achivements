@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import pool from '@/lib/db'
 import { requireXboxUser } from '@/lib/apiAuth'
 import { findXboxAccount, isGamertag, xboxConfigured, xboxFailure, xboxSummary } from '@/lib/xboxClient'
 import { forgetUser } from '@/lib/userRecord'
+import { saveLink } from '@/lib/platformLinks'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
+import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 
 /**
  * Links an Xbox account by its gamertag. Nothing proves the account is the
@@ -11,7 +12,7 @@ import { onPlatformLinked } from '@/lib/scoreRefresh'
  * games, which is checked here so a hidden profile fails now, not later.
  * Admin-only while Xbox is (requireXboxUser).
  */
-export async function POST(req: Request) {
+async function post(req: Request) {
   const auth = await requireXboxUser()
   if (!auth.ok) return auth.response
 
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    await pool.query('UPDATE users SET xboxxuid = $1, xboxgamertag = $2 WHERE id = $3', [account.xuid, account.gamertag, auth.id])
+    await saveLink(auth.id, 'xbox', account.xuid, account.gamertag)
   } catch (err) {
     console.error('[xbox/link] save', err)
     return NextResponse.json({ error: 'failed' }, { status: 500 })
@@ -44,4 +45,8 @@ export async function POST(req: Request) {
   forgetUser(auth.id)
   await onPlatformLinked(Number(auth.id), 'xbox')
   return NextResponse.json({ xboxxuid: account.xuid, xboxgamertag: account.gamertag })
+}
+
+export async function POST(req: Request) {
+  return withXboxTelemetry('xbox/link', () => post(req))
 }

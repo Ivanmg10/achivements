@@ -1,3 +1,4 @@
+jest.mock('@/lib/bootstrapParts', () => ({ bootstrapPart: jest.fn(async () => null) }))
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { HiddenGamesProvider, useHiddenGames } from './HiddenGamesContext'
@@ -44,6 +45,41 @@ test('a refused hide rolls back and says so', async () => {
   expect(notify.error).toHaveBeenCalledWith(en.toast.gameHideFailed)
 })
 
+test('hiding several saves one request each and gives one toast', async () => {
+  fetchMock.mockReturnValueOnce(ok([])).mockReturnValueOnce(ok()).mockReturnValueOnce(ok())
+  const { result } = renderHook(() => useHiddenGames(), { wrapper })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  let failed: unknown[] = [{}]
+  await act(async () => {
+    failed = await result.current.hideGames([
+      { source: 'steam', id: 620, title: 'Portal 2', image: null },
+      { source: 'ra', id: 5, title: 'Zelda', image: null },
+    ])
+  })
+  expect(failed).toEqual([])
+  expect(result.current.isHidden(620, 'steam') && result.current.isHidden(5, 'ra')).toBe(true)
+  expect(fetchMock).toHaveBeenCalledTimes(3)
+  expect(notify.success).toHaveBeenCalledTimes(1)
+  expect(notify.success).toHaveBeenCalledWith(en.toast.gamesHidden)
+})
+
+test('in a batch only the refused games roll back, and they are returned', async () => {
+  fetchMock.mockReturnValueOnce(ok([])).mockReturnValueOnce(ok()).mockReturnValueOnce(Promise.resolve({ ok: false, status: 500 }))
+  const { result } = renderHook(() => useHiddenGames(), { wrapper })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  const good = { source: 'steam' as const, id: 620, title: 'Portal 2', image: null }
+  const bad = { source: 'ra' as const, id: 5, title: 'Zelda', image: null }
+  let failed: unknown[] = []
+  await act(async () => {
+    failed = await result.current.hideGames([good, bad])
+  })
+  expect(failed).toEqual([bad])
+  expect(result.current.isHidden(620, 'steam')).toBe(true)
+  expect(result.current.isHidden(5, 'ra')).toBe(false)
+  expect(notify.error).toHaveBeenCalledWith(en.toast.gamesHideFailed)
+  expect(notify.success).not.toHaveBeenCalled()
+})
+
 test('showing again removes it; a refusal puts it back and says so', async () => {
   fetchMock.mockReturnValueOnce(ok([{ source: 'ra', game_id: 5, title: 'Zelda', image: null }]))
   const { result } = renderHook(() => useHiddenGames(), { wrapper })
@@ -69,6 +105,16 @@ test('if the list cannot be read, every game stays visible', async () => {
   expect(console.error).toHaveBeenCalled()
 })
 
+test('a public subject uses the profile owner keys without fetching the viewer list', async () => {
+  const subjectWrapper = ({ children }: { children: React.ReactNode }) => <HiddenGamesProvider initialKeys={['psn:2018800']}>{children}</HiddenGamesProvider>
+  const { result } = renderHook(() => useHiddenGames(), { wrapper: subjectWrapper })
+
+  expect(result.current.isHidden(2018800, 'psn')).toBe(true)
+  expect(result.current.isHidden(2018800, 'steam')).toBe(false)
+  expect(result.current.isLoading).toBe(false)
+  expect(fetchMock).not.toHaveBeenCalled()
+})
+
 test('a re-render of the provider keeps the same value, so what reads it is not re-rendered for nothing', async () => {
   fetchMock.mockImplementation(() => ok([]))
   const { result, rerender } = renderHook(() => useHiddenGames(), { wrapper })
@@ -76,4 +122,14 @@ test('a re-render of the provider keeps the same value, so what reads it is not 
   const before = result.current
   rerender()
   expect(result.current).toBe(before)
+})
+
+test('the list comes from the start-up bootstrap when it has it (#101)', async () => {
+  const { bootstrapPart } = jest.requireMock('@/lib/bootstrapParts')
+  ;(bootstrapPart as jest.Mock).mockResolvedValueOnce([{ source: 'psn', game_id: 9, title: 'Astro', image: null }])
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { id: '7' } } })
+  const { result } = renderHook(() => useHiddenGames(), { wrapper })
+  await waitFor(() => expect(result.current.isHidden(9, 'psn')).toBe(true))
+  expect(bootstrapPart).toHaveBeenCalledWith('7', 'hiddenGames')
+  expect(fetchMock).not.toHaveBeenCalled()
 })

@@ -4,6 +4,7 @@ jest.mock('@/lib/raCache', () => ({
   clearCache: jest.fn(),
 }))
 jest.mock('@/lib/fetchRA', () => ({ fetchRA: jest.fn() }))
+jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
 
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
@@ -21,9 +22,9 @@ test('GET returns completed games', async () => {
   expect(res.data).toEqual([{ GameID: 1, Title: 'Game' }])
 })
 
-test('GET sets a private Cache-Control header matching the cache TTL', async () => {
+test('GET does not let the browser keep a stale visibility projection', async () => {
   const res = await GET()
-  expect(res.headers.get('Cache-Control')).toBe('private, max-age=600')
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=0')
 })
 
 test('GET returns 401 when no session', async () => {

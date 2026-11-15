@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
-import { authOptions } from '@/lib/authOptions'
 import { requireSession } from '@/lib/apiAuth'
 import { presenceColumns } from '@/lib/presence'
 import { canUseXbox } from '@/utils/xboxAccess'
 import { vaultTotalsOrNone } from '@/lib/rankings'
+import { notHidden } from '@/lib/gameVisibility'
 
 /**
  * The people you follow as the Friends section's cards show them, from our
@@ -21,7 +20,7 @@ export async function GET(req?: Request) {
 
   try {
     // Xbox is admin-only for now: to anyone else it is not there at all (see canUseXbox).
-    const xbox = canUseXbox((await getServerSession(authOptions))?.user?.admin)
+    const xbox = canUseXbox(auth.user.admin)
     // Fixed strings, chosen by the parameter, never taken from it.
     const followers = req ? new URL(req.url).searchParams.get('who') === 'followers' : false
     const [them, you] = followers ? ['f.follower_id', 'f.followed_id'] : ['f.followed_id', 'f.follower_id']
@@ -33,16 +32,23 @@ export async function GET(req?: Request) {
               -- The names their accounts go by, as their public profile shows them.
               json_build_object('ra', u.rausername, 'steam', u.steamusername, 'psn', u.psnusername,
                                 'xbox', CASE WHEN $2::boolean THEN u.xboxgamertag END) AS accounts,
-              json_build_object('ra', u.favorite_game, 'steam', u.favorite_steam_game, 'psn', u.favorite_psn_game,
-                                'xbox', CASE WHEN $2::boolean THEN u.favorite_xbox_game END) AS favorites,
+              json_build_object(
+                'ra', CASE WHEN NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = u.id AND h.source = 'ra' AND h.game_id = (u.favorite_game->>'id')::int) THEN u.favorite_game END,
+                'steam', CASE WHEN NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = u.id AND h.source = 'steam' AND h.game_id = (u.favorite_steam_game->>'id')::int) THEN u.favorite_steam_game END,
+                'psn', CASE WHEN NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = u.id AND h.source = 'psn' AND h.game_id = (u.favorite_psn_game->>'id')::int) THEN u.favorite_psn_game END,
+                'xbox', CASE WHEN $2::boolean AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = u.id AND h.source = 'xbox' AND h.game_id = (u.favorite_xbox_game->>'id')::int) THEN u.favorite_xbox_game END
+              ) AS favorites,
               (SELECT COUNT(*) FROM game_groups g WHERE g.user_id = u.id AND g.is_public)::int AS "publicGroups",
               -- Their achievement showcase (earned, chosen, in their order); never their pinned goals.
               COALESCE((
                 SELECT json_agg(json_build_object('source', sc.source, 'gameId', sc.game_id, 'gameTitle', sc.game_title,
                                                   'title', sc.title, 'description', sc.description, 'badge', sc.badge)
                                 ORDER BY sc.position, sc.created_at)
-                FROM showcase_achievements sc WHERE sc.user_id = u.id AND ($2::boolean OR sc.source <> 'xbox')
-              ), '[]'::json) AS showcase
+                FROM showcase_achievements sc
+                WHERE sc.user_id = u.id AND ($2::boolean OR sc.source <> 'xbox')
+                  AND ${notHidden('sc', 'u.id')}
+              ), '[]'::json) AS showcase,
+              COALESCE((SELECT json_agg(h.source || ':' || h.game_id) FROM hidden_games h WHERE h.user_id = u.id), '[]'::json) AS "hiddenGames"
        FROM follows f JOIN users u ON u.id = ${them}
        WHERE ${you} = $1 AND u.profile_public
        ORDER BY f.created_at DESC`,

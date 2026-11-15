@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 /**
  * A game's square icon on any platform: Steam's from its CDN (with its own

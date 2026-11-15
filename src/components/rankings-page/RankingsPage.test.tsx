@@ -3,13 +3,14 @@ import { en } from '@/translations/en'
 import RankingsPage from './RankingsPage'
 import { useRankings } from '@/hooks/useRankings'
 import { useVaultMe } from '@/hooks/useVaultMe'
+import { levelOf } from '@/utils/vaultLevel'
 
 jest.mock('@/hooks/useRankings', () => ({ useRankings: jest.fn(), ZONE_MAX: 50 }))
 jest.mock('@/hooks/useVaultMe', () => ({ useVaultMe: jest.fn() }))
 jest.mock('@/hooks/useXboxEnabled', () => ({ useXboxEnabled: () => false }))
 
 const row = (rank: number, username: string, over: Record<string, unknown> = {}) => ({
-  username, avatar: null, rank, points: 10_000 - rank * 100, totalPoints: 10_000 - rank * 100, split: { ra: 100 }, completed: 3, achievements: 40, delta: null, isMe: false, trend: [], ...over,
+  username, avatar: null, rank, points: 10_000 - rank * 100, totalPoints: 10_000 - rank * 100, split: { ra: 100 }, completed: 3, achievements: 40, delta: null, isMe: false, trend: [], streak: 0, bestStreak: 0, ...over,
 })
 const rows = Array.from({ length: 6 }, (_, i) => row(i + 1, `user${i + 1}`))
 const retry = jest.fn()
@@ -44,17 +45,22 @@ test('a podium for the first three, then the table, and more on demand', () => {
 test('changing the view asks for it', () => {
   render(<RankingsPage signedIn />)
   fireEvent.click(screen.getByRole('tab', { name: en.rankings.following }))
-  expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toEqual({ scope: 'following', period: 'all', source: 'all' })
-  fireEvent.click(screen.getByRole('button', { name: en.rankings.week }))
+  expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toEqual({ scope: 'following', period: 'all', source: 'all', sort: 'points' })
+  fireEvent.click(screen.getByRole('combobox', { name: en.rankings.period }))
+  fireEvent.click(screen.getByRole('option', { name: en.rankings.week }))
   expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toMatchObject({ period: 'week' })
-  expect(screen.getByRole('button', { name: en.rankings.week })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByRole('combobox', { name: en.rankings.period })).toHaveTextContent(en.rankings.week)
+  fireEvent.click(screen.getByRole('combobox', { name: en.rankings.sort }))
+  fireEvent.click(screen.getByRole('option', { name: en.rankings.sortBest }))
+  expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toMatchObject({ sort: 'best' })
+  expect(screen.getByRole('combobox', { name: en.rankings.sort })).toHaveTextContent(en.rankings.sortBest)
 })
 
 test('signed out: only the global list, names open their public card, and how to join', () => {
   render(<RankingsPage signedIn={false} />)
   expect(screen.queryByRole('tab', { name: en.rankings.following })).not.toBeInTheDocument()
   expect(screen.getAllByRole('link', { name: 'user4' })[0]).toHaveAttribute('href', '/user/user4')
-  expect(screen.getByRole('link', { name: en.rankings.joinCta })).toHaveAttribute('href', '/authPage')
+  expect(screen.getByRole('link', { name: en.rankings.joinCta })).toHaveAttribute('href', '/authPage?mode=register')
 })
 
 test('your zone below the list when you are not in it, widened on demand; your level beside', () => {
@@ -120,7 +126,7 @@ test('beside your level, who is most active this week, and a way to that ranking
   expect(hot).toHaveTextContent('blazing')
   expect(hot).toHaveTextContent('+677')
   fireEvent.click(screen.getByRole('button', { name: en.rankings.hotSee }))
-  expect(useRankings).toHaveBeenLastCalledWith({ scope: 'global', period: 'week', source: 'all' })
+  expect(useRankings).toHaveBeenLastCalledWith({ scope: 'global', period: 'week', source: 'all', sort: 'points' })
   // Already on the weekly ranking: no way to it.
   expect(screen.queryByRole('button', { name: en.rankings.hotSee })).not.toBeInTheDocument()
 })
@@ -128,4 +134,28 @@ test('beside your level, who is most active this week, and a way to that ranking
 test('leads to how points work', () => {
   render(<RankingsPage signedIn />)
   expect(screen.getByRole('link', { name: en.rankings.how })).toHaveAttribute('href', '/rankings/how')
+})
+
+test('a tie reads as one: "3=" on the podium and in the table, the jump to 5 is explained', () => {
+  const tied = [row(1, 'user1'), row(2, 'user2'), row(3, 'user3', { tied: true }), row(3, 'user4', { tied: true }), row(5, 'user5')]
+  setup({ rows: tied })
+  render(<RankingsPage signedIn />)
+  const podium = screen.getByRole('list', { name: en.rankings.title })
+  expect(podium).toHaveTextContent('3=')
+  expect(podium).not.toHaveTextContent('1=')
+  const table = screen.getByRole('table')
+  expect(table).toHaveTextContent('3=')
+  expect(table).not.toHaveTextContent('5=')
+})
+
+test('your level is said once: the ring has the number, beside it only the tier and your place', () => {
+  ;(useVaultMe as jest.Mock).mockReturnValue({ me: { points: 500, split: { ra: 500 }, week: 20, month: 80, rank: 120, listed: true, showInRankings: true, provisional: 0, refreshedAt: null, weeks: [] } })
+  render(<RankingsPage signedIn />)
+  const panel = screen.getByRole('heading', { name: en.rankings.yourLevel }).closest('section')!
+  // "Lv 5 · Novice" would repeat the ring: the tier only; the level stays for a screen reader.
+  const level = en.rankings.levelShort.replace('{n}', String(levelOf(500)))
+  const said = [...panel.querySelectorAll('*')].filter((el) => el.children.length === 0 && el.textContent?.includes(level))
+  expect(said.length).toBeGreaterThan(0)
+  expect(said.every((el) => el.classList.contains('sr-only'))).toBe(true)
+  expect(panel).toHaveTextContent(`${en.rankings.statRank} #120`)
 })

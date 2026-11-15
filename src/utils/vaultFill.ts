@@ -1,5 +1,6 @@
 import type { FillPlatform, FillStatus } from '@/lib/scoreRefresh'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
+import { PLATFORM_NAME } from '@/utils/gameRef'
 import type { Translations } from '@/translations/en'
 
 export type FillProgress = {
@@ -29,15 +30,13 @@ export function fillProgress(status: FillStatus | null | undefined): FillProgres
 }
 
 
-const NAMES: Record<GameSource, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PlayStation', xbox: 'Xbox' }
-
 /**
  * What to tell the user about one platform's fill, or null when the bar says
  * it all: how to fix a private profile or a refused key, that a busy or
  * silent platform is retried on its own, and that Xbox fills in slowly.
  */
 export function fillMessage(source: GameSource, p: FillPlatform, t: Translations['rankings']): string | null {
-  const name = NAMES[source]
+  const name = PLATFORM_NAME[source]
   if (p.error === 'private') return source === 'steam' ? t.fillPrivateSteam : source === 'psn' ? t.fillPrivatePsn : t.fillPrivate.replace('{platform}', name)
   if (p.error === 'key') return t.fillKey
   if (p.error === 'busy') return t.fillBusy.replace('{platform}', name)

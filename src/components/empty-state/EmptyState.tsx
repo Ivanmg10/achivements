@@ -15,14 +15,14 @@ export default function EmptyState({
 
   return (
     <div
-      className={`flex flex-col items-center justify-center gap-2 text-center px-6 ${isCompact ? '' : 'flex-1'} ${className ?? ''}`}
+      className={`enter-rise flex flex-col items-center justify-center gap-2 text-center px-6 ${isCompact ? '' : 'flex-1'} ${className ?? ''}`}
     >
       <span
         aria-hidden="true"
         className={
           isCompact
             ? 'text-2xl text-text-secondary'
-            : 'mb-1 w-14 h-14 rounded-2xl bg-ink/5 ring-1 ring-ink/5 text-text-secondary flex items-center justify-center'
+            : 'mb-1 w-14 h-14 rounded-card bg-ink/5 ring-1 ring-ink/5 text-text-secondary flex items-center justify-center'
         }
       >
         {icon}

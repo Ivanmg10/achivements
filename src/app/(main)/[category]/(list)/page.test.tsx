@@ -74,8 +74,10 @@ jest.mock('@/components/library-all-list/LibraryAllList', () => ({
 
 jest.mock('@/components/library-explorer/LibraryExplorer', () => ({
   __esModule: true,
-  default: ({ layout, entries, onLayout }: { layout: string; entries: { key: string }[]; onLayout: (l: string) => void }) => (
+  default: ({ layout, entries, onLayout, search, layoutToggle }: { layout: string; entries: { key: string }[]; onLayout: (l: string) => void; search?: React.ReactNode; layoutToggle?: React.ReactNode }) => (
     <div data-testid="explorer" data-layout={layout}>
+      {search}
+      {layoutToggle}
       {entries.map((e) => e.key).join(',')}
       <button onClick={() => onLayout('list')}>to-list</button>
     </div>
@@ -84,8 +86,9 @@ jest.mock('@/components/library-explorer/LibraryExplorer', () => ({
 
 jest.mock('@/hooks/useRaLinked', () => ({ useRaLinked: jest.fn() }))
 
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import CategoryPage from './page'
+import LibraryPage from '@/components/library-page/LibraryPage'
 import { useParams } from 'next/navigation'
 import { useGamesByCategory } from '@/hooks/useGamesByCategory'
 import { useGameFiltering } from '@/hooks/useGameFiltering'
@@ -134,10 +137,11 @@ test('renders empty state when no games', () => {
   expect(screen.getByTestId('empty-state')).toBeInTheDocument()
 })
 
-test('renders error message on fetch error', () => {
+test('a failed read says it in a sentence, not the error’s own text', () => {
   ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: 'Network error' })
   renderCards()
-  expect(screen.getByText('Network error')).toBeInTheDocument()
+  expect(screen.getByText(en.categoryPage.loadError)).toBeInTheDocument()
+  expect(screen.queryByText('Network error')).not.toBeInTheDocument()
 })
 
 test('a Steam profile that turned private says so, and any other Steam failure is the generic one', () => {
@@ -217,11 +221,12 @@ describe('Steam section', () => {
     expect(screen.getByTestId('steam-section')).toBeInTheDocument()
   })
 
-  test('with no RA account there is no RA section at all, not even an empty one', () => {
+  test('with no RA account there is no RA section at all, not even an empty one; with no account, a word on connecting one', () => {
     asUser(false, false)
     ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: undefined })
     renderCards()
-    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument()
+    expect(screen.getByTestId('empty-state')).toHaveTextContent(en.categoryPage.noGames)
+    expect(screen.queryByText(en.categoryPage.noPlaying)).not.toBeInTheDocument()
     expect(screen.queryByTestId('game-list')).not.toBeInTheDocument()
     expect(screen.getByTestId('steam-section')).toBeInTheDocument()
   })
@@ -271,8 +276,13 @@ describe('foldable RA and Steam sections', () => {
     expect(links.length).toBeLessThanOrEqual(3)
   })
 
-  test('the page count covers both platforms', () => {
+  test('the page count covers both platforms, said once: by the "all" filter in progress, under the title elsewhere', () => {
     bothAccounts()
+    const { unmount } = renderCards()
+    expect(screen.getByTestId('status-header')).toHaveTextContent(/^$/)
+    expect(within(screen.getByRole('group', { name: en.libraryFilters.quickLabel })).getByRole('button', { pressed: true })).toHaveTextContent('3')
+    unmount()
+    ;(useParams as jest.Mock).mockReturnValue({ category: 'completed' })
     renderCards()
     expect(screen.getByTestId('status-header')).toHaveTextContent('3')
   })
@@ -329,6 +339,19 @@ describe('library filters and views', () => {
     ;(useParams as jest.Mock).mockReturnValue({ category: 'wantToPlay' })
     renderCards()
     expect(screen.queryByRole('group', { name: 'Quick filters' })).not.toBeInTheDocument()
+  })
+
+  test('all games: the same page, its quick filters the statuses, the cards always together', () => {
+    ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true })
+    ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [{ ...steam, pctWon: 100, achievementsLoaded: true, maxPossible: 4, numAwarded: 4 }], loading: false })
+    render(<LibraryPage category="all" />)
+    fireEvent.click(screen.getByRole('button', { name: 'Cards' }))
+    const filters = within(screen.getByRole('group', { name: 'Quick filters' })).getAllByRole('button')
+    expect(filters.map((b) => b.textContent)).toEqual(['All2', 'In progress1', 'Completed1', 'Not started0'])
+    expect(screen.queryByRole('group', { name: 'View' })).not.toBeInTheDocument()
+    expect(screen.getAllByTestId('mixed-item')).toHaveLength(2)
+    fireEvent.click(filters[2])
+    expect(screen.getAllByTestId('mixed-item').map((n) => n.textContent)).toEqual(['Hades'])
   })
 
   test('there is no view toggle with one platform', () => {
@@ -424,11 +447,13 @@ describe('shelves and list', () => {
   test('a platform selector beside the title narrows what the shelves and the list show', () => {
     render(<CategoryPage />)
     expect(screen.getByTestId('explorer')).toHaveTextContent('ra:1,steam:5')
-    fireEvent.click(screen.getByRole('button', { name: 'Steam 1' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Steam 1' }))
     expect(screen.getByTestId('explorer')).toHaveTextContent('steam:5')
     expect(screen.getByTestId('explorer')).not.toHaveTextContent('ra:1')
-    expect(screen.getByRole('button', { name: 'Steam 1' })).toHaveAttribute('aria-pressed', 'true')
-    fireEvent.click(screen.getByRole('button', { name: 'All 2' }))
+    expect(screen.getByRole('tab', { name: 'Steam 1' })).toHaveAttribute('aria-selected', 'true')
+    // The list is the tabs' panel, named by the tab chosen.
+    expect(screen.getByRole('tabpanel', { name: 'Steam 1' })).toContainElement(screen.getByTestId('explorer'))
+    fireEvent.click(screen.getByRole('tab', { name: 'All 2' }))
     expect(screen.getByTestId('explorer')).toHaveTextContent('ra:1,steam:5')
   })
 

@@ -20,6 +20,7 @@ function makeRequest(method: string, url: string, body?: unknown) {
 beforeEach(() => {
   jest.clearAllMocks()
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1' } })
+  ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
 })
 
 describe('GET', () => {
@@ -32,21 +33,21 @@ describe('GET', () => {
   test('defaults to RA when no source is given', async () => {
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
     await GET(makeRequest('GET', 'http://localhost/api/favorites'))
-    const [, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(params).toEqual(['1', 'ra'])
   })
 
   test('filters by Steam source and gameId', async () => {
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
     await GET(makeRequest('GET', 'http://localhost/api/favorites?source=steam&gameId=620'))
-    const [, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(params).toEqual(['1', 'steam', '620'])
   })
 
   test('returns every pin across both platforms with source=all', async () => {
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [{ source: 'steam' }, { source: 'ra' }] })
     const res = await GET(makeRequest('GET', 'http://localhost/api/favorites?source=all'))
-    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [sql, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(params).toEqual(['1'])
     expect(sql).not.toContain('source =')
     expect(res.data).toEqual([{ source: 'steam' }, { source: 'ra' }])
@@ -59,7 +60,7 @@ describe('GET', () => {
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [{ source: 'ra' }] })
     await GET(makeRequest('GET', 'http://localhost/api/favorites?source=all&user=bob'))
     expect(pool.query).toHaveBeenCalledTimes(1)
-    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['1'])
+    expect((pool.query as jest.Mock).mock.calls.at(-1)![1]).toEqual(['1'])
   })
 
   test('returns 500 when the query fails', async () => {
@@ -93,7 +94,7 @@ describe('POST', () => {
       }),
     )
     expect(res.status).toBe(200)
-    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [sql, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(sql).toContain("'ra'")
     expect(params).toEqual(['1', 5, 1, 'Game', JSON.stringify({ ID: 5, Title: 'x' }), 10])
   })
@@ -118,7 +119,7 @@ describe('POST', () => {
       }),
     )
     expect(res.status).toBe(200)
-    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [sql, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(sql).toContain("'steam'")
     expect(params).toEqual(['1', 'ACH_WIN', 620, 'Portal 2', JSON.stringify({ apiname: 'ACH_WIN', title: 'Win' }), 0])
   })
@@ -126,7 +127,7 @@ describe('POST', () => {
   test('returns 400 without an integer psnTrophyId for PSN', async () => {
     const res = await POST(makeRequest('POST', 'http://localhost/api/favorites', { source: 'psn', psnTrophyId: 'x', gameId: 2018800 }))
     expect(res.status).toBe(400)
-    expect(pool.query).not.toHaveBeenCalled()
+    expect(pool.query).not.toHaveBeenCalledWith(expect.stringContaining('INSERT'), expect.anything())
   })
 
   test('pins a PSN trophy', async () => {
@@ -137,7 +138,7 @@ describe('POST', () => {
       }),
     )
     expect(res.status).toBe(200)
-    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [sql, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(sql).toContain("'psn'")
     expect(params).toEqual(['1', 4, 2018800, 'Astro Bot', JSON.stringify({ id: 4, name: 'Bot Master' })])
   })
@@ -154,7 +155,7 @@ describe('POST', () => {
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
     const res = await POST(makeRequest('POST', 'http://localhost/api/favorites', body))
     expect(res.status).toBe(200)
-    const sql: string = (pool.query as jest.Mock).mock.calls[0][0]
+    const sql: string = (pool.query as jest.Mock).mock.calls.at(-1)![0]
     const columns = /pinned_achievements\s*\(([^)]*)\)/.exec(sql)![1].split(',')
     const values = /VALUES\s*\(([^)]*)\)/.exec(sql)![1].split(',')
     expect(columns).toHaveLength(values.length)
@@ -186,7 +187,7 @@ describe('DELETE', () => {
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
     const res = await DELETE(makeRequest('DELETE', 'http://localhost/api/favorites?achievementId=5'))
     expect(res.status).toBe(200)
-    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [sql, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(sql).toContain("source = 'ra'")
     expect(params).toEqual(['1', '5'])
   })
@@ -197,7 +198,7 @@ describe('DELETE', () => {
       makeRequest('DELETE', 'http://localhost/api/favorites?steamApiname=ACH_WIN&gameId=620'),
     )
     expect(res.status).toBe(200)
-    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [sql, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(sql).toContain("source = 'steam'")
     expect(params).toEqual(['1', '620', 'ACH_WIN'])
   })
@@ -206,7 +207,7 @@ describe('DELETE', () => {
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
     const res = await DELETE(makeRequest('DELETE', 'http://localhost/api/favorites?psnTrophyId=4&gameId=2018800'))
     expect(res.status).toBe(200)
-    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [sql, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(sql).toContain("source = 'psn'")
     expect(params).toEqual(['1', '2018800', '4'])
   })
@@ -226,7 +227,7 @@ describe('Xbox', () => {
   test('a non-admin cannot pin an Xbox achievement', async () => {
     const res = await POST(makeRequest('POST', url, { source: 'xbox', xboxAchievementId: '49', gameId: 1738914043, achievement }))
     expect(res.status).toBe(403)
-    expect(pool.query).not.toHaveBeenCalled()
+    expect(pool.query).not.toHaveBeenCalledWith(expect.stringContaining('INSERT'), expect.anything())
   })
 
   test('an admin pins one, by its own id', async () => {
@@ -234,7 +235,7 @@ describe('Xbox', () => {
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
     const res = await POST(makeRequest('POST', url, { source: 'xbox', xboxAchievementId: '49', gameId: 1738914043, gameTitle: 'Halo', achievement }))
     expect(res.status).toBe(200)
-    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [sql, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(sql).toContain("'xbox'")
     expect(sql).toContain('xbox_achievement_id')
     expect(params).toEqual(['1', '49', 1738914043, 'Halo', JSON.stringify(achievement)])
@@ -245,14 +246,14 @@ describe('Xbox', () => {
     expect((await POST(makeRequest('POST', url, { source: 'xbox', gameId: 1 }))).status).toBe(400)
     expect((await POST(makeRequest('POST', url, { source: 'xbox', xboxAchievementId: 49, gameId: 1 }))).status).toBe(400)
     expect((await POST(makeRequest('POST', url, { source: 'xbox', xboxAchievementId: '49', gameId: 'x' }))).status).toBe(400)
-    expect(pool.query).not.toHaveBeenCalled()
+    expect(pool.query).not.toHaveBeenCalledWith(expect.stringContaining('INSERT'), expect.anything())
   })
 
   test('unpins one by its id and game', async () => {
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
     const res = await DELETE(makeRequest('DELETE', `${url}?xboxAchievementId=49&gameId=1738914043`))
     expect(res.status).toBe(200)
-    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [sql, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(sql).toContain("source = 'xbox'")
     expect(params).toEqual(['1', '1738914043', '49'])
   })
@@ -270,7 +271,7 @@ describe('Xbox', () => {
     ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
     await GET(makeRequest('GET', `${url}?source=xbox&gameId=1738914043`))
-    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['1', 'xbox', '1738914043'])
+    expect((pool.query as jest.Mock).mock.calls.at(-1)![1]).toEqual(['1', 'xbox', '1738914043'])
   })
 })
 
@@ -284,14 +285,14 @@ describe('PUT (the order)', () => {
   test.each([[undefined], [[]], [['a']], [[1, 1]], [[0]], [[1.5]]])('refuses %j as an order', async (order) => {
     const res = await PUT(makeRequest('PUT', 'http://localhost/api/favorites', { order }))
     expect(res.status).toBe(400)
-    expect(pool.query).not.toHaveBeenCalled()
+    expect(pool.query).not.toHaveBeenCalledWith(expect.stringContaining('INSERT'), expect.anything())
   })
 
   test("saves each pin's place, only among the user's own rows", async () => {
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rowCount: 3 })
     const res = await PUT(makeRequest('PUT', 'http://localhost/api/favorites', { order: [30, 10, 20] }))
     expect(res.status).toBe(200)
-    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    const [sql, params] = (pool.query as jest.Mock).mock.calls.at(-1)!
     expect(sql).toContain('WITH ORDINALITY')
     expect(sql).toContain('p.user_id = $1')
     expect(params).toEqual(['1', [30, 10, 20]])

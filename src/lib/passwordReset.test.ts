@@ -1,6 +1,6 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
-import { claimToken, createResetToken, hashToken, resetUrl } from './passwordReset'
+import { claimToken, createResetToken, hashToken, resetUrl, retireResetTokens } from './passwordReset'
 import pool from '@/lib/db'
 
 const query = pool.query as jest.Mock
@@ -8,6 +8,11 @@ const query = pool.query as jest.Mock
 beforeEach(() => {
   jest.clearAllMocks()
   query.mockResolvedValue({ rows: [] })
+})
+
+test('a change of password or address leaves no unused link alive', async () => {
+  await retireResetTokens(7)
+  expect(query).toHaveBeenCalledWith(expect.stringContaining('DELETE FROM password_resets'), [7])
 })
 
 test('a new token retires the ones that user already had', async () => {

@@ -1,4 +1,5 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
+jest.mock('@/lib/serverLanguage', () => ({ serverLanguage: jest.fn().mockResolvedValue('es') }))
 jest.mock('next-auth', () => ({ getServerSession: jest.fn() }))
 jest.mock('next/navigation', () => ({ redirect: jest.fn() }))
 

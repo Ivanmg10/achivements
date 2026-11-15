@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import type { RetroAchievementsGameWithAchievements, SubsetGame } from '@/types/types'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 
@@ -11,10 +11,12 @@ type State = {
   subsets: SubsetGame[]
   /** The game is in, its subsets are still being looked up. */
   subsetsLoading: boolean
+  /** RA does not know this game: a not-found page, not an error to retry. */
+  missing: boolean
   error: string | null
 }
 
-const EMPTY: State = { game: null, parentId: null, parentIcon: '', subsets: [], subsetsLoading: false, error: null }
+const EMPTY: State = { game: null, parentId: null, parentIcon: '', subsets: [], subsetsLoading: false, missing: false, error: null }
 
 /** The title a subset shares with its main game, for looking the subsets up. */
 function baseTitle(title: string | null | undefined): string {
@@ -28,7 +30,7 @@ function baseTitle(title: string | null | undefined): string {
  * subset lookup only costs the tabs, never the page. `retry` asks again.
  */
 export function useGameInfo(gameId: string | null) {
-  const { status } = useSession()
+  const { status } = useAuthSession()
   const [state, setState] = useState<State>(EMPTY)
   const [attempt, setAttempt] = useState(0)
 
@@ -48,6 +50,10 @@ export function useGameInfo(gameId: string | null) {
       let game: RetroAchievementsGameWithAchievements
       try {
         const res = await fetch(`/api/getGameProgression?gameId=${gameId}`)
+        if (res.status === 404) {
+          set({ missing: true })
+          return
+        }
         if (!res.ok) throw new Error(`Error ${res.status}`)
         game = await res.json()
       } catch (err) {

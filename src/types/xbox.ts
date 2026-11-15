@@ -1,4 +1,4 @@
-import type { GameProgressBase } from '@/types/steam'
+import type { GameProgressBase } from '@/types/game'
 
 /** An Xbox Live profile, as the app shows it. */
 export type XboxProfile = {
@@ -36,6 +36,8 @@ export type XboxGameProgress = GameProgressBase & {
   totalKnown: boolean
   earnedGamerscore: number
   totalGamerscore: number
+  /** Latest unlocked achievement when the current set is complete; null if that cannot be proven. */
+  completedAt?: string | null
   /** Minutes played, when known. Not read yet: Xbox sends it in a separate call. */
   playtimeMinutes: number | null
 }

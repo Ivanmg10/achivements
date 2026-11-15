@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 
 /**
  * The blurred artwork behind a Steam game page, as the RA page does with its

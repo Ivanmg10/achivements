@@ -4,6 +4,8 @@ import { dataOwner } from '@/lib/apiAuth'
 import { withCache } from '@/lib/raCache'
 import { cachedJson } from '@/lib/httpCache'
 import { getUserRecentlyPlayedGames } from '@/lib/raClient'
+import { visibleGamesForUser } from '@/lib/gameVisibility'
+import type { RecentlyPlayedGame } from '@/types/types'
 
 const TTL = 5 * 60 * 1000
 
@@ -19,13 +21,14 @@ export async function GET(req?: Request) {
   }
 
   try {
-    const data = await withCache(
+    const data = await withCache<RecentlyPlayedGame[]>(
       `recentlyPlayed:${id}`,
       TTL,
-      () => getUserRecentlyPlayedGames(rausername, raid, 500),
+      async () => (await getUserRecentlyPlayedGames(rausername, raid, 500)) as RecentlyPlayedGame[],
       (d) => Array.isArray(d),
     )
-    return cachedJson(data, TTL)
+    const visible = await visibleGamesForUser(id, data, 'ra', (game) => game.GameID)
+    return cachedJson(visible, 0)
   } catch (err) {
     return raUnavailable(err)
   }

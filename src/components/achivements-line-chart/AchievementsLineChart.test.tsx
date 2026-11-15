@@ -49,6 +49,14 @@ test('still renders the chart, flat at 0, with only old achievements', async () 
   expect(await screen.findByTestId('ResponsiveContainer')).toBeInTheDocument()
 })
 
+test('its heading keeps its height while it loads: a block has no baseline to stand on', () => {
+  const { rerender } = render(<AchievementsLineChart achievements={[]} isLoading />)
+  const heading = screen.getByText(en.lineChart.last7Days).parentElement
+  expect(heading).toHaveClass('items-end')
+  rerender(<AchievementsLineChart achievements={[]} />)
+  expect(heading).toHaveClass('items-baseline')
+})
+
 test('one unlock is said in the singular', () => {
   render(<AchievementsLineChart achievements={[{ Date: recentDate(0) } as never]} />)
   expect(screen.getByText(en.lineChart.last7DaysOne)).toBeInTheDocument()

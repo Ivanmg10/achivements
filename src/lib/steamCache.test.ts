@@ -2,7 +2,7 @@ jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }
 
 import pool from '@/lib/db'
 import { wantsFresh } from '@/lib/wantsFresh'
-import { readCache, readCacheMany, writeCache, withSteamCache, clearUserCache, sweepExpired, TTL } from './steamCache'
+import { readCache, readCacheEntry, readCacheMany, writeCache, withSteamCache, clearUserCache, sweepExpired, takeLease, dropLease, TTL } from './steamCache'
 
 jest.mock('@/lib/wantsFresh', () => ({ MIN_REFRESH_AGE_MS: 60000, wantsFresh: jest.fn() }))
 
@@ -10,11 +10,13 @@ const query = pool.query as jest.Mock
 
 beforeEach(() => {
   jest.clearAllMocks()
+  query.mockReset()
   jest.spyOn(console, 'error').mockImplementation(() => {})
 })
 
 afterEach(() => {
   ;(console.error as jest.Mock).mockRestore()
+  jest.useRealTimers()
 })
 
 describe('readCache', () => {
@@ -33,6 +35,18 @@ describe('readCache', () => {
   test('degrades to a miss when the DB is down rather than throwing', async () => {
     query.mockRejectedValue(new Error('db down'))
     await expect(readCache('k')).resolves.toBeNull()
+  })
+
+  test('redacts Xbox account and title ids from cache error logs', async () => {
+    query.mockRejectedValue(new Error('db down'))
+    await readCache('xbox:account:v2:PersonalGamertag')
+    await readCache('xbox:titles:v7:2535400000000001')
+
+    const output = (console.error as jest.Mock).mock.calls.flat().join(' ')
+    expect(output).not.toContain('PersonalGamertag')
+    expect(output).not.toContain('2535400000000001')
+    expect(output).toContain('xbox:account:v2')
+    expect(output).toContain('xbox:titles:v7')
   })
 })
 
@@ -109,9 +123,98 @@ describe('withSteamCache', () => {
     await expect(withSteamCache('k', 1000, fetcher)).resolves.toEqual({ ok: 1 })
     expect(fetcher).toHaveBeenCalledTimes(2)
   })
+
+  test('serves an expired successful value for an allowed failure and marks it stale', async () => {
+    query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ cache_data: { old: true } }] })
+    const onEvent = jest.fn()
+    const fetcher = jest.fn().mockRejectedValue(new Error('upstream down'))
+
+    await expect(withSteamCache('stale-basic', 1000, fetcher, { staleIfError: () => true, onEvent })).resolves.toEqual({ old: true })
+    expect(query.mock.calls[1][0]).not.toContain('expires_at > NOW()')
+    expect(query.mock.calls.some(([sql]) => String(sql).includes('INSERT INTO steam_cache'))).toBe(false)
+    expect(onEvent).toHaveBeenCalledWith('stale')
+  })
+
+  test('does not read or serve stale data when the failure is excluded', async () => {
+    query.mockResolvedValue({ rows: [] })
+    const fetcher = jest.fn().mockRejectedValue(new Error('private'))
+
+    await expect(withSteamCache('stale-excluded', 1000, fetcher, { staleIfError: () => false })).rejects.toThrow('private')
+    expect(query).toHaveBeenCalledTimes(1)
+  })
+
+  test('a shared or backed-off stale result still obeys each caller failure policy', async () => {
+    query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ cache_data: 'old' }] })
+    let reject!: (err: Error) => void
+    const fetcher = jest.fn().mockReturnValue(new Promise((_resolve, r) => { reject = r }))
+    const allowed = withSteamCache('mixed-stale', 1000, fetcher, { staleIfError: () => true })
+    const refused = withSteamCache('mixed-stale', 1000, fetcher, { staleIfError: () => false })
+    const settled = Promise.allSettled([allowed, refused])
+    await new Promise<void>((resolve) => setTimeout(resolve, 0))
+    reject(new Error('rate-limited'))
+
+    await expect(settled).resolves.toEqual([
+      { status: 'fulfilled', value: 'old' },
+      { status: 'rejected', reason: new Error('rate-limited') },
+    ])
+    query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ cache_data: 'old' }] })
+    await expect(withSteamCache('mixed-stale', 1000, fetcher, { staleIfError: () => false })).rejects.toThrow('rate-limited')
+    expect(fetcher).toHaveBeenCalledTimes(1)
+  })
+
+  test('backs off retries for 60 seconds after serving stale data', async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-10-30T12:00:00Z'))
+    query.mockImplementation((sql: string) => Promise.resolve({ rows: sql.includes('SELECT cache_data FROM steam_cache WHERE cache_key = $1 AND expires_at') ? [] : [{ cache_data: 'old' }] }))
+    const fetcher = jest.fn().mockRejectedValue(new Error('down'))
+    const options = { staleIfError: () => true }
+
+    await expect(withSteamCache('stale-backoff', 1000, fetcher, options)).resolves.toBe('old')
+    await expect(withSteamCache('stale-backoff', 1000, fetcher, options)).resolves.toBe('old')
+    expect(fetcher).toHaveBeenCalledTimes(1)
+
+    jest.advanceTimersByTime(61_000)
+    await expect(withSteamCache('stale-backoff', 1000, fetcher, options)).resolves.toBe('old')
+    expect(fetcher).toHaveBeenCalledTimes(2)
+    jest.useRealTimers()
+  })
+
+  test('a nested stale result is not written as fresh and is shared as stale', async () => {
+    query.mockResolvedValue({ rows: [] })
+    const onEvent = jest.fn()
+
+    await expect(withSteamCache('nested-stale', 1000, async () => 'value', { staleResult: () => true, onEvent })).resolves.toBe('value')
+    expect(query.mock.calls.some(([sql]) => String(sql).includes('INSERT INTO steam_cache'))).toBe(false)
+    expect(onEvent).toHaveBeenCalledWith('stale')
+  })
+
+  test('reports a shared stale outcome to every concurrent caller', async () => {
+    query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ cache_data: 'old' }] })
+    let reject!: (err: Error) => void
+    const fetcher = jest.fn().mockReturnValue(new Promise((_resolve, r) => { reject = r }))
+    const firstEvent = jest.fn()
+    const secondEvent = jest.fn()
+
+    const first = withSteamCache('stale-shared', 1000, fetcher, { staleIfError: () => true, onEvent: firstEvent })
+    const second = withSteamCache('stale-shared', 1000, fetcher, { staleIfError: () => true, onEvent: secondEvent })
+    const settled = Promise.allSettled([first, second])
+    await new Promise<void>((resolve) => setTimeout(resolve, 0))
+    expect(fetcher).toHaveBeenCalledTimes(1)
+    reject(new Error('down'))
+
+    await expect(settled).resolves.toEqual([{ status: 'fulfilled', value: 'old' }, { status: 'fulfilled', value: 'old' }])
+    expect(firstEvent).toHaveBeenCalledWith('stale')
+    expect(secondEvent).toHaveBeenCalledWith('stale')
+    expect(fetcher).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe('clearUserCache', () => {
+  test('takes RA\'s rows too, which carry the user in their key alone', async () => {
+    query.mockResolvedValue({ rowCount: 1 })
+    await clearUserCache('7')
+    expect(query).toHaveBeenCalledWith(expect.stringContaining("cache_key ~ ('^ra:[^:]+:'"), ['7'])
+  })
+
   test('deletes every row for the user', async () => {
     query.mockResolvedValue({ rowCount: 3 })
     await clearUserCache('7')
@@ -125,9 +228,15 @@ describe('clearUserCache', () => {
 })
 
 describe('sweepExpired', () => {
-  test('reports how many rows it removed', async () => {
+  test('reports how many rows it removed and retains Xbox stale data for 30 days', async () => {
     query.mockResolvedValue({ rowCount: 12 })
     await expect(sweepExpired()).resolves.toBe(12)
+    const [sql] = query.mock.calls[0]
+    expect(sql).toContain('expires_at <= NOW()')
+    expect(sql).toContain("cache_key NOT LIKE 'xbox:%'")
+    expect(sql).toContain("INTERVAL '30 days'")
+    // PSN's are served stale for a week (#177).
+    expect(sql).toContain("cache_key NOT LIKE 'psn:%' OR expires_at <= NOW() - INTERVAL '7 days'")
   })
 
   test('treats a null rowCount as zero', async () => {
@@ -206,5 +315,35 @@ describe('refreshing', () => {
     query.mockResolvedValue({ rows: [] })
     await withSteamCache('k', 1000, async () => 'x')
     expect(query.mock.calls[0][1]).toEqual(['k'])
+  })
+})
+
+describe('readCacheEntry', () => {
+  test('an entry younger than the age asked, live or not, with how old it is', async () => {
+    query.mockResolvedValue({ rows: [{ cache_data: { a: 1 }, live: false, age_ms: '1200.5' }] })
+    await expect(readCacheEntry('k', 5000)).resolves.toEqual({ data: { a: 1 }, ageMs: 1200.5, live: false })
+    expect(query.mock.calls[0][1]).toEqual(['k', '5000'])
+  })
+
+  test('none, or a database failure, is null', async () => {
+    query.mockResolvedValueOnce({ rows: [] }).mockRejectedValueOnce(new Error('down'))
+    await expect(readCacheEntry('k', 1)).resolves.toBeNull()
+    await expect(readCacheEntry('k', 1)).resolves.toBeNull()
+  })
+})
+
+describe('leases', () => {
+  test('held by whoever wrote the row; a live one is refused; a database that will not answer grants it', async () => {
+    query.mockResolvedValueOnce({ rowCount: 1 }).mockResolvedValueOnce({ rowCount: 0 }).mockRejectedValueOnce(new Error('down'))
+    await expect(takeLease('lease', 60000)).resolves.toBe(true)
+    await expect(takeLease('lease', 60000)).resolves.toBe(false)
+    await expect(takeLease('lease', 60000)).resolves.toBe(true)
+    expect(query.mock.calls[0][0]).toContain('WHERE steam_cache.expires_at <= NOW()')
+  })
+
+  test('let go by deleting the row, and a failure only logged', async () => {
+    query.mockRejectedValueOnce(new Error('down'))
+    await expect(dropLease('lease')).resolves.toBeUndefined()
+    expect(query).toHaveBeenCalledWith('DELETE FROM steam_cache WHERE cache_key = $1', ['lease'])
   })
 })

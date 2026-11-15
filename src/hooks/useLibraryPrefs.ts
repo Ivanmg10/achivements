@@ -9,7 +9,7 @@ export type LibraryView = 'platform' | 'all'
 const VIEWS: readonly LibraryView[] = ['platform', 'all']
 const LAYOUTS: readonly LibraryLayout[] = ['shelves', 'list', 'cards']
 const COLS: readonly `${StatusGridCols}`[] = ['1', '2', '3']
-const SORTS = (['name', 'lastPlayed', 'percent', 'points'] as const).flatMap((k) => (['asc', 'desc'] as const).map((d) => `${k}:${d}` as const))
+const SORTS = (['name', 'lastPlayed', 'completed', 'percent', 'points'] as const).flatMap((k) => (['asc', 'desc'] as const).map((d) => `${k}:${d}` as const))
 
 const encode = ({ key, dir }: StatusSortState) => `${key}:${dir}` as (typeof SORTS)[number]
 const decode = (s: string): StatusSortState => {
@@ -26,7 +26,8 @@ const decode = (s: string): StatusSortState => {
 export function useLibraryPrefs(cat: string) {
   const fallback = encode(defaultSortStateFor(cat))
   const [sort, setSort] = useStoredChoice(`library-sort:${cat}`, SORTS, fallback)
-  const [allSort, setAllSort] = useStoredChoice(`library-sort-all:${cat}`, SORTS, fallback)
+  // RA's own list has no completion date to sort by; the mixed one does, and on Completed it is what matters.
+  const [allSort, setAllSort] = useStoredChoice(`library-sort-all:${cat}`, SORTS, cat === 'completed' ? 'completed:desc' : fallback)
   const [cols, setCols] = useStoredChoice('library-cols', COLS, '2')
   const [view, setView] = useStoredChoice<LibraryView>('library-view', VIEWS, 'platform')
   const [layout, setLayout] = useStoredChoice<LibraryLayout>('library-layout', LAYOUTS, 'shelves')

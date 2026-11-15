@@ -6,9 +6,10 @@ import { IconFolders, IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { FriendOverview } from '@/utils/friends'
 import { candidateIconUrl } from '@/utils/gameCandidates'
-import { gameHref } from '@/utils/gameRef'
+import { gameHref, GAME_SOURCES } from '@/utils/gameRef'
 import UserSummary from '@/components/user-summary/UserSummary'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
+import Kicker from '@/components/ui/Kicker'
 
 /**
  * One person you follow, from our own data: who they are, their favourite
@@ -17,16 +18,16 @@ import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
  */
 export default function MainPageFriendsCard({ friend, week }: { friend: FriendOverview; week: number | null }) {
   const { T, lang } = useLanguage()
-  const favorites = (['ra', 'steam', 'psn', 'xbox'] as const)
+  const favorites = GAME_SOURCES
     .map((source) => ({ source, game: friend.favorites?.[source] ?? null }))
     .filter((f) => f.game !== null)
 
   return (
-    <article className="bg-bg-main rounded-xl p-3 flex flex-col gap-3 min-w-0">
+    <article className="bg-bg-main rounded-tile p-3 flex flex-col gap-3 min-w-0">
       <div className="flex items-center justify-between gap-2 min-w-0">
         <Link
           href={`/user/${encodeURIComponent(friend.username)}`}
-          className="flex items-center gap-3 rounded-lg -m-1 p-1 hover:bg-ink/[0.06] transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="flex items-center gap-3 rounded-box -m-1 p-1 hover:bg-ink/[0.06] transition-colors min-w-0 focus-ring"
         >
           <UserSummary user={friend} size={40} />
         </Link>
@@ -43,12 +44,12 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
                   href={gameHref(source, game!.id, friend.username)}
                   title={game!.title}
                   aria-label={game!.title}
-                  className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="block rounded-box focus-ring"
                 >
                   {icon ? (
-                    <Image src={icon} alt="" width={36} height={36} className="w-9 h-9 rounded-lg object-cover" unoptimized />
+                    <Image src={icon} alt="" width={36} height={36} className="w-9 h-9 rounded-box object-cover" unoptimized />
                   ) : (
-                    <span aria-hidden="true" className="block w-9 h-9 rounded-lg bg-ink/10" />
+                    <span aria-hidden="true" className="block w-9 h-9 rounded-box bg-ink/10" />
                   )}
                 </Link>
               </li>
@@ -58,10 +59,10 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
       )}
 
       <div className="flex flex-col gap-1">
-        <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-text-secondary">
+        <Kicker className="flex items-center gap-1.5">
           <IconTrophy size={12} aria-hidden="true" />
           {T.friends.showcase}
-        </p>
+        </Kicker>
         {friend.showcase.length === 0 ? (
           <p className="text-xs text-text-secondary italic">{T.friends.noShowcase}</p>
         ) : (
@@ -69,9 +70,9 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
             {friend.showcase.slice(0, 3).map((p, i) => (
               <li key={`${p.source}:${p.gameId}:${i}`} className="flex items-center gap-2 min-w-0">
                 {p.badge ? (
-                  <Image src={p.badge} alt="" width={24} height={24} className="w-6 h-6 rounded object-cover shrink-0" unoptimized />
+                  <Image src={p.badge} alt="" width={24} height={24} className="w-6 h-6 rounded-box-sm object-cover shrink-0" unoptimized />
                 ) : (
-                  <span aria-hidden="true" className="w-6 h-6 rounded bg-ink/10 shrink-0" />
+                  <span aria-hidden="true" className="w-6 h-6 rounded-box-sm bg-ink/10 shrink-0" />
                 )}
                 <span className="text-xs truncate">
                   {p.title ?? '—'} <span className="text-text-secondary">· {p.gameTitle}</span>

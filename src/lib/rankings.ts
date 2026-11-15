@@ -1,15 +1,19 @@
 import pool from '@/lib/db'
 import { queryRows } from '@/lib/queryRows'
 import { presenceColumns } from '@/lib/presence'
+import { notHidden } from '@/lib/gameVisibility'
+import { PSN_VERIFIED_JOINED, psnVerifiedFor } from '@/lib/vaultGate'
 import { isUploadedAvatar } from '@/lib/avatarImage'
-import type { GameSource } from '@/types/steam'
 import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
+import { readCache, writeCache } from '@/lib/steamCache'
+import type { GameSource } from '@/types/game'
 
 /**
  * The rankings, read from the stored scores (scoreRefresh keeps them). Only
  * users with a public profile who did not opt out are listed; the viewer
  * always sees their own standing. A game counts only for the account still
- * linked, and never while it is flagged. Xbox only for admins.
+ * linked, and never while it is flagged. Xbox only for admins. PSN only once its
+ * account is verified (vaultGate.ts, #176).
  */
 
 export type RankScope = 'global' | 'following'
@@ -19,6 +23,9 @@ export type RankSource = 'all' | GameSource
 export const RANK_SCOPES: RankScope[] = ['global', 'following']
 export const RANK_PERIODS: RankPeriod[] = ['all', 'month', 'week']
 export const RANK_SOURCES: RankSource[] = ['all', 'ra', 'steam', 'psn', 'xbox']
+/** What the list is ordered by: points, the current streak, or the longest one. */
+export type RankSort = 'points' | 'streak' | 'best'
+export const RANK_SORTS: RankSort[] = ['points', 'streak', 'best']
 
 export type RankEntry = {
   id: number
@@ -41,9 +48,10 @@ export type RankEntry = {
 type GameRow = { id: number; username: string; avatar: string | null; listed: boolean; source: GameSource; points: number; completed: number; achievements: number }
 type PeriodRow = { id: number; source: GameSource; points: number }
 
-// A game belongs to the account linked now; relinking another drops the old one's games at once.
+// A game belongs to the account linked now; relinking another drops the old one's games at once. PSN's only counts
+// while that account is verified, which is the one gate of the totals: every read of score_games carries it.
 const LINKED_ACCOUNT = `g.account = CASE g.source WHEN 'ra' THEN u.rausername WHEN 'steam' THEN u.steamid
-                         WHEN 'psn' THEN u.psnaccountid WHEN 'xbox' THEN u.xboxxuid END`
+                         WHEN 'psn' THEN u.psnaccountid WHEN 'xbox' THEN u.xboxxuid END AND ${PSN_VERIFIED_JOINED}`
 
 /** Who: everyone listed (global), or the viewer and whom they follow, or the viewer alone. */
 function audience(scope: RankScope | 'self'): string {
@@ -59,6 +67,7 @@ async function gameRows(scope: RankScope | 'self', viewerId: number, xbox: boole
             COUNT(*) FILTER (WHERE g.completed)::int AS completed, SUM(g.earned)::int AS achievements
      FROM score_games g JOIN users u ON u.id = g.user_id
      WHERE g.flag IS DISTINCT FROM 'suspect' AND ${LINKED_ACCOUNT}
+       AND ${notHidden('g')}
        AND ($1::boolean OR g.source <> 'xbox') AND ${audience(scope)}
      GROUP BY u.id, g.source`,
     [xbox, viewerId],
@@ -71,6 +80,7 @@ async function periodRows(period: Exclude<RankPeriod, 'all'>, xbox: boolean, now
   return queryRows<PeriodRow>(
     `SELECT user_id AS id, source, SUM(points)::int AS points FROM score_periods
      WHERE kind = $1 AND start = $2::date AND ($3::boolean OR source <> 'xbox') AND ($4::int IS NULL OR user_id = $4)
+       AND ${psnVerifiedFor('source', 'user_id')}
      GROUP BY user_id, source`,
     [kind, start, xbox, userId ?? null],
   )
@@ -120,12 +130,40 @@ export function rankEntries(rows: GameRow[], periods: PeriodRow[] | null, source
 const GLOBAL_TTL_MS = 5 * 60 * 1000
 const globalCache = new Map<string, { at: number; rows: unknown }>()
 
+/** Hide/show changes the read projection even when no platform data changed. */
+function clearRankingCache(): void {
+  globalCache.clear()
+}
+
+const VISIBILITY_KEY = 'rankings:hidden-version'
+const VISIBILITY_TTL_MS = 10 * 365 * 24 * 60 * 60 * 1000
+
+async function visibilityVersion(): Promise<string> {
+  return (await readCache<string>(VISIBILITY_KEY)) ?? '0'
+}
+
+/** One shared revision invalidates the five-minute cache in every instance. */
+export async function markRankingVisibilityChanged(): Promise<void> {
+  await writeCache(VISIBILITY_KEY, crypto.randomUUID(), VISIBILITY_TTL_MS)
+  clearRankingCache()
+}
+
+const loading = new Map<string, Promise<unknown>>()
+
 async function cached<T>(key: string, load: () => Promise<T>): Promise<T> {
   const hit = globalCache.get(key)
   if (hit && Date.now() - hit.at < GLOBAL_TTL_MS) return hit.rows as T
-  const rows = await load()
-  globalCache.set(key, { at: Date.now(), rows })
-  return rows
+  // Requests that find it missing together share one read: this one can take seconds.
+  const running = loading.get(key)
+  if (running) return running as Promise<T>
+  const read = load()
+    .then((rows) => {
+      globalCache.set(key, { at: Date.now(), rows })
+      return rows
+    })
+    .finally(() => loading.delete(key))
+  loading.set(key, read)
+  return read
 }
 
 export async function loadRanking(opts: { scope: RankScope; period: RankPeriod; source: RankSource; viewerId: number | null; xbox: boolean; now?: Date }): Promise<RankEntry[]> {
@@ -139,9 +177,10 @@ export async function loadRanking(opts: { scope: RankScope; period: RankPeriod; 
   }
 
   const start = period === 'week' ? weekStart(now) : monthStart(now)
+  const visibility = await visibilityVersion()
   const [rows, periods] = await Promise.all([
-    cached(`g|${xbox}`, () => gameRows('global', -1, xbox)),
-    period === 'all' ? null : cached(`p|${period}|${start}|${xbox}`, () => periodRows(period, xbox, now)),
+    cached(`g|${xbox}|${visibility}`, () => gameRows('global', -1, xbox)),
+    period === 'all' ? null : cached(`p|${period}|${start}|${xbox}|${visibility}`, () => periodRows(period, xbox, now)),
   ])
   if (viewer < 0) return rankEntries(rows, periods, source)
   // Everyone else may be a few minutes old; the viewer's own row is always read now, so their
@@ -165,7 +204,7 @@ export async function weeklyTrend(userIds: number[], source: RankSource, xbox: b
   const rows = await queryRows<{ id: number; start: string; points: number }>(
     `SELECT user_id AS id, to_char(start, 'YYYY-MM-DD') AS start, SUM(points)::int AS points FROM score_periods
      WHERE kind = 'w' AND start >= $1::date AND user_id = ANY($2::int[])
-       AND ($3::text = 'all' OR source = $3) AND ($4::boolean OR source <> 'xbox')
+       AND ($3::text = 'all' OR source = $3) AND ($4::boolean OR source <> 'xbox') AND ${psnVerifiedFor('source', 'user_id')}
      GROUP BY user_id, start`,
     [weeks[0], userIds, source, xbox],
   )
@@ -177,7 +216,70 @@ export async function weeklyTrend(userIds: number[], source: RankSource, xbox: b
   return trend
 }
 
+export type Streak = { current: number; best: number }
+
+const DAY_S = 86400
+
+/** Days in a row with an unlock, from sorted unique day numbers: the run up to today or yesterday, and the longest. */
+export function streakOf(days: number[], today: number): Streak {
+  let run = 0
+  let best = 0
+  days.forEach((d, i) => {
+    run = i > 0 && d === days[i - 1] + 1 ? run + 1 : 1
+    best = Math.max(best, run)
+  })
+  const last = days[days.length - 1]
+  return { current: last !== undefined && last >= today - 1 ? run : 0, best }
+}
+
+/**
+ * Each user's streaks on the chosen platforms, from the days stored with their scored games
+ * (UTC days, as weeks and months are), so no platform is asked. Games without dates
+ * (provisional) do not count; hidden games are excluded from this read projection.
+ */
+export async function streaksOf(userIds: number[], source: RankSource, xbox: boolean, now = new Date()): Promise<Map<number, Streak>> {
+  if (userIds.length === 0) return new Map()
+  // ponytail: reads every stored day of every user asked on each call; keep a per-user column if the list grows large.
+  const rows = await queryRows<{ id: number; days: number[] }>(
+    `SELECT g.user_id AS id, array_agg(DISTINCT ((x->>0)::bigint / ${DAY_S})::int ORDER BY ((x->>0)::bigint / ${DAY_S})::int) AS days
+     FROM score_games g JOIN users u ON u.id = g.user_id, jsonb_array_elements(g.unlocks) x
+     WHERE g.user_id = ANY($1::int[]) AND (x->>0)::bigint > 0 AND g.flag IS DISTINCT FROM 'suspect' AND ${LINKED_ACCOUNT}
+       AND ${notHidden('g')}
+       AND ($2::text = 'all' OR g.source = $2) AND ($3::boolean OR g.source <> 'xbox')
+     GROUP BY g.user_id`,
+    [userIds, source, xbox],
+  )
+  const today = Math.floor(now.getTime() / 1000 / DAY_S)
+  return new Map(rows.map((r) => [r.id, streakOf(r.days, today)]))
+}
+
+/** The same users ordered by a streak (longer first, then points, then name), sharing a place on equal streaks; who has none is left out. */
+export function rankByStreak(entries: RankEntry[], streaks: Map<number, Streak>, key: keyof Streak): RankEntry[] {
+  const value = (e: RankEntry) => streaks.get(e.id)?.[key] ?? 0
+  const ranked = entries
+    .filter((e) => e.listed && value(e) > 0)
+    .sort((a, b) => value(b) - value(a) || b.points - a.points || a.username.localeCompare(b.username))
+    .map((e) => ({ ...e }))
+  ranked.forEach((u, i) => {
+    u.rank = i > 0 && value(ranked[i - 1]) === value(u) ? ranked[i - 1].rank : i + 1
+  })
+  const unlisted = entries.filter((e) => !e.listed).map((u) => ({ ...u, rank: value(u) > 0 ? 1 + ranked.filter((r) => value(r) > value(u)).length : 0 }))
+  return [...ranked, ...unlisted]
+}
+
 /** Where each listed user stood at the start of this week (global, all time, no Xbox). */
+/**
+ * Everyone's streaks, to order a global list by them. They read every listed
+ * user's unlocks, so they are kept like the list itself; the viewer's own row
+ * may not be in the list others see, and is read now.
+ */
+export async function orderingStreaks(entries: RankEntry[], opts: { period: RankPeriod; source: RankSource; xbox: boolean; viewerId: number | null }): Promise<Map<number, Streak>> {
+  const { period, source, xbox, viewerId } = opts
+  const everyone = await cached(`st|${period}|${source}|${xbox}`, () => streaksOf(entries.filter((e) => e.listed).map((e) => e.id), source, xbox))
+  if (viewerId === null || everyone.has(viewerId)) return everyone
+  return new Map([...everyone, ...(await streaksOf([viewerId], source, xbox))])
+}
+
 export async function weekStartRanks(now = new Date()): Promise<Map<number, number>> {
   const rows = await queryRows<{ user_id: number; rank: number }>('SELECT user_id, rank FROM score_snapshots WHERE week = $1::date', [weekStart(now)])
   return new Map(rows.map((r) => [r.user_id, r.rank]))
@@ -208,6 +310,7 @@ export async function vaultTotals(userIds: number[], xbox: boolean): Promise<Map
     `SELECT g.user_id AS id, SUM(g.points * g.stack_factor)::float AS points
      FROM score_games g JOIN users u ON u.id = g.user_id
      WHERE g.user_id = ANY($1::int[]) AND g.flag IS DISTINCT FROM 'suspect' AND ${LINKED_ACCOUNT}
+       AND ${notHidden('g')}
        AND ($2::boolean OR g.source <> 'xbox')
      GROUP BY g.user_id`,
     [userIds, xbox],
@@ -246,6 +349,7 @@ export async function profileTeaser(username: string): Promise<ProfileTeaser | n
             COUNT(g.*) FILTER (WHERE g.completed)::int AS completed, COALESCE(SUM(g.earned), 0)::int AS achievements
      FROM users u
      LEFT JOIN score_games g ON g.user_id = u.id AND g.flag IS DISTINCT FROM 'suspect' AND g.source <> 'xbox' AND ${LINKED_ACCOUNT}
+       AND ${notHidden('g')}
      WHERE LOWER(u.username) = LOWER($1) AND u.profile_public AND u.show_in_rankings
      GROUP BY u.username, u.avatar, g.source`,
     [username],

@@ -1,6 +1,6 @@
 import { storedUnlocks } from '@/lib/steamUnlocks'
 import { loadGlobalPct, loadOwnedGames, loadPlayerAchievements, loadSchema, mapWithConcurrency, SteamAuth } from '@/lib/steamProgress'
-import { lastPlayedGames, unixToIso } from '@/utils/steamMappers'
+import { lastPlayedGames, lastPlayedOf, unixToIso } from '@/utils/steamMappers'
 import type {
   SteamRecentAchievement,
   SteamSchemaAchievement,
@@ -124,9 +124,11 @@ export async function loadActivityAchievements(
 ): Promise<SteamRecentAchievement[]> {
   const cutoff = Math.floor(now / 1000) - days * 86_400
   const owned = await loadOwnedGames(auth)
-  const played = (owned?.response?.games ?? [])
-    .filter((g) => g.has_community_visible_stats && (g.rtime_last_played ?? 0) >= cutoff)
-    .sort((a, b) => (b.rtime_last_played ?? 0) - (a.rtime_last_played ?? 0))
+  const played = lastPlayedGames(
+    (owned?.response?.games ?? []).filter((g) => g.has_community_visible_stats && lastPlayedOf(g, now) >= cutoff),
+    Infinity,
+    now,
+  )
   const live = played.slice(0, maxGames)
   // The rest of the window's games, from the unlocks kept as they were read (the score
   // refresh reads every played game): only games the owned list still shows, so a

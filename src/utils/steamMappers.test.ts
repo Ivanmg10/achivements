@@ -1,8 +1,9 @@
 import {
   lastPlayedGames,
+  lastPlayedOf,
+  TWO_WEEKS_S,
   unixToIso,
   toSteamGameProgress,
-  withAchievementCounts,
   toSteamAchievements,
   countUnlocks,
   withUnlockCounts,
@@ -68,36 +69,6 @@ describe('toSteamGameProgress', () => {
 
   test('treats a missing has_community_visible_stats as no stats', () => {
     expect(toSteamGameProgress({ ...GAME, has_community_visible_stats: undefined }).hasStats).toBe(false)
-  })
-})
-
-describe('withAchievementCounts', () => {
-  const base = toSteamGameProgress(GAME)
-
-  test('counts earned achievements and the percentage', () => {
-    const result = withAchievementCounts(base, [
-      { earned: true },
-      { earned: false },
-      { earned: true },
-      { earned: false },
-    ] as never)
-
-    expect(result.maxPossible).toBe(4)
-    expect(result.numAwarded).toBe(2)
-    expect(result.pctWon).toBe(50)
-  })
-
-  test('rounds the percentage to two decimals', () => {
-    const result = withAchievementCounts(base, [
-      { earned: true }, { earned: false }, { earned: false },
-    ] as never)
-    expect(result.pctWon).toBe(33.33)
-  })
-
-  test('avoids dividing by zero for a game with no achievements', () => {
-    const result = withAchievementCounts(base, [])
-    expect(result.maxPossible).toBe(0)
-    expect(result.pctWon).toBe(0)
   })
 })
 
@@ -167,7 +138,7 @@ describe('toSteamAchievements', () => {
 
   test('an earned-but-undated achievement still counts as earned', () => {
     const [a] = toSteamAchievements(schema, [{ apiname: 'ACH_WIN', achieved: 1, unlocktime: 0 }])
-    expect(withAchievementCounts(toSteamGameProgress(GAME), [a]).numAwarded).toBe(1)
+    expect(a.earned).toBe(true)
   })
 })
 
@@ -192,7 +163,7 @@ describe('countUnlocks / withUnlockCounts', () => {
 test('a freshly mapped game is not yet loaded; counting marks it loaded', () => {
   const base = toSteamGameProgress(GAME)
   expect(base.achievementsLoaded).toBe(false)
-  expect(withAchievementCounts(base, []).achievementsLoaded).toBe(true)
+  expect(withUnlockCounts(base, countUnlocks([{ apiname: 'A', achieved: 1, unlocktime: 1 }])).achievementsLoaded).toBe(true)
 })
 
 describe('toGlobalPctMap', () => {
@@ -298,5 +269,45 @@ describe('lastPlayedGames', () => {
 
   test('leaves out games never played', () => {
     expect(lastPlayedGames([game(1, 0), game(2), game(3, 1)], 5).map((g) => g.appid)).toEqual([3])
+  })
+
+  test('orders a library Steam leaves undated by our own dates (#113)', () => {
+    const now = 1_790_000_000_000
+    const games: SteamOwnedGame[] = [
+      { appid: 1, playtime_forever: 50 },
+      { appid: 2, playtime_forever: 50, playtime_2weeks: 30 },
+      { appid: 3, playtime_forever: 50, last_played_at: 1_789_900_000 },
+      { appid: 4, playtime_forever: 50, last_played_at: 1_700_000_000 },
+    ]
+    expect(lastPlayedGames(games, 10, now).map((g) => g.appid)).toEqual([3, 2, 4])
+  })
+})
+
+describe('lastPlayedOf', () => {
+  const now = 1_790_000_000_000
+  const floor = now / 1000 - TWO_WEEKS_S
+
+  test("Steam's own date wins when it sends one (the API key's owner)", () => {
+    expect(lastPlayedOf({ appid: 1, playtime_forever: 5, playtime_2weeks: 5, rtime_last_played: 1_600_000_000, last_played_at: 1_789_000_000 }, now))
+      .toBe(1_600_000_000)
+  })
+
+  test('otherwise the latest of a kept date and the start of the two weeks', () => {
+    expect(lastPlayedOf({ appid: 1, playtime_forever: 5, playtime_2weeks: 5 }, now)).toBe(floor)
+    expect(lastPlayedOf({ appid: 1, playtime_forever: 5, playtime_2weeks: 5, last_played_at: floor + 10 }, now)).toBe(floor + 10)
+    expect(lastPlayedOf({ appid: 1, playtime_forever: 5, playtime_2weeks: 5, last_played_at: floor - 10 }, now)).toBe(floor)
+  })
+
+  test('no signal is no date', () => {
+    expect(lastPlayedOf({ appid: 1, playtime_forever: 5 }, now)).toBe(0)
+  })
+})
+
+describe('toSteamGameProgress without rtime_last_played (#113)', () => {
+  test('takes our own date', () => {
+    const undated = { ...GAME, rtime_last_played: undefined }
+    expect(toSteamGameProgress({ ...undated, playtime_2weeks: 0, last_played_at: 1_789_000_000 }).lastPlayed)
+      .toBe(new Date(1_789_000_000 * 1000).toISOString())
+    expect(toSteamGameProgress({ ...undated, playtime_2weeks: 0 }).lastPlayed).toBeNull()
   })
 })

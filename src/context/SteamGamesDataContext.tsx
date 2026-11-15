@@ -7,6 +7,7 @@ import type { SteamGameProgress } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 /** Follow-up library requests while the server is still filling counts. */
 const MAX_FILL_PASSES = 10
@@ -18,25 +19,31 @@ type SteamGamesCtx = {
   recent: SteamGameProgress[]
   recentLoading: boolean
   recentError: string | null
-  /** Full library — deferred until the recent feed is in. Feeds category pages. */
+  /** Visible library — deferred until the recent feed is in. Feeds listings and aggregates. */
   library: SteamGameProgress[]
+  /** Unfiltered library for direct game URLs and id lookups, never for listings. */
+  fullLibrary: SteamGameProgress[]
   libraryLoading: boolean
   libraryError: string | null
   refetch: () => void
 }
 
-const EMPTY: SteamGamesCtx = {
+type ProviderValue = SteamGamesCtx & { request: () => void }
+
+const EMPTY: ProviderValue = {
   isLinked: false,
   recent: [],
   recentLoading: false,
   recentError: null,
   library: [],
+  fullLibrary: [],
   libraryLoading: false,
   libraryError: null,
   refetch: () => {},
+  request: () => {},
 }
 
-const Ctx = createContext<SteamGamesCtx>(EMPTY)
+const Ctx = createContext<ProviderValue>(EMPTY)
 
 /**
  * Always straight from the server: these lists change as the server fills in
@@ -67,6 +74,7 @@ async function fetchGames(url: string): Promise<SteamGameProgress[]> {
 export function SteamGamesDataProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
   const subject = useSubject()
+  const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
   const steamid = session?.user?.steamid ?? null
 
   const [recent, setRecent] = useState<SteamGameProgress[]>([])
@@ -75,6 +83,8 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
   const [library, setLibrary] = useState<SteamGameProgress[]>([])
   const [libraryLoading, setLibraryLoading] = useState(false)
   const [libraryError, setLibraryError] = useState<string | null>(null)
+  const [wanted, setWanted] = useState(false)
+  const request = useCallback(() => setWanted(true), [])
   /** Which account the lists belong to — a stale response for a previous link is dropped. */
   const loadedFor = useRef<string | null>(null)
   const generation = useRef(0)
@@ -150,7 +160,7 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
       loadedFor.current = null
       return
     }
-    if (loadedFor.current === steamid) return
+    if (!wanted || loadedFor.current === steamid) return
     loadedFor.current = steamid
     load(steamid)
     // The ref objects themselves: the cleanup must bump whatever load is live then.
@@ -165,7 +175,7 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
       gen.current++
       loaded.current = null
     }
-  }, [steamid, load])
+  }, [steamid, load, wanted])
 
   const refetch = useCallback(() => {
     if (!steamid) return
@@ -177,20 +187,23 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
   }, [steamid, load])
 
   // Games with no achievements at all are left out of every list (see hasSteamAchievements).
-  const withAchievementsRecent = useMemo(() => recent.filter(hasSteamAchievements), [recent])
+  const withAchievementsRecent = useMemo(() => hiddenLoading ? [] : recent.filter(hasSteamAchievements).filter((game) => !isHidden(game.id, 'steam')), [recent, isHidden, hiddenLoading])
   const withAchievementsLibrary = useMemo(() => library.filter(hasSteamAchievements), [library])
+  const visibleLibrary = useMemo(() => hiddenLoading ? [] : withAchievementsLibrary.filter((game) => !isHidden(game.id, 'steam')), [withAchievementsLibrary, isHidden, hiddenLoading])
 
   return (
     <Ctx.Provider
       value={{
         isLinked: Boolean(steamid),
         recent: withAchievementsRecent,
-        recentLoading,
+        recentLoading: Boolean(recentLoading || hiddenLoading),
         recentError,
-        library: withAchievementsLibrary,
-        libraryLoading,
+        library: visibleLibrary,
+        fullLibrary: withAchievementsLibrary,
+        libraryLoading: Boolean(libraryLoading || hiddenLoading),
         libraryError,
         refetch,
+        request,
       }}
     >
       {children}
@@ -198,4 +211,14 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
   )
 }
 
-export const useSteamGamesData = () => useContext(Ctx)
+/**
+ * Reading the lists is what asks for them: the first reader starts the load (#101).
+ * `passive` reads without asking, for what only needs `isLinked` (from the session).
+ */
+export function useSteamGamesData({ passive = false }: { passive?: boolean } = {}): SteamGamesCtx {
+  const { request, ...value } = useContext(Ctx)
+  useEffect(() => {
+    if (!passive) request()
+  }, [passive, request])
+  return value
+}

@@ -14,6 +14,7 @@ import PsnLibraryDetail from '@/components/psn/psn-library-detail/PsnLibraryDeta
 import XboxLibraryDetail from '@/components/xbox/xbox-library-detail/XboxLibraryDetail'
 import { entryHref, entryId } from '@/utils/libraryShelves'
 import type { LibraryEntry } from '@/utils/libraryInsights'
+import { detailCategory } from '@/utils/libraryCategory'
 
 type Of<K extends LibraryEntry['kind']> = Extract<LibraryEntry, { kind: K }>
 
@@ -39,19 +40,21 @@ function RaBody({ entry, category }: { entry: Of<'ra'>; category: string }) {
  * hide, and then the same detail the cards open to. Mounted per game, so each
  * one is asked for when it is shown, not for the whole list.
  */
-export default function LibraryEntryDetail({ entry, category }: { entry: LibraryEntry; category: string }) {
+export default function LibraryEntryDetail({ entry, category: page }: { entry: LibraryEntry; category: string }) {
+  // On "all games" a game opens as its own status: a finished one shows its trophy room, not a game in progress.
+  const category = detailCategory(page, entry.status)
   const { T } = useLanguage()
   const id = entryId(entry)
 
   return (
-    <section aria-label={entry.title} className="relative isolate overflow-hidden flex flex-col gap-3 grow shrink-0 rounded-2xl bg-bg-card p-4 ring-1 ring-accent/30 shadow-lg shadow-black/10">
+    <section aria-label={entry.title} className="relative isolate overflow-hidden flex flex-col gap-3.5 grow shrink-0 rounded-card bg-bg-card p-5 ring-1 ring-inset ring-ink/[0.06]">
       <LibraryDetailBackdrop entry={entry} />
       <header className="flex items-center gap-2 min-w-0">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <Link
             href={entryHref(entry)}
             title={T.libraryLayout.openGame}
-            className="min-w-0 text-2xl sm:text-3xl font-bold tracking-tight leading-tight truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="min-w-0 text-2xl sm:text-[2rem] font-extrabold leading-none truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-ring"
           >
             {entry.title}
           </Link>

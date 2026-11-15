@@ -10,7 +10,8 @@ import { useConsoleVisibility } from '@/hooks/useConsoleVisibility'
  */
 export function useActivityHeatmapYear() {
   const feed = useYearFeed()
-  const { isShown, filtering } = useConsoleVisibility()
+  const { isShown, filtering, isLoading: filterLoading } = useConsoleVisibility()
   const achievements = useMemo(() => (filtering ? feed.achievements.filter(isShown) : feed.achievements), [feed.achievements, filtering, isShown])
-  return { ...feed, achievements }
+  // Loading until the filter is final too: counting before it, the streak changed once the library landed.
+  return { ...feed, achievements, isLoading: feed.isLoading || filterLoading }
 }

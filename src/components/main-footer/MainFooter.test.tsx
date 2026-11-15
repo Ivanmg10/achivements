@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import MainFooter from './MainFooter'
 import { en } from '@/translations/en'
+import { APP_VERSION } from '@/lib/version'
 
 jest.mock('@/lib/analytics', () => ({ GA_ID: '', setAnalyticsEnabled: jest.fn() }))
 
@@ -21,4 +22,9 @@ test('links to the repository and the privacy policy', () => {
   render(<MainFooter />)
   expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', 'https://github.com/Ivanmg10/achivements')
   expect(screen.getByRole('link', { name: en.privacy.link })).toHaveAttribute('href', '/privacy')
+})
+
+test('carries the version, which no longer floats over the page', () => {
+  render(<MainFooter />)
+  expect(screen.getByText(`v${APP_VERSION}`)).toBeInTheDocument()
 })

@@ -1,12 +1,13 @@
 jest.mock('@/hooks/useRecentAchievements', () => ({ useRecentAchievements: jest.fn() }))
-jest.mock('@/hooks/useActivityHeatmap', () => ({ useActivityHeatmap: jest.fn() }))
 jest.mock('@/hooks/useActivityHeatmapYear', () => ({ useActivityHeatmapYear: jest.fn() }))
 jest.mock('@/hooks/useGamesInProgressPreview', () => ({ useGamesInProgressPreview: () => ({ listGames: [], isLoading: false }) }))
 jest.mock('@/context/GamesDataContext', () => ({ useGamesData: () => ({ all: [], hardcore: [], softcore: [], isLoading: false }) }))
 jest.mock('@/hooks/useUserRank', () => ({ useUserRank: () => ({ rank: null, isLoading: false }) }))
 jest.mock('@/hooks/useUserAwards', () => ({ useUserAwards: () => ({ awards: null, isLoading: false }) }))
 jest.mock('@/hooks/useSteamRecentAchievements', () => ({ useSteamRecentAchievements: jest.fn() }))
+jest.mock('@/hooks/useXboxRecentAchievements', () => ({ useXboxRecentAchievements: jest.fn() }))
 jest.mock('@/context/MainPlatformContext', () => ({ useMainPlatform: jest.fn() }))
+jest.mock('@/hooks/useHomeLayout', () => ({ useHomeLayout: jest.fn() }))
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
 
 // The cards themselves have their own tests; here only what each one is fed matters.
@@ -21,7 +22,12 @@ function mockProbe(name: string) {
 jest.mock('./MainPageHeatmap', () => mockProbe('heatmap'))
 jest.mock('./MainPageTopGames', () => mockProbe('top-games'))
 jest.mock('@/components/achivements-line-chart/AchievementsLineChart', () => mockProbe('daily'))
-jest.mock('./MainPagePointsStats', () => mockProbe('points'))
+jest.mock('../main-page-period-stats/MainPagePeriodStats', () => ({
+  __esModule: true,
+  default: ({ achievements, monthSource, streak, isLoading }: { achievements: { Title: string }[]; monthSource: { Title: string }[]; streak: number | null; isLoading?: boolean }) => (
+    <div data-testid="points" data-streak={String(streak)}>{isLoading ? 'loading' : `${achievements.map((a) => a.Title).join(',')}|${monthSource.map((a) => a.Title).join(',')}`}</div>
+  ),
+}))
 jest.mock('./MainPageRarest', () => mockProbe('rarest'))
 jest.mock('./MainPageAbandoned', () => mockProbe('abandoned'))
 jest.mock('../main-page-collection/MainPageCollection', () => mockProbe('collection'))
@@ -29,39 +35,47 @@ jest.mock('./MainPageBestPeriod', () => mockProbe('best'))
 jest.mock('./main-page-month-compare/MainPageMonthCompare', () => mockProbe('month'))
 jest.mock('./main-page-habits/MainPageHabits', () => mockProbe('habits'))
 jest.mock('./main-page-journal/MainPageJournal', () => mockProbe('journal'))
-jest.mock('./MainPageConsoleNav', () => mockProbe('nav'))
+jest.mock('../main-page-browse/main-page-console-nav/MainPageConsoleNav', () => mockProbe('nav'))
 jest.mock('../main-page-groups-section/MainPageGroupsSection', () => mockProbe('groups'))
 jest.mock('../main-page-pinned-section/MainPagePinnedSection', () => mockProbe('favorites'))
 jest.mock('../main-page-friends/MainPageFriends', () => ({
   __esModule: true,
   default: ({ active }: { active: boolean }) => <div data-testid="friends" data-active={String(active)} />,
 }))
-jest.mock('./main-page-steam-stats/MainPageSteamStats', () => mockProbe('steam-stats'))
-jest.mock('./main-page-steam-nav/MainPageSteamNav', () => mockProbe('steam-nav'))
+jest.mock('../main-page-browse/main-page-steam-nav/MainPageSteamNav', () => mockProbe('steam-nav'))
 
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import MainPageCharts from './MainPageCharts'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
-import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
+import { useXboxRecentAchievements } from '@/hooks/useXboxRecentAchievements'
+import { xboxRecentFixture } from '@/test-utils/xboxFixtures'
 import { useMainPlatform } from '@/context/MainPlatformContext'
+import { useHomeLayout } from '@/hooks/useHomeLayout'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 
+const RECENT_DAY = `${new Date(Date.now() - 10 * 86_400_000).toISOString().slice(0, 10)} 10:00:00`
 const STEAM_UNLOCK = { appId: 620, gameTitle: 'Portal 2', apiname: 'WIN', title: 'Win', badgeUrl: '', unlockedAt: '2024-01-15T10:00:00.000Z' }
 
 function platform(p: 'ra' | 'steam') {
-  ;(useMainPlatform as jest.Mock).mockReturnValue({ platform: p })
+  ;(useMainPlatform as jest.Mock).mockReturnValue({ platform: p, linked: ['ra', 'steam'], setPlatform: jest.fn() })
 }
 
 beforeEach(() => {
+  ;(useHomeLayout as jest.Mock).mockReturnValue(['classic', jest.fn()])
   ;(useRecentAchievements as jest.Mock).mockReturnValue({ achievements: [{ Title: 'Recent RA', Date: '2024-01-20 10:00:00' }], isLoading: false })
-  ;(useActivityHeatmap as jest.Mock).mockReturnValue({ achievements: [{ Title: 'Heatmap RA', Date: '2024-01-10 10:00:00' }], isLoading: false })
   ;(useSteamRecentAchievements as jest.Mock).mockReturnValue({ achievements: [STEAM_UNLOCK], isLoading: false })
+  ;(useXboxRecentAchievements as jest.Mock).mockReturnValue({ achievements: [], isLoading: false, error: null, retry: jest.fn() })
   ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true, library: [], libraryLoading: false })
   // The year context merges both platforms itself, so the page passes it on whole.
   ;(useActivityHeatmapYear as jest.Mock).mockReturnValue({
-    achievements: [{ Title: 'Year RA', Date: '2023-06-01 10:00:00' }],
+    // RA's last 60 days are taken from the year (#101): one old unlock, one inside the window.
+    achievements: [{ Title: 'Year RA', Date: '2023-06-01 10:00:00' }, { Title: 'Heatmap RA', Date: RECENT_DAY }],
+    xboxAchievements: [],
+    xboxLoading: false,
+    psnTrophies: [],
+    psnLoading: false,
     isLoading: false,
     error: false,
     refetch: jest.fn(),
@@ -78,6 +92,29 @@ test('feeds the shared activity cards both platforms, newest first', () => {
   expect(screen.getByTestId('top-games')).toHaveTextContent('Recent RA,Win')
 })
 
+test.each(['classic', 'cover'])('%s derives Xbox activity from the shared year without a second request', (layout) => {
+  platform('ra')
+  ;(useHomeLayout as jest.Mock).mockReturnValue([layout, jest.fn()])
+  const recent = xboxRecentFixture({ name: 'Recent Xbox', earnedAt: new Date(Date.now() - 10 * 86_400_000).toISOString() })
+  const old = xboxRecentFixture({ name: 'Old Xbox', earnedAt: new Date(Date.now() - 100 * 86_400_000).toISOString() })
+  ;(useActivityHeatmapYear as jest.Mock).mockReturnValue({
+    achievements: [],
+    xboxAchievements: [recent, old],
+    xboxLoading: false,
+    psnTrophies: [],
+    psnLoading: false,
+    isLoading: false,
+    error: false,
+    refetch: jest.fn(),
+  })
+
+  render(<MainPageCharts />)
+
+  expect(screen.getByTestId('daily')).toHaveTextContent('Recent Xbox')
+  expect(screen.getByTestId('daily')).not.toHaveTextContent('Old Xbox')
+  expect(useXboxRecentAchievements).not.toHaveBeenCalled()
+})
+
 test('the month, habits and diary read the year every platform already loads', () => {
   platform('ra')
   render(<MainPageCharts />)
@@ -92,6 +129,20 @@ test('loads nothing from Steam without a linked account', () => {
   expect(useSteamRecentAchievements).toHaveBeenCalledWith(null)
 })
 
+test.each(['classic', 'cover'])('%s: the activity figures count every platform, whichever profile tab is open', (layout) => {
+  platform('steam')
+  ;(useHomeLayout as jest.Mock).mockReturnValue([layout, jest.fn()])
+  render(<MainPageCharts />)
+  expect(screen.getByTestId('points')).toHaveTextContent('Recent RA,Win|Year RA,Heatmap RA')
+})
+
+test('the cover leaves the streak out of the figures: it has its own card', () => {
+  platform('ra')
+  ;(useHomeLayout as jest.Mock).mockReturnValue(['cover', jest.fn()])
+  render(<MainPageCharts />)
+  expect(screen.getByTestId('points')).toHaveAttribute('data-streak', 'null')
+})
+
 /** Every card id the section rail can reach, visiting each section in turn. */
 function cardsAcrossSections() {
   const seen = new Set<string>()
@@ -102,9 +153,9 @@ function cardsAcrossSections() {
   return seen
 }
 
-const RA_ONLY = ['points', 'nav']
-const STEAM_ONLY = ['steam-stats', 'steam-nav']
-const SHARED = ['heatmap', 'daily', 'top-games', 'rarest', 'abandoned', 'collection', 'groups', 'favorites', 'best', 'month', 'habits', 'journal']
+const RA_ONLY = ['nav']
+const STEAM_ONLY = ['steam-nav']
+const SHARED = ['points', 'heatmap', 'daily', 'top-games', 'rarest', 'abandoned', 'collection', 'groups', 'favorites', 'best', 'month', 'habits', 'journal']
 
 test('the shared cards are there whichever platform is selected', () => {
   platform('steam')
@@ -121,6 +172,7 @@ test('in RA mode, shows the RA versions of the platform-specific cards', () => {
   for (const id of STEAM_ONLY) expect(cards).not.toContain(id)
   fireEvent.click(screen.getByRole('tab', { name: 'Activity' }))
   expect(screen.getByTestId('best')).toHaveTextContent('Heatmap RA')
+  expect(screen.getByTestId('best')).not.toHaveTextContent('Year RA')
 })
 
 test('in Steam mode, swaps them for the Steam versions and feeds best performance Steam unlocks', () => {
@@ -140,8 +192,7 @@ test('the heatmap reads the year both platforms share, not the 60-day list', () 
   render(<MainPageCharts />)
 
   // Its own call would be a second one for data the streak already loaded.
-  expect(screen.getByTestId('heatmap')).toHaveTextContent('Year RA')
-  expect(screen.getByTestId('heatmap')).not.toHaveTextContent('Heatmap RA')
+  expect(screen.getByTestId('heatmap')).toHaveTextContent('Year RA,Heatmap RA')
 })
 
 describe('sections', () => {
@@ -202,4 +253,39 @@ test('the pinned achievements have a section of their own', () => {
   render(<MainPageCharts />)
   fireEvent.click(screen.getByRole('tab', { name: 'Pinned' }))
   expect(within(screen.getByRole('tabpanel')).getByTestId('favorites')).toBeInTheDocument()
+})
+
+test('the sections that load their own data wait for an idle moment, unless opened first (#101)', () => {
+  jest.useFakeTimers()
+  try {
+    platform('ra')
+    render(<MainPageCharts />)
+    expect(screen.queryByTestId('groups')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('favorites')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab', { name: 'Pinned' }))
+    expect(screen.getByTestId('favorites')).toBeInTheDocument()
+    act(() => jest.advanceTimersByTime(2000))
+    expect(screen.getByTestId('groups')).toBeInTheDocument()
+  } finally {
+    jest.useRealTimers()
+  }
+})
+
+test('the PlayStation 60 days come from the year, without a second request (#101)', () => {
+  platform('ra')
+  const trophy = (name: string, daysAgo: number) =>
+    ({ trophyId: daysAgo, gameId: 7, gameTitle: 'Astro Bot', name, earnedAt: new Date(Date.now() - daysAgo * 86_400_000).toISOString() }) as never
+  ;(useActivityHeatmapYear as jest.Mock).mockReturnValue({
+    achievements: [],
+    xboxAchievements: [],
+    xboxLoading: false,
+    psnTrophies: [trophy('Recent PSN', 10), trophy('Old PSN', 100)],
+    psnLoading: false,
+    isLoading: false,
+    error: false,
+    refetch: jest.fn(),
+  })
+  render(<MainPageCharts />)
+  expect(screen.getByTestId('daily')).toHaveTextContent('Recent PSN')
+  expect(screen.getByTestId('daily')).not.toHaveTextContent('Old PSN')
 })

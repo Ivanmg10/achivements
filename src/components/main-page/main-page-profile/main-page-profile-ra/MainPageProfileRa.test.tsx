@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import MainPageProfileRa from './MainPageProfileRa'
+import { SubjectContext } from '@/context/SubjectContext'
 
 const mockUser = {
   ID: 1,
@@ -26,12 +27,12 @@ test('renders user info when user present', () => {
   render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} />)
   expect(screen.getByText('IvanXMarine')).toBeInTheDocument()
   expect(screen.getByText('Hardcore points')).toBeInTheDocument()
-  expect(screen.getByText('Playing level 1')).toBeInTheDocument()
+  expect(screen.getByText(/Playing level 1/)).toBeInTheDocument()
 })
 
 test('renders login link when no user', () => {
   render(<MainPageProfileRa user={null} game={null} recentAchievements={[]} />)
-  expect(screen.getByText('Sign in with RetroAchievements')).toBeInTheDocument()
+  expect(screen.getByText('Connect RetroAchievements')).toBeInTheDocument()
 })
 
 test('renders without UserPic', () => {
@@ -43,4 +44,25 @@ test('keeps the recent achievements block visible with an empty state instead of
   render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} achievementsLoading={false} />)
   expect(screen.getByText('Recent achievements')).toBeInTheDocument()
   expect(screen.getByText('No achievements earned yet')).toBeInTheDocument()
+})
+
+test('on someone\'s page the recent achievements are not drawn: their page lists them itself (#130)', () => {
+  render(
+    <SubjectContext.Provider value="someone">
+      <MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} achievementsLoading={false} />
+    </SubjectContext.Provider>,
+  )
+  expect(screen.queryByText('Recent achievements')).not.toBeInTheDocument()
+})
+
+test('shows RA\'s RetroRatio as a plain figure, not a percentage', () => {
+  render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} />)
+  expect(screen.getByText('RetroRatio').nextElementSibling?.textContent).toBe('3.50')
+  expect(screen.queryByText(/%$/)).toBeNull()
+})
+
+test('what RA says the player is doing is its own line under the game, not part of the "Playing now" label', () => {
+  render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} />)
+  expect(screen.getByText('Playing now')).toBeInTheDocument()
+  expect(screen.getByText('Playing level 1')).toHaveClass('line-clamp-2')
 })

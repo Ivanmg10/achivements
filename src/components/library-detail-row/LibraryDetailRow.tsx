@@ -36,7 +36,7 @@ export default function LibraryDetailRow({
         initial={reduce ? false : { y: -16, scale: 0.98 }}
         animate={{ y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 220, damping: 24 }}
-        className="flex flex-col gap-3 rounded-2xl bg-bg-card p-4 sm:p-5 ring-1 ring-accent/30 shadow-lg shadow-black/10"
+        className="flex flex-col gap-3 rounded-card bg-bg-card p-4 sm:p-5 ring-1 ring-accent/30 shadow-lg shadow-black/10"
       >
         <h3 id={headingId} className="text-sm font-semibold text-text-main truncate">{title}</h3>
         {children}

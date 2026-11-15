@@ -63,7 +63,7 @@ test('shows an alert when the toggle request fails', async () => {
   ;(usePinnedGames as jest.Mock).mockReturnValue({ isPinned: () => false, pinGame, unpinGame })
   render(<PinToggleButton gameId={1} />)
   fireEvent.click(screen.getByRole('button'))
-  expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't update pin, please try again")
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.pinnedGames.error)
 })
 
 describe('platform', () => {

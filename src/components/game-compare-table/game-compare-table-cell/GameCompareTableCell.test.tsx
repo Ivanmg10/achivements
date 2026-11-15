@@ -3,9 +3,9 @@ import GameCompareTableCell from './GameCompareTableCell'
 import { en } from '@/translations/en'
 
 test('an unlock with its day, and its tags in words', () => {
-  render(<GameCompareTableCell who="ivan" unlock={{ earned: true, earnedAt: '2026-10-03 12:00:00', hardcore: true }} first />)
+  render(<GameCompareTableCell who="ivan" unlock={{ earned: true, earnedAt: '2025-10-03 12:00:00', hardcore: true }} first />)
   expect(screen.getByText('ivan')).toBeInTheDocument()
-  expect(screen.getByText(new Date('2026-10-03T12:00:00').toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' }))).toBeInTheDocument()
+  expect(screen.getByText('Oct 3, 2025')).toBeInTheDocument()
   expect(screen.getByText(en.userGame.hardcore)).toBeInTheDocument()
   expect(screen.getByText(en.userGame.first)).toBeInTheDocument()
 })

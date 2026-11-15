@@ -2,10 +2,12 @@ import Link from 'next/link'
 import { IconLock, IconWorld } from '@tabler/icons-react'
 import { GameGroup } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { relativeTime, plural } from '@/utils/utils'
+import { plural } from '@/utils/utils'
 import GroupCoverMosaic from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgressBar'
 import GroupPlatformLogos, { platformCounts } from '@/components/groups/group-platform-logos/GroupPlatformLogos'
+import { relativeTime } from '@/utils/dates'
+import Facts from '@/components/ui/Facts'
 
 /**
  * A group in the list: its covers, name and privacy, how many games and from
@@ -20,7 +22,7 @@ export default function GroupCard({ group }: { group: GameGroup }) {
   return (
     <Link
       href={`/groups/${group.id}`}
-      className="spotlight flex items-center gap-4 h-full bg-bg-card rounded-2xl p-3 ring-1 ring-ink/5 hover:ring-ink/15 hover:bg-ink/[0.03] transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="relative isolate flex items-center gap-4 h-full bg-bg-card rounded-card p-3 ring-1 ring-ink/5 hover:ring-ink/15 hover:bg-ink/[0.03] transition-all group focus-ring"
     >
       <GroupCoverMosaic group={group} />
       <div className="flex flex-col min-w-0 flex-1 gap-1.5">
@@ -40,13 +42,7 @@ export default function GroupCard({ group }: { group: GameGroup }) {
         <GroupProgressBar earned={group.total_awarded} total={group.total_possible} label={group.title} />
 
         <p className="text-xs text-text-secondary truncate">
-          {group.total_possible > 0 && (
-            <>
-              {T.groups.achievementsCount.replace('{earned}', String(group.total_awarded)).replace('{total}', String(group.total_possible))}
-              {' · '}
-            </>
-          )}
-          {T.groups.updatedAgo.replace('{when}', relativeTime(group.updated_at, lang))}
+          <Facts items={[group.total_possible > 0 && T.groups.achievementsCount.replace('{earned}', String(group.total_awarded)).replace('{total}', String(group.total_possible)), T.groups.updatedAgo.replace('{when}', relativeTime(group.updated_at, lang))]} />
         </p>
       </div>
     </Link>

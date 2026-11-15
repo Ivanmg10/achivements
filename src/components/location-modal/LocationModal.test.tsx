@@ -3,13 +3,15 @@ import { useSession } from 'next-auth/react'
 import LocationModal from './LocationModal'
 import { notify } from '@/lib/notify'
 import { en } from '@/translations/en'
+import { useLanguage } from '@/context/LanguageContext'
+import { es } from '@/translations/es'
 
 jest.mock('next-auth/react', () => ({ useSession: jest.fn() }))
 jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 
 const update = jest.fn()
 const answer = (body: unknown, ok = true) => Promise.resolve({ ok, status: ok ? 200 : 400, json: () => Promise.resolve(body) })
-const search = () => screen.getByRole('textbox', { name: en.userData.searchCountry })
+const search = () => screen.getByRole('searchbox', { name: en.userData.searchCountry })
 
 function setup(props: Partial<React.ComponentProps<typeof LocationModal>> = {}) {
   const onClose = jest.fn()
@@ -26,7 +28,7 @@ beforeEach(() => {
 
 test('renders nothing while closed', () => {
   render(<LocationModal isOpen={false} onClose={jest.fn()} />)
-  expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+  expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
 })
 
 test('lists the countries, and filters by name or by code', () => {
@@ -37,6 +39,22 @@ test('lists the countries, and filters by name or by code', () => {
   expect(screen.queryByRole('button', { name: /France/ })).not.toBeInTheDocument()
   fireEvent.change(search(), { target: { value: 'FR' } })
   expect(screen.getByRole('button', { name: /France/ })).toBeInTheDocument()
+})
+
+test('in Spanish the list is named and searched in Spanish, and still finds the English name', () => {
+  ;(useLanguage as jest.Mock).mockReturnValue({ lang: 'es', T: es, setLang: jest.fn(), fromBrowser: false })
+  try {
+    setup()
+    expect(screen.getByRole('button', { name: /Alemania/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Germany/ })).not.toBeInTheDocument()
+    fireEvent.change(screen.getByRole('searchbox', { name: es.userData.searchCountry }), { target: { value: 'alemania' } })
+    expect(screen.getAllByRole('button', { name: /Alemania/ })).toHaveLength(1)
+    expect(screen.queryByRole('button', { name: /España/ })).not.toBeInTheDocument()
+    fireEvent.change(screen.getByRole('searchbox', { name: es.userData.searchCountry }), { target: { value: 'Germany' } })
+    expect(screen.getByRole('button', { name: /Alemania/ })).toBeInTheDocument()
+  } finally {
+    ;(useLanguage as jest.Mock).mockReturnValue({ lang: 'en', T: en, setLang: jest.fn(), fromBrowser: false })
+  }
 })
 
 test('says so when nothing matches', () => {
@@ -62,11 +80,11 @@ test('choosing one saves it, refreshes the session, says so and closes', async (
   expect(notify.success).toHaveBeenCalledWith(en.toast.saved)
 })
 
-test('a refusal is shown inline, in an alert, and the modal stays open', async () => {
-  ;(fetch as jest.Mock).mockImplementation(() => answer({ error: 'Not a country' }, false))
+test('a refusal is shown inline, in an alert, in our words, and the modal stays open', async () => {
+  ;(fetch as jest.Mock).mockImplementation(() => answer({ error: 'location-invalid' }, false))
   const { onClose } = setup()
   fireEvent.click(screen.getByRole('button', { name: /France/ }))
-  expect(await screen.findByRole('alert')).toHaveTextContent('Not a country')
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.editProfileModal.errorGeneric)
   expect(onClose).not.toHaveBeenCalled()
   expect(update).not.toHaveBeenCalled()
   expect(notify.success).not.toHaveBeenCalled()

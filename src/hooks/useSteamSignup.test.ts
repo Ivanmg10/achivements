@@ -3,7 +3,8 @@ import { signIn } from 'next-auth/react'
 import { useSteamSignup } from './useSteamSignup'
 
 const mockPush = jest.fn()
-jest.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush, refresh: jest.fn() }) }))
+const mockRouter = { push: mockPush, refresh: jest.fn(), prefetch: jest.fn() }
+jest.mock('next/navigation', () => ({ useRouter: () => mockRouter }))
 
 const PROFILE = { registered: false, persona: 'Gabe', avatar: null, username: 'Gabe', isPublic: true }
 
@@ -17,6 +18,15 @@ function answers(...responses: { ok: boolean; body: object }[]) {
 beforeEach(() => {
   jest.clearAllMocks()
   ;(signIn as jest.Mock).mockResolvedValue({ ok: true })
+})
+
+test('the ticket ends with the sign-in, and a failure to end it does not undo it', async () => {
+  const fetchMock = answers({ ok: true, body: { registered: true } })
+  fetchMock.mockRejectedValueOnce(new Error('offline'))
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  const { result } = renderHook(() => useSteamSignup('1'))
+  await waitFor(() => expect(result.current.state.status).toBe('signed-in'))
+  expect(fetchMock).toHaveBeenCalledWith('/api/auth/steam/register', { method: 'DELETE' })
 })
 
 test('a known Steam account signs in and goes home', async () => {
@@ -60,4 +70,7 @@ test('registering signs in once the account exists, and a refusal is kept to sho
   await act(() => result.current.register('gabe2', 'gabe@test.com'))
   expect(JSON.parse(fetchMock.mock.calls[2][1].body)).toEqual({ username: 'gabe2', email: 'gabe@test.com' })
   expect(result.current.state.status).toBe('signed-in')
+  // A new account goes to the welcome, not straight into the app.
+  expect(result.current.entering).toBe(true)
+  await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/welcome'), { timeout: 3000 })
 })

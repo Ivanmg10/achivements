@@ -15,6 +15,7 @@ jest.mock('@/components/psn/psn-game-info-table/PsnGameInfoTable', () => ({
 }))
 
 import { render, screen, fireEvent } from '@testing-library/react'
+import { useSession } from 'next-auth/react'
 import PsnGamePage from './page'
 import { useParams, notFound } from 'next/navigation'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
@@ -24,16 +25,18 @@ import { en } from '@/translations/en'
 const ID = 'NPWR00001_00'
 const GAME = { id: 100, titleId: ID, title: 'Astro Bot', imageIcon: 'a.png' }
 const retry = jest.fn()
+const refetch = jest.fn()
 
 function setup({
   id = ID,
   linked = true,
   library = [GAME] as unknown[],
   libraryLoading = false,
+  libraryError = null as string | null,
   trophies = { trophies: [{ id: 0 }, { id: 1 }], groups: [], isLoading: false, error: null as string | null },
 } = {}) {
   ;(useParams as jest.Mock).mockReturnValue({ id })
-  ;(usePsnGamesData as jest.Mock).mockReturnValue({ isLinked: linked, fullLibrary: library, libraryLoading })
+  ;(usePsnGamesData as jest.Mock).mockReturnValue({ isLinked: linked, fullLibrary: library, libraryLoading, libraryError, refetch })
   ;(usePsnTrophies as jest.Mock).mockReturnValue({ ...trophies, retry })
 }
 
@@ -76,6 +79,24 @@ test('a failed load says so and can be retried', () => {
   expect(screen.getByText(en.psn.errors.private)).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: en.psn.retry }))
   expect(retry).toHaveBeenCalled()
+})
+
+test('a full load holds the skeleton until the session is read, not "not connected" or a 404', () => {
+  ;(useSession as jest.Mock).mockReturnValueOnce({ data: undefined, status: 'loading', update: jest.fn() })
+  setup({ linked: false })
+  render(<PsnGamePage />)
+  expect(screen.getByTestId('loading')).toBeInTheDocument()
+  expect(notFound).not.toHaveBeenCalled()
+})
+
+test('a list that could not be read says try later, not "game not found"', () => {
+  setup({ library: [], libraryError: 'failed' })
+  render(<PsnGamePage />)
+  expect(notFound).not.toHaveBeenCalled()
+  expect(screen.getByRole('alert')).toHaveTextContent(en.psn.gamesError)
+  expect(screen.getByText(en.psn.errors.failed)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: en.psn.retry }))
+  expect(refetch).toHaveBeenCalled()
 })
 
 test('a game without trophies says so', () => {

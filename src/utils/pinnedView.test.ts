@@ -14,7 +14,7 @@ test('RA: points, its rarity among the game players, and no anchor (it opens its
   )
   expect(v).toMatchObject({
     key: 'ra:5', source: 'ra', gameId: 7423, title: 'Win', description: 'Win it', earned: true, anchor: null,
-    value: '10 pts', rarity: 25, iconUrl: 'https://media.retroachievements.org/Badge/123.png',
+    value: '10 points', rarity: 25, iconUrl: 'https://media.retroachievements.org/Badge/123.png',
   })
 })
 
@@ -32,7 +32,7 @@ test('PSN: its grade in its colour, and a hidden trophy keeps its text', () => {
     pin({ source: 'psn', psn_trophy_id: 3, game_id: 2018800, game_title: 'BO2', num_distinct_players: 0, snapshot: { name: 'X', detail: 'Y', iconUrl: 'i', type: 'gold', earned: false, hidden: true, rarity: 1.5 } }),
     en,
   )
-  expect(v).toMatchObject({ title: en.psn.hiddenTrophy, description: en.psn.hiddenTrophyDesc, value: en.psn.gold, valueClass: 'text-yellow-400', rarity: 1.5 })
+  expect(v).toMatchObject({ title: en.psn.hiddenTrophy, description: en.psn.hiddenTrophyDesc, value: en.psn.gold, valueClass: 'text-hardcore', rarity: 1.5 })
 })
 
 test('Xbox: gamerscore, and a secret one not unlocked is concealed', () => {

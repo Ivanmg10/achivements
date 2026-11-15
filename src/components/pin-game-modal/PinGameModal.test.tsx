@@ -56,10 +56,9 @@ test('renders nothing when closed', () => {
   expect(container.innerHTML).toBe('')
 })
 
-test('renders the search input and hint text when open', () => {
+test('renders the search input when open', () => {
   render(<PinGameModal isOpen={true} onClose={jest.fn()} />)
   expect(screen.getByPlaceholderText('Search a game to pin…')).toBeInTheDocument()
-  expect(screen.getAllByText('Search a game to pin…').length).toBeGreaterThan(0)
 })
 
 test('calls onClose when the close button is clicked', () => {
@@ -175,7 +174,7 @@ test('a failed id lookup leaves the selection empty', async () => {
 test('closes on Escape', () => {
   const onClose = jest.fn()
   render(<PinGameModal isOpen={true} onClose={onClose} />)
-  fireEvent.keyDown(window, { key: 'Escape' })
+  fireEvent.keyDown(document, { key: 'Escape' })
   expect(onClose).toHaveBeenCalled()
 })
 
@@ -203,4 +202,31 @@ test('opening it again starts over: the search and the chosen games are gone', (
   rerender(<PinGameModal isOpen={true} onClose={jest.fn()} />)
   expect(screen.getByPlaceholderText('Search a game to pin…')).toHaveValue('')
   expect(screen.queryByText('Pin (1)')).not.toBeInTheDocument()
+})
+
+test('the search stays in the fixed toolbar and the chosen games in the footer, neither inside the scrolling list', () => {
+  render(<PinGameModal isOpen={true} onClose={jest.fn()} />)
+  const search = screen.getByPlaceholderText('Search a game to pin…')
+  fireEvent.change(search, { target: { value: 'sly' } })
+  fireEvent.click(screen.getByText('Sly Cooper'))
+  const body = document.querySelector('.overflow-y-auto') as HTMLElement
+  expect(body.contains(search)).toBe(false)
+  expect(body.contains(screen.getByRole('button', { name: 'Remove Sly Cooper' }))).toBe(false)
+})
+
+test('a failure part way keeps the games not pinned yet chosen, to try again', async () => {
+  ;(useGamesData as jest.Mock).mockReturnValue({ all: [sampleGame, { ...sampleGame, GameID: 2, Title: 'Sly 2' }] })
+  pinGame.mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error('fail'))
+  render(<PinGameModal isOpen={true} onClose={jest.fn()} />)
+  fireEvent.change(screen.getByPlaceholderText('Search a game to pin…'), { target: { value: 'sly' } })
+  fireEvent.click(screen.getByText('Sly Cooper'))
+  fireEvent.click(screen.getByText('Sly 2'))
+  fireEvent.click(screen.getByText('Pin (2)'))
+  expect(await screen.findByRole('alert')).toBeInTheDocument()
+  expect(screen.getByText('Pin (1)')).toBeInTheDocument()
+})
+
+test('before anything is picked, the footer talks about pinning, not adding (#165, H8)', () => {
+  render(<PinGameModal isOpen={true} onClose={jest.fn()} />)
+  expect(screen.getByRole('status')).toHaveTextContent('Pick games to pin them')
 })

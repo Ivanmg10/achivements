@@ -12,16 +12,21 @@ import PsnCollectionItem from '@/components/psn/psn-collection-item/PsnCollectio
 import XboxGameItem from '@/components/xbox/xbox-game-item/XboxGameItem'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
+import ErrorRetry from '@/components/ui/ErrorRetry'
+import SectionHead from '@/components/ui/SectionHead'
+import { useSubject } from '@/context/SubjectContext'
 
 const MAX_GAMES = 7
 
 /**
  * Recently played Steam, PSN and Xbox games, without RA — the main page feed for a
  * user with no RA account. (With RA linked, they join the RA feed in
- * RARecentlyPlayed instead.) One game expanded at a time, like that feed.
+ * RecentlyPlayedFeed instead.) One game expanded at a time, like that feed.
  */
 export default function RecentGamesList() {
   const { T } = useLanguage()
+  const subject = useSubject()
   const { isLinked: steamLinked, recent, recentLoading, recentError, refetch } = useSteamGamesData()
   const { library: psn, libraryLoading: psnLoading, libraryError: psnError, refetch: refetchPsn } = usePsnGamesData()
   const { library: xbox, libraryLoading: xboxLoading, libraryError: xboxError, refetch: refetchXbox } = useXboxGamesData()
@@ -33,35 +38,30 @@ export default function RecentGamesList() {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 gap-2">
-      <h2 className="text-2xl font-bold shrink-0">{T.cards.recentlyPlayed}</h2>
+      {/* On someone's page, the head every section of it has (#130); on the home, the home's. */}
+      {subject ? <SectionHead as="h2" size="lg" title={T.cards.recentlyPlayed} className="shrink-0" /> : <h2 className="text-2xl font-bold shrink-0">{T.cards.recentlyPlayed}</h2>}
 
       {recentLoading || psnLoading || xboxLoading ? (
         <div aria-busy="true" className="flex flex-col gap-1.5 flex-1">
           {Array.from({ length: MAX_GAMES }).map((_, i) => (
-            <div key={i} className="h-20 bg-bg-main rounded-xl animate-pulse" />
+            <GameRowSkeleton key={i} />
           ))}
         </div>
       ) : failed ? (
-        <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-red-400">
-            {recentError ? T.steam.gamesError : psnError ? T.psn.gamesError : T.xbox.gamesError}
-          </p>
-          <p className="text-xs text-text-secondary">{recentError ? T.steam.privateProfileHint : psnError ? T.psn.errors.private : T.xbox.errors.private}</p>
-          <button
-            onClick={() => {
+        <ErrorRetry
+          message={recentError ? T.steam.gamesError : psnError ? T.psn.gamesError : T.xbox.gamesError}
+          hint={recentError ? T.steam.privateProfileHint : psnError ? T.psn.errors.private : T.xbox.errors.private}
+          retryLabel={T.steam.retry}
+          onRetry={() => {
               if (recentError) refetch()
               if (psnError) refetchPsn()
               if (xboxError) refetchXbox()
             }}
-            className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors"
-          >
-            {T.steam.retry}
-          </button>
-        </div>
+        />
       ) : games.length === 0 ? (
         <EmptyState icon={<SteamLogo className="w-6 h-6" />} title={steamLinked ? T.steam.recentEmpty : T.cards.noGames} />
       ) : (
-        <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-y-auto">
+        <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-y-auto enter-rows">
           {games.map((item) => {
             const toggle = () => setExpanded((cur) => (cur === item.key ? null : item.key))
             if (item.source === 'psn') {

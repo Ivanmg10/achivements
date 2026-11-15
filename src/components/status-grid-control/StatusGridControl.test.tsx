@@ -20,6 +20,11 @@ test('clicking an option reports the new column count', () => {
   expect(onChange).toHaveBeenCalledWith(3)
 })
 
+test('each icon says its name on hover too, not only to a screen reader', () => {
+  setup(1)
+  expect(screen.getByRole('button', { name: '3 per row' })).toHaveAttribute('title', '3 per row')
+})
+
 test('renders one button per layout option', () => {
   setup(1)
   expect(screen.getAllByRole('button')).toHaveLength(3)

@@ -1,4 +1,4 @@
-import type { GameProgressBase } from '@/types/steam'
+import type { GameProgressBase } from '@/types/game'
 
 /**
  * Trophies by grade. psn-api types platinum as 0 | 1, which holds for one
@@ -48,8 +48,10 @@ export type PsnGameProgress = GameProgressBase & {
   platinumCompletes?: boolean
   /** The game has DLC trophy groups; they count like any other trophy, so a game is complete only with them. */
   hasDlc: boolean
-  /** When the trophy list last changed (ISO) — what the trophy caches key on. */
+  /** When the trophy list last changed (ISO) — activity and cache fingerprints, not base completion. */
   lastTrophyAt: string | null
+  /** Base-group completion, when Sony supplies enough data to prove it; never inferred from DLC activity. */
+  completedAt?: string | null
   playtimeMinutes: number | null
   /**
    * The played games the play data came from ("CUSA01106_00"…). A collection

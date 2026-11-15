@@ -1,13 +1,16 @@
-import type { RecentAchievement } from '@/types/types'
-import type { GameSource, SteamGameProgress } from '@/types/steam'
-import type { PsnGameProgress } from '@/types/psn'
-import type { XboxGameProgress } from '@/types/xbox'
+import { parseUnlockTime, utcDay } from '@/utils/dates'
+import type { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
+import type { SteamGameProgress, SteamRecentAchievement } from '@/types/steam'
+import type { PsnGameProgress, PsnRecentTrophy } from '@/types/psn'
+import type { XboxGameProgress, XboxRecentAchievement } from '@/types/xbox'
 import type { UserSearchResult } from '@/hooks/useUserSearch'
-import type { LibraryGame } from '@/utils/library'
+import { profileLibrary, type LibraryGame } from '@/utils/library'
 import { achievementBadgeUrl, achievementGameIconUrl } from '@/utils/utils'
-import { steamAssetUrl } from '@/lib/steamClient'
-
-type SavedGame = { id: number; title: string; imageIcon: string } | null
+import { steamAssetUrl } from '@/lib/steamAssets'
+import { toRecentAchievement } from '@/utils/steamMappers'
+import { psnToRecentAchievement } from '@/utils/psnMappers'
+import { xboxToRecentAchievement } from '@/utils/xboxMappers'
+import type { GameSource, SavedGame } from '@/types/game'
 
 export type FriendPin = {
   source: GameSource
@@ -27,6 +30,8 @@ export type FriendOverview = UserSearchResult & {
   publicGroups: number
   /** Their achievement showcase, in their order (up to five, earned). */
   showcase: FriendPin[]
+  /** Source-qualified keys used only to project their visible library. */
+  hiddenGames?: string[]
   /** Their Vault Points, for the level on their card; null before they are scored. */
   vaultPoints?: number | null
 }
@@ -61,21 +66,20 @@ export type FriendStats = {
 export type StatKey = 'week' | 'activeDays' | 'streak' | 'completed'
 
 const DAY = 86400000
-const dayKey = (t: number) => new Date(t).toISOString().slice(0, 10)
 
 export function friendStats(recent: RecentAchievement[], games: LibraryGame[], now: number = Date.now()): FriendStats {
   const days = new Set<string>()
   let week = 0
   for (const a of recent) {
-    const t = Date.parse(a.Date.replace(' ', 'T'))
+    const t = parseUnlockTime(a.Date)
     if (Number.isNaN(t)) continue
     if (t >= now - 7 * DAY) week++
     if (t >= now - ACTIVITY_DAYS * DAY) days.add(a.Date.slice(0, 10))
   }
   // A streak still counts when today has nothing yet: it runs up to yesterday.
-  let start = days.has(dayKey(now)) ? now : now - DAY
+  let start = days.has(utcDay(now)) ? now : now - DAY
   let streak = 0
-  while (streak < ACTIVITY_DAYS && days.has(dayKey(start))) {
+  while (streak < ACTIVITY_DAYS && days.has(utcDay(start))) {
     streak++
     start -= DAY
   }
@@ -142,7 +146,7 @@ export function filterFollowing<U extends UserSearchResult>(users: U[], query: s
 /** The game someone played last, with art for a backdrop: wide art (a store header) or an icon, to be blurred. */
 export type LastPlayed = { source: GameSource; id: number; title: string; at: string; image: string | null; wide: boolean }
 
-const playedAt = (s: string) => Date.parse(s.includes('T') ? s : s.replace(' ', 'T'))
+const playedAt = parseUnlockTime
 
 /**
  * The most recently played game across platforms. Steam, PSN and Xbox say when
@@ -182,4 +186,49 @@ export function presenceOf(friend: { online?: boolean; lastSeenAt?: string | nul
   const at = Date.parse(friend.lastSeenAt)
   if (Number.isNaN(at)) return null
   return now - at > SEEN_LONG_AGO_MS ? { kind: 'longAgo' } : { kind: 'seen', at: friend.lastSeenAt }
+}
+
+/** How many friends get their activity and games read: the newest follows. Each costs a few cached platform calls. */
+export const DETAIL_LIMIT = 10
+/** RA's own system "consoles" (events, hubs) are not games. */
+const RA_SYSTEM_CONSOLES = new Set([100, 101])
+
+export type FriendDetails = {
+  recent: RecentAchievement[]
+  games: LibraryGame[]
+  lastPlayed: LastPlayed | null
+  /** Something could not be read (a private profile, a platform down): the numbers may be short. */
+  partial: boolean
+}
+
+/** What a friend's card is built from: the lists their profile's routes answer (empty when not linked or not read). */
+export type FriendLists = {
+  raRecent: RecentAchievement[]
+  steamRecent: SteamRecentAchievement[]
+  psnRecent: PsnRecentTrophy[]
+  xboxRecent: XboxRecentAchievement[]
+  raGames: RetroAchievementsGameCompleted[]
+  steamGames: SteamGameProgress[]
+  psnGames: PsnGameProgress[]
+  xboxGames: XboxGameProgress[]
+}
+
+/** A friend's card data from their lists: unlocks of every platform newest first, their visible library, the game played last. */
+export function friendDetails(friend: FriendOverview, lists: FriendLists, partial: boolean): FriendDetails {
+  const recent = [
+    ...lists.raRecent,
+    ...lists.steamRecent.map(toRecentAchievement),
+    ...lists.psnRecent.map(psnToRecentAchievement),
+    ...lists.xboxRecent.map(xboxToRecentAchievement),
+  ].sort((a, b) => b.Date.localeCompare(a.Date))
+  const games = profileLibrary(
+    lists.raGames.filter((g) => !RA_SYSTEM_CONSOLES.has(g.ConsoleID)),
+    lists.steamGames,
+    lists.psnGames,
+    friend.hiddenGames ?? [],
+    friend.username,
+    lists.xboxGames,
+  )
+  const lastPlayed = lastPlayedGame(lists.raRecent, lists.steamGames, lists.psnGames, lists.xboxGames)
+  return { recent, games, lastPlayed, partial }
 }

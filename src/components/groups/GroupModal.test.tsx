@@ -35,6 +35,7 @@ test('renders nothing while closed', () => {
 test('a new group starts empty and private, and creates with what was typed and the games picked', async () => {
   const { onSave, onClose } = setup()
   expect(screen.getByRole('heading', { name: en.groups.newGroup })).toBeInTheDocument()
+  expect(screen.getByRole('dialog')).toHaveClass('sm:max-w-5xl')
   expect(title()).toHaveValue('')
   expect(isPrivate()).toBeChecked()
 
@@ -58,6 +59,7 @@ test('a new group starts empty and private, and creates with what was typed and 
 test('editing starts from the group, offers no game picker, and saves without initial games', async () => {
   const { onSave } = setup({ group: GROUP })
   expect(screen.getByRole('heading', { name: en.groups.editGroup })).toBeInTheDocument()
+  expect(screen.getByRole('dialog')).toHaveClass('sm:max-w-[33.75rem]')
   expect(title()).toHaveValue('Speedruns')
   expect(description()).toHaveValue('Fast ones')
   expect(icon()).toHaveValue('🏃')
@@ -77,12 +79,12 @@ test('a title is required: nothing is saved and the field says so', () => {
   expect(onSave).not.toHaveBeenCalled()
 })
 
-test('a failed save keeps the modal open and says why', async () => {
+test('a failed save keeps the modal open and says why, in our words', async () => {
   const { onSave, onClose } = setup()
-  onSave.mockRejectedValue(new Error('Title taken'))
+  onSave.mockRejectedValue(new Error('groups-max'))
   fireEvent.change(title(), { target: { value: 'X' } })
   fireEvent.click(screen.getByRole('button', { name: en.groups.create }))
-  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Title taken'))
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(en.groups.maxGroups.replace('{n}', '10')))
   expect(onClose).not.toHaveBeenCalled()
   expect(screen.getByRole('button', { name: en.groups.create })).toBeEnabled()
 })
@@ -126,7 +128,7 @@ test('the title and description say how much room is left', () => {
 
 test('Escape closes it', () => {
   const { onClose } = setup()
-  fireEvent.keyDown(window, { key: 'Escape' })
+  fireEvent.keyDown(document, { key: 'Escape' })
   expect(onClose).toHaveBeenCalled()
 })
 

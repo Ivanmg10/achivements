@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, type ComponentType } from 'react'
 import { useAllGamesGlobal } from '@/hooks/useAllGamesGlobal'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -10,12 +10,17 @@ import { xboxHasAchievements } from '@/utils/xboxTitles'
 import { useMainPlatform } from '@/context/MainPlatformContext'
 import { buildLibrary, summarizeConsoles } from '@/utils/library'
 import { ChartCard } from '@/components/ui/ChartCard'
-import MainPageConsoleNav from '@/components/main-page/main-page-charts/MainPageConsoleNav'
-import MainPageSteamNav from '@/components/main-page/main-page-charts/main-page-steam-nav/MainPageSteamNav'
-import MainPagePsnNav from '@/components/main-page/main-page-charts/main-page-psn-nav/MainPagePsnNav'
-import MainPageXboxNav from '@/components/main-page/main-page-charts/main-page-xbox-nav/MainPageXboxNav'
+import type { GameSource } from '@/types/game'
+import MainPageConsoleNav from './main-page-console-nav/MainPageConsoleNav'
+import MainPageSteamNav from './main-page-steam-nav/MainPageSteamNav'
+import MainPagePsnNav from './main-page-psn-nav/MainPagePsnNav'
+import MainPageXboxNav from './main-page-xbox-nav/MainPageXboxNav'
 import BrowseSearch from './browse-search/BrowseSearch'
 import BrowseConsoles from './browse-consoles/BrowseConsoles'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { RememberedHeight } from '@/components/ui/RememberedHeight'
+
+const NAV: Record<GameSource, ComponentType> = { ra: MainPageConsoleNav, steam: MainPageSteamNav, psn: MainPagePsnNav, xbox: MainPageXboxNav }
 
 /**
  * The Browse section: the way into each list (by status, and by console on
@@ -24,8 +29,8 @@ import BrowseConsoles from './browse-consoles/BrowseConsoles'
  * nav and the consoles follow it.
  */
 export default function MainPageBrowse() {
-  const { wantToPlay, playing, completed } = useAllGamesGlobal()
-  const { all } = useGamesData()
+  const { wantToPlay, playing, completed, loading } = useAllGamesGlobal()
+  const { all, isLoading } = useGamesData()
   const { library: steam } = useSteamGamesData()
   const { library: psn } = usePsnGamesData()
   const { library: xbox } = useXboxGamesData()
@@ -37,22 +42,36 @@ export default function MainPageBrowse() {
   )
   const consoles = useMemo(() => summarizeConsoles(all), [all])
   const showConsoles = platform === 'ra' && consoles.length > 0
+  const Nav = NAV[platform]
 
   return (
-    <div className="flex flex-col gap-4">
+    <RememberedHeight id="browse" loading={loading || isLoading} className="flex flex-col gap-4">
       <ChartCard>
-        {platform === 'steam' ? <MainPageSteamNav /> : platform === 'psn' ? <MainPagePsnNav /> : platform === 'xbox' ? <MainPageXboxNav /> : <MainPageConsoleNav />}
+        <Nav />
       </ChartCard>
 
       <ChartCard>
         <BrowseSearch library={library} />
       </ChartCard>
 
+      {platform === 'ra' && isLoading && all.length === 0 && (
+        <ChartCard>
+          <div aria-busy="true" className="flex flex-col gap-3">
+            <Skeleton className="h-3 w-24" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2">
+              {Array.from({ length: 12 }, (_, i) => (
+                <Skeleton key={i} radius="tile" className="h-[4.5rem]" />
+              ))}
+            </div>
+          </div>
+        </ChartCard>
+      )}
+
       {showConsoles && (
         <ChartCard>
           <BrowseConsoles consoles={consoles} />
         </ChartCard>
       )}
-    </div>
+    </RememberedHeight>
   )
 }

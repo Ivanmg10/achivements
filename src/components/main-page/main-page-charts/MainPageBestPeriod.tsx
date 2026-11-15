@@ -3,13 +3,18 @@
 import { useState, useMemo, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { IconCalendarEvent, IconCalendarMonth, IconCalendarWeek } from '@tabler/icons-react'
+import dynamic from 'next/dynamic'
 import { RecentAchievement } from '@/types/types'
 import MainPageBestPeriodRow from './main-page-best-period-row/MainPageBestPeriodRow'
 import { getBestMonth } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
-import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
-import WeekAchievementsModal from '@/components/week-achievements-modal/WeekAchievementsModal'
-import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
+import { formatDay, parseUnlockTime, utcDay, utcWeekDays } from '@/utils/dates'
+import Kicker from '@/components/ui/Kicker'
+
+// Downloaded the first time it opens, not with the page.
+const DayAchievementsModal = dynamic(() => import('@/components/day-achievements-modal/DayAchievementsModal'), { loading: () => null })
+const PeriodAchievementsModal = dynamic(() => import('@/components/period-achievements-modal/PeriodAchievementsModal'), { loading: () => null })
 
 type Metric = 'pts' | 'ach'
 
@@ -27,11 +32,11 @@ function getBestDay(achievements: RecentAchievement[], by: Metric) {
 function getBestWeek(achievements: RecentAchievement[], by: Metric) {
   const byWeek: Record<string, { pts: number; ach: number }> = {}
   for (const a of achievements) {
-    const d = new Date(a.Date.replace(' ', 'T'))
-    const day = d.getDay() || 7
+    const d = new Date(parseUnlockTime(a.Date))
+    const day = d.getUTCDay() || 7
     const monday = new Date(d)
-    monday.setDate(d.getDate() - day + 1)
-    const key = monday.toISOString().split('T')[0]
+    monday.setUTCDate(d.getUTCDate() - day + 1)
+    const key = utcDay(monday)
     if (!byWeek[key]) byWeek[key] = { pts: 0, ach: 0 }
     byWeek[key].pts += a.Points
     byWeek[key].ach++
@@ -46,7 +51,7 @@ export default function MainPageBestPeriod({
   achievements: RecentAchievement[]
   isLoading?: boolean
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [selectedWeek, setSelectedWeek] = useState<string | null>(null)
@@ -65,11 +70,20 @@ export default function MainPageBestPeriod({
   /** The period's total: RA counts points, Steam counts unlocks. */
   const amount = (p: { pts: number; ach: number }) =>
     isSteam
-      ? { value: p.ach.toLocaleString(), unit: T.lineChart.achievements }
-      : { value: p.pts.toLocaleString(), unit: 'pts' }
+      ? { value: p.ach.toLocaleString(lang), unit: T.lineChart.achievements }
+      : { value: p.pts.toLocaleString(lang), unit: T.libraryDetail.pointsShort }
+  /** A month ("2024-01") as a reader says it: "January 2024". */
+  const month = (m: string) => formatDay(`${m}-01`, lang, { month: 'long', year: 'numeric' })
   /** The line under the period: when it was, with RA's unlock count alongside. */
   const when = (p: { pts: number; ach: number }, date: string) =>
     isSteam ? date : `${p.ach} ${T.lineChart.achievements} · ${date}`
+
+  // The week's seven days are UTC ones, as the card counted them.
+  const weekAchievements = useMemo(() => {
+    if (!selectedWeek) return []
+    const days = new Set(utcWeekDays(selectedWeek))
+    return achievements.filter((a) => days.has(a.Date.split(' ')[0]))
+  }, [achievements, selectedWeek])
 
   const closeDayModal = useCallback(() => setSelectedDay(null), [])
   const closeWeekModal = useCallback(() => setSelectedWeek(null), [])
@@ -78,19 +92,12 @@ export default function MainPageBestPeriod({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestPerformance}</p>
+      <Kicker>{T.cards.bestPerformance}</Kicker>
 
       {isLoading ? (
-        <div className="flex flex-col gap-2 animate-pulse">
+        <div className="flex flex-col gap-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="bg-bg-main rounded-lg px-3 py-2.5 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-ink/10 shrink-0" />
-              <div className="flex flex-col gap-1.5 flex-1">
-                <div className="h-2 w-16 bg-ink/10 rounded" />
-                <div className="h-2 w-28 bg-ink/10 rounded" />
-              </div>
-              <div className="h-5 w-10 bg-ink/10 rounded" />
-            </div>
+            <SkeletonRow key={i} icon="w-8 h-8" figure className="bg-bg-main rounded-tile px-3 py-2.5 gap-3" />
           ))}
         </div>
       ) : (
@@ -102,11 +109,11 @@ export default function MainPageBestPeriod({
               tone="purple"
               icon={<IconCalendarEvent className="w-4 h-4" />}
               {...amount(bestDay[1])}
-              when={when(bestDay[1], T.cards.dayOf.replace('{date}', bestDay[0]))}
+              when={when(bestDay[1], T.cards.dayOf.replace('{date}', formatDay(bestDay[0], lang)))}
               onClick={() => setSelectedDay(bestDay[0])}
             />
           ) : (
-            <div className="bg-bg-main rounded-lg px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
+            <div className="bg-bg-main rounded-box px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
 
           {/* Best Week — yellow */}
@@ -116,11 +123,11 @@ export default function MainPageBestPeriod({
               tone="yellow"
               icon={<IconCalendarWeek className="w-4 h-4" />}
               {...amount(bestWeek[1])}
-              when={when(bestWeek[1], T.cards.weekOf.replace('{date}', bestWeek[0]))}
+              when={when(bestWeek[1], T.cards.weekOf.replace('{date}', formatDay(bestWeek[0], lang)))}
               onClick={() => setSelectedWeek(bestWeek[0])}
             />
           ) : (
-            <div className="bg-bg-main rounded-lg px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
+            <div className="bg-bg-main rounded-box px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
 
           {/* Best Month — red */}
@@ -131,11 +138,11 @@ export default function MainPageBestPeriod({
               tone="red"
               icon={<IconCalendarMonth className="w-4 h-4" />}
               {...amount(bestMonth[1])}
-              when={when(bestMonth[1], bestMonth[0])}
+              when={when(bestMonth[1], month(bestMonth[0]))}
               onClick={() => setSelectedMonth(bestMonth[0])}
             />
           ) : (
-            <div className="bg-bg-main rounded-lg p-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
+            <div className="bg-bg-main rounded-box p-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
         </div>
       )}
@@ -150,15 +157,17 @@ export default function MainPageBestPeriod({
           />
         )}
         {selectedWeek && (
-          <WeekAchievementsModal
-            startDate={selectedWeek}
-            achievements={achievements}
+          <PeriodAchievementsModal
+            title={T.cards.bestWeek}
+            hint={T.cards.weekOf.replace('{date}', formatDay(selectedWeek, lang))}
+            empty={T.dayModal.empty}
+            achievements={weekAchievements}
             onClose={closeWeekModal}
           />
         )}
         {selectedMonth && (
           <PeriodAchievementsModal
-            title={`${T.cards.bestMonth} · ${selectedMonth}`}
+            title={`${T.cards.bestMonth} · ${month(selectedMonth)}`}
             achievements={achievements.filter((a) => a.Date.startsWith(selectedMonth))}
             onClose={closeMonthModal}
           />

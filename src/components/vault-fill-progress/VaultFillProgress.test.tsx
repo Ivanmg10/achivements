@@ -46,10 +46,13 @@ test("a platform's card: calculating with a bar, then how many counted, or what 
   expect(screen.getByRole('alert')).toHaveTextContent(en.rankings.fillKey)
 })
 
-test('the header fills a ring with the percentage while calculating, then shows the level', () => {
+test('the header holds the level badge’s slot in grey while calculating, no figure shown, then shows the level', () => {
   ;(useVaultFillState as jest.Mock).mockReturnValue(fill(true, {}))
   const { rerender } = render(<MainHeaderLevel />)
+  // Heard, not seen: a "99 %" on screen read as a real figure (#128).
   expect(screen.getByRole('link')).toHaveTextContent(en.rankings.fillA11y.replace('{pct}', '88'))
+  expect(screen.queryByText(/88 %/, { ignore: '.sr-only' })).not.toBeInTheDocument()
+  expect(screen.getByRole('link').querySelector('.animate-pulse')).toBeInTheDocument()
 
   ;(useVaultFillState as jest.Mock).mockReturnValue(fill(false, {}))
   ;(useVaultMe as jest.Mock).mockReturnValue({ me: { points: 500 } })

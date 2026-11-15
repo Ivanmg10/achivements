@@ -1,5 +1,4 @@
 import {
-  cookieFromHeader,
   linkReturn,
   returnParams,
   stateCookie,
@@ -58,6 +57,7 @@ test('what comes back is read from the return URL Steam signed', () => {
 test('a link only returns to the pages it starts from', () => {
   expect(linkReturn('/')).toBe('/')
   expect(linkReturn('/user')).toBe('/user')
+  expect(linkReturn('/welcome')).toBe('/welcome')
   expect(linkReturn('https://evil.example')).toBe('/user')
   expect(linkReturn('//evil.example')).toBe('/user')
   expect(linkReturn(null)).toBe('/user')
@@ -65,7 +65,6 @@ test('a link only returns to the pages it starts from', () => {
 
 test('the state cookie is only sent back to the callback', () => {
   expect(stateCookie('abc', true)).toBe('steam-state=abc; Path=/api/auth/steam/callback; HttpOnly; SameSite=Lax; Max-Age=600; Secure')
-  expect(cookieFromHeader('a=1; steam-state=abc', 'steam-state')).toBe('abc')
 })
 
 test('a confirmed answer gives the SteamID64, after asking Steam to check its signature', async () => {
@@ -91,6 +90,20 @@ test.each([
   expect(await verifySteamLogin(answer(overrides), BASE)).toBeNull()
   expect(global.fetch).not.toHaveBeenCalled()
 })
+
+test.each(['openid.claimed_id', 'openid.identity', 'openid.return_to', 'openid.sig', 'openid.ns'])(
+  'an answer with %s twice is refused without asking Steam, in either order',
+  async (name) => {
+    steamSays('is_valid:true')
+    const other = `https://steamcommunity.com/openid/id/76561197960287931`
+    const after = answer()
+    after.append(name, other)
+    const before = new URLSearchParams([[name, other], ...answer()])
+    expect(await verifySteamLogin(after, BASE)).toBeNull()
+    expect(await verifySteamLogin(before, BASE)).toBeNull()
+    expect(global.fetch).not.toHaveBeenCalled()
+  },
+)
 
 test('Steam not answering throws, so the callback can say "try later"', async () => {
   steamSays('', false)

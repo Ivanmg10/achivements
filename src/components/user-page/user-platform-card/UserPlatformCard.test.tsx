@@ -1,6 +1,29 @@
 import { render, screen } from '@testing-library/react'
-import UserPlatformCard from './UserPlatformCard'
+import UserPlatformCard, { platformStat } from './UserPlatformCard'
 import { en } from '@/translations/en'
+
+describe('platformStat', () => {
+  test("a number is written in the reader's language, and is loading while it is on its way", () => {
+    expect(platformStat('Games', 1234, { lang: 'es' })).toEqual({ label: 'Games', value: (1234).toLocaleString('es'), tone: undefined, loading: false })
+    expect(platformStat('Games', undefined, { lang: 'en', loading: true })).toMatchObject({ value: '—', loading: true })
+  })
+
+  test('the dash is for a value that is truly absent, and a zero is a zero', () => {
+    expect(platformStat('Tier', null, { lang: 'en' })).toMatchObject({ value: '—', loading: false })
+    expect(platformStat('Platinum', 0, { lang: 'en' })).toMatchObject({ value: '0' })
+  })
+})
+
+test('a figure on its way is a skeleton in its place, not a dash', () => {
+  const { container } = render(
+    <UserPlatformCard
+      name="Steam" logo={null} gradient="" connected
+      stats={[platformStat('Games', undefined, { lang: 'en', loading: true }), platformStat('Perfect', 3, { lang: 'en' })]}
+    />,
+  )
+  expect(container.textContent).not.toContain('—')
+  expect(container.querySelector('.bg-skeleton')).not.toBeNull()
+})
 
 const STATS = [
   { label: 'Games', value: '120' },
@@ -14,9 +37,10 @@ test('connected: the account, its numbers and the disconnect button', () => {
       logo={null}
       gradient="bg-blue-500"
       connected
-      identity={<p>ivanxmarine</p>}
+      identity={{ name: 'ivanxmarine', id: '7656' }}
       stats={STATS}
-      action={<button>Disconnect</button>}
+      disconnect={{ label: 'Disconnect', run: async () => true, done: 'Gone' }}
+      action={<button>Connect</button>}
     />,
   )
 
@@ -26,6 +50,7 @@ test('connected: the account, its numbers and the disconnect button', () => {
   expect(screen.getByText('Games')).toBeInTheDocument()
   expect(screen.getByText('120')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Disconnect' })).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Connect' })).not.toBeInTheDocument()
 })
 
 test('disconnected: says so, and shows no numbers', () => {
@@ -35,13 +60,16 @@ test('disconnected: says so, and shows no numbers', () => {
       logo={null}
       gradient=""
       connected={false}
-      identity={<p>Connect Steam to…</p>}
+      identity={{ name: 'ivanxmarine' }}
+      disconnect={{ label: 'Disconnect', run: async () => true, done: 'Gone' }}
       action={<button>Connect</button>}
     />,
   )
   expect(screen.getByText(en.userData.notConnected)).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Connect' })).toBeInTheDocument()
   expect(document.querySelector('dl')).toBeNull()
+  expect(screen.queryByText('ivanxmarine')).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Disconnect' })).not.toBeInTheDocument()
 })
 
 test('shows a link status message', () => {
@@ -61,4 +89,27 @@ test('connected with an href: the name links to the account on the platform', ()
 test('not connected: no link even with an href', () => {
   render(<UserPlatformCard name="Steam" href="https://steamcommunity.com/profiles/1" logo={null} gradient="" connected={false} />)
   expect(screen.queryByRole('link')).not.toBeInTheDocument()
+})
+
+test('connected: a badge beside the name and one more button beside the disconnect', () => {
+  render(
+    <UserPlatformCard
+      name="PlayStation Network"
+      logo={null}
+      gradient=""
+      connected
+      badge={<span>Verified</span>}
+      extraAction={<button type="button">Verify</button>}
+      disconnect={{ label: 'Disconnect PSN', run: async () => true, done: 'ok' }}
+    />,
+  )
+  expect(screen.getByText('Verified')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Verify' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Disconnect PSN' })).toBeInTheDocument()
+})
+
+test('not connected: neither the badge nor the extra button', () => {
+  render(<UserPlatformCard name="PlayStation Network" logo={null} gradient="" connected={false} badge={<span>Verified</span>} extraAction={<button type="button">Verify</button>} />)
+  expect(screen.queryByText('Verified')).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Verify' })).not.toBeInTheDocument()
 })

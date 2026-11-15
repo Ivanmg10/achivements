@@ -19,8 +19,12 @@ const Ctx = createContext<VaultFillValue | null>(null)
  * same progress.
  */
 export function VaultFillProvider({ children }: { children: ReactNode }) {
-  const { status, version } = useVaultFill()
-  const value = useMemo(() => ({ ...fillProgress(status), status, version }), [status, version])
+  const { status, version, stopped } = useVaultFill()
+  // Given up on this page: not "calculating" any more, whatever the last status said.
+  const value = useMemo(() => {
+    const progress = fillProgress(status)
+    return { ...progress, active: progress.active && !stopped, status, version }
+  }, [status, version, stopped])
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 

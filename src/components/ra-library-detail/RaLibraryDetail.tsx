@@ -1,20 +1,21 @@
 'use client'
 
 import { useMemo } from 'react'
-import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
+import type { RetroAchievementsGameWithAchievements } from '@/types/types'
 import type { CategoryGame } from '@/hooks/useGamesByCategory'
 import { useLanguage } from '@/context/LanguageContext'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import { SectionFallback } from '@/components/ui/SectionFallback'
-import LibraryGameDetail, { type LibraryCategory } from '@/components/library-game-detail/LibraryGameDetail'
+import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetail'
+import { asCategory } from '@/utils/utils'
 import { fromRa } from '@/utils/gameInsights'
 import { parseReleaseYear } from '@/utils/utils'
 import type { InfoRow } from '@/components/library-game-detail/library-detail-info/LibraryDetailInfo'
+import { raAwardCompletedAt } from '@/utils/completionDates'
+import { raImageUrl } from '@/utils/raAssets'
+import { raAchievementList } from '@/utils/gameAchievements'
 
-// About three rows at two columns on a wide screen; the rest is a click away.
-const ACHIEVEMENT_LIMIT = 60
 
-const asCategory = (c?: string): LibraryCategory => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * An opened RA card in a status list. The card asks for the game and hands
@@ -42,8 +43,7 @@ export default function RaLibraryDetail({
   const achievements = useMemo(
     () =>
       data
-        ? Object.values(data.Achievements ?? {})
-            .filter((a): a is RetroAchievement => !!a)
+        ? raAchievementList(data)
             .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
         : [],
     [data],
@@ -74,10 +74,11 @@ export default function RaLibraryDetail({
     <LibraryGameDetail
       category={asCategory(category)}
       items={items}
+      completedAt={data ? raAwardCompletedAt(data) : null}
       state={loading ? 'loading' : error && !data ? 'error' : 'ready'}
       errorNode={<SectionFallback error onRefresh={onRetry}>{null}</SectionFallback>}
       ring={{ earned, total, label: T.gameExpanded.allAchievements }}
-      game={{ source: 'ra', id: Number(gameId), title: game.Title, iconUrl: game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : undefined }}
+      game={{ source: 'ra', id: Number(gameId), title: game.Title, iconUrl: raImageUrl(game.ImageIcon) }}
       info={info}
       facts={data ? [{ label: T.libraryDetail.players, value: (data.NumDistinctPlayers ?? 0).toLocaleString(lang) }] : []}
       empty={T.statusGameItem.noPublishedAchievements}
@@ -89,7 +90,6 @@ export default function RaLibraryDetail({
           gameId={gameId}
           gameTitle={game.Title}
           badgeSize={48}
-          limit={ACHIEVEMENT_LIMIT}
         />
       }
     />

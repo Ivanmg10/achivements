@@ -3,10 +3,12 @@
 import { IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useVaultFillState } from '@/context/VaultFillContext'
-import type { GameSource } from '@/types/steam'
 import { ProgressBar } from '@/components/ui/ProgressBar'
-import { PLATFORM_FILL, PLATFORM_NAMES, PLATFORM_ORDER } from '@/components/vault-platform-split/VaultPlatformSplit'
+import { PLATFORM_FILL, PLATFORM_NAMES } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { fillMessage } from '@/utils/vaultFill'
+import { GAME_SOURCES } from '@/utils/gameRef'
+import type { GameSource } from '@/types/game'
+import Notice from '@/components/ui/Notice'
 
 /**
  * How the Vault Points fill is getting on, one small card per platform: games
@@ -20,7 +22,7 @@ export default function VaultFillProgress({ wide = false, className = '' }: { wi
   const { T, lang } = useLanguage()
   const fill = useVaultFillState()
   const platforms = fill?.status?.platforms ?? {}
-  const sources = PLATFORM_ORDER.filter((s) => platforms[s])
+  const sources = GAME_SOURCES.filter((s) => platforms[s])
   const messages = sources.map((s) => [s, fillMessage(s, platforms[s]!, T.rankings)] as const).filter((m): m is readonly [GameSource, string] => m[1] !== null)
   if (!fill || (!fill.active && messages.every(([s]) => platforms[s]?.state !== 'error'))) return null
   const n = (x: number) => x.toLocaleString(lang)
@@ -35,7 +37,7 @@ export default function VaultFillProgress({ wide = false, className = '' }: { wi
             const failed = p.state === 'error'
             const counted = p.read + (p.skipped ?? 0)
             return (
-              <li key={s} className="bg-bg-main rounded-xl px-3 py-2 flex flex-col gap-1.5 min-w-0">
+              <li key={s} className="bg-bg-main rounded-tile px-3 py-2 flex flex-col gap-1.5 min-w-0">
                 <span className="flex items-center justify-between gap-2 text-xs">
                   <span className="flex items-center gap-1.5 min-w-0 font-medium">
                     <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${PLATFORM_FILL[s]}`} />
@@ -68,13 +70,11 @@ export default function VaultFillProgress({ wide = false, className = '' }: { wi
         </ul>
       )}
       {messages.map(([s, message]) => (
-        <p
-          key={s}
-          role={platforms[s]?.state === 'error' ? 'alert' : undefined}
-          className={`text-xs rounded-lg px-2.5 py-1.5 ${platforms[s]?.state === 'error' ? 'bg-danger/10 text-text-main ring-1 ring-danger/30' : 'text-text-secondary'}`}
-        >
-          {message}
-        </p>
+        platforms[s]?.state === 'error' ? (
+          <Notice key={s} tone="danger" size="sm">{message}</Notice>
+        ) : (
+          <p key={s} className="text-xs rounded-box px-2.5 py-1.5 text-text-secondary">{message}</p>
+        )
       ))}
       {fill.active && <p className="text-xs text-text-secondary">{T.rankings.fillInRanking}</p>}
     </div>

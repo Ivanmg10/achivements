@@ -1,0 +1,10 @@
+<!-- CheevoVault logo, a hand-traced DRAFT of cheevovault-logo-source.png (the user's drawing, 2026-10-28).
+     The big hexagonal C is "Cheevo"; the V inside it, cut into three facets of a cube, is "Vault".
+     Coordinates are the source scaled to 2000 px wide; check the outline against the PNG before shipping.
+     In the app: the C takes the text colour, the three facets three steps of the theme's accent (see issue). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="440 80 1060 1200" role="img" aria-label="CheevoVault">
+  <path fill="#111" d="M963 90 L1482 384 L1376 452 L963 227 L581 456 L581 897 L970 1123 L1374 893 L1490 960 L975 1265 L456 965 L452 385 Z"/>
+  <path fill="#a78bfa" d="M963 322 L1172 447 L970 930 L760 452 Z"/>
+  <path fill="#7c5fd6" d="M655 495 L880 965 L662 858 Z"/>
+  <path fill="#5b40b0" d="M1265 495 L1282 855 L1055 975 Z"/>
+</svg>

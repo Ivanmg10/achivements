@@ -1,24 +1,31 @@
-import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { CONTACT_EMAIL, DATA_CONTROLLER } from '@/lib/siteUrl'
+import Button from '@/components/ui/Button'
+import PublicShell from '@/components/public-shell/PublicShell'
 
 export type LegalText = {
   title: string
   updated: string
   intro: string
   back: string
-  sections: { heading: string; body: string[] }[]
+  /** A section is paragraphs, or `parts` with a subheading each (a long one, like what the site keeps). */
+  sections: { heading: string; body?: string[]; parts?: { heading: string; body: string[] }[] }[]
 }
 
-/** A legal page — the privacy policy or the terms — with who answers for it and how to reach them. */
-export default function LegalDocument({ doc }: { doc: LegalText }) {
+const PARAGRAPH = 'text-sm text-text-secondary leading-relaxed'
+
+/**
+ * A legal page (the privacy policy or the terms) with who answers for it and how to reach them,
+ * inside the visitors' bar and footer like every public page. `path` is where it lives.
+ */
+export default function LegalDocument({ doc, path }: { doc: LegalText; path: string }) {
   const { T } = useLanguage()
 
   return (
-    <main className="min-h-screen bg-bg-main text-text-main px-4 sm:px-6 py-12 sm:py-16">
-      <article className="max-w-2xl mx-auto flex flex-col gap-8">
+    <PublicShell current={path}>
+      <article className="max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-16 flex flex-col gap-8 enter-rows">
         <header className="flex flex-col gap-2">
-          <h1 className="text-2xl sm:text-3xl font-semibold">{doc.title}</h1>
+          <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1">{doc.title}</h1>
           <p className="text-xs text-text-secondary">{doc.updated}</p>
           <p className="text-sm text-text-secondary">{doc.intro}</p>
         </header>
@@ -26,8 +33,16 @@ export default function LegalDocument({ doc }: { doc: LegalText }) {
         {doc.sections.map((section) => (
           <section key={section.heading} className="flex flex-col gap-2">
             <h2 className="text-lg font-semibold">{section.heading}</h2>
-            {section.body.map((paragraph) => (
-              <p key={paragraph} className="text-sm text-text-secondary leading-relaxed">{paragraph}</p>
+            {section.body?.map((paragraph) => (
+              <p key={paragraph} className={PARAGRAPH}>{paragraph}</p>
+            ))}
+            {section.parts?.map((part) => (
+              <div key={part.heading} className="flex flex-col gap-2 mt-2">
+                <h3 className="text-sm font-semibold text-text-main">{part.heading}</h3>
+                {part.body.map((paragraph) => (
+                  <p key={paragraph} className={PARAGRAPH}>{paragraph}</p>
+                ))}
+              </div>
             ))}
           </section>
         ))}
@@ -46,13 +61,13 @@ export default function LegalDocument({ doc }: { doc: LegalText }) {
           )}
         </dl>
 
-        <Link
+        <Button
           href="/"
-          className="self-start px-4 py-2 rounded-lg bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="self-start"
         >
           {doc.back}
-        </Link>
+        </Button>
       </article>
-    </main>
+    </PublicShell>
   )
 }

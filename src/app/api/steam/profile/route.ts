@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
+import { steamFailure } from '@/lib/steamFailure'
 import { TTL } from '@/lib/steamCache'
 import { loadSteamProfile } from '@/lib/steamProfile'
 import { cachedJson } from '@/lib/httpCache'
@@ -19,6 +20,6 @@ export async function GET(req?: Request) {
     return cachedJson(profile, TTL.profile)
   } catch (err) {
     console.error('[steam/profile]', err)
-    return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })
+    return steamFailure(err)
   }
 }

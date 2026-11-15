@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { RARITY_BANDS, rarityBands, type InsightAchievement } from '@/utils/gameInsights'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const BAND_LABEL = { common: 'bandCommon', uncommon: 'bandUncommon', rare: 'bandRare', ultra: 'bandUltra' } as const
 
@@ -29,7 +30,10 @@ export default function LibraryDetailDifficulty({ items, isLoading = false }: { 
       {isLoading ? (
         <div aria-busy="true" className="flex flex-col gap-3">
           {RARITY_BANDS.map((b) => (
-            <div key={b.id} className="h-8 bg-ink/5 rounded-lg animate-pulse" />
+            <div key={b.id} className="flex flex-col gap-1">
+              <Skeleton className="h-3.5 w-2/5" />
+              <Skeleton className="h-2" />
+            </div>
           ))}
         </div>
       ) : !known ? (

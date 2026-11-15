@@ -1,5 +1,6 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
+jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
 jest.mock('@/lib/steamCache', () => ({
   ...jest.requireActual('@/lib/steamCache'),
   withSteamCache: jest.fn(),

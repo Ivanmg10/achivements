@@ -18,6 +18,19 @@ test('your level, points and place, leading to the rankings', () => {
   expect(screen.getByRole('progressbar')).toBeInTheDocument()
 })
 
+test('holds its room while it is read, so the card does not jump when it lands', () => {
+  ;(useVaultMe as jest.Mock).mockReturnValue({ me: null, isLoading: true })
+  const { container } = render(<UserVaultLevel />)
+  expect(screen.queryByRole('link')).not.toBeInTheDocument()
+  expect(container.firstElementChild).toHaveClass('rounded-pane')
+})
+
+test('takes no room when the level could not be read', () => {
+  ;(useVaultMe as jest.Mock).mockReturnValue({ me: null, isLoading: false })
+  const { container } = render(<UserVaultLevel />)
+  expect(container).toBeEmptyDOMElement()
+})
+
 test('before anything is scored, says it is being worked out', () => {
   ;(useVaultMe as jest.Mock).mockReturnValue({ me: me(0), isLoading: false })
   render(<UserVaultLevel />)

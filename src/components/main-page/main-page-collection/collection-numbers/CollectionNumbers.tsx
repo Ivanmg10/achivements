@@ -20,7 +20,7 @@ import MasteryMix from '@/components/main-page/main-page-charts/mastery-mix/Mast
 /** One platform's tile in the strip: its name, its headline number and what it counts, then its bar. */
 function PlatformTile({ label, logo, value, valueClass, caption, children }: { label: string; logo: ReactNode; value: number; valueClass: string; caption: string; children: ReactNode }) {
   return (
-    <section aria-label={label} className="flex flex-col gap-2 rounded-lg bg-bg-main p-3 min-w-0">
+    <section aria-label={label} className="flex flex-col gap-2 rounded-box bg-bg-main p-3 min-w-0">
       <span className="flex items-center gap-2 text-xs text-text-secondary">
         {logo} {label}
       </span>
@@ -79,7 +79,7 @@ export default function CollectionNumbers({
           <section aria-label={T.steam.totalPlaytime}>
             <p className="flex items-baseline gap-2">
               <span className="text-2xl font-bold text-text-main tabular-nums leading-none whitespace-nowrap">
-                {formatPlaytime(playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+                {formatPlaytime(playtimeMinutes, T.steam, lang)}
               </span>
               <span className="text-xs text-text-secondary">
                 {T.steam.totalPlaytime} · {T.cards.playtimeSources}
@@ -96,23 +96,23 @@ export default function CollectionNumbers({
             logo={<RaLogo height={11} />}
             value={awards.MasteryAwardsCount ?? 0}
             valueClass="text-warning"
-            caption={`${T.cards.mastered}${awards.TotalAwardsCount !== null ? ` · ${awards.TotalAwardsCount.toLocaleString()} ${T.userStats.awards.toLowerCase()}` : ''}`}
+            caption={`${T.cards.mastered}${awards.TotalAwardsCount !== null ? ` · ${awards.TotalAwardsCount.toLocaleString(lang)} ${T.userStats.awards.toLowerCase()}` : ''}`}
           >
             <MasteryMix awards={awards} />
           </PlatformTile>
         )}
         {steamGames.length > 0 && (
-          <PlatformTile label="Steam" logo={<SteamLogo size={12} className="text-[#66c0f4]" aria-hidden="true" />} value={steam.perfect} valueClass="text-[#66c0f4]" caption={perfectOf(fractions.length)}>
+          <PlatformTile label="Steam" logo={<SteamLogo size={12} className="text-steam" aria-hidden="true" />} value={steam.perfect} valueClass="text-steam" caption={perfectOf(fractions.length)}>
             <CompletionDistribution fractions={fractions} tone="steam" showTitle={false} note={hasUnloadedProgress(steamGames) ? T.steam.partialProgressNote : undefined} />
           </PlatformTile>
         )}
         {psnGames.length > 0 && (
-          <PlatformTile label="PlayStation" logo={<PlaystationLogo size={12} className="text-[#0070d1]" aria-hidden="true" />} value={psnPerfect} valueClass="text-[#0070d1]" caption={perfectOf(psnGames.length)}>
+          <PlatformTile label="PlayStation" logo={<PlaystationLogo size={12} className="text-psn" aria-hidden="true" />} value={psnPerfect} valueClass="text-psn" caption={perfectOf(psnGames.length)}>
             <CompletionDistribution fractions={psnFractions} tone="psn" showTitle={false} />
           </PlatformTile>
         )}
         {xboxPlayable.length > 0 && (
-          <PlatformTile label="Xbox" logo={<XboxLogo size={12} className="text-green-500" aria-hidden="true" />} value={xboxPerfect} valueClass="text-green-500" caption={perfectOf(xboxPlayable.length)}>
+          <PlatformTile label="Xbox" logo={<XboxLogo size={12} className="text-success" aria-hidden="true" />} value={xboxPerfect} valueClass="text-success" caption={perfectOf(xboxPlayable.length)}>
             <CompletionDistribution fractions={xboxFractions} tone="xbox" showTitle={false} />
           </PlatformTile>
         )}

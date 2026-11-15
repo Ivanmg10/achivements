@@ -37,18 +37,21 @@ test('renders the game title and drag handle', () => {
   expect(screen.getByLabelText('Drag to reorder: Sly Cooper')).toBeInTheDocument()
 })
 
-test('does not render a hardcore dot for a softcore game', () => {
-  const { container } = render(<PerfectGameOrderRow game={softcoreGame} />)
-  expect(container.querySelector('.bg-warning')).not.toBeInTheDocument()
+test('an RA game shows the RA logo and, in words, that it was completed in softcore', () => {
+  render(<PerfectGameOrderRow game={softcoreGame} />)
+  expect(screen.getByLabelText('RetroAchievements')).toBeInTheDocument()
+  expect(screen.getByText('Softcore')).not.toHaveClass('text-hardcore')
 })
 
-test('renders a hardcore dot for a hardcore game', () => {
+test('an RA game completed in hardcore says so in words, with the hardcore tone, never a bare dot', () => {
   const { container } = render(<PerfectGameOrderRow game={hardcoreGame} />)
-  expect(container.querySelector('.bg-warning')).toBeInTheDocument()
+  expect(screen.getByText('Hardcore')).toHaveClass('text-hardcore')
+  expect(container.querySelector('.bg-warning')).not.toBeInTheDocument()
 })
 
-test('marks a Steam game with its logo instead of the hardcore dot', () => {
-  const { container } = render(<PerfectGameOrderRow game={steamGame} />)
+test('marks a Steam game with its logo and no RA mode', () => {
+  render(<PerfectGameOrderRow game={steamGame} />)
   expect(screen.getByLabelText('Steam')).toBeInTheDocument()
-  expect(container.querySelector('.bg-warning')).not.toBeInTheDocument()
+  expect(screen.queryByText('Hardcore')).not.toBeInTheDocument()
+  expect(screen.queryByText('Softcore')).not.toBeInTheDocument()
 })

@@ -1,9 +1,10 @@
 jest.mock('@/hooks/useXboxAchievements', () => ({ useXboxAchievements: jest.fn() }))
 jest.mock('@/components/library-game-detail/LibraryGameDetail', () => ({
   __esModule: true,
-  default: ({ facts, ring, state, info }: { facts: { label: string; value: string }[]; ring: { earned: number; total: number }; state: string; info: { value: string }[] }) => (
+  default: ({ facts, ring, state, info, grid }: { facts: { label: string; value: string }[]; ring: { earned: number; total: number }; state: string; info: { value: string }[]; grid: React.ReactNode }) => (
     <div data-testid="detail" data-state={state} data-ring={`${ring.earned}/${ring.total}`}>
       {info.map((i) => i.value).join(',')}|{facts.map((f) => `${f.label}:${f.value}`).join(',')}
+      <div data-testid="grid">{grid}</div>
     </div>
   ),
 }))
@@ -43,9 +44,15 @@ test('loaded, the ring counts the achievements; a failure is its own state', () 
 test('the play time is a fact when Xbox gave it, and nothing otherwise', () => {
   setup()
   const { unmount } = render(<XboxLibraryDetail game={{ ...GAME, playtimeMinutes: 3409 }} />)
-  const played = formatPlaytime(3409, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en')
+  const played = formatPlaytime(3409, en.steam, 'en')
   expect(screen.getByTestId('detail')).toHaveTextContent(`${en.steam.playtime}:${played}`)
   unmount()
   render(<XboxLibraryDetail game={GAME} />)
   expect(screen.getByTestId('detail')).not.toHaveTextContent(en.steam.playtime)
+})
+
+test('the opened game shows its whole grid, as the other three platforms do: no "see all" cut', () => {
+  setup(Array.from({ length: 93 }, (_, i) => xboxAchievementFixture({ id: String(i + 1), name: `A${i + 1}` })))
+  render(<XboxLibraryDetail game={GAME} category="playing" />)
+  expect(screen.getByTestId('grid').querySelectorAll('li')).toHaveLength(93)
 })

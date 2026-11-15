@@ -5,7 +5,7 @@ import type { PinnedView } from '@/utils/pinnedView'
 
 const view = (over: Partial<PinnedView> = {}): PinnedView => ({
   key: 'psn:1:3', source: 'psn', gameId: 2018800, gameTitle: 'Black Ops II', title: 'Back in Time', description: 'Do it',
-  iconUrl: 'https://i.png', earned: true, anchor: 'trophy-3', value: 'Gold', valueClass: 'text-yellow-400', rarity: 1.5, ...over,
+  iconUrl: 'https://i.png', earned: true, anchor: 'trophy-3', value: 'Gold', valueClass: 'text-hardcore', rarity: 1.5, ...over,
 })
 
 test('links to the trophy on its game page, with how it stands', () => {

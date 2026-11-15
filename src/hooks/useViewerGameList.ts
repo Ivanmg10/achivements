@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 import { useSession } from 'next-auth/react'
-import type { GameSource } from '@/types/steam'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
 import { usePsnTrophies } from '@/hooks/usePsnTrophies'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { canUseXbox } from '@/utils/xboxAccess'
 import { psnCompareList, raCompareList, steamCompareList, xboxCompareList, type CompareAchievement } from '@/utils/gameCompare'
+import type { GameSource } from '@/types/game'
 
 /**
  * The signed-in viewer's own achievements in one game, to set beside someone

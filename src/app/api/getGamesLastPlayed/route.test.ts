@@ -1,6 +1,8 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/raCache', () => ({ withCache: jest.fn() }))
 jest.mock('@/lib/raClient', () => ({ getGameInfoAndUserProgress: jest.fn() }))
+jest.mock('@/lib/publicUser', () => ({ findSubject: jest.fn() }))
+jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn().mockResolvedValue(true) }))
 
 import { GET } from './route'
 import { NextRequest } from 'next/server'
@@ -59,4 +61,16 @@ test('one request cannot fan out into hundreds of RA calls', async () => {
   const ids = Array.from({ length: 101 }, (_, i) => i + 1).join(',')
   expect((await GET(request(`gameIds=${ids}`))).status).toBe(400)
   expect(getGameInfoAndUserProgress).not.toHaveBeenCalled()
+})
+
+test('on someone else\'s key only the first few games are read', async () => {
+  const { findSubject } = jest.requireMock('@/lib/publicUser')
+  findSubject.mockResolvedValue({ id: 7, rausername: 'Bob', raid: 'bob-key', profilePublic: true })
+  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1' } })
+  ;(getGameInfoAndUserProgress as jest.Mock).mockReset()
+  ;(getGameInfoAndUserProgress as jest.Mock).mockResolvedValue({ ID: 1, Achievements: {} })
+  const ids = Array.from({ length: 40 }, (_, i) => i + 1).join(',')
+  const request = new NextRequest(`http://localhost/api/getGamesLastPlayed?user=bob&gameIds=${ids}`)
+  await GET(request)
+  expect(getGameInfoAndUserProgress).toHaveBeenCalledTimes(10)
 })

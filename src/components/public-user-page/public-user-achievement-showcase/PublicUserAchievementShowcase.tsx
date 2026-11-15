@@ -6,8 +6,10 @@ import { useSubject } from '@/context/SubjectContext'
 import { useShowcase } from '@/hooks/useShowcase'
 import { SHOWCASE_MAX, showcaseKey } from '@/utils/showcase'
 import { SectionFallback } from '@/components/ui/SectionFallback'
+import SectionHead from '@/components/ui/SectionHead'
 import EmptyState from '@/components/empty-state/EmptyState'
 import ShowcaseTile from '@/components/showcase-tile/ShowcaseTile'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const GRID = 'grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3'
 
@@ -23,14 +25,11 @@ export default function PublicUserAchievementShowcase() {
 
   return (
     <section aria-labelledby="public-showcase-title" className="flex flex-col gap-3">
-      <h3 id="public-showcase-title" className="flex items-center gap-2 text-base font-semibold">
-        <IconTrophy size={18} className="text-accent" aria-hidden="true" />
-        {T.showcase.title}
-      </h3>
+      <SectionHead as="h3" size="lg" id="public-showcase-title" title={T.showcase.title} />
       {isLoading ? (
         <div aria-busy="true" className={GRID}>
           {Array.from({ length: SHOWCASE_MAX }, (_, i) => (
-            <div key={i} className="min-h-44 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+            <Skeleton key={i} radius="tile" className="min-h-44" />
           ))}
         </div>
       ) : error ? (
@@ -40,7 +39,7 @@ export default function PublicUserAchievementShowcase() {
       ) : items.length === 0 ? (
         <EmptyState icon={<IconTrophy className="w-6 h-6" />} title={T.showcase.emptyPublic} size="compact" className="py-6" />
       ) : (
-        <ul className={GRID}>
+        <ul className={`${GRID} enter-cards`}>
           {items.map((item) => (
             <li key={showcaseKey(item)}>
               <ShowcaseTile item={item} subject={subject} />

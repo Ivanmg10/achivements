@@ -52,9 +52,9 @@ test('a labelled image keeps its label on the placeholder', () => {
 })
 
 test('passes size and classes through', () => {
-  const { container } = render(<SteamGameImage appId={620} size={56} className="rounded-xl" />)
+  const { container } = render(<SteamGameImage appId={620} size={56} className="rounded-tile" />)
   expect(img(container)?.getAttribute('width')).toBe('56')
-  expect(img(container)?.className).toContain('rounded-xl')
+  expect(img(container)?.className).toContain('rounded-tile')
   expect(img(container)?.className).toContain('object-cover')
 })
 

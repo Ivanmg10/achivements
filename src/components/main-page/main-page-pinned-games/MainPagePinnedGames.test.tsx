@@ -134,7 +134,7 @@ test('clicking an expanded row again collapses it back to the full grid', () => 
 test('switches back to the recently played view', () => {
   ;(usePinnedGames as jest.Mock).mockReturnValue({ pins: raPins(), isLoading: false, reorder })
   render(<MainPagePinnedGames />)
-  fireEvent.click(screen.getByRole('tab', { name: 'View recently played' }))
+  fireEvent.click(screen.getByRole('tab', { name: 'Recently played' }))
   expect(setView).toHaveBeenCalledWith('recent')
 })
 

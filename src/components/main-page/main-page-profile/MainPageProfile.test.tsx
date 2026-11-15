@@ -17,6 +17,8 @@ jest.mock("@/components/main-page/main-page-profile/main-page-profile-ra/MainPag
   default: () => <div data-testid="profile-ra">ProfileRa</div>,
 }));
 
+jest.mock("./MainPageProfile.module.css", () => ({ enter: "enter" }));
+
 import { render, screen, fireEvent } from "@testing-library/react";
 import MainPageProfile from "./MainPageProfile";
 import { useSession } from "next-auth/react";
@@ -38,6 +40,12 @@ test("renders profile sub-components", () => {
   });
   renderProfile();
   expect(screen.getByTestId("profile-ra")).toBeInTheDocument();
+});
+
+test("the profile makes its entrance", () => {
+  (useSession as jest.Mock).mockReturnValue({ data: { user: { raLinked: true, raUser: { User: "Ivan" } } } });
+  renderProfile();
+  expect(screen.getByTestId("profile-ra").parentElement).toHaveClass("enter");
 });
 
 test("renders without raUser", () => {
@@ -77,6 +85,16 @@ describe("RA / Steam tabs", () => {
     expect(screen.queryByTestId("profile-ra")).not.toBeInTheDocument();
     const panel = screen.getByRole("tabpanel");
     expect(panel.getAttribute("aria-labelledby")).toBe(screen.getByRole("tab", { name: "Steam" }).id);
+  });
+
+  test("each platform makes its entrance: the panel is a new one per tab", () => {
+    bothAccounts();
+    renderProfile();
+    const raPanel = screen.getByRole("tabpanel");
+    fireEvent.click(screen.getByRole("tab", { name: "Steam" }));
+    const stPanel = screen.getByRole("tabpanel");
+    expect(stPanel).not.toBe(raPanel);
+    expect(stPanel).toHaveClass("enter");
   });
 
   test("remembers the chosen tab", () => {

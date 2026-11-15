@@ -269,11 +269,11 @@ describe('adding, editing, deleting', () => {
     expect(body).toEqual({ title: 'Renamed', is_public: true })
   })
 
-  test('a refused edit throws the server message, for the modal to show', async () => {
-    server({ 'GET /api/groups/3': GROUP([item(1)]), 'PUT /api/groups/3': () => answer({ message: 'Title taken' }, false, 409) })
+  test('a refused edit throws the server’s code, for the modal to show', async () => {
+    server({ 'GET /api/groups/3': GROUP([item(1)]), 'PUT /api/groups/3': () => answer({ error: 'title-required' }, false, 400) })
     const { result } = renderHook(() => useGroupPage(3, []))
     await waitFor(() => expect(result.current.status).toBe('ready'))
-    await expect(result.current.edit({ title: 'X', description: '', icon: '', is_public: false })).rejects.toThrow('Title taken')
+    await expect(result.current.edit({ title: 'X', description: '', icon: '', is_public: false })).rejects.toThrow('title-required')
   })
 
   test('deleting says so and reports the group gone', async () => {

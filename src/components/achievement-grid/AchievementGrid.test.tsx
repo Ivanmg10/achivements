@@ -1,6 +1,7 @@
 import { render, screen, act, fireEvent } from '@testing-library/react'
 import { AchievementGrid } from './AchievementGrid'
 import { RetroAchievement } from '@/types/types'
+import { useSession } from 'next-auth/react'
 
 jest.mock('@/components/achievement-modal/AchievementModal', () => ({
   __esModule: true,
@@ -80,10 +81,11 @@ test('renders the badge grid once achievements are provided', async () => {
 })
 
 test('fetches favorited achievements for the game', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { id: '1' } } })
   render(
     <AchievementGrid achievements={[earnedAchievement]} total={1} gameId={7} gameTitle="Game" numDistinctPlayers={1} />,
   )
-  expect(fetch).toHaveBeenCalledWith('/api/favorites?gameId=7')
+  expect(fetch).toHaveBeenCalledWith('/api/favorites?source=ra&gameId=7')
 })
 
 test('opens the achievement modal on click', async () => {
@@ -97,7 +99,7 @@ test('opens the achievement modal on click', async () => {
   jest.useRealTimers()
 
   fireEvent.click(screen.getByRole('button', { name: /First blood/ }))
-  expect(screen.getByTestId('achievement-modal')).toBeInTheDocument()
+  expect(await screen.findByTestId('achievement-modal')).toBeInTheDocument()
 
   fireEvent.click(screen.getByText('close'))
   expect(screen.queryByTestId('achievement-modal')).not.toBeInTheDocument()

@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
+import { profileFieldError } from '@/utils/apiErrors'
 
 /**
  * Saves one plain profile field (description, gender…) and refreshes the
- * session. The error is returned as state so the caller shows it inline;
+ * session. `extra` rides along in the request (the password an email change asks for). The error is returned as state so the caller shows it inline;
  * success raises the toast.
  */
 export function useSaveProfileField() {
@@ -14,18 +15,18 @@ export function useSaveProfileField() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function save(field: string, value: string): Promise<boolean> {
+  async function save(field: string, value: string, extra: Record<string, unknown> = {}): Promise<boolean> {
     setSaving(true)
     setError(null)
     try {
       const res = await fetch('/api/updateUserProfile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ field, value }),
+        body: JSON.stringify({ field, value, ...extra }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        setError(data.error ?? T.editProfileModal.errorGeneric)
+        setError(profileFieldError(data.error, T))
         return false
       }
       await update()

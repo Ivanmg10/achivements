@@ -4,6 +4,8 @@ import { dataOwner } from '@/lib/apiAuth'
 import { withCache } from '@/lib/raCache'
 import { cachedJson } from '@/lib/httpCache'
 import { getUserCompletedGames } from '@/lib/raClient'
+import { visibleGamesForUser } from '@/lib/gameVisibility'
+import type { RetroAchievementsGameCompleted } from '@/types/types'
 
 const TTL = 10 * 60 * 1000
 
@@ -19,13 +21,14 @@ export async function GET(req?: Request) {
   }
 
   try {
-    const data = await withCache(
+    const data = await withCache<RetroAchievementsGameCompleted[]>(
       `gamesCompleted:${id}`,
       TTL,
-      () => getUserCompletedGames(rausername, raid),
+      async () => (await getUserCompletedGames(rausername, raid)) as RetroAchievementsGameCompleted[],
       (d) => Array.isArray(d),
     )
-    return cachedJson(data, TTL)
+    const visible = await visibleGamesForUser(id, data, 'ra', (game) => game.GameID)
+    return cachedJson(visible, 0)
   } catch (err) {
     return raUnavailable(err)
   }

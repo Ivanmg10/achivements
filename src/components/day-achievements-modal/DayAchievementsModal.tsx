@@ -1,17 +1,16 @@
 'use client'
 
 import { useMemo } from 'react'
-import { motion } from 'framer-motion'
 import { RecentAchievement } from '@/types/types'
-import { modalOverlay, modalContent } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { useUserAwards } from '@/hooks/useUserAwards'
-import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
-import Image from 'next/image'
-import Link from 'next/link'
-import { IconX, IconStar, IconCheck } from '@tabler/icons-react'
-import { useSubject } from '@/context/SubjectContext'
-import { gameHref } from '@/utils/gameRef'
+import DayAchievementsAwards from '@/components/day-achievements-awards/DayAchievementsAwards'
+import PeriodAchievementsDay from '@/components/period-achievements-day/PeriodAchievementsDay'
+import Modal from '@/components/ui/Modal'
+import Facts from '@/components/ui/Facts'
+import { formatWeekdayDay, utcDay } from '@/utils/dates'
+import { groupDays } from '@/utils/periodDays'
+import { plural } from '@/utils/utils'
 
 interface Props {
   date: string
@@ -22,17 +21,14 @@ interface Props {
 const COMPLETION_TYPES = new Set(['Mastery/Completion', 'Game Beaten'])
 
 function awardDate(awardedAt: string): string {
-  return new Date(awardedAt).toISOString().split('T')[0]
+  return utcDay(new Date(awardedAt))
 }
 
+/** One day's unlocks, grouped by game as in the week and month dialogs (the same pane), under the day's mastery awards. */
 export default function DayAchievementsModal({ date, achievements, onClose }: Props) {
-  const { T } = useLanguage()
-  const subject = useSubject()
+  const { T, lang } = useLanguage()
   const { awards } = useUserAwards()
-  const dayAchs = achievements.filter(a => a.Date.startsWith(date))
-  const formatted = new Date(date + 'T00:00:00').toLocaleDateString('default', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-  })
+  const day = useMemo(() => groupDays(achievements.filter(a => a.Date.startsWith(date)))[0], [achievements, date])
 
   const dayAwards = useMemo(() => {
     // Mastery/beaten awards are RA's; Steam unlocks in the list simply have none.
@@ -43,106 +39,31 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
   }, [awards, date])
 
   return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      variants={modalOverlay}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      onClick={onClose}
-    >
-      <motion.div
-        className="bg-bg-header rounded-2xl p-4 w-full max-w-2xl max-h-[70vh] flex flex-col gap-3"
-        variants={modalContent}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="flex items-start justify-between gap-2 shrink-0">
-          <div>
-            <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.dayModal.title}</p>
-            <p className="text-sm font-semibold text-text-main mt-0.5">{formatted}</p>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="text-text-secondary hover:text-text-main transition-colors mt-0.5 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            <IconX size={16} />
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-3 overflow-y-auto flex-1 min-h-0">
-          {/* Completion awards */}
-          {dayAwards.length > 0 && (
-            <div className="flex flex-col gap-1.5">
-              {dayAwards.map(award => {
-                const isMastery = award.AwardType === 'Mastery/Completion'
-                const isHardcore = award.AwardDataExtra === 1
-                return (
-                  <Link
-                    key={`${award.AwardType}-${award.AwardData}`}
-                    href={gameHref('ra', award.AwardData, subject)}
-                    onClick={onClose}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-bg-main hover:bg-bg-card transition-colors group ring-1 ring-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-                  >
-                    <div className="relative shrink-0">
-                      {award.ImageIcon ? (
-                        <Image
-                          src={`https://retroachievements.org${award.ImageIcon}`}
-                          alt={award.Title}
-                          width={36}
-                          height={36}
-                          className="w-9 h-9 rounded-lg object-cover"
-                          unoptimized
-                        />
-                      ) : (
-                        <div className="w-9 h-9 rounded-lg bg-ink/5" />
-                      )}
-                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${isMastery ? 'bg-yellow-400' : 'bg-green-500'}`}>
-                        {isMastery
-                          ? <IconStar className="w-2.5 h-2.5 text-black" aria-hidden />
-                          : <IconCheck className="w-2.5 h-2.5 text-white" aria-hidden />
-                        }
-                      </div>
-                    </div>
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <span className="text-xs font-semibold text-text-main group-hover:text-accent transition-colors line-clamp-1">{award.Title}</span>
-                      <span className="text-[10px] text-text-secondary">{award.ConsoleName}</span>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isMastery ? 'bg-yellow-400/15 text-yellow-400' : 'bg-green-500/15 text-green-400'}`}>
-                        {isMastery ? T.streak.mastery : T.streak.beaten}
-                      </span>
-                      {isHardcore && <span className="text-[10px] text-warning font-semibold">HC</span>}
-                    </div>
-                  </Link>
-                )
-              })}
-              {dayAchs.length > 0 && <div className="border-t border-ink/5 mt-1" />}
-            </div>
-          )}
-
-          {/* Achievement grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {dayAchs.length === 0 && dayAwards.length === 0 ? (
-              <p className="col-span-3 text-sm text-text-secondary text-center py-6">{T.dayModal.empty}</p>
-            ) : (
-              dayAchs.map(ach => (
-                <RecentAchievementRow key={ach.AchievementID} ach={ach} onNavigate={onClose} />
-              ))
-            )}
-          </div>
-        </div>
-
-        {(dayAchs.length > 0 || dayAwards.length > 0) && (
-          <p className="text-xs text-text-secondary text-right pt-2 border-t border-ink/5 shrink-0">
-            {dayAchs.length} {T.dayModal.achievements}
-            {dayAwards.length > 0 && ` · ${dayAwards.length} ${T.streak.completions.split(' ')[0].toLowerCase()}`}
+    <Modal
+      isOpen
+      onClose={onClose}
+      size="lg"
+      title={T.dayModal.title}
+      hint={formatWeekdayDay(date, lang)}
+      className="gap-3"
+      footer={
+        day || dayAwards.length > 0 ? (
+          <p className="flex flex-wrap items-center text-xs text-text-secondary">
+            <Facts items={[plural(day?.count ?? 0, T.plurals.achievements, lang), dayAwards.length > 0 && plural(dayAwards.length, T.plurals.completions, lang)]} />
           </p>
-        )}
-      </motion.div>
-    </motion.div>
+        ) : undefined
+      }
+    >
+      {day || dayAwards.length > 0 ? (
+        <PeriodAchievementsDay
+          day={day ?? { date, count: 0, points: 0, hasPoints: false, games: [] }}
+          onNavigate={onClose}
+          hideHead
+          above={dayAwards.length > 0 ? <DayAchievementsAwards awards={dayAwards} onNavigate={onClose} /> : undefined}
+        />
+      ) : (
+        <p className="text-sm text-text-secondary text-center py-6">{T.dayModal.empty}</p>
+      )}
+    </Modal>
   )
 }

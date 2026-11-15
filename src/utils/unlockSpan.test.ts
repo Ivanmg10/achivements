@@ -1,4 +1,4 @@
-import { unlockSpan } from './utils'
+import { unlockSpan } from './dates'
 
 const L = { underMinute: 'under a minute', minutes: '{n} min', hours: '{n} h', days: '{n} d', months: '{n} mo' }
 

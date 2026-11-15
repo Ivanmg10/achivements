@@ -2,32 +2,30 @@
 
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
+import BrandMark from '@/components/ui/BrandMark'
+import Button from '@/components/ui/Button'
 
 /**
- * The bar a visitor sees: the name, and the way in for anyone who already
- * has an account. The same floating, frosted shape as the app's own bar, so
- * signing in feels like stepping through rather than into another site.
+ * The bar a visitor sees: the logo and the name, and the way in for anyone who
+ * already has an account. The same floating, frosted shape as the app's own bar,
+ * so signing in feels like stepping through rather than into another site. `wide`
+ * is for a page whose content runs the full width (the rankings): the bar is as
+ * wide as it and starts at the same edge.
  */
-export default function LandingNav() {
+export default function LandingNav({ wide = false }: { wide?: boolean }) {
   const { T } = useLanguage()
   return (
-    <div className="sticky top-0 z-40 px-2 sm:px-3 pt-2">
+    <div className={`sticky short:relative top-0 z-40 pt-2 ${wide ? 'px-4 sm:px-8' : 'px-2 sm:px-3'}`}>
       <nav
         aria-label={T.authPage.brand}
-        className="max-w-6xl mx-auto h-14 px-4 rounded-2xl flex items-center justify-between bg-bg-card/75 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-ink/[0.06] shadow-lg shadow-black/20"
+        className={`${wide ? 'w-full' : 'max-w-6xl mx-auto'} h-14 px-4 rounded-card flex items-center justify-between bg-bg-card/75 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-ink/[0.06] shadow-lg shadow-black/20`}
       >
-        <Link
-          href="/"
-          className="text-lg font-extrabold tracking-tight rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-        >
-          {T.authPage.brand}
+        <Link href="/" className="relative tap-target rounded focus-ring">
+          <BrandMark name={T.authPage.brand} size="sm" />
         </Link>
-        <Link
-          href="/authPage"
-          className="px-4 py-1.5 rounded-full text-sm font-medium bg-bg-main ring-1 ring-ink/10 hover:ring-ink/25 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-        >
+        <Button href="/authPage" variant="secondary" size="sm">
           {T.landing.signIn}
-        </Link>
+        </Button>
       </nav>
     </div>
   )

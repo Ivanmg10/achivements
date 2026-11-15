@@ -3,12 +3,12 @@ import { GameAchievementsProgressChart } from './GameAchievementsProgressChart'
 import type { InsightAchievement } from '@/utils/gameInsights'
 
 // The real plot is recharts; this one has a button per bucket, like clicking its point.
-jest.mock('./game-achievements-progress-plot/GameAchievementsProgressPlot', () => ({
+jest.mock('@/components/achivements-line-chart/achievements-line-plot/AchievementsLinePlot', () => ({
   __esModule: true,
-  default: ({ data, onSelect }: { data: { label: string; count: number }[]; onSelect: (label: string) => void }) => (
+  default: ({ data, onPick, tick }: { data: { label: string; count: number }[]; onPick: (label: string) => void; tick: (label: string) => string }) => (
     <div data-testid="ResponsiveContainer">
       {data.map((d) => (
-        <button key={d.label} onClick={() => onSelect(d.label)}>
+        <button key={d.label} onClick={() => onPick(d.label)} data-tick={tick(d.label)}>
           point {d.label} {d.count}
         </button>
       ))}
@@ -48,12 +48,12 @@ test('shows a loading skeleton while data is not ready', () => {
 
 test('toggles between weekly and monthly tabs', () => {
   render(<GameAchievementsProgressChart achievements={[earned]} />)
-  const weekTab = screen.getByRole('tab', { name: 'Weekly' })
-  const monthTab = screen.getByRole('tab', { name: 'Monthly' })
-  expect(weekTab).toHaveAttribute('aria-selected', 'true')
+  const weekTab = screen.getByRole('button', { name: 'Weekly' })
+  const monthTab = screen.getByRole('button', { name: 'Monthly' })
+  expect(weekTab).toHaveAttribute('aria-pressed', 'true')
   fireEvent.click(monthTab)
-  expect(monthTab).toHaveAttribute('aria-selected', 'true')
-  expect(weekTab).toHaveAttribute('aria-selected', 'false')
+  expect(monthTab).toHaveAttribute('aria-pressed', 'true')
+  expect(weekTab).toHaveAttribute('aria-pressed', 'false')
 })
 
 test('draws no plot at all, so loads none, when there is nothing to draw or it is loading', () => {
@@ -81,7 +81,7 @@ test('clicking a point lists what was unlocked that week, newest first, each lin
 
 test('a month opens titled by its name; a point with nothing opens nothing', async () => {
   render(<GameAchievementsProgressChart achievements={[earned]} />)
-  fireEvent.click(screen.getByRole('tab', { name: 'Monthly' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Monthly' }))
   const buttons = await screen.findAllByRole('button', { name: /^point/ })
   fireEvent.click(buttons[0])
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()

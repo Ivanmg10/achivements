@@ -1,11 +1,10 @@
-import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
-import { authOptions } from '@/lib/authOptions'
 import { forgetUser } from '@/lib/userRecord'
 import { isGameSource } from '@/utils/gameRef'
 import { sourceAllowed } from '@/utils/xboxAccess'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 /** One favourite per platform, each in its own column. No source means RA. */
 const COLUMN: Record<GameSource, string> = {
@@ -15,6 +14,10 @@ const COLUMN: Record<GameSource, string> = {
   xbox: 'favorite_xbox_game',
 }
 
+// A favourite travels in the session cookie and in every list that shows this user.
+const TITLE_MAX = 300
+const IMAGE_MAX = 500
+
 function readColumn(value: unknown): string | null {
   if (value === undefined || value === null) return COLUMN.ra
   return isGameSource(value) ? COLUMN[value] : null
@@ -22,10 +25,10 @@ function readColumn(value: unknown): string | null {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireSession({ error: 'Unauthorized' })
+    if (!auth.ok) return auth.response
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { id, title, imageIcon, source } = body as {
       id?: number
       title?: string
@@ -34,13 +37,16 @@ export async function POST(req: Request) {
     }
     const column = readColumn(source)
 
-    if (!id || !title) return NextResponse.json({ error: 'id and title required' }, { status: 400 })
+    if (!Number.isInteger(id) || typeof title !== 'string' || !title) return NextResponse.json({ error: 'id and title required' }, { status: 400 })
+    if (title.length > TITLE_MAX || (imageIcon != null && (typeof imageIcon !== 'string' || imageIcon.length > IMAGE_MAX))) {
+      return NextResponse.json({ error: 'Too long' }, { status: 400 })
+    }
     if (!column) return NextResponse.json({ error: 'source must be ra, steam, psn or xbox' }, { status: 400 })
-    if (!sourceAllowed(source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+    if (!sourceAllowed(source, auth.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 
     const value = JSON.stringify({ id, title, imageIcon: imageIcon ?? '' })
-    await pool.query(`UPDATE users SET ${column} = $1 WHERE id = $2`, [value, session.user.id])
-    forgetUser(session.user.id)
+    await pool.query(`UPDATE users SET ${column} = $1 WHERE id = $2`, [value, auth.id])
+    forgetUser(auth.id)
 
     return NextResponse.json({ ok: true })
   } catch (err) {
@@ -51,14 +57,14 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = await requireSession({ error: 'Unauthorized' })
+    if (!auth.ok) return auth.response
 
     const column = readColumn(req.nextUrl.searchParams.get('source'))
     if (!column) return NextResponse.json({ error: 'source must be ra, steam or psn' }, { status: 400 })
 
-    await pool.query(`UPDATE users SET ${column} = NULL WHERE id = $1`, [session.user.id])
-    forgetUser(session.user.id)
+    await pool.query(`UPDATE users SET ${column} = NULL WHERE id = $1`, [auth.id])
+    forgetUser(auth.id)
 
     return NextResponse.json({ ok: true })
   } catch (err) {

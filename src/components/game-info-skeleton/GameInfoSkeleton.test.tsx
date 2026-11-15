@@ -17,6 +17,7 @@ test('does not cover the screen: it sits where the page will be', () => {
 
 test('the table skeleton draws the rows it is asked for', () => {
   const { container } = render(<GameInfoSkeletonTable rows={3} />)
-  expect(container.firstElementChild!.children).toHaveLength(3)
+  // The card holds the tabs' line, then one shape per row.
+  expect(container.firstElementChild!.firstElementChild!.children).toHaveLength(4)
   expect(container.firstElementChild).toHaveAttribute('aria-hidden', 'true')
 })

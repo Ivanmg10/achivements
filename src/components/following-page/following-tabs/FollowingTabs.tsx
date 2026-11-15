@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
+import Tabs from '@/components/ui/Tabs'
 
 export type FollowingTab = 'following' | 'followers'
 
@@ -21,24 +22,12 @@ export default function FollowingTabs({
   ]
 
   return (
-    <div role="tablist" aria-label={T.following.tabsLabel} className="self-start flex gap-1 bg-bg-card rounded-full p-1">
-      {tabs.map((t) => {
-        const on = t.id === tab
-        return (
-          <button
-            key={t.id}
-            role="tab"
-            aria-selected={on}
-            onClick={() => onTab(t.id)}
-            className={`inline-flex items-center gap-1.5 min-h-9 px-4 rounded-full text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              on ? 'bg-bg-main font-bold text-text-main ring-1 ring-accent/40' : 'text-text-secondary hover:text-text-main'
-            }`}
-          >
-            {t.label}
-            {t.n !== undefined && <span className="tabular-nums text-xs text-text-secondary">{t.n.toLocaleString(lang)}</span>}
-          </button>
-        )
-      })}
-    </div>
+    <Tabs
+      id="following"
+      aria-label={T.following.tabsLabel}
+      value={tab}
+      onChange={onTab}
+      tabs={tabs.map((t) => ({ value: t.id, label: t.label, count: t.n?.toLocaleString(lang) }))}
+    />
   )
 }

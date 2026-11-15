@@ -5,9 +5,9 @@ import { useLanguage } from '@/context/LanguageContext'
 import { plural } from '@/utils/utils'
 
 const CATEGORY_STYLES: Record<string, string> = {
-  playing:    'bg-blue-900/50 text-blue-300',
-  wantToPlay: 'bg-purple-900/50 text-purple-300',
-  completed:  'bg-green-900/50 text-green-300',
+  playing:    'bg-status-playing-bg/50 text-status-playing',
+  wantToPlay: 'bg-status-want-bg/50 text-status-want',
+  completed:  'bg-status-done-bg/50 text-success',
 }
 
 export default function StatusPageHeader({
@@ -18,7 +18,8 @@ export default function StatusPageHeader({
 }: {
   consoleName?: string
   category: string
-  gameCount: number
+  /** How many games, under the title; left out when the platform tabs or the "all" filter already say it. */
+  gameCount?: number
   /** Beside the title: a control that belongs to it, such as which platform to show. */
   children?: ReactNode
 }) {
@@ -28,21 +29,24 @@ export default function StatusPageHeader({
     playing:    T.mainPage.playing,
     wantToPlay: T.mainPage.wantToPlay,
     completed:  T.mainPage.completed,
+    all:        T.mainPage.allGames,
   }
 
   const label = CATEGORY_LABELS[category] ?? category
   const style = CATEGORY_STYLES[category] ?? 'bg-bg-card text-text-secondary'
 
   return (
-    <div className="flex flex-col gap-1 pb-5 border-b border-bg-card mb-1 min-w-0 max-w-full">
-      <div className="flex items-center gap-3 flex-wrap">
-        <h1 className="text-2xl font-bold">{consoleName ?? label}</h1>
-        {consoleName && (
-          <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${style}`}>{label}</span>
-        )}
-        {children}
+    <div className="flex flex-col lg:flex-row lg:items-end gap-x-7 gap-y-3 min-w-0 max-w-full enter-rows">
+      <div className="flex flex-col gap-1 shrink-0">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="font-display italic font-extrabold text-[2.75rem] sm:text-[3.5rem] leading-[0.9] pr-1">{consoleName ?? label}</h1>
+          {consoleName && (
+            <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${style}`}>{label}</span>
+          )}
+        </div>
+        {gameCount !== undefined && <p className="text-[0.8125rem] text-text-secondary">{plural(gameCount, T.plurals.games, lang)}</p>}
       </div>
-      <p className="text-sm text-text-secondary">{plural(gameCount, T.plurals.games, lang)}</p>
+      {children}
     </div>
   )
 }

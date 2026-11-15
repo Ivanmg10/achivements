@@ -26,6 +26,14 @@ test('an empty filter is disabled', () => {
   expect(onChange).not.toHaveBeenCalled()
 })
 
+test('on all games the filters are the statuses, each with its count', () => {
+  const onChange = jest.fn()
+  render(<LibraryQuickFilters value="all" counts={{ all: 9, playing: 4, completed: 3, wantToPlay: 2 }} filters={['all', 'playing', 'completed', 'wantToPlay']} onChange={onChange} />)
+  expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual(['All9', 'In progress4', 'Completed3', 'Not started2'])
+  fireEvent.click(screen.getByRole('button', { name: /Completed/ }))
+  expect(onChange).toHaveBeenCalledWith('completed')
+})
+
 test('the filter in use can always be left, even when it empties', () => {
   render(<LibraryQuickFilters value="stalled" counts={counts} onChange={jest.fn()} />)
   const stalled = screen.getByRole('button', { name: /Stalled 0/ })

@@ -6,7 +6,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import { isRa } from '@/utils/groupItems'
 import { mapLimit } from '@/utils/utils'
-import type { GameGroup, GameGroupItem, RecentlyPlayedGame, RetroAchievement } from '@/types/types'
+import type { GameGroup, GameGroupItem, RecentlyPlayedGame } from '@/types/types'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 export type GroupWithItems = GameGroup & { items: GameGroupItem[] }
 export type GroupStatus = 'loading' | 'ready' | 'missing' | 'error'
@@ -131,9 +132,7 @@ export function useGroupPage(groupId: number, recentlyPlayed: RecentlyPlayedGame
       const res = await fetch(`/api/getGameProgression?gameId=${item.game_id}`)
       if (!res.ok) throw new Error(`getGameProgression ${res.status}`)
       const data = await res.json()
-      const achs = Object.values((data.Achievements ?? {}) as Record<string, RetroAchievement | undefined>).filter(
-        (a): a is RetroAchievement => !!a,
-      )
+      const achs = raAchievementList(data)
       if (!achs.length) return null
       const earned = achs.filter((a) => a.DateEarnedHardcore || a.DateEarned)
       return {
@@ -269,7 +268,7 @@ export function useGroupPage(groupId: number, recentlyPlayed: RecentlyPlayedGame
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(err.message ?? 'Error')
+        throw new Error(err.error ?? 'error')
       }
       const updated = (await res.json()) as GameGroup
       setGroup((g) => (g ? { ...g, ...updated } : g))

@@ -1,4 +1,4 @@
-import { relativeTime } from './utils'
+import { relativeTime } from './dates'
 
 const ago = (ms: number) => new Date(Date.now() - ms).toISOString()
 

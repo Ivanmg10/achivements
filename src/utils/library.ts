@@ -1,5 +1,5 @@
 import { classifySteamGame } from '@/utils/steamFeed'
-import { gameHref, gameKey } from '@/utils/gameRef'
+import { gameHref, gameKey, GAME_SOURCES } from '@/utils/gameRef'
 import { classifyPsnGame } from '@/utils/psnTitles'
 import { PSN_PLATFORM } from '@/utils/psnMappers'
 import type { PsnGameProgress } from '@/types/psn'
@@ -7,10 +7,11 @@ import { classifyXboxGame, xboxHasAchievements } from '@/utils/xboxTitles'
 import { XBOX_PLATFORM } from '@/utils/xboxMappers'
 import type { XboxGameProgress } from '@/types/xbox'
 import { normalizeTitle } from '@/utils/gameCandidates'
+import { raImageUrl } from '@/utils/raAssets'
 import type { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
-import type { GameSource, SteamGameProgress } from '@/types/steam'
-
-export type LibraryStatus = 'playing' | 'wantToPlay' | 'completed'
+import type { SteamGameProgress } from '@/types/steam'
+import type { GameSource } from '@/types/game'
+import type { GameStatus } from '@/types/game'
 
 /** One game of any platform, in the shape Browse lists, searches and picks from. */
 export type LibraryGame = {
@@ -23,13 +24,12 @@ export type LibraryGame = {
   iconUrl?: string
   /** Box art where it differs from the icon (PSN's store art); the picker shows it. */
   coverUrl?: string
-  status: LibraryStatus
+  status: GameStatus
   /** 0–100; 0 for a game not started. */
   pct: number
   href: string
 }
 
-const raIcon = (path?: string) => (path ? `https://retroachievements.org${path}` : undefined)
 
 /**
  * Every library as one list, one entry per game. RA's started games can come
@@ -52,7 +52,7 @@ export function buildLibrary(
     for (const g of list) {
       put({
         key: gameKey('ra', g.GameID), source: 'ra', id: g.GameID, title: g.Title, subtitle: g.ConsoleName,
-        iconUrl: raIcon(g.ImageIcon), status, pct: Math.round(parseFloat(g.PctWon) * 100), href: `/gameInfo/${g.GameID}`,
+        iconUrl: raImageUrl(g.ImageIcon), status, pct: Math.round(parseFloat(g.PctWon) * 100), href: `/gameInfo/${g.GameID}`,
       })
     }
   }
@@ -61,7 +61,7 @@ export function buildLibrary(
     if (byKey.has(gameKey('ra', id))) continue
     put({
       key: gameKey('ra', id), source: 'ra', id, title: g.Title, subtitle: g.ConsoleName,
-      iconUrl: raIcon(g.ImageIcon), status: 'wantToPlay', pct: 0, href: `/gameInfo/${id}`,
+      iconUrl: raImageUrl(g.ImageIcon), status: 'wantToPlay', pct: 0, href: `/gameInfo/${id}`,
     })
   }
   for (const g of steam) {
@@ -88,7 +88,7 @@ export function buildLibrary(
   return [...byKey.values()]
 }
 
-export type LibraryFilter = { query: string; source: GameSource | 'all'; status: LibraryStatus | 'all' }
+export type LibraryFilter = { query: string; source: GameSource | 'all'; status: GameStatus | 'all' }
 
 /** Accent- and case-insensitive title match, plus the platform and status chips. */
 export function filterLibrary(games: LibraryGame[], { query, source, status }: LibraryFilter): LibraryGame[] {
@@ -146,7 +146,7 @@ export type PlatformSummary = { source: GameSource; games: number; completed: nu
 
 /** Per platform with games, in the app's order: how many, at 100%, under way, and the average progress. */
 export function summarizeByPlatform(games: LibraryGame[]): PlatformSummary[] {
-  return (['ra', 'steam', 'psn', 'xbox'] as const)
+  return GAME_SOURCES
     .map((source) => {
       const own = games.filter((g) => g.source === source)
       return {

@@ -48,9 +48,10 @@ test('lists only the subsets of that exact game, never the game itself', async (
   expect((withCache as jest.Mock).mock.calls[0][0]).toBe('gameList_v1:7')
 })
 
-test('an empty list when RA fails', async () => {
+test('a failed RA read is an error, not a game without subsets (AP-10)', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
   ;(getGameList as jest.Mock).mockRejectedValue(new Error('RA down'))
   const res = await GET(request(QUERY))
-  expect(res.status).toBe(200)
-  expect((res as unknown as { data: unknown }).data).toEqual([])
+  expect(res.status).toBe(503)
+  expect(console.error).toHaveBeenCalled()
 })

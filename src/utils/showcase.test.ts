@@ -1,5 +1,4 @@
-import { parseShowcaseEntry, raShowcaseEntry, showcaseChoices, showcaseFromUnlock, showcaseKey } from './showcase'
-import type { RecentAchievement } from '@/types/types'
+import { parseShowcaseEntry, raShowcaseEntry, showcaseChoices, showcaseKey } from './showcase'
 
 const NOW = Date.parse('2026-10-20T12:00:00Z')
 const OK = {
@@ -34,13 +33,7 @@ test('anything off is refused', () => {
   }
 })
 
-test('an unlock from the year becomes an entry, keyed by its platform id', () => {
-  const ra = { Date: '2026-10-19 10:00:00', AchievementID: 42, Title: 'A', Description: 'Do it', BadgeName: '7', GameID: 3, GameTitle: 'Zelda' } as RecentAchievement
-  expect(showcaseFromUnlock(ra)).toMatchObject({ source: 'ra', achievementKey: '42', description: 'Do it', badge: 'https://media.retroachievements.org/Badge/7.png' })
-  const steam = { ...ra, Source: 'steam', Key: 'ACH_WIN', BadgeUrl: 'https://cdn/a.jpg', Description: '' } as RecentAchievement
-  expect(showcaseFromUnlock(steam)).toMatchObject({ source: 'steam', achievementKey: 'ACH_WIN', description: null })
-  // Without its platform id it cannot be told apart from another: left out.
-  expect(showcaseFromUnlock({ ...steam, Key: undefined })).toBeNull()
+test('an entry is keyed by platform, game and achievement', () => {
   expect(showcaseKey({ source: 'ra', gameId: 3, achievementKey: '42' })).toBe('ra:3:42')
 })
 

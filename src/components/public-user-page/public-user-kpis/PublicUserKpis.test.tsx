@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import PublicUserKpis from './PublicUserKpis'
 import { useStreakData } from '@/hooks/useStreakData'
 import { en } from '@/translations/en'
+import { streakInk, streakTier } from '@/utils/streakTier'
 
 jest.mock('@/hooks/useStreakData', () => ({ useStreakData: jest.fn() }))
 
@@ -19,29 +20,39 @@ function setup(over: Record<string, unknown> = {}) {
   })
 }
 
-const value = (label: string) => screen.getByText(label).parentElement!.querySelector('dd')!.textContent
+const figure = (label: string) => screen.getByText(label).parentElement!.querySelector('dd')!
 
-test('their pace and streaks, every platform together', () => {
+test('their pace and streaks, every platform together, as one row of bare figures', () => {
   setup()
   render(<PublicUserKpis />)
-  expect(value(en.userProfile.today)).toBe('1')
-  expect(value(en.userProfile.week)).toBe('2')
-  expect(value(en.userProfile.month)).toBe('3')
-  expect(value(en.userProfile.perDay)).toBe('0.1')
-  expect(value(en.userProfile.streak)).toBe('8 d')
-  expect(value(en.userProfile.bestStreak)).toBe('21 d')
+  expect(figure(en.userProfile.today)).toHaveTextContent('1')
+  expect(figure(en.userProfile.week)).toHaveTextContent('2')
+  expect(figure(en.userProfile.month)).toHaveTextContent('3')
+  expect(figure(en.userProfile.perDay)).toHaveTextContent('0.1')
+  expect(figure(en.userProfile.streak)).toHaveTextContent('8 d')
+  expect(figure(en.userProfile.bestStreak)).toHaveTextContent('21 d')
   expect(screen.getByText(en.userProfile.last30Days)).toBeInTheDocument()
+  // No boxes: the figures sit side by side with the mark between them.
+  expect(screen.getByText(en.userProfile.today).parentElement!.className).not.toContain('bg-bg-main')
+  expect(screen.getByText(en.userProfile.week).parentElement!.querySelector('[aria-hidden="true"]')).toHaveClass('before:content-(--mark)')
 })
 
-test('no streak is zero days', () => {
+test('a streak is coloured by its tier; a zero is quiet', () => {
+  setup()
+  const { unmount } = render(<PublicUserKpis />)
+  expect(figure(en.userProfile.streak)).toHaveStyle({ color: streakInk(streakTier(8)) })
+  unmount()
   setup({ achievements: [], activeStreak: null, bestStreak: null })
   render(<PublicUserKpis />)
-  expect(value(en.userProfile.streak)).toBe('0 d')
+  expect(figure(en.userProfile.streak)).toHaveTextContent('0 d')
+  expect(figure(en.userProfile.streak).className).toContain('text-text-secondary')
+  expect(figure(en.userProfile.today).className).toContain('text-text-secondary')
 })
 
-test('says it is loading while the year comes in', () => {
+test('says it is loading while the year comes in, holding the six figures\' room', () => {
   setup({ isLoading: true })
   render(<PublicUserKpis />)
   expect(screen.getByText(en.userProfile.loadingActivity)).toBeInTheDocument()
-  expect(screen.queryByText(en.userProfile.today)).not.toBeInTheDocument()
+  expect(screen.getByText(en.userProfile.today)).toBeInTheDocument()
+  expect(screen.queryByText('0 d')).not.toBeInTheDocument()
 })

@@ -4,6 +4,7 @@ jest.mock('@/lib/raCache', () => ({
   clearCache: jest.fn(),
 }))
 jest.mock('@/lib/fetchRA', () => ({ fetchRA: jest.fn() }))
+jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
 
 import { GET } from './route'
 import { getServerSession } from 'next-auth'

@@ -1,5 +1,6 @@
 import pool from '@/lib/db'
 import type { GameGroup } from '@/types/types'
+import { notHidden } from '@/lib/gameVisibility'
 
 /**
  * A user's groups as the group cards show them: counts, progress, the first
@@ -24,16 +25,20 @@ export async function listGroups(
               SELECT json_agg(json_build_object('source', c.source, 'game_id', c.game_id, 'image_icon', c.image_icon,
                                                 'title', c.title, 'num_awarded', c.num_awarded, 'max_possible', c.max_possible) ORDER BY c.position)
                 FROM (SELECT source, game_id, image_icon, title, num_awarded, max_possible, position FROM game_group_items
-                       WHERE group_id = g.id AND ($2::boolean OR source <> 'xbox') ORDER BY position LIMIT 5) c
+                       WHERE group_id = g.id AND ($2::boolean OR source <> 'xbox')
+                         AND ${notHidden('game_group_items', 'g.user_id')}
+                       ORDER BY position LIMIT 5) c
             ), '[]'::json) AS covers,
             -- The started, unfinished game with the largest share earned.
             (SELECT json_build_object('title', n.title, 'left', n.max_possible - n.num_awarded)
                FROM game_group_items n
               WHERE n.group_id = g.id AND ($2::boolean OR n.source <> 'xbox')
+                AND ${notHidden('n', 'g.user_id')}
                 AND n.num_awarded > 0 AND n.num_awarded < n.max_possible
               ORDER BY n.num_awarded::float / n.max_possible DESC, n.position LIMIT 1) AS next_up
      FROM game_groups g
      LEFT JOIN game_group_items i ON i.group_id = g.id AND ($2::boolean OR i.source <> 'xbox')
+       AND ${notHidden('i', 'g.user_id')}
      WHERE g.user_id = $1${publicOnly ? ' AND g.is_public' : ''}
      GROUP BY g.id
      ORDER BY g.position ASC, g.created_at ASC`,

@@ -1,21 +1,27 @@
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { PLATFORM_NAME } from '@/utils/gameRef'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
+import Tag from '@/components/ui/Tag'
 
 /**
  * The platform a game is from, with its logo and name. Small on a card; large
- * beside a game's name when it is the one open.
+ * beside a game's name when it is the one open; a plain tag in a list row.
  */
-export default function LibraryPlatformBadge({ source, size = 'sm' }: { source: GameSource; size?: 'sm' | 'lg' }) {
+export default function LibraryPlatformBadge({ source, size = 'sm' }: { source: GameSource; size?: 'sm' | 'lg' | 'tag' }) {
+  if (size === 'tag') {
+    // On a phone the name ("RetroAchievements") ate the game's title: the logo says it there, the name stays for a screen reader.
+    return (
+      <span className="inline-flex shrink-0 items-center h-[1.1875rem] px-1.5 rounded-badge text-[0.6875rem] font-bold whitespace-nowrap bg-ink/[0.07] text-text-secondary">
+        <PlatformLogo source={source} size={11} className="sm:hidden" />
+        <span className="max-sm:sr-only">{PLATFORM_NAME[source]}</span>
+      </span>
+    )
+  }
   const large = size === 'lg'
   return (
-    <span
-      className={`inline-flex items-center font-semibold bg-bg-main text-text-main whitespace-nowrap ${
-        large ? 'gap-2 text-xs px-3 py-1.5 rounded-xl ring-1 ring-ink/10' : 'gap-1.5 text-[10px] px-1.5 py-0.5 rounded-md'
-      }`}
-    >
+    <Tag tone={large ? 'overlay' : 'surface'} size={large ? 'md' : 'xs'}>
       <PlatformLogo source={source} size={large ? 18 : 11} />
       {PLATFORM_NAME[source]}
-    </span>
+    </Tag>
   )
 }

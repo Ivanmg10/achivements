@@ -1,63 +1,31 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
+import { useCallback, useMemo, useRef } from 'react'
+import { useRetryingRead } from '@/hooks/useRetryingRead'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import { notify } from '@/lib/notify'
 import { withSubject } from '@/utils/withSubject'
 import { SHOWCASE_MAX, showcaseKey, type ShowcaseEntry, type ShowcaseItem } from '@/utils/showcase'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 /**
  * The achievement showcase: up to five earned achievements, in the user's order.
  * The user's own (to add, take out and reorder), or on someone's public profile
  * theirs, to read. Every change is optimistic and goes back, saying so, if it
  * cannot be saved; adding to a full showcase says it is full instead.
+ * Nothing is asked until `enabled` (ShowcaseProvider waits for a reader).
  */
-export function useShowcase() {
+const NONE: ShowcaseItem[] = []
+// A shared answer is shared by reference: copied before it is kept.
+const copied = (data: unknown) => (Array.isArray(data) ? [...(data as ShowcaseItem[])] : NONE)
+
+export function useShowcase(enabled = true) {
   const { T } = useLanguage()
   const subject = useSubject()
-  const [items, setItems] = useState<ShowcaseItem[]>([])
-  /** Which load the answer (data or final failure) belongs to; loading is any other being asked for. */
-  const [loadedKey, setLoadedKey] = useState<number | null>(null)
-  const [failed, setFailed] = useState(false)
-  const [reloadKey, setReloadKey] = useState(0)
-  const attemptRef = useRef(0)
+  const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
+  const read = useRetryingRead(enabled ? withSubject('/api/showcase', subject) : null, { parse: copied })
+  const items = read.data ?? NONE
+  const { setData: setItems, refetch: retry } = read
   const tempId = useRef(-1)
-
-  useEffect(() => {
-    let current = true
-    const retryTimer: { current: ReturnType<typeof setTimeout> | undefined } = { current: undefined }
-    attemptRef.current = 0
-
-    function load() {
-      fetchWithRetry(withSubject('/api/showcase', subject))
-        .then((data) => {
-          if (!current) return
-          // A shared answer is shared by reference: copied before it is kept.
-          setItems(Array.isArray(data) ? [...(data as ShowcaseItem[])] : [])
-          setFailed(false)
-          setLoadedKey(reloadKey)
-        })
-        .catch((err) => {
-          if (!current) return
-          console.error('[useShowcase]', err)
-          if (!scheduleRetry(attemptRef, retryTimer, load, err)) {
-            setFailed(true)
-            setLoadedKey(reloadKey)
-          }
-        })
-    }
-
-    load()
-    return () => {
-      current = false
-      clearTimeout(retryTimer.current)
-    }
-  }, [reloadKey, subject])
-
-  const retry = useCallback(() => {
-    setFailed(false)
-    setReloadKey((k) => k + 1)
-  }, [])
 
   const has = useCallback((e: Pick<ShowcaseEntry, 'source' | 'gameId' | 'achievementKey'>) => items.some((i) => showcaseKey(i) === showcaseKey(e)), [items])
 
@@ -74,7 +42,7 @@ export function useShowcase() {
         return
       }
       const temps: ShowcaseItem[] = fresh.slice(0, SHOWCASE_MAX - items.length).map((e) => ({ ...e, id: tempId.current-- }))
-      setItems((prev) => [...prev, ...temps])
+      setItems((prev) => [...(prev ?? NONE), ...temps])
       let full = false
       let failed = false
       for (const temp of temps) {
@@ -87,23 +55,23 @@ export function useShowcase() {
           })
           if (res.status === 409) {
             full = true
-            setItems((prev) => prev.filter((i) => i.id !== tempKey))
+            setItems((prev) => (prev ?? NONE).filter((i) => i.id !== tempKey))
             continue
           }
           if (!res.ok) throw new Error(`Failed to add to the showcase (${res.status})`)
           const saved = (await res.json()) as ShowcaseItem
-          setItems((prev) => prev.map((i) => (i.id === tempKey ? saved : i)))
+          setItems((prev) => (prev ?? NONE).map((i) => (i.id === tempKey ? saved : i)))
         } catch (err) {
           console.error('[useShowcase] add', err)
           failed = true
-          setItems((prev) => prev.filter((i) => i.id !== tempKey))
+          setItems((prev) => (prev ?? NONE).filter((i) => i.id !== tempKey))
         }
       }
       if (full) notify.error(T.toast.showcaseFull)
       else if (failed) notify.error(T.toast.showcaseFailed)
       else notify.success(T.toast.showcaseUpdated)
     },
-    [items, T],
+    [items, T, setItems],
   )
 
   const add = useCallback((entry: ShowcaseEntry) => addMany([entry]), [addMany])
@@ -111,7 +79,7 @@ export function useShowcase() {
   const remove = useCallback(
     async (item: ShowcaseItem) => {
       const before = items
-      setItems((prev) => prev.filter((i) => i.id !== item.id))
+      setItems((prev) => (prev ?? NONE).filter((i) => i.id !== item.id))
       try {
         const res = await fetch(`/api/showcase?id=${item.id}`, { method: 'DELETE' })
         if (!res.ok) throw new Error(`Failed to take out of the showcase (${res.status})`)
@@ -122,7 +90,7 @@ export function useShowcase() {
         notify.error(T.toast.showcaseFailed)
       }
     },
-    [items, T],
+    [items, T, setItems],
   )
 
   const reorder = useCallback(
@@ -142,9 +110,9 @@ export function useShowcase() {
         notify.error(T.toast.orderFailed)
       }
     },
-    [items, T],
+    [items, T, setItems],
   )
 
-  const answered = loadedKey === reloadKey
-  return { items, isLoading: !answered, error: answered && failed, retry, has, add, addMany, remove, reorder, full: items.length >= SHOWCASE_MAX }
+  const visible = useMemo(() => hiddenLoading ? [] : items.filter((item) => !isHidden(item.gameId, item.source)), [items, isHidden, hiddenLoading])
+  return { items: visible, isLoading: hiddenLoading || !enabled || read.isLoading, error: read.error, retry, has, add, addMany, remove, reorder, full: items.length >= SHOWCASE_MAX }
 }

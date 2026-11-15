@@ -27,7 +27,7 @@ test('a month going worse says so with a minus', () => {
   expect(screen.getByText(en.cards.monthUnlocks).closest('div')).toHaveTextContent('0-2')
 })
 
-test('dashes while loading', () => {
-  render(<MainPageMonthCompare achievements={[]} isLoading />)
-  expect(screen.getAllByText('—')).toHaveLength(3)
+test('blocks in the figures\' place while loading', () => {
+  const { container } = render(<MainPageMonthCompare achievements={[]} isLoading />)
+  expect(container.querySelectorAll('.bg-skeleton')).toHaveLength(3)
 })

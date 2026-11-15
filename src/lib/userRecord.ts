@@ -1,8 +1,8 @@
 import { createHash } from 'crypto'
 import pool from '@/lib/db'
+import { readRaKey } from '@/lib/raKey'
 import type { RetroAchievementsUserProfile } from '@/types/types'
-
-type SavedGame = { id: number; title: string; imageIcon: string } | null
+import type { SavedGame } from '@/types/game'
 
 /** A users row as the session needs it. The database is the only source of truth for these. */
 export type UserRecord = {
@@ -17,6 +17,8 @@ export type UserRecord = {
   steamusername: string | null
   psnaccountid: string | null
   psnusername: string | null
+  /** When a code in that PSN account's About Me proved it is theirs (migrations/046); null until then. */
+  psn_verified_at: string | null
   xboxxuid: string | null
   xboxgamertag: string | null
   email: string | null
@@ -39,7 +41,7 @@ export type UserRecord = {
 }
 
 const COLUMNS = `id, username, password, theme, avatar, raid, rausername, steamid, steamusername,
-  psnaccountid, psnusername, email, email_verified_at, admin, "raUser", location, description, gender, gender_public, profile_public, show_presence, favorite_game, favorite_steam_game, favorite_psn_game, xboxxuid, xboxgamertag, favorite_xbox_game`
+  psnaccountid, psnusername, psn_verified_at, email, email_verified_at, admin, "raUser", location, description, gender, gender_public, profile_public, show_presence, favorite_game, favorite_steam_game, favorite_psn_game, xboxxuid, xboxgamertag, favorite_xbox_game`
 
 // Every API call re-reads the signed-in user (see authOptions' jwt callback); a
 // short cache keeps that to about one query per user per minute. A session
@@ -50,6 +52,9 @@ const COLUMNS = `id, username, password, theme, avatar, raid, rausername, steami
 // synced yet (a password or admin change) can take up to TTL_MS to be seen here.
 const TTL_MS = 60_000
 const cache = new Map<string, { row: UserRecord | null; at: number }>()
+
+/** A row as the app reads it: the RA key opened, or null when it cannot be. */
+const toRecord = (row: UserRecord | undefined): UserRecord | null => (row ? { ...row, raid: readRaKey(row.raid) } : null)
 
 type LoadOptions = { fresh?: boolean; notBefore?: number }
 
@@ -63,7 +68,7 @@ export async function loadUserSynced(
   if (!fresh && hit && Date.now() - hit.at < TTL_MS && hit.at >= notBefore) return hit
 
   const { rows } = await pool.query(`SELECT ${COLUMNS} FROM users WHERE id = $1`, [key])
-  const entry = { row: (rows[0] as UserRecord | undefined) ?? null, at: Date.now() }
+  const entry = { row: toRecord(rows[0]), at: Date.now() }
   cache.set(key, entry)
   return entry
 }
@@ -74,13 +79,13 @@ export async function loadUser(id: string | number, options: LoadOptions = {}): 
 
 export async function loadUserByUsername(username: string): Promise<UserRecord | null> {
   const { rows } = await pool.query(`SELECT ${COLUMNS} FROM users WHERE username = $1`, [username])
-  return (rows[0] as UserRecord | undefined) ?? null
+  return toRecord(rows[0])
 }
 
 /** The user who signs in with this Steam account (migrations/041_steam_login.sql). */
 export async function loadUserBySteamLogin(steamid: string): Promise<UserRecord | null> {
   const { rows } = await pool.query(`SELECT ${COLUMNS} FROM users WHERE steam_login_id = $1`, [steamid])
-  return (rows[0] as UserRecord | undefined) ?? null
+  return toRecord(rows[0])
 }
 
 /** Drop the cached row after changing it, so this instance sees the change at once. */

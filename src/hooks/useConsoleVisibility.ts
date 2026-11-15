@@ -21,12 +21,15 @@ export function useConsoleVisibility() {
   const { hidden: raHidden } = useHiddenConsoles('ra')
   const { hidden: psnHidden } = useHiddenConsoles('psn')
   const { hidden: xboxHidden } = useHiddenConsoles('xbox')
-  const { fullLibrary: psnLibrary = [] } = usePsnGamesData()
-  const { fullLibrary: xboxLibrary = [] } = useXboxGamesData()
+  // Their libraries say which console each game is on; only worth loading when one is unticked.
+  const { fullLibrary: psnLibrary = [], libraryLoading: psnLoading } = usePsnGamesData({ passive: psnHidden.size === 0 })
+  const { fullLibrary: xboxLibrary = [], libraryLoading: xboxLoading } = useXboxGamesData({ passive: xboxHidden.size === 0 })
 
   const hiddenPsn = useMemo(() => new Set(psnLibrary.filter((g) => !isConsoleShown(g.consoleName, psnHidden)).map((g) => g.id)), [psnLibrary, psnHidden])
   const hiddenXbox = useMemo(() => new Set(xboxLibrary.filter((g) => !isConsoleShown(g.consoleName, xboxHidden)).map((g) => g.id)), [xboxLibrary, xboxHidden])
   const filtering = !subject && (raHidden.size > 0 || hiddenPsn.size > 0 || hiddenXbox.size > 0)
+  // Until that library is in, a game on an unticked console still counts: what is counted is not final yet.
+  const isLoading = !subject && ((psnHidden.size > 0 && psnLoading) || (xboxHidden.size > 0 && xboxLoading))
 
   /** An unlock in RA's shape (every platform is mapped into it). */
   const isShown = useCallback(
@@ -46,5 +49,5 @@ export function useConsoleVisibility() {
     [filtering, hiddenPsn, hiddenXbox],
   )
 
-  return { isShown, isGameShown, filtering }
+  return { isShown, isGameShown, filtering, isLoading }
 }

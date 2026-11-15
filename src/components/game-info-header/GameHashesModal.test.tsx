@@ -1,12 +1,14 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import GameHashesModal from './GameHashesModal'
+import { en } from '@/translations/en'
 
 const HASHES = [
   { MD5: 'aaaa1111', Name: 'Sonic (USA).md', Labels: ['nointro'], PatchUrl: null },
   { MD5: 'bbbb2222', Name: 'Sonic (EU).md', Labels: [], PatchUrl: null },
 ]
 
-const answer = (body: unknown, ok = true) => ({ ok, status: ok ? 200 : 500, json: () => Promise.resolve(body) })
+// A 4xx is final (asking again will not fix it): the error shows at once. A 5xx or a lost network is retried first.
+const answer = (body: unknown, ok = true) => ({ ok, status: ok ? 200 : 404, json: () => Promise.resolve(body) })
 
 function setup(props: Partial<React.ComponentProps<typeof GameHashesModal>> = {}) {
   const onClose = jest.fn()
@@ -26,28 +28,39 @@ test('asks nothing while closed', () => {
 
 test('opening it asks for the game hashes and lists them', async () => {
   setup()
-  expect(fetch).toHaveBeenCalledWith('/api/getGameHashes?gameId=7')
+  expect(fetch).toHaveBeenCalledWith('/api/getGameHashes?gameId=7', expect.anything())
   expect(await screen.findByText('Sonic (USA).md')).toBeInTheDocument()
   expect(screen.getByText('Sonic (EU).md')).toBeInTheDocument()
-  expect(screen.getByText(/2 hashes registrados/)).toBeInTheDocument()
+  expect(screen.getByText('2 registered hashes')).toBeInTheDocument()
 })
 
 test('says when the game has none', async () => {
   ;(fetch as jest.Mock).mockResolvedValue(answer({ Results: [] }))
   setup()
-  expect(await screen.findByText('Sin hashes registrados')).toBeInTheDocument()
+  expect(await screen.findByText(en.gameInfoPage.hashesNone)).toBeInTheDocument()
 })
 
 test('says so when the request fails, and shows no stale list', async () => {
   ;(fetch as jest.Mock).mockResolvedValue(answer({}, false))
   setup()
-  expect(await screen.findByRole('alert')).toHaveTextContent('Error al cargar hashes')
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.gameInfoPage.hashesLoadError)
 })
 
-test('a network failure is the same message, not a crash', async () => {
-  ;(fetch as jest.Mock).mockRejectedValue(new Error('offline'))
-  setup()
-  expect(await screen.findByRole('alert')).toBeInTheDocument()
+test('a lost network is retried in the background, then says so with a way to ask again', async () => {
+  jest.useFakeTimers()
+  try {
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    ;(fetch as jest.Mock).mockRejectedValue(new Error('offline'))
+    setup()
+    await act(async () => { await jest.advanceTimersByTimeAsync(10 * 60_000) })
+    expect(screen.getByRole('alert')).toHaveTextContent(en.gameInfoPage.hashesLoadError)
+    ;(fetch as jest.Mock).mockResolvedValue(answer({ Results: HASHES }))
+    fireEvent.click(screen.getByRole('button', { name: en.gameInfoPage.retry }))
+    await act(async () => { await jest.advanceTimersByTimeAsync(0) })
+    expect(screen.getByText('Sonic (USA).md')).toBeInTheDocument()
+  } finally {
+    jest.useRealTimers()
+  }
 })
 
 test('shows loading until the answer is in', async () => {
@@ -65,7 +78,7 @@ test('another game asks again', async () => {
   await screen.findByText('Sonic (USA).md')
   ;(fetch as jest.Mock).mockResolvedValue(answer({ Results: [HASHES[1]] }))
   rerender(<GameHashesModal isOpen onClose={onClose} gameId={8} gameTitle="Other" />)
-  expect(fetch).toHaveBeenLastCalledWith('/api/getGameHashes?gameId=8')
+  expect(fetch).toHaveBeenLastCalledWith('/api/getGameHashes?gameId=8', expect.anything())
   await waitFor(() => expect(screen.queryByText('Sonic (USA).md')).not.toBeInTheDocument())
 })
 
@@ -81,7 +94,19 @@ test('an answer for a game that was closed in the meantime does not land', async
 test('closing with the X or the backdrop', async () => {
   const { onClose } = setup()
   await screen.findByText('Sonic (USA).md')
-  fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Cerrar modal' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+  fireEvent.click(screen.getByRole('dialog').parentElement!)
   expect(onClose).toHaveBeenCalledTimes(2)
+})
+
+test('a hash can be copied, with the check said aloud, and its label is a sentence-case tag', async () => {
+  const writeText = jest.fn().mockResolvedValue(undefined)
+  Object.assign(navigator, { clipboard: { writeText } })
+  setup()
+  await screen.findByText('Sonic (USA).md')
+  expect(screen.getByText('No-Intro').className).not.toMatch(/uppercase/)
+  fireEvent.click(screen.getAllByRole('button', { name: en.gameInfoPage.hashesCopy })[0])
+  await waitFor(() => expect(writeText).toHaveBeenCalledWith('aaaa1111'))
+  expect(await screen.findByText(en.gameInfoPage.hashesCopied)).toBeInTheDocument()
+  expect(screen.getAllByRole('button', { name: en.gameInfoPage.hashesCopy })[0]).toHaveAttribute('type', 'button')
 })

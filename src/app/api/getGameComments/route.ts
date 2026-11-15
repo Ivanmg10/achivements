@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       () => getGameComments(gameId, raid),
       (d) => d !== null && typeof d === 'object' && 'Results' in d,
     )
-    return cachedJson(data, TTL)
+    return cachedJson(data, TTL, { sameForEveryone: true })
   } catch (err) {
     return raUnavailable(err)
   }

@@ -41,6 +41,16 @@ test('nothing pinned says where to pin', () => {
   expect(screen.getByText(en.pinnedGames.emptyTitle)).toBeInTheDocument()
 })
 
+test('a pins list that could not be read says so and offers to read it again, not "nothing pinned" (HK-09)', () => {
+  const retry = jest.fn()
+  ;(usePinnedGames as jest.Mock).mockReturnValue({ pins: [], isLoading: false, error: true, retry })
+  render(<MainPagePinnedSectionGames />)
+  expect(screen.queryByText(en.pinnedGames.emptyTitle)).not.toBeInTheDocument()
+  expect(screen.getByRole('alert')).toHaveTextContent(en.charts.failedToLoad)
+  fireEvent.click(screen.getByRole('button', { name: en.gameInfoPage.retry }))
+  expect(retry).toHaveBeenCalled()
+})
+
 test('placeholders until the pins and the libraries are in', () => {
   ;(usePinnedGames as jest.Mock).mockReturnValue({ pins: [], isLoading: true })
   const { container } = render(<MainPagePinnedSectionGames />)

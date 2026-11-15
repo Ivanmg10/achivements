@@ -1,8 +1,8 @@
-import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
-import { authOptions } from '@/lib/authOptions'
 import { checkCurrentPassword } from '@/lib/currentPassword'
+import { clearUserCache } from '@/lib/steamCache'
 import { forgetUser, loadUser } from '@/lib/userRecord'
 
 /**
@@ -16,11 +16,9 @@ import { forgetUser, loadUser } from '@/lib/userRecord'
  */
 export async function DELETE(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-    const userId = session.user.id
+    const auth = await requireSession({ error: 'Unauthorized' })
+    if (!auth.ok) return auth.response
+    const userId = auth.id
 
     const { currentPassword } = ((await req.json().catch(() => null)) ?? {}) as { currentPassword?: unknown }
     const check = await checkCurrentPassword(userId, currentPassword)
@@ -35,6 +33,7 @@ export async function DELETE(req: Request) {
       if (!rows[0]?.n) return NextResponse.json({ error: 'last-admin' }, { status: 409 })
     }
 
+    await clearUserCache(userId)
     await pool.query('DELETE FROM users WHERE id = $1', [userId])
     forgetUser(userId)
 

@@ -1,74 +1,10 @@
-import { ragamesIds } from '@/constants/ragamesidpool'
-import { PinnedAchievement, RecentAchievement, RetroAchievement, RetroAchievementsGameCompleted, Streak } from '@/types/types'
+import { PinnedAchievement, RecentAchievement, RetroAchievement, RetroAchievementsGameCompleted } from '@/types/types'
 import { CategoryGame } from '@/hooks/useGamesByCategory'
 import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
-import type { GameSource } from '@/types/steam'
-
-export function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '—'
-  const d = new Date(dateStr.replace(' ', 'T'))
-  if (isNaN(d.getTime())) return '—'
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-}
-
-/**
- * How long ago, in the given language ("2 hours ago", "hace 2 horas"), in the
- * largest unit that fits. "—" when there is no date to tell.
- */
-export function relativeTime(dateStr: string | null | undefined, lang = 'en'): string {
-  if (!dateStr) return '—'
-  const t = new Date(dateStr).getTime()
-  if (isNaN(t)) return '—'
-  const secs = Math.round((t - Date.now()) / 1000)
-  const fmt = new Intl.RelativeTimeFormat(lang, { numeric: 'auto', style: 'short' })
-  const units: [Intl.RelativeTimeFormatUnit, number][] = [['year', 31536000], ['month', 2592000], ['day', 86400], ['hour', 3600], ['minute', 60]]
-  for (const [unit, size] of units) {
-    if (Math.abs(secs) >= size) return fmt.format(Math.trunc(secs / size), unit)
-  }
-  return fmt.format(0, 'minute')
-}
-
-export function getRandomGameIds(count: number = 5): string[] {
-  const shuffled = [...ragamesIds].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, count)
-}
-
-export const groupByDay = (achievements: RecentAchievement[]) => {
-  const last7Days: string[] = []
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    last7Days.push(d.toISOString().split('T')[0])
-  }
-
-  if (!Array.isArray(achievements)) return last7Days.map((date) => ({ date, count: 0 }))
-
-  const grouped = achievements.reduce(
-    (acc, a) => {
-      const day = a.Date.split(' ')[0]
-      acc[day] = (acc[day] || 0) + 1
-      return acc
-    },
-    {} as Record<string, number>,
-  )
-
-  return last7Days.map((date) => ({ date, count: grouped[date] || 0 }))
-}
-
-export const groupByConsole = (games: RetroAchievementsGameCompleted[]) => {
-  const grouped = games
-    .filter((game) => game.ConsoleName !== 'Events')
-    .reduce(
-      (acc, game) => {
-        acc[game.ConsoleName] = (acc[game.ConsoleName] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    )
-
-  return Object.entries(grouped).map(([name, value]) => ({ name, value }))
-}
+import { localDay, parseUnlockTime, utcDay } from '@/utils/dates'
+import { raBadgeUrl, raImageUrl } from '@/utils/raAssets'
+import type { GameSource, GameStatus } from '@/types/game'
 
 /** The last `totalDays` days up to `end` (today unless said otherwise), each with how many achievements fell on it. */
 export const groupByDays = (achievements: RecentAchievement[], totalDays: number, end: Date = new Date()) => {
@@ -76,7 +12,7 @@ export const groupByDays = (achievements: RecentAchievement[], totalDays: number
   for (let i = totalDays - 1; i >= 0; i--) {
     const d = new Date(end)
     d.setDate(d.getDate() - i)
-    days.push(d.toISOString().split('T')[0])
+    days.push(utcDay(d))
   }
   const grouped = achievements.reduce((acc, a) => {
     const day = a.Date.split(' ')[0]
@@ -87,40 +23,19 @@ export const groupByDays = (achievements: RecentAchievement[], totalDays: number
 }
 
 
-export function calcStreak(achievements: RecentAchievement[]): number {
-  if (!achievements.length) return 0
-  const days = new Set(achievements.map((a) => a.Date.split(' ')[0]))
-  let count = 0
-  const today = new Date()
-  for (let i = 0; i < 30; i++) {
-    const d = new Date(today)
-    d.setDate(d.getDate() - i)
-    const key = d.toISOString().split('T')[0]
-    if (days.has(key)) count++
-    else if (i > 0) break
-  }
-  return count
-}
-
-
 /** Only the unlock date is read, so any platform's achievements can be grouped. */
 export type DatedUnlock = { earnedAt: string | null }
 
-/** `YYYY-MM-DD` of a date in local time (toISOString would give the UTC day). */
-function localDay(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
 /**
- * A game's unlocks counted per week (the last 8) or month (the last 6), in local
- * time, each bucket with its achievements and when it starts.
+ * A game's unlocks counted per week (the last 8, Monday to Sunday, as everywhere in the app) or month (the
+ * last 6), in local time, each bucket with its achievements and when it starts.
  */
 export function groupGameAchievementsByPeriod<T extends DatedUnlock>(
   achievements: T[],
   period: 'week' | 'month',
 ): { label: string; start: number; count: number; items: T[] }[] {
   const dated = achievements
-    .map((a) => ({ a, d: a.earnedAt ? new Date(a.earnedAt.replace(' ', 'T')) : null }))
+    .map((a) => ({ a, d: a.earnedAt ? new Date(parseUnlockTime(a.earnedAt)) : null }))
     .filter((x): x is { a: T; d: Date } => !!x.d && !isNaN(x.d.getTime()))
 
   const ranges =
@@ -132,12 +47,10 @@ export function groupGameAchievementsByPeriod<T extends DatedUnlock>(
           return { label: localDay(start).slice(0, 7), start: start.getTime(), end: end.getTime() - 1 }
         })
       : Array.from({ length: 8 }, (_, i) => {
-          const end = new Date()
-          end.setHours(0, 0, 0, 0)
-          end.setDate(end.getDate() - (7 - i) * 7)
-          const start = new Date(end)
-          start.setDate(start.getDate() - 6)
-          return { label: localDay(start).slice(5), start: start.getTime(), end: end.getTime() + 86399999 }
+          const today = new Date()
+          const start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - ((today.getDay() + 6) % 7) - (7 - i) * 7)
+          const next = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 7)
+          return { label: localDay(start).slice(5), start: start.getTime(), end: next.getTime() - 1 }
         })
 
   return ranges.map(({ label, start, end }) => {
@@ -158,6 +71,9 @@ export function getGameSortValue(
       return game.Title
     case 'lastPlayed':
       return isWantToPlay ? null : (extra?.lastPlayed ?? null)
+    case 'completed':
+      // Offered on the mixed lists only, which carry the date: RA's own list has no such order.
+      return null
     case 'percent':
       return isWantToPlay ? null : (parseFloat((game as RetroAchievementsGameCompleted).PctWon) || 0) * 100
     case 'points':
@@ -205,7 +121,7 @@ export function calcThisMonth(achievements: RecentAchievement[]): { pts: number;
 export function calcAvgPerDay(achievements: RecentAchievement[], days: number = 30): number {
   if (!achievements.length) return 0
   const cutoff = Date.now() - days * 86400000
-  const count = achievements.filter((a) => new Date(a.Date.replace(' ', 'T')).getTime() >= cutoff).length
+  const count = achievements.filter((a) => parseUnlockTime(a.Date) >= cutoff).length
   return count / days
 }
 
@@ -216,13 +132,13 @@ export type ActivityKpis = { today: number; week: number; month: number; avgPerD
  * last 30, from any platform. Days are UTC, as everywhere else on the site.
  */
 export function activityKpis(achievements: RecentAchievement[], now: number = Date.now()): ActivityKpis {
-  const todayKey = new Date(now).toISOString().slice(0, 10)
+  const todayKey = utcDay(new Date(now))
   const monthKey = todayKey.slice(0, 7)
   const weekAgo = now - 7 * 86400000
   const monthAgo = now - 30 * 86400000
   let today = 0, week = 0, month = 0, last30 = 0
   for (const a of achievements) {
-    const t = Date.parse(a.Date.replace(' ', 'T'))
+    const t = parseUnlockTime(a.Date)
     if (a.Date.startsWith(todayKey)) today++
     if (a.Date.slice(0, 7) === monthKey) month++
     if (t >= weekAgo) week++
@@ -230,39 +146,6 @@ export function activityKpis(achievements: RecentAchievement[], now: number = Da
   }
   return { today, week, month, avgPerDay: last30 / 30 }
 }
-
-export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
-  if (!achievements.length) return []
-  const uniqueDays = [...new Set(achievements.map(a => a.Date.split(' ')[0]))].sort()
-  const streaks: Streak[] = []
-  let start = uniqueDays[0]
-  let prev = uniqueDays[0]
-
-  const makeStreak = (s: string, e: string): Streak => {
-    const days = Math.round((new Date(e + 'T00:00:00').getTime() - new Date(s + 'T00:00:00').getTime()) / 86400000) + 1
-    return {
-      start: s,
-      end: e,
-      days,
-      achievements: achievements.filter(a => { const d = a.Date.split(' ')[0]; return d >= s && d <= e }),
-    }
-  }
-
-  for (let i = 1; i < uniqueDays.length; i++) {
-    const curr = uniqueDays[i]
-    const diff = Math.round((new Date(curr + 'T00:00:00').getTime() - new Date(prev + 'T00:00:00').getTime()) / 86400000)
-    if (diff === 1) {
-      prev = curr
-    } else {
-      streaks.push(makeStreak(start, prev))
-      start = curr
-      prev = curr
-    }
-  }
-  streaks.push(makeStreak(start, prev))
-  return streaks.sort((a, b) => b.days - a.days)
-}
-
 
 export function sumAchievementPoints(
   achievements: Record<string, RetroAchievement | undefined | null>,
@@ -290,13 +173,13 @@ export function pinnedKey(fav: PinnedAchievement): string {
 /** An achievement's badge image: the full URL a Steam unlock carries, or RA's badge path. */
 export function achievementBadgeUrl(a: RecentAchievement): string | undefined {
   if (a.BadgeUrl) return a.BadgeUrl
-  return a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : undefined
+  return raBadgeUrl(a.BadgeName)
 }
 
 /** The image of an achievement's game: the full URL a Steam unlock carries, or RA's icon path. */
 export function achievementGameIconUrl(a: RecentAchievement): string | undefined {
   if (a.GameIconUrl) return a.GameIconUrl
-  return a.GameIcon ? `https://retroachievements.org${a.GameIcon}` : undefined
+  return raImageUrl(a.GameIcon)
 }
 
 /** Completion bands, as fractions: <25%, 25–49%, 50–74%, 75–99%, 100%. */
@@ -361,7 +244,7 @@ export function groupByDaySource(achievements: RecentAchievement[], days = 7): D
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date()
     d.setDate(d.getDate() - i)
-    const date = d.toISOString().split('T')[0]
+    const date = utcDay(d)
     rows.set(date, { date, ra: 0, steam: 0, psn: 0, xbox: 0, total: 0 })
   }
   for (const a of Array.isArray(achievements) ? achievements : []) {
@@ -390,25 +273,8 @@ export function heatLevel(count: number, max: number): number {
   return Math.min(HEAT_LEVELS, Math.max(1, Math.ceil(Math.sqrt(count / max) * HEAT_LEVELS)))
 }
 
-export type SpanLabels = { underMinute: string; minutes: string; hours: string; days: string; months: string }
-
-/**
- * How long it took from the first unlock to the last, in the largest unit
- * that fits ("{n}" in each label is the count). Null with fewer than two
- * dated unlocks: there is no span to tell.
- */
-export function unlockSpan(dates: (string | null | undefined)[], labels: SpanLabels): string | null {
-  const times = dates.filter((d): d is string => !!d).map((d) => new Date(d).getTime()).filter((t) => !Number.isNaN(t))
-  if (times.length < 2) return null
-  const mins = Math.floor((Math.max(...times) - Math.min(...times)) / 60000)
-  const hours = Math.floor(mins / 60)
-  const days = Math.floor(hours / 24)
-  if (mins < 1) return labels.underMinute
-  if (hours < 1) return labels.minutes.replace('{n}', String(mins))
-  if (days < 1) return labels.hours.replace('{n}', String(hours))
-  if (days < 30) return labels.days.replace('{n}', String(days))
-  return labels.months.replace('{n}', String(Math.floor(days / 30)))
-}
+/** The list a game is on (a page's category) as a status; anything else reads as playing. */
+export const asCategory = (c?: string): GameStatus => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * The first `limit` items of a long list, unless it is only a little longer
@@ -454,29 +320,14 @@ export async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) =>
  * A counted noun in the right plural form for the language ("1 game",
  * "5 games", "5 игр"), with the number formatted for it too.
  */
+/** A number with a fixed count of decimals, in the reader's language ("0,8" in Spanish, never "0.8"). */
+export function decimal(n: number, lang = 'en', digits = 1): string {
+  return n.toLocaleString(lang, { minimumFractionDigits: digits, maximumFractionDigits: digits })
+}
+
 export function plural(n: number, forms: { zero?: string; one?: string; two?: string; few?: string; many?: string; other: string }, lang = 'en'): string {
   const form = forms[new Intl.PluralRules(lang).select(n)] ?? forms.other
   return form.replace('{n}', n.toLocaleString(lang))
-}
-
-/**
- * A calendar day ("2026-06-05") in the app's language, read as a local date:
- * parsed as UTC it can land on the day before west of Greenwich.
- */
-export function formatDay(day: string, lang: string, options: Intl.DateTimeFormatOptions): string {
-  return new Date(`${day}T00:00:00`).toLocaleDateString(lang, options)
-}
-
-/** Every day from `start` to `end` (inclusive), as "YYYY-MM-DD", local time. */
-export function daysBetween(start: string, end: string): string[] {
-  const out: string[] = []
-  const d = new Date(`${start}T00:00:00`)
-  const last = new Date(`${end}T00:00:00`)
-  while (d <= last) {
-    out.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
-    d.setDate(d.getDate() + 1)
-  }
-  return out
 }
 
 /** Achievements per calendar day ("YYYY-MM-DD" → count). */
@@ -487,6 +338,21 @@ export function countByDay(achievements: RecentAchievement[]): Record<string, nu
     out[d] = (out[d] ?? 0) + 1
   }
   return out
+}
+
+/**
+ * `text` cut where it matches `query` (first match, ignoring case), so the
+ * match can be drawn apart: e.g. "Spider" in "Marvel's Spider-Man".
+ */
+export function matchParts(text: string, query: string): { text: string; match: boolean }[] {
+  const q = query.trim()
+  const at = q ? text.toLowerCase().indexOf(q.toLowerCase()) : -1
+  if (at < 0) return [{ text, match: false }]
+  return [
+    { text: text.slice(0, at), match: false },
+    { text: text.slice(at, at + q.length), match: true },
+    { text: text.slice(at + q.length), match: false },
+  ].filter((p) => p.text !== '')
 }
 
 /**

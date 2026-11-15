@@ -1,15 +1,9 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 
-const mockClient = {
-  query: jest.fn(),
-  release: jest.fn(),
-}
-
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
     query: jest.fn(),
-    connect: jest.fn(),
   },
 }))
 
@@ -30,8 +24,7 @@ function makeRequest(method: string, body?: unknown, url = 'http://localhost/api
 beforeEach(() => {
   jest.clearAllMocks()
   ;(getServerSession as jest.Mock).mockResolvedValue(mockSession)
-  ;(pool.connect as jest.Mock).mockResolvedValue(mockClient)
-  mockClient.query.mockResolvedValue({ rows: [] })
+  ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
 })
 
 describe('GET', () => {
@@ -157,38 +150,37 @@ describe('PUT', () => {
     expect(res.status).toBe(400)
   })
 
-  test('upserts each game id with its index as position, plain ids meaning RA (older clients)', async () => {
+  test('saves every game in one statement, plain ids meaning RA (older clients)', async () => {
     const res = await PUT(makeRequest('PUT', { order: [10, 20, 30] }))
     expect(res.data).toEqual({ ok: true })
-    expect(mockClient.query).toHaveBeenCalledWith('BEGIN')
-    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 'ra', 10, 0])
-    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 'ra', 20, 1])
-    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 'ra', 30, 2])
-    expect(mockClient.query).toHaveBeenCalledWith('COMMIT')
-    expect(mockClient.release).toHaveBeenCalled()
+    expect(pool.query).toHaveBeenCalledTimes(1)
+    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['1', ['ra', 'ra', 'ra'], [10, 20, 30]])
+    expect((pool.query as jest.Mock).mock.calls[0][0]).toContain('WITH ORDINALITY')
   })
 
-  test('rolls back and returns 500 when a query fails mid-transaction', async () => {
-    mockClient.query.mockImplementation((sql: string) => {
-      if (sql === 'BEGIN') return Promise.resolve()
-      if (sql.includes('ON CONFLICT')) return Promise.reject(new Error('fail'))
-      return Promise.resolve()
-    })
-    const res = await PUT(makeRequest('PUT', { order: [10] }))
-    expect(res.status).toBe(500)
-    expect(mockClient.query).toHaveBeenCalledWith('ROLLBACK')
-    expect(mockClient.release).toHaveBeenCalled()
+  test('a game named twice is saved once', async () => {
+    await PUT(makeRequest('PUT', { order: [10, 10, 20] }))
+    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['1', ['ra', 'ra'], [10, 20]])
+  })
+
+  test('refuses an order longer than anyone could have', async () => {
+    const res = await PUT(makeRequest('PUT', { order: Array.from({ length: 1001 }, (_, i) => i + 1) }))
+    expect(res.status).toBe(400)
+    expect(pool.query).not.toHaveBeenCalled()
+  })
+
+  test('returns 500 when the save fails', async () => {
+    ;(pool.query as jest.Mock).mockRejectedValueOnce(new Error('fail'))
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    expect((await PUT(makeRequest('PUT', { order: [10] }))).status).toBe(500)
   })
 })
 
 describe('mixed RA and Steam order', () => {
   test('stores each entry with its source', async () => {
-    mockClient.query.mockResolvedValue({})
-    ;(pool.connect as jest.Mock).mockResolvedValue(mockClient)
     const res = await PUT(makeRequest('PUT', { order: [{ source: 'steam', gameId: 730 }, { source: 'ra', gameId: 730 }] }))
     expect(res.data).toEqual({ ok: true })
-    expect(mockClient.query).toHaveBeenCalledWith(expect.any(String), ['1', 'steam', 730, 0])
-    expect(mockClient.query).toHaveBeenCalledWith(expect.any(String), ['1', 'ra', 730, 1])
+    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['1', ['steam', 'ra'], [730, 730]])
   })
 
   test('rejects an entry with an unknown source or no id', async () => {
@@ -214,7 +206,7 @@ describe('Xbox is admin-only', () => {
   test('nor put one in the order', async () => {
     const res = await PUT(makeRequest('PUT', { order: [{ source: 'ra', gameId: 1 }, { source: 'xbox', gameId: 2 }] }))
     expect(res.status).toBe(403)
-    expect(pool.connect).not.toHaveBeenCalled()
+    expect(pool.query).not.toHaveBeenCalled()
   })
 
   test('an admin can pin one', async () => {
@@ -222,6 +214,6 @@ describe('Xbox is admin-only', () => {
     ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
     const res = await POST(makeRequest('POST', { gameId: 1738914043, source: 'xbox' }))
     expect(res.status).toBe(200)
-    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['1', 'xbox', 1738914043])
+    expect((pool.query as jest.Mock).mock.calls.at(-1)![1]).toEqual(['1', 'xbox', 1738914043])
   })
 })

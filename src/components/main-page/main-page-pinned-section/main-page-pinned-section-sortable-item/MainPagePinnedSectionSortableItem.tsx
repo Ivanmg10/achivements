@@ -32,7 +32,7 @@ export default function MainPagePinnedSectionSortableItem({
       {...listeners}
       aria-label={`${T.cards.dragToReorder}: ${label}`}
       title={T.cards.dragToReorder}
-      className="text-text-secondary/50 hover:text-text-main cursor-grab active:cursor-grabbing touch-none rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="text-text-secondary/50 hover:text-text-main cursor-grab active:cursor-grabbing touch-none rounded focus-ring"
     >
       <IconGripVertical className="w-4 h-4" aria-hidden="true" />
     </button>
@@ -42,7 +42,7 @@ export default function MainPagePinnedSectionSortableItem({
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`relative ${isDragging ? 'z-10 opacity-70 shadow-2xl' : ''}`}
+      className={`relative h-full ${isDragging ? 'z-10 opacity-70 shadow-2xl' : ''}`}
     >
       {children(handle)}
     </li>

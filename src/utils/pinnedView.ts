@@ -1,10 +1,11 @@
 import type { PinnedAchievement } from '@/types/types'
-import type { GameSource } from '@/types/steam'
 import type { Translations } from '@/translations/en'
-import { pinnedKey } from '@/utils/utils'
+import { pinnedKey, plural } from '@/utils/utils'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
-import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { steamAchievementAnchor } from '@/utils/steamTitles'
+import { raBadgeUrl } from '@/utils/raAssets'
+import type { GameSource } from '@/types/game'
 
 /** A pinned achievement of any platform, in the one shape its tile draws. */
 export type PinnedView = {
@@ -29,7 +30,7 @@ export type PinnedView = {
  * A pinned achievement as its tile shows it. A hidden or secret one not yet
  * earned keeps its name and description concealed, as on its game's page.
  */
-export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView {
+export function pinnedView(fav: PinnedAchievement, T: Translations, lang = 'en'): PinnedView {
   const base = { key: pinnedKey(fav), source: fav.source, gameId: fav.game_id, gameTitle: fav.game_title }
   if (fav.source === 'steam') {
     const a = fav.snapshot
@@ -40,7 +41,7 @@ export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView 
       description: concealed ? '' : a.description,
       iconUrl: a.badgeUrl || null,
       earned: a.earned,
-      anchor: achievementAnchor(fav.steam_apiname),
+      anchor: steamAchievementAnchor(fav.steam_apiname),
       value: null,
       valueClass: '',
       rarity: a.globalPct ?? null,
@@ -49,7 +50,7 @@ export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView 
   if (fav.source === 'psn') {
     const t = fav.snapshot
     const concealed = t.hidden && !t.earned
-    const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }[t.type]
+    const grade = T.psn[t.type]
     return {
       ...base,
       title: concealed ? T.psn.hiddenTrophy : t.name,
@@ -73,7 +74,7 @@ export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView 
       earned: a.unlocked,
       anchor: xboxAchievementAnchor(fav.xbox_achievement_id),
       value: `${a.gamerscore} G`,
-      valueClass: 'text-green-500',
+      valueClass: 'text-success',
       rarity: a.rarity ?? null,
     }
   }
@@ -82,10 +83,10 @@ export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView 
     ...base,
     title: a.Title,
     description: a.Description,
-    iconUrl: a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : null,
+    iconUrl: raBadgeUrl(a.BadgeName) ?? null,
     earned: Boolean(a.DateEarned || a.DateEarnedHardcore),
     anchor: null,
-    value: `${a.Points} pts`,
+    value: plural(a.Points, T.plurals.points, lang),
     valueClass: 'text-accent',
     rarity: fav.num_distinct_players > 0 ? (a.NumAwarded / fav.num_distinct_players) * 100 : null,
   }

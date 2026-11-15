@@ -19,7 +19,6 @@ export default function PsnTrophyCounts({
   className?: string
 }) {
   const { T } = useLanguage()
-  const names = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }
 
   return (
     <ul className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-xs ${className}`}>
@@ -32,7 +31,7 @@ export default function PsnTrophyCounts({
             {earned[grade]}
             {of && <span className="text-text-secondary font-normal">/{of[grade]}</span>}
           </span>
-          <span className="text-text-secondary">{names[grade]}</span>
+          <span className="text-text-secondary">{T.psn[grade]}</span>
         </li>
       ))}
     </ul>

@@ -10,7 +10,7 @@ const params = (id = '5') => ({ params: Promise.resolve({ id }) })
 const request = (method: string, body?: unknown) =>
   new NextRequest('http://localhost/api/groups/5', { method, body: body !== undefined ? JSON.stringify(body) : undefined })
 
-const group = (overrides = {}) => ({ id: 5, title: 'RPGs', is_public: false, user_id: 1, ...overrides })
+const group = (overrides = {}) => ({ id: 5, title: 'RPGs', is_public: false, user_id: 1, owner_public: true, ...overrides })
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -25,6 +25,10 @@ describe('GET', () => {
     const res = await GET(request('GET'), params())
     expect(res.status).toBe(200)
     expect((res as unknown as { data: { items: unknown[] } }).data.items).toHaveLength(1)
+    const [sql, values] = (pool.query as jest.Mock).mock.calls[1]
+    expect(sql).toContain('NOT EXISTS')
+    expect(sql).toContain('h.user_id = $3')
+    expect(values).toEqual([5, false, 1])
   })
 
   test('someone else cannot see a private group', async () => {
@@ -41,8 +45,24 @@ describe('GET', () => {
     expect((await GET(request('GET'), params())).status).toBe(401)
   })
 
-  test('a public group is open to anyone', async () => {
+  test('a public group is refused to a visitor without a session', async () => {
     ;(getServerSession as jest.Mock).mockResolvedValue(null)
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [group({ is_public: true })] })
+    expect((await GET(request('GET'), params())).status).toBe(401)
+  })
+
+  test('a public group of a private profile is only its owner\'s', async () => {
+    const hidden = group({ is_public: true, owner_public: false })
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '2' } })
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [hidden] })
+    expect((await GET(request('GET'), params())).status).toBe(401)
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1' } })
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [hidden] }).mockResolvedValueOnce({ rows: [] })
+    expect((await GET(request('GET'), params())).status).toBe(200)
+  })
+
+  test('a public group is open to other users, without saying who owns it', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '2' } })
     ;(pool.query as jest.Mock)
       .mockResolvedValueOnce({ rows: [group({ is_public: true })] })
       .mockResolvedValueOnce({ rows: [] })
@@ -118,20 +138,20 @@ describe('Xbox is admin-only', () => {
     await GET(request('GET'), params())
     const [sql, values] = (pool.query as jest.Mock).mock.calls[1]
     expect(sql).toContain("source <> 'xbox'")
-    expect(values).toEqual([5, false])
+    expect(values).toEqual([5, false, 1])
   })
 
   test('an admin gets them', async () => {
     ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '2', admin: true } })
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [group({ is_public: true })] }).mockResolvedValueOnce({ rows: [] })
     await GET(request('GET'), params())
-    expect((pool.query as jest.Mock).mock.calls[1][1]).toEqual([5, true])
+    expect((pool.query as jest.Mock).mock.calls[1][1]).toEqual([5, true, 1])
   })
 
-  test('a visitor with no session gets them left out too', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue(null)
+  test('another user who is not an admin gets them left out too', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '2' } })
     ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [group({ is_public: true })] }).mockResolvedValueOnce({ rows: [] })
     await GET(request('GET'), params())
-    expect((pool.query as jest.Mock).mock.calls[1][1]).toEqual([5, false])
+    expect((pool.query as jest.Mock).mock.calls[1][1]).toEqual([5, false, 1])
   })
 })

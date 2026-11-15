@@ -18,12 +18,13 @@ test('opens the game and says how much is left', () => {
   tile()
   expect(screen.getByRole('link', { name: 'Portal 2' })).toHaveAttribute('href', '/steamGame/620')
   expect(screen.getByText('67%')).toBeInTheDocument()
-  expect(screen.getByText('Steam · 10 left')).toBeInTheDocument()
+  expect(screen.getByText('Steam')).toBeInTheDocument()
+  expect(screen.getByText('· 10 left')).toBeInTheDocument()
 })
 
 test('a finished game is marked, and its percentage turns the done colour', () => {
   tile({ earned: 30, total: 30, pct: 1 })
-  expect(screen.getByText('Steam · Finished')).toBeInTheDocument()
+  expect(screen.getByText('· Finished')).toBeInTheDocument()
   expect(screen.getAllByText(/100%/).some((el) => el.classList.contains('text-success'))).toBe(true)
 })
 

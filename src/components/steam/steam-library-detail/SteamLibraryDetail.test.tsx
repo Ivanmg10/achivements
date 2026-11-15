@@ -7,7 +7,6 @@ jest.mock('@/components/library-game-detail/LibraryGameDetail', () => ({
   },
 }))
 jest.mock('@/components/steam/steam-achievement-grid/SteamAchievementGrid', () => ({
-  achievementAnchor: (n: string) => n,
   SteamAchievementGrid: () => <div data-testid="grid" />,
 }))
 jest.mock('@/hooks/useSteamAchievements', () => ({ useSteamAchievements: jest.fn() }))

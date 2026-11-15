@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import { IconFolder } from '@tabler/icons-react'
 import type { GameGroup } from '@/types/types'
-import type { GameSource } from '@/types/steam'
+import { raImageUrl } from '@/utils/raAssets'
+import type { GameSource } from '@/types/game'
 
 const isUrl = (s: string) => /^https?:\/\//i.test(s)
 
@@ -10,7 +11,7 @@ export function coverSrc(c: { source?: GameSource; image_icon: string | null }):
   if (!c.image_icon) return null
   return c.source === 'steam' || c.image_icon.startsWith('/api/') || isUrl(c.image_icon)
     ? c.image_icon
-    : `https://retroachievements.org${c.image_icon}`
+    : raImageUrl(c.image_icon) ?? null
 }
 
 // How the tile is split for 1 to 4 covers.
@@ -41,18 +42,18 @@ export default function GroupCoverMosaic({ group, size = 'w-24 h-24' }: { group:
   return (
     <div aria-hidden="true" className={`relative shrink-0 ${size}`}>
       {covers.length > 0 ? (
-        <div className={`grid gap-0.5 w-full h-full rounded-xl overflow-hidden bg-bg-main ${LAYOUT[covers.length]}`}>
+        <div className={`grid gap-0.5 w-full h-full rounded-tile overflow-hidden bg-bg-main ${LAYOUT[covers.length]}`}>
           {covers.map((src, i) => (
             <Image key={i} src={src} alt="" width={96} height={96} className="w-full h-full object-cover" unoptimized />
           ))}
         </div>
       ) : (
-        <div className="w-full h-full rounded-xl bg-bg-main flex items-center justify-center text-4xl">
+        <div className="w-full h-full rounded-tile bg-bg-main flex items-center justify-center text-4xl">
           {iconMark ?? <IconFolder className="w-8 h-8 text-text-secondary" />}
         </div>
       )}
       {covers.length > 0 && iconMark && (
-        <span className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-lg bg-bg-card ring-2 ring-bg-card overflow-hidden flex items-center justify-center text-lg">
+        <span className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-box bg-bg-card ring-2 ring-bg-card overflow-hidden flex items-center justify-center text-lg">
           {iconMark}
         </span>
       )}

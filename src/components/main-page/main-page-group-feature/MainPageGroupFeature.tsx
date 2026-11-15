@@ -19,6 +19,10 @@ import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosai
 import EmptyState from '@/components/empty-state/EmptyState'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import MainPageGroupFeatureGame from '@/components/main-page/main-page-group-feature-game/MainPageGroupFeatureGame'
+import Button from '@/components/ui/Button'
+import { Skeleton } from '@/components/ui/Skeleton'
+import Kicker from '@/components/ui/Kicker'
+import Facts from '@/components/ui/Facts'
 
 // Downloaded the first time it is opened, not with the page.
 const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'), { loading: () => null })
@@ -72,7 +76,7 @@ export default function MainPageGroupFeature({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative rounded-2xl overflow-hidden ring-1 ring-ink/5 bg-bg-main">
+      <div className="relative rounded-card overflow-hidden ring-1 ring-ink/5 bg-bg-main">
         {covers.length > 0 && (
           <div aria-hidden="true" className="absolute inset-0 grid opacity-25" style={{ gridTemplateColumns: `repeat(${covers.length}, minmax(0, 1fr))` }}>
             {covers.map((src, i) => (
@@ -98,14 +102,13 @@ export default function MainPageGroupFeature({
             <h3 className="text-lg font-bold tracking-tight truncate">
               <Link
                 href={`/groups/${group.id}`}
-                className="hover:underline underline-offset-2 decoration-text-main/40 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="hover:underline underline-offset-2 decoration-text-main/40 rounded focus-ring"
               >
                 {group.title}
               </Link>
             </h3>
             <p className="text-xs text-text-secondary truncate">
-              {plural(items.length || group.game_count, T.plurals.games, lang)}
-              {counts.total > 0 && ` · ${T.groups.summary.replace('{earned}', counts.earned.toLocaleString(lang)).replace('{total}', counts.total.toLocaleString(lang))}`}
+              <Facts items={[plural(items.length || group.game_count, T.plurals.games, lang), counts.total > 0 && T.groups.summary.replace('{earned}', counts.earned.toLocaleString(lang)).replace('{total}', counts.total.toLocaleString(lang))]} />
             </p>
             {items.length > 0 && (
               <ul className="flex flex-wrap gap-1.5 mt-1 text-[11px]">
@@ -120,7 +123,7 @@ export default function MainPageGroupFeature({
               type="button"
               onClick={() => setEditing(true)}
               aria-label={T.groups.editGroup}
-              className="self-start p-2 rounded-lg bg-bg-card/80 ring-1 ring-ink/10 text-text-secondary hover:text-text-main transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="self-start p-2 rounded-chip bg-bg-card/80 ring-1 ring-ink/10 text-text-secondary hover:text-text-main transition-colors shrink-0 focus-ring"
             >
               <IconEdit className="w-4 h-4" aria-hidden="true" />
             </button>
@@ -132,18 +135,18 @@ export default function MainPageGroupFeature({
       {closest && (
         <Link
           href={gameHref(closest.item.source ?? 'ra', closest.item.game_id)}
-          className="flex items-center gap-3 rounded-xl bg-bg-main px-3 py-2.5 hover:bg-ink/5 transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="flex items-center gap-3 rounded-tile bg-bg-main px-3 py-2.5 hover:bg-ink/5 transition-colors min-w-0 focus-ring"
         >
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-accent shrink-0">{T.groups.nextUp}</span>
+          <Kicker as="span" size="sm" tone="accent" className="shrink-0">{T.groups.nextUp}</Kicker>
           <span className="text-sm truncate flex-1">{T.groups.nextUpLeft.replace('{left}', String(closest.left)).replace('{game}', closest.item.title)}</span>
           <IconArrowRight className="w-4 h-4 text-text-secondary shrink-0" aria-hidden="true" />
         </Link>
       )}
 
       {isLoading ? (
-        <div className={`${GRID} animate-pulse motion-reduce:animate-none`} aria-busy="true">
+        <div className={GRID} aria-busy="true">
           {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} className="aspect-square rounded-xl bg-ink/10" />
+            <Skeleton key={i} radius="tile" className="aspect-square" />
           ))}
         </div>
       ) : error ? (
@@ -151,17 +154,16 @@ export default function MainPageGroupFeature({
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center gap-2">
           <EmptyState icon={<IconFolder className="w-6 h-6" />} title={T.cards.groupEmpty} size="compact" />
-          <button
+          <Button
             type="button"
             onClick={() => setAdding(true)}
-            className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <IconPlus className="w-4 h-4" aria-hidden="true" />
             {T.groups.addGames}
-          </button>
+          </Button>
         </div>
       ) : (
-        <ul className={GRID}>
+        <ul className={`${GRID} enter-cards`}>
           {items.slice(0, SHOWN).map((item) => (
             <li key={item.id} className="min-w-0">
               <MainPageGroupFeatureGame item={item} progress={progress(item)} />
@@ -171,7 +173,7 @@ export default function MainPageGroupFeature({
             <li>
               <Link
                 href={`/groups/${group.id}`}
-                className="flex items-center justify-center aspect-square rounded-xl border-2 border-dashed border-ink/10 text-sm font-semibold text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="flex items-center justify-center aspect-square rounded-tile border-2 border-dashed border-ink/10 text-sm font-semibold text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-ring"
               >
                 {T.groups.moreGames.replace('{n}', String(items.length - SHOWN))}
               </Link>
@@ -182,7 +184,7 @@ export default function MainPageGroupFeature({
 
       <Link
         href={`/groups/${group.id}`}
-        className="self-start flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-main transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="self-start flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-main transition-colors rounded focus-ring"
       >
         {T.cards.viewGroup}
         <IconArrowRight size={14} aria-hidden="true" />

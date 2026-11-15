@@ -11,7 +11,7 @@ import { BCRYPT_COST, PASSWORD_MIN } from '@/utils/authValidation'
  */
 export async function POST(req: Request) {
   try {
-    const { token, password } = (await req.json()) as { token?: unknown; password?: unknown }
+    const { token, password } = (await req.json().catch(() => ({}))) as { token?: unknown; password?: unknown }
 
     if (typeof token !== 'string' || typeof password !== 'string' || !token || !password) {
       return NextResponse.json({ error: 'token and password required' }, { status: 400 })

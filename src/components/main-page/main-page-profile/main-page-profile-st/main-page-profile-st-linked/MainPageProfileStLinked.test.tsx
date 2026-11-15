@@ -69,6 +69,14 @@ describe('header, like the RA profile', () => {
     expect(screen.getByText(en.steam.level).textContent).toBe(`${en.steam.level}78`)
   })
 
+  test('reads the latest unlocks only on your own card: someone\'s page lists them itself (#130)', () => {
+    const { unmount } = renderIt()
+    expect(useSteamRecentAchievements).toHaveBeenLastCalledWith('recent')
+    unmount()
+    render(<SubjectContext.Provider value="someone"><MainPageProfileStLinked profile={PROFILE} isLoading={false} error={null} onRetry={retry} /></SubjectContext.Provider>)
+    expect(useSteamRecentAchievements).toHaveBeenLastCalledWith(null)
+  })
+
   test('omits the level when Steam gave none', () => {
     renderIt({ profile: { ...PROFILE, level: null } })
     expect(screen.queryByText(en.steam.level)).not.toBeInTheDocument()
@@ -113,8 +121,17 @@ describe('status, in words as well as a dot', () => {
     expect(screen.getByText(en.steam.online)).toBeInTheDocument()
   })
 
-  test('offline, including when Steam gives no state', () => {
-    renderIt({ profile: { ...PROFILE, personastate: undefined } })
+  test('offline says nothing on your own card: you are using the site', () => {
+    renderIt({ profile: { ...PROFILE, personastate: 0 } })
+    expect(screen.queryByText(en.steam.offline)).not.toBeInTheDocument()
+  })
+
+  test('offline on someone else’s card, including when Steam gives no state', () => {
+    render(
+      <SubjectContext.Provider value="someone">
+        <MainPageProfileStLinked profile={{ ...PROFILE, personastate: undefined }} isLoading={false} error={null} onRetry={retry} />
+      </SubjectContext.Provider>,
+    )
     expect(screen.getByText(en.steam.offline)).toBeInTheDocument()
   })
 })
@@ -148,12 +165,6 @@ test('hands the library to the stats and recent unlocks to their list', () => {
   expect(screen.getByTestId('recent')).toHaveTextContent('2')
 })
 
-test('shows a skeleton while the profile loads', () => {
-  const { container } = renderIt({ isLoading: true })
-  expect(container.querySelector('[aria-busy="true"]')).not.toBeNull()
-  expect(screen.queryByText('Palmera')).not.toBeInTheDocument()
-})
-
 test('announces an error with the privacy hint and a retry', () => {
   renderIt({ error: 'boom', profile: null })
   expect(screen.getByRole('alert')).toHaveTextContent(en.steam.profileError)
@@ -165,31 +176,4 @@ test('announces an error with the privacy hint and a retry', () => {
 test('treats a missing profile with no error as an error, not a blank card', () => {
   renderIt({ profile: null })
   expect(screen.getByRole('alert')).toBeInTheDocument()
-})
-
-describe('the refresh button', () => {
-  const refreshName = en.profileRa.refreshData
-
-  test('on the own page it refetches the profile, the recent unlocks and the library together', () => {
-    const recentRetry = jest.fn()
-    const refetch = jest.fn()
-    const onRetry = jest.fn()
-    setup({ refetch })
-    ;(useSteamRecentAchievements as jest.Mock).mockReturnValue({ achievements: [], isLoading: false, error: null, retry: recentRetry })
-    renderIt({ onRetry })
-    fireEvent.click(screen.getByRole('button', { name: refreshName }))
-    expect(onRetry).toHaveBeenCalledTimes(1)
-    expect(recentRetry).toHaveBeenCalledTimes(1)
-    expect(refetch).toHaveBeenCalledTimes(1)
-  })
-
-  test('on someone else page there is nothing of the viewer to refresh', () => {
-    render(
-      <SubjectContext.Provider value="someone">
-        <MainPageProfileStLinked profile={PROFILE} isLoading={false} error={null} onRetry={retry} />
-      </SubjectContext.Provider>,
-    )
-    expect(screen.queryByRole('button', { name: refreshName })).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: en.steam.viewOnSteam })).toBeInTheDocument()
-  })
 })

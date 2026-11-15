@@ -23,7 +23,7 @@ export default function XboxGamerscore({
     <span className={`inline-flex items-baseline gap-1 text-xs tabular-nums ${className}`}>
       <span className="text-text-main font-semibold">{n(earned)}</span>
       {total !== undefined && <span className="text-text-secondary">/{n(total)}</span>}
-      <abbr title={T.xbox.gamerscore} className="text-green-500 font-semibold no-underline">
+      <abbr title={T.xbox.gamerscore} className="text-success font-semibold no-underline">
         <span aria-hidden="true">G</span>
         <span className="sr-only">{T.xbox.gamerscore}</span>
       </abbr>

@@ -1,17 +1,18 @@
 'use client'
 
-import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { notFound, useParams } from 'next/navigation'
-import { fadeUp } from '@/lib/animations'
+import { GAME_COLUMN } from '@/components/game-page-states/gameSectionWidth'
 import { useLanguage } from '@/context/LanguageContext'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { useXboxGameDetails } from '@/hooks/useXboxGameDetails'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { isXboxTitleId, xboxBackdrop } from '@/utils/xboxTitles'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
-import GameInfoSkeletonTable from '@/components/game-info-skeleton/game-info-skeleton-table/GameInfoSkeletonTable'
+import GamePageNotLinked from '@/components/game-page-states/game-page-not-linked/GamePageNotLinked'
+import GamePageLibraryError from '@/components/game-page-states/game-page-library-error/GamePageLibraryError'
+import GameTableState from '@/components/game-page-states/game-table-state/GameTableState'
 import XboxGameHeroBackground from '@/components/xbox/xbox-game-hero-background/XboxGameHeroBackground'
 import XboxGameInfoHeader from '@/components/xbox/xbox-game-info-header/XboxGameInfoHeader'
 import XboxGameInfoTable from '@/components/xbox/xbox-game-info-table/XboxGameInfoTable'
@@ -25,75 +26,58 @@ import { xboxAiSource } from '@/utils/aiExport'
  *
  * The game itself comes from the shared library, so opening it from a list
  * costs no extra request; its achievements load for the page. A game the
- * account does not have is not in that list, and is a 404.
+ * account does not have is not in that list, and is a 404; a list that could
+ * not be read is not a 404, it says why and offers a retry.
  *
- * Xbox is admin-only for now: anyone else is told there is nothing here.
+ * Xbox is admin-only for now: anyone else is told there is nothing here. Who
+ * is looking is only known once the session is read, so a full load holds the
+ * skeleton until then (it used to 404 every game, admins included).
  */
 export default function XboxGamePage() {
   const { id: rawId } = useParams()
   const titleId = typeof rawId === 'string' && isXboxTitleId(rawId) ? rawId : null
   const { T } = useLanguage()
+  const { status } = useAuthSession()
   const enabled = useXboxEnabled()
-  const { isLinked, fullLibrary, libraryLoading } = useXboxGamesData()
+  const { isLinked, fullLibrary, libraryLoading, libraryError, refetch } = useXboxGamesData()
   const { achievements, isLoading, error, retry } = useXboxAchievements(isLinked ? titleId : null)
   const { details } = useXboxGameDetails(isLinked ? titleId : null)
 
-  if (titleId === null || !enabled) notFound()
-
-  if (!isLinked) {
-    return (
-      <main className="flex-1 flex flex-col justify-center items-center text-text-main gap-3 p-6 text-center">
-        <p className="text-text-secondary">Xbox · {T.userData.notConnected}</p>
-        <Link
-          href="/user"
-          className="px-4 py-1.5 bg-accent text-bg-main font-semibold rounded-xl hover:scale-[1.03] transition-transform duration-200 text-sm"
-        >
-          {T.xbox.connect}
-        </Link>
-      </main>
-    )
-  }
+  if (titleId === null) notFound()
+  if (status === 'loading') return <GameInfoSkeleton />
+  if (!enabled) notFound()
+  if (!isLinked) return <GamePageNotLinked platform="Xbox" connectLabel={T.xbox.connect} />
 
   const game = fullLibrary.find((g) => g.titleId === titleId) ?? null
   if (!game && libraryLoading) return <GameInfoSkeleton />
+  if (!game && libraryError) {
+    return <GamePageLibraryError title={T.xbox.gamesError} reason={T.xbox.errors[libraryError]} retryLabel={T.xbox.retry} onRetry={refetch} />
+  }
   if (!game) notFound()
 
   return (
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <XboxGameHeroBackground src={details?.heroUrl ?? xboxBackdrop(game)} />
-      <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
+      <div className={GAME_COLUMN}>
         <XboxGameInfoHeader
           game={game}
           details={details}
           actions={achievements.length > 0 && <GameAiExport getSource={() => xboxAiSource({ game, achievements, details })} />}
         />
-
-        {isLoading ? (
-          <div role="status" aria-busy="true" className="w-full flex flex-col items-center">
-            <span className="sr-only">{T.loadingPage.game}</span>
-            <GameInfoSkeletonTable />
-          </div>
-        ) : error ? (
-          <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 flex flex-col items-center gap-2 text-center">
-            <p role="alert" className="text-red-400">
-              {T.xbox.achievementsError}
-            </p>
-            {error === 'private' && <p className="text-xs text-text-secondary">{T.xbox.errors.private}</p>}
-            <button onClick={retry} className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-ink/10 transition-colors">
-              {T.xbox.retry}
-            </button>
-          </section>
-        ) : achievements.length === 0 ? (
-          <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 text-center">
-            <p className="text-text-secondary">{T.xbox.noAchievements}</p>
-          </section>
-        ) : (
-          <>
-            <XboxPartialListNote game={game} listed={achievements.length} />
-            <XboxGameInfoTable achievements={achievements} gameId={game.id} gameTitle={game.title} />
-          </>
-        )}
-      </motion.div>
+        <GameTableState
+          isLoading={isLoading}
+          failed={Boolean(error)}
+          errorText={T.xbox.achievementsError}
+          hint={error === 'private' ? T.xbox.errors.private : null}
+          retryLabel={T.xbox.retry}
+          onRetry={retry}
+          emptyText={T.xbox.noAchievements}
+          isEmpty={achievements.length === 0}
+        >
+          <XboxPartialListNote game={game} listed={achievements.length} />
+          <XboxGameInfoTable achievements={achievements} gameId={game.id} gameTitle={game.title} />
+        </GameTableState>
+      </div>
     </main>
   )
 }

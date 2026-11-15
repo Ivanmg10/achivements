@@ -14,14 +14,15 @@ function setup(items: GameGroupItem[], f = filters()) {
 
 test('progress states, the current one pressed', () => {
   const h = setup([item({})])
-  expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByRole('button', { name: 'All 1' })).toHaveAttribute('aria-pressed', 'true')
   fireEvent.click(screen.getByRole('button', { name: 'Completed' }))
   expect(h.onPct).toHaveBeenCalledWith('100')
 })
 
 test('consoles only when there is more than one, each a checkbox', () => {
   const h = setup([item({ id: 1, console_name: 'SNES' }), item({ id: 2, console_name: 'Mega Drive' })], filters({ consoles: new Set(['SNES']) }))
-  expect(screen.getByText(/Console: SNES/)).toBeInTheDocument()
+  expect(screen.getByText('Console', { selector: 'summary span' })).toBeInTheDocument()
+  expect(screen.getByText('SNES', { selector: 'summary span' })).toBeInTheDocument()
   expect(screen.getByRole('checkbox', { name: 'SNES' })).toBeChecked()
   fireEvent.click(screen.getByRole('checkbox', { name: 'Mega Drive' }))
   expect(h.onToggleConsole).toHaveBeenCalledWith('Mega Drive')
@@ -37,7 +38,8 @@ test('no console or decade menus with one console and no years', () => {
 
 test('decade once a release year is known', () => {
   const h = setup([item({ release_year: 1994 })])
-  fireEvent.change(screen.getByLabelText('Decade'), { target: { value: '90s' } })
+  fireEvent.click(screen.getByRole('combobox', { name: 'Decade' }))
+  fireEvent.click(screen.getByRole('option', { name: "90's" }))
   expect(h.onDecade).toHaveBeenCalledWith('90s')
 })
 

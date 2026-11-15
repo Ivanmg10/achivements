@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
-import { dataOwner } from '@/lib/apiAuth'
+import { dataOwner, requireSession } from '@/lib/apiAuth'
 import { canUseXbox, sourceAllowed } from '@/utils/xboxAccess'
 import { parseShowcaseEntry, SHOWCASE_MAX } from '@/utils/showcase'
 
@@ -34,12 +34,12 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const entry = parseShowcaseEntry(await req.json().catch(() => null))
     if (!entry) return NextResponse.json({ error: 'invalid' }, { status: 400 })
-    if (!sourceAllowed(entry.source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+    if (!sourceAllowed(entry.source, auth.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 
     // ponytail: two adds racing past the count can make six; harmless, and the next add says full.
     const inserted = await pool.query(
@@ -50,13 +50,13 @@ export async function POST(req: NextRequest) {
        HAVING COUNT(*) < ${SHOWCASE_MAX}
        ON CONFLICT (user_id, source, game_id, achievement_key) DO NOTHING
        RETURNING ${COLUMNS}`,
-      [session.user.id, entry.source, entry.gameId, entry.achievementKey, entry.gameTitle, entry.title, entry.description, entry.badge, entry.earnedAt],
+      [auth.id, entry.source, entry.gameId, entry.achievementKey, entry.gameTitle, entry.title, entry.description, entry.badge, entry.earnedAt],
     )
     if (inserted.rows[0]) return NextResponse.json(inserted.rows[0])
 
     const existing = await pool.query(
       `SELECT ${COLUMNS} FROM showcase_achievements WHERE user_id = $1 AND source = $2 AND game_id = $3 AND achievement_key = $4`,
-      [session.user.id, entry.source, entry.gameId, entry.achievementKey],
+      [auth.id, entry.source, entry.gameId, entry.achievementKey],
     )
     if (existing.rows[0]) return NextResponse.json(existing.rows[0])
     return NextResponse.json({ error: 'showcase-full' }, { status: 409 })
@@ -69,13 +69,13 @@ export async function POST(req: NextRequest) {
 /** Takes one out of the showcase, by its id (`?id=`). Someone else's id deletes nothing. */
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const id = Number(req.nextUrl.searchParams.get('id'))
     if (!Number.isInteger(id) || id <= 0) return NextResponse.json({ error: 'invalid' }, { status: 400 })
 
-    await pool.query('DELETE FROM showcase_achievements WHERE id = $1 AND user_id = $2', [id, session.user.id])
+    await pool.query('DELETE FROM showcase_achievements WHERE id = $1 AND user_id = $2', [id, auth.id])
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[showcase DELETE]', err)
@@ -86,8 +86,8 @@ export async function DELETE(req: NextRequest) {
 /** Puts the showcase in the order given, as row ids. Ids that are not the user's are ignored. */
 export async function PUT(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const order = (await req.json().catch(() => null))?.order
     if (
@@ -104,7 +104,7 @@ export async function PUT(req: NextRequest) {
       `UPDATE showcase_achievements s SET position = o.pos
        FROM unnest($2::int[]) WITH ORDINALITY AS o(id, pos)
        WHERE s.id = o.id AND s.user_id = $1`,
-      [session.user.id, order],
+      [auth.id, order],
     )
     return NextResponse.json({ ok: true })
   } catch (err) {

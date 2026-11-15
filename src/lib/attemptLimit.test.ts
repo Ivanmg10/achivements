@@ -1,6 +1,6 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
-import { allowAttempt, clientAddress, isLimited, recordAttempt } from './attemptLimit'
+import { allowAttempt, clientAddress, recordAttempt, reserveAttempt } from './attemptLimit'
 import pool from '@/lib/db'
 
 const query = pool.query as jest.Mock
@@ -9,7 +9,7 @@ const query = pool.query as jest.Mock
 function recent(count: number) {
   query.mockReset()
   query.mockImplementation((sql: string) =>
-    Promise.resolve(sql.includes('COUNT(*)') ? { rows: [{ recent: count }] } : { rows: [] }),
+    Promise.resolve(sql.includes('COUNT(*)') ? { rows: [{ recent: count }] } : sql.includes('INSERT INTO signup_attempts') ? { rows: [{ id: 42 }] } : { rows: [] }),
   )
 }
 
@@ -73,24 +73,29 @@ test('asking for a password reset has a tighter window of its own', async () => 
   expect(countCall()![1]).toEqual(['reset', '1.2.3.4', '15'])
 })
 
+test('Xbox upstream calls share a 150-attempt sliding hour across the app', async () => {
+  recent(150)
+  await expect(allowAttempt('xbox-upstream', 'app')).resolves.toBe(true)
+  expect(countCall()![1]).toEqual(['xbox-upstream', 'app', '60'])
+  recent(151)
+  await expect(allowAttempt('xbox-upstream', 'app')).resolves.toBe(false)
+  expect(query.mock.calls.some(([sql, params]) => String(sql).includes('DELETE FROM signup_attempts WHERE id') && params[0] === 42)).toBe(true)
+})
+
+test('Xbox fails closed when PostgreSQL cannot count or record the shared budget', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  query.mockReset()
+  query.mockRejectedValue(new Error('db down'))
+  await expect(allowAttempt('xbox-upstream', 'app')).resolves.toBe(false)
+  ;(console.error as jest.Mock).mockRestore()
+})
+
 describe('sign-in', () => {
-  test('isLimited only counts, it does not record', async () => {
-    recent(9)
-    await expect(isLimited('login', '1.2.3.4:ivan')).resolves.toBe(false)
-    expect(query).toHaveBeenCalledTimes(1)
-    expect(query.mock.calls[0][1]).toEqual(['login', '1.2.3.4:ivan', '15'])
-  })
-
-  test('ten failures for one address and account in 15 minutes is the limit', async () => {
-    recent(10)
-    await expect(isLimited('login', '1.2.3.4:ivan')).resolves.toBe(true)
-  })
-
   test('one address gets fifty failures across all accounts', async () => {
-    recent(49)
-    await expect(isLimited('login-ip', '1.2.3.4')).resolves.toBe(false)
     recent(50)
-    await expect(isLimited('login-ip', '1.2.3.4')).resolves.toBe(true)
+    expect((await reserveAttempt('login-ip', '1.2.3.4')).allowed).toBe(true)
+    recent(51)
+    expect((await reserveAttempt('login-ip', '1.2.3.4')).allowed).toBe(false)
   })
 
   test('recordAttempt writes one row for the scope and address', async () => {
@@ -104,7 +109,6 @@ describe('sign-in', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {})
     query.mockReset()
     query.mockRejectedValue(new Error('db down'))
-    await expect(isLimited('login', 'x')).resolves.toBe(false)
     await expect(recordAttempt('login', 'x')).resolves.toBeUndefined()
   })
 
@@ -112,5 +116,31 @@ describe('sign-in', () => {
     expect(clientAddress({ 'x-forwarded-for': '9.9.9.9, 10.0.0.1' })).toBe('9.9.9.9')
     expect(clientAddress({ 'x-real-ip': ['8.8.8.8'] })).toBe('8.8.8.8')
     expect(clientAddress({})).toBe('unknown')
+  })
+})
+
+describe('reserveAttempt', () => {
+  test('counts itself before answering, so a burst past the limit is refused', async () => {
+    recent(11)
+    expect((await reserveAttempt('login', 'a')).allowed).toBe(false)
+    recent(10)
+    expect((await reserveAttempt('login', 'a')).allowed).toBe(true)
+  })
+
+  test('takes the attempt back by its own id', async () => {
+    query.mockReset()
+    query.mockImplementation((sql: string) => Promise.resolve(sql.includes('INSERT') ? { rows: [{ id: 42 }] } : { rows: [{ recent: 1 }] }))
+    const attempt = await reserveAttempt('login', 'a')
+    await attempt.release()
+    expect(query).toHaveBeenCalledWith('DELETE FROM signup_attempts WHERE id = $1', [42])
+  })
+
+  test('a database that will not answer does not lock anyone out', async () => {
+    query.mockReset()
+    query.mockRejectedValue(new Error('down'))
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    const attempt = await reserveAttempt('login', 'a')
+    expect(attempt.allowed).toBe(true)
+    await expect(attempt.release()).resolves.toBeUndefined()
   })
 })

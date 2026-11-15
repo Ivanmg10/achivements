@@ -39,13 +39,13 @@ test('opens on General: theme and language, with a tab for each platform', () =>
   expect(screen.getByText(en.userPage.preferences)).toBeInTheDocument()
   expect(screen.getByRole('tab', { name: en.userData.prefsGeneral })).toHaveAttribute('aria-selected', 'true')
   expect(screen.getByText(en.userTheme.name_dark)).toBeInTheDocument()
-  expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual([en.userData.prefsGeneral, 'RetroAchievements', 'Steam', 'PlayStation'])
+  expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual([en.userData.prefsGeneral, 'RA', 'Steam', 'PlayStation'])
   expect(screen.queryByText('Zelda')).not.toBeInTheDocument()
 })
 
 test('each platform tab has its favourite, and the last tab is remembered', () => {
   const { unmount } = render(<UserPreferencesCard />)
-  tab('RetroAchievements')
+  tab('RA')
   expect(screen.getByText('Zelda')).toBeInTheDocument()
   tab('Steam')
   expect(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteSteamGame) })).toHaveTextContent(en.userData.notSet)
@@ -98,7 +98,7 @@ test('saves the Steam favourite under its own platform and refreshes the session
 
 test('saving the RA favourite keeps the RA field', async () => {
   render(<UserPreferencesCard />)
-  tab('RetroAchievements')
+  tab('RA')
   fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteRaGame) }))
   fireEvent.click(await screen.findByTestId('fav-modal'))
   await waitFor(() => expect(update).toHaveBeenCalledWith())
@@ -107,11 +107,20 @@ test('saving the RA favourite keeps the RA field', async () => {
 test('a failed save does not touch the session', async () => {
   ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 })
   render(<UserPreferencesCard />)
-  tab('RetroAchievements')
+  tab('RA')
   fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteRaGame) }))
   fireEvent.click(await screen.findByTestId('fav-modal'))
   await waitFor(() => expect(global.fetch).toHaveBeenCalled())
   expect(update).not.toHaveBeenCalled()
+})
+
+test('reserves the rankings preference row while its value loads', () => {
+  render(<UserPreferencesCard />)
+  const row = screen.getByTestId('rankings-preference-placeholder')
+  expect(row).toHaveClass('invisible')
+  expect(row).toHaveAttribute('aria-hidden', 'true')
+  expect(row).toHaveAttribute('inert')
+  expect(screen.queryByRole('switch', { name: en.rankings.showInRankings })).not.toBeInTheDocument()
 })
 
 test('the public profile switch reads the session, on unless turned off', () => {

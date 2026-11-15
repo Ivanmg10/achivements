@@ -1,4 +1,13 @@
-import { checkEmail, checkPassword, checkUsername } from './authValidation'
+import { checkEmail, checkPassword, checkUsername, isEmail, suggestUsername } from './authValidation'
+
+describe('isEmail', () => {
+  test('takes an ordinary address', () => {
+    expect(isEmail('ana.perez+vault@mail.example.com')).toBe(true)
+  })
+  test.each(['x@<b>hi</b>.example', 'a"b@c.de', "a'b@c.de", 'a&b@c.de', 'a b@c.de', 'a@b', `${'a'.repeat(250)}@c.de`])('refuses %s', (address) => {
+    expect(isEmail(address)).toBe(false)
+  })
+})
 
 describe('checkUsername', () => {
   test('accepts letters, numbers and underscores, 3 to 20 long', () => {
@@ -46,5 +55,14 @@ describe('checkEmail', () => {
     expect(checkEmail('ivan')).toBe('shape')
     expect(checkEmail('ivan@test')).toBe('shape')
     expect(checkEmail('ivan @test.com')).toBe('shape')
+  })
+})
+
+describe('suggestUsername', () => {
+  test('a name from another site as a username, when it can be one', () => {
+    expect(suggestUsername('PalmeraMiami')).toBe('PalmeraMiami')
+    expect(suggestUsername('Gabe Newell')).toBe('Gabe_Newell')
+    expect(suggestUsername('★ab')).toBe('')
+    expect(suggestUsername('a'.repeat(30))).toHaveLength(20)
   })
 })

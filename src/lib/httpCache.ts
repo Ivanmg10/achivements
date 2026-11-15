@@ -10,10 +10,13 @@ import { NextResponse } from 'next/server'
  * that uses this returns data scoped to the requester's own session/cookie,
  * never safe to cache at a shared/CDN layer.
  */
-export function cachedJson<T>(data: T, ttlMs: number): NextResponse {
+export function cachedJson<T>(data: T, ttlMs: number, { sameForEveryone = false }: { sameForEveryone?: boolean } = {}): NextResponse {
   const maxAge = Math.max(0, Math.floor(ttlMs / 1000))
+  // Vary: the refresh button sets a cookie, and its refetch must not be answered from this copy.
+  // But the session cookie is rewritten on every session read, so with it the browser's copy almost
+  // never served (#101). `sameForEveryone`: an answer that depends only on the URL (a game's
+  // definition, its comments), never on who asks and never refreshed by cookie, so it may skip it.
   return NextResponse.json(data, {
-    // Vary: the refresh button sets a cookie, and its refetch must not be answered from this copy.
-    headers: { 'Cache-Control': `private, max-age=${maxAge}`, Vary: 'Cookie' },
+    headers: sameForEveryone ? { 'Cache-Control': `private, max-age=${maxAge}` } : { 'Cache-Control': `private, max-age=${maxAge}`, Vary: 'Cookie' },
   })
 }

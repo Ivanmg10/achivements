@@ -50,6 +50,14 @@ test('a failed game is an error; retry asks again', async () => {
   expect(result.current.error).toBeNull()
 })
 
+test('a game RA does not know is missing, not an error, and is not asked for subsets', async () => {
+  fetchMock.mockImplementation(() => fail(404))
+  const { result } = renderHook(() => useGameInfo('999999'))
+  await waitFor(() => expect(result.current.missing).toBe(true))
+  expect(result.current.error).toBeNull()
+  expect(fetchMock).toHaveBeenCalledTimes(1)
+})
+
 test('failed subsets only cost the tabs, never the page', async () => {
   fetchMock.mockImplementation((url: string) => (url.includes('getGameSubsets') ? fail(500) : json({ ID: 5, Title: 'Zelda' })))
   const { result } = renderHook(() => useGameInfo('5'))

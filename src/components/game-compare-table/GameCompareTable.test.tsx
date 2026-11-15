@@ -33,7 +33,7 @@ describe('alone', () => {
     const first = screen.getAllByRole('listitem')[0]
     expect(first).toHaveAttribute('id', 'ach-a')
     expect(first).toHaveTextContent('Does a')
-    expect(first).toHaveTextContent('10 pts')
+    expect(first).toHaveTextContent('10 points')
     expect(first).toHaveTextContent(en.psn.rarity.replace('{n}', '12.3'))
     expect(first).toHaveTextContent(en.userGame.hardcore)
     expect(screen.getAllByRole('listitem')[1]).toHaveTextContent(en.psn.gold)

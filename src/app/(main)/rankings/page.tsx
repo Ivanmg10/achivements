@@ -18,7 +18,7 @@ export default async function Rankings() {
   if (session) return <RankingsPage signedIn />
 
   return (
-    <PublicShell current="/rankings">
+    <PublicShell current="/rankings" wide>
       <RankingsPage signedIn={false} />
     </PublicShell>
   )

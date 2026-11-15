@@ -1,3 +1,4 @@
+jest.mock('@/lib/raKey', () => ({ sealRaKey: (key: string) => ({ sealed: `sealed:${key}`, hash: `hash:${key}` }), raKeyHash: (key: string) => `hash:${key}` }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/adminAuth', () => ({ requireAdmin: jest.fn(), logAdminAction: jest.fn() }))
 jest.mock('@/lib/raProfile', () => ({ ...jest.requireActual('@/lib/raProfile'), fetchRaProfile: jest.fn() }))
@@ -70,7 +71,7 @@ describe('RetroAchievements', () => {
     const res = await POST(post({ id: 11, platform: 'ra', username: ' bobra ', apiKey: ' key ' }))
     expect(res.status).toBe(200)
     expect(fetchRaProfile).toHaveBeenCalledWith('bobra', 'key')
-    expect(updates()[0][1]).toEqual([JSON.stringify({ User: 'BobRA' }), 'BobRA', 'key', 11])
+    expect(updates()[0][1]).toEqual([JSON.stringify({ User: 'BobRA' }), 'BobRA', 'sealed:key', 'hash:key', 11])
     expect(forgetUser).toHaveBeenCalledWith(11)
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'link-ra', BOB, { rausername: 'BobRA' })
   })
@@ -95,11 +96,6 @@ describe('RetroAchievements', () => {
     expect(logAdminAction).not.toHaveBeenCalled()
   })
 
-  test('unlinking clears the account and logs it', async () => {
-    expect((await DELETE(del('id=11&platform=ra'))).status).toBe(200)
-    expect(updates()[0][0]).toContain('raid = NULL')
-    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-ra', BOB)
-  })
 })
 
 describe('Steam', () => {
@@ -109,7 +105,7 @@ describe('Steam', () => {
     expect(res.status).toBe(200)
     expect(getPlayerSummaries).toHaveBeenCalledWith(STEAM_ID, 'steam-key')
     expect(updates()[0][1]).toEqual([STEAM_ID, 'Bobby', 11])
-    expect(clearUserCache).toHaveBeenCalledWith('11')
+    expect(clearUserCache).not.toHaveBeenCalled()
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'link-steam', BOB, { steamid: STEAM_ID, steamusername: 'Bobby' })
   })
 
@@ -144,12 +140,6 @@ describe('Steam', () => {
     expect((await POST(post({ id: 11, platform: 'steam', steamid: STEAM_ID }))).status).toBe(503)
   })
 
-  test('unlinking clears the account and its cache, and logs it', async () => {
-    expect((await DELETE(del('id=11&platform=steam'))).status).toBe(200)
-    expect(updates()[0][0]).toContain('steamid = NULL')
-    expect(clearUserCache).toHaveBeenCalledWith('11')
-    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-steam', BOB)
-  })
 })
 
 describe('PSN', () => {
@@ -164,7 +154,7 @@ describe('PSN', () => {
     expect(res.status).toBe(200)
     expect(findPsnAccount).toHaveBeenCalledWith('BobPS')
     expect(updates()[0][1]).toEqual(['123', 'BobPS', 11])
-    expect(clearUserCache).toHaveBeenCalledWith('11')
+    expect(clearUserCache).not.toHaveBeenCalled()
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'link-psn', BOB, { psnaccountid: '123', psnusername: 'BobPS' })
   })
 
@@ -190,12 +180,6 @@ describe('PSN', () => {
     expect((await POST(post({ id: 11, platform: 'psn', username: 'BobPS' }))).status).toBe(503)
   })
 
-  test('unlinking clears the account and its cache, and logs it', async () => {
-    expect((await DELETE(del('id=11&platform=psn'))).status).toBe(200)
-    expect(updates()[0][0]).toContain('psnaccountid = NULL')
-    expect(clearUserCache).toHaveBeenCalledWith('11')
-    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-psn', BOB)
-  })
 })
 
 describe('Xbox', () => {
@@ -210,10 +194,11 @@ describe('Xbox', () => {
   test('links an account Xbox knows, as it spells it, and logs it', async () => {
     const res = await POST(post({ id: 11, platform: 'xbox', gamertag: ' testplayer ' }))
     expect(res.status).toBe(200)
+    expect(res.headers.get('X-Request-Id')).toBeTruthy()
     expect(findXboxAccount).toHaveBeenCalledWith('testplayer')
     expect(xboxSummary).toHaveBeenCalledWith(PROFILE.xuid, 'TestPlayer', '11')
     expect(updates()[0][1]).toEqual([PROFILE.xuid, 'TestPlayer', 11])
-    expect(clearUserCache).toHaveBeenCalledWith('11')
+    expect(clearUserCache).not.toHaveBeenCalled()
     expect(forgetUser).toHaveBeenCalledWith(11)
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'link-xbox', BOB, { xboxxuid: PROFILE.xuid, xboxgamertag: 'TestPlayer' })
   })
@@ -244,10 +229,4 @@ describe('Xbox', () => {
     expect(updates()).toHaveLength(0)
   })
 
-  test('unlinking clears the account and its cache, and logs it', async () => {
-    expect((await DELETE(del('id=11&platform=xbox'))).status).toBe(200)
-    expect(updates()[0][0]).toContain('xboxxuid = NULL')
-    expect(clearUserCache).toHaveBeenCalledWith('11')
-    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-xbox', BOB)
-  })
 })

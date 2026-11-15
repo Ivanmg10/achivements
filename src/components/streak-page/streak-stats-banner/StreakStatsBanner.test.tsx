@@ -4,22 +4,28 @@ import StreakStatsBanner from './StreakStatsBanner'
 
 jest.mock('@/context/LanguageContext', () => ({ useLanguage: () => ({ T: jest.requireActual('@/translations/en').en, lang: 'en' }) }))
 
+// The one date format leaves the year out only for this one: the clock is fixed.
+beforeEach(() => jest.useFakeTimers({ now: Date.parse('2026-10-03T12:00:00Z') }))
+afterEach(() => jest.useRealTimers())
+
 const streak = (start: string, end: string, days: number) => ({ start, end, days, achievements: [] })
 
 test('a streak going says how far it is from the record', () => {
-  render(<StreakStatsBanner activeStreak={streak('2026-10-01', '2026-10-03', 3)} bestStreak={streak('2026-05-02', '2026-06-05', 35)} totalStreaks={53} lastActiveDay="2026-10-03" />)
+  render(<StreakStatsBanner activeStreak={streak('2026-10-01', '2026-10-03', 3)} bestStreak={streak('2026-05-02', '2026-06-05', 35)} lastActiveDay="2026-10-03" today="2026-10-03" todayCount={1} hoursLeft={6} />)
   expect(screen.getByText('3 days')).toBeInTheDocument()
-  expect(screen.getByText('33 days more to beat your record')).toBeInTheDocument()
+  expect(screen.getByText(/33 days more to beat your record/)).toBeInTheDocument()
+  expect(screen.getByText(/From Oct 1 to today, without missing a day\. One achievement already today\./)).toBeInTheDocument()
 })
 
 test('matching the record says so', () => {
   const best = streak('2026-09-01', '2026-10-03', 35)
-  render(<StreakStatsBanner activeStreak={best} bestStreak={best} totalStreaks={1} lastActiveDay="2026-10-03" />)
-  expect(screen.getByText(en.streak.newRecord)).toBeInTheDocument()
+  render(<StreakStatsBanner activeStreak={best} bestStreak={best} lastActiveDay="2026-10-03" today="2026-10-03" todayCount={0} hoursLeft={6} />)
+  expect(screen.getByText(new RegExp(en.streak.newRecord))).toBeInTheDocument()
+  expect(screen.getByText(/Nothing yet today: 6 h left/)).toBeInTheDocument()
 })
 
 test('with no streak going, it says when the last achievement was', () => {
-  render(<StreakStatsBanner activeStreak={null} bestStreak={streak('2026-05-02', '2026-06-05', 35)} totalStreaks={53} lastActiveDay="2026-09-26" />)
+  render(<StreakStatsBanner activeStreak={null} bestStreak={streak('2026-05-02', '2026-06-05', 35)} lastActiveDay="2026-09-26" today="2026-10-03" todayCount={0} hoursLeft={6} />)
   expect(screen.getByText(en.streak.noStreak)).toBeInTheDocument()
   expect(screen.getByText(/Last achievement: Saturday, September 26/)).toBeInTheDocument()
 })

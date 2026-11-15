@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, within, fireEvent } from '@testing-library/react'
 import { en } from '@/translations/en'
 import StreakPage from './StreakPage'
 import { useStreakData } from '@/hooks/useStreakData'
@@ -26,9 +26,30 @@ test('with streaks: the record, the bars and the best streak day by day', () => 
   const best = { start: '2026-05-02', end: '2026-05-04', days: 3, achievements: [] }
   ;(useStreakData as jest.Mock).mockReturnValue({ ...base, streaks: [best], bestStreak: best })
   render(<StreakPage />)
-  expect(screen.getAllByText('3 days').length).toBeGreaterThan(0)
+  expect(screen.getAllByText(/^3 (days|d)$/).length).toBeGreaterThan(0)
   expect(screen.getAllByRole('button', { pressed: true }).length).toBeGreaterThan(0)
   expect(screen.getByRole('heading', { name: en.streak.listTitle })).toBeInTheDocument()
+})
+
+test('the streak shown day by day counts as picked in the list; another is picked there and let go the same way', () => {
+  const best = { start: '2026-06-01', end: '2026-06-03', days: 3, achievements: [{ Date: '2026-06-01 10:00:00' }] }
+  const other = { start: '2026-06-08', end: '2026-06-09', days: 2, achievements: [{ Date: '2026-06-08 10:00:00' }] }
+  ;(useStreakData as jest.Mock).mockReturnValue({ ...base, achievements: [...best.achievements, ...other.achievements], streaks: [best, other], bestStreak: best })
+  render(<StreakPage />)
+  const year = screen.getByRole('group', { name: en.streak.yearTitle })
+  const list = screen.getByRole('region', { name: en.streak.chartTitle })
+  const pressed = () => within(list).getByRole('button', { pressed: true })
+  // The best streak is shown, so its row is the coloured one; the year has nothing picked.
+  expect(pressed()).toHaveAccessibleName(/^3 days/)
+  expect(within(year).queryByRole('button', { pressed: true })).toBeNull()
+
+  fireEvent.click(within(list).getByRole('button', { name: /^2 days/ }))
+  expect(pressed()).toHaveAccessibleName(/^2 days/)
+  expect(within(year).getAllByRole('button', { pressed: true }).length).toBeGreaterThan(0)
+
+  fireEvent.click(pressed())
+  expect(pressed()).toHaveAccessibleName(/^3 days/)
+  expect(within(year).queryByRole('button', { pressed: true })).toBeNull()
 })
 
 test('the year at a glance: quick numbers, the year grid and the weekdays', () => {

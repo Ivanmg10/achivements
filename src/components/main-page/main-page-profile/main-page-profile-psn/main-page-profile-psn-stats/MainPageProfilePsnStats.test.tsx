@@ -22,6 +22,6 @@ test('games, play time, platinums and trophies', () => {
 })
 
 test('the play time waits for the list', () => {
-  render(<MainPageProfilePsnStats summary={SUMMARY} library={[]} isLoading />)
-  expect(screen.getByText('—')).toBeInTheDocument()
+  const { container } = render(<MainPageProfilePsnStats summary={SUMMARY} library={[]} isLoading />)
+  expect(container.querySelectorAll('.bg-skeleton')).toHaveLength(1)
 })

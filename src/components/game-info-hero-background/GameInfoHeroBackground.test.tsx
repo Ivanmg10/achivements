@@ -6,7 +6,7 @@ test('blurs the title/in-game screenshot behind the page, hidden from assistive 
   const img = container.querySelector('img')!
   expect(img.getAttribute('src')).toBe('https://retroachievements.org/Images/1.png')
   expect(img.getAttribute('alt')).toBe('')
-  expect(img.style.filter).toBe('blur(16px)')
+  expect(img.style.filter).toBe('blur(48px) saturate(1.3)')
   expect(container.firstElementChild?.getAttribute('aria-hidden')).toBe('true')
 })
 

@@ -5,15 +5,23 @@ import {
   RetroAchievementsGameWithAchievements,
   RetroAchievementsUserProfile,
 } from '@/types/types'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSubject } from '@/context/SubjectContext'
+import { useUserRank } from '@/hooks/useUserRank'
 
 import MainPageProfileActions from '../main-page-profile-actions/MainPageProfileActions'
 import MainPageProfileRaAchievements from './main-page-profile-ra-achievements/MainPageProfileRaAchievements'
 import MainPageProfileRaGame from './main-page-profile-ra-game/MainPageProfileRaGame'
 import MainPageProfileRaStats from './main-page-profile-ra-stats/MainPageProfileRaStats'
 import MainPageProfileGameSkeleton from '../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
+import MainPageProfileCard from '../main-page-profile-card/MainPageProfileCard'
+import { SURFACE } from '@/components/ui/surface'
+import Figure from '@/components/ui/Figure'
+import { raImageUrl } from '@/utils/raAssets'
+import { raPlayRing } from '@/utils/raRatio'
+import Facts from '@/components/ui/Facts'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export default function MainPageProfileRa({
   user,
@@ -31,60 +39,44 @@ export default function MainPageProfileRa({
   /** Only on the signed-in user's own page. */
   onRefresh?: () => void | Promise<void>
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
+  const subject = useSubject()
 
-  const hardcoreRatio =
-    user && (user.TotalTruePoints ?? 0) > 0
-      ? Math.round(((user.TotalTruePoints ?? 0) / (user.TotalPoints || 1)) * 100)
-      : 0
-
-  const ringColor =
-    hardcoreRatio >= 80
-      ? 'ring-yellow-400'
-      : hardcoreRatio >= 50
-        ? 'ring-blue-400'
-        : 'ring-gray-600'
+  const { rank, isLoading: rankLoading } = useUserRank()
 
   const memberYear = user?.MemberSince ? new Date(user.MemberSince).getFullYear() : null
   const hasContribs = user && ((user.ContribCount ?? 0) > 0 || (user.ContribYield ?? 0) > 0)
 
   return (
-    <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
+    <div className="flex flex-col gap-3.5 w-full h-full">
       {user?.User ? (
         <>
-          <MainPageProfileActions
-            href={`https://retroachievements.org/user/${user.User}`}
-            linkLabel={T.profileRa.viewOnRA}
-            ringClass="focus:ring-accent/70"
-            onRefresh={onRefresh}
-          />
-
-          <div className={`flex gap-3 items-center ${onRefresh ? 'pr-36' : 'pr-24'}`}>
-            {user?.UserPic && (
-              <Image
-                src={`https://retroachievements.org${user.UserPic}`}
-                alt={`Avatar of ${user.User}`}
-                width={90}
-                height={90}
-                className={`m-1 rounded-lg ring-2 shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5 ${ringColor}`}
+          <MainPageProfileCard
+            avatarSrc={raImageUrl(user.UserPic) ?? null}
+            avatarFallback={<span className="w-full h-full bg-bg-main" />}
+            ring={raPlayRing(user)}
+            name={user.User}
+            actions={
+              <MainPageProfileActions
+                href={`https://retroachievements.org/user/${user.User}`}
+                linkLabel={T.profileRa.viewOnRA}
+                ringClass="focus:ring-accent/70"
+                onRefresh={onRefresh}
               />
-            )}
-            <div className="flex flex-col gap-1 min-w-0 w-full">
-              <p className="text-xl lg:text-2xl font-bold leading-tight truncate">{user.User}</p>
-              {user.Motto && (
-                <p className="text-xs text-text-secondary italic line-clamp-2">
-                  &ldquo;{user.Motto}&rdquo;
-                </p>
-              )}
-              {memberYear && (
-                <p className="text-xs text-text-secondary">
-                  {T.profileRa.memberSince} {memberYear}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <MainPageProfileRaStats user={user} hardcoreRatio={hardcoreRatio} />
+            }
+            stats={<MainPageProfileRaStats user={user} />}
+          >
+            {user.Motto && <p className="text-[0.8125rem] text-text-secondary italic line-clamp-2">&ldquo;{user.Motto}&rdquo;</p>}
+            {/* The global rank is an account total: it lives on the card, not in the activity row (#128). */}
+            <p className="text-[0.8125rem] text-text-secondary">
+              <Facts
+                items={[
+                  memberYear && `${T.profileRa.memberSince} ${memberYear}`,
+                  rankLoading && !rank ? <Skeleton key="rank" className="inline-block align-middle h-3 w-24" /> : rank?.Rank != null && `${T.userStats.globalRank} #${rank.Rank.toLocaleString(lang)}`,
+                ]}
+              />
+            </p>
+          </MainPageProfileCard>
 
           {gameLoading && !game ? (
             <MainPageProfileGameSkeleton />
@@ -92,36 +84,22 @@ export default function MainPageProfileRa({
             <MainPageProfileRaGame game={game} richPresenceMsg={user?.RichPresenceMsg} />
           ) : null}
 
-          <MainPageProfileRaAchievements achievements={recentAchievements} isLoading={achievementsLoading} />
+          {/* Someone's page lists their latest unlocks itself (#130): the column does not say them a second time. */}
+          {!subject && <MainPageProfileRaAchievements achievements={recentAchievements} isLoading={achievementsLoading} />}
 
           {hasContribs && (
-            <div className="flex flex-col gap-2 bg-bg-main rounded-lg p-3">
-              <p className="text-xs text-text-secondary uppercase tracking-wider">
-                {T.profileRa.contributions}
-              </p>
+            <div className={`${SURFACE} p-5 flex flex-col gap-3`}>
+              <p className="text-[1.0625rem] font-bold">{T.profileRa.contributions}</p>
               <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-1">
-                  <span className="text-lg font-bold text-purple-400">
-                    {(user.ContribCount ?? 0).toLocaleString()}
-                  </span>
-                  <span className="text-xs text-text-secondary">{T.profileRa.achievementsCreated}</span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-lg font-bold text-pink-400">
-                    {(user.ContribYield ?? 0).toLocaleString()}
-                  </span>
-                  <span className="text-xs text-text-secondary">{T.profileRa.pointsContributed}</span>
-                </div>
+                <Figure look="card" label={T.profileRa.achievementsCreated} value={(user.ContribCount ?? 0).toLocaleString(lang)} />
+                <Figure look="card" label={T.profileRa.pointsContributed} value={(user.ContribYield ?? 0).toLocaleString(lang)} />
               </div>
             </div>
           )}
         </>
       ) : (
-        <Link
-          href="/user"
-          className="w-full text-left bg-bg-card p-3 rounded-3xl hover:scale-[1.03] transition-transform duration-200"
-        >
-          {T.profileRa.signIn}
+        <Link href="/user" className={`${SURFACE} p-5 font-semibold hover:ring-accent/50 transition-shadow`}>
+          {T.profileRa.connect}
         </Link>
       )}
     </div>

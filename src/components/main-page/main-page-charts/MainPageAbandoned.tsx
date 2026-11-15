@@ -1,12 +1,11 @@
 'use client'
 
-import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
+import { useMemo, useState } from 'react'
 import { IconMoodEmpty } from '@tabler/icons-react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
 import type { XboxGameProgress } from '@/types/xbox'
-import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { classifySteamGame } from '@/utils/steamFeed'
@@ -16,11 +15,16 @@ import { gameHref } from '@/utils/gameRef'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
-import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useRetryingRead } from '@/hooks/useRetryingRead'
 import { useSubject } from '@/context/SubjectContext'
+import { parseUnlockTime } from '@/utils/dates'
+import { raImageUrl } from '@/utils/raAssets'
+import Kicker from '@/components/ui/Kicker'
 
 const ABANDONED_DAYS = 30
 const DAY_MS = 1000 * 60 * 60 * 24
+const NO_DATES: Record<number, string> = {}
+const asDates = (data: unknown) => (data && typeof data === 'object' ? (data as Record<number, string>) : null)
 
 type Row = { key: string; href: string; imageUrl?: string; title: string; subtitle: string; daysAgo: number; pct: number }
 
@@ -46,7 +50,7 @@ export default function MainPageAbandoned({
   isLoading?: boolean
   now?: number
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   // Read once, when the page opens: render has to give the same answer every time.
   const [mountedAt] = useState(Date.now)
@@ -57,10 +61,6 @@ export default function MainPageAbandoned({
   // inactive games that fell out of RA's most-recently-played window) still
   // need the dedicated /api/getGamesLastPlayed lookup.
   const { games: recentlyPlayed, isLoading: recentlyPlayedLoading } = useRecentlyPlayedGames()
-  const [lastAchDates, setLastAchDates] = useState<Record<number, string>>({})
-  const [fetchedKey, setFetchedKey] = useState('')
-  const attemptRef = useRef(0)
-  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const lastPlayedMap = useMemo(
     () => new Map(recentlyPlayed.map((g) => [g.GameID, g.LastPlayed])),
@@ -73,52 +73,19 @@ export default function MainPageAbandoned({
     [playing, lastPlayedMap]
   )
 
-  const doFetch = useCallback((key: string) => {
-    // Named, so a retry can call it again.
-    const run = (key: string) => {
-      if (!key) return
-      fetchWithRetry(`/api/getGamesLastPlayed?gameIds=${key}`)
-        .then((data) => {
-          if (typeof data === 'object' && data) {
-            setLastAchDates(data as Record<number, string>)
-            setFetchedKey(key)
-            attemptRef.current = 0
-          }
-        })
-        .catch((err) => {
-          // Giving up just leaves out the RA games with no known date; the rest still show.
-          if (!scheduleRetry(attemptRef, retryTimer, () => run(key), err)) setFetchedKey(key)
-        })
-    }
-    run(key)
-  }, [])
-
-  // A new set of games to look up starts over; state, so while rendering. The lookup is the effect.
-  useWhenChanged([missingIdsKey, recentlyPlayedLoading], () => {
-    if (recentlyPlayedLoading) return
-    if (!missingIdsKey) setLastAchDates({})
-    setFetchedKey('')
-  })
-
-  useEffect(() => {
-    if (recentlyPlayedLoading) return
-    clearTimeout(retryTimer.current)
-    attemptRef.current = 0
-    if (!missingIdsKey) return
-    doFetch(missingIdsKey)
-  }, [missingIdsKey, recentlyPlayedLoading, doFetch])
-
-  useEffect(() => () => clearTimeout(retryTimer.current), [])
+  // Giving up just leaves out the RA games with no known date; the rest still show.
+  const dates = useRetryingRead(recentlyPlayedLoading || !missingIdsKey ? null : `/api/getGamesLastPlayed?gameIds=${missingIdsKey}`, { parse: asDates })
+  const lastAchDates = dates.data ?? NO_DATES
 
   const abandoned = useMemo(() => {
     const ra: Row[] = playing.flatMap((g) => {
       const dateStr = lastPlayedMap.get(g.GameID) ?? lastAchDates[g.GameID]
       if (!dateStr) return []
-      const daysAgo = Math.floor((now - new Date(dateStr.replace(' ', 'T')).getTime()) / DAY_MS)
+      const daysAgo = Math.floor((now - parseUnlockTime(dateStr)) / DAY_MS)
       return [{
         key: `ra:${g.GameID}`,
         href: gameHref('ra', g.GameID, subject),
-        imageUrl: g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : undefined,
+        imageUrl: raImageUrl(g.ImageIcon),
         title: g.Title,
         subtitle: g.ConsoleName,
         daysAgo,
@@ -161,17 +128,17 @@ export default function MainPageAbandoned({
     return [...ra, ...steam, ...psn, ...xbox].filter((g) => g.daysAgo >= ABANDONED_DAYS).sort((a, b) => b.daysAgo - a.daysAgo)
   }, [playing, steamGames, psnGames, xboxGames, lastPlayedMap, lastAchDates, now, subject])
 
-  const datesNotReady = recentlyPlayedLoading || (missingIdsKey !== '' && fetchedKey !== missingIdsKey)
+  const datesNotReady = recentlyPlayedLoading || dates.isLoading
   const loading = isLoading || datesNotReady
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">
+      <Kicker>
         {T.cards.abandoned} — {ABANDONED_DAYS}{T.cards.abandonedIdle}
-      </p>
+      </Kicker>
 
       {loading ? (
-        <SkeletonGameList count={3} />
+        <SkeletonGameList count={7} />
       ) : abandoned.length === 0 ? (
         <EmptyState
           icon={<IconMoodEmpty className="w-6 h-6" />}
@@ -181,7 +148,7 @@ export default function MainPageAbandoned({
           className="py-2"
         />
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 enter-rows">
           {abandoned.slice(0, 6).map((g) => (
             <GameListRow
               key={g.key}
@@ -189,9 +156,9 @@ export default function MainPageAbandoned({
               imageUrl={g.imageUrl}
               title={g.title}
               subtitle={g.subtitle}
-              stat={`${g.daysAgo}d`}
+              stat={T.rankings.daysShort.replace('{n}', g.daysAgo.toLocaleString(lang))}
               statLabel={`${g.pct}%`}
-              statClassName="text-orange-400"
+              statClassName="text-warning"
               progress={g.pct}
             />
           ))}

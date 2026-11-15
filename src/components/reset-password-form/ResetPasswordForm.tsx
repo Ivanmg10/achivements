@@ -2,27 +2,35 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { IconArrowRight, IconLock } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
-import Spinner from '@/components/main-spinner/Spinner'
+import AuthTitle from '@/components/auth-title/AuthTitle'
 import { useLanguage } from '@/context/LanguageContext'
 import { checkPassword, PASSWORD_MIN } from '@/utils/authValidation'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
+
+// Downloaded the first time it is opened, not with the page.
+const ForgotPasswordModal = dynamic(() => import('@/components/forgot-password-modal/ForgotPasswordModal'), { loading: () => null })
 
 /**
  * The page the reset link opens: a new password, typed twice, plus the token
  * from the link. The token is checked on the server, so a stale or spent link
- * is only found out on submit — which is what it says then.
+ * is only found out on submit. Then (or with no token at all) the form gives way to
+ * what to do next: ask for another link, which opens the sign-in's own "forgot your password".
  */
-export default function ResetPasswordForm() {
+export default function ResetPasswordForm({ token }: { token: string }) {
   const { T } = useLanguage()
-  const token = useSearchParams().get('token') ?? ''
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [fieldErrors, setFieldErrors] = useState<{ password?: string; confirm?: string }>({})
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
+  const [expired, setExpired] = useState(false)
+  const [askOpen, setAskOpen] = useState(false)
 
   const passwordRule = T.registerForm.passwordRule.replace('{min}', String(PASSWORD_MIN))
 
@@ -48,34 +56,31 @@ export default function ResetPasswordForm() {
       const data = await res.json().catch(() => ({}))
 
       if (res.ok) setDone(true)
-      else setError(data.error === 'invalid-token' ? T.passwordReset.invalidToken : T.registerForm.errorCreating)
+      else if (data.error === 'invalid-token') setExpired(true)
+      else setError(T.passwordReset.saveFailed)
     } catch {
-      setError(T.registerForm.errorCreating)
+      setError(T.passwordReset.saveFailed)
     }
     setSubmitting(false)
   }
 
   return (
     <div className="w-full max-w-sm mx-auto">
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-text-main">{T.passwordReset.title}</h1>
-        <div className="mt-2 h-0.5 w-10 bg-accent mx-auto rounded-full" />
-      </div>
+      <AuthTitle>{T.passwordReset.title}</AuthTitle>
 
-      {!token ? (
-        <p role="alert" className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3 text-sm text-danger">
-          {T.passwordReset.missingToken}
-        </p>
+      {!token || expired ? (
+        <div className="flex flex-col gap-3 mb-5">
+          <Notice tone="danger">{token ? T.passwordReset.invalidToken : T.passwordReset.missingToken}</Notice>
+          <Button size="lg" className="w-full" onClick={() => setAskOpen(true)}>
+            {T.passwordReset.askAgain}
+          </Button>
+        </div>
       ) : done ? (
-        <p role="status" className="mb-5 bg-success/20 border border-success/40 rounded-xl p-3 text-sm text-success">
-          {T.passwordReset.done}
-        </p>
+        <Notice tone="success" className="mb-5">{T.passwordReset.done}</Notice>
       ) : (
         <>
           {error && (
-            <p role="alert" className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3 text-sm text-danger">
-              {error}
-            </p>
+            <Notice tone="danger" className="mb-5">{error}</Notice>
           )}
 
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
@@ -110,31 +115,30 @@ export default function ResetPasswordForm() {
               disabled={submitting}
             />
 
-            <button
+            <Button
               type="submit"
-              disabled={submitting}
-              className="bg-accent text-bg-main w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              loading={submitting}
+              size="lg" className="w-full mt-2"
             >
-              {submitting ? (
-                <>
-                  <Spinner size={16} />
-                  {T.passwordReset.saving}
-                </>
-              ) : (
+              {submitting ? (T.passwordReset.saving) : (
                 <>
                   {T.passwordReset.save}
                   <IconArrowRight size={16} aria-hidden="true" />
                 </>
               )}
-            </button>
+            </Button>
           </form>
         </>
       )}
 
+      <LazyWhenOpened open={askOpen}>
+        <ForgotPasswordModal isOpen={askOpen} onClose={() => setAskOpen(false)} />
+      </LazyWhenOpened>
+
       <p className="text-center mt-5">
         <Link
           href="/authPage"
-          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors text-sm rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors text-sm rounded focus-ring"
         >
           {T.passwordReset.backToSignIn}
         </Link>

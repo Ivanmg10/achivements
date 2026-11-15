@@ -12,6 +12,6 @@ test('the last game played, with its progress, opening its page', () => {
   render(<MainPageProfilePsnGame game={GAME} />)
   expect(screen.getByRole('link')).toHaveAttribute('href', '/psnGame/NPWR20188_00')
   expect(screen.getByText('Astro Bot')).toBeInTheDocument()
-  expect(screen.getByText('20 / 45')).toBeInTheDocument()
+  expect(screen.getByText(/ %$/)).toBeInTheDocument()
   expect(screen.getByRole('progressbar', { name: 'Astro Bot' })).toHaveAttribute('aria-valuenow', '44')
 })

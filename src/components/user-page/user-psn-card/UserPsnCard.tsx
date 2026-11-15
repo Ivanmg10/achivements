@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { usePsnLink } from '@/hooks/usePsnLink'
 import { usePsnSummary } from '@/hooks/usePsnSummary'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
@@ -8,48 +7,37 @@ import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import { countTrophies, totalPlaytime } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
-import UserPlatformCard, {
-  DISCONNECT_CLASS,
-  PlatformStat,
-} from '@/components/user-page/user-platform-card/UserPlatformCard'
-import UserPsnCardForm from '@/components/user-page/user-psn-card/user-psn-card-form/UserPsnCardForm'
+import UserPlatformCard, { platformStat, PlatformStat } from '@/components/user-page/user-platform-card/UserPlatformCard'
+import UserPlatformLinkForm from '@/components/user-page/user-platform-link-form/UserPlatformLinkForm'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import PsnVerificationTag from '@/components/user-page/user-psn-card/psn-verification-tag/PsnVerificationTag'
+import PsnVerificationButton from '@/components/user-page/user-psn-card/psn-verification-button/PsnVerificationButton'
 
 /**
  * PlayStation Network on the account page. Linked by typing an online ID —
  * nothing proves it is yours, it only has to exist and show its trophies.
+ * Its points count in Vault Points once a code in its About Me proves it (PsnVerification, #176).
  */
 export default function UserPsnCard() {
   const { T, lang } = useLanguage()
-  const { accountId, username, isLinked, link, isLinking, error: linkError, unlink, isUnlinking } = usePsnLink()
+  const { accountId, username, isLinked, link, isLinking, error: linkError, unlink } = usePsnLink()
   const { summary, isLoading, error: summaryError } = usePsnSummary()
   const { library, libraryLoading } = usePsnGamesData()
   const minutes = totalPlaytime(library)
   const onlineId = summary?.onlineId || username
 
-  const value = (n: number | undefined) => (isLoading || n === undefined ? '—' : n.toLocaleString())
   const earned = summary?.earned
+  const summaryOpts = { lang, loading: isLoading }
   const stats: PlatformStat[] = [
-    { label: T.psn.level, value: value(summary?.trophyLevel) },
-    { label: T.userStats.games, value: value(summary?.games) },
-    { label: T.psn.platinum, value: value(earned?.platinum), accent: 'text-sky-300' },
-    {
-      label: T.steam.playtime,
-      value: libraryLoading ? '—' : formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang),
-    },
-    {
-      label: T.psn.trophies,
-      value: value(earned ? countTrophies(earned) : undefined),
-    },
+    platformStat(T.psn.level, summary?.trophyLevel, summaryOpts),
+    platformStat(T.userStats.games, summary?.games, summaryOpts),
+    platformStat(T.psn.platinum, earned?.platinum, { ...summaryOpts, tone: 'platinum' }),
+    platformStat(T.steam.playtime, formatPlaytime(minutes, T.steam, lang), { lang, loading: libraryLoading }),
+    platformStat(T.psn.trophies, earned ? countTrophies(earned) : undefined, summaryOpts),
   ]
 
   const handleLink = async (name: string) => {
     if (await link(name)) notify.success(T.toast.psnLinked)
-  }
-
-  const handleUnlink = async () => {
-    if (await unlink()) notify.success(T.toast.psnUnlinked)
-    else notify.error(T.toast.unlinkFailed)
   }
 
   return (
@@ -57,48 +45,42 @@ export default function UserPsnCard() {
       name="PlayStation Network"
       source="psn"
       href={onlineId ? `https://profile.playstation.com/${encodeURIComponent(onlineId)}` : undefined}
-      logo={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />}
-      bigLogo={<PlaystationLogo size={40} className="text-[#0070d1]" aria-hidden="true" />}
-      gradient="from-[#0070d1] via-[#0070d1]/40 to-[#003791]"
+      logo={<PlaystationLogo size={18} className="text-psn" aria-hidden="true" />}
+      bigLogo={<PlaystationLogo size={40} className="text-psn" aria-hidden="true" />}
+      gradient="from-psn via-psn/40 to-psn-dark"
       connected={isLinked}
       hint={T.psn.connectHint}
       status={
         isLinked &&
         summaryError && (
-          <p role="alert" className="text-xs text-red-400">
+          <p role="alert" className="text-xs text-danger">
             {T.psn.errors[summaryError]}
           </p>
         )
       }
-      identity={
-        <div className="flex items-center gap-3 min-w-0">
-          {summary?.avatarUrl ? (
-            <Image
-              src={summary.avatarUrl}
-              alt=""
-              width={44}
-              height={44}
-              className="rounded-lg w-11 h-11 object-cover shrink-0"
-              unoptimized
-            />
-          ) : (
-            <PlaystationLogo size={40} className="shrink-0 text-text-secondary" aria-hidden="true" />
-          )}
-          <div className="flex flex-col gap-0.5 min-w-0">
-            <span className="font-bold truncate">{summary?.onlineId || username || '—'}</span>
-            <span className="text-xs text-text-secondary font-mono truncate">{accountId}</span>
-          </div>
-        </div>
-      }
+      identity={{
+        avatar: summary?.avatarUrl,
+        fallback: <PlaystationLogo size={40} className="shrink-0 text-text-secondary" aria-hidden="true" />,
+        name: onlineId || '—',
+        id: accountId,
+      }}
+      badge={<PsnVerificationTag />}
+      extraAction={<PsnVerificationButton onlineId={onlineId} />}
       stats={isLinked ? stats : []}
+      disconnect={{ label: T.psn.disconnect, busyLabel: T.psn.disconnecting, run: unlink, done: T.toast.psnUnlinked }}
       action={
-        isLinked ? (
-          <button onClick={handleUnlink} disabled={isUnlinking} className={DISCONNECT_CLASS}>
-            {isUnlinking ? T.psn.disconnecting : T.psn.disconnect}
-          </button>
-        ) : (
-          <UserPsnCardForm onSubmit={handleLink} isLinking={isLinking} error={linkError} />
-        )
+        <UserPlatformLinkForm
+          id="psn-online-id"
+          label={T.psn.usernameLabel}
+          placeholder={T.psn.usernamePlaceholder}
+          maxLength={16}
+          logo={<PlaystationLogo size={16} aria-hidden="true" />}
+          connect={T.psn.connect}
+          connecting={T.psn.connecting}
+          onSubmit={handleLink}
+          isLinking={isLinking}
+          error={linkError && T.psn.errors[linkError]}
+        />
       }
     />
   )

@@ -5,7 +5,6 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useCheevoUser } from '@/hooks/useCheevoUser'
 import { useViewerGameList } from '@/hooks/useViewerGameList'
 import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
-import type { GameSource } from '@/types/steam'
 import SubjectProviders from '@/components/subject-providers/SubjectProviders'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
 import PublicUserError from '@/components/public-user-page/public-user-error/PublicUserError'
@@ -15,6 +14,7 @@ import UserGamePageRa from './user-game-page-ra/UserGamePageRa'
 import UserGamePageSteam from './user-game-page-steam/UserGamePageSteam'
 import UserGamePagePsn from './user-game-page-psn/UserGamePagePsn'
 import UserGamePageXbox from './user-game-page-xbox/UserGamePageXbox'
+import type { GameSource } from '@/types/game'
 
 const BODIES = { ra: UserGamePageRa, steam: UserGamePageSteam, psn: UserGamePagePsn, xbox: UserGamePageXbox }
 

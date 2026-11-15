@@ -27,7 +27,7 @@ export default function ShowcaseToggleButton({ entry, size = 18 }: { entry: Show
       aria-pressed={Boolean(item)}
       aria-label={item ? T.showcase.remove : T.showcase.add}
       title={item ? T.showcase.remove : T.showcase.add}
-      className={`shrink-0 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+      className={`shrink-0 rounded transition-colors focus-ring ${
         item ? 'text-accent hover:text-accent/80' : 'text-text-secondary hover:text-accent'
       }`}
     >

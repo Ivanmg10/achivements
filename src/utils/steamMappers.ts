@@ -1,4 +1,4 @@
-import { gameIconUrl, gameLogoUrl } from '@/lib/steamClient'
+import { gameIconUrl, gameLogoUrl } from '@/lib/steamAssets'
 import type { RecentAchievement } from '@/types/types'
 import type {
   SteamOwnedGame,
@@ -29,16 +29,35 @@ export function unixToIso(seconds?: number): string | null {
   return new Date(seconds * 1000).toISOString()
 }
 
+/** Steam's `playtime_2weeks` window. */
+export const TWO_WEEKS_S = 14 * 86_400
+
+/**
+ * When a game was last played, in unix seconds, 0 when unknown. Steam's own
+ * date when it sends one, which it does only for the API key's owner (#113);
+ * for everyone else the latest of what we know: the last kept unlock or
+ * observed rise in hours (`last_played_at`), and minutes in the last two
+ * weeks, which say "within 14 days" with no time, so they count as the start
+ * of that window: never later than the truth.
+ */
+export function lastPlayedOf(game: SteamOwnedGame, now = Date.now()): number {
+  if (game.rtime_last_played) return game.rtime_last_played
+  const recent = (game.playtime_2weeks ?? 0) > 0 ? Math.floor(now / 1000) - TWO_WEEKS_S : 0
+  return Math.max(game.last_played_at ?? 0, recent)
+}
+
 /**
  * The `limit` games played last, newest first, from the owned list. Steam's
  * "recently played" call only covers two weeks (empty for someone who stopped
- * months ago); the owned list dates every game. Never-played games are left out.
+ * months ago). Games with no known date are left out.
  */
-export function lastPlayedGames(games: SteamOwnedGame[], limit: number): SteamOwnedGame[] {
+export function lastPlayedGames(games: SteamOwnedGame[], limit: number, now = Date.now()): SteamOwnedGame[] {
   return games
-    .filter((g) => (g.rtime_last_played ?? 0) > 0)
-    .sort((a, b) => (b.rtime_last_played ?? 0) - (a.rtime_last_played ?? 0))
+    .map((game) => ({ game, at: lastPlayedOf(game, now) }))
+    .filter((g) => g.at > 0)
+    .sort((a, b) => b.at - a.at)
     .slice(0, limit)
+    .map((g) => g.game)
 }
 
 /**
@@ -56,28 +75,12 @@ export function toSteamGameProgress(game: SteamOwnedGame): SteamGameProgress {
     maxPossible: 0,
     numAwarded: 0,
     pctWon: 0,
-    lastPlayed: unixToIso(game.rtime_last_played),
+    lastPlayed: unixToIso(lastPlayedOf(game)),
     playtimeForever: game.playtime_forever ?? 0,
     playtime2Weeks: game.playtime_2weeks ?? 0,
     imgLogoUrl: gameLogoUrl(game.appid, game.img_logo_url),
     hasStats: game.has_community_visible_stats === true,
     achievementsLoaded: false,
-  }
-}
-
-/** Applies counts from a loaded achievement list onto a game. */
-export function withAchievementCounts(
-  game: SteamGameProgress,
-  achievements: SteamAchievementUnified[],
-): SteamGameProgress {
-  const maxPossible = achievements.length
-  const numAwarded = achievements.filter((a) => a.earned).length
-  return {
-    ...game,
-    maxPossible,
-    numAwarded,
-    pctWon: maxPossible === 0 ? 0 : Math.round((numAwarded / maxPossible) * 10000) / 100,
-    achievementsLoaded: true,
   }
 }
 

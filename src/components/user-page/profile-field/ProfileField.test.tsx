@@ -24,6 +24,12 @@ test('children replace the plain value', () => {
   expect(screen.getByText('dark')).toBeInTheDocument()
 })
 
+test('a value given as children is part of the name, never "Theme: —" (V4-01)', () => {
+  render(<ProfileField label="Theme" onEdit={jest.fn()}><span>Venom</span></ProfileField>)
+  const button = screen.getByRole('button', { name: /Venom/ })
+  expect(button).toHaveAccessibleName('Theme Venom')
+})
+
 test('an icon sits before the label, hidden from assistive tech', () => {
   render(<ProfileField label="Theme" value="Dark" icon={<svg data-testid="icon" />} onEdit={() => {}} />)
   expect(screen.getByTestId('icon').closest('[aria-hidden="true"]')).not.toBeNull()

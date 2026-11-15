@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import SteamRarestAchievements from './SteamRarestAchievements'
 import { en } from '@/translations/en'
+import { SubjectContext } from '@/context/SubjectContext'
 import type { SteamAchievementUnified } from '@/types/steam'
 
 function ach(apiname: string, overrides: Partial<SteamAchievementUnified> = {}): SteamAchievementUnified {
@@ -39,6 +40,15 @@ test('lists earned achievements rarest first, capped at four', () => {
 test('each links to that achievement on the game page', () => {
   render(<SteamRarestAchievements appId={620} achievements={[ach('RARE', { globalPct: 1 })]} isLoading={false} />)
   expect(screen.getByRole('link').getAttribute('href')).toBe('/steamGame/620#ach-RARE')
+})
+
+test("on someone's profile each link stays on that person's game (D1-10)", () => {
+  render(
+    <SubjectContext.Provider value="ana">
+      <SteamRarestAchievements appId={620} achievements={[ach('RARE', { globalPct: 1 })]} isLoading={false} />
+    </SubjectContext.Provider>,
+  )
+  expect(screen.getByRole('link').getAttribute('href')).toBe('/user/ana/steam/620#ach-RARE')
 })
 
 test('is headed like the RA side panel it replaces', () => {

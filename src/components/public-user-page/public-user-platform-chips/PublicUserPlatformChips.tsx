@@ -8,15 +8,17 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
+import Tag from '@/components/ui/Tag'
 
 const CHIP = 'flex items-center gap-1.5 rounded-full bg-bg-main/80 ring-1 ring-ink/[0.06] px-2.5 py-1 text-xs font-medium min-w-0'
 
-function Chip({ icon, name, href, opens }: { icon: ReactNode; name: string; href?: string; opens: string }) {
+function Chip({ icon, name, href, opens, badge }: { icon: ReactNode; name: string; href?: string; opens: string; badge?: ReactNode }) {
   if (!href) {
     return (
       <li className={CHIP}>
         {icon}
         <span className="truncate">{name}</span>
+        {badge}
       </li>
     )
   }
@@ -27,7 +29,7 @@ function Chip({ icon, name, href, opens }: { icon: ReactNode; name: string; href
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`${name} — ${opens}`}
-        className={`${CHIP} hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+        className={`${CHIP} hover:bg-ink/10 transition-colors focus-ring`}
       >
         {icon}
         <span className="truncate">{name}</span>
@@ -39,7 +41,8 @@ function Chip({ icon, name, href, opens }: { icon: ReactNode; name: string; href
 
 /**
  * The accounts a user has linked, each with their name on it. RA's opens
- * their RA profile; Steam and PSN are named only — their ids stay with us.
+ * their RA profile; Steam and PSN are named only — their ids stay with us. A PSN
+ * account proven theirs (a code in its About Me, #176) says so, in words.
  */
 export default function PublicUserPlatformChips({ user }: { user: CheevoUser }) {
   const { T } = useLanguage()
@@ -56,13 +59,18 @@ export default function PublicUserPlatformChips({ user }: { user: CheevoUser }) 
         />
       )}
       {user.steam && (
-        <Chip icon={<SteamLogo size={13} className="text-[#66c0f4] shrink-0" aria-hidden="true" />} name={user.steamName || 'Steam'} opens="" />
+        <Chip icon={<SteamLogo size={13} className="text-steam shrink-0" aria-hidden="true" />} name={user.steamName || 'Steam'} opens="" />
       )}
       {user.psn && (
-        <Chip icon={<PlaystationLogo size={13} className="text-[#0070d1] shrink-0" aria-hidden="true" />} name={user.psnName || 'PlayStation'} opens="" />
+        <Chip
+          icon={<PlaystationLogo size={13} className="text-psn shrink-0" aria-hidden="true" />}
+          name={user.psnName || 'PlayStation'}
+          opens=""
+          badge={user.psnVerified && <Tag tone="success" size="xs" title={T.psn.verification.publicVerified}>{T.psn.verification.verified}</Tag>}
+        />
       )}
       {user.xbox && (
-        <Chip icon={<XboxLogo size={13} className="text-[#107c10] shrink-0" aria-hidden="true" />} name={user.xboxName || 'Xbox'} opens="" />
+        <Chip icon={<XboxLogo size={13} className="text-xbox shrink-0" aria-hidden="true" />} name={user.xboxName || 'Xbox'} opens="" />
       )}
     </ul>
   )

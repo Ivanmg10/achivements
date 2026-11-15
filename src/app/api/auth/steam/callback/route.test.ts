@@ -7,10 +7,13 @@ jest.mock('@/lib/apiAuth', () => ({ requireSession: jest.fn() }))
 jest.mock('@/lib/steamClient', () => ({ getPlayerSummaries: jest.fn() }))
 jest.mock('@/lib/scoreRefresh', () => ({ onPlatformLinked: jest.fn() }))
 jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))
+jest.mock('@/lib/steamLinkNotice', () => ({ sendSteamLinkNotice: jest.fn() }))
 
 import { GET } from './route'
 import { NextRequest } from 'next/server'
 import pool from '@/lib/db'
+import { after } from 'next/server'
+import { sendSteamLinkNotice } from '@/lib/steamLinkNotice'
 import { requireSession } from '@/lib/apiAuth'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
@@ -42,6 +45,13 @@ beforeEach(() => {
 
 afterEach(() => { (console.error as jest.Mock).mockRestore() })
 
+test('linking tells the account\'s address', async () => {
+  ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ username: 'ana', email: 'ana@test.com' }] })
+  await GET(callback({ intent: 'link', state: 's2', next: '/user' }))
+  await Promise.all((after as unknown as { pending: Promise<unknown>[] }).pending)
+  expect(sendSteamLinkNotice).toHaveBeenCalledWith({ to: 'ana@test.com', username: 'ana', linked: true })
+})
+
 describe('signing in', () => {
   const back = { intent: 'signin', state: 's1' }
 
@@ -53,6 +63,11 @@ describe('signing in', () => {
     expect(readTicket(ticketFromCookieHeader(cookie.split(';')[0]))).toBe(ID)
     expect(cookie).toContain('Path=/api/auth; HttpOnly; SameSite=Lax')
     expect(cookie).toContain('Secure')
+  })
+
+  test('the state is spent with the answer, so the same link cannot be used twice', async () => {
+    const res = await GET(callback(back))
+    expect(res.headers.get('Set-Cookie')).toContain('steam-state=; Path=/api/auth/steam/callback; HttpOnly; SameSite=Lax; Max-Age=0')
   })
 
   test('an answer Steam does not confirm sets no cookie', async () => {

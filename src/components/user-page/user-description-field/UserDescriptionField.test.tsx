@@ -29,5 +29,5 @@ test('a failed save shows the error inline', async () => {
   render(<UserDescriptionField />)
   fireEvent.change(screen.getByLabelText(en.userData.description), { target: { value: 'x' } })
   fireEvent.click(screen.getByRole('button', { name: en.editProfileModal.save }))
-  expect(await screen.findByRole('alert')).toHaveTextContent('Nope')
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.editProfileModal.errorGeneric)
 })

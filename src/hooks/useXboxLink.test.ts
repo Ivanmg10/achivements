@@ -96,7 +96,6 @@ test('unlinks and reports whether it worked', async () => {
   await act(async () => {
     expect(await result.current.unlink()).toBe(false)
   })
-  expect(result.current.isUnlinking).toBe(false)
 })
 
 test('an unlink the session still shows linked is a failure', async () => {

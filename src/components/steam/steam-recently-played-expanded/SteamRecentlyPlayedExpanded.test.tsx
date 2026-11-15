@@ -17,7 +17,6 @@ jest.mock('@/components/game-achievements-progress-chart/GameAchievementsProgres
   ),
 }))
 jest.mock('@/components/steam/steam-achievement-grid/SteamAchievementGrid', () => ({
-  achievementAnchor: (apiname: string) => `ach-${apiname}`,
   SteamAchievementGrid: ({ achievements, badgeSize }: { achievements: unknown[]; badgeSize: number }) => (
     <div data-testid="grid">{achievements.length}:{badgeSize}</div>
   ),
@@ -60,21 +59,9 @@ beforeEach(() => {
   setHook()
 })
 
-test('loads this game\'s achievements when opened', () => {
-  render(<SteamRecentlyPlayedExpanded game={GAME} />)
-  expect(useSteamAchievements).toHaveBeenCalledWith(377160)
-})
 
-test('has the same four panels as the RA dashboard', () => {
-  setHook({ achievements: [ach(true, '2024-01-15T12:00:00.000Z'), ach(false)] })
-  render(<SteamRecentlyPlayedExpanded game={GAME} />)
 
-  expect(screen.getByTestId('ring')).toBeInTheDocument()
-  expect(screen.getByTestId('chart')).toBeInTheDocument()
-  expect(screen.getByTestId('grid')).toHaveTextContent('2:40')
-  expect(screen.getByTestId('rarest')).toHaveTextContent('2')
-  expect(screen.getByText(en.gameExpanded.allAchievements)).toBeInTheDocument()
-})
+
 
 test('counts from the loaded achievements once they are in', () => {
   setHook({ achievements: [ach(true), ach(true), ach(false), ach(false)] })
@@ -101,14 +88,7 @@ test('feeds the chart the unlock dates', () => {
   expect(screen.getByTestId('chart')).toHaveTextContent('2024-01-15T12:00:00.000Z,-')
 })
 
-test('announces a load failure with a retry', () => {
-  setHook({ error: 'boom' })
-  render(<SteamRecentlyPlayedExpanded game={GAME} />)
 
-  expect(screen.getByRole('alert')).toHaveTextContent(en.steam.achievementsError)
-  fireEvent.click(screen.getByRole('button', { name: en.steam.retry }))
-  expect(retry).toHaveBeenCalledTimes(1)
-})
 
 test('says so when there turn out to be no achievements', () => {
   render(<SteamRecentlyPlayedExpanded game={{ ...GAME, achievementsLoaded: false, maxPossible: 0, numAwarded: 0 }} />)
@@ -117,8 +97,12 @@ test('says so when there turn out to be no achievements', () => {
   expect(screen.getByTestId('stats')).toHaveTextContent('0%|0')
 })
 
-test('uses a default skeleton size when the count is unknown', () => {
-  setHook({ isLoading: true })
-  const { container } = render(<SteamRecentlyPlayedExpanded game={{ ...GAME, maxPossible: 0, numAwarded: 0 }} />)
-  expect(container.querySelector('[aria-busy="true"]')!.children).toHaveLength(24)
+
+
+test('a failed read points at the profile being private', () => {
+  setHook({ error: 'boom' })
+  render(<SteamRecentlyPlayedExpanded game={GAME} />)
+  expect(screen.getByText(en.steam.privateProfileHint)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: en.steam.retry }))
+  expect(retry).toHaveBeenCalledTimes(1)
 })

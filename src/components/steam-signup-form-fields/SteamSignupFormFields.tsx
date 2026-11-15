@@ -8,7 +8,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { SteamSignupProfile } from '@/hooks/useSteamSignup'
 import { checkEmail, checkUsername, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
-import Spinner from '@/components/main-spinner/Spinner'
+import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
 
 /** The Steam account Steam confirmed, and the username and email it still needs. */
 export default function SteamSignupFormFields({
@@ -46,9 +47,9 @@ export default function SteamSignupFormFields({
 
   return (
     <>
-      <div className="flex items-center gap-3 mb-4 rounded-xl border border-ink/10 p-3">
+      <div className="flex items-center gap-3 mb-4 rounded-tile border border-ink/10 p-3">
         {profile.avatar && (
-          <Image src={profile.avatar} alt="" width={48} height={48} className="rounded-lg shrink-0" />
+          <Image src={profile.avatar} alt="" width={48} height={48} className="rounded-box shrink-0" />
         )}
         <div className="min-w-0">
           <p className="text-xs text-text-secondary">{T.steamAuth.steamAccount}</p>
@@ -59,15 +60,13 @@ export default function SteamSignupFormFields({
       <p className="text-sm text-text-secondary mb-4">{T.steamAuth.lead}</p>
 
       {!profile.isPublic && (
-        <p className="mb-4 text-xs text-warning bg-warning/10 border border-warning/30 rounded-xl p-3">
+        <p className="mb-4 text-xs text-warning bg-warning/10 border border-warning/30 rounded-tile p-3">
           {T.steam.privateProfileHint}
         </p>
       )}
 
       {error && (
-        <div role="alert" className="mb-4 bg-danger/20 border border-danger/40 rounded-xl p-3">
-          <p className="text-sm text-danger">{error}</p>
-        </div>
+        <Notice tone="danger" className="mb-4">{error}</Notice>
       )}
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
@@ -102,23 +101,18 @@ export default function SteamSignupFormFields({
           disabled={submitting}
         />
 
-        <button
+        <Button
           type="submit"
-          disabled={submitting}
-          className="bg-accent text-bg-main w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main"
+          loading={submitting}
+          size="lg" className="w-full mt-2"
         >
-          {submitting ? (
-            <>
-              <Spinner size={16} />
-              {T.steamAuth.creating}
-            </>
-          ) : (
+          {submitting ? (T.steamAuth.creating) : (
             <>
               {T.steamAuth.create}
               <IconArrowRight size={16} aria-hidden="true" />
             </>
           )}
-        </button>
+        </Button>
       </form>
 
       <p className="text-text-secondary text-xs text-center mt-4">{T.steamAuth.noPassword}</p>

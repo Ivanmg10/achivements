@@ -14,7 +14,7 @@ export default function GroupIconDisplay({ icon }: { icon?: string | null }) {
         alt=""
         width={56}
         height={56}
-        className="w-14 h-14 rounded-xl object-cover"
+        className="w-14 h-14 rounded-tile object-cover"
         unoptimized
       />
     )

@@ -1,4 +1,5 @@
-import { gameKey, parseGameKey, gameHref, isGameSource, GAME_SOURCES } from './gameRef'
+import { gameKey, parseGameKey, gameHref, isGameSource, GAME_SOURCES, raGameId } from './gameRef'
+import type { CategoryGame } from '@/hooks/useGamesByCategory'
 
 test('keys keep RA and Steam games with the same id apart', () => {
   expect(gameKey('ra', 730)).toBe('ra:730')
@@ -35,4 +36,12 @@ test('recognises only known sources', () => {
   expect(isGameSource('psn')).toBe(true)
   expect(isGameSource('epic')).toBe(false)
   expect(isGameSource(undefined)).toBe(false)
+})
+
+test('an RA game id from a library or a want-to-play game', () => {
+  const game = (fields: object) => fields as CategoryGame
+  expect(raGameId(game({ GameID: 3 }))).toBe(3)
+  expect(raGameId(game({ ID: 4 }))).toBe(4)
+  expect(raGameId(game({ ID: 4, GameID: 5 }))).toBe(5)
+  expect(raGameId(game({ ID: 4, GameID: 0 }))).toBe(4)
 })

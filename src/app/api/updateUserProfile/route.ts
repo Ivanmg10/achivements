@@ -1,23 +1,22 @@
-import { getServerSession } from 'next-auth'
 import { NextResponse, after } from 'next/server'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
-import { authOptions } from '@/lib/authOptions'
 import { checkCurrentPassword } from '@/lib/currentPassword'
+import { retireResetTokens } from '@/lib/passwordReset'
 import { forgetUser, loadUser } from '@/lib/userRecord'
 import { sendVerificationEmail } from '@/lib/verificationEmail'
 import { sendEmailChangedNotice } from '@/lib/emailChangedNotice'
+import { isEmail } from '@/utils/authValidation'
 
 const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location', 'description', 'gender', 'profilePublic', 'genderPublic', 'showPresence', 'showInRankings'] as const
 type AllowedField = (typeof ALLOWED_FIELDS)[number]
 
 const DESCRIPTION_MAX = 280
+/** It travels in the session cookie and in every list that shows this user. */
+const AVATAR_URL_MAX = 500
 const GENDERS = ['male', 'female', 'neutral']
 /** On/off settings, and the column each is kept in. */
 const SWITCHES: Partial<Record<AllowedField, string>> = { profilePublic: 'profile_public', genderPublic: 'gender_public', showPresence: 'show_presence', showInRankings: 'show_in_rankings' }
-
-function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
 
 // https only: a plain-http image would be loaded by everyone who sees the
 // avatar, over a connection anyone on their network can read or alter.
@@ -31,16 +30,14 @@ function isValidUrl(url: string) {
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const auth = await requireSession({ error: 'Unauthorized' })
+    if (!auth.ok) return auth.response
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { field, value, currentPassword } = body as { field: AllowedField; value: string; currentPassword?: unknown }
 
     if (!ALLOWED_FIELDS.includes(field)) {
-      return NextResponse.json({ error: 'Invalid field' }, { status: 400 })
+      return NextResponse.json({ error: 'invalid-field' }, { status: 400 })
     }
 
     const trimmed = typeof value === 'string' ? value.trim() : ''
@@ -48,77 +45,78 @@ export async function POST(req: Request) {
     // A description and a gender can be cleared; everything else needs a value.
     const clearable = field === 'description' || field === 'gender'
     if (!trimmed && !clearable) {
-      return NextResponse.json({ error: 'Value is required' }, { status: 400 })
+      return NextResponse.json({ error: 'value-required' }, { status: 400 })
     }
 
     if (field === 'username') {
       if (trimmed.length < 3 || trimmed.length > 20) {
-        return NextResponse.json({ error: 'Username must be 3–20 characters' }, { status: 400 })
+        return NextResponse.json({ error: 'username-invalid' }, { status: 400 })
       }
       if (!/^[a-zA-Z0-9_]+$/.test(trimmed)) {
-        return NextResponse.json({ error: 'Username: only letters, numbers and underscores' }, { status: 400 })
+        return NextResponse.json({ error: 'username-invalid' }, { status: 400 })
       }
-      const existing = await pool.query('SELECT id FROM users WHERE LOWER(username) = LOWER($1) AND id != $2', [trimmed, session.user.id])
+      const existing = await pool.query('SELECT id FROM users WHERE LOWER(username) = LOWER($1) AND id != $2', [trimmed, auth.id])
       if (existing.rows.length > 0) {
-        return NextResponse.json({ error: 'Username already taken' }, { status: 409 })
+        return NextResponse.json({ error: 'username-taken' }, { status: 409 })
       }
     }
 
     if (field === 'email') {
-      if (!isValidEmail(trimmed)) {
-        return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
+      if (!isEmail(trimmed)) {
+        return NextResponse.json({ error: 'email-invalid' }, { status: 400 })
       }
-      const existing = await pool.query('SELECT id FROM users WHERE LOWER(email) = LOWER($1) AND id != $2', [trimmed, session.user.id])
+      const existing = await pool.query('SELECT id FROM users WHERE LOWER(email) = LOWER($1) AND id != $2', [trimmed, auth.id])
       if (existing.rows.length > 0) {
-        return NextResponse.json({ error: 'Email already in use' }, { status: 409 })
+        return NextResponse.json({ error: 'email-taken' }, { status: 409 })
       }
       // The recovery address is the key to the account: with a stolen session
       // and no password check, changing it and asking for a reset would be a
       // takeover. So it takes the current password too.
-      const check = await checkCurrentPassword(session.user.id, currentPassword)
+      const check = await checkCurrentPassword(auth.id, currentPassword)
       if (check === 'too-many') return NextResponse.json({ error: 'too-many-attempts' }, { status: 429 })
       if (check === 'no-user') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       if (check === 'wrong') return NextResponse.json({ error: 'wrong-password' }, { status: 403 })
       // Read just now by the password check, so this comes from the cache.
-      previousEmail = (await loadUser(session.user.id))?.email ?? null
+      previousEmail = (await loadUser(auth.id))?.email ?? null
     }
 
     if (field === 'avatar') {
-      if (!isValidUrl(trimmed)) {
-        return NextResponse.json({ error: 'Avatar must be a valid https URL' }, { status: 400 })
+      if (trimmed.length > AVATAR_URL_MAX || !isValidUrl(trimmed)) {
+        return NextResponse.json({ error: 'avatar-invalid' }, { status: 400 })
       }
     }
 
     if (field === 'location' && !/^[A-Z]{2}$/.test(trimmed.toUpperCase())) {
-      return NextResponse.json({ error: 'Location must be a valid 2-letter country code' }, { status: 400 })
+      return NextResponse.json({ error: 'location-invalid' }, { status: 400 })
     }
 
     if (field === 'description' && trimmed.length > DESCRIPTION_MAX) {
-      return NextResponse.json({ error: `Description must be ${DESCRIPTION_MAX} characters or fewer` }, { status: 400 })
+      return NextResponse.json({ error: 'description-too-long' }, { status: 400 })
     }
 
     const switchColumn = SWITCHES[field]
     if (switchColumn && trimmed !== 'true' && trimmed !== 'false') {
-      return NextResponse.json({ error: `${field} must be true or false` }, { status: 400 })
+      return NextResponse.json({ error: 'value-invalid' }, { status: 400 })
     }
 
     if (field === 'gender' && trimmed && !GENDERS.includes(trimmed)) {
-      return NextResponse.json({ error: 'Invalid gender' }, { status: 400 })
+      return NextResponse.json({ error: 'gender-invalid' }, { status: 400 })
     }
 
     const column = switchColumn ?? field
     const valueToStore = field === 'location' ? trimmed.toUpperCase() : switchColumn ? trimmed === 'true' : trimmed || null
     // A new address has not been confirmed yet, whatever the old one was.
     const resetVerified = field === 'email' ? ', email_verified_at = NULL' : ''
-    await pool.query(`UPDATE users SET "${column}" = $1${resetVerified} WHERE id = $2`, [valueToStore, session.user.id])
-    forgetUser(session.user.id)
+    await pool.query(`UPDATE users SET "${column}" = $1${resetVerified} WHERE id = $2`, [valueToStore, auth.id])
+    forgetUser(auth.id)
     if (field === 'avatar') {
       // A link replaces any uploaded picture, which no longer has a reason to be kept.
-      await pool.query('DELETE FROM user_avatars WHERE user_id = $1', [session.user.id])
+      await pool.query('DELETE FROM user_avatars WHERE user_id = $1', [auth.id])
     }
     if (field === 'email') {
-      const username = session.user.name ?? ''
-      after(() => sendVerificationEmail(session.user.id, username, trimmed))
+      await retireResetTokens(auth.id)
+      const username = auth.user.name ?? ''
+      after(() => sendVerificationEmail(auth.id, username, trimmed))
       // The old address hears about it too: it is the one a takeover would silence.
       if (previousEmail && previousEmail.toLowerCase() !== trimmed.toLowerCase()) {
         const to = previousEmail
@@ -130,9 +128,9 @@ export async function POST(req: Request) {
   } catch (err) {
     // Another account took the name or address between the check and the write.
     if ((err as { code?: string }).code === '23505') {
-      return NextResponse.json({ error: 'Already in use' }, { status: 409 })
+      return NextResponse.json({ error: 'taken' }, { status: 409 })
     }
     console.error('[updateUserProfile POST]', err)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }

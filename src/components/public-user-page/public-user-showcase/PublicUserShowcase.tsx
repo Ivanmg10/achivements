@@ -10,6 +10,7 @@ import { buildPerfectGames, countPerfectGames, latestPerfects } from '@/utils/pe
 import { ChartCard } from '@/components/ui/ChartCard'
 import CollectionShelf from '@/components/main-page/main-page-collection/collection-shelf/CollectionShelf'
 import PublicUserAchievementShowcase from '../public-user-achievement-showcase/PublicUserAchievementShowcase'
+import CollectionShelfSkeleton from '@/components/main-page/main-page-collection/collection-shelf-skeleton/CollectionShelfSkeleton'
 
 const SHELF = 5
 
@@ -32,7 +33,7 @@ export default function PublicUserShowcase() {
     <div className="flex flex-col gap-4">
       <ChartCard>
         {gamesLoading || awardsLoading ? (
-          <div aria-busy="true" className="h-60 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+          <CollectionShelfSkeleton />
         ) : (
           <CollectionShelf games={latest} counts={counts} />
         )}

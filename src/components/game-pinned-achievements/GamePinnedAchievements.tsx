@@ -8,6 +8,8 @@ import { RetroAchievement } from '@/types/types'
 import { PinAchievementModal } from '@/components/pin-achievement-modal/PinAchievementModal'
 import { notify } from '@/lib/notify'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 type PinnedRow = { achievement_id: number; snapshot: RetroAchievement }
 
@@ -72,7 +74,7 @@ export function GamePinnedAchievements({
 
   return (
     <div className="flex flex-col gap-2 h-full">
-      <p className="text-xs text-text-secondary">{T.gameExpanded.pinnedAchievements}</p>
+      <p className="text-sm font-bold text-text-main">{T.gameExpanded.pinnedAchievements}</p>
 
       {hasError && (
         <p role="alert" className="text-xs text-danger">
@@ -81,16 +83,9 @@ export function GamePinnedAchievements({
       )}
 
       {isLoading ? (
-        <div className="flex flex-col gap-2 animate-pulse">
+        <div className="flex flex-col gap-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 px-2 py-1.5">
-              <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
-              <div className="flex flex-col gap-1.5 flex-1">
-                <div className="h-2.5 w-28 rounded bg-ink/10" />
-                <div className="h-2 w-20 rounded bg-ink/10" />
-              </div>
-              <div className="w-6 h-4 rounded bg-ink/10 shrink-0" />
-            </div>
+            <SkeletonRow key={i} icon="w-9 h-9" figure className="gap-3 px-2 py-1.5" />
           ))}
         </div>
       ) : pinned.length === 0 ? (
@@ -98,9 +93,9 @@ export function GamePinnedAchievements({
           <button
             onClick={() => setModalOpen(true)}
             aria-label={T.gameExpanded.pinAchievementAria}
-            className="w-full flex-1 rounded-lg border-2 border-dashed border-ink/15 flex flex-col items-center justify-center gap-1.5 text-text-secondary hover:text-text-main hover:border-ink/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="w-full flex-1 rounded-control ring-1 ring-inset ring-accent/35 bg-[repeating-linear-gradient(-60deg,rgb(var(--accent)/0.06)_0_10px,transparent_10px_20px)] text-text-main hover:ring-accent/70 transition-shadow flex flex-col items-center justify-center gap-1.5 font-semibold focus-ring"
           >
-            <IconPlus className="w-6 h-6" aria-hidden />
+            <IconPlus className="w-6 h-6 text-accent" aria-hidden />
             <span className="text-xs">{T.gameExpanded.pinAchievementAria}</span>
           </button>
         ) : (
@@ -109,26 +104,26 @@ export function GamePinnedAchievements({
           </div>
         )
       ) : (
-        <div className="flex flex-col gap-1 flex-1 overflow-y-auto">
+        <div className="flex flex-col gap-1 flex-1 overflow-y-auto enter-rows">
           {pinned.map((row) => {
             const earned = !!row.snapshot.DateEarned
             return (
               <div
                 key={row.achievement_id}
-                className="group flex items-center gap-2 hover:bg-bg-main/60 rounded-lg px-2 py-1.5 transition-colors"
+                className="group flex items-center gap-2 hover:bg-bg-main/60 rounded-box px-2 py-1.5 transition-colors"
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {row.snapshot.BadgeName ? (
                     <Image
-                      src={`https://media.retroachievements.org/Badge/${row.snapshot.BadgeName}.png`}
+                      src={raBadgeUrl(row.snapshot.BadgeName)!}
                       alt={row.snapshot.Title}
                       width={36}
                       height={36}
-                      className={`w-9 h-9 rounded-lg object-cover shrink-0 ${earned ? '' : 'grayscale opacity-50'}`}
+                      className={`w-9 h-9 rounded-box object-cover shrink-0 ${earned ? '' : 'grayscale opacity-50'}`}
                       unoptimized
                     />
                   ) : (
-                    <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
+                    <div className="w-9 h-9 rounded-box bg-ink/10 shrink-0" />
                   )}
                   <div className="flex flex-col min-w-0 flex-1">
                     <p className="text-xs font-medium truncate">{row.snapshot.Title}</p>
@@ -139,12 +134,12 @@ export function GamePinnedAchievements({
                 <div className="flex items-center gap-2 shrink-0">
                   <div className="text-right">
                     <p className="text-xs font-semibold tabular-nums">{row.snapshot.Points}</p>
-                    <p className="text-[10px] text-text-secondary">pts</p>
+                    <p className="text-[10px] text-text-secondary">{T.libraryDetail.pointsShort}</p>
                   </div>
                   <button
                     onClick={() => handleUnpin(row.achievement_id)}
                     aria-label={`${T.gameExpanded.unpinAria} ${row.snapshot.Title}`}
-                    className="text-yellow-400 hover:text-yellow-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
+                    className="text-hardcore hover:text-hardcore transition-colors focus-ring rounded"
                   >
                     <IconStarFilled className="w-4 h-4" aria-hidden />
                   </button>
@@ -156,9 +151,9 @@ export function GamePinnedAchievements({
             <button
               onClick={() => setModalOpen(true)}
               aria-label={T.gameExpanded.pinAchievementAria}
-              className="w-full rounded-lg border-2 border-dashed border-ink/15 flex items-center justify-center gap-1.5 py-2 text-text-secondary hover:text-text-main hover:border-ink/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="w-full rounded-control ring-1 ring-inset ring-accent/35 bg-[repeating-linear-gradient(-60deg,rgb(var(--accent)/0.06)_0_10px,transparent_10px_20px)] text-text-main hover:ring-accent/70 transition-shadow flex items-center justify-center gap-1.5 py-2 font-semibold focus-ring"
             >
-              <IconPlus className="w-4 h-4" aria-hidden />
+              <IconPlus className="w-4 h-4 text-accent" aria-hidden />
               <span className="text-xs">{T.gameExpanded.pinAchievementAria}</span>
             </button>
           )}

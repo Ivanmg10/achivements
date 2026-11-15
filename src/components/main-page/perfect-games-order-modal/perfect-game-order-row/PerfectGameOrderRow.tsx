@@ -6,11 +6,11 @@ import { CSS } from '@dnd-kit/utilities'
 import { IconGripVertical } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { PerfectGame } from '@/utils/perfectGames'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
-import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
-import XboxLogo from '@/components/xbox-logo/XboxLogo'
+import { PLATFORM_NAME } from '@/utils/gameRef'
+import PlatformLogo from '@/components/platform-logo/PlatformLogo'
+import Tag from '@/components/ui/Tag'
 
-/** One draggable game in the reorder list — RA and Steam games alike. */
+/** One draggable game in the reorder list: its platform's logo and, for an RA game, how it was completed in words. */
 export default function PerfectGameOrderRow({ game }: { game: PerfectGame }) {
   const { T } = useLanguage()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -22,7 +22,7 @@ export default function PerfectGameOrderRow({ game }: { game: PerfectGame }) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 bg-bg-card rounded-xl p-2 ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`flex items-center gap-3 bg-bg-card rounded-tile p-2 ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       <button
         {...attributes}
@@ -43,15 +43,13 @@ export default function PerfectGameOrderRow({ game }: { game: PerfectGame }) {
         />
       )}
       <span className="text-sm truncate flex-1">{game.title}</span>
-      {game.source === 'steam' ? (
-        <SteamLogo size={12} className="text-[#66c0f4] shrink-0" aria-label="Steam" />
-      ) : game.source === 'psn' ? (
-        <PlaystationLogo size={12} className="text-[#0070d1] shrink-0" aria-label="PlayStation" />
-      ) : game.source === 'xbox' ? (
-        <XboxLogo size={12} className="text-[#107c10] shrink-0" aria-label="Xbox" />
-      ) : (
-        game.hardcore && <span className="w-2 h-2 bg-warning rounded-full shrink-0" title="Hardcore" />
+      {game.source === 'ra' && (
+        <Tag tone={game.hardcore ? 'hardcore' : 'muted'} size="xs" className="shrink-0">
+          {game.hardcore ? T.achievement.hardcore : T.achievement.softcore}
+        </Tag>
       )}
+      <PlatformLogo source={game.source} size={12} label={PLATFORM_NAME[game.source]} className="shrink-0" />
+
     </div>
   )
 }

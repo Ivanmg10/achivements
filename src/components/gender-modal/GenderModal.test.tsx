@@ -19,10 +19,12 @@ test('offers male, female, neutral and not set, with the current one checked', (
   expect(screen.getByRole('radio', { name: en.userData.notSet })).toBeInTheDocument()
 })
 
-test('choosing one saves it and closes', async () => {
+test('choosing one and saving sends it and closes', async () => {
   const onClose = jest.fn()
   render(<GenderModal isOpen onClose={onClose} />)
   fireEvent.click(screen.getByRole('radio', { name: en.userData.genderFemale }))
+  expect(global.fetch).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button', { name: en.editProfileModal.save }))
   await waitFor(() => expect(onClose).toHaveBeenCalled())
   expect(sent()).toEqual({ field: 'gender', value: 'female' })
 })
@@ -30,15 +32,17 @@ test('choosing one saves it and closes', async () => {
 test('not set clears it', async () => {
   render(<GenderModal isOpen onClose={jest.fn()} current="male" />)
   fireEvent.click(screen.getByRole('radio', { name: en.userData.notSet }))
+  fireEvent.click(screen.getByRole('button', { name: en.editProfileModal.save }))
   await waitFor(() => expect(global.fetch).toHaveBeenCalled())
   expect(sent()).toEqual({ field: 'gender', value: '' })
 })
 
 test('a failed save keeps the modal open and says why', async () => {
-  global.fetch = jest.fn().mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'Invalid gender' }) })
+  global.fetch = jest.fn().mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'gender-invalid' }) })
   const onClose = jest.fn()
   render(<GenderModal isOpen onClose={onClose} />)
   fireEvent.click(screen.getByRole('radio', { name: en.userData.genderMale }))
-  expect(await screen.findByRole('alert')).toHaveTextContent('Invalid gender')
+  fireEvent.click(screen.getByRole('button', { name: en.editProfileModal.save }))
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.editProfileModal.errorGeneric)
   expect(onClose).not.toHaveBeenCalled()
 })

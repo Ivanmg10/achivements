@@ -14,14 +14,19 @@ beforeEach(() => {
 })
 
 test('the feed as it is when nothing is unticked', () => {
-  ;(useConsoleVisibility as jest.Mock).mockReturnValue({ filtering: false, isShown: () => false })
+  ;(useConsoleVisibility as jest.Mock).mockReturnValue({ filtering: false, isShown: () => false, isLoading: false })
   const { result } = renderHook(() => useActivityHeatmapYear())
   expect(result.current.achievements).toBe(FEED)
 })
 
 test('without what the visibility says is out, and the rest of the feed passes through', () => {
-  ;(useConsoleVisibility as jest.Mock).mockReturnValue({ filtering: true, isShown: (a: { GameID: number }) => a.GameID === 2 })
+  ;(useConsoleVisibility as jest.Mock).mockReturnValue({ filtering: true, isShown: (a: { GameID: number }) => a.GameID === 2, isLoading: false })
   const { result } = renderHook(() => useActivityHeatmapYear())
   expect(result.current.achievements).toEqual([{ GameID: 2 }])
   expect(result.current).toMatchObject({ isLoading: false, error: false, refetch })
+})
+
+test('loading until the filter is final, though the feed is in', () => {
+  ;(useConsoleVisibility as jest.Mock).mockReturnValue({ filtering: false, isShown: () => true, isLoading: true })
+  expect(renderHook(() => useActivityHeatmapYear()).result.current.isLoading).toBe(true)
 })

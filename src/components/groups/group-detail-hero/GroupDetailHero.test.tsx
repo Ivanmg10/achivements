@@ -10,21 +10,18 @@ const props = {
   covers: ['https://a/1.png', 'https://a/2.png'],
   gameCount: 12,
   summary: { earned: 412, total: 503 },
-  states: { done: 5, started: 6, notStarted: 1 },
   onAdd: jest.fn(),
   onEdit: jest.fn(),
   onDelete: jest.fn(),
 }
 
-test('names the group, its progress and how many games are in each state', () => {
+test('names the group and its progress; the states of its games are for the tabs to count, not the banner', () => {
   const { container } = render(<GroupDetailHero {...props} />)
   expect(screen.getByRole('heading', { name: 'SNES platformers' })).toBeInTheDocument()
   expect(screen.getByText('The ones left')).toBeInTheDocument()
   expect(screen.getByText('Public')).toBeInTheDocument()
   expect(screen.getByRole('img', { name: '82%' })).toBeInTheDocument()
-  expect(screen.getByText('5 completed')).toBeInTheDocument()
-  expect(screen.getByText('6 in progress')).toBeInTheDocument()
-  expect(screen.getByText('1 not started')).toBeInTheDocument()
+  expect(screen.queryByText(/completed|in progress|not started/)).not.toBeInTheDocument()
   expect(container.querySelectorAll('img[src^="https://a/"]')).toHaveLength(2)
   expect(screen.getByRole('link', { name: /Back to groups/ })).toHaveAttribute('href', '/groups')
 })
@@ -39,8 +36,7 @@ test('its actions', () => {
   expect(props.onDelete).toHaveBeenCalled()
 })
 
-test('an empty group: no ring and no state counts', () => {
-  render(<GroupDetailHero {...props} covers={[]} gameCount={0} summary={{ earned: 0, total: 0 }} states={{ done: 0, started: 0, notStarted: 0 }} />)
+test('an empty group: no ring', () => {
+  render(<GroupDetailHero {...props} covers={[]} gameCount={0} summary={{ earned: 0, total: 0 }} />)
   expect(screen.queryByRole('img', { name: /%/ })).not.toBeInTheDocument()
-  expect(screen.queryByText('0 completed')).not.toBeInTheDocument()
 })

@@ -54,7 +54,7 @@ test('one play-time total across Steam, PlayStation and Xbox, and none when none
   )
   // 60 + 120 + 180 minutes
   const region = screen.getByRole('region', { name: en.steam.totalPlaytime })
-  expect(region).toHaveTextContent(formatPlaytime(360, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en'))
+  expect(region).toHaveTextContent(formatPlaytime(360, en.steam, 'en'))
   expect(region).toHaveTextContent(en.cards.playtimeSources)
   rerender(<CollectionNumbers awards={awards} />)
   expect(screen.queryByRole('region', { name: en.steam.totalPlaytime })).not.toBeInTheDocument()

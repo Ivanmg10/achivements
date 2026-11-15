@@ -1,4 +1,5 @@
-import { activityJournal, compareMonths, localDay, playHabits, unlockTime } from './activityInsights'
+import { activityJournal, compareMonths, playHabits, unlockTime } from './activityInsights'
+import { localDay } from './dates'
 import type { RecentAchievement } from '@/types/types'
 
 // Every date here is built in local time and written out as UTC, as the feed sends them,

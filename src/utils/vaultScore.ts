@@ -7,8 +7,10 @@
  *
  * Bump RULES_VERSION whenever a number here changes: stored scores carry it,
  * and the refresh recomputes every game scored under another one.
+ * 4: only a verified PSN account counts (#176). The gate is in the reads (src/lib/vaultGate.ts), not in a game's
+ * score, so verifying needs no new read; the bump only makes each user's next refresh score their games again.
  */
-export const RULES_VERSION = 1
+export const RULES_VERSION = 4
 
 /** One achievement as the score sees it, whatever the platform. */
 export type ScoreAchievement = {
@@ -75,8 +77,9 @@ export function difficultyMultiplier(rarestRelative: number): number {
 /**
  * A game's points from its whole list (earned and not), and when each was
  * earned. `players` (RA) softens rarities measured on very few people.
+ * `completedAt` is the platform-proven base date, never the latest DLC unlock.
  */
-export function scoreGame(list: ScoreAchievement[], players?: number): GameScore {
+export function scoreGame(list: ScoreAchievement[], players?: number, completedAt: string | null = null): GameScore {
   const total = list.length
   const earnedList = list.filter((a) => a.earned)
   if (total === 0 || earnedList.length === 0) return { points: 0, earned: earnedList.length, total, completed: false, unlocks: [] }
@@ -105,8 +108,8 @@ export function scoreGame(list: ScoreAchievement[], players?: number): GameScore
 
   const completed = earnedList.length === total && earnedList.every((a) => !a.softcore)
   if (completed) {
-    // The bonus belongs to the day the game was finished: its last unlock.
-    unlocks.push([Math.max(...unlocks.map(([t]) => t)), sum * COMPLETION_BONUS])
+    // Only a platform-proven base date places the bonus in a period; unknown stays at 0.
+    unlocks.push([seconds(completedAt), sum * COMPLETION_BONUS])
   }
   // Weeks and months need no finer grain than a day, and a game with thousands of achievements stays small.
   const byDay = new Map<number, number>()

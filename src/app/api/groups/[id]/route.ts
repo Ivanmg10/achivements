@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { readGroupFields } from '@/utils/groupValidation'
+import { dbId } from '@/utils/dbId'
 import { canUseXbox } from '@/utils/xboxAccess'
+import { notHidden } from '@/lib/gameVisibility'
 
 async function ownsGroup(userId: string, groupId: number) {
   if (!Number.isInteger(groupId)) return false
@@ -14,60 +17,62 @@ async function ownsGroup(userId: string, groupId: number) {
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
     if (!Number.isInteger(groupId)) {
-      return NextResponse.json({ message: 'No encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'not-found' }, { status: 404 })
     }
 
     const session = await getServerSession(authOptions)
 
     const groupRes = await pool.query(
-      `SELECT g.id, g.title, g.description, g.icon, g.is_public, g.position, g.user_id, g.created_at, g.updated_at
-       FROM game_groups g WHERE g.id = $1`,
+      `SELECT g.id, g.title, g.description, g.icon, g.is_public, g.position, g.user_id, g.created_at, g.updated_at,
+              u.profile_public AS owner_public
+       FROM game_groups g JOIN users u ON u.id = g.user_id WHERE g.id = $1`,
       [groupId],
     )
     if (!groupRes.rows.length) {
-      return NextResponse.json({ message: 'No encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'not-found' }, { status: 404 })
     }
 
-    const group = groupRes.rows[0]
-    if (!group.is_public && String(session?.user?.id) !== String(group.user_id)) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    const { user_id, owner_public, ...group } = groupRes.rows[0]
+    // A public group is for signed-in users, and only while its owner's profile is public.
+    const visible = session?.user?.id && group.is_public && owner_public
+    if (!visible && String(session?.user?.id) !== String(user_id)) {
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
     }
 
     const itemsRes = await pool.query(
-      `SELECT id, source, game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points, position, added_at, release_year
-       FROM game_group_items
-       WHERE group_id = $1 AND ($2::boolean OR source <> 'xbox')
-       ORDER BY position ASC`,
-      // Xbox games are admin-only for now: anyone else gets the group without them.
-      [groupId, canUseXbox(session?.user?.admin)],
+      `SELECT i.id, i.source, i.game_id, i.title, i.image_icon, i.console_name, i.pct_won, i.num_awarded, i.max_possible, i.points_won, i.max_points, i.position, i.added_at, i.release_year
+       FROM game_group_items i
+       WHERE i.group_id = $1 AND ($2::boolean OR i.source <> 'xbox')
+         AND ${notHidden('i', '$3')}
+       ORDER BY i.position ASC`,
+      // Hidden items stay stored and return on unhide; public reads use the group owner's keys.
+      [groupId, canUseXbox(session?.user?.admin), user_id],
     )
 
     return NextResponse.json({ ...group, items: itemsRes.rows })
   } catch (err) {
     console.error('[groups/[id] GET]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    if (!(await ownsGroup(session.user.id, groupId))) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
+    if (!(await ownsGroup(auth.id, groupId))) {
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
     const fields = readGroupFields(await req.json().catch(() => null))
-    if (!fields.ok) return NextResponse.json({ message: fields.message }, { status: 400 })
+    if (!fields.ok) return NextResponse.json({ error: fields.code }, { status: 400 })
     const { title, description, icon, is_public } = fields.value
 
     const result = await pool.query(
@@ -81,22 +86,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json(result.rows[0])
   } catch (err) {
     console.error('[groups/[id] PUT]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    if (!(await ownsGroup(session.user.id, groupId))) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
+    if (!(await ownsGroup(auth.id, groupId))) {
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
     await pool.query('DELETE FROM game_groups WHERE id = $1', [groupId])
@@ -104,6 +107,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[groups/[id] DELETE]', err)
-    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+    return NextResponse.json({ error: 'internal' }, { status: 500 })
   }
 }

@@ -39,7 +39,7 @@ export default function RankingsPageMeBar({
   return (
     <section
       aria-label={T.rankings.yourPlace}
-      className="flex items-center gap-3 rounded-2xl bg-bg-header/95 backdrop-blur px-3 sm:px-4 py-2.5 ring-1 ring-accent/40 shadow-xl shadow-black/30"
+      className="flex items-center gap-3 rounded-card bg-bg-header/95 backdrop-blur px-3 sm:px-4 py-2.5 ring-1 ring-accent/40 shadow-xl shadow-black/30"
     >
       <span className="text-lg sm:text-xl font-extrabold text-accent tabular-nums shrink-0">{me.rank > 0 ? `#${n(me.rank)}` : '—'}</span>
       <span className="min-w-0 flex-1">

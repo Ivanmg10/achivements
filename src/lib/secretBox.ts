@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { appSecret } from '@/lib/secrets'
 
 /**
  * Encrypts small secrets for storage (AES-256-GCM), keyed from
@@ -8,9 +9,7 @@ import crypto from 'crypto'
  */
 
 function key(purpose: string): Buffer {
-  const secret = process.env.NEXTAUTH_SECRET
-  if (!secret) throw new Error('NEXTAUTH_SECRET is not configured')
-  return crypto.createHash('sha256').update(`${secret}:${purpose}`).digest()
+  return crypto.createHash('sha256').update(`${appSecret()}:${purpose}`).digest()
 }
 
 /** "iv.tag.ciphertext", base64url each. */

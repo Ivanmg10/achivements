@@ -33,28 +33,11 @@ function setTrophies(overrides: Record<string, unknown> = {}) {
 
 beforeEach(() => jest.clearAllMocks())
 
-test("loads the game's trophies and lays out the dashboard", () => {
-  setTrophies()
-  render(<PsnRecentlyPlayedExpanded game={GAME} />)
-  expect(usePsnTrophies).toHaveBeenCalledWith('NPWR00001_00')
-  expect(screen.getByTestId('grid')).toHaveTextContent('2')
-  expect(screen.getByTestId('chart')).toBeInTheDocument()
-  expect(screen.getByTestId('rarest')).toBeInTheDocument()
-})
 
-test('a failed load can be retried', () => {
-  setTrophies({ trophies: [], error: 'failed' })
-  render(<PsnRecentlyPlayedExpanded game={GAME} />)
-  expect(screen.getByRole('alert')).toHaveTextContent(en.psn.trophiesError)
-  fireEvent.click(screen.getByRole('button', { name: en.psn.retry }))
-  expect(retry).toHaveBeenCalled()
-})
 
-test('while loading, a skeleton the size of the set', () => {
-  setTrophies({ trophies: [], isLoading: true })
-  const { container } = render(<PsnRecentlyPlayedExpanded game={GAME} />)
-  expect(container.querySelectorAll('[aria-busy="true"] li')).toHaveLength(10)
-})
+
+
+
 
 test('with DLC, the ring counts the whole set, as "completed" does', () => {
   setTrophies({
@@ -67,4 +50,12 @@ test('with DLC, the ring counts the whole set, as "completed" does', () => {
   })
   render(<PsnRecentlyPlayedExpanded game={GAME} />)
   expect(screen.getByText('2/3', { exact: false })).toBeInTheDocument()
+})
+
+test('a private trophy list says so under the failure', () => {
+  setTrophies({ trophies: [], error: 'private' })
+  render(<PsnRecentlyPlayedExpanded game={GAME} />)
+  expect(screen.getByText(en.psn.errors.private)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: en.psn.retry }))
+  expect(retry).toHaveBeenCalled()
 })

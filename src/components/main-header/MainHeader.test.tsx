@@ -1,13 +1,41 @@
 import { en } from '@/translations/en'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import MainHeader from './MainHeader'
 import { useSession } from 'next-auth/react'
+import { useStreakSummary } from '@/hooks/useStreakSummary'
+
+jest.mock('@/hooks/useStreakSummary', () => ({ useStreakSummary: jest.fn(() => ({ streak: 0 })) }))
 
 jest.mock('@/hooks/useRecentAchievements', () => ({
   useRecentAchievements: () => ({ achievements: [] }),
 }))
 
-jest.mock('@/components/search-modal/SearchModal', () => () => null)
+const mockSearchModal = jest.fn()
+jest.mock('@/components/search-modal/SearchModal', () => (props: unknown) => {
+  mockSearchModal(props)
+  return null
+})
+
+describe('type to search', () => {
+  const lastProps = () => mockSearchModal.mock.calls.at(-1)![0] as { isOpen: boolean; initialQuery: string }
+  beforeEach(() => {
+    mockSearchModal.mockClear()
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', rausername: 'Ivan' } } })
+  })
+
+  test('a printable key opens search with that key typed in', async () => {
+    render(<MainHeader />)
+    fireEvent.keyDown(document, { key: 'z' })
+    await waitFor(() => expect(lastProps()).toMatchObject({ isOpen: true, initialQuery: 'z' }))
+  })
+
+  test('"/" opens search empty: it is the shortcut, not text to search for', async () => {
+    render(<MainHeader />)
+    const notPrevented = fireEvent.keyDown(document, { key: '/' })
+    expect(notPrevented).toBe(false)
+    await waitFor(() => expect(lastProps()).toMatchObject({ isOpen: true, initialQuery: '' }))
+  })
+})
 
 test('renders sign in link when no session', () => {
   ;(useSession as jest.Mock).mockReturnValue({ data: null })
@@ -34,7 +62,7 @@ test('renders the Status dropdown grouping the 3 status routes', () => {
   render(<MainHeader />)
   fireEvent.click(screen.getByRole('button', { name: 'Library' }))
   expect(screen.getByRole('menuitem', { name: 'In progress' })).toHaveAttribute('href', '/playing')
-  expect(screen.getByRole('menuitem', { name: 'No achievements' })).toHaveAttribute('href', '/wantToPlay')
+  expect(screen.getByRole('menuitem', { name: 'Not started' })).toHaveAttribute('href', '/wantToPlay')
   expect(screen.getByRole('menuitem', { name: 'Completed' })).toHaveAttribute('href', '/completed')
 })
 
@@ -56,7 +84,7 @@ test('PSN alone is a platform: search and the sections are there', () => {
   render(<MainHeader />)
   expect(screen.getByRole('button', { name: 'Library' })).toBeInTheDocument()
   expect(screen.getByRole('link', { name: en.following.title })).toBeInTheDocument()
-  expect(screen.getAllByRole('button', { name: 'Search games' }).length).toBeGreaterThan(0)
+  expect(screen.getAllByRole('button', { name: /Search games/ }).length).toBeGreaterThan(0)
 })
 
 test('Xbox alone counts only for who may see Xbox', () => {
@@ -70,6 +98,14 @@ test('Xbox alone counts only for who may see Xbox', () => {
 })
 
 describe('with no platform linked', () => {
+  test('the account stays on the right, with no search bar to push it there', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan' } } })
+    render(<MainHeader />)
+    const right = screen.getByRole('link', { name: en.sidePanel.userSettings }).parentElement
+    expect(right?.className).toContain('ml-auto')
+    expect(right?.className).not.toContain('lg:ml-0')
+  })
+
   beforeEach(() => {
     ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', avatar: null } } })
   })
@@ -78,7 +114,7 @@ describe('with no platform linked', () => {
     render(<MainHeader />)
     expect(screen.queryByRole('button', { name: 'Library' })).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Groups' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Search games' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Search games/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Menu' })).not.toBeInTheDocument()
   })
 
@@ -101,8 +137,19 @@ test('while the session loads, holds the place of the avatar instead of flashing
   expect(screen.queryByText('Sign in')).not.toBeInTheDocument()
 })
 
+test('while the streak is first read, its room in grey and no number, not a 0 that turns into another', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', rausername: 'Ivan' } } })
+  ;(useStreakSummary as jest.Mock).mockReturnValue({ streak: null })
+  render(<MainHeader />)
+  const link = screen.getByRole('link', { name: en.streak.title })
+  expect(link).toHaveAttribute('href', '/racha')
+  expect(link).toHaveAttribute('aria-busy', 'true')
+  expect(link.querySelector('.bg-skeleton')).toBeInTheDocument()
+})
+
 test('the streak page is always one click away, even with no streak going', () => {
   ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', rausername: 'Ivan' } } })
+  ;(useStreakSummary as jest.Mock).mockReturnValue({ streak: 0 })
   render(<MainHeader />)
   const link = screen.getByRole('link', { name: new RegExp(`^${en.streak.title}:`) })
   expect(link).toHaveAttribute('href', '/racha')

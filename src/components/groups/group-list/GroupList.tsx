@@ -21,7 +21,7 @@ export default function GroupList({
 }) {
   const shelves = view === 'shelves'
   return (
-    <ul className={shelves ? 'flex flex-col gap-4' : 'grid gap-5 grid-cols-[repeat(auto-fill,minmax(min(100%,400px),1fr))]'}>
+    <ul className={shelves ? 'flex flex-col gap-4 enter-rows' : 'grid gap-5 grid-cols-[repeat(auto-fill,minmax(min(100%,400px),1fr))] enter-cards'}>
       {groups.map((group) => (
         <li key={group.id} className="min-w-0">
           {shelves ? <GroupShelfRow group={group} /> : <GroupAlbumCard group={group} />}

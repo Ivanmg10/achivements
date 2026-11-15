@@ -8,6 +8,7 @@ import { activityJournal } from '@/utils/activityInsights'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import MainPageJournalDay from '../main-page-journal-day/MainPageJournalDay'
+import Kicker from '@/components/ui/Kicker'
 
 // Three days of at most two games: as tall as the lists beside it.
 const DAYS = 3
@@ -19,13 +20,13 @@ export default function MainPageJournal({ achievements, isLoading }: { achieveme
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.journal}</p>
+      <Kicker>{T.cards.journal}</Kicker>
       {isLoading ? (
-        <SkeletonGameList count={4} />
+        <SkeletonGameList count={7} />
       ) : days.length === 0 ? (
         <EmptyState icon={<IconNotebook className="w-6 h-6" />} title={T.cards.noData} size="compact" className="py-2" />
       ) : (
-        <ol className="flex flex-col gap-3">
+        <ol className="flex flex-col gap-3 enter-rows">
           {days.map((d) => (
             <li key={d.day}>
               <MainPageJournalDay day={d} />

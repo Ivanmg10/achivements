@@ -22,6 +22,13 @@ test('lays out the heading, each section, the FAQ and the way in', () => {
   expect(screen.getByText(text.note!)).toBeInTheDocument()
 })
 
+test('the questions are not numbered and the page ends in a line and a button, not a closing card', () => {
+  render(<SeoPage page={page} />)
+  expect(screen.queryByText('01')).not.toBeInTheDocument()
+  expect(screen.getByText(en.landing.closingTitle)).toBeInTheDocument()
+  expect(screen.getByText(en.landing.closingTitle).closest('.bg-bg-card')).toBeNull()
+})
+
 test('links the other public pages, not itself', () => {
   render(<SeoPage page={page} />)
   expect(screen.queryByRole('link', { name: page.text.en.link })).not.toBeInTheDocument()

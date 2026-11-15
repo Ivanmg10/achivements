@@ -5,6 +5,7 @@ import { useShowcaseGameChoices } from '@/hooks/useShowcaseGameChoices'
 import type { LibraryGame } from '@/utils/library'
 import type { ShowcaseEntry } from '@/utils/showcase'
 import ShowcasePickerModalAchievement from '../showcase-picker-modal-achievement/ShowcasePickerModalAchievement'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /**
  * The picker's second view: every achievement of one game, the earned ones
@@ -30,20 +31,20 @@ export default function ShowcasePickerModalGame({
   const earned = choices.filter((c) => c.entry).length
 
   return (
-    <div className="overflow-y-auto overscroll-contain p-3 flex-1 flex flex-col gap-3">
+    <div className="lg:overflow-y-auto lg:overscroll-contain lg:min-h-0 lg:flex-1 lg:p-1 lg:-m-1 flex flex-col gap-3">
       {isLoading ? (
-        <div aria-busy="true" className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+        <div aria-busy="true" className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 gap-2">
           {Array.from({ length: 8 }, (_, i) => (
-            <div key={i} className="h-28 rounded-xl bg-bg-card animate-pulse motion-reduce:animate-none" />
+            <Skeleton key={i} radius="tile" className="h-28" />
           ))}
         </div>
       ) : error ? (
         <div className="flex flex-col items-center gap-2 py-10 text-center">
-          <p role="alert" className="text-sm text-red-400">{T.showcase.gameError}</p>
+          <p role="alert" className="text-sm text-danger">{T.showcase.gameError}</p>
           <button
             type="button"
             onClick={retry}
-            className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="text-sm text-accent hover:underline rounded focus-ring"
           >
             {T.publicProfile.retry}
           </button>
@@ -53,7 +54,7 @@ export default function ShowcasePickerModalGame({
           <p className="text-xs text-text-secondary tabular-nums">
             {T.showcase.earnedOf.replace('{n}', String(earned)).replace('{total}', String(choices.length))}
           </p>
-          <ul aria-label={T.showcase.achievementsLabel} className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+          <ul aria-label={T.showcase.achievementsLabel} className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 gap-2">
             {choices.map((choice) => (
               <li key={choice.key}>
                 <ShowcasePickerModalAchievement

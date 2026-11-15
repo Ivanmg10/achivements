@@ -12,6 +12,7 @@ const setVisibility = (v: DocumentVisibilityState) => {
 }
 
 beforeEach(() => {
+  window.sessionStorage.clear()
   jest.useFakeTimers()
   visibility = 'visible'
   global.fetch = jest.fn().mockResolvedValue({ ok: true }) as unknown as typeof fetch
@@ -55,4 +56,12 @@ test('a failed beat is logged, not thrown', async () => {
   await Promise.resolve()
   await Promise.resolve()
   expect(spy).toHaveBeenCalledWith('[usePresenceHeartbeat]', 500)
+})
+
+test('a reload within a minute does not beat again on arrival (#101)', () => {
+  renderHook(() => usePresenceHeartbeat()).unmount()
+  renderHook(() => usePresenceHeartbeat())
+  expect(global.fetch).toHaveBeenCalledTimes(1)
+  jest.advanceTimersByTime(HEARTBEAT_MS)
+  expect(global.fetch).toHaveBeenCalledTimes(2)
 })

@@ -1,6 +1,6 @@
 # Architecture
 
-A map, not a spec. The rules each area must follow are in `CLAUDE.md`; this
+A map, not a spec. The rules each area must follow are in `CLAUDE.md` and the area docs it links; this
 file says where things are and how they connect. Keep it current when you add
 a folder, a data path or a cache.
 
@@ -8,19 +8,19 @@ a folder, a data path or a cache.
 
 ```
 page (src/app/(main)/…)            client component
-  └─ hook (src/hooks/useXxx.ts)    owns the fetch, the state, the hasFetched guard
+  └─ hook (src/hooks/useXxx.ts)    owns the fetch and the state (useRetryingRead retries it)
        └─ context (src/context/)   shared library data, so pages do not refetch
             └─ fetch /api/…        src/app/api/**/route.ts
                  ├─ apiAuth        who is asking, whose data, whose key
                  ├─ cache          memory → Postgres (steam_cache table)
                  └─ client         raClient / steamClient / psnClient / igdbClient
-                      └─ external API
+                      └─ external API  (RA and Steam through fetchUpstream: deadline, retries)
 ```
 
 - **Auth gate**: `src/proxy.ts` (Next 16's middleware) sends anyone without a
   session to `/authPage`, except the public paths listed in it and anything
   under `/compare/` and `/track/` (the public pages). API routes check for
-  themselves.
+  themselves. `/welcome` is signed-in only, like the rest.
 - **Session**: NextAuth JWT, rebuilt from the `users` row on every read
   (`src/lib/authOptions.ts` + `src/lib/userRecord.ts`). Server code that needs
   the RA key uses `getServerSession(authOptions)`; the browser never sees it.
@@ -32,14 +32,15 @@ page (src/app/(main)/…)            client component
 
 | Area | Routes | Notes |
 |---|---|---|
-| RetroAchievements | `get*` (gameData, recentAchievements, activityHeatmap…), `updateRaUser`, `unlinkRaUser` | Older flat names; keep them, the client calls them |
+| RetroAchievements | `get*` (gameData, recentAchievements, activityHeatmapYear…), `updateRaUser`, `unlinkRaUser` | Older flat names; keep them, the client calls them |
 | Steam | `steam/*` (ownedGames, achievements, recentlyPlayed…, unlink) | Linked through Steam sign-in (`auth/steam?intent=link`); admins by name (`src/lib/steamAccount.ts`) |
-| PlayStation | `psn/*` (link, titles, trophies, details…) | One app account, `src/lib/psnClient.ts` |
-| Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}`, `admin/xbox`, `admin/xbox/achievements` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
+| PlayStation | `psn/*` (link, titles, trophies, details, `verify`…) | One app account, `src/lib/psnClient.ts` (its caches `psnCache.ts`, its call budget `psnBudget.ts`, errors `psnErrors.ts`, #177); `verify` proves the account is the user's (`src/lib/psnVerification.ts`, #176) and `src/lib/vaultGate.ts` lets only verified PSN count in Vault Points |
+| Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
+| Me (start-up) | `me/bootstrap`, `me/streak`, `follows/cards` | #101: the viewer's own; bootstrap reads only our DB, streak and cards reuse the platforms' loaders and routes |
 | Rankings | `rankings` (public), `rankings/me`, `rankings/fill`, `admin/rankings` | Read stored scores; `fill` runs a pass. See Vault Points below |
-| Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | |
+| Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | `auth/ra/check`: an RA key checked before signing up with it (signed out, rate limited) |
 | Admin | `admin/*` | Every one starts with `requireAdmin(req)` |
 | Cron | `cron/sweepCache` (04:00), `cron/scores` (05:00), `cron/psnToken` (09:00) | Scheduled in `vercel.json`, need `CRON_SECRET` |
 
@@ -48,8 +49,9 @@ auth, 429 rate limited, 502/503 upstream).
 
 ## Whose data, whose key — `src/lib/apiAuth.ts`
 
-- `requireSession` / `requireRaSession` / `requireSteamSession` /
-  `requirePsnSession` — the signed-in user, with that platform linked.
+- `requireSession` — a signed-in user, and the session's user (`auth.user.admin`, `.raid`…);
+  every route that needs one starts with it (#119). `requireRaSession` / `requireSteamSession` /
+  `requirePsnSession` / `requireXboxSession` — the same, with that platform linked.
 - `requireViewerApiKey` — the viewer's own RA key; never a fallback.
 - `dataOwner(req)` — on someone else's page, whose library is being read.
 
@@ -58,12 +60,27 @@ auth, 429 rate limited, 502/503 upstream).
 | Layer | Where | Used for |
 |---|---|---|
 | Memory | `src/lib/raCache.ts` (`withCache`, LRU of 5000) | First level for RA, per instance |
-| Postgres | `steam_cache` table, `src/lib/steamCache.ts` | Second level for RA (`ra:` keys), Steam, PSN (`psn:`) and IGDB; swept daily |
+| Postgres | `steam_cache` table, `src/lib/steamCache.ts` | Second level for RA (`ra:` keys), Steam, PSN, Xbox (`xbox:`) and IGDB; swept daily, with expired Xbox successes kept 30 days for explicit stale-if-error |
 | Postgres | `steam_unlocks` table, `src/lib/steamUnlocks.ts` | Every Steam unlock read, dated, per user and Steam account: the streak and activity use it past the games read live. Not a cache: kept until Steam is unlinked |
+| Postgres | `steam_playtime` table (`migrations/045`), `src/lib/steamUnlocks.ts` | Each Steam game's minutes when the owned list was last read, and when they last rose: dates games Steam leaves undated (#113, `docs/platforms/steam.md`). Not a cache: kept until Steam is unlinked; without the table it only logs |
 | HTTP | `src/lib/httpCache.ts` (`cachedJson`) | `Cache-Control` on the response |
 
 Change the shape of a cached value → bump its key's version (`gameData_v2:` →
 `_v3`) in the same change.
+
+Hidden-game visibility is a projection, not a canonical-cache key. Listing routes apply
+`src/lib/gameVisibility.ts` after the cached read and disable browser reuse; shared client providers
+apply the same `source:id` rule for immediate hide/show. Raw `fullLibrary` remains available to direct
+game pages. Stored score periods are rebuilt and a shared Postgres revision changes the five-minute
+ranking-cache key in every instance on visibility changes.
+
+Xbox server loaders share one OpenXBL guard: a 5 s timeout, a PostgreSQL-backed
+150-call hourly budget, and per-instance 429 cooldown. `xboxTelemetry.ts` uses
+`AsyncLocalStorage` to attach sanitized operation logs and request-scoped counts
+without XUIDs or gamertags. Xbox responses carry `X-Request-Id`,
+`X-Xbox-Upstream-Calls`, cache outcomes, observed rate limits, and explicit
+`X-Xbox-Stale` / `X-Xbox-Partial` markers. Library entries use `xbox:titles:v7:`;
+assembled feeds use `xbox:feed:v2:` and include the latest-played fingerprint.
 
 ## Vault Points (rankings)
 
@@ -82,6 +99,9 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
    is kept in `steam_cache` (`score:fill:<user>`) for the screens.
 2. **Formula** — `src/utils/vaultScore.ts` (pure), fed by the per-platform
    mappers in `src/utils/vaultScoreInputs.ts`; levels in `src/utils/vaultLevel.ts`.
+   `src/utils/completionDates.ts` supplies the separate nullable base-completion date used by the
+   completion bonus. PSN/Xbox library responses are enriched through existing achievement caches;
+   Steam uses `lastUnlock` and Xbox `unlockedAt` when the current set is complete.
 3. **Storage** — `score_games` (one row per game, points before the stack
    factor, unlocks by day), `score_periods` (weeks and months, rebuilt per user),
    `score_snapshots` (Monday ranks, for the arrows). `migrations/040`.
@@ -105,16 +125,61 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
 ## Client side
 
 - **Contexts** (`src/context/`): library data per platform (`GamesDataContext`,
-  `SteamGamesDataContext`, `PsnGamesDataContext`), recent achievements,
+  `SteamGamesDataContext`, `PsnGamesDataContext`, `XboxGamesDataContext`), recent achievements,
   pinned/hidden games, theme, language, which platform/view is shown, and
   `SubjectContext` (whose profile is being looked at).
+- **What a page asks for** (#101): each data context loads on its first reader (`request()`;
+  `{ passive: true }` reads `isLinked` without loading), so a route pays only for what it shows. At
+  start-up a signed-in page asks `me/bootstrap` (preferences, hidden games, Vault Points, one DB
+  read; `bootstrapPart` hands each reader its part once) and the header `me/streak` (a few bytes,
+  counted on the server). The home mounts its self-loading sections when idle (`useWhenIdle`);
+  Following reads `follows/cards`, which calls the profile routes' handlers in-process.
+  `scripts/measure-api-calls.js` counts a route's `/api` calls. Coming back to a page paints its
+  last answers (`lastAnswers`) and reads again; RA pictures are kept in localStorage (`raArtStore`);
+  on-every-load work is limited per tab (`dueInThisTab`).
 - **Hooks** (`src/hooks/`): one per concern; fetches live here, not in
   components. `useWhenChanged`, `useStorageValue`, `useIsClient` are the
   building blocks the lint rule pushes towards (see `CLAUDE.md` → State and effects).
+  `useRetryingRead` is the GET that retries in the background (`scheduleRetry`) and paints the
+  last answer (`lastAnswers`); the RA providers and hooks, pins and the showcase read through it.
 - **Components** (`src/components/`): one folder each, sub-components in
   `parent-sub/ParentSub.tsx`. Shared UI primitives in `components/ui/`.
+  A family of per-platform components is one shell plus an adapter per platform
+  (`docs/platform-shells.md`, #125): the game page table is `achievement-table/` (with
+  `hooks/useAchievementTable`, `utils/achievementTable`, `types/achievementTable`), and RA's,
+  Steam's, PSN's and Xbox's `*GameInfoTable` are its adapters at their old paths. A game card in a
+  group is `groups/group-game-card/GroupGameCard` (adapters `SortableItem`, `Steam-`, `Psn-`,
+  `XboxSortableItem`), and a game on a category page is `status-game-card/StatusGameCard` (adapters
+  `StatusGameItem`, `Steam-`, `Psn-`, `XboxStatusGameItem`); the two share their pieces in
+  `game-card-*/` (cover, title, mark, progress, line, dates, playtime, platform tag, expand button)
+  and `types/gameCard.ts`. The grid of an achievement's badges is `badge-grid/BadgeGrid` (adapters
+  `AchievementGrid`, `Steam-`, `Psn-`, `XboxAchievementGrid`; `useBadgeTooltip`, `types/badgeGrid`), a
+  game in the recent feed is `feed-game-card/FeedGameCard` (adapters `RaGameItem`, `Steam-`, `Psn-`,
+  `XboxGameItem`, `PsnCollectionItem`), a platform's category section is
+  `platform-category-section/PlatformCategorySection`, and an opened game is
+  `game-expanded-layout/GameExpandedLayout` with `badge-grid/lazy-badge-grid/LazyBadgeGrid` for the
+  grid's loading, failure and empty states. A platform on the account page is
+  `user-page/user-platform-card/UserPlatformCard` (identity as data, the small ringed disconnect beside "Connected" with its `platform-unlink-dialog/PlatformUnlinkDialog` confirmation, and its toasts;
+  adapters `UserRaCard`, `UserSteamCard`, `UserPsnCard`, `UserXboxCard`, also on `ConnectAccounts`), with
+  `user-platform-link-form/` for PSN and Xbox; the admin panel's per-platform rows come from
+  `utils/adminPlatforms.ts` (`ADMIN_PLATFORMS`). The link and unlink SQL of the user and admin routes is
+  `lib/platformLinks.ts` (each route keeps its own auth, checks, answers, mails and logs).
+  The library's pages are one component, `library-page/LibraryPage` (`category`: `playing`, `completed`,
+  `wantToPlay`, or `all` for `/allGames`, #129): the `[category]` route and `/allGames` only pass it their
+  status. Its one row of controls is `library-toolbar/LibraryToolbar`; which page takes which game is
+  `utils/libraryCategory.ts` (`inCategory`, and `detailCategory`: on "all" a game opens as its own status).
 - **Utils** (`src/utils/`): pure functions — mappers per platform
-  (`steamMappers`, `psnMappers`), library shelves and insights, `aiExport`.
+  (`steamMappers`, `psnMappers`), library shelves and insights, `aiExport`. The shared helpers
+  (#119): `dates.ts` (the platforms' UTC dates, day keys, dates in the reader's language),
+  `raAssets.ts` (RA's picture URLs, as `lib/steamAssets.ts` is Steam's), `gameRef.ts`
+  (`GAME_SOURCES`, `PLATFORM_NAME`, `raGameId`, game keys and pages), `gameAchievements.ts`
+  (one game's achievements on any platform, through the routes its page uses), `artWall.ts` (the art wall's
+  covers, which the sign-in's wall, the landing's backdrop and its closing band deal from). The types
+  every platform shares are in `src/types/game.ts`.
+- **Server helpers** (`src/lib/`, #119): `secrets.ts` (the app secret, HMAC, constant-time
+  compares, the cookie reader, the cron check; each caller's key derivation is pinned by its
+  test), `upstreamFetch.ts` (RA's and Steam's deadline and retries), `notHidden()` in
+  `gameVisibility.ts` (the SQL that leaves hidden games out).
 - **i18n**: `useLanguage()` gives `T`; strings in `src/translations/<lang>.ts`.
   The public comparison/how-to pages keep their prose apart, in
   `src/translations/seoPages.ts` (English and Spanish, others fall back to
@@ -134,7 +199,37 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   it (`show_presence`), in every query that shows other users; `PresenceDot` and
   `PresenceLabel` draw it.
 - **Themes**: `THEMES` in `src/types/types.ts`, CSS variables in
-  `src/app/globals.css`, applied before paint by a script in `src/app/layout.tsx`.
+  `src/app/globals.css`, applied before paint by the script `themeScript()` builds
+  (`src/utils/themeIcon.ts`) for `src/app/layout.tsx`. It also sets the favicon, the logo
+  in the theme's accent as a data URL on the layout's `<link id="theme-icon">`;
+  `public/icon.svg` is that logo in the default theme, for no JavaScript and the manifest.
+  The picker (`ThemeModal`, the welcome's style step) offers them as a base and an option under it
+  (`src/utils/themePicker.ts`), each option a `ui/ThemeScreen`.
+- **Language**: `LanguageContext` shows the saved choice (`app-language`, in storage and in a
+  cookie of the same name), else the first of `navigator.languages` the app has (`pickLanguage`,
+  `src/utils/languages.ts`), else English; the detected one is never saved. `(main)/layout.tsx`
+  renders in the request's language from the server (`serverLanguage`: the cookie, else
+  `Accept-Language`) through a `LanguageProvider initial`; static pages render English until
+  they hydrate.
+- **Welcome** (`/welcome`, `src/app/welcome/`, outside `(main)` so it has no app
+  header): `WelcomePage` and its steps in `src/components/welcome-page/`, the step
+  state in `useWelcomeSteps` (this tab's sessionStorage, `welcome-progress`, so Steam's
+  sign-in round trip lands back on its step). Linking reuses `useRaLink`, `useSteamLink`
+  (`next=/welcome` is an allowed return) and `usePsnLink`; the profile, style and privacy steps
+  reuse the account page's fields, and style shows the Layout modal's sample. The curtain is `welcome-curtain/WelcomeCurtain` (shared with
+  the sign-up forms, which start it: `useWelcomeEntry`). The rest of its motion is a CSS module (`WelcomePage.module.css`)
+  and its titles use the `font-display` face (Barlow Condensed, `display` in
+  `src/lib/fonts.ts`), loaded only there. Sign-up (`RegisterUserForm`, a new Steam
+  account in `useSteamSignup`) signs in and goes there.
+
+## Design system (see `design-system.md`)
+
+- `src/app/globals.css`: the themes' colours and the design's tokens (shapes, sizes, motion); the round design is `:root[data-shape="round"]`.
+- `src/components/game-picker/GamePicker.tsx` (+ `-footer`, `-id-row`, `-tile`, `-chip`, `hooks/useGamePicker`): the one "pick games from your library" dialog behind pin game, add game to a group and favourite game; `utils/raGameId.ts` reads a pasted RA id or link (the search uses it too). `country-list/CountryList` is the one country list (the location dialog and the admin's editor). `achievement-window/AchievementWindow` is the shell of RA's and the other platforms' achievement windows (`docs/platform-shells.md`). `period-achievements-modal/` is the dialog of a week, a month or any stretch (the week's days come from `utcWeekDays`; `week-achievements-modal/` is gone): two panes of `period-achievements-days/` (the days) and `period-achievements-day/` (a day by game, `-game-group/` each game), which `day-achievements-modal/` (the heatmap's day, with `day-achievements-awards/`) reuses; the day → game grouping is `utils/periodDays.ts`.
+- `src/components/ui/`: the library; `ui/shape.ts` (`SLANT_PLATE`, `MARK`) is how a big piece leans on the one angle and how the mark is drawn (#127).
+- `src/components/shape-sync/ShapeSync.tsx` (mounted in `app/providers.tsx`) puts `shape-style` on `<html>`; `app/layout.tsx` has the script that applies it before paint.
+- `src/app/(main)/design/page.tsx` + `src/components/design-catalog/`: the catalogue, admins only.
+- `src/utils/streakTier.ts`: the streak's tiers and their hues.
 
 ## Tooling
 

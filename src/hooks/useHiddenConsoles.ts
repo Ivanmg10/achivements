@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import { useStorageValue } from '@/hooks/useStorageValue'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
 
 const EMPTY: ReadonlySet<string> = new Set()
 

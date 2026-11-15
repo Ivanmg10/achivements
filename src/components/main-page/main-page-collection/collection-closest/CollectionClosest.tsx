@@ -12,6 +12,7 @@ import { classifyXboxGame, xboxHasAchievements } from '@/utils/xboxTitles'
 import { gameHref } from '@/utils/gameRef'
 import { ChartCard } from '@/components/ui/ChartCard'
 import ClosestToComplete, { CLOSEST_SHOWN, type ClosestGame } from '@/components/main-page/main-page-charts/closest-to-complete/ClosestToComplete'
+import { raImageUrl } from '@/utils/raAssets'
 
 /** The started games nearest 100%, whichever platform they are on: beside the collection, what could join it next. */
 export default function CollectionClosest({
@@ -31,7 +32,7 @@ export default function CollectionClosest({
       key: `ra:${g.GameID}`,
       href: gameHref('ra', g.GameID, subject),
       title: g.Title,
-      imageUrl: g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : undefined,
+      imageUrl: raImageUrl(g.ImageIcon),
       done: g.NumAwarded,
       total: g.MaxPossible,
       percent: parseFloat(g.PctWon) * 100,

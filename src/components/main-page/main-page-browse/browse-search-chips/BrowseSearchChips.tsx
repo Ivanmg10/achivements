@@ -1,5 +1,7 @@
 'use client'
 
+import { pillClass } from '@/components/ui/Pill'
+
 /** A row of toggle chips; the pressed one is bold and filled, not only coloured. */
 export default function BrowseSearchChips<V extends string>({ label, value, options, onChange }: { label: string; value: V; options: { value: V; label: string }[]; onChange: (v: V) => void }) {
   return (
@@ -10,9 +12,7 @@ export default function BrowseSearchChips<V extends string>({ label, value, opti
           type="button"
           aria-pressed={o.value === value}
           onClick={() => onChange(o.value)}
-          className={`px-2.5 py-1 rounded-full text-[11px] ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-            o.value === value ? 'bg-bg-tertiary ring-ink/15 text-text-main font-semibold' : 'ring-ink/[0.06] text-text-secondary hover:text-text-main'
-          }`}
+          className={pillClass(o.value === value)}
         >
           {o.label}
         </button>

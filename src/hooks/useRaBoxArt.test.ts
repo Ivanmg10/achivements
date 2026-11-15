@@ -3,6 +3,7 @@ import { useRaBoxArt } from './useRaBoxArt'
 
 const fetchMock = jest.fn()
 beforeEach(() => {
+  window.localStorage.clear()
   fetchMock.mockReset()
   global.fetch = fetchMock as unknown as typeof fetch
   jest.spyOn(console, 'error').mockImplementation(() => {})
@@ -53,4 +54,15 @@ test('a passing 503 is asked again, so one throttled answer does not cost the ar
   const { result } = renderHook(() => useRaBoxArt([9]))
   await waitFor(() => expect(result.current[9]).toBe('https://retroachievements.org/Images/box9.png'), { timeout: 4000 })
   expect(calls).toBeGreaterThanOrEqual(2)
+})
+
+test('art read once is kept in this browser and never asked again (#101)', async () => {
+  fetchMock.mockImplementation(() => ok({ ImageBoxArt: '/Images/box1.png' }))
+  const first = renderHook(() => useRaBoxArt([1]))
+  await waitFor(() => expect(first.result.current[1]).toBeDefined())
+  first.unmount()
+  fetchMock.mockClear()
+  const again = renderHook(() => useRaBoxArt([1]))
+  await waitFor(() => expect(again.result.current[1]).toBe('https://retroachievements.org/Images/box1.png'))
+  expect(fetchMock).not.toHaveBeenCalled()
 })

@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react'
+import { fireEvent, render, waitFor } from '@testing-library/react'
 import LibraryShelfBanner from './LibraryShelfBanner'
 import { fetchShared } from '@/lib/fetchShared'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
@@ -25,6 +25,20 @@ describe('LibraryShelfBanner (Xbox)', () => {
     await waitFor(() => expect(img(container)).toHaveAttribute('src', HERO))
     expect(img(container).className).not.toMatch(/blur/)
     expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/xbox/details?id='))
+  })
+
+  it('a wide picture far smaller than its card gives way to the blurred tile, not a stretched blur', async () => {
+    mockFetch.mockResolvedValue({ ok: true, status: 200, json: async () => ({ heroUrl: HERO }) })
+    const { container } = render(<LibraryShelfBanner entry={xboxEntry()} />)
+    await waitFor(() => expect(img(container)).toHaveAttribute('src', HERO))
+    const loaded = img(container)
+    Object.defineProperties(loaded, {
+      naturalWidth: { value: 320 }, naturalHeight: { value: 224 },
+      clientWidth: { value: 1230 }, clientHeight: { value: 460 },
+    })
+    fireEvent.load(loaded)
+    await waitFor(() => expect(img(container).className).toMatch(/blur/))
+    expect(img(container).getAttribute('src')).toBe(xboxGameFixture().imageIcon)
   })
 
   it('keeps the blurred tile when IGDB has no match', async () => {

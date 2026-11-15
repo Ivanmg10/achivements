@@ -28,7 +28,7 @@ beforeEach(() => {
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7', admin: true, xboxxuid: '25354', xboxgamertag: 'TestPlayer' } })
   ;(findXboxGame as jest.Mock).mockResolvedValue(GAME)
   ;(igdbXboxDetails as jest.Mock).mockResolvedValue(DETAILS)
-  ;(igdbXboxArt as jest.Mock).mockResolvedValue({ coverUrl: null, heroUrl: 'https://img/hero.jpg', releaseYear: 2021 })
+  ;(igdbXboxArt as jest.Mock).mockResolvedValue({ coverUrl: 'https://img/cover.jpg', heroUrl: 'https://img/hero.jpg', releaseYear: 2021 })
 })
 
 afterEach(() => (console.error as jest.Mock).mockRestore())
@@ -52,15 +52,15 @@ test('404 for a game the account does not have, and when IGDB knows nothing', as
   expect(await call('id=1738914043')).toEqual({ status: 404, body: { error: 'no-details' } })
 })
 
-test("IGDB's facts and a backdrop, searched by the title in the user's own library", async () => {
-  expect(await call('id=1738914043')).toEqual({ status: 200, body: { ...DETAILS, heroUrl: 'https://img/hero.jpg' } })
+test("IGDB's facts, a backdrop and the box art, searched by the title in the user's own library", async () => {
+  expect(await call('id=1738914043')).toEqual({ status: 200, body: { ...DETAILS, heroUrl: 'https://img/hero.jpg', coverUrl: 'https://img/cover.jpg' } })
   expect(igdbXboxDetails).toHaveBeenCalledWith('Halo', 'Xbox Series')
   expect(igdbXboxArt).toHaveBeenCalledWith('Halo', 'Xbox Series')
 })
 
-test('the facts still come when only the backdrop fails', async () => {
+test('the facts still come when only the pictures fail', async () => {
   ;(igdbXboxArt as jest.Mock).mockRejectedValue(new Error('IGDB down'))
-  expect(await call('id=1738914043')).toEqual({ status: 200, body: { ...DETAILS, heroUrl: null } })
+  expect(await call('id=1738914043')).toEqual({ status: 200, body: { ...DETAILS, heroUrl: null, coverUrl: null } })
   expect(console.error).toHaveBeenCalled()
 })
 

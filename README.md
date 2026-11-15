@@ -12,13 +12,20 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
 ## What it does
 
 - **Accounts** — open sign-up (username, password, required email) or with
-  Steam (Steam sign-in, then a username and email; Steam linked at once), password
+  Steam (Steam sign-in, then a username and email; Steam linked at once) or with
+  RetroAchievements (its username and Web API key; RA linked at once, name and picture filled in), password
   recovery and a soft email verification by mail, account deletion. Admin panel
   behind a second password check, with every action logged.
+- **Welcome** — after signing up, `/welcome` walks a new account through what the
+  app does, linking RetroAchievements (with a guide to finding the key), Steam and
+  PlayStation, the profile, the style (with a live sample) and the privacy, one step
+  at a time; every step can be skipped or gone back to.
 - **Three platforms, linked by the user**
   - *RetroAchievements* — with the user's own Web API key (never a shared one).
   - *Steam* — by signing in on Steam (proves the account is yours; game details must be public).
-  - *PlayStation* — by online ID, read through one app PSN account; PS3/Vita art from IGDB.
+  - *PlayStation* — by online ID, read through one app PSN account; PS3/Vita art from IGDB. Anyone sees the
+    trophies, but **PSN counts in Vault Points only once the account is verified** (a code pasted in its About Me;
+    one verified owner per account). Needs `migrations/046`.
 - **Library** — recently played, playing, want to play, completed, all games;
   filters by console/platform, hidden games, pinned games.
 - **Game pages** for each platform — achievement/trophy grid with rarity,
@@ -40,8 +47,10 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
 - **Public pages** — honest comparisons (vs Exophase, vs PSNProfiles) and
   how-tos at `/compare/*` and `/track/*`, plus a FAQ on the landing, for
   visitors and for what search engines and chat AIs read.
-- **Personalization** — 25 themes (`THEMES` in `src/types/types.ts`), 9 UI
-  languages (en, es, de, fr, it, ja, pl, pt, ru), country with flag.
+- **Personalization** — 22 themes (`THEMES` in `src/types/types.ts`), picked as a
+  base and an option under it, with a favicon in the theme's colour, 9 UI
+  languages (en, es, de, fr, it, ja, pl, pt, ru), taken from the browser until
+  the user picks one, country with flag.
 
 ## Stack
 
@@ -53,7 +62,7 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
 | Database | PostgreSQL on Neon, via a `pg` pool (`src/lib/db.js`) |
 | Data | RetroAchievements API, Steam Web API, `psn-api`, IGDB |
 | Email | Resend (REST, no SDK) |
-| Hosting | Vercel, functions in `fra1`, two daily crons (`vercel.json`) |
+| Hosting | Vercel, functions in `fra1`, daily crons (`vercel.json`) |
 | Tests | Jest + Testing Library |
 
 ## Getting started
@@ -75,7 +84,7 @@ missing:
 | `PSN_NPSSO` | PSN linking answers `not-configured` |
 | `OPENXBL_API_KEY` | Xbox (admin-only for now) answers `not-configured` |
 | `TWITCH_CLIENT_ID` / `_SECRET` | PS3/Vita games keep their trophy icon, no IGDB details |
-| `RESEND_API_KEY` (+ `EMAIL_FROM`) | Password recovery and verification mail — see `CLAUDE.md` → Email |
+| `RESEND_API_KEY` (+ `EMAIL_FROM`) | Password recovery and verification mail — see `docs/accounts.md` → Email |
 | `CRON_SECRET` | The cron routes refuse to run |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | `/privacy` has no contact address (required before going public) |
 | `NEXT_PUBLIC_GA_ID` | No analytics and no cookie banner (that is fine) |
@@ -129,13 +138,17 @@ Short version — the full rules are in [`CLAUDE.md`](CLAUDE.md) → Git:
 - `npm test`, `npm run lint` and `npm run build` pass before a PR.
 - New user-facing strings go in every file under `src/translations/`.
 - **Write down what you did** in [`docs/worklog.md`](docs/worklog.md), and
-  update `CLAUDE.md` when a rule or invariant changes.
+  update its area doc in `docs/` (and `CLAUDE.md`, if every task must obey it) when a rule or invariant changes.
+
+## Credits
+
+- **Country flags** are drawn by the "Twemoji Country Flags" font (`public/fonts/TwemojiCountryFlags.woff2`, from the `country-flag-emoji-polyfill` package, MIT), because Windows has no flag emoji. The flag artwork is [Twemoji](https://github.com/twitter/twemoji), © Twitter, Inc. and other contributors, used under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It only loads when a flag is on screen (`docs/performance.md`).
 
 ## Documentation
 
 | File | For |
 |---|---|
-| [`CLAUDE.md`](CLAUDE.md) | Rules and invariants: auth, email, admin, each platform, git. Read before touching any of them. |
+| [`CLAUDE.md`](CLAUDE.md) | The rules every task obeys, with a link to each area's doc in `docs/` (accounts, platforms, performance, social, releases…). |
 | [`docs/README.md`](docs/README.md) | Index of internal docs |
 | [`docs/architecture.md`](docs/architecture.md) | How the code is laid out and how data flows |
 | [`docs/worklog.md`](docs/worklog.md) | What each session did, why, and what it left open |

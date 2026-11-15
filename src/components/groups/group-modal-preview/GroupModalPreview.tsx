@@ -31,7 +31,7 @@ export default function GroupModalPreview({
   const Privacy = isPublic ? IconWorld : IconLock
 
   return (
-    <div aria-hidden="true" className="relative h-28 rounded-2xl overflow-hidden bg-bg-main ring-1 ring-ink/5 shrink-0">
+    <div aria-hidden="true" className="relative h-28 rounded-card overflow-hidden bg-bg-main ring-1 ring-ink/5 shrink-0">
       {covers.length > 0 && (
         <div className="absolute inset-0 grid opacity-35" style={{ gridTemplateColumns: `repeat(${covers.length}, minmax(0, 1fr))` }}>
           {covers.map((src, i) => (
@@ -41,7 +41,7 @@ export default function GroupModalPreview({
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-bg-main via-bg-main/70 to-transparent" />
       <div className="absolute inset-x-4 bottom-3 flex items-end gap-3">
-        <span className="w-12 h-12 rounded-xl bg-bg-card ring-1 ring-ink/10 flex items-center justify-center overflow-hidden shrink-0 [&>span]:text-2xl [&>img]:w-full [&>img]:h-full">
+        <span className="w-12 h-12 rounded-tile bg-bg-card ring-1 ring-ink/10 flex items-center justify-center overflow-hidden shrink-0 [&>span]:text-2xl [&>img]:w-full [&>img]:h-full">
           <GroupIconDisplay icon={icon.trim() || null} />
         </span>
         <div className="min-w-0">

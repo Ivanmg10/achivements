@@ -16,10 +16,9 @@ const props = {
 // The mock of AnimatePresence keeps the props it was given.
 const presence = AnimatePresence as unknown as { lastProps: { initial?: boolean; mode?: string } }
 
-test('the swap between views does not switch off the entrance of what is inside on the first load', () => {
+test('the swap between views plays only on a swap: the first load is the rows and cards, in CSS', () => {
   render(<LibraryExplorer {...props} />)
   expect(screen.getByTestId('shelves')).toBeInTheDocument()
-  // initial={false} would stop the shelves cascade on the first load, and let it run only when coming back from the list.
-  expect(presence.lastProps.initial).not.toBe(false)
+  expect(presence.lastProps.initial).toBe(false)
   expect(presence.lastProps.mode).toBe('wait')
 })

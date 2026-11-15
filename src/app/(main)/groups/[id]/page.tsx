@@ -4,8 +4,6 @@ import { useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { fadeUp } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useGroupPage } from '@/hooks/useGroupPage'
@@ -17,8 +15,8 @@ import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
 // Downloaded the first time it is opened, not with the page.
 const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
+const DeleteConfirmDialog = dynamic(() => import('@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'), { loading: () => null })
 const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'), { loading: () => null })
-import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
 import GroupDetailHero from '@/components/groups/group-detail-hero/GroupDetailHero'
 import GroupToolbar from '@/components/groups/group-toolbar/GroupToolbar'
 import GroupCoverGrid from '@/components/groups/group-cover-grid/GroupCoverGrid'
@@ -26,6 +24,7 @@ import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosai
 import { GROUP_DETAIL_VIEWS, type GroupDetailView } from '@/components/groups/group-view-toggle/GroupViewToggle'
 import GroupGameGrid from '@/components/groups/group-game-grid/GroupGameGrid'
 import GroupDetailSkeleton from '@/components/groups/group-detail-skeleton/GroupDetailSkeleton'
+import Button from '@/components/ui/Button'
 
 const PAGE = 'flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main'
 
@@ -58,11 +57,11 @@ export default function GroupDetailPage() {
       <div className={`${PAGE} justify-center gap-3 text-center`}>
         <p role="alert" className="text-text-secondary">{status === 'missing' ? T.groups.notFound : T.groups.loadError}</p>
         {status === 'error' ? (
-          <button onClick={retry} className="text-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded">
+          <button onClick={retry} className="text-sm text-accent hover:underline focus-ring rounded">
             {T.groups.retry}
           </button>
         ) : (
-          <Link href="/groups" className="text-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded">
+          <Link href="/groups" className="text-sm text-accent hover:underline focus-ring rounded">
             {T.groups.backToGroups}
           </Link>
         )}
@@ -71,7 +70,7 @@ export default function GroupDetailPage() {
   }
 
   return (
-    <motion.div className={PAGE} variants={fadeUp} initial="hidden" animate="visible">
+    <div className={PAGE}>
       <div className="w-full lg:max-w-[98%] flex flex-col gap-5">
         {!group ? (
           <GroupDetailSkeleton />
@@ -82,7 +81,6 @@ export default function GroupDetailPage() {
               covers={covers}
               gameCount={items.length}
               summary={summary}
-              states={states}
               onAdd={() => setAddGameOpen(true)}
               onEdit={() => setEditOpen(true)}
               onDelete={() => setConfirmDelete(true)}
@@ -98,28 +96,28 @@ export default function GroupDetailPage() {
                 onDecade={setDecade}
                 onToggleConsole={toggleConsole}
                 onClearConsoles={clearConsoles}
+                counts={states}
               />
             )}
 
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
                 <p className="text-sm text-text-secondary">{T.groups.noGames}</p>
-                <button
+                <Button
                   onClick={() => setAddGameOpen(true)}
-                  className="px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 >
                   {T.groups.addGame}
-                </button>
+                </Button>
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
                 <p className="text-sm text-text-secondary">{T.groups.noGamesFilter}</p>
-                <button onClick={clear} className="text-xs text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded">
+                <button onClick={clear} className="text-xs text-accent hover:underline focus-ring rounded">
                   {T.groups.clearFilters}
                 </button>
               </div>
             ) : view === 'covers' ? (
-              <GroupCoverGrid items={filtered} progress={progress} draggable={!filtersActive} onRemove={removeGame} onReorder={reorder} />
+              <GroupCoverGrid items={filtered} progress={progress} draggable={!filtersActive} onRemove={removeGame} onReorder={reorder} onAdd={() => setAddGameOpen(true)} />
             ) : (
               <GroupGameGrid
                 items={filtered}
@@ -144,7 +142,9 @@ export default function GroupDetailPage() {
           <GroupModal isOpen={editOpen} onClose={() => setEditOpen(false)} group={group} onSave={edit} />
         </LazyWhenOpened>
       )}
-      <DeleteConfirmDialog isOpen={confirmDelete} onClose={() => setConfirmDelete(false)} onConfirm={handleDelete} />
-    </motion.div>
+      <LazyWhenOpened open={confirmDelete}>
+        <DeleteConfirmDialog isOpen={confirmDelete} onClose={() => setConfirmDelete(false)} onConfirm={handleDelete} />
+      </LazyWhenOpened>
+    </div>
   )
 }

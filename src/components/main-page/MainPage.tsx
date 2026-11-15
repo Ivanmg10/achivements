@@ -1,7 +1,7 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
-import { motion } from 'framer-motion'
+import { useId, useState } from 'react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 
 import MainPageSkeleton from './main-page-skeleton/MainPageSkeleton'
 import MainPagePinnedGames from './main-page-pinned-games/MainPagePinnedGames'
@@ -10,15 +10,19 @@ import ConnectAccounts from '@/components/connect-accounts/ConnectAccounts'
 import MainPageWithoutRa from './main-page-without-ra/MainPageWithoutRa'
 import MainPageCharts from './main-page-charts/MainPageCharts'
 import RaKeyInvalidNotice from '@/components/ra-key-invalid-notice/RaKeyInvalidNotice'
-import RARecentlyPlayed from '@/components/ra-recently-played/RARecentlyPlayed'
+import RecentlyPlayedFeed from '@/components/recently-played-feed/RecentlyPlayedFeed'
 import { useMainView } from '@/context/MainViewContext'
 import { useSubject } from '@/context/SubjectContext'
 import { useRaLinked } from '@/hooks/useRaLinked'
 import { canUseXbox } from '@/utils/xboxAccess'
 import { homeFit } from '@/lib/homeFit'
+import { useHomeLayout } from '@/hooks/useHomeLayout'
+import MainPagePortada from '@/components/main-page/main-page-portada/MainPagePortada'
+import MainPagePortadaSide from '@/components/main-page/main-page-portada-side/MainPagePortadaSide'
+import MainPageProfileFold from '@/components/main-page/main-page-profile-fold/MainPageProfileFold'
 
 export default function MainPage() {
-  const { status, data: session } = useSession()
+  const { status, data: session } = useAuthSession()
   const raLinked = useRaLinked()
 
   // Only the first read, while there is no session yet. update() (RaUserRefresher
@@ -35,17 +39,10 @@ export default function MainPage() {
   }
 
   return (
-    <motion.main
-      ref={homeFit}
-      className="home-fit flex flex-col min-h-full text-text-main"
-      // Opacity only: content landing where the skeleton was, with no slide on top.
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-    >
+    <main ref={homeFit} className="home-fit flex flex-col min-h-full text-text-main">
       <RaKeyInvalidNotice />
       <MainPageBody />
-    </motion.main>
+    </main>
   )
 }
 
@@ -57,21 +54,30 @@ export default function MainPage() {
 export function MainPageBody() {
   const { view } = useMainView()
   const visitor = useSubject() !== null
+  const [layout] = useHomeLayout()
+  // On a phone (#134) or a screen held sideways below lg (#115) your profile starts folded to one line, so your games come first; elsewhere it is always open.
+  const [profileOpen, setProfileOpen] = useState(false)
+  const sideId = useId()
+  const folded = !visitor && !profileOpen
 
   return (
     <>
-      <div className="home-fit-top flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
-        {/* Profile first in DOM → top on mobile; placed col-2 on desktop */}
-        <div className="home-fit-side min-h-0 flex flex-col lg:col-start-2 lg:row-start-1">
-          <MainPageProfile />
+      {/* The "cover" layout: the game played last, in big, before the usual home. Never on someone else's page. */}
+      {layout === 'cover' && !visitor && <MainPagePortada />}
+      <div className="home-fit-top flex-1 min-h-0 grid grid-cols-1 items-stretch lg:grid-cols-[2fr_1fr]">
+        {!visitor && <MainPageProfileFold open={profileOpen} onToggle={() => setProfileOpen((o) => !o)} controls={sideId} />}
+        {/* Profile first in DOM → top on mobile (folded on a phone until opened); placed col-2 on desktop */}
+        <div id={sideId} className={`home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1 ${folded ? 'max-sm:hidden max-lg:short:hidden' : ''}`}>
+          {/* The cover puts your level, streak and last achievements here; the classic home, the platform profiles. */}
+          {layout === 'cover' && !visitor ? <MainPagePortadaSide /> : <MainPageProfile />}
         </div>
         {/* Left column: either pinned games or recently played */}
-        <div className="home-fit-main flex flex-col min-h-0 lg:col-start-1 lg:row-start-1">
+        <div className="home-fit-main flex flex-col min-h-0 min-w-0 lg:col-start-1 lg:row-start-1">
           {view === 'pinned' && !visitor ? (
             <MainPagePinnedGames />
           ) : (
-            <div className="m-3 bg-bg-card rounded-xl p-4 flex flex-col flex-1 min-h-0">
-              <RARecentlyPlayed />
+            <div className="m-3 bg-bg-card rounded-tile p-4 flex flex-col flex-1 min-h-0">
+              <RecentlyPlayedFeed skipLatest={layout === 'cover' && !visitor} />
             </div>
           )}
         </div>

@@ -5,12 +5,14 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { XboxAchievementGrid } from '@/components/xbox/xbox-achievement-grid/XboxAchievementGrid'
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
-import LibraryGameDetail, { type LibraryCategory } from '@/components/library-game-detail/LibraryGameDetail'
+import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetail'
+import { asCategory } from '@/utils/utils'
 import { fromXbox } from '@/utils/gameInsights'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { XboxGameProgress } from '@/types/xbox'
+import { latestFullSetCompletedAt } from '@/utils/completionDates'
+import ErrorRetry from '@/components/ui/ErrorRetry'
 
-const asCategory = (c?: string): LibraryCategory => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
 /**
  * An opened Xbox card in a status list: PsnLibraryDetail's counterpart.
@@ -33,21 +35,16 @@ export default function XboxLibraryDetail({ game, category }: { game: XboxGamePr
       game={{ source: 'xbox', id: game.id, title: game.title, iconUrl: game.imageIcon || undefined }}
       info={game.consoleName ? [{ label: T.libraryDetail.console, value: game.consoleName }] : []}
       items={items}
+      completedAt={latestFullSetCompletedAt(items)}
       state={isLoading ? 'loading' : error ? 'error' : 'ready'}
       errorNode={
-        <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-red-400">{T.xbox.achievementsError}</p>
-          {error === 'private' && <p className="text-xs text-text-secondary">{T.xbox.errors.private}</p>}
-          <button onClick={retry} className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">
-            {T.xbox.retry}
-          </button>
-        </div>
+        <ErrorRetry message={T.xbox.achievementsError} hint={error === 'private' ? T.xbox.errors.private : undefined} retryLabel={T.xbox.retry} onRetry={retry} />
       }
       ring={{ earned, total, label: T.xbox.achievements }}
       ringExtra={<XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} />}
-      facts={game.playtimeMinutes ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang), className: 'text-[#107c10]' }] : []}
+      facts={game.playtimeMinutes ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, T.steam, lang), className: 'text-xbox' }] : []}
       empty={T.xbox.noAchievements}
-      grid={<XboxAchievementGrid gameId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={48} limit={60} />}
+      grid={<XboxAchievementGrid gameId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={48} />}
     />
   )
 }

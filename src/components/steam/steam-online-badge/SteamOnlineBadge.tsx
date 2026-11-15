@@ -12,7 +12,7 @@ export default function SteamOnlineBadge({ className = '' }: { className?: strin
   return (
     <span
       title={T.steam.likelyOnlineHint}
-      className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-orange-500/15 text-orange-300 whitespace-nowrap ${className}`}
+      className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-warning/15 text-warning whitespace-nowrap ${className}`}
     >
       <IconWorld size={11} aria-hidden="true" />
       {T.steam.likelyOnline}

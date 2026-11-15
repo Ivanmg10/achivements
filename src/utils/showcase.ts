@@ -1,6 +1,7 @@
-import type { GameSource } from '@/types/steam'
-import type { RecentAchievement } from '@/types/types'
-import { achievementBadgeUrl } from '@/utils/utils'
+import { parseUnlockTime, unlockIso } from '@/utils/dates'
+import type { GameSource } from '@/types/game'
+import { GAME_SOURCES } from '@/utils/gameRef'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 /** How many achievements a showcase holds. */
 export const SHOWCASE_MAX = 5
@@ -24,7 +25,6 @@ export type ShowcaseEntry = {
 
 export type ShowcaseItem = ShowcaseEntry & { id: number }
 
-const SOURCES: GameSource[] = ['ra', 'steam', 'psn', 'xbox']
 const DAY = 86400000
 
 export const showcaseKey = (e: Pick<ShowcaseEntry, 'source' | 'gameId' | 'achievementKey'>) => `${e.source}:${e.gameId}:${e.achievementKey}`
@@ -40,7 +40,7 @@ const text = (v: unknown, max: number): string | null => (typeof v === 'string' 
 export function parseShowcaseEntry(v: unknown, now: number = Date.now()): ShowcaseEntry | null {
   if (!v || typeof v !== 'object') return null
   const o = v as Record<string, unknown>
-  const source = SOURCES.find((s) => s === o.source)
+  const source = GAME_SOURCES.find((s) => s === o.source)
   const gameId = o.gameId
   const achievementKey = text(o.achievementKey, 100)
   const gameTitle = text(o.gameTitle, 200)
@@ -57,24 +57,6 @@ export function parseShowcaseEntry(v: unknown, now: number = Date.now()): Showca
   return { source, gameId: gameId as number, achievementKey, gameTitle, title, description, badge, earnedAt: new Date(earnedAt).toISOString() }
 }
 
-/** One of the year's unlocks (any platform) as a showcase entry; null without a key to tell it apart. */
-export function showcaseFromUnlock(a: RecentAchievement): ShowcaseEntry | null {
-  const source = a.Source ?? 'ra'
-  const achievementKey = a.Key ?? (source === 'ra' ? String(a.AchievementID) : null)
-  const at = Date.parse(a.Date.includes('T') ? a.Date : a.Date.replace(' ', 'T'))
-  if (!achievementKey || Number.isNaN(at)) return null
-  return {
-    source,
-    gameId: a.GameID,
-    achievementKey,
-    gameTitle: a.GameTitle,
-    title: a.Title,
-    description: a.Description || null,
-    badge: achievementBadgeUrl(a) ?? null,
-    earnedAt: new Date(at).toISOString(),
-  }
-}
-
 /** An RA achievement as a showcase entry, if it was earned (hardcore first); null otherwise. */
 export function raShowcaseEntry(
   a: { ID: number; Title: string; Description?: string | null; BadgeName?: string | null; DateEarned?: string | null; DateEarnedHardcore?: string | null },
@@ -82,7 +64,7 @@ export function raShowcaseEntry(
   gameTitle: string,
 ): ShowcaseEntry | null {
   const earned = a.DateEarnedHardcore || a.DateEarned
-  const at = earned ? Date.parse(earned.includes('T') ? earned : earned.replace(' ', 'T')) : NaN
+  const at = earned ? parseUnlockTime(earned) : NaN
   if (Number.isNaN(at)) return null
   return {
     source: 'ra',
@@ -91,7 +73,7 @@ export function raShowcaseEntry(
     gameTitle,
     title: a.Title,
     description: a.Description || null,
-    badge: a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : null,
+    badge: raBadgeUrl(a.BadgeName) ?? null,
     earnedAt: new Date(at).toISOString(),
   }
 }
@@ -111,7 +93,7 @@ export type ShowcaseChoice = {
   entry: ShowcaseEntry | null
 }
 
-type ChoiceInput = {
+export type ChoiceInput = {
   key: string
   title: string
   description?: string | null
@@ -120,16 +102,10 @@ type ChoiceInput = {
   hidden?: boolean
 }
 
-const isoOf = (d: string | null | undefined) => {
-  if (!d) return null
-  const t = Date.parse(d.includes('T') ? d : d.replace(' ', 'T'))
-  return Number.isNaN(t) ? null : new Date(t).toISOString()
-}
-
 /** A game's achievements as picker choices, earned first (newest first), then the rest in the game's order. */
 export function showcaseChoices(source: ShowcaseEntry['source'], gameId: number, gameTitle: string, list: ChoiceInput[]): ShowcaseChoice[] {
   const choices = list.map((a) => {
-    const earnedAt = isoOf(a.earnedAt)
+    const earnedAt = unlockIso(a.earnedAt)
     const concealed = Boolean(a.hidden) && !earnedAt
     return {
       key: a.key,

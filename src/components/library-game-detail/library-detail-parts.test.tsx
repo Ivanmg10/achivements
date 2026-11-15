@@ -16,7 +16,7 @@ describe('LibraryDetailList', () => {
     expect(first).toHaveAttribute('href', '/g#1')
     expect(first).toHaveTextContent('T1')
     expect(first).toHaveTextContent(en.libraryDetail.rarityOf.replace('{n}', '12.3'))
-    expect(first).toHaveTextContent(`25 ${en.libraryDetail.pointsShort}`)
+    expect(first).toHaveTextContent('25 points')
     // No rarity known, none claimed.
     expect(second).not.toHaveTextContent('%')
   })

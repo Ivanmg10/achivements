@@ -26,12 +26,17 @@ export function sniffImageType(bytes: Uint8Array): AvatarMime | null {
  * good. No query string: Next's image component refuses local ones by default.
  */
 export function avatarUrl(userId: number | string, version: number): string {
-  return `/api/avatar/${userId}-${version}`
+  return avatarPath(`${userId}-${version}`)
+}
+
+/** The stored form of an avatar path segment, as `users.avatar` keeps it. */
+export function avatarPath(segment: string): string {
+  return `/api/avatar/${segment}`
 }
 
 /** The user id in an avatar path segment ("12-1700000000"), or null if it is not one. */
 export function parseAvatarSegment(segment: string): number | null {
-  const match = /^(\d+)-\d+$/.exec(segment)
+  const match = /^(\d{1,10})-\d+$/.exec(segment)
   return match ? Number(match[1]) : null
 }
 

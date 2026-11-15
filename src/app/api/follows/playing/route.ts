@@ -54,7 +54,20 @@ export async function GET() {
       },
       { userId: auth.id },
     )
-    return NextResponse.json(playing)
+    // Apply current visibility after the warm assembled cache as well.
+    const { rows: hidden } = await pool.query(
+      `SELECT u.username, h.game_id
+         FROM follows f
+         JOIN users u ON u.id = f.followed_id
+         JOIN hidden_games h ON h.user_id = u.id
+        WHERE f.follower_id = $1 AND h.source = 'steam'`,
+      [auth.id],
+    )
+    const visible: PlayingNow = { ...playing }
+    for (const row of hidden as { username: string; game_id: number }[]) {
+      if (visible[row.username]?.appId === row.game_id) delete visible[row.username]
+    }
+    return NextResponse.json(visible)
   } catch (err) {
     console.error('[follows/playing GET]', err)
     return NextResponse.json({ error: 'steam-unavailable' }, { status: 503 })

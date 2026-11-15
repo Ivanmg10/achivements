@@ -10,6 +10,7 @@ import { render, screen, within } from '@testing-library/react'
 import LibraryGameDetail from './LibraryGameDetail'
 import { en } from '@/translations/en'
 import type { InsightAchievement } from '@/utils/gameInsights'
+import { formatDate } from '@/utils/dates'
 
 const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString()
 const a = (id: string, o: Partial<InsightAchievement> = {}): InsightAchievement => ({
@@ -35,7 +36,7 @@ test('playing: the calendar of the game, and the latest unlocked with their date
   expect(screen.getByTestId('calendar')).toHaveTextContent('Hades')
   const latest = within(screen.getByText(L.recentTitle).parentElement!).getAllByRole('link')
   expect(latest.map((l) => l.getAttribute('href'))).toEqual(['/g#done3', '/g#done2', '/g#done1'])
-  expect(latest[0]).toHaveTextContent(new Date(finished[2].earnedAt!).toLocaleDateString('en'))
+  expect(latest[0]).toHaveTextContent(formatDate(finished[2].earnedAt, 'en'))
 })
 
 test('completed: the calendar, and the milestones with the days they were reached', () => {
@@ -58,7 +59,7 @@ test('wantToPlay: the hardest ones, and what is known of the game beside them', 
 test('wantToPlay with nothing known of the game: the hardest take the whole row', () => {
   render(<LibraryGameDetail {...base} category="wantToPlay" items={notStarted} game={game} />)
   expect(screen.queryByText(L.infoTitle)).not.toBeInTheDocument()
-  expect(screen.getByText(L.hardestTitle).parentElement!.parentElement).toHaveClass('@3xl:col-span-3')
+  expect(screen.getByText(L.hardestTitle).parentElement!.parentElement).toHaveClass('@3xl:col-span-2')
 })
 
 test('no calendar when the game is not said, but the list of latest stays', () => {

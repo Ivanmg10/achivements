@@ -21,12 +21,14 @@ import { useParams, notFound } from 'next/navigation'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
+import { useSession } from 'next-auth/react'
 import { en } from '@/translations/en'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
 
 const ID = '1738914043'
 const GAME = xboxGameFixture({ id: 1738914043, titleId: ID, title: 'Halo' })
 const retry = jest.fn()
+const refetch = jest.fn()
 
 function setup({
   id = ID,
@@ -34,11 +36,12 @@ function setup({
   linked = true,
   library = [GAME] as unknown[],
   libraryLoading = false,
+  libraryError = null as string | null,
   achievements = { achievements: [{ id: '0' }, { id: '1' }], isLoading: false, error: null as string | null },
 } = {}) {
   ;(useParams as jest.Mock).mockReturnValue({ id })
   ;(useXboxEnabled as jest.Mock).mockReturnValue(enabled)
-  ;(useXboxGamesData as jest.Mock).mockReturnValue({ isLinked: linked, fullLibrary: library, libraryLoading })
+  ;(useXboxGamesData as jest.Mock).mockReturnValue({ isLinked: linked, fullLibrary: library, libraryLoading, libraryError, refetch })
   ;(useXboxAchievements as jest.Mock).mockReturnValue({ ...achievements, retry })
 }
 
@@ -94,4 +97,22 @@ test('a skeleton table while the achievements load', () => {
   setup({ achievements: { achievements: [], isLoading: true, error: null } })
   render(<XboxGamePage />)
   expect(screen.getByRole('status')).toBeInTheDocument()
+})
+
+test('a full load holds the skeleton until the session says who is looking, not a 404 (V2)', () => {
+  ;(useSession as jest.Mock).mockReturnValueOnce({ data: undefined, status: 'loading', update: jest.fn() })
+  setup({ enabled: false, linked: false })
+  render(<XboxGamePage />)
+  expect(screen.getByTestId('loading')).toBeInTheDocument()
+  expect(notFound).not.toHaveBeenCalled()
+})
+
+test('a library that could not be read says try later, not "game not found"', () => {
+  setup({ library: [], libraryError: 'rate-limited' })
+  render(<XboxGamePage />)
+  expect(notFound).not.toHaveBeenCalled()
+  expect(screen.getByRole('alert')).toHaveTextContent(en.xbox.gamesError)
+  expect(screen.getByText(en.xbox.errors['rate-limited'])).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: en.xbox.retry }))
+  expect(refetch).toHaveBeenCalled()
 })

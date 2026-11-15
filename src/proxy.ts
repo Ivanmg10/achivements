@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
+import { safeNext } from '@/utils/safeNext'
 
 /**
  * Everything inside the app needs an account. The home page is the exception:
@@ -17,8 +18,26 @@ const PUBLIC_PREFIXES = ['/compare/', '/track/']
 // Not /user (your account) and not a game inside a profile.
 const PUBLIC_PROFILE = /^\/user\/[^/]+(\/opengraph-image[^/]*)?$/
 
+/**
+ * A write from another site, which SameSite alone does not stop when that site
+ * is a sibling subdomain. Only requests that carry Origin reach this (see the
+ * matcher); a server calling the API sends none and is left to the route's own check.
+ */
+function crossSiteWrite(req: NextRequest): boolean {
+  if (req.method === 'GET' || req.method === 'HEAD') return false
+  const origin = req.headers.get('origin')
+  try {
+    return new URL(origin ?? '').host !== req.headers.get('host')
+  } catch {
+    return true
+  }
+}
+
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
+  if (pathname.startsWith('/api/')) {
+    return crossSiteWrite(req) ? NextResponse.json({ error: 'cross-site' }, { status: 403 }) : NextResponse.next()
+  }
   if (PUBLIC_PATHS.includes(pathname) || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p)) || PUBLIC_PROFILE.test(pathname)) {
     return NextResponse.next()
   }
@@ -26,11 +45,18 @@ export async function proxy(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
   if (token) return NextResponse.next()
 
+  // Sign-in says why it was reached and sends the person back to where they were going (a safe, own-site path only).
   const signIn = new URL('/authPage', req.url)
+  const back = safeNext(`${pathname}${req.nextUrl.search}`)
+  if (back !== '/') signIn.searchParams.set('next', back)
   return NextResponse.redirect(signIn)
 }
 
 export const config = {
   // Everything but the API, Next's own files, and anything with an extension.
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|media|.*\\..*).*)'],
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|media|.*\\..*).*)',
+    // Same-origin GETs send no Origin, so the API's reads never pass through here.
+    { source: '/api/:path*', has: [{ type: 'header', key: 'origin' }] },
+  ],
 }

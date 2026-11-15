@@ -2,6 +2,7 @@ jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/currentPassword', () => ({ checkCurrentPassword: jest.fn() }))
 jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn(), loadUser: jest.fn() }))
+jest.mock('@/lib/steamCache', () => ({ clearUserCache: jest.fn() }))
 
 import { DELETE } from './route'
 import { getServerSession } from 'next-auth'

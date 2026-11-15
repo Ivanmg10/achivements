@@ -26,7 +26,7 @@ test('asks for pass after pass until complete, then says the points are ready', 
   await waitFor(() => expect(result.current.status?.complete).toBe(true), { timeout: 4000 })
   expect((global.fetch as jest.Mock).mock.calls.filter(([, init]) => init?.method === 'POST')).toHaveLength(2)
   expect(result.current.version).toBe(2)
-  expect(notify.success).toHaveBeenCalledWith('Your Vault Points are ready: Level 32 · Veteran')
+  expect(notify.success).toHaveBeenCalledWith('Your Vault Points are ready: Level 32 · Specialist')
 })
 
 test('a returning user with a fresh score: one quiet answer, no toast, nothing to reload', async () => {
@@ -53,4 +53,28 @@ test('signed out, nothing is asked; a failed request ends the loop', async () =>
   ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 })
   renderHook(() => useVaultFill())
   await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1))
+})
+
+test('a pass that read nothing new ends the page’s fill, so the screens stop saying "calculating" (#128)', async () => {
+  // Steam is busy (one key for everyone): every pass answers the same count.
+  ;(global.fetch as jest.Mock).mockImplementation(async (_url: string, init?: { method?: string }) => ok(init?.method === 'POST' ? answer({ platforms: { steam: { read: 189, total: 190, state: 'reading', error: 'busy' } } }) : null))
+  const { result } = renderHook(() => useVaultFill())
+  await waitFor(() => expect(result.current.stopped).toBe(true), { timeout: 4000 })
+  expect((global.fetch as jest.Mock).mock.calls.filter(([, init]) => init?.method === 'POST')).toHaveLength(2)
+})
+
+test('a pass that moved on keeps the fill going', async () => {
+  ;(global.fetch as jest.Mock)
+    .mockResolvedValueOnce(ok(answer({})))
+    .mockResolvedValueOnce(ok(answer({ platforms: { steam: { read: 100, total: 190, state: 'reading' } } })))
+    .mockResolvedValueOnce(ok(answer({ complete: true, platforms: { steam: { read: 190, total: 190, state: 'done' } } })))
+  const { result } = renderHook(() => useVaultFill())
+  await waitFor(() => expect(result.current.status?.complete).toBe(true), { timeout: 6000 })
+  expect(result.current.stopped).toBe(false)
+})
+
+test('a failed request stops the page’s fill', async () => {
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 })
+  const { result } = renderHook(() => useVaultFill())
+  await waitFor(() => expect(result.current.stopped).toBe(true))
 })

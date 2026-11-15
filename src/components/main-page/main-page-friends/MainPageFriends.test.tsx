@@ -9,8 +9,8 @@ jest.mock('@/hooks/useFriendsData', () => ({ useFriendsData: jest.fn(), DETAIL_L
 jest.mock('@/hooks/useProfileLibrary', () => ({ useProfileLibrary: jest.fn() }))
 jest.mock('./main-page-friends-leaderboard/MainPageFriendsLeaderboard', () => ({
   __esModule: true,
-  default: ({ rows, pending }: { rows: { username: string; isMe: boolean }[]; pending: { username: string }[] }) => (
-    <div data-testid="leaderboard" data-rows={rows.map((r) => `${r.username}${r.isMe ? '*' : ''}`).join(',')} data-pending={pending.map((p) => p.username).join(',')} />
+  default: ({ rows }: { rows: { username: string; isMe: boolean }[] }) => (
+    <div data-testid="leaderboard" data-rows={rows.map((r) => `${r.username}${r.isMe ? '*' : ''}`).join(',')} />
   ),
 }))
 jest.mock('./main-page-friends-feed/MainPageFriendsFeed', () => ({
@@ -68,20 +68,24 @@ test('a placeholder while loading, a retry on failure, and a note when you follo
   expect(screen.getByText(en.following.emptyTitle)).toBeInTheDocument()
 })
 
-test('you on the board with the friends read so far; the rest pending; a card for everyone', () => {
+test('the whole section waits until everyone is read, then lands at once', () => {
   const details = {
     ana: { recent: [{ Date: new Date().toISOString().slice(0, 19).replace('T', ' '), Title: 'A', GameID: 1 }], games: [{ ...game, pct: 90 }], partial: true },
   }
   setup({ friends: [friend('ana'), friend('bo'), friend('cy')], details, detailsLoading: true })
-  render(<MainPageFriends active myRecent={[]} />)
-  expect(screen.getByTestId('leaderboard')).toHaveAttribute('data-rows', 'me*,ana')
-  // Only DETAIL_LIMIT friends are read; the third is never pending.
-  expect(screen.getByTestId('leaderboard')).toHaveAttribute('data-pending', 'bo')
+  const { rerender } = render(<MainPageFriends active myRecent={[]} />)
+  expect(screen.getByRole('status')).toHaveTextContent(en.friends.loading)
+  expect(screen.queryByTestId('leaderboard')).not.toBeInTheDocument()
+  expect(screen.queryByTestId('card')).not.toBeInTheDocument()
+
+  setup({ friends: [friend('ana'), friend('bo'), friend('cy')], details: { ...details, bo: { recent: [], games: [], partial: false } } })
+  rerender(<MainPageFriends active myRecent={[]} />)
+  expect(screen.getByTestId('leaderboard')).toHaveAttribute('data-rows', 'me*,ana,bo')
   expect(screen.getByTestId('feed')).toHaveAttribute('data-count', '1')
   expect(screen.getByTestId('shared')).toHaveAttribute('data-count', '1')
   expect(screen.getAllByTestId('card').map((c) => c.textContent)).toEqual(['ana', 'bo', 'cy'])
   expect(screen.getAllByTestId('card')[0]).toHaveAttribute('data-week', '1')
-  expect(screen.getAllByTestId('card')[1]).toHaveAttribute('data-week', 'null')
+  expect(screen.getAllByTestId('card')[2]).toHaveAttribute('data-week', 'null')
   expect(screen.getByText(en.friends.limitNote.replace('{n}', '2'))).toBeInTheDocument()
   expect(screen.getByText(en.friends.partialNote)).toBeInTheDocument()
 })
