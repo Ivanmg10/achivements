@@ -25,11 +25,14 @@ import pool from '@/lib/db'
  * 'avatar' counts uploads per account: an avatar is small, but each one is a
  * write of up to 512 KB to the database.
  *
+ * 'psn-verify' counts the checks of a PSN verification code per account (each one reads Sony); a check
+ * that succeeds, or that Sony failed to answer, does not count.
+ *
  * 'psn-score' counts the PSN games read for Vault Points, for the whole app
  * (address 'app'): PSN is one app account for everyone, so the score fill goes
  * gently whoever it is for. 300 games is 600 calls to Sony in 15 minutes.
  */
-export type AttemptScope = 'totp' | 'psn-upstream' | 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'ra-borrowed' | 'avatar' | 'user-search' | 'follow' | 'psn-score' | 'xbox-upstream' | 'ra-check'
+export type AttemptScope = 'totp' | 'psn-upstream' | 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'ra-borrowed' | 'avatar' | 'user-search' | 'follow' | 'psn-score' | 'psn-verify' | 'xbox-upstream' | 'ra-check'
 
 const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   signup: { max: 5, windowMinutes: 60 },
@@ -43,6 +46,7 @@ const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   'user-search': { max: 60, windowMinutes: 5 },
   follow: { max: 60, windowMinutes: 5 },
   'psn-score': { max: 300, windowMinutes: 15 },
+  'psn-verify': { max: 6, windowMinutes: 15 },
   // Every call to Sony, for the whole app: scoring's 600 and room for people browsing.
   'psn-upstream': { max: 900, windowMinutes: 15 },
   // One OpenXBL key and plan are shared by every route and score job in this environment.

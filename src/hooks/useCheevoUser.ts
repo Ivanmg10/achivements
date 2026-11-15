@@ -17,6 +17,8 @@ export type CheevoUser = {
   /** Their names on Steam, PSN and Xbox, when linked. */
   steamName?: string | null
   psnName?: string | null
+  /** Their PSN account was proven theirs (a code in its About Me). */
+  psnVerified?: boolean
   xboxName?: string | null
   /** The page is the viewer's own. */
   isSelf?: boolean

@@ -83,7 +83,7 @@ test('saves the account as PSN spells it and drops the cached user row', async (
     body: { psnaccountid: '42', psnusername: 'Hakoom' },
   })
   expect(findPsnAccount).toHaveBeenCalledWith('hakoom')
-  expect(pool.query).toHaveBeenCalledWith('UPDATE users SET psnaccountid = $1, psnusername = $2 WHERE id = $3', [
+  expect(pool.query).toHaveBeenCalledWith('UPDATE users SET psnaccountid = $1, psnusername = $2, psn_verified_at = NULL, psn_verification_code = NULL, psn_verification_expires_at = NULL WHERE id = $3', [
     '42',
     'Hakoom',
     '7',

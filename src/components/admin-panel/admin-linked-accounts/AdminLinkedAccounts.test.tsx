@@ -43,6 +43,8 @@ const PLATFORMS = [
 ] as const
 
 const blockOf = (name: string) => screen.getByRole('group', { name })
+/** A new or removed PSN account is never verified: its changes say so too (#176). */
+const withVerification = (platform: string, changes: Record<string, unknown>) => (platform === 'psn' ? { ...changes, psnVerified: false } : changes)
 
 describe.each(PLATFORMS)('$platform', ({ platform, name, typed, body, answer, linked, shown }) => {
   const [first] = Object.keys(typed)
@@ -58,7 +60,7 @@ describe.each(PLATFORMS)('$platform', ({ platform, name, typed, body, answer, li
     for (const [label, value] of Object.entries(typed)) fireEvent.change(screen.getByLabelText(label), { target: { value } })
     fireEvent.click(button)
 
-    await waitFor(() => expect(onUpdated).toHaveBeenCalledWith(11, answer))
+    await waitFor(() => expect(onUpdated).toHaveBeenCalledWith(11, withVerification(platform, answer)))
     expect(global.fetch).toHaveBeenCalledWith('/api/admin/users/accounts', expect.objectContaining({
       method: 'POST',
       body: JSON.stringify({ id: 11, platform, ...body }),
@@ -84,7 +86,7 @@ describe.each(PLATFORMS)('$platform', ({ platform, name, typed, body, answer, li
 
     fireEvent.click(screen.getByRole('button', { name: 'Unlink' }))
     const cleared = Object.fromEntries(Object.keys(answer).map((k) => [k, null]))
-    await waitFor(() => expect(onUpdated).toHaveBeenCalledWith(11, cleared))
+    await waitFor(() => expect(onUpdated).toHaveBeenCalledWith(11, withVerification(platform, cleared)))
     expect(global.fetch).toHaveBeenCalledWith(`/api/admin/users/accounts?id=11&platform=${platform}`, { method: 'DELETE' })
   })
 })
@@ -111,4 +113,37 @@ test('the RA key is typed into a password box', () => {
 test('a Steam account with no name is still shown as linked, by its id', () => {
   render(<AdminLinkedAccounts user={{ ...BOB, steamid: '76561198000000000' }} onUpdated={jest.fn()} />)
   expect(screen.getByText('76561198000000000')).toBeInTheDocument()
+})
+
+describe('PSN verification (#176)', () => {
+  const VERIFIED = { ...BOB, psnaccountid: '123', psnusername: 'BobPS', psnVerified: true } as AdminUser
+
+  test('a verified account says so and its verification can be cleared, the link staying', async () => {
+    respond(true, { ok: true })
+    const onUpdated = jest.fn()
+    render(<AdminLinkedAccounts user={VERIFIED} onUpdated={onUpdated} />)
+    expect(within(blockOf('PSN')).getByText('Verified')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Clear verification' }))
+    await waitFor(() => expect(onUpdated).toHaveBeenCalledWith(11, { psnVerified: false }))
+    expect(global.fetch).toHaveBeenCalledWith('/api/admin/users/psnVerification?id=11', { method: 'DELETE' })
+    expect(notify.success).toHaveBeenCalledWith('bob: PSN updated')
+  })
+
+  test('a failed clear is said in its block and changes nothing', async () => {
+    respond(false, { error: 'failed' })
+    const onUpdated = jest.fn()
+    render(<AdminLinkedAccounts user={VERIFIED} onUpdated={onUpdated} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Clear verification' }))
+    expect(await within(blockOf('PSN')).findByRole('alert')).toBeInTheDocument()
+    expect(onUpdated).not.toHaveBeenCalled()
+  })
+
+  test.each([
+    ['not verified', { ...BOB, psnaccountid: '123', psnusername: 'BobPS' }],
+    ['not linked', BOB],
+  ])('%s: nothing to clear', (_name, user) => {
+    render(<AdminLinkedAccounts user={user as AdminUser} onUpdated={jest.fn()} />)
+    expect(screen.queryByRole('button', { name: 'Clear verification' })).not.toBeInTheDocument()
+  })
 })

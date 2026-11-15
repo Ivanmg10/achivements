@@ -48,6 +48,8 @@ export function adminAccount(user: AdminUser, { fields: [id, name] }: AdminPlatf
 }
 
 /** The user's fields after a link (`answer`, the route's JSON) or an unlink (no answer: all null). */
-export function adminAccountChanges({ fields }: AdminPlatform, answer?: Record<string, unknown>): Partial<AdminUser> {
-  return Object.fromEntries(fields.map((f) => [f, (answer?.[f] as string | null | undefined) ?? null]))
+export function adminAccountChanges({ source, fields }: AdminPlatform, answer?: Record<string, unknown>): Partial<AdminUser> {
+  const changes: Partial<AdminUser> = Object.fromEntries(fields.map((f) => [f, (answer?.[f] as string | null | undefined) ?? null]))
+  // A new PSN account must be verified again, and an unlinked one has nothing to verify.
+  return source === 'psn' ? { ...changes, psnVerified: false } : changes
 }

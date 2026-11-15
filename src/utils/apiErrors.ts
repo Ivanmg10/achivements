@@ -61,3 +61,9 @@ export function groupError(code: unknown, T: Translations): string {
     T.groups.saveFailed,
   )
 }
+
+/** `/api/psn/verify` failures (`no-code`, `not-found`, `taken`, `private`, `rate-limited`, `not-configured`); any other code is the generic one. */
+export function psnVerifyError(code: unknown, T: Translations): string {
+  const { errors } = T.psn.verification
+  return byCode(errors, code, errors.failed)
+}

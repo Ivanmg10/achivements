@@ -17,6 +17,8 @@ export type UserRecord = {
   steamusername: string | null
   psnaccountid: string | null
   psnusername: string | null
+  /** When a code in that PSN account's About Me proved it is theirs (migrations/046); null until then. */
+  psn_verified_at: string | null
   xboxxuid: string | null
   xboxgamertag: string | null
   email: string | null
@@ -39,7 +41,7 @@ export type UserRecord = {
 }
 
 const COLUMNS = `id, username, password, theme, avatar, raid, rausername, steamid, steamusername,
-  psnaccountid, psnusername, email, email_verified_at, admin, "raUser", location, description, gender, gender_public, profile_public, show_presence, favorite_game, favorite_steam_game, favorite_psn_game, xboxxuid, xboxgamertag, favorite_xbox_game`
+  psnaccountid, psnusername, psn_verified_at, email, email_verified_at, admin, "raUser", location, description, gender, gender_public, profile_public, show_presence, favorite_game, favorite_steam_game, favorite_psn_game, xboxxuid, xboxgamertag, favorite_xbox_game`
 
 // Every API call re-reads the signed-in user (see authOptions' jwt callback); a
 // short cache keeps that to about one query per user per minute. A session

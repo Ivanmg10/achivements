@@ -15,7 +15,7 @@ beforeEach(() => {
   ;(loadRanking as jest.Mock).mockResolvedValue([{ id: 4, totalPoints: 1200, split: { ra: 1200 }, rank: 12, listed: true }])
   ;(weekStartRanks as jest.Mock).mockResolvedValue(new Map([[4, 19]]))
   query.mockImplementation(async (sql: string) => {
-    if (sql.includes('FROM users')) return { rows: [{ show_in_rankings: true, profile_public: false, score_refreshed_at: '2026-10-20T10:00:00Z' }] }
+    if (sql.includes('FROM users WHERE id = $1')) return { rows: [{ show_in_rankings: true, profile_public: false, score_refreshed_at: '2026-10-20T10:00:00Z' }] }
     if (sql.includes('to_timestamp')) return { rows: [{ start: '2026-10-20', points: 15 }] }
     if (sql.includes('to_char')) return { rows: [{ start: '2026-10-12', points: 880 }] }
     if (sql.includes('score_periods')) return { rows: [{ kind: 'w', points: 40 }, { kind: 'm', points: 300 }] }

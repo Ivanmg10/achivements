@@ -28,6 +28,8 @@ export type PublicProfileRow = PublicUserRow & {
   lastSeenAt: string | null
   steamusername: string | null
   psnusername: string | null
+  /** The PSN account was proven theirs; false while none is linked. */
+  psnVerified: boolean
   xboxgamertag: string | null
   theme: string | null
   gender: 'male' | 'female' | 'neutral' | null
@@ -45,7 +47,7 @@ export async function findPublicUser(username: string): Promise<PublicProfileRow
   if (username.includes('\0')) return null
   const { rows } = await pool.query(
     `SELECT id, username, avatar, description, location, rausername, steamid, psnaccountid, xboxxuid,
-            steamusername, psnusername, xboxgamertag, theme, gender, gender_public AS "genderPublic",
+            steamusername, psnusername, (psn_verified_at IS NOT NULL) AS "psnVerified", xboxgamertag, theme, gender, gender_public AS "genderPublic",
             favorite_game, favorite_steam_game, favorite_psn_game, favorite_xbox_game,
             (raid IS NOT NULL) AS "hasRaKey", profile_public AS "profilePublic",
             ${presenceColumns()}

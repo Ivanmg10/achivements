@@ -3,6 +3,7 @@
 import type { VaultMe } from '@/app/api/rankings/me/route'
 import { useLanguage } from '@/context/LanguageContext'
 import { useVaultFillState } from '@/context/VaultFillContext'
+import { usePsnUnverified } from '@/hooks/usePsnUnverified'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import { CountUp } from '@/components/ui/CountUp'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
@@ -13,6 +14,7 @@ import { levelProgress } from '@/utils/vaultLevel'
 import { GAME_SOURCES } from '@/utils/gameRef'
 import Kicker from '@/components/ui/Kicker'
 import Tag from '@/components/ui/Tag'
+import PsnUnverifiedLine from '@/components/psn-unverified-line/PsnUnverifiedLine'
 
 /** A card of the rankings' side column. */
 export const CARD = 'bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 flex flex-col gap-3'
@@ -29,6 +31,7 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
   const p = levelProgress(me.points)
   const total = Object.values(me.split).reduce((s, x) => s + (x ?? 0), 0)
   const fill = useVaultFillState()
+  const psnUnverified = usePsnUnverified()
 
   return (
     <>
@@ -112,6 +115,7 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
         {/* A platform that failed (a private profile, a refused key) says so after the fill too. */}
         {!fill?.active && <VaultFillProgress />}
         {!fill?.active && me.provisional > 0 && <p className="text-xs text-text-secondary">{T.rankings.provisional}</p>}
+        {psnUnverified && <PsnUnverifiedLine action className="self-stretch text-left" />}
       </section>
 
       {!fill?.active && total > 0 && (

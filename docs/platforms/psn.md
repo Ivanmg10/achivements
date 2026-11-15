@@ -9,6 +9,24 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   Users link by typing their online ID — nothing proves it is theirs, so
   `psnaccountid` is deliberately **not unique** (a squatter must not lock the
   owner out). `/privacy` and `/terms` say so.
+- **Verification (#176, the owner's decision of 2026-11-14): only a verified PSN account counts in Vault Points, and
+  only one user can have a given account verified.** Linking is unchanged (anyone sees any account's trophies);
+  *verifying* is a separate step: the user gets a code (`CV-` + 8 characters from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`, 24 h,
+  `src/lib/psnVerification.ts`), pastes it in the About Me of the PSN profile and presses check. `POST /api/psn/verify`
+  reads the About Me **once, fresh, and only when asked** (`psnAboutMe`, through `psnCall('profile', …)`, never cached) and, if the
+  code is in it (case, spaces and line breaks do not matter), sets `users.psn_verified_at`. The code and the date are
+  what is stored; the About Me text is not. `migrations/046` has the columns and a **partial unique index on
+  `psnaccountid` where `psn_verified_at IS NOT NULL`**: a second user verifying the same account is refused as `taken`
+  (checked first, and the index's `23505` is caught as the same `taken` for two at once). The check is rate limited
+  (`psn-verify`, 6 per 15 min per user; a check that succeeds or that Sony failed to answer does not count). Errors:
+  `no-code` 409, `not-found` 422 (the code is not in About Me), `taken` 409, `private` 403, `rate-limited` 429,
+  `not-configured` 503, `failed` 502/500, all put in words by `psnVerifyError` (`apiErrors.ts`). **Linking, unlinking or an
+  admin's link or unlink clear the verification** (`platformLinks.ts`: a new account, even the same one, must be verified
+  again); the admin's "Clear verification" (users tab, `DELETE /api/admin/users/psnVerification`, logged) is for disputes.
+  The gate on the points is `src/lib/vaultGate.ts` (see `docs/social.md`). The UI is `PsnVerification` on the account page's PSN
+  card (the tag beside its name, "Verify account" beside the disconnect) and in the welcome's PSN step (both on one line); the button opens `PsnVerificationModal` with the
+  code (a dialog, the owner's call on 2026-11-15: an open panel stretched the row of platform cards). The code is asked for only
+  while the dialog is open, since asking makes one. Then `PsnUnverifiedLine` where Vault Points show, and a "Verified" tag on the public profile's PSN chip.
 - **The NPSSO dies 60 days after sign-in, and nothing extends it** (measured:
   refreshing returns the same 10-day refresh token; psn-api issue #171; Sony's
   sign-in has a captcha). It lives encrypted in `psn_credentials`
@@ -58,7 +76,7 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   requests" — psn-api hides the HTTP status and `Retry-After`, so it goes by
   the message). `psnFailure()` maps them to 503 / 403 (private) / 429 (rate
   limited, with `Retry-After: 60`) / 502. The client reads a 429 as a plain
-  failure with a retry button.
+  failure with a retry button. `psnAboutMe` (verification, counted as `profile`) is one more call of the kind: a hidden profile answers 403 `private`.
 
 ## Call baseline (#175, 2026-11-14)
 

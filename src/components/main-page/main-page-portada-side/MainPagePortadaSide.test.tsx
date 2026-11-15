@@ -4,10 +4,12 @@ import MainPagePortadaSideStreak from './main-page-portada-side-streak/MainPageP
 import MainPagePortadaSideRecent from './main-page-portada-side-recent/MainPagePortadaSideRecent'
 import { useVaultMe } from '@/hooks/useVaultMe'
 import { useStreakData } from '@/hooks/useStreakData'
+import { usePsnUnverified } from '@/hooks/usePsnUnverified'
 import { en } from '@/translations/en'
 
 jest.mock('@/hooks/useVaultMe', () => ({ useVaultMe: jest.fn() }))
 jest.mock('@/hooks/useStreakData', () => ({ useStreakData: jest.fn() }))
+jest.mock('@/hooks/usePsnUnverified', () => ({ usePsnUnverified: jest.fn(() => false) }))
 
 const NOW = new Date('2026-10-25T10:00:00').getTime()
 const unlock = (date: string, title: string, points = 5) => ({
@@ -47,6 +49,33 @@ describe('level', () => {
     ;(useVaultMe as jest.Mock).mockReturnValue({ me: { points: 0, week: 0, rank: 0 } })
     const { container } = render(<MainPagePortadaSideLevel />)
     expect(container).toBeEmptyDOMElement()
+  })
+})
+
+describe('level, PlayStation not verified (#176)', () => {
+  const days = [10, 0, 20, 30, 0, 40, 50].map((points, i) => ({ start: `2026-10-${19 + i}`, points }))
+
+  test('under the figures it says what is missing, as text inside the card that opens the rankings', () => {
+    ;(usePsnUnverified as jest.Mock).mockReturnValue(true)
+    ;(useVaultMe as jest.Mock).mockReturnValue({ me: { points: 5000, week: 1, rank: 2, days } })
+    render(<MainPagePortadaSideLevel />)
+    expect(screen.getByText(en.psn.verification.vaultLine)).toBeInTheDocument()
+    expect(screen.getAllByRole('link')).toHaveLength(1)
+  })
+
+  test('with no points at all the card still says it, so the reason is not hidden', () => {
+    ;(usePsnUnverified as jest.Mock).mockReturnValue(true)
+    ;(useVaultMe as jest.Mock).mockReturnValue({ me: { points: 0, week: 0, rank: 0 } })
+    render(<MainPagePortadaSideLevel />)
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/rankings')
+    expect(screen.getByText(en.psn.verification.vaultLine)).toBeInTheDocument()
+  })
+
+  test('verified, or no PlayStation: nothing about it', () => {
+    ;(usePsnUnverified as jest.Mock).mockReturnValue(false)
+    ;(useVaultMe as jest.Mock).mockReturnValue({ me: { points: 5000, week: 1, rank: 2, days } })
+    render(<MainPagePortadaSideLevel />)
+    expect(screen.queryByText(en.psn.verification.vaultLine)).not.toBeInTheDocument()
   })
 })
 

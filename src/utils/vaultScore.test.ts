@@ -1,6 +1,7 @@
 import {
   difficultyMultiplier,
   looksUnlockedByTool,
+  RULES_VERSION,
   provisionalScore,
   rarityMultiplier,
   scoreGame,
@@ -124,5 +125,11 @@ describe('stacks', () => {
   })
   it('keeps the best copy whole, the second at half and the rest at a tenth', () => {
     expect(stackFactors([{ key: 'a', points: 100 }, { key: 'a', points: 300 }, { key: 'b', points: 50 }, { key: 'a', points: 200 }])).toEqual([0.1, 1, 1, 0.5])
+  })
+})
+
+describe('RULES_VERSION', () => {
+  it('moved with the PSN verification gate (#176): stored scores of an older version are scored again', () => {
+    expect(RULES_VERSION).toBeGreaterThanOrEqual(4)
   })
 })

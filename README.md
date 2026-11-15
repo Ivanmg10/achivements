@@ -23,7 +23,9 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
 - **Three platforms, linked by the user**
   - *RetroAchievements* — with the user's own Web API key (never a shared one).
   - *Steam* — by signing in on Steam (proves the account is yours; game details must be public).
-  - *PlayStation* — by online ID, read through one app PSN account; PS3/Vita art from IGDB.
+  - *PlayStation* — by online ID, read through one app PSN account; PS3/Vita art from IGDB. Anyone sees the
+    trophies, but **PSN counts in Vault Points only once the account is verified** (a code pasted in its About Me;
+    one verified owner per account). Needs `migrations/046`.
 - **Library** — recently played, playing, want to play, completed, all games;
   filters by console/platform, hidden games, pinned games.
 - **Game pages** for each platform — achievement/trophy grid with rarity,

@@ -2,6 +2,7 @@ import pool from '@/lib/db'
 import { queryRows } from '@/lib/queryRows'
 import { presenceColumns } from '@/lib/presence'
 import { notHidden } from '@/lib/gameVisibility'
+import { PSN_VERIFIED_JOINED, psnVerifiedFor } from '@/lib/vaultGate'
 import { isUploadedAvatar } from '@/lib/avatarImage'
 import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
 import { readCache, writeCache } from '@/lib/steamCache'
@@ -11,7 +12,8 @@ import type { GameSource } from '@/types/game'
  * The rankings, read from the stored scores (scoreRefresh keeps them). Only
  * users with a public profile who did not opt out are listed; the viewer
  * always sees their own standing. A game counts only for the account still
- * linked, and never while it is flagged. Xbox only for admins.
+ * linked, and never while it is flagged. Xbox only for admins. PSN only once its
+ * account is verified (vaultGate.ts, #176).
  */
 
 export type RankScope = 'global' | 'following'
@@ -46,9 +48,10 @@ export type RankEntry = {
 type GameRow = { id: number; username: string; avatar: string | null; listed: boolean; source: GameSource; points: number; completed: number; achievements: number }
 type PeriodRow = { id: number; source: GameSource; points: number }
 
-// A game belongs to the account linked now; relinking another drops the old one's games at once.
+// A game belongs to the account linked now; relinking another drops the old one's games at once. PSN's only counts
+// while that account is verified, which is the one gate of the totals: every read of score_games carries it.
 const LINKED_ACCOUNT = `g.account = CASE g.source WHEN 'ra' THEN u.rausername WHEN 'steam' THEN u.steamid
-                         WHEN 'psn' THEN u.psnaccountid WHEN 'xbox' THEN u.xboxxuid END`
+                         WHEN 'psn' THEN u.psnaccountid WHEN 'xbox' THEN u.xboxxuid END AND ${PSN_VERIFIED_JOINED}`
 
 /** Who: everyone listed (global), or the viewer and whom they follow, or the viewer alone. */
 function audience(scope: RankScope | 'self'): string {
@@ -77,6 +80,7 @@ async function periodRows(period: Exclude<RankPeriod, 'all'>, xbox: boolean, now
   return queryRows<PeriodRow>(
     `SELECT user_id AS id, source, SUM(points)::int AS points FROM score_periods
      WHERE kind = $1 AND start = $2::date AND ($3::boolean OR source <> 'xbox') AND ($4::int IS NULL OR user_id = $4)
+       AND ${psnVerifiedFor('source', 'user_id')}
      GROUP BY user_id, source`,
     [kind, start, xbox, userId ?? null],
   )
@@ -200,7 +204,7 @@ export async function weeklyTrend(userIds: number[], source: RankSource, xbox: b
   const rows = await queryRows<{ id: number; start: string; points: number }>(
     `SELECT user_id AS id, to_char(start, 'YYYY-MM-DD') AS start, SUM(points)::int AS points FROM score_periods
      WHERE kind = 'w' AND start >= $1::date AND user_id = ANY($2::int[])
-       AND ($3::text = 'all' OR source = $3) AND ($4::boolean OR source <> 'xbox')
+       AND ($3::text = 'all' OR source = $3) AND ($4::boolean OR source <> 'xbox') AND ${psnVerifiedFor('source', 'user_id')}
      GROUP BY user_id, start`,
     [weeks[0], userIds, source, xbox],
   )

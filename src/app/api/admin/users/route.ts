@@ -31,7 +31,7 @@ export async function GET(req: Request) {
     if (!auth.ok) return auth.response
 
     const result = await pool.query(
-      `SELECT id, username, email, theme, avatar, admin, rausername, steamid, steamusername, psnaccountid, psnusername, xboxxuid, xboxgamertag, location,
+      `SELECT id, username, email, theme, avatar, admin, rausername, steamid, steamusername, psnaccountid, psnusername, (psn_verified_at IS NOT NULL) AS "psnVerified", xboxxuid, xboxgamertag, location,
               "raUser"->>'User' AS ra_display
        FROM users ORDER BY id ASC`
     )

@@ -33,6 +33,51 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-15 — PSN verification as a dialog (`feat/176-psn-verification`, #176)
+
+- **Did:**
+  - The verification panel left the PSN card. In the card's head, the `Tag` ("Sin verificar" / "Verificada") sits beside the platform's name, and "Verificar cuenta" sits beside "Desvincular" (`UserPlatformCard`'s new `badge` and `extraAction`, replacing `notice`). The welcome keeps both on one line (`PsnVerification`).
+  - That button opens `PsnVerificationModal` (`md`): the code, Copy, "Open my PlayStation profile", "Later" and "check".
+  - The welcome's PSN step gets the same line.
+  - `usePsnVerification({ active })` asks for the code only while the dialog is open.
+  - `verifiedNote` is gone from the nine languages. `counts` became "Why verify it?" (`PsnVerificationWhy`, under the code): anyone could link any public profile and pass its trophies off as theirs, so only a proven account adds Vault Points (one user per account), and only the About Me is read, once, with no password and no sign-in. The owner asked for a fuller why (2026-11-15).
+- **Why:** the owner, on the real page: the open panel made the PSN card taller than the others in its row.
+- **Watch out:**
+  - The profile link sits in the body, not the footer: the guard refuses a ringed button in a dialog's footer (#132).
+  - A local dev server that cannot reach Google Fonts draws every page in "Barlow Fallback", which looks bold. The fix is restarting `npm run dev`, not code. The log says "Failed to download Barlow from Google Fonts".
+
+---
+
+## 2026-11-15 — PSN phase 1: verify the account; only verified PSN counts in Vault Points (`feat/176-psn-verification`, #176, epic #174)
+
+**Did**
+- `migrations/046_psn_verification.sql`: `users.psn_verified_at`, `psn_verification_code`, `psn_verification_expires_at` and a **partial unique index on `psnaccountid` where verified**. Idempotent. **Not applied by the agent: pre first, before this merges; production before the release** (`docs/releases.md`).
+- `src/lib/psnVerification.ts` (code `CV-` + 8 characters, 24 h, normalise, `aboutMeHasCode`), `psnAboutMe` in `psnClient.ts` (`psnCall('profile', …)`, never cached), `/api/psn/verify` GET / POST / DELETE (`psn-verify` limit 6 per 15 min; `no-code` 409, `not-found` 422, `taken` 409, `private` 403, `rate-limited` 429, put in words by `psnVerifyError`).
+- Plumbing: `userRecord`, `tokenFields` / session (`psnVerified`), the public profile (`psnVerified`), `useCheevoUser`. Linking or unlinking PSN (user and admin) clears the verification in `platformLinks.ts`.
+- Admin: "Clear verification" on a user's PSN row (`DELETE /api/admin/users/psnVerification`, `requireAdmin`, `clear-psn-verification` in the log).
+- **The Vault gate**, `src/lib/vaultGate.ts`: `PSN_VERIFIED_JOINED` is part of `LINKED_ACCOUNT` (lists, `vaultTotals`, streaks, teaser, weekly snapshot) and `psnVerifiedFor` goes on every `score_periods` / `vaultMe` read. `RULES_VERSION` 3 to 4. `scoreRefresh` is untouched.
+- UI: `PsnVerification` (account page's PSN card through a new `notice` slot of `UserPlatformCard`, and the welcome's PSN step), `usePsnVerification`, `PsnUnverifiedLine` (rankings' level card, home's Vault card), a "Verified" tag on the public PSN chip. Nine languages, `/privacy` and `/terms` updated.
+
+**Why** — the owner's decision of 2026-11-14 (issue #176): competitors verify, so the rankings must not count trophies of an account someone does not own.
+
+**Decisions**
+- The issue's decisions win over the spike: no `PSN_RANK_REQUIRES_VERIFICATION` flag (always on), no grace period; linking stays non-unique.
+- The gate is in the **reads**, not in the scoring, so verifying shows the points at once with no Sony read and the rankings routes still call no platform. A test per reader pins the clause; the admin's balance table reads raw on purpose.
+- `taken` is checked before the Sony read (cheap, and saves a call), and the index's `23505` is caught as the same `taken` for two users at once. The UPDATE is keyed by the code that was checked, so a code replaced meanwhile is `no-code`.
+- A check that succeeds, or that Sony failed to answer, is not counted by the rate limit; a wrong one is. The session `psnVerified` decides whether the code is asked for at all (asking makes one).
+- Verifying or clearing calls `markRankingVisibilityChanged` (best effort) so the five-minute global cache does not show stale standings.
+- The code is stored in clear in the row (like the spike); it is a one-shot proof bound to the user, not a secret, and it is never logged or put in a URL.
+
+**Open**
+- The owner applies `046` to pre, then verifies their own test PSN account by hand.
+- `RULES_VERSION` 4 makes each user's next refresh score their games again (PSN reads included, at `PACE`); this is what the issue asked for.
+- Existing PSN users drop to 0 PSN points until they verify (and the home's Vault card shows only the line when PSN was all they had).
+- The account page's PSN card is taller while unverified; the other cards of the row stretch to it.
+
+**Watch out** — a new query that sums `score_games` or `score_periods` must carry the gate. `migrations/046` must be in place before this code: `userRecord` reads `psn_verified_at` on every signed-in request.
+
+---
+
 ## 2026-11-14 — PSN phase 0: the call baseline (`chore/175-psn-call-baseline`, #175, epic #174)
 
 **Did**

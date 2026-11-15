@@ -46,6 +46,15 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   third of a demanding one) must keep passing. Change a number → bump `RULES_VERSION`.
   Do not weigh native values (gamerscore, grades, RA points) more than the 25 % they have:
   that is what made platforms unequal in the tests.
+- **Only a verified PSN account counts (#176, 2026-11-14).** PSN's games are scored and stored as before (`scoreRefresh` is
+  unchanged, so an unverified account still shows its trophies everywhere), but **every read that adds points up carries
+  `src/lib/vaultGate.ts`**: `PSN_VERIFIED_JOINED` where `score_games g` joins `users u` (it is part of `LINKED_ACCOUNT` in
+  `rankings.ts`, so the lists, `vaultTotals` (the header, the level, the "ready" toast, profile cards, follows), `streaksOf`,
+  `profileTeaser` and the weekly snapshot all have it) and `psnVerifiedFor(source, userId)` for `score_periods` and `vaultMe`.
+  Verifying shows the points at once with **no new read of Sony**; unlinking or clearing a verification takes them out at
+  once. A new query that sums `score_games` or `score_periods` must carry the clause (a test per reader pins it). The admin's
+  rankings balance table reads raw on purpose (it tunes the formula). Where Vault Points show for someone with an unverified PSN
+  account, `PsnUnverifiedLine` says why (the rankings' level card, the home's Vault card). `RULES_VERSION` is 4 for it.
 - **Scores are computed ahead, never on a read.** `scoreRefresh` runs right after a platform is
   linked (`onPlatformLinked` in the four link routes), in back-to-back passes while the user has
   the site open (`useVaultFill` → `POST /api/rankings/fill`, up to 90 s each), after the presence

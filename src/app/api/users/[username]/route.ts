@@ -50,6 +50,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ usernam
       xbox: xbox && Boolean(user.xboxxuid),
       steamName: user.steamid ? user.steamusername : null,
       psnName: user.psnaccountid ? user.psnusername : null,
+      psnVerified: Boolean(user.psnaccountid && user.psnVerified),
       xboxName: xbox && user.xboxxuid ? user.xboxgamertag : null,
       isSelf: String(user.id) === String(viewer.id),
       theme: user.theme,

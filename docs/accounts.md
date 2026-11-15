@@ -210,5 +210,13 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   (`clearUserCache`): RA's cache is keyed per user, so another RA account would show the old one's data. Steam,
   PSN and Xbox links (user and admin) no longer clear it (the owner's call). An unlink still clears it, for every platform. `platformLinks.test.ts` pins the SQL text; `app/api/platformLinks.contract.test.ts` checks every route,
   user and admin. The panel's platform rows are `utils/adminPlatforms.ts`.
+- **PSN verification (#176).** `users.psn_verified_at` (and the code and its expiry) say whether a code in the PSN
+  account's About Me proved it is the user's; `UserRecord`, the token (`psnVerified`, rebuilt from the row like everything else:
+  save in the DB, then `update()` with no arguments) and the session carry it, and the public profile has `psnVerified`. **Linking or
+  unlinking PSN, the user's or the admin's, clears it** (`LINK_RESETS` / `UNLINK_COLUMNS` in `platformLinks.ts`, pinned by
+  `platformLinks.test.ts`). The admin panel's users tab shows "Verified" on a user's PSN row with a **Clear verification** button
+  (`DELETE /api/admin/users/psnVerification?id=`, `requireAdmin`, logged as `clear-psn-verification`) for a dispute. The route and the
+  rules: `docs/platforms/psn.md`. `/privacy` says the About Me is read once, when the user asks, and what is kept; `/terms` that one
+  account can be verified by one CheevoVault account.
 - The privacy policy (`/privacy`) says all of this; `/terms` says when an
   account may be suspended or deleted. Change the policy if the panel changes.

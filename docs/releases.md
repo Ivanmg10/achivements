@@ -64,7 +64,7 @@ They asked for this reminder on purpose, because it is easy to forget.
 
 ## Migrations that must be applied first
 
-`migrations/` holds `002`–`045`. **Every migration is applied twice**: to pre first, to production when
+`migrations/` holds `002`–`046`. **Every migration is applied twice**: to pre first, to production when
 the work reaches `main` (see Environments). Any other database needs each one before the code that
 reads it runs. What each breaks without it, as `CLAUDE.md` used to say section by section:
 
@@ -88,6 +88,7 @@ reads it runs. What each breaks without it, as `CLAUDE.md` used to say section b
 | `043_ra_key_sealed` | RA keys sealed at rest | pre 2026-10-31, prod 2026-11-02 | Linking RA answers 500; reads still work |
 | `044_admin_totp` | The admin's one-time codes | pre 2026-10-31, prod 2026-11-02 | The admin unlock answers 500 |
 | `045_steam_playtime` | Hours per Steam game, to date games Steam does not (#113) | pre 2026-11-07, **not in production yet** | Each owned-list read logs the missing table; dates come from kept unlocks and Steam's two-week minutes only, so a game with no achievements played more than two weeks ago stays undated. Nothing fails |
+| `046_psn_verification` | `users.psn_verified_at`, `psn_verification_code`, `psn_verification_expires_at` and the partial unique index on `psnaccountid` where verified (#176) | **not applied anywhere yet: pre first, before #176 merges; production before its release** | **Every signed-in request fails** (`userRecord` reads `psn_verified_at`), and the verification route and the rankings' PSN gate answer 500. Idempotent (`IF NOT EXISTS`), so a second run is harmless |
 
 `—`: not written down in `CLAUDE.md` (the worklog archive may say). All of `041`–`044` are in production since the 1.7.0
 release (2026-11-02).

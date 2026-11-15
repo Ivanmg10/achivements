@@ -17,6 +17,9 @@ reasoning behind it: `archive/welcome-plan.md` (and the design canvas linked the
 - **No Xbox** in it while Xbox is admin-only (a new account is not an admin).
 - **No app header** until the person leaves it: it lives in `src/app/welcome/`, outside
   `(main)`, on purpose (the user's call).
+- **PSN's step offers verification once linked (#176)**: `PsnVerification` (the account page's own panel, its hook
+  `usePsnVerification`) under the "linked as" card, with a line saying it is optional. It never blocks: "Next" is always there and the
+  panel folds with "Later". No second way to verify.
 - **Linking reuses the account page's logic** (`useRaLink`, `useSteamLink`, `usePsnLink`);
   do not add a second way to link. RA's step is a page of its own with the guide to the
   Web API key, not the modal.

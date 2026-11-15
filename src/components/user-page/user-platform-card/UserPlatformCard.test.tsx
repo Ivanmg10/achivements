@@ -90,3 +90,26 @@ test('not connected: no link even with an href', () => {
   render(<UserPlatformCard name="Steam" href="https://steamcommunity.com/profiles/1" logo={null} gradient="" connected={false} />)
   expect(screen.queryByRole('link')).not.toBeInTheDocument()
 })
+
+test('connected: a badge beside the name and one more button beside the disconnect', () => {
+  render(
+    <UserPlatformCard
+      name="PlayStation Network"
+      logo={null}
+      gradient=""
+      connected
+      badge={<span>Verified</span>}
+      extraAction={<button type="button">Verify</button>}
+      disconnect={{ label: 'Disconnect PSN', run: async () => true, done: 'ok' }}
+    />,
+  )
+  expect(screen.getByText('Verified')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Verify' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Disconnect PSN' })).toBeInTheDocument()
+})
+
+test('not connected: neither the badge nor the extra button', () => {
+  render(<UserPlatformCard name="PlayStation Network" logo={null} gradient="" connected={false} badge={<span>Verified</span>} extraAction={<button type="button">Verify</button>} />)
+  expect(screen.queryByText('Verified')).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'Verify' })).not.toBeInTheDocument()
+})
