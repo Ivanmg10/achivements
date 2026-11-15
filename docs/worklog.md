@@ -33,6 +33,36 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-15 — PSN phase 2: fast core and one call budget (`perf/177-psn-fast-core`, #177, epic #174)
+
+**Did**
+- `psnTitlesCore` (the trophy list alone) is what pages and the score read; `psnLibrary` lays the background **enrichment** over it (played list, trophy sets of 20 more games a pass, IGDB art, 20 more completion dates a pass; `psn:enriched:v1`). `psnTitles` and `psnTitlesWithCompletion` are gone; `psnCompletion.ts` became `withCompletion`.
+- `src/lib/psnCache.ts` (`psnCached`): live entry, else stale up to 7 days with a refresh after the answer, else fetch now or (`cold: 'background'`) 202. A lease per key across instances, negative caches `psn:private` (10 min, cleared on link) and `psn:notfound` (1 h), the refresh button once per 10 minutes.
+- `src/lib/psnBudget.ts`: every request (played pages and `auth` included) takes one of `PSN_CALLS_PER_WINDOW` (600 / 15 min, `attemptLimit.ts`); background work (`psnBackground`) only 450. `PsnBusyError` → 429 `busy`; `PsnSyncing` → 202 `syncing` (`src/lib/psnErrors.ts`). Sony's code `2138635` counts as a rate limit; two refusals write `psn:cooldown` (60 s, every instance).
+- The year (60 days, streak, heatmap) is one cached entry built in the background; `usePsnRecentTrophies` waits out a 202. The summary costs 2 (game count from the core) and answers `syncedAt` / `nextSyncAt`, shown under the home's PSN profile (`MainPageProfilePsnSync`, nine languages).
+- Split per-game caches: `psn:defs:v1:<npwr>:<lang>` (everyone's), `psn:earned:v1:<account>:<npwr>:<lastTrophyAt>` (no language), groups the same; `splitRead` reads the defined half again when a DLC id is missing. `steamCache.ts`: `readCacheEntry`, `takeLease` / `dropLease`, PSN rows kept 7 days past expiry. `runLater` = `after()` or at once outside a request.
+- Measured (`psnCallBaseline.test.ts`, rewritten for phase 2): **cold home 9 calls (500 games) / 10 (1,000)**, was 356 / 709. Table in `docs/platforms/psn.md` → Fast core and call budget; rules in `CLAUDE.md` → Platforms and `docs/performance.md`.
+
+**Why** — issue #177: a cold profile cost ~300 Sony calls on one shared account; stale data and a 429 must never blank a page.
+
+**Decisions**
+- **A lease row, not `pg_try_advisory_lock`** (the issue's wording): a session lock holds one of the pool's 5 connections for the whole Sony fetch while the budget's own queries need the pool; a row that expires holds nothing and frees itself if the instance dies. No migration (it is a `steam_cache` row), and the budget reuses `signup_attempts` through `reserveAttempt(…, max)`: **no migration in this phase**.
+- Background work has no queue yet (phase 4): `after()`, deduped per key in the instance and by the lease, a failed one waits 30 to 90 s (jitter) before the next visit may start it again. The score fill already stops a pass on `busy` and resumes on the next.
+- `psn-score` 300 → 200 games / 15 min, to fit under the background share (450 calls).
+- `X-RateLimit-Next-Available` cannot be read: psn-api returns only the body (checked in `node_modules/psn-api/dist`), so the cooldown is a fixed 60 s.
+- The 429 `busy` code is read by the client as the generic failure with a retry (no new text); the friendlier words are phase 5 (#180).
+
+**Open**
+- The first visit's library has no play time and DLC games no completion date until the background pass lands (a later read); totals of hours grow over a few passes (20 games each).
+- The score reads defined trophies in English, pages in the reader's language: a second defined read per game for non-English readers.
+- Check on pre with a real account: the 202 for the year, the "Updated … / next update …" line, and the per-minute `[psn] calls` log.
+
+**Watch out**
+- Running jest locally picks up `.claude/worktrees/*` (another agent's checkout inside the repo): use `--testPathIgnorePatterns .claude --modulePathIgnorePatterns .claude`. CI does not have it.
+- A route that calls `psnLibrary` / `psnSummary` must handle `PsnSyncing` and `PsnBusyError` through `psnFailure`.
+
+---
+
 ## 2026-11-15 — PSN verification as a dialog (`feat/176-psn-verification`, #176)
 
 - **Did:**

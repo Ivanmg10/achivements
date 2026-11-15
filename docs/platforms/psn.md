@@ -56,13 +56,14 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   collection, and each game is a fold of trophies, as DLC are. Only the feed folds:
   stats, library, pins, pages and "completed" stay per trophy set (user's choice).
   A game of the collection never started has no trophy list, so Sony lists it nowhere.
-- **Two lists, merged**: the trophy list (`getUserTitles`) and the played-games
+- **Two lists, merged**: the trophy list (`getUserTitles`, the *core*) and the played-games
   list (play time, last session, store art, PS4/PS5 only, its own privacy
-  setting). `lastTrophyAt` is the trophy list's date and keys every trophy
+  setting; the *enrichment*, filled in the background since #177). `lastTrophyAt` is the trophy list's date and keys every trophy
   cache; `lastPlayed` is the last session when known.
 - **Caches** live in `steam_cache` under `psn:` keys. When the shape of a
-  cached value changes, bump its key's version (`psn:titles:vN`) in the same
-  change — a dev server will otherwise serve the old shape.
+  cached value changes, bump its key's version (`psn:titles:core:vN`) in the same
+  change — a dev server will otherwise serve the old shape. How they are read since #177
+  (stale data, one fetch at a time, the split per game): "Fast core and call budget" below.
 - **PS3/Vita games** have no play data and no Store page: their cover,
   backdrop and release year come from IGDB (`src/lib/igdbClient.ts`, a Twitch
   app in `TWITCH_CLIENT_ID`/`TWITCH_CLIENT_SECRET`), matched by title and
@@ -74,9 +75,9 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
 - Sony returns errors as bodies, not throws: every call goes through
   `psnCall(fn, call)` (`fn` names the endpoint for the call counters, see Call baseline; `unwrap()` plus one retry after 2 s when Sony says "too many
   requests" — psn-api hides the HTTP status and `Retry-After`, so it goes by
-  the message). `psnFailure()` maps them to 503 / 403 (private) / 429 (rate
-  limited, with `Retry-After: 60`) / 502. The client reads a 429 as a plain
-  failure with a retry button. `psnAboutMe` (verification, counted as `profile`) is one more call of the kind: a hidden profile answers 403 `private`.
+  the message, or Sony's code `2138635`). `psnFailure()` maps them to 202 `syncing` (built in the background),
+  503 / 403 (private) / 429 `busy` (the app's own budget is spent) / 429 `rate-limited` (Sony refused; both with
+  `Retry-After: 60`) / 502. The client reads a 429 as a plain failure with a retry button. `psnAboutMe` (verification, counted as `profile`) is one more call of the kind: a hidden profile answers 403 `private`.
 
 ## Call baseline (#175, 2026-11-14)
 
@@ -203,3 +204,83 @@ every game opened, even one with no DLC), and an old game costs all 4.
   is read from the table above, by the code path. Phase 5 can add an origin if it needs one.
 - IGDB (PS3/Vita art, one request per game, cached half a year) and the Store page (release year) are not Sony API
   calls and are not counted here.
+
+## Fast core and call budget (#177, phase 2, 2026-11-15)
+
+Still one service account. What a page waits for is a handful of requests; the rest is done after the answer,
+in the background, under one budget. Code: `src/lib/psnClient.ts`, `psnCache.ts`, `psnBudget.ts`, `psnErrors.ts`.
+
+- **The core and the enrichment.** `psnTitlesCore` is the trophy list alone (`getUserTitles`, 800 a page): no
+  played games, no trophy sets, no IGDB. Every reader that only needs the trophy list (summary, latest trophies,
+  the year, a game page's lookup, the streak's hidden consoles, the score fill) reads it. `psnLibrary` (the
+  `/api/psn/titles` route, a group's years) is the core with the **enrichment** laid over it
+  (`psn:enriched:v1:<account>`, an hour): the whole played list, the trophy sets of **20 more played games a
+  pass, most recent first** (the sets are the same for everyone and kept 90 days, so it converges), IGDB art for
+  PS3/Vita, and the base-game completion dates of **20 more DLC games a pass** (kept by `titleId@lastTrophyAt`).
+  The first visit gets the core; the play time, art and dates arrive on a later read. So on a first visit the
+  library has no play time and a complete DLC game has no completion date yet (`null`, as a failed lookup was).
+- **The summary costs 2**, not 3: its game count is the core's length (shared), no `getUserTitles` of one game.
+- **No year on a first visit.** `psnRecentTrophies` (the 60 days and the year, the streak, the heatmap) reads
+  one cached year (`psn:year:v1:<account>:<lang>`, 15 min) built in the background from per-game entries. With
+  none, the route answers **202** `{ status: 'syncing' }` with `Retry-After: 15`; `usePsnRecentTrophies` stays
+  loading and asks again (sections land whole). `/api/me/streak` counts PSN as `failed` meanwhile. The latest
+  trophies (3 games, 6 requests) are the only trophies read on the visit itself.
+- **Stale data instead of waiting** (`psnCached`): a live entry is the answer; an expired one up to **7 days**
+  old is the answer too, and a fresh one is fetched after the answer (`runLater`, which is `after()`); with none,
+  the fetch happens now (or in the background, for the year and the enrichment). A refresh that Sony refuses
+  keeps the old one. `sweepExpired` keeps `psn:` rows 7 days past their expiry for this.
+- **Negative caches:** `psn:private:<account>` (10 min) after Sony says the profile is hidden: visits are
+  refused without asking (linking clears it, `forgetPsnPrivate`, so making the profile public and linking again
+  works at once). `psn:notfound:<online id>` (1 h) when a search finds nobody.
+- **One fetch at a time per key, across instances:** a lease (`takeLease` / `dropLease` in `steamCache.ts`, a
+  row in `steam_cache` that expires after 60 s), not `pg_try_advisory_lock` as the issue said. A session
+  advisory lock holds a pooled connection for the whole Sony fetch, and the pool has 5: the budget's own queries
+  inside that fetch could then wait on the pool (and an instance that dies with the lock held keeps it until its
+  connection closes). A reader that finds the lease taken waits up to 8 s for the other's answer, then answers
+  `busy`. Inside one instance the in-flight promise is shared. No migration: the lease is a `steam_cache` row.
+- **Manual refresh once per 10 minutes:** the refresh button (`wantsFresh`) reads Sony again only for an entry
+  at least `REFRESH_MS` (10 min) old. The summary answers `syncedAt` and `nextSyncAt`; the home's PSN profile
+  shows "Updated 3 minutes ago / next update in 7 minutes" (`MainPageProfilePsnSync`, `T.psn.syncedAgo` /
+  `nextSync`).
+- **Split caches per game.** A game's defined trophies are everyone's: `psn:defs:v1:<npwr>:<lang>` (30 days);
+  the account's earned ones carry no language: `psn:earned:v1:<account>:<npwr>:<lastTrophyAt>` (30 days). The
+  groups the same (`psn:groupdefs:v1`, `psn:groupearned:v1`). A DLC added after the defined half was kept
+  shows as an earned id it lacks, and the defined half is read again (`splitRead`). The old
+  `psn:trophies:v2`, `psn:groups:`, `psn:titles:v12` and `psn:summary:v3` keys are no longer read (they expire).
+- **One budget for every request** (`psnBudget.ts`): `PSN_CALLS_PER_WINDOW` (600 per 15 minutes, in
+  `attemptLimit.ts`, the one number to tune) for the whole app, counted in the database
+  (`reserveAttempt('psn-upstream', 'app', max)`), now including the played pages and the token exchange
+  (`auth`). Work nobody waits for (`psnBackground`: the enrichment, the year, the stale refreshes, the score
+  fill) may spend only **three quarters** (450); the rest is kept for pages. Past it, `PsnBusyError`: nothing is
+  asked, routes answer 429 `busy`, a background fetch is not tried again for 30 to 90 s (jitter), the score
+  fill stops its pass as `busy` and resumes on the next. `psn-score` went from 300 to 200 games per 15 minutes
+  to fit under the background share. **When Sony itself refuses twice**, `psnRateLimited` writes
+  `psn:cooldown` for 60 s: no instance asks until then.
+- **What Sony's limit is said to be** (community reports, no Sony document): a 429 with the body
+  `{"error":{"code":2138635,"message":"Rate limit exceeded"}}`, about 300 requests per 15 minutes, per account
+  **and per kind of request** (trophy titles, profile...), plus an unknown per-address limit. Some clients see an
+  `X-RateLimit-Next-Available` header on the 429; **psn-api returns only the body** of every response, so the
+  app cannot read it and waits a fixed 60 s. The per-function counters (`psnCallStats`) are what will say which
+  endpoint hits 429 first. Sources: [psn-php #117](https://github.com/Tustin/psn-php/issues/117),
+  [psn-php #148](https://github.com/Tustin/psn-php/issues/148), [psn-go](https://pkg.go.dev/github.com/wolveix/psn-go).
+
+### Phase 2 numbers
+
+Measured the same way as the baseline (`src/lib/psnCallBaseline.test.ts`, the fake Sony and the in-memory
+cache, now with the background queued and run apart; the test asserts them):
+`PSN_BASELINE=1 npx jest src/lib/psnCallBaseline --coverage=false`.
+
+| | 500 games | 1,000 games |
+|---|--:|--:|
+| **cold home, what the visit waits for** (phase 0: 356 / 709) | **9** | **10** |
+| of which | summary 1, profile 1, titles 1, gameTrophies 6 | the same, titles 2 |
+| after it, in the background (played, 20 sets, the year, 20 completion dates) | 255 | 472 |
+| a second player of the same games, visit and background | 134 | 242 |
+| refresh after 15 min: the visit / in the background | 0 / 3 | 0 / 4 |
+| navigation: a game this year, an older game, the library | 2, 4, 0 | 2, 4, 0 |
+| score fill after the visit (phase 0: 790 / 1,580) | 705 | 1,450 |
+| linking (search, summary, profile, titles) | 4 | 5 |
+
+The background is still the year game by game (2 requests per game the first time anyone reads it, 1 after);
+phase 4 (#179) makes it free with stored snapshots. The score fill reads the defined trophies in English while
+pages read them in the reader's language: one language for the score is a follow-up.
