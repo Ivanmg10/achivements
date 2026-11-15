@@ -1,10 +1,6 @@
-import { countUpstream } from '@/lib/upstreamCount'
-import { recordPsnCall, type PsnFunction } from '@/lib/psnCallStats'
+import type { PsnFunction } from '@/lib/psnCallStats'
 import { NextResponse } from 'next/server'
 import {
-  exchangeAccessCodeForAuthTokens,
-  exchangeNpssoForAccessCode,
-  exchangeRefreshTokenForAuthTokens,
   getProfileFromAccountId,
   getTitleTrophies,
   getTitleTrophyGroups,
@@ -16,24 +12,19 @@ import {
   getUserTrophyProfileSummary,
   makeUniversalSearch,
   type AuthorizationPayload,
-  type AuthTokensResponse,
   type TrophyTitle,
 } from 'psn-api'
 import { readCache, readCacheMany, withSteamCache, writeCache } from '@/lib/steamCache'
 import { igdbArt, igdbConfigured, igdbPlatforms, type IgdbArt } from '@/lib/igdbClient'
-import {
-  loadPsnCredentials,
-  npssoExpiry,
-  savePsnNpsso,
-  savePsnTokens,
-  type PsnCredentials,
-  type PsnTokens,
-} from '@/lib/psnCredentials'
-import { countTrophies, psnNumericId, psnPlatformName } from '@/utils/psnTitles'
+import type { PoolAccount } from '@/lib/psnAccounts'
+import { psnPoolConfigured, withPsnAccount } from '@/lib/psnPool'
+import { maybeMaintainPsnPool } from '@/lib/psnMaintenance'
+import { psnAuthorization } from '@/lib/psnTokens'
+import { avatarUrl, countTrophies, https, psnNumericId, psnPlatformName } from '@/utils/psnTitles'
 import { mapLimit } from '@/utils/utils'
 import type { PsnGameProgress, PsnRecentTrophy, PsnTrophy, PsnTrophyGroup, TrophyCounts } from '@/types/psn'
-import { NOT_CONFIGURED, PsnBusyError, PsnError, PsnSyncing } from '@/lib/psnErrors'
-import { psnRateLimited, takePsnCall } from '@/lib/psnBudget'
+import { PsnBusyError, PsnError, PsnSyncing, TIMED_OUT } from '@/lib/psnErrors'
+import { spendPsnCall } from '@/lib/psnBudget'
 import { psnCached, psnSyncedAt } from '@/lib/psnCache'
 import { needsBaseTrophies, withCompletion } from '@/lib/psnCompletion'
 import { psnBaseCompletedAt } from '@/utils/completionDates'
@@ -42,14 +33,14 @@ export { PsnBusyError, PsnError, PsnSyncing } from '@/lib/psnErrors'
 
 /**
  * PlayStation Network through psn-api, which speaks Sony's own (unofficial)
- * mobile API. Every call is authenticated as ONE account: the one whose NPSSO
- * token is in PSN_NPSSO — like Steam's server-wide key, not per user. That
- * account can read any profile whose trophies are public. Its NPSSO and
- * tokens live in the database (see psnCredentials), seeded once from
- * PSN_NPSSO and renewed from the admin panel.
+ * mobile API. Every call is authenticated as one of the app's service
+ * accounts (#178, psnPool), not as the user: any of them can read any profile
+ * whose trophies are public. Their NPSSOs and tokens live in the database
+ * (psnAccounts, psnTokens), added and renewed from the admin panel; the first
+ * one comes from the old psn_credentials row or PSN_NPSSO.
  *
  * psn-api returns Sony's error bodies instead of throwing, so every response
- * goes through unwrap(). Every request spends the app's budget (psnBudget).
+ * goes through unwrap(). Every request spends its account's budget (psnBudget).
  * Responses are cached in the Steam cache table under "psn:" keys: the
  * account-level ones through psnCache (stale data, one fetch at a time), the
  * per-game ones split into what every player shares (a game's defined trophies
@@ -62,13 +53,8 @@ export { PsnBusyError, PsnError, PsnSyncing } from '@/lib/psnErrors'
  * pass, and laid over the core when it is there.
  */
 
-/** How long a rate-limited call waits before its one retry. Sony sends no Retry-After that psn-api lets through. */
-const RATE_LIMIT_WAIT_MS = 2_000
 /** psn-api takes no signal, so a hung call is left behind rather than aborted. */
 const CALL_TIMEOUT_MS = 8_000
-/** After Sony refuses twice, this instance does not ask again for this long (psnBudget tells the others). */
-const COOLDOWN_MS = 60_000
-const MARGIN_MS = 60_000
 const SUMMARY_TTL_MS = 15 * 60 * 1000
 const NOT_FOUND_TTL_MS = 60 * 60 * 1000
 const TITLES_TTL_MS = 15 * 60 * 1000
@@ -116,26 +102,15 @@ export function psnLanguage(lang: string | null | undefined): string {
   return (lang && LANGUAGES[lang]) || DEFAULT_LANGUAGE
 }
 
-// The tokens in use on this instance. The database keeps them too
-// (psnCredentials), so a cold start reuses them instead of spending the NPSSO.
-let tokens: PsnTokens | null = null
-let pending: Promise<PsnTokens> | null = null
-
-/** Where the NPSSO comes from: the one an admin pasted, else the PSN_NPSSO variable (the first setup). */
-async function storedCredentials(): Promise<PsnCredentials | null> {
-  try {
-    return await loadPsnCredentials()
-  } catch (err) {
-    // A missing table (migration not run) or a database hiccup: fall back to the variable.
-    console.error('[psn] stored credentials unavailable', err)
-    return null
-  }
-}
-
-/** Whether PSN can be called at all: an NPSSO is stored or set in the environment. */
+/** Whether PSN can be called at all: a service account is set up (today's NPSSO is copied in on first use). */
 export async function psnConfigured(): Promise<boolean> {
-  if (process.env.PSN_NPSSO?.trim()) return true
-  return Boolean((await storedCredentials())?.npsso)
+  try {
+    return await psnPoolConfigured()
+  } catch (err) {
+    // The pool's table missing (migration 047 not run) or a database hiccup.
+    console.error('[psn] the account pool is unavailable', err)
+    return false
+  }
 }
 
 function unwrap<T>(res: T): T {
@@ -144,137 +119,33 @@ function unwrap<T>(res: T): T {
   return res
 }
 
-let cooldownUntil = 0
-
-/** One request's worth of the budget, counted under `fn`; PsnBusyError when it is spent. */
-async function spend(fn: PsnFunction): Promise<void> {
-  if (Date.now() < cooldownUntil || !(await takePsnCall())) throw new PsnBusyError()
-  countUpstream('psn')
-  recordPsnCall(fn)
-}
-
-/** One request to Sony: within the app's budget, and never longer than the deadline. */
-async function attempt<T>(fn: PsnFunction, call: () => Promise<T>): Promise<T> {
-  await spend(fn)
+/** One request to Sony with one account: signed in, within its budget, and never longer than the deadline. */
+async function attempt<T>(account: PoolAccount, fn: PsnFunction, call: (auth: AuthorizationPayload) => Promise<T>): Promise<T> {
+  const auth = await psnAuthorization(account)
+  await spendPsnCall(account, fn)
   let timer: ReturnType<typeof setTimeout> | undefined
   const deadline = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new PsnError('PSN did not answer in time')), CALL_TIMEOUT_MS)
+    timer = setTimeout(() => reject(new PsnError('PSN did not answer in time', TIMED_OUT)), CALL_TIMEOUT_MS)
   })
   try {
-    return unwrap(await Promise.race([call(), deadline]))
+    return unwrap(await Promise.race([call(auth), deadline]))
   } finally {
     clearTimeout(timer)
   }
 }
 
 /**
- * One Sony call, unwrapped and counted under `fn` (psnCallStats). When Sony says "too many requests" it waits a
- * moment and asks once more; a second refusal is thrown (psnFailure answers
- * 429) and this instance stops asking for a minute: one account serves everyone,
- * so insisting is what would take PSN away from all of them. Any other error is
- * thrown at once: retrying a hidden profile helps no one.
+ * One Sony call, unwrapped and counted under `fn` (psnCallStats), on an account of the pool (#178): the pool
+ * picks the account, and moves the call to another when Sony refuses that one (`withPsnAccount`). A hidden
+ * profile or any other answer about the profile is thrown at once: retrying it helps no one.
  */
-export async function psnCall<T>(fn: PsnFunction, call: () => Promise<T>): Promise<T> {
-  try {
-    return await attempt(fn, call)
-  } catch (err) {
-    if (!(err instanceof PsnError && err.isRateLimited) || err instanceof PsnBusyError) throw err
-    await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_WAIT_MS))
-    try {
-      return await attempt(fn, call)
-    } catch (again) {
-      if (again instanceof PsnError && again.isRateLimited && !(again instanceof PsnBusyError)) {
-        cooldownUntil = Date.now() + COOLDOWN_MS
-        await psnRateLimited()
-      }
-      throw again
-    }
-  }
+export function psnCall<T>(fn: PsnFunction, call: (auth: AuthorizationPayload) => Promise<T>): Promise<T> {
+  maybeMaintainPsnPool()
+  return withPsnAccount((account) => attempt(account, fn, call))
 }
 
-function toTokens(res: AuthTokensResponse): PsnTokens {
-  if (!res.accessToken) throw new PsnError('PSN refused the token exchange')
-  const now = Date.now()
-  return {
-    accessToken: res.accessToken,
-    accessExpiresAt: now + res.expiresIn * 1000,
-    refreshToken: res.refreshToken,
-    refreshExpiresAt: now + res.refreshTokenExpiresIn * 1000,
-  }
-}
+export { forgetPsnTokens } from '@/lib/psnTokens'
 
-/**
- * Fresh tokens, cheapest first: the stored access token, then the refresh
- * token, then a new exchange of the NPSSO. What comes out is stored for the
- * next instance. An NPSSO from the environment is copied in on first use
- * (with its expiry, asked of Sony), so the admin panel and the reminder
- * know when it dies.
- */
-async function newTokens(): Promise<PsnTokens> {
-  const now = Date.now()
-  const stored = await storedCredentials()
-  const known = stored?.tokens ?? tokens
-  if (known && known.accessExpiresAt - MARGIN_MS > now) return known
-
-  if (known && known.refreshExpiresAt - MARGIN_MS > now) {
-    try {
-      await spend('auth')
-      const refreshed = toTokens(await exchangeRefreshTokenForAuthTokens(known.refreshToken))
-      // Sony hands back the same refresh token with the same deadline; keep that deadline.
-      refreshed.refreshExpiresAt = Math.min(refreshed.refreshExpiresAt, known.refreshExpiresAt)
-      await savePsnTokens(refreshed).catch((err) => console.error('[psn] could not store tokens', err))
-      return refreshed
-    } catch (err) {
-      console.error('[psn] refresh failed, falling back to NPSSO', err)
-    }
-  }
-
-  const envNpsso = process.env.PSN_NPSSO?.trim() || null
-  const npsso = stored?.npsso ?? envNpsso
-  if (!npsso) throw new PsnError('PSN is not configured: no NPSSO stored or set', NOT_CONFIGURED)
-  if (!stored?.npsso && envNpsso) {
-    await savePsnNpsso(envNpsso, await npssoExpiry(envNpsso), 'PSN_NPSSO').catch((err) =>
-      console.error('[psn] could not store the NPSSO', err),
-    )
-  }
-  const fresh = await exchangeNpsso(npsso)
-  await savePsnTokens(fresh).catch((err) => console.error('[psn] could not store tokens', err))
-  return fresh
-}
-
-/** The two requests that turn an NPSSO into tokens. */
-async function exchangeNpsso(npsso: string): Promise<PsnTokens> {
-  await spend('auth')
-  const code = await exchangeNpssoForAccessCode(npsso)
-  await spend('auth')
-  return toTokens(await exchangeAccessCodeForAuthTokens(code))
-}
-
-async function authorization(): Promise<AuthorizationPayload> {
-  if (tokens && Date.now() < tokens.accessExpiresAt - MARGIN_MS) return { accessToken: tokens.accessToken }
-  pending ??= newTokens()
-    .then((t) => (tokens = t))
-    .finally(() => {
-      pending = null
-    })
-  return { accessToken: (await pending).accessToken }
-}
-
-/** Drops this instance's tokens, so the next call starts from what is stored (a new NPSSO). */
-export function forgetPsnTokens(): void {
-  cooldownUntil = 0
-  tokens = null
-}
-
-/** Exchanges an NPSSO once, to prove it works before it is stored. */
-export async function verifyNpsso(npsso: string): Promise<PsnTokens> {
-  return exchangeNpsso(npsso)
-}
-
-/** Sony's icons come as http:// at times, which the site's CSP (and any https page) refuses. */
-function https(url: string): string {
-  return url.replace(/^http:\/\//, 'https://')
-}
 
 /** The account with exactly this online ID (any case), or null. */
 export async function findPsnAccount(username: string): Promise<{ accountId: string; onlineId: string } | null> {
@@ -282,17 +153,13 @@ export async function findPsnAccount(username: string): Promise<{ accountId: str
   // An online ID nobody has is remembered for an hour (#177): typing it again does not ask Sony again.
   const notFound = `psn:notfound:${wanted}`
   if (await readCache<boolean>(notFound)) return null
-  const res = await psnCall('search', async () => makeUniversalSearch(await authorization(), username, 'SocialAllAccounts'))
+  const res = await psnCall('search', (auth) => makeUniversalSearch(auth, username, 'SocialAllAccounts'))
   const match = res.domainResponses?.[0]?.results?.find((r) => r.socialMetadata.onlineId.toLowerCase() === wanted)
   if (!match) await writeCache(notFound, true, NOT_FOUND_TTL_MS)
   return match ? { accountId: match.socialMetadata.accountId, onlineId: match.socialMetadata.onlineId } : null
 }
 
-/** The largest avatar, over https (the same host serves both). */
-export function avatarUrl(avatars: Array<{ size: string; url: string }>): string | null {
-  const best = ['xl', 'l', 'm', 's'].map((size) => avatars.find((a) => a.size === size)).find(Boolean)
-  return best ? https(best.url) : null
-}
+export { avatarUrl } from '@/utils/psnTitles'
 
 export type PsnSummary = {
   onlineId: string
@@ -320,10 +187,9 @@ export async function psnSummary(accountId: string, userId: string | null = null
     `psn:summary:v4:${accountId}`,
     SUMMARY_TTL_MS,
     async () => {
-      const auth = await authorization()
       const [summary, profile, games] = await Promise.all([
-        psnCall('summary', () => getUserTrophyProfileSummary(auth, accountId)),
-        psnCall('profile', () => getProfileFromAccountId(auth, accountId)),
+        psnCall('summary', (auth) => getUserTrophyProfileSummary(auth, accountId)),
+        psnCall('profile', (auth) => getProfileFromAccountId(auth, accountId)),
         psnTitlesCore(accountId, userId),
       ])
       return {
@@ -347,8 +213,7 @@ export async function psnSummary(accountId: string, userId: string | null = null
  * presses "check", and the answer must be what the profile says this second. Throws as any call does.
  */
 export async function psnAboutMe(accountId: string): Promise<string> {
-  const auth = await authorization()
-  const profile = await psnCall('profile', () => getProfileFromAccountId(auth, accountId))
+  const profile = await psnCall('profile', (auth) => getProfileFromAccountId(auth, accountId))
   return profile.aboutMe ?? ''
 }
 
@@ -416,10 +281,9 @@ function pickImage(images: Array<{ url: string; type: string }>, types: string[]
 
 /** Every game the account has played, with when, for how long and its store art. */
 async function playedGames(accountId: string): Promise<PlayedGame[]> {
-  const auth = await authorization()
   const games: PlayedGame[] = []
   for (let offset = 0; ; offset += PLAYED_PAGE) {
-    const page = await psnCall('played', () => getUserPlayedGames(auth, accountId, { limit: PLAYED_PAGE, offset }))
+    const page = await psnCall('played', (auth) => getUserPlayedGames(auth, accountId, { limit: PLAYED_PAGE, offset }))
     const titles = page.titles ?? []
     for (const t of titles) {
       const images = t.concept?.media?.images ?? []
@@ -454,11 +318,10 @@ async function trophySetsOf(accountId: string, titleIds: string[], userId: strin
   const missing = titleIds.filter((id) => !found.has(id)).slice(0, limit)
   if (missing.length === 0) return found
 
-  const auth = await authorization()
   const batches: string[][] = []
   for (let i = 0; i < missing.length; i += LOOKUP_BATCH) batches.push(missing.slice(i, i + LOOKUP_BATCH))
   const answers = await mapLimit(batches, PARALLEL, async (batch) => {
-    const res = await psnCall('sets', () => getUserTrophiesForSpecificTitle(auth, accountId, { npTitleIds: batch.join(',') }))
+    const res = await psnCall('sets', (auth) => getUserTrophiesForSpecificTitle(auth, accountId, { npTitleIds: batch.join(',') }))
     const answered = new Map((res.titles ?? []).map((t) => [t.npTitleId, (t.trophyTitles ?? []).map((tt) => tt.npCommunicationId)]))
     for (const id of batch) {
       const sets = answered.get(id) ?? []
@@ -561,11 +424,11 @@ export async function psnGameGroups(accountId: string, game: GameRef, userId: st
     },
     userId,
     async () => {
-      const res = await psnCall('gameGroups', async () => getTitleTrophyGroups(await authorization(), game.titleId, { ...options, headerOverrides: { 'Accept-Language': language } }))
+      const res = await psnCall('gameGroups', (auth) => getTitleTrophyGroups(auth, game.titleId, { ...options, headerOverrides: { 'Accept-Language': language } }))
       return (res.trophyGroups ?? []).map((g) => ({ id: g.trophyGroupId, name: g.trophyGroupName, iconUrl: g.trophyGroupIconUrl ? https(g.trophyGroupIconUrl) : null, defined: g.definedTrophies }))
     },
     async () => {
-      const res = await psnCall('gameGroups', async () => getUserTrophyGroupEarningsForTitle(await authorization(), accountId, game.titleId, options))
+      const res = await psnCall('gameGroups', (auth) => getUserTrophyGroupEarningsForTitle(auth, accountId, game.titleId, options))
       return (res.trophyGroups ?? []).map((g) => ({ id: g.trophyGroupId, earned: g.earnedTrophies, progress: g.progress }))
     },
   )
@@ -583,10 +446,9 @@ export async function psnTitlesCore(accountId: string, userId: string | null = n
     titlesKey(accountId),
     TITLES_TTL_MS,
     async () => {
-      const auth = await authorization()
       const games: PsnGameProgress[] = []
       for (let offset = 0; ; offset += TITLES_PAGE) {
-        const page = await psnCall('titles', () => getUserTitles(auth, accountId, { limit: TITLES_PAGE, offset }))
+        const page = await psnCall('titles', (auth) => getUserTitles(auth, accountId, { limit: TITLES_PAGE, offset }))
         const titles = page.trophyTitles ?? []
         for (const t of titles) {
           const game = toPsnGameProgress(t)
@@ -711,7 +573,7 @@ export async function psnGameTrophies(accountId: string, game: GameRef, userId: 
     },
     userId,
     async () => {
-      const res = await psnCall('gameTrophies', async () => getTitleTrophies(await authorization(), game.titleId, 'all', { ...options, headerOverrides: { 'Accept-Language': language } }))
+      const res = await psnCall('gameTrophies', (auth) => getTitleTrophies(auth, game.titleId, 'all', { ...options, headerOverrides: { 'Accept-Language': language } }))
       return (res.trophies ?? []).map((t) => ({
         id: t.trophyId,
         name: t.trophyName ?? '',
@@ -723,7 +585,7 @@ export async function psnGameTrophies(accountId: string, game: GameRef, userId: 
       }))
     },
     async () => {
-      const res = await psnCall('gameTrophies', async () => getUserTrophiesEarnedForTitle(await authorization(), accountId, game.titleId, 'all', options))
+      const res = await psnCall('gameTrophies', (auth) => getUserTrophiesEarnedForTitle(auth, accountId, game.titleId, 'all', options))
       return (res.trophies ?? []).map((t) => {
         const rate = Number(t.trophyEarnedRate)
         return { id: t.trophyId, earned: t.earned === true, earnedAt: t.earnedDateTime ?? null, rarity: t.trophyEarnedRate && Number.isFinite(rate) ? rate : null }

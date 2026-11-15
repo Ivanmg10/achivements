@@ -1,4 +1,4 @@
-jest.mock('./admin-psn-token/AdminPsnToken', () => ({ __esModule: true, default: () => <p>psn tab</p> }))
+jest.mock('./admin-psn-accounts/AdminPsnAccounts', () => ({ __esModule: true, default: () => <p>psn tab</p> }))
 jest.mock('./admin-rankings/AdminRankings', () => ({ __esModule: true, default: () => <p>rankings tab</p> }))
 jest.mock('./admin-action-log/AdminActionLog', () => ({ __esModule: true, default: () => <p>log tab</p> }))
 jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))

@@ -8,6 +8,7 @@ import { raKeyHash, readRaKey } from './raKey'
 import { signElevation } from './adminAuth'
 import { signVerification } from './emailVerification'
 import { signTicket } from './steamLogin'
+import { openPsn, sealPsn } from './psnAccounts'
 
 const SECRET = 'pinned-secret-119'
 const AT = 1800000000000
@@ -24,6 +25,18 @@ describe('the derivations stay what they were', () => {
   test('sealed values made before still open', () => {
     expect(open('Te-TXioxneFFASAG.5jKMb2EYGAf5ApTxKwadSw.cqSuRRsVCVGcpbc', 'psn-npsso')).toBe('npsso-value')
     expect(readRaKey('plh4rBYL2CcIMKKR.dLvbrz5gl5rkzooVG2iKyg.Gaoxk7HwFtDl')).toBe('my-ra-key')
+  })
+
+  test("the PSN pool's two derivations (#178): PSN_SECRET_KEY under psn-account:v1, and the old one it still reads", () => {
+    process.env.PSN_SECRET_KEY = 'pinned-psn-key'
+    expect(openPsn('v1:BwcHBwcHBwcHBwcH.kAu0-qPahf7W1H9na3Jaow.fYkKAV1LRCoIess')).toBe('npsso-value')
+    expect(openPsn('BwcHBwcHBwcHBwcH.8-EM4I9UlH0uBxAK5TELVw.U0DNslcjbOiaysyP')).toBe('legacy-npsso')
+    expect(sealPsn('x').startsWith('v1:')).toBe(true)
+    delete process.env.PSN_SECRET_KEY
+    // Without the key: new values use the old derivation; a v1 value cannot be opened.
+    expect(sealPsn('x').startsWith('v1:')).toBe(false)
+    expect(openPsn(sealPsn('round-trip'))).toBe('round-trip')
+    expect(openPsn('v1:BwcHBwcHBwcHBwcH.kAu0-qPahf7W1H9na3Jaow.fYkKAV1LRCoIess')).toBeNull()
   })
 
   test('the RA key hash', () => {

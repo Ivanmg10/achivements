@@ -1,54 +1,62 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import AdminPsnAccountRow from './AdminPsnAccountRow'
-import { notify } from '@/lib/notify'
+import { DAY_MS, NOW, psnAccount } from '@/test-utils/psnPoolFixtures'
 
-jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
-
-const STATUS = { configured: true, stored: true, expiresAt: '2026-12-01T00:00:00Z', daysLeft: 40, updatedAt: null, updatedBy: 'ivan' }
-const row = (over: Record<string, unknown> = {}, onSave = jest.fn().mockResolvedValue(true)) => {
+const renderRow = (over = {}, props = {}) => {
+  const onAction = jest.fn()
   render(
     <ul>
-      <AdminPsnAccountRow name="App account" status={STATUS} saving={false} saveError={null} onSave={onSave} {...over} />
+      <AdminPsnAccountRow account={psnAccount(over)} crowded={false} busy={false} now={NOW} onAction={onAction} {...props} />
     </ul>,
   )
-  return onSave
+  return onAction
 }
 
-test('says who, how long it has left and who set it', () => {
-  row()
-  expect(screen.getByText('App account')).toBeInTheDocument()
+test('shows the label, state, who it signs in as, days left and until when, renewal, weight, calls and canary', () => {
+  renderRow({ hint: 'the blue one', callsLastHour: 12, weight: 2 })
+  expect(screen.getByText('PSN-1')).toBeInTheDocument()
+  expect(screen.getByText('Active')).toBeInTheDocument()
+  expect(screen.getByText('signs in as ServiceOne')).toBeInTheDocument()
+  expect(screen.getByText('the blue one')).toBeInTheDocument()
   expect(screen.getByText('40 days left')).toBeInTheDocument()
-  expect(screen.getByText(/set by ivan/)).toBeInTheDocument()
+  const row = screen.getByRole('listitem')
+  expect(row).toHaveTextContent(/renewed .* by ivan/)
+  expect(row).toHaveTextContent('weight 2')
+  expect(row).toHaveTextContent('12 calls last hour')
+  expect(row).toHaveTextContent(/Canary ok/)
 })
 
-test('the field for a new NPSSO opens from the row, and saving closes it and says so', async () => {
-  const onSave = row()
-  expect(screen.queryByLabelText(/New NPSSO/)).not.toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: 'Renew' }))
-  expect(screen.getByRole('link', { name: /this page/ })).toHaveAttribute('href', 'https://ca.account.sony.com/api/v1/ssocookie')
-  fireEvent.change(screen.getByLabelText(/New NPSSO/), { target: { value: ' abc ' } })
-  fireEvent.click(screen.getByRole('button', { name: 'Save' }))
-  await waitFor(() => expect(notify.success).toHaveBeenCalled())
-  expect(onSave).toHaveBeenCalledWith('abc')
-  expect(screen.queryByLabelText(/New NPSSO/)).not.toBeInTheDocument()
+test('a sign-in close to its end, gone, or unknown says so', () => {
+  renderRow({ npssoExpiresAt: NOW + 3 * DAY_MS + 1000 })
+  expect(screen.getByText('3 days left')).toHaveClass('text-warning')
 })
 
-test('a refused one stays open and says why; cancelling closes the field', () => {
-  row({ saveError: 'rejected' })
-  fireEvent.click(screen.getByRole('button', { name: 'Renew' }))
-  expect(screen.getByRole('alert')).toHaveTextContent('Sony did not accept it')
-  expect(screen.getByLabelText(/New NPSSO/)).toHaveAttribute('aria-invalid', 'true')
-  fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-  expect(screen.queryByLabelText(/New NPSSO/)).not.toBeInTheDocument()
-})
-
-test('expired is said plainly', () => {
-  row({ status: { ...STATUS, daysLeft: 0, expiresAt: null, updatedBy: null } })
+test('expired, quarantined, resting and crowded are all in words', () => {
+  renderRow({ npssoExpiresAt: NOW - DAY_MS, status: 'quarantined', canaryOk: false }, { crowded: true })
   expect(screen.getByText('Expired')).toBeInTheDocument()
+  expect(screen.getByText('Quarantined')).toBeInTheDocument()
+  expect(screen.getByText('Expires near another')).toBeInTheDocument()
+  expect(screen.getByRole('listitem')).toHaveTextContent(/Canary failed/)
+  expect(screen.getByRole('button', { name: 'Resume' })).toBeInTheDocument()
 })
 
-test('not set up offers to set it up', () => {
-  row({ status: { configured: false, stored: false, expiresAt: null, daysLeft: null, updatedAt: null, updatedBy: null } })
-  expect(screen.getByText(/Not set up/)).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Set up' })).toBeInTheDocument()
+test('a resting active account and one never checked', () => {
+  renderRow({ cooldownUntil: NOW + 60_000, npssoExpiresAt: null, canaryAt: null, onlineId: null, renewedAt: null })
+  expect(screen.getByText('Resting after 429s')).toBeInTheDocument()
+  expect(screen.getByText('Expiry unknown')).toBeInTheDocument()
+  expect(screen.getByRole('listitem')).toHaveTextContent('No canary yet')
+  expect(screen.getByText('online ID not read yet')).toBeInTheDocument()
+})
+
+test('every action is a button that says what it does', () => {
+  const onAction = renderRow()
+  for (const [name, action] of [['Renew', 'renew'], ['Test', 'test'], ['Drain', 'drain'], ['Pause', 'pause'], ['Remove', 'remove']]) {
+    fireEvent.click(screen.getByRole('button', { name }))
+    expect(onAction).toHaveBeenLastCalledWith(action)
+  }
+})
+
+test('busy: the actions wait', () => {
+  renderRow({}, { busy: true })
+  expect(screen.getByRole('button', { name: 'Test' })).toBeDisabled()
 })

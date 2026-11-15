@@ -14,12 +14,8 @@ jest.mock('psn-api', () => ({
   getUserTrophyGroupEarningsForTitle: jest.fn(),
 }))
 jest.mock('@/lib/attemptLimit', () => ({ reserveAttempt: jest.fn(async () => ({ allowed: true, release: async () => {} })) }))
-jest.mock('@/lib/psnCredentials', () => ({
-  loadPsnCredentials: jest.fn(async () => null),
-  savePsnTokens: jest.fn(async () => {}),
-  savePsnNpsso: jest.fn(async () => {}),
-  npssoExpiry: jest.fn(async () => null),
-}))
+jest.mock('@/lib/psnAccounts', () => jest.requireActual('@/test-utils/fakePsnAccounts').fakePsnStore)
+jest.mock('@/lib/psnMaintenance', () => ({ maybeMaintainPsnPool: jest.fn() }))
 jest.mock('@/lib/steamCache', () => ({
   withSteamCache: jest.fn((_key: string, _ttl: number, fetcher: () => Promise<unknown>) => fetcher()),
   readCacheMany: jest.fn(async () => new Map()),
@@ -41,7 +37,7 @@ import * as psn from 'psn-api'
 import { igdbArt, igdbConfigured } from '@/lib/igdbClient'
 import { readCache, readCacheMany, withSteamCache, writeCache } from '@/lib/steamCache'
 import { psnCached } from '@/lib/psnCache'
-import { loadPsnCredentials, savePsnNpsso, savePsnTokens } from '@/lib/psnCredentials'
+import { fakePsnStore } from '@/test-utils/fakePsnAccounts'
 import {
   durationMinutes,
   findPsnAccount,
@@ -79,7 +75,7 @@ function search(...onlineIds: string[]) {
 
 beforeEach(() => {
   jest.clearAllMocks()
-  process.env.PSN_NPSSO = 'npsso'
+  fakePsnStore.reset()
   mock(psn.exchangeNpssoForAccessCode).mockResolvedValue('code')
   mock(psn.exchangeAccessCodeForAuthTokens).mockResolvedValue({
     accessToken: 'token',
@@ -104,9 +100,9 @@ beforeEach(() => {
   })
 })
 
-test('is configured with an NPSSO in the environment', async () => {
+test('is configured while the pool has an account with a sign-in', async () => {
   expect(await psnConfigured()).toBe(true)
-  process.env.PSN_NPSSO = '  '
+  fakePsnStore.reset([])
   expect(await psnConfigured()).toBe(false)
 })
 
@@ -470,48 +466,19 @@ describe('sign-in', () => {
   beforeEach(() => forgetPsnTokens())
 
   test('reuses the tokens another instance stored, without spending the NPSSO', async () => {
-    mock(loadPsnCredentials).mockResolvedValueOnce({
-      npsso: 'stored', npssoExpiresAt: null, updatedAt: null, updatedBy: null, warnedAt: null,
-      tokens: { accessToken: 'stored-access', accessExpiresAt: Date.now() + 3_600_000, refreshToken: 'r', refreshExpiresAt: Date.now() + 864_000_000 },
-    })
+    fakePsnStore.accounts[0].tokens = { accessToken: 'stored-access', accessExpiresAt: Date.now() + 3_600_000, refreshToken: 'r', refreshExpiresAt: Date.now() + 864_000_000 }
     mock(psn.makeUniversalSearch).mockResolvedValue(search())
     await findPsnAccount('abc')
     expect(psn.exchangeNpssoForAccessCode).not.toHaveBeenCalled()
     expect(mock(psn.makeUniversalSearch).mock.calls[0][0]).toEqual({ accessToken: 'stored-access' })
   })
 
-  test('an expired access token is refreshed and stored, keeping the refresh deadline Sony set', async () => {
-    const refreshDeadline = Date.now() + 5 * 86_400_000
-    mock(loadPsnCredentials).mockResolvedValueOnce({
-      npsso: 'stored', npssoExpiresAt: null, updatedAt: null, updatedBy: null, warnedAt: null,
-      tokens: { accessToken: 'old', accessExpiresAt: Date.now() - 1, refreshToken: 'r', refreshExpiresAt: refreshDeadline },
-    })
-    mock(psn.exchangeRefreshTokenForAuthTokens).mockResolvedValue({ accessToken: 'new', refreshToken: 'r', expiresIn: 3600, refreshTokenExpiresIn: 864000 })
+  test("the account's NPSSO signs in when it has no tokens", async () => {
+    fakePsnStore.reset([{ id: 1, npsso: 'from-admin' }])
     mock(psn.makeUniversalSearch).mockResolvedValue(search())
-    await findPsnAccount('abc')
-    expect(psn.exchangeNpssoForAccessCode).not.toHaveBeenCalled()
-    expect(mock(savePsnTokens).mock.calls[0][0]).toMatchObject({ accessToken: 'new', refreshExpiresAt: refreshDeadline })
-  })
-
-  test('the stored NPSSO wins over the variable; the variable is stored on first use', async () => {
-    mock(psn.makeUniversalSearch).mockResolvedValue(search())
-    mock(loadPsnCredentials).mockResolvedValueOnce({ npsso: 'from-admin', npssoExpiresAt: null, tokens: null, updatedAt: null, updatedBy: null, warnedAt: null })
     await findPsnAccount('abc')
     expect(psn.exchangeNpssoForAccessCode).toHaveBeenLastCalledWith('from-admin')
-
-    forgetPsnTokens()
-    mock(loadPsnCredentials).mockResolvedValueOnce(null)
-    await findPsnAccount('abc')
-    expect(psn.exchangeNpssoForAccessCode).toHaveBeenLastCalledWith('npsso')
-    expect(savePsnNpsso).toHaveBeenCalledWith('npsso', null, 'PSN_NPSSO')
-  })
-
-  test('configured by a stored NPSSO even without the variable', async () => {
-    process.env.PSN_NPSSO = ''
-    mock(loadPsnCredentials).mockResolvedValueOnce({ npsso: 'x' })
-    expect(await psnConfigured()).toBe(true)
-    mock(loadPsnCredentials).mockResolvedValueOnce(null)
-    expect(await psnConfigured()).toBe(false)
+    expect(fakePsnStore.accounts[0].tokens).toMatchObject({ accessToken: 'token' })
   })
 })
 
