@@ -4,6 +4,17 @@ import type { TagTone } from '@/components/ui/Tag'
 
 const TITLE_ID = /^NPWR(\d{5})_(\d{2})$/
 
+/** Sony's icons come as http:// at times, which the site's CSP (and any https page) refuses. */
+export function https(url: string): string {
+  return url.replace(/^http:\/\//, 'https://')
+}
+
+/** The largest avatar, over https (the same host serves both). */
+export function avatarUrl(avatars: Array<{ size: string; url: string }>): string | null {
+  const best = ['xl', 'l', 'm', 's'].map((size) => avatars.find((a) => a.size === size)).find(Boolean)
+  return best ? https(best.url) : null
+}
+
 /**
  * Sony's trophy-set ID as a number, so a PSN game fits wherever the app keys
  * games by (source, number) — pins, groups, hidden games. Always "NPWR",

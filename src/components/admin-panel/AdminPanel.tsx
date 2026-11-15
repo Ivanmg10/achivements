@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react'
 import { useAdminUsers } from '@/hooks/useAdminUsers'
 import AdminUnlock from './admin-unlock/AdminUnlock'
 import AdminActionLog from './admin-action-log/AdminActionLog'
-import AdminPsnToken from './admin-psn-token/AdminPsnToken'
+import AdminPsnAccounts from './admin-psn-accounts/AdminPsnAccounts'
 import AdminRankings from './admin-rankings/AdminRankings'
 import AdminUsersTab from './admin-users-tab/AdminUsersTab'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
@@ -114,7 +114,7 @@ export default function AdminPanel({
                 )}
               </>,
             )}
-          {tab === 'psn' && panel('psn', <AdminPsnToken />)}
+          {tab === 'psn' && panel('psn', <AdminPsnAccounts />)}
           {tab === 'rankings' && panel('rankings', <AdminRankings />)}
           {tab === 'log' && panel('log', <AdminActionLog />)}
         </>

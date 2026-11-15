@@ -28,12 +28,9 @@ jest.mock('psn-api', () => ({
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: () => Promise.reject(new Error('no database in this test')) } }))
 jest.mock('@/lib/upstreamCount', () => ({ countUpstream: jest.fn() }))
 jest.mock('@/lib/attemptLimit', () => ({ PSN_CALLS_PER_WINDOW: 600, reserveAttempt: jest.fn(async () => ({ allowed: true, release: async () => {} })) }))
-jest.mock('@/lib/psnCredentials', () => ({
-  loadPsnCredentials: jest.fn(async () => null),
-  savePsnTokens: jest.fn(async () => {}),
-  savePsnNpsso: jest.fn(async () => {}),
-  npssoExpiry: jest.fn(async () => null),
-}))
+// One service account, in memory (#178): the real pool and sign-in on top.
+jest.mock('@/lib/psnAccounts', () => jest.requireActual('@/test-utils/fakePsnAccounts').fakePsnStore)
+jest.mock('@/lib/psnMaintenance', () => ({ maybeMaintainPsnPool: jest.fn() }))
 jest.mock('@/lib/steamCache', () => jest.requireActual('@/test-utils/memorySteamCache').memorySteamCache)
 jest.mock('@/lib/igdbClient', () => ({ igdbConfigured: () => false, igdbPlatforms: () => [], igdbArt: jest.fn() }))
 jest.mock('@/lib/runLater', () => ({ runLater: (task: () => Promise<unknown>) => queued.push(task) }))

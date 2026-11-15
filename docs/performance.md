@@ -15,9 +15,9 @@ this file has every rule with its measurement. Steam's owned list, batch counts 
   breaks the build even through a dynamic import.
 - **Every call to a platform has a deadline shorter than the client's 20 s** (two 8 s attempts on RA
   and Steam, 8 s per PSN call through `psnCall`, since `psn-api` takes no signal). RA keeps its measured
-  pace per key in `fetchRA`; every Sony call (the played pages and the token exchange too) spends the app's
-  `psn-upstream` budget (`psnBudget.ts`: 600 per 15 min, background work three quarters of it) and Sony's own
-  refusal cools every instance down a minute (`psn:cooldown`). `countUpstream` counts calls per day; Steam fills wait at 85 % of its
+  pace per key in `fetchRA`; every Sony call (the played pages and the token exchange too) spends its service account's
+  `psn-upstream` budget (`psnBudget.ts`: `rate_per_min` × 15, 600 per 15 min by default, background work three quarters of it) and Sony's own
+  refusal twice in a row rests that account a minute, doubling to five (`cooldown_until`, #178), while the call moves to another account. `countUpstream` counts calls per day; Steam fills wait at 85 % of its
   100,000 a day (`steamBudgetLow`).
 - **Guarded work counts first:** `reserveAttempt` before a password check, never a count and then a
   record: a burst passes those together (30 of 30 past a limit of 10, measured).

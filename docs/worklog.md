@@ -37,6 +37,58 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 **Did** — `AdminUnlockTotp`'s code field takes focus (`autoFocus`) when it appears after the password, with a test (#185).
 **Why** — the owner had to click the field before typing the code.
+## 2026-11-16 — PSN phase 3: the service-account pool, its admin panel and Telegram alerts (`feat/178-psn-account-pool`, #178, epic #174)
+
+**Did**
+- `migrations/047_psn_account_pool.sql`: `psn_service_accounts`, `psn_account_leases`, `psn_account_stats`, `psn_alert_state`,
+  `psn_sync_jobs` (phase 4's, empty), and the copy of `psn_credentials` into PSN-1 when the pool is empty. **Not applied by the
+  agent: pre first, before this merges; production before its release** (`docs/releases.md`). The app runs the same copy on first
+  use of an empty pool (`psnAccounts.seedPsnPool`), then `PSN_NPSSO`.
+- The pool: `psnAccounts.ts` (all its SQL, sealing with `PSN_SECRET_KEY` under `psn-account:v1`, the old derivation still read),
+  `psnPool.ts` (`withPsnAccount`: weighted pick, a lease per call, 429/5xx on another account twice at most, refused token dropped,
+  403 never retried), `psnTokens.ts` (per account under `SELECT … FOR UPDATE`, access at ~50 min, refresh token at ~7 days),
+  `psnAccountCheck.ts` (test an NPSSO before keeping it, the canary), `psnMaintenance.ts` (upkeep after PSN traffic every 15 min and
+  from the cron). `psnBudget.ts` is now per account (`rate_per_min` × 15). `psnCall(fn, (auth) => …)` takes the account's auth;
+  `psnCredentials.ts` and `/api/admin/psn` are gone.
+- Admin: routes `/api/admin/psn/accounts` (GET, POST), `[id]` (PATCH, DELETE), `[id]/test`, `[id]/rotate`, `/api/admin/psn/pool`;
+  the PlayStation tab rebuilt (`admin-psn-accounts`, `-account-row`, `-pool-summary`, `-renew-modal`, `useAdminPsnAccounts`).
+- Alerts: `telegram.ts` (send-only), `psnAlerts.ts`, texts in Spanish in `psnAlertMessages.ts`, `/api/cron/psn-alerts` (daily
+  09:15 UTC in `vercel.json`), `/api/cron/psnToken` now the mail fallback per account when Telegram is not set. Status for the owner's
+  agent: `/api/ops/psn/status` (`PSN_STATUS_TOKEN`, `psn-status` limit).
+- Docs: `docs/platforms/psn.md` → Service-account pool, `docs/accounts.md`, `docs/architecture.md`, `docs/releases.md` (047, the
+  variables), `CLAUDE.md` → Platforms, `README.md`, `.env.example`.
+
+**Why** — issue #178: more than one PlayStation account behind PSN, with a panel comfortable for the owner and alerts before a
+sign-in dies.
+
+**Decisions** (the owner's, through the coordinator, 2026-11-15/16)
+- Infrastructure only, one real account: no fake accounts seeded; PSN-1 alone behaves as before (the call baseline is unchanged,
+  `psnCallBaseline.test.ts` now runs through the real pool with one fake account).
+- Telegram goes through the owner's own bot (Hermes polls it): send-only, no webhook, no `TELEGRAM_WEBHOOK_SECRET` /
+  `TELEGRAM_ADMIN_IDS`, no `/status` commands; instead the read-only `/api/ops/psn/status` for Hermes.
+- Alerts for pre and production separately, to the same chat, tagged `[PRO]` / `[PRE]`. Vercel crons run only on production, so
+  production also reads pre's pool through `PREVIEW_DATABASE_URL` set in Production (`src/lib/preDb.js`, read-only
+  transactions); pre's dedup is in production's `psn_alert_state` under `pre:`. Pre and local never send.
+- "Fewer than two usable" fires only when two or more accounts are meant to serve (active or quarantined): silent with one.
+- One limiter: the per-account budget reuses phase 2's `psnBudget`, so no `psn_account_budget` table.
+- A refused token drops the tokens and the account is quarantined only when a fresh sign-in is also refused (not on the first
+  401): with one account a stale token would otherwise take PSN down until someone renews it.
+- Canary = `getUserTrophyProfileSummary(auth, 'me')` (gives the account id) + `getProfileFromAccountId` (the online ID). The
+  NPSSO step alerts are keyed by the expiry date, so a renewed sign-in is warned about again 46 days later.
+- Vercel's plan was not checked: the cron is daily (a sub-daily cron fails the deploy on Hobby); the upkeep also runs after PSN
+  traffic. On Pro it can be `*/15 * * * *`.
+
+**Open**
+- Apply `047` to pre, set `PSN_SECRET_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `PSN_STATUS_TOKEN` (and
+  `PREVIEW_DATABASE_URL` in Production for the `[PRE]` alerts), then check PSN-1 in the panel: its online ID, Test, a Renew.
+- **Pending until a second account exists:** whether Sony's 429 is per account or per IP (load one account while another is
+  idle, numbers from `psnCallsPerMinute()`; record in `docs/platforms/psn.md` → Call baseline), and the "Done when" items that
+  need PSN-1..3 (a 429 or 401 on one account invisible to users, the pool-down alert on a real pool).
+- Drop `psn_credentials` (and the legacy copy in `seedPsnPool`) one release after this ships.
+
+**Watch out**
+- `PSN_SECRET_KEY` must be the same in Production and Preview (pre is a copy of production) and never change.
+- A route that reads the pool needs `047`; without it every PSN call fails (`docs/releases.md`).
 
 ---
 

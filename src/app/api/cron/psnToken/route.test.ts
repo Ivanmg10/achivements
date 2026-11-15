@@ -1,29 +1,26 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/email', () => ({ sendEmail: jest.fn() }))
-jest.mock('@/lib/psnCredentials', () => ({
-  ...jest.requireActual('@/lib/psnCredentials'),
-  loadPsnCredentials: jest.fn(),
-  markPsnWarned: jest.fn(),
-  npssoExpiry: jest.fn(),
-  savePsnNpsso: jest.fn(),
-}))
+jest.mock('@/lib/psnAccounts', () => ({ ...jest.requireActual('@/lib/psnAccounts'), listPsnAccounts: jest.fn(), markPsnWarned: jest.fn() }))
+jest.mock('@/lib/psnPool', () => ({ psnPoolConfigured: jest.fn(async () => true) }))
 
 import { NextRequest } from 'next/server'
 import { GET } from './route'
 import pool from '@/lib/db'
 import { sendEmail } from '@/lib/email'
-import { loadPsnCredentials, markPsnWarned, npssoExpiry, savePsnNpsso } from '@/lib/psnCredentials'
+import { listPsnAccounts, markPsnWarned } from '@/lib/psnAccounts'
+import { psnPoolConfigured } from '@/lib/psnPool'
+import { DAY_MS, psnAccount } from '@/test-utils/psnPoolFixtures'
 
-const DAY = 86_400_000
 const call = (authorization = 'Bearer cron-secret') =>
   GET(new NextRequest('http://localhost/api/cron/psnToken', { headers: { authorization } }))
 const data = (res: unknown) => (res as { data: Record<string, unknown> }).data
-const creds = (days: number, warnedAt: number | null = null) => ({ npsso: 'n', npssoExpiresAt: Date.now() + days * DAY + 1000, warnedAt })
+const expiring = (days: number, over = {}) => psnAccount({ npssoExpiresAt: Date.now() + days * DAY_MS + 1000, ...over })
 
 beforeEach(() => {
   jest.clearAllMocks()
   process.env.CRON_SECRET = 'cron-secret'
-  delete process.env.PSN_NPSSO
+  delete process.env.TELEGRAM_BOT_TOKEN
+  delete process.env.TELEGRAM_CHAT_ID
   ;(pool.query as jest.Mock).mockResolvedValue({ rows: [{ email: 'admin@x.com' }, { email: 'other@x.com' }] })
   ;(sendEmail as jest.Mock).mockResolvedValue('sent')
   jest.spyOn(console, 'error').mockImplementation(() => {})
@@ -40,42 +37,55 @@ test('refuses without the cron secret', async () => {
   expect((await call()).status).toBe(503)
 })
 
+test('does nothing when Telegram tells the owner instead', async () => {
+  process.env.TELEGRAM_BOT_TOKEN = 't'
+  process.env.TELEGRAM_CHAT_ID = 'c'
+  expect(data(await call())).toEqual({ skipped: 'telegram' })
+  expect(listPsnAccounts).not.toHaveBeenCalled()
+})
+
+test('no account set up: nothing to warn about', async () => {
+  ;(psnPoolConfigured as jest.Mock).mockResolvedValueOnce(false)
+  expect(data(await call())).toEqual({ configured: false })
+})
+
 test('plenty of time left: no mail', async () => {
-  ;(loadPsnCredentials as jest.Mock).mockResolvedValue(creds(30))
-  expect(data(await call())).toEqual({ daysLeft: 30, warned: false })
+  ;(listPsnAccounts as jest.Mock).mockResolvedValue([expiring(30)])
+  expect(data(await call())).toEqual({ warned: false })
   expect(sendEmail).not.toHaveBeenCalled()
 })
 
-test('a week or less: every admin is mailed how to renew it, once every two days', async () => {
-  ;(loadPsnCredentials as jest.Mock).mockResolvedValue(creds(5))
-  expect(data(await call())).toEqual({ daysLeft: 5, warned: true, sent: 2 })
-  expect(sendEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'admin@x.com', subject: expect.stringContaining('5 days') }))
-  expect((sendEmail as jest.Mock).mock.calls[0][0].text).toContain('https://ca.account.sony.com/api/v1/ssocookie')
-  expect(markPsnWarned).toHaveBeenCalled()
+test('a week or less: every admin is mailed which account and how to renew it, once every two days', async () => {
+  ;(listPsnAccounts as jest.Mock).mockResolvedValue([expiring(5), expiring(30, { id: 2, label: 'PSN-2' })])
+  expect(data(await call())).toEqual({ warned: true, sent: 2, accounts: ['PSN-1'] })
+  const mail = (sendEmail as jest.Mock).mock.calls[0][0]
+  expect(mail).toMatchObject({ to: 'admin@x.com', subject: expect.stringContaining('PSN-1') })
+  expect(mail.text).toContain('PSN-1: expires in 5 days')
+  expect(mail.text).toContain('https://ca.account.sony.com/api/v1/ssocookie')
+  expect(markPsnWarned).toHaveBeenCalledWith([1])
 
   jest.clearAllMocks()
-  ;(loadPsnCredentials as jest.Mock).mockResolvedValue(creds(4, Date.now() - DAY))
-  expect(data(await call())).toEqual({ daysLeft: 4, warned: false })
-  expect(sendEmail).not.toHaveBeenCalled()
+  ;(listPsnAccounts as jest.Mock).mockResolvedValue([expiring(4, { warnedAt: Date.now() - DAY_MS })])
+  expect(data(await call())).toEqual({ warned: false })
 })
 
-test('a mail that could not be sent is tried again tomorrow', async () => {
-  ;(loadPsnCredentials as jest.Mock).mockResolvedValue(creds(2))
-  ;(sendEmail as jest.Mock).mockResolvedValue('failed')
+test('several accounts in one mail; an expired one says so; a paused one is left alone', async () => {
+  ;(listPsnAccounts as jest.Mock).mockResolvedValue([expiring(0), expiring(2, { id: 2, label: 'PSN-2' }), expiring(1, { id: 3, label: 'PSN-3', status: 'paused' })])
+  await call()
+  const mail = (sendEmail as jest.Mock).mock.calls[0][0]
+  expect(mail.subject).toContain('2 PSN sign-ins')
+  expect(mail.text).toContain('PSN-1: expired.')
+  expect(mail.text).not.toContain('PSN-3')
+})
+
+test('no mail sent: not marked, so it is tried again tomorrow', async () => {
+  ;(listPsnAccounts as jest.Mock).mockResolvedValue([expiring(3)])
+  ;(sendEmail as jest.Mock).mockResolvedValue('not-configured')
   expect(data(await call())).toMatchObject({ warned: false, sent: 0 })
   expect(markPsnWarned).not.toHaveBeenCalled()
 })
 
-test('an NPSSO only in the environment is stored with its expiry, so it can be watched', async () => {
-  process.env.PSN_NPSSO = 'env-npsso'
-  const expires = Date.now() + 50 * DAY
-  ;(npssoExpiry as jest.Mock).mockResolvedValue(expires)
-  ;(loadPsnCredentials as jest.Mock).mockResolvedValueOnce(null).mockResolvedValueOnce(creds(50))
-  await call()
-  expect(savePsnNpsso).toHaveBeenCalledWith('env-npsso', expires, 'PSN_NPSSO')
-})
-
-test('nothing set up: nothing to watch', async () => {
-  ;(loadPsnCredentials as jest.Mock).mockResolvedValue(null)
-  expect(data(await call())).toEqual({ configured: false })
+test('a database failure is a 500', async () => {
+  ;(listPsnAccounts as jest.Mock).mockRejectedValue(new Error('down'))
+  expect((await call()).status).toBe(500)
 })

@@ -64,7 +64,7 @@ They asked for this reminder on purpose, because it is easy to forget.
 
 ## Migrations that must be applied first
 
-`migrations/` holds `002`–`046`. **Every migration is applied twice**: to pre first, to production when
+`migrations/` holds `002`–`047`. **Every migration is applied twice**: to pre first, to production when
 the work reaches `main` (see Environments). Any other database needs each one before the code that
 reads it runs. What each breaks without it, as `CLAUDE.md` used to say section by section:
 
@@ -87,8 +87,9 @@ reads it runs. What each breaks without it, as `CLAUDE.md` used to say section b
 | `042_steam_unlocks` | Every Steam unlock read | pre and prod 2026-10-22 | They only log; nothing fails |
 | `043_ra_key_sealed` | RA keys sealed at rest | pre 2026-10-31, prod 2026-11-02 | Linking RA answers 500; reads still work |
 | `044_admin_totp` | The admin's one-time codes | pre 2026-10-31, prod 2026-11-02 | The admin unlock answers 500 |
-| `045_steam_playtime` | Hours per Steam game, to date games Steam does not (#113) | pre 2026-11-07, **not in production yet** | Each owned-list read logs the missing table; dates come from kept unlocks and Steam's two-week minutes only, so a game with no achievements played more than two weeks ago stays undated. Nothing fails |
-| `046_psn_verification` | `users.psn_verified_at`, `psn_verification_code`, `psn_verification_expires_at` and the partial unique index on `psnaccountid` where verified (#176) | **not applied anywhere yet: pre first, before #176 merges; production before its release** | **Every signed-in request fails** (`userRecord` reads `psn_verified_at`), and the verification route and the rankings' PSN gate answer 500. Idempotent (`IF NOT EXISTS`), so a second run is harmless |
+| `045_steam_playtime` | Hours per Steam game, to date games Steam does not (#113) | pre 2026-11-07, prod 2026-11-16 | Each owned-list read logs the missing table; dates come from kept unlocks and Steam's two-week minutes only, so a game with no achievements played more than two weeks ago stays undated. Nothing fails |
+| `046_psn_verification` | `users.psn_verified_at`, `psn_verification_code`, `psn_verification_expires_at` and the partial unique index on `psnaccountid` where verified (#176) | pre 2026-11-15, prod 2026-11-16 | **Every signed-in request fails** (`userRecord` reads `psn_verified_at`), and the verification route and the rankings' PSN gate answer 500. Idempotent (`IF NOT EXISTS`), so a second run is harmless |
+| `047_psn_account_pool` | The PSN service-account pool (#178): `psn_service_accounts`, `psn_account_leases`, `psn_account_stats`, `psn_alert_state`, `psn_sync_jobs`; copies `psn_credentials` into PSN-1 when the pool is empty | pre and prod 2026-11-16 (PSN-1 seeded in both from `psn_credentials`) | **Every PSN call fails** (the pool's tables are missing): PSN pages answer `not-configured` / 502, the admin PlayStation tab 500. Idempotent (`IF NOT EXISTS`, the copy only into an empty pool) |
 
 `—`: not written down in `CLAUDE.md` (the worklog archive may say). All of `041`–`044` are in production since the 1.7.0
 release (2026-11-02).
@@ -126,3 +127,16 @@ requires `linked-issue` (`CLAUDE.md` → Git → Issues).
   PSN trophy lists only in English and Spanish. Their current streaks are set in `STREAKS` (`demo-personas.mjs`):
   reseed to bring them up to today, since a streak ends two days after the seed.
 - Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
+- **PSN pool variables (#178), in Vercel:**
+  - `PSN_SECRET_KEY` (a long random string): **the same value in Production and Preview**, since pre is a Neon branch of
+    production and a reset from parent copies production's sealed rows into it. Never change it once set: what was sealed
+    with it cannot be opened again. Without it the pool seals from `NEXTAUTH_SECRET`, as before.
+  - `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`: the owner's existing bot (the one Hermes polls) and their chat id, in every
+    environment. Only production sends (vercel.json crons run on production deployments only): production's pool tagged
+    `[PRO]` and pre's tagged `[PRE]`. The app only calls `sendMessage`.
+  - **`PREVIEW_DATABASE_URL` also in Production**, with pre's value, so production's alerts can read pre's pool (read-only
+    transactions, `src/lib/preDb.js`). `db.js` ignores it in production, so nothing else changes. Without it, pre's pool sends
+    nothing (the owner can still ask pre's `/api/ops/psn/status`). Chosen over a GitHub Actions schedule calling pre's
+    route: no second secret in GitHub, no dependence on pre's deployment protection, one place that sends.
+  - `PSN_STATUS_TOKEN` (a long random string) in each environment, for `GET /api/ops/psn/status` (curl in `README.md`).
+  - `PSN_NPSSO` can be emptied once `047` has run and PSN-1 shows in the panel.

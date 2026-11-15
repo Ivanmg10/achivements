@@ -29,17 +29,18 @@ import pool from '@/lib/db'
  * that succeeds, or that Sony failed to answer, does not count.
  *
  * 'psn-score' counts the PSN games read for Vault Points, for the whole app
- * (address 'app'): PSN is one app account for everyone, so the score fill goes
+ * (address 'app'): the service accounts are shared by everyone, so the score fill goes
  * gently whoever it is for. 200 games is at most 400 calls to Sony in 15 minutes (fewer once a game's
  * defined trophies are shared, #177), under the background share of 'psn-upstream'.
  */
 /**
- * Every request to Sony, for the whole app, in 15 minutes (#177): the one number to tune. Reported limits are about
- * 300 per 15 minutes per endpoint plus an unknown per-address one (docs/platforms/psn.md), so 600 across them.
+ * Every request to Sony in 15 minutes (#177), the default for one account. Since the pool (#178) the budget is per
+ * service account, `rate_per_min` × 15 (40 × 15 = this), keyed `account:<id>` (psnBudget). Reported limits are
+ * about 300 per 15 minutes per endpoint plus an unknown per-address one (docs/platforms/psn.md).
  */
 export const PSN_CALLS_PER_WINDOW = 600
 
-export type AttemptScope = 'totp' | 'psn-upstream' | 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'ra-borrowed' | 'avatar' | 'user-search' | 'follow' | 'psn-score' | 'psn-verify' | 'xbox-upstream' | 'ra-check'
+export type AttemptScope = 'totp' | 'psn-upstream' | 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'ra-borrowed' | 'avatar' | 'user-search' | 'follow' | 'psn-score' | 'psn-verify' | 'xbox-upstream' | 'ra-check' | 'psn-status'
 
 const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   signup: { max: 5, windowMinutes: 60 },
@@ -54,12 +55,14 @@ const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   follow: { max: 60, windowMinutes: 5 },
   'psn-score': { max: 200, windowMinutes: 15 },
   'psn-verify': { max: 6, windowMinutes: 15 },
-  // Every call to Sony, for the whole app (psnBudget.ts keeps a share of it for people browsing).
+  // Every call to Sony, per service account; psnBudget passes each account's own max (and keeps a share for people browsing).
   'psn-upstream': { max: PSN_CALLS_PER_WINDOW, windowMinutes: 15 },
   // One OpenXBL key and plan are shared by every route and score job in this environment.
   'xbox-upstream': { max: 150, windowMinutes: 60 },
   // Checking an RA key before signing up: signed out, so per address, and few, or it would test stolen keys.
   'ra-check': { max: 10, windowMinutes: 15 },
+  // The owner's agent reading /api/ops/psn/status (#178), per address, wrong tokens included.
+  'psn-status': { max: 30, windowMinutes: 15 },
   // About twenty profile visits. Past it the page shows the owner without RA.
   'ra-borrowed': { max: 200, windowMinutes: 15 },
 }
