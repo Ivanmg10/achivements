@@ -5,7 +5,7 @@ import { withCache } from '@/lib/raCache'
 import { getGame } from '@/lib/raClient'
 import { withSteamCache, TTL } from '@/lib/steamCache'
 import { getAppDetails } from '@/lib/steamClient'
-import { psnReleaseYear, psnTitles } from '@/lib/psnClient'
+import { psnLibrary, psnReleaseYear } from '@/lib/psnClient'
 import { igdbArt, igdbXboxArt } from '@/lib/igdbClient'
 import { xboxLibrary } from '@/lib/xboxClient'
 import { withXboxTelemetry } from '@/lib/xboxTelemetry'
@@ -58,7 +58,7 @@ async function post(_req: NextRequest, { params }: { params: Promise<{ id: strin
     let psnGames: Promise<Map<number, PsnGameProgress> | null> | null = null
     const ownPsnGames = () =>
       (psnGames ??= accountId
-        ? psnTitles(accountId, auth.id).then((games) => new Map(games.map((g) => [g.id, g])))
+        ? psnLibrary(accountId, auth.id).then((games) => new Map(games.map((g) => [g.id, g])))
         : Promise.resolve(null))
 
     // The owner's Xbox games: Xbox's library has no release year, so it comes from IGDB by title.

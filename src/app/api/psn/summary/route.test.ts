@@ -3,11 +3,12 @@ jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }
 jest.mock('@/lib/psnClient', () => ({
   ...jest.requireActual('@/lib/psnClient'),
   psnSummary: jest.fn(),
+  psnLibrarySyncedAt: jest.fn(),
 }))
 
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
-import { psnSummary, PsnError } from '@/lib/psnClient'
+import { psnLibrarySyncedAt, psnSummary, PsnError } from '@/lib/psnClient'
 
 async function call() {
   const res = await GET()
@@ -20,6 +21,7 @@ beforeEach(() => {
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7', psnaccountid: '42' } })
   process.env.PSN_NPSSO = 'npsso'
   ;(psnSummary as jest.Mock).mockResolvedValue({ onlineId: 'Hakoom', games: 3 })
+  ;(psnLibrarySyncedAt as jest.Mock).mockResolvedValue(null)
 })
 
 afterEach(() => (console.error as jest.Mock).mockRestore())
@@ -40,8 +42,14 @@ test('503 when the app has no PSN sign-in', async () => {
 })
 
 test('the summary of the linked account, cached under the user', async () => {
-  expect(await call()).toEqual({ status: 200, body: { onlineId: 'Hakoom', games: 3 } })
+  expect(await call()).toEqual({ status: 200, body: { onlineId: 'Hakoom', games: 3, syncedAt: null, nextSyncAt: null } })
   expect(psnSummary).toHaveBeenCalledWith('42', '7')
+})
+
+test('says when the library was read from Sony, and when the refresh button reads it again (10 minutes on)', async () => {
+  ;(psnLibrarySyncedAt as jest.Mock).mockResolvedValue(1_000)
+  expect((await call()).body).toMatchObject({ syncedAt: 1_000, nextSyncAt: 1_000 + 10 * 60_000 })
+  expect(psnLibrarySyncedAt).toHaveBeenCalledWith('42')
 })
 
 test('403 when the profile went private since it was linked', async () => {

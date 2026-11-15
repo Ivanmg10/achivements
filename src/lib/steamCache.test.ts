@@ -2,7 +2,7 @@ jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }
 
 import pool from '@/lib/db'
 import { wantsFresh } from '@/lib/wantsFresh'
-import { readCache, readCacheMany, writeCache, withSteamCache, clearUserCache, sweepExpired, TTL } from './steamCache'
+import { readCache, readCacheEntry, readCacheMany, writeCache, withSteamCache, clearUserCache, sweepExpired, takeLease, dropLease, TTL } from './steamCache'
 
 jest.mock('@/lib/wantsFresh', () => ({ MIN_REFRESH_AGE_MS: 60000, wantsFresh: jest.fn() }))
 
@@ -235,6 +235,8 @@ describe('sweepExpired', () => {
     expect(sql).toContain('expires_at <= NOW()')
     expect(sql).toContain("cache_key NOT LIKE 'xbox:%'")
     expect(sql).toContain("INTERVAL '30 days'")
+    // PSN's are served stale for a week (#177).
+    expect(sql).toContain("cache_key NOT LIKE 'psn:%' OR expires_at <= NOW() - INTERVAL '7 days'")
   })
 
   test('treats a null rowCount as zero', async () => {
@@ -313,5 +315,35 @@ describe('refreshing', () => {
     query.mockResolvedValue({ rows: [] })
     await withSteamCache('k', 1000, async () => 'x')
     expect(query.mock.calls[0][1]).toEqual(['k'])
+  })
+})
+
+describe('readCacheEntry', () => {
+  test('an entry younger than the age asked, live or not, with how old it is', async () => {
+    query.mockResolvedValue({ rows: [{ cache_data: { a: 1 }, live: false, age_ms: '1200.5' }] })
+    await expect(readCacheEntry('k', 5000)).resolves.toEqual({ data: { a: 1 }, ageMs: 1200.5, live: false })
+    expect(query.mock.calls[0][1]).toEqual(['k', '5000'])
+  })
+
+  test('none, or a database failure, is null', async () => {
+    query.mockResolvedValueOnce({ rows: [] }).mockRejectedValueOnce(new Error('down'))
+    await expect(readCacheEntry('k', 1)).resolves.toBeNull()
+    await expect(readCacheEntry('k', 1)).resolves.toBeNull()
+  })
+})
+
+describe('leases', () => {
+  test('held by whoever wrote the row; a live one is refused; a database that will not answer grants it', async () => {
+    query.mockResolvedValueOnce({ rowCount: 1 }).mockResolvedValueOnce({ rowCount: 0 }).mockRejectedValueOnce(new Error('down'))
+    await expect(takeLease('lease', 60000)).resolves.toBe(true)
+    await expect(takeLease('lease', 60000)).resolves.toBe(false)
+    await expect(takeLease('lease', 60000)).resolves.toBe(true)
+    expect(query.mock.calls[0][0]).toContain('WHERE steam_cache.expires_at <= NOW()')
+  })
+
+  test('let go by deleting the row, and a failure only logged', async () => {
+    query.mockRejectedValueOnce(new Error('down'))
+    await expect(dropLease('lease')).resolves.toBeUndefined()
+    expect(query).toHaveBeenCalledWith('DELETE FROM steam_cache WHERE cache_key = $1', ['lease'])
   })
 })

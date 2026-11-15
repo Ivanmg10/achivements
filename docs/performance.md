@@ -15,8 +15,9 @@ this file has every rule with its measurement. Steam's owned list, batch counts 
   breaks the build even through a dynamic import.
 - **Every call to a platform has a deadline shorter than the client's 20 s** (two 8 s attempts on RA
   and Steam, 8 s per PSN call through `psnCall`, since `psn-api` takes no signal). RA keeps its measured
-  pace per key in `fetchRA`; every Sony call spends the app's `psn-upstream` budget and a refusal
-  cools the instance down a minute. `countUpstream` counts calls per day; Steam fills wait at 85 % of its
+  pace per key in `fetchRA`; every Sony call (the played pages and the token exchange too) spends the app's
+  `psn-upstream` budget (`psnBudget.ts`: 600 per 15 min, background work three quarters of it) and Sony's own
+  refusal cools every instance down a minute (`psn:cooldown`). `countUpstream` counts calls per day; Steam fills wait at 85 % of its
   100,000 a day (`steamBudgetLow`).
 - **Guarded work counts first:** `reserveAttempt` before a password check, never a count and then a
   record: a burst passes those together (30 of 30 past a limit of 10, measured).
@@ -81,6 +82,12 @@ Rankings). Keep these true:
   Only the viewer's own (it ignores `?user=`); Xbox for admins; every platform failing is a 502.
   Anything else that only shows the streak number uses it too (the search modal does).
   Its `streak` is `null` until the first answer (the header draws `StreakTag loading`, never a 0 meanwhile).
+- **A PSN page waits for at most about 10 requests to Sony (#177).** The core library, the summary and the
+  latest 3 games' trophies; the year, the 60 days, play time, art and completion dates are built after the
+  answer (`after()`), and an account-level PSN read serves a stale answer (up to 7 days) while it refreshes
+  (`psnCached`, `docs/platforms/psn.md` → Fast core and call budget). The year's route answers 202 until it
+  is there, and `usePsnRecentTrophies` keeps its skeleton and asks again. **A new PSN reader reads
+  `psnTitlesCore` unless it needs play data**, and its own account-level cache goes through `psnCached`.
 - **A streak is drawn whole (2026-11-11):** the year's `isLoading` (`ActivityHeatmapYearContext`) is true
   before anything is asked and until every linked platform answered, and `useActivityHeatmapYear` also waits
   for the PSN/Xbox library `useConsoleVisibility` needs when one of their consoles is unticked. A reader of

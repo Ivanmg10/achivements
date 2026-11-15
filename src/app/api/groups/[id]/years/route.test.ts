@@ -4,7 +4,7 @@ jest.mock('@/lib/raCache', () => ({ withCache: jest.fn((_k: string, _t: number, 
 jest.mock('@/lib/raClient', () => ({ getGame: jest.fn() }))
 jest.mock('@/lib/steamCache', () => ({ TTL: { schema: 1 }, withSteamCache: jest.fn((_k: string, _t: number, fn: () => unknown) => fn()) }))
 jest.mock('@/lib/steamClient', () => ({ getAppDetails: jest.fn() }))
-jest.mock('@/lib/psnClient', () => ({ psnTitles: jest.fn(), psnReleaseYear: jest.fn() }))
+jest.mock('@/lib/psnClient', () => ({ psnLibrary: jest.fn(), psnReleaseYear: jest.fn() }))
 jest.mock('@/lib/igdbClient', () => ({ igdbArt: jest.fn(), igdbXboxArt: jest.fn() }))
 jest.mock('@/lib/xboxClient', () => ({ xboxLibrary: jest.fn() }))
 
@@ -13,7 +13,7 @@ import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
 import { getGame } from '@/lib/raClient'
 import { getAppDetails } from '@/lib/steamClient'
-import { psnReleaseYear, psnTitles } from '@/lib/psnClient'
+import { psnReleaseYear, psnLibrary } from '@/lib/psnClient'
 import { igdbArt, igdbXboxArt } from '@/lib/igdbClient'
 import { xboxLibrary } from '@/lib/xboxClient'
 import { recordXboxCacheEvent } from '@/lib/xboxTelemetry'
@@ -105,7 +105,7 @@ test('a PSN game is "no year known", never looked up on RA (its number is not an
 
 test('a linked PSN game takes its year from the PS Store, through its concept', async () => {
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', raid: null, psnaccountid: '42' } })
-  ;(psnTitles as jest.Mock).mockResolvedValue([{ id: 2018800, conceptId: 555 }])
+  ;(psnLibrary as jest.Mock).mockResolvedValue([{ id: 2018800, conceptId: 555 }])
   ;(psnReleaseYear as jest.Mock).mockResolvedValue(2024)
   ;(pool.query as jest.Mock)
     .mockResolvedValueOnce({ rows: [{ id: 5 }] })
@@ -120,7 +120,7 @@ test('a linked PSN game takes its year from the PS Store, through its concept', 
 
 test('a PS3/Vita game (no Store page) takes its year from IGDB, by title and platform', async () => {
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', raid: null, psnaccountid: '42' } })
-  ;(psnTitles as jest.Mock).mockResolvedValue([{ id: 1143600, conceptId: null, title: 'Jak II', consoleName: 'PS3' }])
+  ;(psnLibrary as jest.Mock).mockResolvedValue([{ id: 1143600, conceptId: null, title: 'Jak II', consoleName: 'PS3' }])
   ;(igdbArt as jest.Mock).mockResolvedValue({ coverUrl: null, heroUrl: null, releaseYear: 2003 })
   ;(pool.query as jest.Mock)
     .mockResolvedValueOnce({ rows: [{ id: 5 }] })

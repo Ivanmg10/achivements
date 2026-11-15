@@ -64,8 +64,9 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
 - **Each platform is read at the pace measured on 2026-10-20 (`PACE`), not faster:** Steam 8 at
   once (29 games/s, no error); RA one at a time, 300 ms apart (a burst of ~7 gets 429 **with no
   Retry-After**; one every 250 ms never failed); **PSN gently**, because it is one app account for
-  everyone: 2 at once, 100 games a pass, and 300 games every 15 minutes for the whole app
-  (`allowAttempt('psn-score', 'app')`), stopping the pass at Sony's "too many requests"; Xbox 2 games a
+  everyone: 2 at once, 100 games a pass, and 200 games every 15 minutes for the whole app
+  (`allowAttempt('psn-score', 'app')`, lowered from 300 by #177 to fit under the background share of the
+  PSN call budget, `docs/platforms/psn.md`), stopping the pass at Sony's "too many requests" or the budget; Xbox 2 games a
   pass (`PACE.xbox.perPass` in `src/lib/scoreRefresh.ts`, lowered from 5 by #87: 150 calls an hour for the app).
   Raising any of these needs a new measurement.
 - **The fill is shown, never silent.** Its progress per platform is kept in `steam_cache`

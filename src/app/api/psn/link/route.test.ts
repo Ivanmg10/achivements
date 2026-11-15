@@ -2,6 +2,7 @@ jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/scoreRefresh', () => ({ onPlatformLinked: jest.fn() }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))
+jest.mock('@/lib/psnCache', () => ({ ...jest.requireActual('@/lib/psnCache'), forgetPsnPrivate: jest.fn() }))
 jest.mock('@/lib/psnClient', () => ({
   ...jest.requireActual('@/lib/psnClient'),
   psnConfigured: jest.fn(() => true),
@@ -14,6 +15,7 @@ import { POST } from './route'
 import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
 import { forgetUser } from '@/lib/userRecord'
+import { forgetPsnPrivate } from '@/lib/psnCache'
 import { findPsnAccount, psnConfigured, psnSummary, PsnError } from '@/lib/psnClient'
 
 const post = (body: unknown) =>
@@ -64,6 +66,8 @@ test('403 when the profile hides its trophies, and nothing is saved', async () =
   ;(psnSummary as jest.Mock).mockRejectedValue(new PsnError('Not permitted by access control', 2240526))
   expect(await call({ username: 'Hakoom' })).toEqual({ status: 403, body: { error: 'private' } })
   expect(pool.query).not.toHaveBeenCalled()
+  // Asked fresh: a profile made public a minute ago is not refused from memory.
+  expect(forgetPsnPrivate).toHaveBeenCalledWith(expect.any(String))
 })
 
 test('502 when PSN fails otherwise', async () => {

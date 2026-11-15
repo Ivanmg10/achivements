@@ -9,7 +9,8 @@ import { readCache, withSteamCache, writeCache } from '@/lib/steamCache'
 import { fetchPlayerAchievements, isNoStats, loadGlobalPct, withLastPlayed } from '@/lib/steamProgress'
 import { steamBudgetLow } from '@/lib/upstreamCount'
 import { readRaKey } from '@/lib/raKey'
-import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
+import { PsnError, psnGameTrophies, psnTitlesCore } from '@/lib/psnClient'
+import { psnBackground } from '@/lib/psnBudget'
 import { XboxError, xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
 import { runWithXboxTelemetry } from '@/lib/xboxTelemetry'
 import type { SteamOwnedGamesResponse } from '@/types/steam'
@@ -205,8 +206,9 @@ function psnPlan(userId: number, accountId: string): Plan {
   return {
     source: 'psn',
     account: accountId,
+    // Background work: its Sony calls stop at the budget's background share (#177).
     list: async () =>
-      (await psnTitles(accountId, String(userId)))
+      (await psnBackground(() => psnTitlesCore(accountId, String(userId))))
         .filter((g) => sum(g.earned) > 0)
         .map((g) => ({
           id: g.id,
@@ -216,7 +218,7 @@ function psnPlan(userId: number, accountId: string): Plan {
           provisional: provisionalScore(psnGradeShare(g.earned, g.defined), sum(g.earned), sum(g.defined), sum(g.earned) >= sum(g.defined)),
           // Cached by the date of the last trophy, so a moved game is always read anew.
           read: async () => {
-            const trophies = await psnGameTrophies(accountId, g, String(userId))
+            const trophies = await psnBackground(() => psnGameTrophies(accountId, g, String(userId)))
             return { score: scoreGame(psnScoreInputs(trophies), undefined, psnBaseCompletedAt(trophies)), suspect: false }
           },
         })),

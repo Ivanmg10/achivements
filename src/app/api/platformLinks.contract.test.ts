@@ -10,6 +10,7 @@ jest.mock('@/lib/raKey', () => ({ sealRaKey: (key: string) => ({ sealed: `sealed
 jest.mock('@/lib/raProfile', () => ({ ...jest.requireActual('@/lib/raProfile'), fetchRaProfile: jest.fn() }))
 jest.mock('@/lib/steamCache', () => ({ clearUserCache: jest.fn(), withSteamCache: jest.fn() }))
 jest.mock('@/lib/steamUnlocks', () => ({ forgetUnlocks: jest.fn() }))
+jest.mock('@/lib/psnCache', () => ({ forgetPsnPrivate: jest.fn() }))
 jest.mock('@/lib/steamLinkNotice', () => ({ sendSteamLinkNotice: jest.fn() }))
 jest.mock('@/lib/steamClient', () => ({ getPlayerSummaries: jest.fn() }))
 jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))

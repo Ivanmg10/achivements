@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireSession } from '@/lib/apiAuth'
 import { findPsnAccount, psnConfigured, psnFailure, psnSummary } from '@/lib/psnClient'
 import { forgetUser } from '@/lib/userRecord'
+import { forgetPsnPrivate } from '@/lib/psnCache'
 import { PSN_ONLINE_ID, saveLink } from '@/lib/platformLinks'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
 
@@ -30,6 +31,8 @@ export async function POST(req: Request) {
   try {
     account = await findPsnAccount(username.trim())
     if (!account) return NextResponse.json({ error: 'not-found' }, { status: 404 })
+    // Linking again right after making the profile public must not wait out the memory of it being hidden.
+    await forgetPsnPrivate(account.accountId)
     await psnSummary(account.accountId, auth.id)
   } catch (err) {
     return psnFailure(err, 'psn/link')

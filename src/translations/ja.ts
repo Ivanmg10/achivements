@@ -1432,6 +1432,8 @@ export const ja: Translations = {
     retry: '再試行',
     profileError: 'PlayStationのプロフィールを読み込めませんでした',
     viewOnPsn: 'PSNで見る',
+    syncedAgo: '{when}に更新',
+    nextSync: '次の更新: {when}',
     recentTrophies: '最近のトロフィー',
     total: '合計',
     rarestEarned: '獲得した中で最もレア',

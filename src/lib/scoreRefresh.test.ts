@@ -24,7 +24,7 @@ jest.mock('@/lib/psnClient', () => {
       return /too many requests/.test(this.message)
     }
   }
-  return { PsnError, psnTitles: jest.fn(), psnGameTrophies: jest.fn() }
+  return { PsnError, psnTitlesCore: jest.fn(), psnGameTrophies: jest.fn() }
 })
 jest.mock('@/lib/xboxClient', () => {
   class XboxError extends Error {
@@ -41,7 +41,7 @@ import pool from '@/lib/db'
 import { readCache, writeCache } from '@/lib/steamCache'
 import { allowAttempt } from '@/lib/attemptLimit'
 import { vaultTotals } from '@/lib/rankings'
-import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
+import { PsnError, psnGameTrophies, psnTitlesCore } from '@/lib/psnClient'
 import { XboxError, xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
 import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raClient'
@@ -94,7 +94,7 @@ beforeEach(() => {
     if (sql.includes('UPDATE users SET score_refreshed_at')) return { rowCount: 1 }
     return { rows: [], rowCount: 0 }
   })
-  ;(psnTitles as jest.Mock).mockResolvedValue([game(1, 'PS5', 'k1-new'), game(2, 'PS4', 'k2'), game(3, 'PS5', 'k3'), game(4, 'PS3', 'k4')])
+  ;(psnTitlesCore as jest.Mock).mockResolvedValue([game(1, 'PS5', 'k1-new'), game(2, 'PS4', 'k2'), game(3, 'PS5', 'k3'), game(4, 'PS3', 'k4')])
   ;(psnGameTrophies as jest.Mock).mockResolvedValue([trophy(true, 60), trophy(true, 30), trophy(false, 5), trophy(false, 2), trophy(false, 1)])
 })
 
@@ -113,7 +113,7 @@ describe('refreshScore', () => {
 
   it('keeps the PSN completion bonus on the old platinum day when a later DLC sync lands', async () => {
     stored = []
-    ;(psnTitles as jest.Mock).mockResolvedValue([game(1, 'PS5', '2026-03-01T00:00:00Z')])
+    ;(psnTitlesCore as jest.Mock).mockResolvedValue([game(1, 'PS5', '2026-03-01T00:00:00Z')])
     ;(psnGameTrophies as jest.Mock).mockResolvedValue([
       { ...trophy(true, 2), type: 'platinum', groupId: 'default', earnedAt: '2021-05-10T10:00:00Z' },
       { ...trophy(true, 30), id: 2, groupId: '001', earnedAt: '2026-03-01T00:00:00Z' },
@@ -141,7 +141,7 @@ describe('refreshScore', () => {
   })
 
   it('a private platform keeps its scores and settles as an error to show', async () => {
-    ;(psnTitles as jest.Mock).mockRejectedValue(new PsnError('privacy settings'))
+    ;(psnTitlesCore as jest.Mock).mockRejectedValue(new PsnError('privacy settings'))
     const result = await refreshScore(7, Date.now() + 10_000)
     expect(writes).toEqual([])
     expect(kept).toBeNull()
@@ -151,7 +151,7 @@ describe('refreshScore', () => {
   it('PSN goes gently: 100 games a pass, and stops when Sony or the app-wide budget says so', async () => {
     stored = []
     userRow = user({ psnaccountid: 'acc' })
-    ;(psnTitles as jest.Mock).mockResolvedValue(Array.from({ length: 130 }, (_, i) => game(100 + i, 'PS5', `k${i}`)))
+    ;(psnTitlesCore as jest.Mock).mockResolvedValue(Array.from({ length: 130 }, (_, i) => game(100 + i, 'PS5', `k${i}`)))
     let result = await refreshScore(7, Date.now() + 10_000)
     expect(psnGameTrophies).toHaveBeenCalledTimes(100)
     expect(result.platforms.psn).toMatchObject({ read: 100, total: 130, state: 'reading' })
@@ -320,12 +320,12 @@ describe('passes and their status', () => {
   it('continueFill answers a fresh, complete status without a pass, and never runs two at once', async () => {
     ;(readCache as jest.Mock).mockResolvedValue({ complete: true, running: false, points: 9, updatedAt: new Date().toISOString(), platforms: {} })
     await continueFill(7, 10_000)
-    expect(psnTitles).not.toHaveBeenCalled()
+    expect(psnTitlesCore).not.toHaveBeenCalled()
 
     ;(readCache as jest.Mock).mockResolvedValue({ complete: false, running: true, points: 9, updatedAt: new Date().toISOString(), platforms: {} })
     query.mockImplementationOnce(async () => ({ rowCount: 0 }))
     expect(await continueFill(7, 10_000)).toMatchObject({ running: true })
-    expect(psnTitles).not.toHaveBeenCalled()
+    expect(psnTitlesCore).not.toHaveBeenCalled()
   })
 
   it('a platform just linked says "calculating" at once', async () => {

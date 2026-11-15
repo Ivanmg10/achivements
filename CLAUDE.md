@@ -423,7 +423,12 @@ with its tests; it is the part that decides whether the answers are any good.
 - **PSN: one app account (the NPSSO), not the user's**; `psnaccountid` is deliberately **not unique**, but **only a
   verified PSN account counts in Vault Points, and one user at most has a given account verified** (#176: a code in its
   About Me, `users.psn_verified_at`, a partial unique index; linking or unlinking clears it). Every call
-  through `psnCall(fn, …)` (`fn` is the counter's name, `src/lib/psnCallStats.ts`; the baseline is in `docs/platforms/psn.md`). **Do not try to automate Sony's sign-in.** A game counts by its whole set, DLC included.
+  through `psnCall(fn, …)` (`fn` is the counter's name, `src/lib/psnCallStats.ts`; the baseline is in `docs/platforms/psn.md`), which spends
+  the one app budget (`psnBudget.ts`, `PSN_CALLS_PER_WINDOW`; background work inside `psnBackground`). **A page waits for at most
+  ~10 Sony calls (#177):** a reader takes `psnTitlesCore` unless it needs play data (`psnLibrary`), an account-level cache goes
+  through `psnCached` (stale up to 7 days, one fetch per key, refreshed after the answer), anything costlier is built in the
+  background and answered 202; a game's defined trophies are cached per game and language, for everyone, apart from the
+  earned ones. **Do not try to automate Sony's sign-in.** A game counts by its whole set, DLC included.
 - **Xbox stays admin-only on purpose, and the reason is money** (OpenXBL's free plan, 150 calls an hour for the
   whole app). **Do not set `XBOX_ADMIN_ONLY` to `false`, and do not suggest it as a next step**, until the user says
   they will pay for a plan. The gate is enforced in three places that must keep holding (routes, UI, and every

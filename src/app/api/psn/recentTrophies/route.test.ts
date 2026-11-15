@@ -10,7 +10,7 @@ jest.mock('@/lib/psnClient', () => ({
 import { NextRequest } from 'next/server'
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
-import { psnLatestTrophies, psnRecentTrophies, PsnError } from '@/lib/psnClient'
+import { psnLatestTrophies, psnRecentTrophies, PsnBusyError, PsnError, PsnSyncing } from '@/lib/psnClient'
 
 async function call(qs = '') {
   const res = await GET(new NextRequest(`http://localhost/api/psn/recentTrophies?${qs}`))
@@ -72,4 +72,17 @@ test('the browser never keeps a visibility-filtered answer, and a new session co
   expect(res.status).toBe(200)
   expect(res.headers.get('Cache-Control')).toBe('private, max-age=0')
   expect(res.headers.get('Vary')).toBe('Cookie')
+})
+
+test('the year still being built in the background is a 202 with when to ask again, never an error', async () => {
+  ;(psnRecentTrophies as jest.Mock).mockRejectedValue(new PsnSyncing())
+  const res = await GET(new NextRequest('http://localhost/api/psn/recentTrophies?scope=year'))
+  expect(res.status).toBe(202)
+  expect(res.headers.get('Retry-After')).toBe('15')
+  expect((res as unknown as { data: unknown }).data).toEqual({ status: 'syncing' })
+})
+
+test("the app's budget for Sony spent is a 429 with its own code", async () => {
+  ;(psnLatestTrophies as jest.Mock).mockRejectedValue(new PsnBusyError())
+  expect(await call('scope=recent')).toEqual({ status: 429, body: { error: 'busy' } })
 })

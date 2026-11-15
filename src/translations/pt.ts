@@ -1432,6 +1432,8 @@ export const pt: Translations = {
     retry: 'Tentar novamente',
     profileError: 'Não foi possível carregar o teu perfil PlayStation',
     viewOnPsn: 'Ver na PSN',
+    syncedAgo: 'Atualizado {when}',
+    nextSync: 'próxima atualização {when}',
     recentTrophies: 'Troféus recentes',
     total: 'no total',
     rarestEarned: 'Os mais raros obtidos',
