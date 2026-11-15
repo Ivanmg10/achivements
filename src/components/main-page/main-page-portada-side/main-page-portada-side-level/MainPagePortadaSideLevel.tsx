@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { useVaultMe } from '@/hooks/useVaultMe'
+import { usePsnUnverified } from '@/hooks/usePsnUnverified'
 import { levelProgress } from '@/utils/vaultLevel'
 import { SURFACE } from '@/components/ui/surface'
 import { CircularProgress } from '@/components/ui/CircularProgress'
@@ -10,14 +11,24 @@ import { CountUp } from '@/components/ui/CountUp'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import { PortadaLevelSkeleton } from '../../main-page-portada-skeleton/MainPagePortadaSkeleton'
 import Kicker from '@/components/ui/Kicker'
+import PsnUnverifiedLine from '@/components/psn-unverified-line/PsnUnverifiedLine'
 import { formatDay } from '@/utils/dates'
 
 /** Your level beside the cover: the number in big, your tier, your points, what is left to the next and this week's gain. Opens the rankings. */
 export default function MainPagePortadaSideLevel() {
   const { T, lang } = useLanguage()
   const { me, isLoading } = useVaultMe()
+  const psnUnverified = usePsnUnverified()
   if (isLoading) return <PortadaLevelSkeleton />
-  if (!me || me.points === 0) return null
+  if (!me) return null
+  // Only PlayStation linked and not verified: no points yet, and the reason is worth a card.
+  if (me.points === 0) {
+    return psnUnverified ? (
+      <Link href="/rankings" className={`${SURFACE} p-5 sm:px-6 hover:ring-accent/40 transition-shadow focus-ring`}>
+        <PsnUnverifiedLine className="text-sm" />
+      </Link>
+    ) : null
+  }
 
   const n = (x: number) => x.toLocaleString(lang)
   const p = levelProgress(me.points)
@@ -91,6 +102,7 @@ export default function MainPagePortadaSideLevel() {
           )}
         </span>
       </span>
+      {psnUnverified && <PsnUnverifiedLine className="border-t border-ink/10 pt-3" />}
     </Link>
   )
 }

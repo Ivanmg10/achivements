@@ -10,10 +10,12 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import UserPlatformCard, { platformStat, PlatformStat } from '@/components/user-page/user-platform-card/UserPlatformCard'
 import UserPlatformLinkForm from '@/components/user-page/user-platform-link-form/UserPlatformLinkForm'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import PsnVerification from '@/components/user-page/user-psn-card/psn-verification/PsnVerification'
 
 /**
  * PlayStation Network on the account page. Linked by typing an online ID —
  * nothing proves it is yours, it only has to exist and show its trophies.
+ * Its points count in Vault Points once a code in its About Me proves it (PsnVerification, #176).
  */
 export default function UserPsnCard() {
   const { T, lang } = useLanguage()
@@ -61,6 +63,7 @@ export default function UserPsnCard() {
         name: onlineId || '—',
         id: accountId,
       }}
+      notice={<PsnVerification onlineId={onlineId} />}
       stats={isLinked ? stats : []}
       disconnect={{ label: T.psn.disconnect, busyLabel: T.psn.disconnecting, run: unlink, done: T.toast.psnUnlinked }}
       action={

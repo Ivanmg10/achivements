@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import Kicker from '@/components/ui/Kicker'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
+import AdminPsnVerification from '@/components/admin-panel/admin-psn-verification/AdminPsnVerification'
 
 /** What a refusal means, in the panel's words; anything else is shown as the route sent it. */
 function refusal(code: string | undefined, { source, name }: AdminPlatform): string | undefined {
@@ -78,6 +79,10 @@ export default function AdminLinkedAccounts({
     run(platform, () => adminFetch(`/api/admin/users/accounts?id=${user.id}&platform=${platform.source}`, { method: 'DELETE' }), () =>
       onUpdated(user.id, adminAccountChanges(platform)))
 
+  const clearVerification = (platform: AdminPlatform) =>
+    run(platform, () => adminFetch(`/api/admin/users/psnVerification?id=${user.id}`, { method: 'DELETE' }), () =>
+      onUpdated(user.id, { psnVerified: false }))
+
   return (
     <div className="bg-bg-main/50 rounded-tile p-3 flex flex-col gap-4">
       <Kicker as="span" size="md">Linked accounts</Kicker>
@@ -100,6 +105,7 @@ export default function AdminLinkedAccounts({
                 <span className="text-text-secondary italic">Not linked</span>
               )}
             </div>
+            {source === 'psn' && account && user.psnVerified && <AdminPsnVerification busy={busy !== null} onClear={() => clearVerification(platform)} />}
             {!account && (
               <div className="flex flex-col sm:flex-row gap-2">
                 {inputs.map(({ key, label, placeholder, secret }) => (

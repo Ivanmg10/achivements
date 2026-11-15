@@ -1,6 +1,6 @@
 import { en } from '@/translations/en'
 import { es } from '@/translations/es'
-import { groupError, profileFieldError, signupError } from './apiErrors'
+import { groupError, profileFieldError, psnVerifyError, signupError } from './apiErrors'
 
 describe('signupError', () => {
   test('a known code is the reader\'s language', () => {
@@ -38,5 +38,18 @@ describe('groupError', () => {
     expect(groupError('groups-max', en)).toContain('10')
     expect(groupError('title-required', en)).toBe(en.groups.titleRequired)
     expect(groupError('Máximo 10 grupos permitidos', en)).toBe(en.groups.saveFailed)
+  })
+})
+
+describe('psnVerifyError', () => {
+  test.each(['no-code', 'not-found', 'taken', 'private', 'rate-limited', 'not-configured'] as const)('%s is said in the reader\'s language', (code) => {
+    expect(psnVerifyError(code, en)).toBe(en.psn.verification.errors[code])
+    expect(psnVerifyError(code, es)).toBe(es.psn.verification.errors[code])
+  })
+
+  test('anything else is the generic text, never the raw code', () => {
+    expect(psnVerifyError('failed', en)).toBe(en.psn.verification.errors.failed)
+    expect(psnVerifyError('toString', en)).toBe(en.psn.verification.errors.failed)
+    expect(psnVerifyError(undefined, es)).toBe(es.psn.verification.errors.failed)
   })
 })

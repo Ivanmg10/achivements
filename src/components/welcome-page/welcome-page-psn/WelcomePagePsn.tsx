@@ -10,11 +10,15 @@ import WelcomePageLibraryPreview from '@/components/welcome-page/welcome-page-li
 import WelcomePagePlatformLinked from '@/components/welcome-page/welcome-page-platform-linked/WelcomePagePlatformLinked'
 import { PRIMARY_BUTTON, SECONDARY_BUTTON, STEP_SKY, platformKicker } from '@/components/welcome-page/welcomeArt'
 import { fieldClass } from '@/components/ui/Input'
+import PsnVerification from '@/components/user-page/user-psn-card/psn-verification/PsnVerification'
 
 const FORM_ID = 'welcome-psn-form'
 const INPUT_ID = 'welcome-psn-id'
 
-/** PlayStation by online ID, as on the account page (`usePsnLink`); a refusal is said under the box. Linked, the step stays, to show it. */
+/**
+ * PlayStation by online ID, as on the account page (`usePsnLink`); a refusal is said under the box. Linked, the step
+ * stays, to show it and to offer verifying it (`PsnVerification`, #176): optional, "Next" is always there.
+ */
 export default function WelcomePagePsn({
   onNext,
   onSkip,
@@ -72,6 +76,12 @@ export default function WelcomePagePsn({
         )
       }
     >
+      {isLinked && (
+        <div className="flex flex-col gap-3 max-w-md">
+          <p className="text-[0.8125rem] text-text-secondary">{T.welcome.psn.verify}</p>
+          <PsnVerification onlineId={linkedAs} />
+        </div>
+      )}
       {!isLinked && (
         <form id={FORM_ID} onSubmit={handleSubmit} noValidate className="flex flex-col gap-1.5 max-w-md">
           <label htmlFor={INPUT_ID} className="text-sm font-semibold">{T.psn.usernameLabel}</label>

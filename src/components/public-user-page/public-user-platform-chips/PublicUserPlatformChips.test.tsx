@@ -20,3 +20,13 @@ test('nothing linked, nothing shown', () => {
   const { container } = render(<PublicUserPlatformChips user={{ ...USER, ra: null, steam: false, psn: false }} />)
   expect(container).toBeEmptyDOMElement()
 })
+
+test('a PSN account proven theirs says so in words, not only in colour', () => {
+  render(<PublicUserPlatformChips user={{ ...USER, psnName: 'Hakoom', psnVerified: true }} />)
+  expect(screen.getByText(en.psn.verification.verified)).toHaveAttribute('title', en.psn.verification.publicVerified)
+})
+
+test('an unproven one carries no mark', () => {
+  render(<PublicUserPlatformChips user={{ ...USER, psnName: 'Hakoom', psnVerified: false }} />)
+  expect(screen.queryByText(en.psn.verification.verified)).not.toBeInTheDocument()
+})

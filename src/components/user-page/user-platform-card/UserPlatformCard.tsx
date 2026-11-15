@@ -59,6 +59,7 @@ export default function UserPlatformCard({
   connected,
   status,
   identity,
+  notice,
   hint,
   stats = [],
   action,
@@ -78,6 +79,8 @@ export default function UserPlatformCard({
   status?: ReactNode
   /** Account details once connected. */
   identity?: PlatformIdentity | null
+  /** Something to do about the account, under who it is (PSN's verification); shown while connected. */
+  notice?: ReactNode
   /** What connecting this platform gets you. */
   hint?: string
   /** Four or five headline numbers, side by side. */
@@ -159,6 +162,7 @@ export default function UserPlatformCard({
                 </div>
               </div>
             )}
+            {notice}
             {stats.length > 0 && (
               <dl className="grid grid-cols-2 gap-1.5">
                 {stats.map((stat, i) => (

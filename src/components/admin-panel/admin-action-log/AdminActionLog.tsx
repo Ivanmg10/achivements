@@ -20,6 +20,7 @@ const LABELS: Record<string, string> = {
   'unlink-steam': 'unlinked Steam from',
   'link-psn': 'linked PSN for',
   'unlink-psn': 'unlinked PSN from',
+  'clear-psn-verification': 'cleared the PSN verification of',
   'link-xbox': 'linked Xbox for',
   'unlink-xbox': 'unlinked Xbox from',
   'psn-token': 'renewed the PSN token',
