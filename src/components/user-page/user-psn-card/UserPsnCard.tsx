@@ -10,7 +10,8 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import UserPlatformCard, { platformStat, PlatformStat } from '@/components/user-page/user-platform-card/UserPlatformCard'
 import UserPlatformLinkForm from '@/components/user-page/user-platform-link-form/UserPlatformLinkForm'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
-import PsnVerification from '@/components/user-page/user-psn-card/psn-verification/PsnVerification'
+import PsnVerificationTag from '@/components/user-page/user-psn-card/psn-verification-tag/PsnVerificationTag'
+import PsnVerificationButton from '@/components/user-page/user-psn-card/psn-verification-button/PsnVerificationButton'
 
 /**
  * PlayStation Network on the account page. Linked by typing an online ID —
@@ -63,7 +64,8 @@ export default function UserPsnCard() {
         name: onlineId || '—',
         id: accountId,
       }}
-      notice={<PsnVerification onlineId={onlineId} />}
+      badge={<PsnVerificationTag />}
+      extraAction={<PsnVerificationButton onlineId={onlineId} />}
       stats={isLinked ? stats : []}
       disconnect={{ label: T.psn.disconnect, busyLabel: T.psn.disconnecting, run: unlink, done: T.toast.psnUnlinked }}
       action={

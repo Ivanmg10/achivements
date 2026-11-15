@@ -59,7 +59,8 @@ export default function UserPlatformCard({
   connected,
   status,
   identity,
-  notice,
+  badge,
+  extraAction,
   hint,
   stats = [],
   action,
@@ -79,8 +80,10 @@ export default function UserPlatformCard({
   status?: ReactNode
   /** Account details once connected. */
   identity?: PlatformIdentity | null
-  /** Something to do about the account, under who it is (PSN's verification); shown while connected. */
-  notice?: ReactNode
+  /** A small tag beside the platform's name while connected (PSN: verified or not). */
+  badge?: ReactNode
+  /** One more small button beside the disconnect while connected (PSN: verify the account). */
+  extraAction?: ReactNode
   /** What connecting this platform gets you. */
   hint?: string
   /** Four or five headline numbers, side by side. */
@@ -128,6 +131,7 @@ export default function UserPlatformCard({
             ) : (
               <span className="font-extrabold truncate">{name}</span>
             )}
+            {connected && badge}
           </span>
           {/* One height connected or not, so the figures start at the same place in every card of the row. */}
           <span className="flex items-center justify-between gap-2 min-h-(--h-control-sm)">
@@ -135,11 +139,16 @@ export default function UserPlatformCard({
               <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-current" />
               {connected ? T.userData.connected : T.userData.notConnected}
             </span>
-            {connected && disconnect && (
-              <Button variant="secondary" size="sm" aria-label={disconnect.label} aria-haspopup="dialog" onClick={() => setAsking(true)}>
-                <IconPlugConnectedX size={16} aria-hidden="true" />
-                {T.userData.disconnect}
-              </Button>
+            {connected && (extraAction || disconnect) && (
+              <span className="flex items-center gap-2">
+                {extraAction}
+                {disconnect && (
+                  <Button variant="secondary" size="sm" aria-label={disconnect.label} aria-haspopup="dialog" onClick={() => setAsking(true)}>
+                    <IconPlugConnectedX size={16} aria-hidden="true" />
+                    {T.userData.disconnect}
+                  </Button>
+                )}
+              </span>
             )}
           </span>
         </div>
@@ -162,7 +171,6 @@ export default function UserPlatformCard({
                 </div>
               </div>
             )}
-            {notice}
             {stats.length > 0 && (
               <dl className="grid grid-cols-2 gap-1.5">
                 {stats.map((stat, i) => (

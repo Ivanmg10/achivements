@@ -36,7 +36,7 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 ## 2026-11-15 — PSN verification as a dialog (`feat/176-psn-verification`, #176)
 
 - **Did:**
-  - The verification panel left the PSN card. The card now shows one line: "Sin verificar" / "Verificada" as a `Tag`, and "Verificar cuenta" while unverified.
+  - The verification panel left the PSN card. In the card's head, the `Tag` ("Sin verificar" / "Verificada") sits beside the platform's name, and "Verificar cuenta" sits beside "Desvincular" (`UserPlatformCard`'s new `badge` and `extraAction`, replacing `notice`). The welcome keeps both on one line (`PsnVerification`).
   - That button opens `PsnVerificationModal` (`md`): the code, Copy, "Open my PlayStation profile", "Later" and "check".
   - The welcome's PSN step gets the same line.
   - `usePsnVerification({ active })` asks for the code only while the dialog is open.
