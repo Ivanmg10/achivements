@@ -14,3 +14,8 @@ test('enrolling shows the key and a link for the app', () => {
   expect(screen.getByText('ABC234')).toBeInTheDocument()
   expect(screen.getByRole('link')).toHaveAttribute('href', 'otpauth://totp/x')
 })
+
+test('the code field takes focus when it appears', () => {
+  render(<AdminUnlockTotp setup={null} code="" onChange={jest.fn()} disabled={false} />)
+  expect(screen.getByLabelText(/Code from your authenticator/)).toHaveFocus()
+})

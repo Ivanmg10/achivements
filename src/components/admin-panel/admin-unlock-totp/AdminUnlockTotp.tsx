@@ -4,7 +4,8 @@ export type TotpSetup = { key: string; uri: string }
 
 /**
  * The code field of the unlock form. Enrolling, it first shows the key to add to
- * an authenticator app; `uri` opens that app directly on a phone.
+ * an authenticator app; `uri` opens that app directly on a phone. The field takes focus when it
+ * appears, so the code can be typed right after the password.
  */
 export default function AdminUnlockTotp({ setup, code, onChange, disabled }: {
   setup: TotpSetup | null
@@ -29,6 +30,7 @@ export default function AdminUnlockTotp({ setup, code, onChange, disabled }: {
             onChange={(e) => onChange(e.target.value)}
             disabled={disabled}
             autoComplete="one-time-code"
+            autoFocus
           />
         )}
       </Field>
