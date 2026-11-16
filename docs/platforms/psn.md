@@ -62,10 +62,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   list (play time, last session, store art, PS4/PS5 only, its own privacy
   setting; the *enrichment*, filled in the background since #177). `lastTrophyAt` is the trophy list's date and keys every trophy
   cache; `lastPlayed` is the last session when known.
-- **Caches** live in `steam_cache` under `psn:` keys. When the shape of a
-  cached value changes, bump its key's version (`psn:titles:core:vN`) in the same
-  change — a dev server will otherwise serve the old shape. How they are read since #177
-  (stale data, one fetch at a time, the split per game): "Fast core and call budget" below.
+- **Snapshots, not caches, since #179:** what pages read is in Postgres (`migrations/048`, "Snapshots and sync
+  queue" below). `steam_cache` keeps only `psn:sets:<played id>` (a played game's trophy sets, everyone's, 90
+  days), `psn:notfound:` (1 h) and `psn:release:` (the Store's year); the `psn:summary:`, `psn:titles:`,
+  `psn:enriched:`, `psn:year:`, `psn:defs:`, `psn:earned:` and group keys of #177 are no longer written or read.
 - **PS3/Vita games** have no play data and no Store page: their cover,
   backdrop and release year come from IGDB (`src/lib/igdbClient.ts`, a Twitch
   app in `TWITCH_CLIENT_ID`/`TWITCH_CLIENT_SECRET`), matched by title and
@@ -209,6 +209,9 @@ every game opened, even one with no DLC), and an old game costs all 4.
   calls and are not counted here.
 
 ## Fast core and call budget (#177, phase 2, 2026-11-15)
+
+*History since #179: the readers below (`psnCached`, the split per-game caches, the background year) were replaced
+by the snapshots and the sync queue (next section). The budget, Sony's limits and the pool still hold as written.*
 
 Still one service account. What a page waits for is a handful of requests; the rest is done after the answer,
 in the background, under one budget. Code: `src/lib/psnClient.ts`, `psnCache.ts`, `psnBudget.ts`, `psnErrors.ts`.
@@ -360,3 +363,108 @@ the online ID, a token or an NPSSO.
 **Pending until a second account exists**: whether Sony's 429 is per account or per IP (load one account while another sits
 idle; record it in Call baseline above and the worklog), and the issue's "Done when" checks that need PSN-1..3 (one account's
 429 or 401 invisible to users, the pool-down alert).
+
+## Snapshots and sync queue (#179, phase 4, 2026-11-16)
+
+**No PSN page calls Sony.** Every PSN read is a database read of what the sync worker stored; Sony is reached only
+by the worker, by linking (the search and the summary) and by verification (the About Me). Still built for one
+service account; the pool spreads the worker's calls when there are more.
+
+**Tables** (`migrations/048_psn_snapshots.sql`, all SQL in `src/lib/psnStore.ts`):
+- `psn_players`, one row per PSN account (users may share one): the summary (JSON), when the summary, the profile,
+  the list and the enrichment were read, `year_at` (the year first whole), the language trophy texts are read in,
+  and `state` (`new`, `ok`, `private`).
+- `psn_player_games`: the account's trophy list, the game as the app shows it (JSON), `last_trophy_at`, and
+  `trophies_at`, the `lastTrophyAt` its stored trophies belong to. **The two differing is the delta.** Also the DLC
+  groups the account has, the base-game completion date, and `wanted_at` (a page asked for it).
+- `psn_player_trophies`: only the trophies earned (a row is an earned trophy), with their date.
+- `psn_games` and `psn_trophies`: a trophy set and its trophies, **the same for every player**: name, icon, counts,
+  DLC groups per language; grade, group, icon, rarity, and texts per language (`{"es-ES": [name, detail]}`).
+- Caps: 5,000 games per player (`MAX_GAMES`); trophies are bounded by the games. Rough size: a 500-game library is
+  ~500 game rows (~1–2 KB of JSON each) and ~1,500 earned rows (~60 B); a set's trophies ~300 B each per language,
+  shared. An account nobody links any more loses its rows in the daily sweep (`sweepPsnPlayers`).
+
+**The queue** (`psn_sync_jobs` from `047`, `src/lib/psnQueue.ts`): one active job per user and phase; asking again
+makes the queued one more urgent. A worker claims the most urgent due job (`ORDER BY priority, run_after … FOR
+UPDATE SKIP LOCKED`), a job whose worker died is taken again after 90 s, a failure waits 1, 2, 4, 8 minutes and
+fails after 5 attempts (the app's budget spent is not an attempt). Priorities: link/verify 0, manual 1, first sync
+2, cron 3, history 4, score 5. Finished jobs are swept after a week.
+
+**The phases** (`src/lib/psnSync.ts`, all as background work: three quarters of each account's budget):
+1. `summary`: the trophy counts (1 request); the profile too (2) when the counts moved or once a day. Counts
+   unchanged and the list read in the last day: done. A link, a manual refresh or a moved count goes on.
+2. `titles`: the list (1 per 800 games), saved; the played list, 20 more trophy sets and IGDB art **only when a game
+   moved or once a day** (`getUserPlayedGames` only when needed). A failure there keeps the old enrichment. Then
+   `recent` when there is a delta or the year was never whole.
+3. `recent`: the delta of the year (games with a trophy in the last 366 days that moved, asked-for ones first), 20
+   games a job, queued again until none is left; then `year_at` is set, and `history` (or `score`) follows.
+4. `history`: the older games that moved and any game a page asked for, 20 a job, queued again until none is left;
+   then `score`.
+5. `score`: a Vault Points pass (`runScoreAfterSync`), PSN read from the store (no Sony call); one already running
+   is waited out (2 minutes).
+
+A game read (`fetchPsnGame`): its earned trophies (1 request; none for a game never started), its definitions only
+when the store lacks them in the player's language or a DLC brought ids it does not know (1, shared by everyone),
+and for a game with DLC the account's groups (1) and the groups' definitions when missing (1). A game without DLC is
+one group built from the list. One game failing fails the job (the others are kept) so nothing is marked read
+without its trophies.
+
+**The readers** (`src/lib/psnSnapshot.ts`): nothing stored yet → 202 `syncing` and a sync queued (`titles` when the
+summary is already there, as after a link). Stored → the answer, and a sync queued after it when Sony was last
+checked 15 minutes ago or more (`SYNC_EVERY_MS`; the refresh button's cookie makes it manual, once per 10 minutes).
+A hidden profile → 403 as before, checked again on that schedule. A game page whose trophies were never read →
+202 and the game asked for first; read before its last trophy or in another language → answered as stored and
+asked for anew. The latest trophies → 202 until the 3 latest games are read; the year (60 days, streak, heatmap) →
+202 until it is first whole, then the stored one. The language: linking stores the reader's
+(`serverLanguage()`), and any reader's language becomes the one the next syncs read texts in; texts already stored
+stay in the old one until their game moves or is opened.
+
+**Routes**: the old ones answer the same shapes from the store (`summary`, `titles`, `trophies`, `recentTrophies`,
+`details`), and:
+- `GET /api/psn/bootstrap`: the summary, the first 50 games (most recently played, hidden games and unticked
+  consoles left out), the latest trophies (`null` while first read) and the sync state; 202 before the first sync.
+- `GET /api/psn/status`: `new` / `syncing` / `ready` / `private`, last check and next allowed, games waiting, jobs.
+- `POST /api/psn/refresh`: 202 `queued`; 409 `syncing` while the summary or list is being read; 429 `too-soon`
+  within 10 minutes of the last check, with `Retry-After`.
+- `GET /api/psn/games?page=&limit=50&q=&sort=recent|title|progress`: a page of the library, at most 50.
+- `GET /api/psn/game/[npwr]?lang=`: one game's trophies and groups, as `/api/psn/trophies`.
+- Every answer is `private` with `Vary: Cookie` (60 s for the new ones): a PSN read depends on who asks (a private
+  CheevoVault profile is refused to others), so **no shared `s-maxage` copy**, unlike the issue's wording. Images
+  are Sony's and IGDB's URLs, shown through `next/image` (the optimizer is the proxy) and allowed by
+  `/api/image-proxy`; the answers are the app's game and trophy shapes, no raw Sony objects.
+
+**Draining without a frequent cron.** Vercel's Hobby plan runs crons daily at most, so the queue moves after PSN
+traffic: every reader, link, refresh and verification that queues a job also starts a drain once the answer is sent
+(`kickPsnSync` → `after()`, 20 s, one per instance at a time; other instances drain in parallel without overlap).
+`/api/cron/psn-worker` (04:30 UTC in `vercel.json`) queues a sync for every account seen in the last two weeks and
+not checked in 20 hours, sweeps, and drains for 55 s. **On a Pro plan**, schedule it `* * * * *`: the queue then
+moves every minute whatever the traffic, and the kicks only make a sync start sooner.
+
+### Phase 4 numbers
+
+Measured as before (`src/lib/psnCallBaseline.test.ts`, the fake Sony, now with the in-memory store and queue
+`src/test-utils/memoryPsn.ts` and the real worker; the test asserts them):
+`PSN_BASELINE=1 npx jest src/lib/psnCallBaseline --coverage=false`.
+
+| | 500 games | 1,000 games |
+|---|--:|--:|
+| linking (search, summary, profile; the list is queued) | 3 | 3 |
+| **what a visit waits for**, cold or warm (phase 2: 9 / 10; phase 0: 356 / 709) | **0** | **0** |
+| the worker's first sync: list, played, 20 sets, every started game (2 each) and DLC groups (2 each) | 1,027 | 2,050 |
+| a second player of the same games: link, visit and sync (definitions shared) | 520 | 1,033 |
+| a visit 15 minutes later, nothing new: the visit / the worker | 0 / 1 | 0 / 1 |
+| one new trophy: the worker (summary, profile, list, played, sets, that game) | 10 | 13 |
+| navigation with the sync done: a game this year, an older one, the library | 0, 0, 0 | 0, 0, 0 |
+| a game never started, opened: 202, then its definitions | 1 | 1 |
+| the score fill (phase 2: 705 / 1,450) | 0 | 0 |
+
+The first sync reads every started game once (phase 2 read the year and 20 completion dates, then the score fill
+read every started game again: ~960 for 500 games). With one account at 450 background calls per 15 minutes, the
+year of a 500-game library (~260 requests) lands in one window and the rest in about 35 minutes; then every
+refresh is 1 request when nothing moved. **Score parity** (`src/lib/psnScoreParity.test.ts`): the points from the
+snapshot equal the old live path's, game by game, on a fixture with platinums, DLC, a dateless trophy and odd
+rarities.
+
+**Left for later:** the "Done when" items that need a real pool (PSN-4 and PSN-5 added from the panel 1–2 days
+apart, each with its canary green; then the five expiries staggered; failover tested) and a load test of 100
+simulated links against a real database.

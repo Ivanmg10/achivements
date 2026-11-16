@@ -82,12 +82,15 @@ Rankings). Keep these true:
   Only the viewer's own (it ignores `?user=`); Xbox for admins; every platform failing is a 502.
   Anything else that only shows the streak number uses it too (the search modal does).
   Its `streak` is `null` until the first answer (the header draws `StreakTag loading`, never a 0 meanwhile).
-- **A PSN page waits for at most about 10 requests to Sony (#177).** The core library, the summary and the
-  latest 3 games' trophies; the year, the 60 days, play time, art and completion dates are built after the
-  answer (`after()`), and an account-level PSN read serves a stale answer (up to 7 days) while it refreshes
-  (`psnCached`, `docs/platforms/psn.md` → Fast core and call budget). The year's route answers 202 until it
-  is there, and `usePsnRecentTrophies` keeps its skeleton and asks again. **A new PSN reader reads
-  `psnTitlesCore` unless it needs play data**, and its own account-level cache goes through `psnCached`.
+- **A PSN page waits for no Sony call (#179).** Every PSN read is the stored snapshot (`psnSnapshot.ts` over
+  `psnStore.ts`); Sony is read by the sync worker (`psnSync.ts`, through the queue `psnQueue.ts`), drained after
+  PSN traffic with `after()` and by the daily `cron/psn-worker`. Before the first sync a read answers 202 with
+  `Retry-After`, and the client keeps its skeleton and asks again (`fetchUntilReady` in `usePlatformRead` and the
+  console library; `usePsnRecentTrophies` its own loop): a section lands whole. Data older than 15 minutes is
+  answered as stored and a sync is queued after it (1 Sony request when nothing moved). **A new PSN reader is a
+  function in `psnSnapshot.ts` over the store, never a `psnClient` call**; one that needs data the store lacks adds
+  it to a sync phase. Every PSN answer is `private` with `Vary: Cookie` (a private profile is refused to others),
+  so no `s-maxage`. Numbers: `docs/platforms/psn.md` → Snapshots and sync queue.
 - **A streak is drawn whole (2026-11-11):** the year's `isLoading` (`ActivityHeatmapYearContext`) is true
   before anything is asked and until every linked platform answered, and `useActivityHeatmapYear` also waits
   for the PSN/Xbox library `useConsoleVisibility` needs when one of their consoles is unticked. A reader of
