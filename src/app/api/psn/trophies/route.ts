@@ -1,36 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { cachedJson } from '@/lib/httpCache'
+import { NextRequest } from 'next/server'
 import { requirePsnSession } from '@/lib/apiAuth'
-import { findPsnGame, psnFailure, psnGameGroups, psnGameTrophies, psnLanguage } from '@/lib/psnClient'
-import { isPsnTitleId } from '@/utils/psnTitles'
-
-/** How long the browser may keep an answer; the server's own cache is the longer one. Vary: Cookie (see cachedJson) lets the refresh button and a re-link through. */
-const BROWSER_TTL_MS = 5 * 60 * 1000
+import { psnGameResponse } from '@/lib/psnRoutes'
 
 /**
- * One game's trophies and trophy groups (base game, each DLC) for the
- * signed-in user: ?id=NPWR12345_00&lang=es. The game is looked up in their
- * list, which says which trophy service it is on (PS5 or older) and when it
- * last changed — the cache key. Texts come in the app's language.
+ * One game's trophies and trophy groups (base game, each DLC) for the signed-in user: ?id=NPWR12345_00&lang=es,
+ * from the snapshot (#179): 202 while its trophies are first read. The same answer as /api/psn/game/[npwr].
  */
 export async function GET(req: NextRequest) {
   const auth = await requirePsnSession(req)
   if (!auth.ok) return auth.response
-  const { id: userId, psnaccountid } = auth.session
-
-  const titleId = req.nextUrl.searchParams.get('id') ?? ''
-  const language = psnLanguage(req.nextUrl.searchParams.get('lang'))
-  if (!isPsnTitleId(titleId)) return NextResponse.json({ error: 'invalid-title' }, { status: 400 })
-
-  try {
-    const game = await findPsnGame(psnaccountid, titleId, userId)
-    if (!game) return NextResponse.json({ error: 'not-in-library' }, { status: 404 })
-    const [groups, trophies] = await Promise.all([
-      psnGameGroups(psnaccountid, game, userId, language),
-      psnGameTrophies(psnaccountid, game, userId, language),
-    ])
-    return cachedJson({ groups, trophies }, BROWSER_TTL_MS)
-  } catch (err) {
-    return psnFailure(err, 'psn/trophies')
-  }
+  return psnGameResponse(auth.session, req.nextUrl.searchParams.get('id') ?? '', req.nextUrl.searchParams.get('lang'), 'psn/trophies')
 }

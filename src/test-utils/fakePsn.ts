@@ -111,7 +111,12 @@ export function installFakePsn(psnApi: unknown, library: FakeGame[]): FakeHits {
   answer('exchangeAccessCodeForAuthTokens', () => tokens)
   answer('exchangeRefreshTokenForAuthTokens', () => tokens)
   answer('makeUniversalSearch', (_a, name: string) => ({ domainResponses: [{ results: [{ socialMetadata: { onlineId: name, accountId: 'acc-1' } }] }] }))
-  answer('getUserTrophyProfileSummary', () => ({ trophyLevel: '300', tier: 5, progress: 10, earnedTrophies: NONE }))
+  // The counts follow the library, so a test that earns a trophy moves them (the sync's change check reads them).
+  answer('getUserTrophyProfileSummary', () => {
+    const earned = library.map((g) => trophyTitle(g).earnedTrophies)
+    const total = (k: keyof typeof NONE) => earned.reduce((sum, e) => sum + e[k], 0)
+    return { trophyLevel: '300', tier: 5, progress: 10, earnedTrophies: { bronze: total('bronze'), silver: total('silver'), gold: total('gold'), platinum: total('platinum') } }
+  })
   answer('getProfileFromAccountId', () => ({ onlineId: 'player', avatars: [], aboutMe: '', isPlus: false }))
   answer('getUserTitles', (_a, _id, { limit, offset = 0 }: Page) => {
     const { items, nextOffset } = paged(library, offset, limit)

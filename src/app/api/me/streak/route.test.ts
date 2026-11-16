@@ -3,6 +3,7 @@ jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/raYear', () => ({}))
 jest.mock('@/lib/steamUnlockYear', () => ({}))
 jest.mock('@/lib/psnClient', () => ({}))
+jest.mock('@/lib/psnSnapshot', () => ({}))
 jest.mock('@/lib/xboxClient', () => ({}))
 jest.mock('@/lib/gameVisibility', () => ({}))
 jest.mock('@/lib/meStreak', () => {

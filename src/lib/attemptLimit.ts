@@ -27,11 +27,7 @@ import pool from '@/lib/db'
  *
  * 'psn-verify' counts the checks of a PSN verification code per account (each one reads Sony); a check
  * that succeeds, or that Sony failed to answer, does not count.
- *
- * 'psn-score' counts the PSN games read for Vault Points, for the whole app
- * (address 'app'): the service accounts are shared by everyone, so the score fill goes
- * gently whoever it is for. 200 games is at most 400 calls to Sony in 15 minutes (fewer once a game's
- * defined trophies are shared, #177), under the background share of 'psn-upstream'.
+
  */
 /**
  * Every request to Sony in 15 minutes (#177), the default for one account. Since the pool (#178) the budget is per
@@ -40,7 +36,7 @@ import pool from '@/lib/db'
  */
 export const PSN_CALLS_PER_WINDOW = 600
 
-export type AttemptScope = 'totp' | 'psn-upstream' | 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'ra-borrowed' | 'avatar' | 'user-search' | 'follow' | 'psn-score' | 'psn-verify' | 'xbox-upstream' | 'ra-check' | 'psn-status'
+export type AttemptScope = 'totp' | 'psn-upstream' | 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'ra-borrowed' | 'avatar' | 'user-search' | 'follow' | 'psn-verify' | 'xbox-upstream' | 'ra-check' | 'psn-status'
 
 const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   signup: { max: 5, windowMinutes: 60 },
@@ -53,7 +49,6 @@ const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   avatar: { max: 20, windowMinutes: 60 },
   'user-search': { max: 60, windowMinutes: 5 },
   follow: { max: 60, windowMinutes: 5 },
-  'psn-score': { max: 200, windowMinutes: 15 },
   'psn-verify': { max: 6, windowMinutes: 15 },
   // Every call to Sony, per service account; psnBudget passes each account's own max (and keeps a share for people browsing).
   'psn-upstream': { max: PSN_CALLS_PER_WINDOW, windowMinutes: 15 },

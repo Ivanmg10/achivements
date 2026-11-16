@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePsnSession } from '@/lib/apiAuth'
-import { findPsnGame, psnFailure } from '@/lib/psnClient'
+import { psnFailure } from '@/lib/psnClient'
+import { findPsnGame } from '@/lib/psnSnapshot'
 import { igdbDetails } from '@/lib/igdbClient'
 import { cachedJson } from '@/lib/httpCache'
 import { TTL } from '@/lib/steamCache'

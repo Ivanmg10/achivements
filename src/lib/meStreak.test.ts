@@ -1,6 +1,7 @@
 jest.mock('@/lib/raYear', () => ({ loadRaYear: jest.fn() }))
 jest.mock('@/lib/steamUnlockYear', () => ({ loadSteamYear: jest.fn() }))
-jest.mock('@/lib/psnClient', () => ({ psnLanguage: (l: string) => l, psnRecentTrophies: jest.fn(), psnTitlesCore: jest.fn() }))
+jest.mock('@/lib/psnClient', () => ({ psnLanguage: (l: string) => l }))
+jest.mock('@/lib/psnSnapshot', () => ({ psnRecentTrophies: jest.fn(), psnTitlesCore: jest.fn() }))
 jest.mock('@/lib/xboxClient', () => ({ xboxLanguage: (l: string) => l, xboxRecentAchievements: jest.fn(), xboxLibrary: jest.fn() }))
 jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
 jest.mock('@/utils/psnMappers', () => ({ psnToRecentAchievement: (t: { gameId: number; date: string }) => ({ Date: t.date, GameID: t.gameId, Source: 'psn' }) }))
@@ -10,7 +11,7 @@ jest.mock('@/utils/steamMappers', () => ({ toRecentAchievement: (a: { appId: num
 import { loadStreak, parseHiddenConsoles, StreakUnavailable } from './meStreak'
 import { loadRaYear } from '@/lib/raYear'
 import { loadSteamYear } from '@/lib/steamUnlockYear'
-import { psnRecentTrophies, psnTitlesCore } from '@/lib/psnClient'
+import { psnRecentTrophies, psnTitlesCore } from '@/lib/psnSnapshot'
 import { xboxRecentAchievements } from '@/lib/xboxClient'
 import { visibleGamesForUser } from '@/lib/gameVisibility'
 

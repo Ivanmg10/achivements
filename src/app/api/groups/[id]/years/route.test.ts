@@ -4,7 +4,8 @@ jest.mock('@/lib/raCache', () => ({ withCache: jest.fn((_k: string, _t: number, 
 jest.mock('@/lib/raClient', () => ({ getGame: jest.fn() }))
 jest.mock('@/lib/steamCache', () => ({ TTL: { schema: 1 }, withSteamCache: jest.fn((_k: string, _t: number, fn: () => unknown) => fn()) }))
 jest.mock('@/lib/steamClient', () => ({ getAppDetails: jest.fn() }))
-jest.mock('@/lib/psnClient', () => ({ psnLibrary: jest.fn(), psnReleaseYear: jest.fn() }))
+jest.mock('@/lib/psnClient', () => ({ psnReleaseYear: jest.fn() }))
+jest.mock('@/lib/psnSnapshot', () => ({ psnLibrary: jest.fn() }))
 jest.mock('@/lib/igdbClient', () => ({ igdbArt: jest.fn(), igdbXboxArt: jest.fn() }))
 jest.mock('@/lib/xboxClient', () => ({ xboxLibrary: jest.fn() }))
 
@@ -13,7 +14,8 @@ import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
 import { getGame } from '@/lib/raClient'
 import { getAppDetails } from '@/lib/steamClient'
-import { psnReleaseYear, psnLibrary } from '@/lib/psnClient'
+import { psnReleaseYear } from '@/lib/psnClient'
+import { psnLibrary } from '@/lib/psnSnapshot'
 import { igdbArt, igdbXboxArt } from '@/lib/igdbClient'
 import { xboxLibrary } from '@/lib/xboxClient'
 import { recordXboxCacheEvent } from '@/lib/xboxTelemetry'

@@ -1,14 +1,14 @@
 /**
- * The PSN call counts (#175 baseline, #177 phase 2): how many requests reach Sony for a cold profile, the
- * background work after it, a refresh and a page navigation, by function. Counted against a fake Sony
- * (`test-utils/fakePsn`) and an in-memory cache with the real TTLs, through the real psnClient and psnCache:
- * never the network, never a database. What `after()` would run once the answer is sent is queued here and run
- * when the test says (`background`), so what a visit waits for and what comes after are counted apart.
+ * The PSN call counts (#175 baseline, #177 phase 2, #179 phase 4): how many requests reach Sony to link a profile,
+ * what a visit waits for, what the sync worker reads after it, a refresh and a page navigation, by function.
+ * Counted against a fake Sony (`test-utils/fakePsn`), an in-memory snapshot store and queue (`test-utils/memoryPsn`)
+ * and an in-memory cache, through the real psnClient, psnSync and psnSnapshot: never the network, never a
+ * database. What `after()` would run once the answer is sent (the queue's drain) is kept here and run when the test
+ * says (`background`), so what a visit waits for and what the worker does are counted apart.
  *
  * Rerun and print the tables:   PSN_BASELINE=1 npx jest src/lib/psnCallBaseline --coverage=false
- * The numbers are asserted from the library's own shape, so a change that makes a
- * call more or fewer fails here and the table in docs/platforms/psn.md is redone.
- * The phase 0 numbers (356 / 709 for a cold home) are kept in that doc.
+ * The numbers are asserted from the library's own shape, so a change that makes a call more or fewer fails here and
+ * the table in docs/platforms/psn.md is redone. The phase 0 and phase 2 numbers are kept in that doc.
  */
 jest.mock('psn-api', () => ({
   exchangeNpssoForAccessCode: jest.fn(),
@@ -28,24 +28,30 @@ jest.mock('psn-api', () => ({
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: () => Promise.reject(new Error('no database in this test')) } }))
 jest.mock('@/lib/upstreamCount', () => ({ countUpstream: jest.fn() }))
 jest.mock('@/lib/attemptLimit', () => ({ PSN_CALLS_PER_WINDOW: 600, reserveAttempt: jest.fn(async () => ({ allowed: true, release: async () => {} })) }))
-// One service account, in memory (#178): the real pool and sign-in on top.
 jest.mock('@/lib/psnAccounts', () => jest.requireActual('@/test-utils/fakePsnAccounts').fakePsnStore)
 jest.mock('@/lib/psnMaintenance', () => ({ maybeMaintainPsnPool: jest.fn() }))
 jest.mock('@/lib/steamCache', () => jest.requireActual('@/test-utils/memorySteamCache').memorySteamCache)
 jest.mock('@/lib/igdbClient', () => ({ igdbConfigured: () => false, igdbPlatforms: () => [], igdbArt: jest.fn() }))
-jest.mock('@/lib/runLater', () => ({ runLater: (task: () => Promise<unknown>) => queued.push(task) }))
+jest.mock('@/lib/runLater', () => ({ runLater: (task: () => Promise<unknown>) => mockQueued.push(task) }))
+jest.mock('@/lib/psnStore', () => jest.requireActual('@/test-utils/memoryPsn').memoryPsnStore)
+jest.mock('@/lib/psnQueue', () => jest.requireActual('@/test-utils/memoryPsn').memoryPsnQueue)
+// The worker looks up the account each user has linked: user 7 has acc-1, user 8 acc-2.
+jest.mock('@/lib/queryRows', () => ({ queryRows: jest.fn(async (_sql: string, [id]: [number]) => [{ psnaccountid: `acc-${id - 6}` }]) }))
+jest.mock('@/lib/scoreRefresh', () => ({ runScoreAfterSync: jest.fn(async () => true) }))
+jest.mock('@/lib/wantsFresh', () => ({ wantsFresh: jest.fn(async () => false) }))
 
 import * as psnApi from 'psn-api'
 import { memorySteamCache } from '@/test-utils/memorySteamCache'
+import { memoryPsnQueue, memoryPsnStore } from '@/test-utils/memoryPsn'
 import { FAKE_NOW, fakeLibrary, installFakePsn, type FakeGame, type FakeHits } from '@/test-utils/fakePsn'
 import { PSN_FUNCTIONS, psnCallTotals, resetPsnCallStats, type PsnCallCounts } from '@/lib/psnCallStats'
-import { mapLimit } from '@/utils/utils'
-import { findPsnAccount, findPsnGame, psnGameGroups, psnGameTrophies, psnLatestTrophies, psnLibrary, psnRecentTrophies, psnSummary, psnTitlesCore } from '@/lib/psnClient'
+import { findPsnAccount } from '@/lib/psnClient'
+import { readPsnOnLink, syncLinkedPsn } from '@/lib/psnSync'
+import { psnGame, psnLatestTrophies, psnLibrary, psnRecentTrophies, psnSummary } from '@/lib/psnSnapshot'
 
-const queued: (() => Promise<unknown>)[] = []
+const mockQueued: (() => Promise<unknown>)[] = []
 const ACCOUNT = 'acc-1'
 const USER = '7'
-/** The reader's language; the completion dates and the score read in English (the default), so their defined trophies are kept apart. */
 const LANG = 'es-ES'
 const MIN = 60_000
 const YEAR_DAYS = 366
@@ -55,33 +61,28 @@ let hits: FakeHits
 
 const daysAgo = (g: FakeGame) => (FAKE_NOW - Date.parse(g.lastTrophyAt!)) / 86_400_000
 const started = (lib: FakeGame[]) => lib.filter((g) => g.earned > 0)
-const within = (lib: FakeGame[], days: number) => started(lib).filter((g) => daysAgo(g) <= days)
 
 /** The home's reads, as the page fires them together: summary, library, latest, 60 days, the year (header streak). */
-const home = (account = ACCOUNT) =>
+const home = (account = ACCOUNT, user = USER) =>
   Promise.allSettled([
-    psnSummary(account, USER),
-    psnLibrary(account, USER),
-    psnLatestTrophies(account, USER, LANG),
-    psnRecentTrophies(account, 60, USER, LANG),
-    psnRecentTrophies(account, YEAR_DAYS, USER, LANG),
+    psnSummary(account, user),
+    psnLibrary(account, user),
+    psnLatestTrophies(account, user, LANG),
+    psnRecentTrophies(account, 60, user, LANG),
+    psnRecentTrophies(account, YEAR_DAYS, user, LANG),
   ])
 
-/** What runs after the answers were sent, until nothing is left (a task may queue another). */
+/** What runs after the answers were sent (the queue's drains), until nothing is left. */
 async function background() {
-  while (queued.length) await queued.shift()!()
+  while (mockQueued.length) await mockQueued.shift()!()
 }
 
-/** What /api/psn/trophies does for one game. */
-async function openGame(g: FakeGame) {
-  const game = (await findPsnGame(ACCOUNT, g.titleId, USER))!
-  await Promise.all([psnGameGroups(ACCOUNT, game, USER, LANG), psnGameTrophies(ACCOUNT, game, USER, LANG)])
-}
-
-/** The score fill's reads (scoreRefresh's psnPlan): every game with a trophy, 2 at a time, in the default language. */
-async function scoreFill() {
-  const games = (await psnTitlesCore(ACCOUNT, USER)).filter((g) => g.numAwarded > 0)
-  await mapLimit(games, 2, (g) => psnGameTrophies(ACCOUNT, g, USER))
+/** What the link route does: the search, the summary now, the rest queued. */
+async function link(user = USER) {
+  const found = await findPsnAccount('player')
+  await readPsnOnLink(user === USER ? ACCOUNT : 'acc-2', LANG)
+  await syncLinkedPsn(user)
+  return found
 }
 
 /** The requests `run` made, by function, plus the same count taken at the fake Sony as a cross-check. */
@@ -105,9 +106,13 @@ function note(title: string, rows: [string, PsnCallCounts][]) {
 }
 
 async function setUp(lib: FakeGame[]) {
+  // A drain the last test left queued holds the worker's "draining" flag until it runs.
+  await background()
   jest.clearAllMocks()
   memorySteamCache.clear()
-  queued.length = 0
+  memoryPsnStore.clear()
+  memoryPsnQueue.clear()
+  mockQueued.length = 0
   resetPsnCallStats()
   clock = FAKE_NOW
   hits = installFakePsn(psnApi, lib)
@@ -131,36 +136,29 @@ describe.each([500, 1000])('a profile of %i games', (count) => {
   const lib = fakeLibrary(count)
   const titlePages = Math.ceil(count / 800)
   const playedPages = Math.ceil(lib.filter((g) => g.playedId).length / 200)
-  const year = within(lib, YEAR_DAYS)
+  const dlc = started(lib).filter((g) => g.hasDlc).length
 
   beforeEach(() => setUp(lib))
 
-  test('linking it: the summary shares the core library, no count of its own', async () => {
-    const link = await measure(async () => {
-      const found = await findPsnAccount('player')
-      await psnSummary(found!.accountId, USER)
-    })
-    expect(link).toEqual({ search: 1, summary: 1, profile: 1, titles: titlePages })
+  test('linking it: the search and the summary, nothing else waits', async () => {
+    const counts = await measure(link)
+    expect(counts).toEqual({ search: 1, summary: 1, profile: 1 })
   })
 
-  test('the first visit, cold: at most 10 requests; the rest comes after, in the background', async () => {
-    const cold = await measure(home)
-    // Summary 2, the title list (1 per 800 games), the latest 3 games' trophies (defined + earned each).
-    expect(cold).toEqual({ summary: 1, profile: 1, titles: titlePages, gameTrophies: 6 })
-    expect(total(cold)).toBeLessThanOrEqual(10)
-    const [, , , sixty, theYear] = await home()
-    expect(sixty.status).toBe('rejected')
-    expect(theYear.status).toBe('rejected')
+  test('the first visit waits for no Sony call; the worker reads the rest once, then every read is the database', async () => {
+    await link()
+    const visit = await measure(home)
+    expect(visit).toEqual({})
+    // Nothing stored yet: every read answers 202 (the summary too: the list is not there yet).
+    expect((await home()).every((r) => r.status === 'rejected')).toBe(true)
 
-    const after = await measure(background)
-    // The played list, the sets of the 20 most recent played games, the year game by game (defined trophies
-    // only once per language, the latest 3 already read), and 20 completion dates (English: their own definitions).
-    expect(after.played).toBe(playedPages)
-    expect(after.sets).toBe(4)
-    expect(after.titles ?? 0).toBe(0)
-    note(`${count} games, first visit`, [['what the visit waits for', cold], ['what comes after, in the background', after]])
+    const sync = await measure(background)
+    // The list, the played list and 20 trophy sets, then each started game: its earned trophies and its
+    // definitions (shared), and for a game with DLC its groups (earned + definitions).
+    expect(sync).toEqual({ titles: titlePages, played: playedPages, sets: 4, gameTrophies: 2 * started(lib).length, gameGroups: 2 * dlc })
+    expect(memoryPsnQueue.history()).toEqual(expect.arrayContaining(['titles', 'recent', 'history', 'score']))
+    note(`${count} games, link and first visit`, [['the visit waits for', visit], ['the worker, after it', sync]])
 
-    // Everything has landed: the next visit costs nothing.
     const again = await measure(home)
     expect(again).toEqual({})
     const settled = await home()
@@ -168,52 +166,62 @@ describe.each([500, 1000])('a profile of %i games', (count) => {
     expect((settled[4] as PromiseFulfilledResult<unknown[]>).value.length).toBeGreaterThan(0)
   })
 
-  test("a second player of the same games pays only their own half: the defined trophies are everyone's", async () => {
-    await home()
+  test("a second player of the same games pays only their own half: the definitions are everyone's", async () => {
+    await link()
     await background()
     const second = await measure(async () => {
-      await home('acc-2')
+      await link('8')
+      await home('acc-2', '8')
       await background()
     })
-    // Earned trophies only, for every game the first player's reads already defined.
-    expect(second.gameTrophies).toBeLessThan(year.length + 20)
-    note(`${count} games, a second player, everything`, [['visit + background', second]])
+    expect(second.gameTrophies).toBe(started(lib).length)
+    note(`${count} games, a second player, everything`, [['link + visit + worker', second]])
   })
 
-  test('a refresh after 15 minutes waits for nothing: it is read again in the background', async () => {
-    await home()
+  test('a visit 15 minutes later waits for nothing; the worker checks the summary alone when nothing moved', async () => {
+    await link()
     await background()
     clock += 15 * MIN + 1000
     const visit = await measure(home)
     expect(visit).toEqual({})
-    const after = await measure(background)
-    // Summary 2, the title list, and the year rebuilt from per-game entries: nothing moved, so no game is read.
-    expect(after).toEqual({ summary: 1, profile: 1, titles: titlePages })
-    note(`${count} games, refreshed after 15 minutes`, [['the visit', visit], ['in the background', after]])
+    const sync = await measure(background)
+    expect(sync).toEqual({ summary: 1 })
+    note(`${count} games, 15 minutes later, nothing new`, [['the visit', visit], ['the worker', sync]])
   })
 
-  test('a navigation: a game, another, the library, cache warm', async () => {
-    await home()
+  test('a new trophy: the summary, the list and the played list, and that one game (the delta)', async () => {
+    await link()
     await background()
-    const inYear = year.find((g) => daysAgo(g) > 60)!
-    const old = started(lib).find((g) => daysAgo(g) > YEAR_DAYS && !(g.hasDlc && (g.earned === 3 || g.platinum)))!
+    clock += 15 * MIN + 1000
+    const moved = started(lib).find((g) => g.earned < 3 && !g.hasDlc)!
+    const updated = lib.map((g) => (g === moved ? { ...g, earned: g.earned + 1, lastTrophyAt: new Date(clock).toISOString() } : g))
+    hits = installFakePsn(psnApi, updated)
+    await home()
+    const sync = await measure(background)
+    expect(sync).toEqual({ summary: 1, profile: 1, titles: titlePages, played: playedPages, sets: 4, gameTrophies: 1 })
+    note(`${count} games, one new trophy`, [['the worker', sync]])
+  })
+
+  test('a navigation: a game this year, an older one and the library, with the sync done, cost nothing', async () => {
+    await link()
+    await background()
+    const inYear = started(lib).find((g) => daysAgo(g) > 60 && daysAgo(g) < YEAR_DAYS)!
+    const old = started(lib).find((g) => daysAgo(g) > YEAR_DAYS)!
     const nav = {
-      'a game from this year': await measure(() => openGame(inYear)),
-      'a game older than a year': await measure(() => openGame(old)),
+      'a game from this year': await measure(() => psnGame(ACCOUNT, inYear.titleId, USER, LANG)),
+      'a game older than a year': await measure(() => psnGame(ACCOUNT, old.titleId, USER, LANG)),
       library: await measure(() => psnLibrary(ACCOUNT, USER)),
     }
-    note(`${count} games, navigating with a warm cache`, Object.entries(nav))
-    expect(nav['a game from this year']).toEqual({ gameGroups: 2 })
-    expect(nav['a game older than a year']).toEqual({ gameGroups: 2, gameTrophies: 2 })
-    expect(nav.library).toEqual({})
+    note(`${count} games, navigating`, Object.entries(nav))
+    expect(Object.values(nav).every((c) => total(c) === 0)).toBe(true)
   })
 
-  test('the score fill, after the visit: the year and the completion dates already read are not read again', async () => {
-    await home()
+  test('a game never started, opened: 202, then the worker reads its definitions alone (1 request)', async () => {
+    const unstarted = lib.find((g) => g.earned === 0)!
+    await link()
     await background()
-    const score = await measure(scoreFill)
-    // Every started game: earned once (any language), defined once in English.
-    expect(score.gameTrophies).toBeLessThan(2 * started(lib).length)
-    note(`${count} games, score fill after the visit`, [['score fill', score]])
+    await expect(psnGame(ACCOUNT, unstarted.titleId, USER, LANG)).rejects.toThrow('syncing')
+    expect(await measure(background)).toEqual({ gameTrophies: 1 })
+    expect((await psnGame(ACCOUNT, unstarted.titleId, USER, LANG))!.trophies).toHaveLength(3)
   })
 })

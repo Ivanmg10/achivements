@@ -1,13 +1,11 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
-jest.mock('@/lib/psnClient', () => ({
-  ...jest.requireActual('@/lib/psnClient'),
-  psnLibrary: jest.fn(),
-}))
+jest.mock('@/lib/psnSnapshot', () => ({ psnLibrary: jest.fn() }))
 
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
-import { psnLibrary, PsnError } from '@/lib/psnClient'
+import { PsnError } from '@/lib/psnClient'
+import { psnLibrary } from '@/lib/psnSnapshot'
 
 async function call() {
   const res = await GET()

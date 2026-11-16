@@ -16,6 +16,10 @@
     {
       "path": "/api/cron/scores",
       "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/psn-worker",
+      "schedule": "30 4 * * *"
     }
   ]
 }

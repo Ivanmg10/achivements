@@ -1,6 +1,7 @@
 import { loadRaYear } from '@/lib/raYear'
 import { loadSteamYear } from '@/lib/steamUnlockYear'
-import { psnLanguage, psnRecentTrophies, psnTitlesCore } from '@/lib/psnClient'
+import { psnLanguage } from '@/lib/psnClient'
+import { psnRecentTrophies, psnTitlesCore } from '@/lib/psnSnapshot'
 import { xboxLanguage, xboxLibrary, xboxRecentAchievements } from '@/lib/xboxClient'
 import { visibleGamesForUser } from '@/lib/gameVisibility'
 import { canUseXbox } from '@/utils/xboxAccess'

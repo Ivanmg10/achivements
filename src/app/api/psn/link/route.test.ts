@@ -2,12 +2,12 @@ jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/scoreRefresh', () => ({ onPlatformLinked: jest.fn() }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))
-jest.mock('@/lib/psnCache', () => ({ ...jest.requireActual('@/lib/psnCache'), forgetPsnPrivate: jest.fn() }))
+jest.mock('@/lib/psnSync', () => ({ readPsnOnLink: jest.fn(), syncLinkedPsn: jest.fn() }))
+jest.mock('@/lib/serverLanguage', () => ({ serverLanguage: jest.fn(async () => 'es') }))
 jest.mock('@/lib/psnClient', () => ({
   ...jest.requireActual('@/lib/psnClient'),
   psnConfigured: jest.fn(() => true),
   findPsnAccount: jest.fn(),
-  psnSummary: jest.fn(),
 }))
 
 import { NextRequest } from 'next/server'
@@ -15,8 +15,8 @@ import { POST } from './route'
 import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
 import { forgetUser } from '@/lib/userRecord'
-import { forgetPsnPrivate } from '@/lib/psnCache'
-import { findPsnAccount, psnConfigured, psnSummary, PsnError } from '@/lib/psnClient'
+import { readPsnOnLink, syncLinkedPsn } from '@/lib/psnSync'
+import { findPsnAccount, psnConfigured, PsnError } from '@/lib/psnClient'
 
 const post = (body: unknown) =>
   new NextRequest('http://localhost/api/psn/link', { method: 'POST', body: JSON.stringify(body) }) as unknown as Request
@@ -32,7 +32,7 @@ beforeEach(() => {
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7' } })
   ;(psnConfigured as jest.Mock).mockReturnValue(true)
   ;(findPsnAccount as jest.Mock).mockResolvedValue({ accountId: '42', onlineId: 'Hakoom' })
-  ;(psnSummary as jest.Mock).mockResolvedValue({})
+  ;(readPsnOnLink as jest.Mock).mockResolvedValue(undefined)
   ;(pool.query as jest.Mock).mockResolvedValue({ rowCount: 1 })
 })
 
@@ -63,11 +63,10 @@ test('404 when no account has that online ID', async () => {
 })
 
 test('403 when the profile hides its trophies, and nothing is saved', async () => {
-  ;(psnSummary as jest.Mock).mockRejectedValue(new PsnError('Not permitted by access control', 2240526))
+  ;(readPsnOnLink as jest.Mock).mockRejectedValue(new PsnError('Not permitted by access control', 2240526))
   expect(await call({ username: 'Hakoom' })).toEqual({ status: 403, body: { error: 'private' } })
   expect(pool.query).not.toHaveBeenCalled()
-  // Asked fresh: a profile made public a minute ago is not refused from memory.
-  expect(forgetPsnPrivate).toHaveBeenCalledWith(expect.any(String))
+  expect(syncLinkedPsn).not.toHaveBeenCalled()
 })
 
 test('502 when PSN fails otherwise', async () => {
@@ -93,4 +92,11 @@ test('saves the account as PSN spells it and drops the cached user row', async (
     '7',
   ])
   expect(forgetUser).toHaveBeenCalledWith('7')
+})
+
+test('the summary is read and stored now; the list and the trophies are queued first in line once the link is saved', async () => {
+  await call({ username: 'Hakoom' })
+  // In the reader's language, so the first sync reads trophy texts in it.
+  expect(readPsnOnLink).toHaveBeenCalledWith('42', 'es-ES')
+  expect(syncLinkedPsn).toHaveBeenCalledWith('7')
 })
