@@ -48,9 +48,12 @@ const PROFILE_TTL_MS = 60 * 60 * 1000
 const SUMMARY_TTL_MS = 15 * 60 * 1000
 const LIBRARY_TTL_MS = 15 * 60 * 1000
 /**
- * A game's achievements are keyed by when it was last played: they can only
- * change when it is, which changes the key. So an entry for a game not played
- * since is still right a month later — the same idea as PSN's settled trophies.
+ * A game's achievements are keyed by when it was last played and how many the
+ * library says are unlocked: they can only change when one of the two does. The
+ * session's start alone is not enough, as Xbox does not move it while the game
+ * is still running (#167: an unlock late in a session left the list one short of
+ * the summary). So an entry for a game not played since is still right a month
+ * later — the same idea as PSN's settled trophies.
  */
 const SETTLED_ACHIEVEMENTS_TTL_MS = 30 * 24 * 60 * 60 * 1000
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -370,13 +373,13 @@ export async function xboxSummary(xuid: string, gamertag: string, userId: string
  */
 export async function xboxGameAchievements(
   xuid: string,
-  game: Pick<XboxGameProgress, 'titleId' | 'is360' | 'lastPlayed'>,
+  game: Pick<XboxGameProgress, 'titleId' | 'is360' | 'lastPlayed' | 'numAwarded'>,
   userId: string | null = null,
   language = DEFAULT_LANGUAGE,
   staleOnRateLimit = true,
 ): Promise<XboxAchievement[]> {
   return withXboxCache(
-    `xbox:achievements:v5:${xuid}:${game.titleId}:${game.lastPlayed ?? ''}:${language}`,
+    `xbox:achievements:v5:${xuid}:${game.titleId}:${game.lastPlayed ?? ''}:${game.numAwarded}:${language}`,
     SETTLED_ACHIEVEMENTS_TTL_MS,
     async () => {
       if (game.is360) {

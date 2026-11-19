@@ -1,4 +1,4 @@
-import type { XboxGameProgress } from '@/types/xbox'
+import type { XboxAchievement, XboxGameProgress } from '@/types/xbox'
 import type { GameStatus } from '@/types/game'
 import type { TagTone } from '@/components/ui/Tag'
 
@@ -59,6 +59,22 @@ export function xboxPlatformTone(consoleName: string): TagTone {
 /** The widest art there is for a game's backdrop: its box art (Xbox sends no wide art). */
 export function xboxBackdrop(game: Pick<XboxGameProgress, 'imageIcon'>): string {
   return game.imageIcon
+}
+
+/**
+ * A game's progress as its own achievement list reads it, once the list is
+ * whole: the library's summary is cached apart and can lag behind it, and a
+ * page whose tiles and tabs disagree reads as a bug (#167). A partial list
+ * (an Xbox 360 game OpenXBL lists only in part) leaves the summary as it is.
+ */
+export function xboxProgressFromList(game: XboxGameProgress, achievements: Pick<XboxAchievement, 'unlocked' | 'gamerscore'>[]): XboxGameProgress {
+  if (!game.totalKnown || achievements.length === 0 || achievements.length < game.maxPossible) return game
+  const earned = achievements.filter((a) => a.unlocked)
+  if (earned.length === game.numAwarded) return game
+  const earnedGamerscore = earned.reduce((sum, a) => sum + a.gamerscore, 0)
+  // Xbox's own percentage is by gamerscore, rounded down.
+  const pctWon = game.totalGamerscore > 0 ? Math.floor((earnedGamerscore * 100) / game.totalGamerscore) : game.pctWon
+  return { ...game, numAwarded: earned.length, earnedGamerscore, pctWon }
 }
 
 /** Total play time across a library, in minutes; games Xbox gave none for count as none. */
