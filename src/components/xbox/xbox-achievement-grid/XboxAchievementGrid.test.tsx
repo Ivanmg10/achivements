@@ -1,4 +1,8 @@
 jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
+jest.mock('@/components/achievement-detail-modal/AchievementDetailModal', () => ({
+  __esModule: true,
+  default: ({ title, tags }: { title: string; tags?: React.ReactNode }) => <div role="dialog" aria-label={title}>{tags}</div>,
+}))
 
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { XboxAchievementGrid } from './XboxAchievementGrid'
@@ -18,26 +22,27 @@ beforeEach(() => {
   ;(useAchievementPins as jest.Mock).mockReturnValue({ pins: { canPin: false, isPinned: () => false, leads: () => false, toggle }, error: null })
 })
 
-test('each achievement links to its row on the game page, saying its gamerscore and state', () => {
+test('each achievement opens its window, saying its gamerscore and state', async () => {
   render(<XboxAchievementGrid gameId={1738914043} gameTitle="Game" achievements={ACHIEVEMENTS} />)
-  const earned = screen.getByRole('link', { name: `All of them — 50 G, ${en.xbox.earned}` })
-  expect(earned).toHaveAttribute('href', '/xboxGame/1738914043#achievement-0')
+  const earned = screen.getByRole('button', { name: `All of them — 50 G, ${en.xbox.earned}` })
+  fireEvent.click(earned)
+  expect(await screen.findByRole('dialog', { name: 'All of them' })).toHaveTextContent('50 G')
   // A secret achievement keeps its name hidden until earned.
-  expect(screen.getByRole('link', { name: `${en.xbox.secretAchievement} — 25 G, ${en.xbox.locked}` })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: `${en.xbox.secretAchievement} — 25 G, ${en.xbox.locked}` })).toBeInTheDocument()
   expect(screen.queryByText('Spoiler')).not.toBeInTheDocument()
 })
 
 test('focusing an achievement shows its details at once', () => {
   render(<XboxAchievementGrid gameId={100} gameTitle="Game" achievements={ACHIEVEMENTS} />)
   jest.useFakeTimers()
-  fireEvent.focus(screen.getAllByRole('link')[0])
+  fireEvent.focus(screen.getAllByRole('button')[0])
   act(() => jest.runAllTimers())
   jest.useRealTimers()
   const tip = screen.getByRole('tooltip')
   expect(tip).toHaveTextContent('All of them')
   expect(tip).toHaveTextContent('50 G')
   expect(tip).toHaveTextContent('3.4')
-  fireEvent.blur(screen.getAllByRole('link')[0])
+  fireEvent.blur(screen.getAllByRole('button')[0])
   expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 })
 
@@ -52,13 +57,13 @@ test('focusing an achievement shows its details at once', () => {
 test('an achievement with no icon still renders as a grey square', () => {
   const { container } = render(<XboxAchievementGrid gameId={100} gameTitle="Halo" achievements={[xboxAchievementFixture({ iconUrl: null })]} />)
   expect(container.querySelector('img')).toBeNull()
-  expect(screen.getAllByRole('link')).toHaveLength(1)
+  expect(screen.getAllByRole('button')).toHaveLength(1)
 })
 
 test('a tooltip that would run off the right edge opens to the left of the pointer', () => {
   render(<XboxAchievementGrid gameId={100} gameTitle="Game" achievements={ACHIEVEMENTS} />)
   jest.useFakeTimers()
-  fireEvent.mouseEnter(screen.getAllByRole('link')[0], { clientX: window.innerWidth - 20, clientY: 100 })
+  fireEvent.mouseEnter(screen.getAllByRole('button')[0], { clientX: window.innerWidth - 20, clientY: 100 })
   act(() => jest.runAllTimers())
   jest.useRealTimers()
   expect(screen.getByRole('tooltip').style.transform).toBe('translate(-100%, 0)')

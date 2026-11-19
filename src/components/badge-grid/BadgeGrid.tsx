@@ -1,22 +1,21 @@
 'use client'
 
 import { Fragment, useState, type ReactNode } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { capList } from '@/utils/utils'
 import { useBadgeTooltip } from '@/hooks/useBadgeTooltip'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import CursorTooltip from '@/components/ui/CursorTooltip'
 import { Skeleton } from '@/components/ui/Skeleton'
 import BadgeGridBadge, { BADGE_SIZES } from './badge-grid-badge/BadgeGridBadge'
-import type { BadgePins, BadgeReveal, BadgeSection, BadgeTip } from '@/types/badgeGrid'
+import type { BadgeReveal, BadgeSection, BadgeShown, BadgeTip } from '@/types/badgeGrid'
 
-/** What a platform tells the badge grid about its achievements; the grid draws them and owns the tooltip, the cap and the stars. */
+/** What a platform tells the badge grid about its achievements; the grid draws them and owns the tooltip, the cap and the open window. */
 export type BadgeGridProps<T> = {
   items: T[]
   keyOf: (a: T) => string | number
-  /** Where a badge goes: a link to the achievement on its game page... */
-  href?: (a: T) => string
-  /** ...or what it does when pressed (RA opens its window). */
-  onSelect?: (a: T) => void
+  /** The achievement's window, opened by pressing its badge (every platform, #164): pinning is done there. */
+  detail?: (a: T, shown: BadgeShown, onClose: () => void) => ReactNode
   badgeSize?: 40 | 48
   /** Show only this many until asked for the rest (a card on a list page). */
   limit?: number
@@ -34,7 +33,6 @@ export type BadgeGridProps<T> = {
   /** Steam keeps a secret one's picture; the others stand it in. */
   keepSecretIcon?: boolean
   reveal?: BadgeReveal<T>
-  pins?: BadgePins<T>
   tip: (a: T, concealed: boolean) => BadgeTip
   /** Over a badge's corner (RA's missable mark). */
   corner?: (a: T) => ReactNode
@@ -46,14 +44,14 @@ export type BadgeGridProps<T> = {
 
 /**
  * A game's achievements as a grid of badges, the same on every platform: earned ones ringed, locked ones
- * greyed, a tooltip on hover or focus, a star to pin, an eye on a secret one, and a cap with "show all".
- * The platform's adapter says what each badge is called, where it goes and what its tooltip says.
+ * greyed, a tooltip on hover or focus, an eye on a secret one, a cap with "show all", and the achievement's
+ * window when a badge is pressed. The platform's adapter says what each badge is called, what its tooltip
+ * says and which window it opens.
  */
 export default function BadgeGrid<T>({
   items,
   keyOf,
-  href,
-  onSelect,
+  detail,
   badgeSize = 48,
   limit,
   name,
@@ -64,7 +62,6 @@ export default function BadgeGrid<T>({
   secret,
   keepSecretIcon = false,
   reveal,
-  pins,
   tip,
   corner,
   sections,
@@ -72,10 +69,16 @@ export default function BadgeGrid<T>({
 }: BadgeGridProps<T>) {
   const { tip: shownTip, show, hide } = useBadgeTooltip<T>()
   const [showAll, setShowAll] = useState(false)
+  const [selected, setSelected] = useState<T | null>(null)
   const { visible: shown, capped } = capList(items, limit ?? Infinity, showAll)
   const dims = BADGE_SIZES[badgeSize]
 
   const isConcealed = (a: T) => !!secret?.(a) && !reveal?.isRevealed(a)
+  const iconOf = (a: T, concealed: boolean) => (concealed && !keepSecretIcon ? null : icon(a))
+  const shownOf = (a: T): BadgeShown => {
+    const concealed = isConcealed(a)
+    return { concealed, title: name(a, concealed), text: tip(a, concealed).description, iconUrl: iconOf(a, concealed) }
+  }
   const parts = sections ? sections.split(shown) : [{ id: '', items: shown }]
 
   const list = (part: BadgeSection<T>) => (
@@ -86,16 +89,14 @@ export default function BadgeGrid<T>({
         return (
           <BadgeGridBadge
             key={keyOf(a)}
-            href={href?.(a)}
-            onSelect={onSelect && (() => onSelect(a))}
+            onSelect={detail && (() => setSelected(a))}
             label={label(a, text)}
             ring={ring?.(a)}
             earned={earned(a)}
-            iconUrl={concealed && !keepSecretIcon ? null : icon(a)}
+            iconUrl={iconOf(a, concealed)}
             size={badgeSize}
             corner={corner?.(a)}
             eye={reveal && secret?.(a) ? { revealed: reveal.isRevealed(a), onToggle: () => reveal.toggle(a), labels: reveal.labels } : undefined}
-            pin={pins?.canPin ? { pinned: pins.isPinned(a), title: text, onToggle: () => pins.toggle(a) } : undefined}
             onShow={(x, y, delay) => show(a, x, y, delay)}
             onHide={hide}
           />
@@ -129,6 +130,10 @@ export default function BadgeGrid<T>({
           {details.date && <p className="text-xs text-text-secondary mt-1">{details.date}</p>}
         </CursorTooltip>
       )}
+
+      <AnimatePresence>
+        {detail && selected && <Fragment key={keyOf(selected)}>{detail(selected, shownOf(selected), () => setSelected(null))}</Fragment>}
+      </AnimatePresence>
     </>
   )
 }

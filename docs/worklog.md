@@ -55,6 +55,10 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   beat the pin star's `absolute` on a badge's corner, so the star sat under the badge and each badge was 60 px tall. Only
   PSN, Steam and Xbox grids pass `pins` (RA pins from its detail modal), so only they showed it, and only on your own pages.
   `ToggleButton` now positions itself only when the caller does not. `BadgeGrid` also wraps with `content-start`.
+- Badges open a window on every platform (the owner's pick, 2026-11-19): `BadgeGrid` takes `detail` and keeps the open one; RA
+  opens `AchievementModal`, Steam/PSN/Xbox `BadgeGridDetail` (the table's `AchievementTableDetail`). The corner star and the
+  badge links to the game page are gone (`href`, `pins` and `BadgePins` removed); the tags each platform adds live in
+  `hooks/useDetailOptions.tsx`, read by the table and the grid.
 - 7: `--figure-mark` (`"/"` slanted, `none` round) and `FIGURE_MARK` for the mark between bare figures; `Tabs` and `Facts` keep `--mark`.
   CLAUDE.md, `docs/design-system.md` and the `/design` catalogue say so.
 

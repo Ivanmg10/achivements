@@ -2,13 +2,14 @@
 
 import { memo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSubject } from '@/context/SubjectContext'
 import { formatDate } from '@/utils/dates'
-import { gameHref } from '@/utils/gameRef'
-import { BASE_GROUP, psnTrophyAnchor, trophiesByGroup, TROPHY_GRADE_COLOR, TROPHY_GRADE_RING } from '@/utils/psnTitles'
+import { psnCompareItem } from '@/utils/gameCompare'
+import { usePsnDetailOptions } from '@/hooks/useDetailOptions'
+import { BASE_GROUP, trophiesByGroup, TROPHY_GRADE_COLOR, TROPHY_GRADE_RING } from '@/utils/psnTitles'
 import BadgeGrid from '@/components/badge-grid/BadgeGrid'
 import BadgeRarity from '@/components/badge-grid/badge-tip-parts/BadgeRarity'
 import BadgeEarnedChip from '@/components/badge-grid/badge-tip-parts/BadgeEarnedChip'
+import BadgeGridDetail from '@/components/badge-grid/badge-grid-detail/BadgeGridDetail'
 import PsnTrophyGridGroup from './psn-trophy-grid-group/PsnTrophyGridGroup'
 import { useRevealed } from '@/hooks/useRevealed'
 import { usePsnRevealHidden } from '@/hooks/usePsnRevealHidden'
@@ -41,8 +42,8 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
   limit?: number
 }) {
   const { T, lang } = useLanguage()
-  const subject = useSubject()
   const { pins } = useAchievementPins(PSN_PINS, gameId, gameTitle)
+  const options = usePsnDetailOptions(groups, gameTitle)
   const reveal = useRevealed(usePsnRevealHidden()[0], PSN_PINS.idOf)
 
   const groupName = (id: string) => (id === BASE_GROUP ? T.psn.baseGame : (groups.find((g) => g.id === id)?.name ?? id))
@@ -51,7 +52,9 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
     <BadgeGrid<PsnTrophy>
       items={trophies}
       keyOf={(t) => t.id}
-      href={(t) => `${gameHref('psn', gameId, subject)}#${psnTrophyAnchor(t.id)}`}
+      detail={(t, shown, onClose) => (
+        <BadgeGridDetail item={t} shown={shown} source="psn" gameId={gameId} gameTitle={gameTitle} toRow={psnCompareItem} pins={pins} options={options} onClose={onClose} />
+      )}
       badgeSize={badgeSize}
       limit={limit}
       name={(t, concealed) => (concealed ? T.psn.hiddenTrophy : t.name)}
@@ -61,7 +64,6 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
       icon={(t) => t.iconUrl || null}
       secret={(t) => t.hidden && !t.earned}
       reveal={{ ...reveal, labels: { reveal: T.psn.revealTrophy, conceal: T.psn.concealTrophy } }}
-      pins={pins}
       tip={(t, concealed) => ({
         description: concealed ? T.psn.hiddenTrophyDesc : t.detail,
         chips: (

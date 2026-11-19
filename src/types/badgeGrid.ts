@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { PinControl, RevealControl } from '@/types/achievementTable'
+import type { RevealControl } from '@/types/achievementTable'
 
 /** The details a badge shows when it is hovered or focused: what it is, and its facts as chips. */
 export type BadgeTip = {
@@ -10,8 +10,8 @@ export type BadgeTip = {
   date?: string | null
 }
 
-/** The viewer's pins on this game: a star in a badge's corner. */
-export type BadgePins<T> = Pick<PinControl<T>, 'canPin' | 'isPinned' | 'toggle'>
+/** A badge as its window opens it: the stand-ins of a secret one still hidden, or the real name and text. */
+export type BadgeShown = { concealed: boolean; title: string; text: string; iconUrl: string | null }
 
 /** The eye on a badge whose text is a secret until earned. */
 export type BadgeReveal<T> = Pick<RevealControl<T>, 'isRevealed' | 'toggle'> & {

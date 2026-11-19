@@ -1,7 +1,6 @@
 'use client'
 
 import { memo, useEffect, useState } from 'react'
-import { AnimatePresence } from 'framer-motion'
 import { IconAlertTriangle } from '@tabler/icons-react'
 import dynamic from 'next/dynamic'
 import { RetroAchievement } from '@/types/types'
@@ -54,7 +53,6 @@ export const AchievementGrid = memo(function AchievementGrid({
   limit?: number
 }) {
   const { T, lang } = useLanguage()
-  const [selected, setSelected] = useState<RetroAchievement | null>(null)
   // The badge set whose images have loaded. Keyed by the badges, not the array:
   // a parent re-rendering hands over a new array of the same achievements, and
   // treating that as new sent the grid back to its skeleton, over and over.
@@ -111,7 +109,17 @@ export const AchievementGrid = memo(function AchievementGrid({
       <BadgeGrid<RetroAchievement>
         items={achievements}
         keyOf={(a) => a.ID}
-        onSelect={setSelected}
+        detail={(a, _shown, onClose) => (
+          <AchievementModal
+            achievement={a}
+            numDistinctPlayers={numDistinctPlayers}
+            onClose={onClose}
+            gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
+            gameTitle={gameTitle}
+            isFavorited={pins.isPinned(a)}
+            onToggleFavorite={() => pins.toggle(a)}
+          />
+        )}
         badgeSize={badgeSize}
         limit={limit}
         loading={!allLoaded}
@@ -148,20 +156,6 @@ export const AchievementGrid = memo(function AchievementGrid({
           }
         }}
       />
-
-      <AnimatePresence>
-        {selected && (
-          <AchievementModal
-            achievement={selected}
-            numDistinctPlayers={numDistinctPlayers}
-            onClose={() => setSelected(null)}
-            gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
-            gameTitle={gameTitle}
-            isFavorited={pins.isPinned(selected)}
-            onToggleFavorite={() => pins.toggle(selected)}
-          />
-        )}
-      </AnimatePresence>
     </>
   )
 })

@@ -1,4 +1,8 @@
 jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
+jest.mock('@/components/achievement-detail-modal/AchievementDetailModal', () => ({
+  __esModule: true,
+  default: ({ title, tags }: { title: string; tags?: React.ReactNode }) => <div role="dialog" aria-label={title}>{tags}</div>,
+}))
 
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { SteamAchievementGrid } from './SteamAchievementGrid'
@@ -26,7 +30,7 @@ function ach(overrides: Partial<SteamAchievementUnified> = {}): SteamAchievement
 }
 
 const hover = () => {
-  fireEvent.mouseEnter(screen.getByRole('link'), { clientX: 10, clientY: 10 })
+  fireEvent.mouseEnter(screen.getByRole('button'), { clientX: 10, clientY: 10 })
   act(() => { jest.advanceTimersByTime(450) })
 }
 
@@ -37,16 +41,18 @@ beforeEach(() => {
 })
 afterEach(() => jest.useRealTimers())
 
-test('each badge links to its achievement on the game page, and pins against that game', () => {
-  render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
-  expect(screen.getByRole('link')).toHaveAttribute('href', '/steamGame/620#ach-WIN')
+test('a badge opens its window (with the online flag), and pins against that game', async () => {
+  render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach({ likelyOnline: true })]} />)
+  jest.useRealTimers()
+  fireEvent.click(screen.getByRole('button'))
+  expect(await screen.findByRole('dialog', { name: 'Win a Match' })).toHaveTextContent(en.steam.likelyOnline)
   expect(useAchievementPins).toHaveBeenCalledWith(STEAM_PINS, 620, 'Portal 2')
 })
 
 test('a badge with no image is a placeholder, not a broken picture', () => {
   const { container } = render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach({ badgeUrl: '' })]} />)
   expect(container.querySelector('img')).toBeNull()
-  expect(screen.getAllByRole('link')).toHaveLength(1)
+  expect(screen.getAllByRole('button')).toHaveLength(1)
 })
 
 test('supports the smaller 40px size', () => {
@@ -72,7 +78,7 @@ test('the tooltip omits the rarity when Steam gave none', () => {
 test('a secret achievement keeps its picture, since Steam gives it, but not its text', () => {
   const { container } = render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach({ hidden: true, title: 'Spoiler' })]} />)
   expect(container.querySelector('img')).not.toBeNull()
-  expect(screen.getByRole('link', { name: `${en.steam.hiddenAchievement} — ${en.steam.locked}` })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: `${en.steam.hiddenAchievement} — ${en.steam.locked}` })).toBeInTheDocument()
 })
 
 test('the tooltip flags an achievement that probably needs online play', () => {
