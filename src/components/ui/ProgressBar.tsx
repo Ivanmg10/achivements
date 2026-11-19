@@ -15,6 +15,7 @@ export function ProgressBar({
   pct,
   softPct = 0,
   label,
+  valueText,
   trackClass = 'bg-ink/10',
   height = 'h-1.5',
   className = '',
@@ -25,6 +26,8 @@ export function ProgressBar({
   softPct?: number
   /** Accessible name, e.g. the game title. */
   label: string
+  /** What the value means in words (`aria-valuetext`), when a bare number would not say it. */
+  valueText?: string
   trackClass?: string
   height?: string
   className?: string
@@ -42,6 +45,7 @@ export function ProgressBar({
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(shown)}
+      aria-valuetext={valueText}
       data-complete={done || undefined}
       // Only a finished bar glows.
       className={`relative block w-full ${height} ${done ? 'drop-shadow-done' : ''} ${className}`}
@@ -50,14 +54,14 @@ export function ProgressBar({
         {soft > value && (
           <span
             data-fill="soft"
-            className="absolute inset-y-0 left-0 bg-progress-soft transition-[width] duration-500"
+            className="absolute inset-y-0 left-0 bg-progress-soft transition-[width] duration-500 motion-reduce:transition-none"
             style={{ width: `${soft}%`, borderRadius: 'var(--bar-radius)' }}
           />
         )}
         {value > 0 && (
           <span
             data-fill="main"
-            className="absolute inset-y-0 left-0 bg-progress transition-[width] duration-500"
+            className="absolute inset-y-0 left-0 bg-progress transition-[width] duration-500 motion-reduce:transition-none"
             style={
               value >= 100
                 ? { width: '100%', background: 'linear-gradient(90deg, rgb(var(--progress)), color-mix(in oklab, rgb(var(--progress)) 55%, white))' }

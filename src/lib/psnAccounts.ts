@@ -25,7 +25,7 @@ export type PsnSecrets = { npsso: string | null; tokens: PsnTokens | null }
 export type PoolAccount = { id: number; label: string; ratePerMin: number }
 export type PsnLease = { account: PoolAccount; slot: number }
 /** How a call went, for the account's health and its stats. */
-export type PsnOutcome = 'ok' | 'rate-limited' | 'auth' | 'server'
+export type PsnOutcome = 'ok' | 'forbidden' | 'rate-limited' | 'auth' | 'server'
 /** Whether a call can find an account: none set up, all slots taken for a moment, or none usable now. */
 export type PsnPoolState = 'empty' | 'busy' | 'resting'
 
@@ -82,7 +82,7 @@ export async function npssoExpiry(npsso: string): Promise<number | null> {
  * so a weight of 2 is picked about twice as often), and an account with more free slots has more chances.
  * Null when none is free; two instances racing for one slot get it once.
  */
-export async function leasePsnAccount(exclude: number[]): Promise<PsnLease | null> {
+export async function leasePsnAccount(exclude: number[], single = false): Promise<PsnLease | null> {
   const { rows } = await pool.query(
     `WITH pick AS (
        SELECT a.id, s.slot
@@ -93,6 +93,8 @@ export async function leasePsnAccount(exclude: number[]): Promise<PsnLease | nul
           AND (a.cooldown_until IS NULL OR a.cooldown_until <= NOW())
           AND (l.leased_until IS NULL OR l.leased_until < NOW())
           AND NOT (a.id = ANY($1::int[]))
+          -- PSN_POOL_ENABLED=false (#180): the oldest active account only, as before the pool.
+          AND (NOT $3 OR a.id = (SELECT MIN(id) FROM psn_service_accounts WHERE status = 'active' AND npsso IS NOT NULL))
         ORDER BY -LN(1 - random()) / a.weight
         LIMIT 1
      ), leased AS (
@@ -104,10 +106,19 @@ export async function leasePsnAccount(exclude: number[]): Promise<PsnLease | nul
      )
      SELECT l.account_id, l.slot, a.label, a.rate_per_min
        FROM leased l JOIN psn_service_accounts a ON a.id = l.account_id`,
-    [exclude, LEASE_SECONDS],
+    [exclude, LEASE_SECONDS, single],
   )
   const row = rows[0]
   return row ? { account: { id: row.account_id, label: row.label, ratePerMin: row.rate_per_min }, slot: row.slot } : null
+}
+
+/** The calls a minute the usable accounts may make between them (#180: the sync's ETA); 0 when none can read Sony. */
+export async function psnUsableRate(): Promise<number> {
+  const { rows } = await pool.query(
+    `SELECT COALESCE(SUM(rate_per_min), 0)::int AS rate FROM psn_service_accounts
+      WHERE status = 'active' AND npsso IS NOT NULL AND (cooldown_until IS NULL OR cooldown_until <= NOW())`,
+  )
+  return rows[0]?.rate ?? 0
 }
 
 /** Why no slot was free, leaving out `exclude`. */
@@ -130,32 +141,40 @@ export async function releasePsnLease(lease: PsnLease): Promise<void> {
 
 /**
  * Gives the slot back and records how the call went: an answer resets the account's failures; Sony's
- * "too many requests" twice in a row rests the account for a minute, doubling up to five.
+ * "too many requests" twice in a row rests the account for a minute, doubling up to five. A hidden profile
+ * (`forbidden`) is an answer, counted apart (#180). With `call`, the minute's count for its function and the
+ * call's time (psn_timings, for the p95s) go in the same statement.
  */
-export async function finishPsnLease(lease: PsnLease, outcome: PsnOutcome): Promise<void> {
+export async function finishPsnLease(lease: PsnLease, outcome: PsnOutcome, call?: { fn: string; ms: number }): Promise<void> {
   await pool.query(
     `WITH freed AS (
        DELETE FROM psn_account_leases WHERE account_id = $1 AND slot = $2
      ), account AS (
        UPDATE psn_service_accounts SET
          last_used_at = NOW(),
-         last_ok_at = CASE WHEN $3 = 'ok' THEN NOW() ELSE last_ok_at END,
-         last_error = CASE WHEN $3 = 'ok' THEN NULL ELSE $3 END,
-         failure_count = CASE WHEN $3 = 'ok' THEN 0 WHEN $3 = 'rate-limited' THEN failure_count + 1 ELSE failure_count END,
+         last_ok_at = CASE WHEN $3 IN ('ok', 'forbidden') THEN NOW() ELSE last_ok_at END,
+         last_error = CASE WHEN $3 IN ('ok', 'forbidden') THEN NULL ELSE $3 END,
+         failure_count = CASE WHEN $3 IN ('ok', 'forbidden') THEN 0 WHEN $3 = 'rate-limited' THEN failure_count + 1 ELSE failure_count END,
          cooldown_until = CASE WHEN $3 = 'rate-limited' AND failure_count >= 1
                                THEN NOW() + make_interval(secs => LEAST(300, 60 * POWER(2, failure_count - 1)))
                                ELSE cooldown_until END
        WHERE id = $1
+     ), timed AS (
+       INSERT INTO psn_timings (kind, account_id, ms, ok) SELECT 'sony', $1, $5, $3 IN ('ok', 'forbidden') WHERE $5::int IS NOT NULL
      )
-     INSERT INTO psn_account_stats (account_id, minute, calls, ok, rate_limited, auth_errors, server_errors)
-     VALUES ($1, date_trunc('minute', NOW()), 1, ($3 = 'ok')::int, ($3 = 'rate-limited')::int, ($3 = 'auth')::int, ($3 = 'server')::int)
+     INSERT INTO psn_account_stats (account_id, minute, calls, ok, rate_limited, auth_errors, server_errors, forbidden, by_fn)
+     VALUES ($1, date_trunc('minute', NOW()), 1, ($3 = 'ok')::int, ($3 = 'rate-limited')::int, ($3 = 'auth')::int, ($3 = 'server')::int,
+             ($3 = 'forbidden')::int, CASE WHEN $4::text IS NULL THEN '{}'::jsonb ELSE jsonb_build_object($4::text, 1) END)
      ON CONFLICT (account_id, minute) DO UPDATE SET
        calls = psn_account_stats.calls + 1,
        ok = psn_account_stats.ok + EXCLUDED.ok,
        rate_limited = psn_account_stats.rate_limited + EXCLUDED.rate_limited,
        auth_errors = psn_account_stats.auth_errors + EXCLUDED.auth_errors,
-       server_errors = psn_account_stats.server_errors + EXCLUDED.server_errors`,
-    [lease.account.id, lease.slot, outcome],
+       server_errors = psn_account_stats.server_errors + EXCLUDED.server_errors,
+       forbidden = psn_account_stats.forbidden + EXCLUDED.forbidden,
+       by_fn = CASE WHEN $4::text IS NULL THEN psn_account_stats.by_fn
+                    ELSE psn_account_stats.by_fn || jsonb_build_object($4::text, COALESCE((psn_account_stats.by_fn ->> $4::text)::int, 0) + 1) END`,
+    [lease.account.id, lease.slot, outcome, call?.fn ?? null, call ? Math.round(call.ms) : null],
   )
 }
 
@@ -430,6 +449,8 @@ export async function tidyPsnPool(): Promise<void> {
         AND NOT EXISTS (SELECT 1 FROM psn_account_leases l WHERE l.account_id = a.id AND l.leased_until > NOW())`,
   )
   await pool.query(`DELETE FROM psn_account_stats WHERE minute < NOW() - INTERVAL '14 days'`)
+  // The p95s read the last hour; two days are kept to look back on a bad night (#180).
+  await pool.query(`DELETE FROM psn_timings WHERE at < NOW() - INTERVAL '2 days'`)
 }
 
 export async function markPsnWarned(ids: number[]): Promise<void> {

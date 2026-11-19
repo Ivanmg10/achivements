@@ -44,7 +44,18 @@ export function quarantinedText(label: string): string {
 }
 
 export function rateLimitedText(pct: number, calls: number): string {
-  return `Sony ha rechazado por exceso de peticiones el ${number(pct)} % de las ${number(calls)} llamadas de la última hora.`
+  return `Sony ha rechazado por exceso de peticiones el ${number(pct)} % de las ${number(calls)} llamadas de los últimos 5 minutos.`
+}
+
+/** The queue's lag p95 (ms) above 15 minutes: syncs start late. */
+export function queueSlowText(lagMs: number, due: number): string {
+  const minutes = Math.round(lagMs / 60_000)
+  return `La cola de sincronización va con retraso: el 95 % de los trabajos empieza en menos de ${number(minutes)} min, y hay ${number(due)} esperando. Si no baja, mira el runbook (docs/platforms/psn.md).`
+}
+
+/** A PSN page read's p95 (ms) above 1 s. */
+export function readsSlowText(p95Ms: number, reads: number): string {
+  return `Las páginas de PSN van lentas: el 95 % de las ${number(reads)} lecturas de los últimos 15 minutos tardó menos de ${number(p95Ms)} ms, por encima de 1 s.`
 }
 
 /** Fewer than two accounts can read Sony, out of the ones meant to be serving. */

@@ -2,6 +2,7 @@ jest.mock('@/context/PsnGamesDataContext', () => ({ usePsnGamesData: jest.fn() }
 jest.mock('@/hooks/usePsnRecentTrophies', () => ({
   usePsnRecentTrophies: jest.fn(() => ({ trophies: [], isLoading: false, error: null, retry: jest.fn() })),
 }))
+jest.mock('@/hooks/usePsnSync', () => ({ usePsnSync: jest.fn(() => ({ sync: null, error: false, refresh: jest.fn() })) }))
 jest.mock('../main-page-profile-psn-game/MainPageProfilePsnGame', () => ({
   __esModule: true,
   default: ({ game }: { game: { title: string } }) => <div data-testid="game">{game.title}</div>,
@@ -15,6 +16,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import MainPageProfilePsnLinked from './MainPageProfilePsnLinked'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { usePsnRecentTrophies } from '@/hooks/usePsnRecentTrophies'
+import { usePsnSync } from '@/hooks/usePsnSync'
 import { en } from '@/translations/en'
 import type { PsnSummary } from '@/lib/psnClient'
 
@@ -58,4 +60,20 @@ test('the latest trophies leave out the games on the consoles unticked in prefer
   render(<MainPageProfilePsnLinked summary={SUMMARY} isLoading={false} error={null} onRetry={jest.fn()} />)
   expect(screen.getByTestId('trophies')).toHaveTextContent(/^2$/)
   window.localStorage.clear()
+})
+
+test('the first sync: what is happening above the skeleton; the refresh button asks for a sync (#180)', () => {
+  const refresh = jest.fn()
+  ;(usePsnSync as jest.Mock).mockReturnValue({
+    sync: { stage: 'syncing_core', steps: { trophies: 'active', library: 'waiting', playtime: 'waiting', history: 'waiting' }, progress: 0, games: { read: 0, total: 0 }, etaSeconds: 5, position: null, stale: false, trouble: null, syncedAt: null, nextSyncAt: null },
+    error: false,
+    refresh,
+  })
+  const { unmount } = render(<MainPageProfilePsnLinked summary={null} isLoading error={null} onRetry={jest.fn()} />)
+  expect(screen.getByRole('status', { name: '' }).textContent ?? '').toContain(en.psn.sync.core)
+  unmount()
+  ;(usePsnSync as jest.Mock).mockReturnValue({ sync: null, error: false, refresh })
+  render(<MainPageProfilePsnLinked summary={SUMMARY} isLoading={false} error={null} onRetry={jest.fn()} />)
+  fireEvent.click(screen.getByRole('button', { name: en.profileRa.refreshData }))
+  expect(refresh).toHaveBeenCalled()
 })

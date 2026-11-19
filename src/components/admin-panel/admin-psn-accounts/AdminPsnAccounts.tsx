@@ -13,6 +13,7 @@ import { SURFACE } from '@/components/ui/surface'
 import { Skeleton } from '@/components/ui/Skeleton'
 import AdminPsnAccountRow, { type PsnRowAction } from '../admin-psn-account-row/AdminPsnAccountRow'
 import AdminPsnPoolSummary from '../admin-psn-pool-summary/AdminPsnPoolSummary'
+import AdminPsnPoolMetrics from '../admin-psn-pool-metrics/AdminPsnPoolMetrics'
 
 const AdminPsnRenewModal = dynamic(() => import('../admin-psn-renew-modal/AdminPsnRenewModal'), { loading: () => null })
 const DeleteConfirmDialog = dynamic(() => import('@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'), { loading: () => null })
@@ -103,6 +104,7 @@ export default function AdminPsnAccounts() {
               <AdminPsnAccountRow key={a.id} account={a} crowded={status.pool.crowded.includes(a.id)} busy={busy === a.id} now={loadedAt} onAction={(action) => handleAction(a, action)} />
             ))}
           </ul>
+          {status.metrics && <AdminPsnPoolMetrics metrics={status.metrics} accounts={status.accounts} switches={status.switches} now={loadedAt} />}
         </>
       )}
 

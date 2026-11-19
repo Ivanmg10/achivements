@@ -2,9 +2,9 @@ import { useCallback, useState } from 'react'
 import { useSession } from 'next-auth/react'
 
 /** Why a link attempt failed, as /api/psn/link reports it. Keys of T.psn.errors. */
-export type PsnError = 'invalid-username' | 'not-found' | 'private' | 'not-configured' | 'failed'
+export type PsnError = 'invalid-username' | 'not-found' | 'private' | 'not-configured' | 'paused' | 'failed'
 
-const KNOWN: PsnError[] = ['invalid-username', 'not-found', 'private', 'not-configured', 'failed']
+const KNOWN: PsnError[] = ['invalid-username', 'not-found', 'private', 'not-configured', 'paused', 'failed']
 
 /** Reads the `{ error }` code from a failed PSN response; anything unexpected is 'failed'. */
 export async function psnErrorFrom(res: Response): Promise<PsnError> {

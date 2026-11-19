@@ -44,6 +44,9 @@ export const fakePsnStore = {
     const a = accounts.find((x) => ready(x, exclude))
     return a ? { account: { id: a.id, label: a.label, ratePerMin: a.ratePerMin }, slot: 0 } : null
   },
+  async psnUsableRate() {
+    return accounts.filter((a) => ready(a, [])).reduce((sum, a) => sum + a.ratePerMin, 0)
+  },
   async psnPoolState(exclude: number[] = []) {
     if (!accounts.some((a) => a.npsso)) return 'empty'
     return accounts.some((a) => ready(a, exclude)) ? 'busy' : 'resting'
@@ -52,7 +55,7 @@ export const fakePsnStore = {
   async finishPsnLease(lease: PsnLease, outcome: PsnOutcome) {
     const a = find(lease.account.id)
     a.outcomes.push(outcome)
-    if (outcome === 'ok') a.failures = 0
+    if (outcome === 'ok' || outcome === 'forbidden') a.failures = 0
     if (outcome === 'rate-limited' && ++a.failures >= 2) a.cooldownUntil = Date.now() + 60_000
   },
   async lockPsnTokens(id: number, decide: (s: PsnSecrets) => Promise<PsnTokens>) {

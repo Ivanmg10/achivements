@@ -6,6 +6,7 @@ import { igdbDetails } from '@/lib/igdbClient'
 import { cachedJson } from '@/lib/httpCache'
 import { TTL } from '@/lib/steamCache'
 import { isPsnTitleId } from '@/utils/psnTitles'
+import { timedPsnRead } from '@/lib/psnMetrics'
 
 /**
  * A PSN game page's facts — summary, studios, genres, release date,
@@ -14,7 +15,7 @@ import { isPsnTitleId } from '@/utils/psnTitles'
  * text from the request. 404 when IGDB is not set up or knows no match: the
  * page simply has no details, as for a delisted Steam game.
  */
-export async function GET(req: NextRequest) {
+export const GET = timedPsnRead(async function GET(req: NextRequest) {
   const auth = await requirePsnSession(req)
   if (!auth.ok) return auth.response
   const { id: userId, psnaccountid } = auth.session
@@ -38,4 +39,4 @@ export async function GET(req: NextRequest) {
     console.error('[psn/details]', titleId, err)
     return NextResponse.json({ error: 'details-unavailable' }, { status: 503 })
   }
-}
+})

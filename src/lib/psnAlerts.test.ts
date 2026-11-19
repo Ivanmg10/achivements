@@ -8,6 +8,7 @@ import { prePoolStatus, psnPoolStatus } from '@/lib/psnPoolStatus'
 import { sendTelegram } from '@/lib/telegram'
 import { dueAlerts, sendPsnAlerts } from './psnAlerts'
 import { DAY_MS, NOW, psnAccount, psnStatus } from '@/test-utils/psnPoolFixtures'
+import type { PsnMetrics } from '@/types/psnPool'
 
 const query = pool.query as jest.Mock
 const kinds = (status = psnStatus([])) => dueAlerts(status, NOW).map((a) => `${a.kind.replace(/-\d{4}-\d\d-\d\d$/, '')}:${a.accountId}`)
@@ -49,10 +50,27 @@ describe('what is due', () => {
     expect(kinds(psnStatus([psnAccount({ status: 'quarantined' })]))).toEqual(['quarantined:1'])
   })
 
-  test('too many 429s, once there are calls enough to say so', () => {
-    expect(kinds(psnStatus([psnAccount({ callsLastHour: 100, rateLimitedLastHour: 6 })]))).toEqual(['rate-limited:0'])
-    expect(kinds(psnStatus([psnAccount({ callsLastHour: 100, rateLimitedLastHour: 5 })]))).toEqual([])
-    expect(kinds(psnStatus([psnAccount({ callsLastHour: 10, rateLimitedLastHour: 9 })]))).toEqual([])
+  describe('from the numbers (#180)', () => {
+    const QUIET: PsnMetrics = { accounts: [], calls5m: 0, rateLimited5m: 0, sonyP95Ms: null, readP95Ms: null, reads15m: 0, readsServedPct: null, queue: { due: 0, queued: 0, running: 0, lagP95Ms: null, lagSamples: 0 } }
+    const withMetrics = (m: Partial<PsnMetrics>) => ({ ...psnStatus([psnAccount()]), metrics: { ...QUIET, ...m } })
+
+    test('429s above 1 % in the last 5 minutes, once there are calls enough to say so', () => {
+      expect(kinds(withMetrics({ calls5m: 100, rateLimited5m: 2 }))).toEqual(['rate-limited:0'])
+      expect(kinds(withMetrics({ calls5m: 100, rateLimited5m: 1 }))).toEqual([])
+      expect(kinds(withMetrics({ calls5m: 10, rateLimited5m: 9 }))).toEqual([])
+    })
+
+    test('the queue late by more than 15 minutes at p95, with jobs enough', () => {
+      expect(kinds(withMetrics({ queue: { ...QUIET.queue, lagP95Ms: 16 * 60_000, lagSamples: 5, due: 30 } }))).toEqual(['queue-slow:0'])
+      expect(kinds(withMetrics({ queue: { ...QUIET.queue, lagP95Ms: 16 * 60_000, lagSamples: 2 } }))).toEqual([])
+      expect(kinds(withMetrics({ queue: { ...QUIET.queue, lagP95Ms: 10 * 60_000, lagSamples: 50 } }))).toEqual([])
+    })
+
+    test('page reads slower than 1 s at p95, with reads enough', () => {
+      expect(kinds(withMetrics({ readP95Ms: 1200, reads15m: 40 }))).toEqual(['reads-slow:0'])
+      expect(kinds(withMetrics({ readP95Ms: 1200, reads15m: 5 }))).toEqual([])
+      expect(kinds(withMetrics({ readP95Ms: 800, reads15m: 400 }))).toEqual([])
+    })
   })
 
   test('fewer than two usable accounts: silent with one account by design, loud once two are meant to serve', () => {

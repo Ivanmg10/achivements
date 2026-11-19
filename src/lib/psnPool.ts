@@ -9,6 +9,7 @@ import {
   type PsnOutcome,
 } from '@/lib/psnAccounts'
 import { NOT_CONFIGURED, PsnBusyError, PsnError, TIMED_OUT } from '@/lib/psnErrors'
+import { psnPoolEnabled } from '@/lib/psnMode'
 import { forgetPsnAccountTokens } from '@/lib/psnTokens'
 
 /**
@@ -22,6 +23,8 @@ import { forgetPsnAccountTokens } from '@/lib/psnTokens'
  *   call runs on another.
  * - The account's own budget is spent: another account, at no cost to its health.
  * - A hidden profile, a profile that does not exist, anything else that is the profile's answer: never again.
+ *
+ * `PSN_POOL_ENABLED=false` (psnMode, #180) narrows it to the oldest active account, as before the pool.
  *
  * With one account (today) there is no other: after a 429 it waits 2 s and asks the same account once more,
  * and after a refused token it signs in again at once, as the single-account client did.
@@ -43,6 +46,7 @@ export function failureOf(err: unknown): Exclude<Failure, 'ok'> {
   if (err.isAuth) return 'auth'
   if (err.isRateLimited) return 'rate-limited'
   if (err.code === TIMED_OUT) return 'server'
+  if (err.isPrivate) return 'forbidden'
   return 'final'
 }
 
@@ -51,7 +55,7 @@ let seeding: Promise<void> | null = null
 /** A free slot on an account not in `exclude`, waiting a moment when the usable ones are all busy. */
 async function acquire(exclude: number[]): Promise<PsnLease | null> {
   for (let wait = 0; wait <= SLOT_WAITS; wait++) {
-    const lease = await leasePsnAccount(exclude)
+    const lease = await leasePsnAccount(exclude, !psnPoolEnabled())
     if (lease) return lease
     const state = await psnPoolState(exclude)
     if (state === 'resting') return null
@@ -82,33 +86,38 @@ async function nextLease(tried: number[], last: unknown): Promise<PsnLease | nul
 }
 
 /** Gives the slot back and records the call; a database hiccup here must not hide the call's own answer. */
-async function finish(lease: PsnLease, failure: Failure): Promise<void> {
+async function finish(lease: PsnLease, failure: Failure, call?: { fn: string; ms: number }): Promise<void> {
   try {
     if (failure === 'busy') return await releasePsnLease(lease)
     if (failure === 'auth') await forgetPsnAccountTokens(lease.account.id)
-    await finishPsnLease(lease, failure === 'final' ? 'ok' : failure)
+    await finishPsnLease(lease, failure === 'final' ? 'ok' : failure, call)
   } catch (err) {
     console.error('[psnPool] could not record the call', lease.account.label, err)
   }
 }
 
-/** Runs `work` (one request to Sony) on an account of the pool, moving to another when that one fails. */
-export async function withPsnAccount<T>(work: (account: PoolAccount) => Promise<T>): Promise<T> {
+/**
+ * Runs `work` (one request to Sony) on an account of the pool, moving to another when that one fails. With `fn`
+ * (psnCallStats' name), the account's minute counts it by function and its time is kept for the p95s (#180).
+ */
+export async function withPsnAccount<T>(work: (account: PoolAccount) => Promise<T>, fn?: string): Promise<T> {
   const tried: number[] = []
   let last: unknown = null
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     const lease = await nextLease(tried, last)
     if (!lease) break
     tried.push(lease.account.id)
+    const started = Date.now()
+    const timed = () => (fn ? { fn, ms: Date.now() - started } : undefined)
     try {
       const result = await work(lease.account)
-      await finish(lease, 'ok')
+      await finish(lease, 'ok', timed())
       return result
     } catch (err) {
       last = err
       const failure = failureOf(err)
-      await finish(lease, failure)
-      if (failure === 'final') throw err
+      await finish(lease, failure, failure === 'busy' ? undefined : timed())
+      if (failure === 'final' || failure === 'forbidden') throw err
     }
   }
   throw last ?? new PsnBusyError()

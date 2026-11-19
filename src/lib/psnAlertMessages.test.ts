@@ -4,7 +4,9 @@ import {
   npssoExpiringText,
   poolLowText,
   quarantinedText,
+  queueSlowText,
   rateLimitedText,
+  readsSlowText,
   syncFailuresText,
 } from './psnAlertMessages'
 import { DAY_MS, NOW, psnAccount, psnStatus } from '@/test-utils/psnPoolFixtures'
@@ -32,7 +34,14 @@ test('a quarantined account (its refresh and its NPSSO refused)', () => {
 })
 
 test('too many 429s, with the number in Spanish', () => {
-  expect(rateLimitedText(8.5, 1240)).toBe('Sony ha rechazado por exceso de peticiones el 8,5 % de las 1240 llamadas de la última hora.')
+  expect(rateLimitedText(8.5, 1240)).toBe('Sony ha rechazado por exceso de peticiones el 8,5 % de las 1240 llamadas de los últimos 5 minutos.')
+})
+
+test('a slow queue and slow page reads (#180)', () => {
+  expect(queueSlowText(20 * 60_000, 12)).toBe(
+    'La cola de sincronización va con retraso: el 95 % de los trabajos empieza en menos de 20 min, y hay 12 esperando. Si no baja, mira el runbook (docs/platforms/psn.md).',
+  )
+  expect(readsSlowText(1450, 300)).toBe('Las páginas de PSN van lentas: el 95 % de las 300 lecturas de los últimos 15 minutos tardó menos de 1450 ms, por encima de 1 s.')
 })
 
 test('fewer than two usable accounts', () => {

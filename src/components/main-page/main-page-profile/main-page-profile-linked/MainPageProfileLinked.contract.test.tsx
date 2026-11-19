@@ -2,6 +2,8 @@ jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn
 jest.mock('@/hooks/useSteamRecentAchievements', () => ({ useSteamRecentAchievements: jest.fn() }))
 jest.mock('@/context/PsnGamesDataContext', () => ({ usePsnGamesData: jest.fn() }))
 jest.mock('@/hooks/usePsnRecentTrophies', () => ({ usePsnRecentTrophies: jest.fn() }))
+// PSN's refresh asks for a sync and reads everything again when it ends (#180): here it ends at once.
+jest.mock('@/hooks/usePsnSync', () => ({ usePsnSync: (_on: boolean, onSynced: () => void) => ({ sync: null, error: false, refresh: async () => onSynced() }) }))
 jest.mock('@/context/XboxGamesDataContext', () => ({ useXboxGamesData: jest.fn() }))
 jest.mock('@/hooks/useXboxRecentAchievements', () => ({ useXboxRecentAchievements: jest.fn() }))
 jest.mock('../main-page-profile-st/main-page-profile-st-game/MainPageProfileStGame', () => ({ __esModule: true, default: () => <div data-testid="game" /> }))

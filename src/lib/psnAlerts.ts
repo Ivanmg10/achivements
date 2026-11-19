@@ -6,7 +6,9 @@ import {
   npssoExpiringText,
   poolLowText,
   quarantinedText,
+  queueSlowText,
   rateLimitedText,
+  readsSlowText,
   syncFailuresText,
   type PsnAlertEnv,
 } from '@/lib/psnAlertMessages'
@@ -17,8 +19,11 @@ import type { PsnPoolStatus } from '@/types/psnPool'
 
 /**
  * The PSN pool's alerts to the owner over Telegram (#178): a sign-in about to die (14, 7, 3 and 1 days, per
- * account), a quarantined account (its refresh and its NPSSO refused), too many 429s, fewer than two usable
- * accounts, failing syncs, and a daily digest after 09:00 UTC. The texts are in `psnAlertMessages.ts`.
+ * account), a quarantined account (its refresh and its NPSSO refused), fewer than two usable accounts, failing
+ * syncs, and a daily digest after 09:00 UTC. From the numbers (#180, psnMetrics): 429s above 1 % in the last 5
+ * minutes, the queue's lag p95 above 15 minutes, a PSN page read's p95 above 1 s. The texts are in
+ * `psnAlertMessages.ts`. They are checked when upkeep runs (after PSN traffic, at most every 15 minutes, and the
+ * daily cron), so "5 minutes" is the window looked at, not how often it is looked at (Hobby plan).
  *
  * Only production sends, one message per environment: production's pool tagged PRO and, when it can read it,
  * pre's tagged PRE (Vercel runs crons on production only). Pre and a local machine never send. Which alert went
@@ -31,9 +36,13 @@ type EnvResult = { sent: number; result: TelegramResult | 'nothing' | 'failed-to
 
 const NPSSO_STEPS = [1, 3, 7, 14]
 /** How long before the same alert may be sent again. An NPSSO step is keyed by the expiry, so it is sent once per sign-in. */
-const REPEAT_HOURS: Record<string, number> = { npsso: 24 * 90, quarantined: 24, 'rate-limited': 6, 'pool-low': 6, 'sync-failures': 6, digest: 20 }
-const RATE_LIMITED_PCT = 5
+const REPEAT_HOURS: Record<string, number> = { npsso: 24 * 90, quarantined: 24, 'rate-limited': 6, 'pool-low': 6, 'sync-failures': 6, 'queue-slow': 6, 'reads-slow': 6, digest: 20 }
+const RATE_LIMITED_PCT = 1
 const SYNC_FAILED_PCT = 5
+const QUEUE_LAG_MS = 15 * 60_000
+const READ_P95_MS = 1_000
+/** Jobs enough to speak of the queue's lag. */
+const MIN_JOBS = 5
 /** Too few calls or jobs to say anything about a rate. */
 const MIN_SAMPLE = 20
 const DIGEST_HOUR_UTC = 9
@@ -57,13 +66,25 @@ function accountAlerts({ accounts }: PsnPoolStatus, now: number): PsnAlert[] {
   })
 }
 
+/** What the numbers call for (#180): 429s, a slow queue, slow page reads. None before they are read. */
+function metricAlerts({ metrics: m }: PsnPoolStatus): PsnAlert[] {
+  if (!m) return []
+  const out: PsnAlert[] = []
+  const pct = m.calls5m > 0 ? Math.round((m.rateLimited5m / m.calls5m) * 1000) / 10 : 0
+  if (m.calls5m >= MIN_SAMPLE && pct > RATE_LIMITED_PCT) out.push({ kind: 'rate-limited', accountId: 0, text: rateLimitedText(pct, m.calls5m) })
+  if (m.queue.lagSamples >= MIN_JOBS && m.queue.lagP95Ms !== null && m.queue.lagP95Ms > QUEUE_LAG_MS) {
+    out.push({ kind: 'queue-slow', accountId: 0, text: queueSlowText(m.queue.lagP95Ms, m.queue.due) })
+  }
+  if (m.reads15m >= MIN_SAMPLE && m.readP95Ms !== null && m.readP95Ms > READ_P95_MS) {
+    out.push({ kind: 'reads-slow', accountId: 0, text: readsSlowText(m.readP95Ms, m.reads15m) })
+  }
+  return out
+}
+
 /** The alerts the pool's state calls for now, before deduplication. */
 export function dueAlerts(status: PsnPoolStatus, now = Date.now()): PsnAlert[] {
   const { pool: p, accounts } = status
-  const out = accountAlerts(status, now)
-  if (p.callsLastHour >= MIN_SAMPLE && p.rateLimitedPct > RATE_LIMITED_PCT) {
-    out.push({ kind: 'rate-limited', accountId: 0, text: rateLimitedText(p.rateLimitedPct, p.callsLastHour) })
-  }
+  const out = [...accountAlerts(status, now), ...metricAlerts(status)]
   // Silent while the pool is one account by design: only when two or more are meant to be serving.
   const serving = accounts.filter((a) => a.status === 'active' || a.status === 'quarantined').length
   if (serving >= 2 && p.usable < 2) out.push({ kind: 'pool-low', accountId: 0, text: poolLowText(p.usable, serving) })

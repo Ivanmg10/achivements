@@ -12,6 +12,12 @@ test('exposes its value to assistive tech', () => {
   expect(bar.getAttribute('aria-valuemax')).toBe('100')
 })
 
+test('says what the value means in words when asked, and its fill stays still under reduced motion', () => {
+  const { container } = render(<ProgressBar pct={48} label="PlayStation update" valueText="48 % done" />)
+  expect(screen.getByRole('progressbar').getAttribute('aria-valuetext')).toBe('48 % done')
+  expect(fill(container, 'main')!.className).toContain('motion-reduce:transition-none')
+})
+
 test('fills to the given percentage in the theme colour', () => {
   const { container } = render(<ProgressBar pct={30} label="x" />)
   expect(fill(container, 'main')?.style.width).toBe('30%')

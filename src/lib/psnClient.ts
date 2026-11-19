@@ -24,7 +24,8 @@ import { psnAuthorization } from '@/lib/psnTokens'
 import { avatarUrl, countTrophies, https, psnNumericId, psnPlatformName } from '@/utils/psnTitles'
 import { mapLimit } from '@/utils/utils'
 import type { PsnGameProgress, PsnTrophy, TrophyCounts } from '@/types/psn'
-import { PsnBusyError, PsnError, PsnSyncing, TIMED_OUT } from '@/lib/psnErrors'
+import { PAUSED, PsnBusyError, PsnError, PsnSyncing, TIMED_OUT } from '@/lib/psnErrors'
+import { psnMode } from '@/lib/psnMode'
 import { spendPsnCall } from '@/lib/psnBudget'
 import { needsBaseTrophies, withCompletion } from '@/lib/psnCompletion'
 import { psnBaseCompletedAt } from '@/utils/completionDates'
@@ -111,8 +112,10 @@ async function attempt<T>(account: PoolAccount, fn: PsnFunction, call: (auth: Au
  * profile or any other answer about the profile is thrown at once: retrying it helps no one.
  */
 export function psnCall<T>(fn: PsnFunction, call: (auth: AuthorizationPayload) => Promise<T>): Promise<T> {
+  // PSN_MODE=stale (#180): Sony is not called at all; pages serve the store.
+  if (psnMode() === 'stale') return Promise.reject(new PsnError('PSN is paused (PSN_MODE=stale)', PAUSED))
   maybeMaintainPsnPool()
-  return withPsnAccount((account) => attempt(account, fn, call))
+  return withPsnAccount((account) => attempt(account, fn, call), fn)
 }
 
 export { forgetPsnTokens } from '@/lib/psnTokens'
@@ -485,6 +488,9 @@ export function psnFailure(err: unknown, where: string): NextResponse {
   }
   if (err instanceof PsnError && err.notConfigured) {
     return NextResponse.json({ error: 'not-configured' }, { status: 503 })
+  }
+  if (err instanceof PsnError && err.isPaused) {
+    return NextResponse.json({ error: 'paused' }, { status: 503, headers: { 'Retry-After': '600' } })
   }
   if (err instanceof PsnError && err.isPrivate) {
     return NextResponse.json({ error: 'private' }, { status: 403 })

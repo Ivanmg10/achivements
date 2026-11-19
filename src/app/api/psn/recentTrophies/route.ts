@@ -4,6 +4,7 @@ import { requirePsnSession } from '@/lib/apiAuth'
 import { psnFailure, psnLanguage } from '@/lib/psnClient'
 import { psnLatestTrophies, psnRecentTrophies } from '@/lib/psnSnapshot'
 import { visibleGamesForUser } from '@/lib/gameVisibility'
+import { timedPsnRead } from '@/lib/psnMetrics'
 
 /** Days each scope looks back — the same windows as Steam's activity and year. */
 const DAYS = { activity: 60, year: 366 } as const
@@ -13,7 +14,7 @@ const DAYS = { activity: 60, year: 366 } as const
  * profile column; `activity` — the last 60 days, for the main page's charts;
  * `year` — the last year, for the streak and the heatmap.
  */
-export async function GET(req: NextRequest) {
+export const GET = timedPsnRead(async function GET(req: NextRequest) {
   const auth = await requirePsnSession(req)
   if (!auth.ok) return auth.response
   const { id, psnaccountid } = auth.session
@@ -35,4 +36,4 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     return psnFailure(err, 'psn/recentTrophies')
   }
-}
+})

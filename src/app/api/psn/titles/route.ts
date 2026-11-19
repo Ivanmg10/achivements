@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server'
 import { requirePsnSession } from '@/lib/apiAuth'
 import { psnFailure } from '@/lib/psnClient'
 import { psnLibrary } from '@/lib/psnSnapshot'
+import { timedPsnRead } from '@/lib/psnMetrics'
 
 /** Every game in the signed-in user's PSN trophy list, from the snapshot (202 before the first sync). */
-export async function GET(req?: Request) {
+export const GET = timedPsnRead(async function GET(req?: Request) {
   const auth = await requirePsnSession(req)
   if (!auth.ok) return auth.response
 
@@ -13,4 +14,4 @@ export async function GET(req?: Request) {
   } catch (err) {
     return psnFailure(err, 'psn/titles')
   }
-}
+})
