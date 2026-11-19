@@ -22,4 +22,5 @@ test('cuts its line to one, unless it wraps', () => {
   expect(screen.getByText('A long line')).toHaveClass('truncate')
   rerender(<ListRow media={null} title="T" sub="A long line" wrap />)
   expect(screen.getByText('A long line')).not.toHaveClass('truncate')
+  expect(screen.getByText('T')).not.toHaveClass('truncate')
 })
