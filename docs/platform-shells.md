@@ -13,7 +13,8 @@ column's glue (`MainPageProfileLinked`, `MainPageProfileRecentList`). Family 5 h
 its contract suite: the badge grid (`BadgeGrid`, generic over the platform's item like the table, with
 slots for what a badge is called, its ring, its tooltip and the window it opens (every badge is a button that opens
 its achievement window on all four platforms since #164: pinning is done there, never with a star on the badge; Steam,
-PSN and Xbox open , the same window as their table row, with the tags from ), and `LazyBadgeGrid` for the
+PSN and Xbox open `BadgeGridDetail`, the same window as their table row, with the tags from `hooks/useDetailOptions`),
+and `LazyBadgeGrid` for the
 grid's loading / failure / empty states), the feed row (`FeedGameCard`, a view model), the category
 section (`PlatformCategorySection`, the platform's hook result and its words) and the opened game
 (`GameExpandedLayout`). Family 8 put the account page's cards on one `UserPlatformCard` (identity as data, the
