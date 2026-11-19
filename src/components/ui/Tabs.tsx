@@ -26,7 +26,8 @@ const SIZES: Record<Size | 'rail', string> = {
 }
 
 const LISTS: Record<Size | Orientation, string> = {
-  horizontal: 'flex items-end gap-1 overflow-x-auto shadow-hairline-b',
+  // No scrollbar on a phone (#167): the fade says there is more.
+  horizontal: 'flex items-end gap-1 overflow-x-auto [scrollbar-width:none] shadow-hairline-b',
   // Beside the sections on a wide screen, a strip that scrolls on a narrow one.
   rail: 'flex lg:flex-col gap-1 overflow-x-auto snap-x lg:overflow-visible [scrollbar-width:none]',
   sm: '',

@@ -91,6 +91,8 @@ describe('Tabs', () => {
     const room = jest.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(300)
     const { unmount } = render(<Harness />)
     expect(screen.getByRole('tablist')).toHaveClass(scrollFadeClass({ start: false, end: true }))
+    // The fade says there is more: no scrollbar under the tabs on a phone (#167).
+    expect(screen.getByRole('tablist')).toHaveClass('[scrollbar-width:none]')
     unmount()
     wide.mockReturnValue(300)
     render(<Harness />)

@@ -54,7 +54,7 @@ export default function AchievementTableToolbar<F extends string, S extends stri
           placeholder={T.gameInfoTable.searchPlaceholder}
           value={query}
           onChange={(e) => onQuery(e.target.value)}
-          className="flex-1 lg:w-[16.25rem] lg:flex-none"
+          className="max-sm:order-first max-sm:basis-full flex-1 lg:w-[16.25rem] lg:flex-none"
         />
         <Select<S> look="button" size="sm" aria-label={T.gameInfoTable.sortLabel} value={sort} onChange={onSort} options={sortOptions} />
       </div>
