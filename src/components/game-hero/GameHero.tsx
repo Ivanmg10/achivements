@@ -1,9 +1,18 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import GameHeroTile, { type GameHeroTileData } from './game-hero-tile/GameHeroTile'
 import GameHeroCover, { type GameHeroCoverProps } from './game-hero-cover/GameHeroCover'
 
 export type GameHeroFact = { label: string; value: string | null | undefined }
+
+/**
+ * The title's size follows its column's width over its length (#167: a long
+ * title took four lines at 1280): about two lines' worth, never under 2rem,
+ * never over today's size (3rem on a phone, 4.75rem from lg), so a short title
+ * stays as big as it was.
+ */
+const TITLE_SIZE =
+  '[--title-max:3rem] lg:[--title-max:4.75rem] text-[length:clamp(2rem,calc(400cqi/var(--title-chars)),var(--title-max))]'
 
 /**
  * The top of every game page (RA, Steam, PlayStation, Xbox), as agreed on the
@@ -48,9 +57,14 @@ export default function GameHero({
     <section className="relative w-full px-4 sm:px-8 lg:px-14 pt-6 lg:pt-10 flex flex-col lg:flex-row gap-6 lg:gap-9 items-start">
       <GameHeroCover {...cover} />
 
-      <div className="flex-1 min-w-0 flex flex-col gap-3.5 lg:pt-1.5 enter-rows">
+      <div className="@container w-full flex-1 min-w-0 flex flex-col gap-3.5 lg:pt-1.5 enter-rows">
         {chips && <div className="flex flex-wrap items-center gap-2">{chips}</div>}
-        <h1 className="font-display italic font-extrabold text-5xl lg:text-[4.75rem] leading-[0.9] pr-2 text-text-main break-words">{title}</h1>
+        <h1
+          className={`font-display italic font-extrabold ${TITLE_SIZE} leading-[0.9] pr-2 text-text-main break-words`}
+          style={{ '--title-chars': Math.max(title.length, 1) } as CSSProperties}
+        >
+          {title}
+        </h1>
         {description && <p className="text-sm text-text-secondary max-w-2xl line-clamp-3">{description}</p>}
         {progress}
         {children}

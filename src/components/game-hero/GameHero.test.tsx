@@ -19,6 +19,14 @@ test('the title is the page heading, in the display face', () => {
   expect(screen.getByRole('heading', { level: 1, name: 'Ultimate Spider-Man' })).toHaveClass('font-display')
 })
 
+test('the title is sized by its length against its column, capped at the old size', () => {
+  const { container } = render(<GameHero {...base} />)
+  const h1 = screen.getByRole('heading', { level: 1 })
+  expect(h1.style.getPropertyValue('--title-chars')).toBe('19')
+  expect(h1.parentElement).toHaveClass('@container')
+  expect(container.querySelector('h1')?.className).toContain('var(--title-max)')
+})
+
 test('facts: a missing value says so instead of a dash', () => {
   const { container } = render(<GameHero {...base} />)
   const dds = container.querySelectorAll('dl')[0].querySelectorAll('dd')
