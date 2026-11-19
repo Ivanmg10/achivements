@@ -14,6 +14,7 @@ import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
+import { formatStoreDate } from '@/utils/dates'
 
 /**
  * The top of a Steam game page, on the shared `GameHero` as RA's: Steam swaps
@@ -79,7 +80,7 @@ export default function SteamGameInfoHeader({
         )
       }
       facts={[
-        { label: T.gameInfoPage.released, value: details?.releaseDate },
+        { label: T.gameInfoPage.released, value: formatStoreDate(details?.releaseDate, lang) },
         { label: T.gameInfoPage.developer, value: details?.developers.join(', ') },
         { label: T.gameInfoPage.publisher, value: details?.publishers.join(', ') },
         { label: T.gameInfoPage.genre, value: details?.genres.join(', ') },

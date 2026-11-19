@@ -1,3 +1,5 @@
+import { LANGUAGES } from '@/utils/languages'
+
 /**
  * The moment of a date the platforms send, in ms (NaN when unreadable).
  *
@@ -146,6 +148,51 @@ export function formatDay(day: string, lang: string, options?: Intl.DateTimeForm
   return d.toLocaleDateString(lang, options ?? dateFormat(d))
 }
 
+const fold = (w: string) => w.normalize('NFD').replace(/[\p{M}.]/gu, '').toLowerCase()
+
+let monthNames: Map<string, number> | null = null
+
+/** Every month's short and long name in the app's languages, folded ("janv", "styczen", "января"), to its number; a name two months share is dropped. */
+function storeMonths(): Map<string, number> {
+  if (monthNames) return monthNames
+  const found = new Map<string, number | null>()
+  for (const { id } of LANGUAGES) {
+    for (const month of ['short', 'long'] as const) {
+      const alone = new Intl.DateTimeFormat(id, { month, timeZone: 'UTC' })
+      const inDate = new Intl.DateTimeFormat(id, { day: 'numeric', month, timeZone: 'UTC' })
+      for (let m = 1; m <= 12; m++) {
+        const d = new Date(Date.UTC(2000, m - 1, 15))
+        const names = [alone.format(d), inDate.formatToParts(d).find((p) => p.type === 'month')?.value ?? '']
+        for (const name of names.map(fold).filter(Boolean)) found.set(name, found.has(name) && found.get(name) !== m ? null : m)
+      }
+    }
+  }
+  monthNames = new Map([...found].filter((e): e is [string, number] => e[1] !== null))
+  return monthNames
+}
+
+/**
+ * A store's release date as a calendar day ("2014-01-15"), or null when it names no
+ * day ("Coming soon", "Q3 2026"). Steam writes it in the reader's language:
+ * "15 ENE 2014", "Jan 15, 2014", "15. Jan. 2014", "15 janv. 2014", "2014年1月15日".
+ */
+export function parseStoreDay(s: string | null | undefined): string | null {
+  if (!s) return null
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const check = (y: number, m: number, d: number) => {
+    const day = `${y}-${pad(m)}-${pad(d)}`
+    const t = new Date(`${day}T00:00:00Z`)
+    return !Number.isNaN(t.getTime()) && t.getUTCMonth() === m - 1 && t.getUTCDate() === d ? day : null
+  }
+  const yearFirst = s.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/)
+  if (yearFirst) return check(+yearFirst[1], +yearFirst[2], +yearFirst[3])
+  const year = s.match(/(?<!\d)(\d{4})(?!\d)/)
+  const day = s.replace(/(?<!\d)\d{4}(?!\d)/, '').match(/(?<!\d)(\d{1,2})(?!\d)/)
+  const word = s.match(/\p{L}[\p{L}.]*/u)
+  const month = word && storeMonths().get(fold(word[0]))
+  return year && day && month ? check(+year[1], month, +day[1]) : null
+}
+
 /** The calendar day `n` days after `day` (before, when negative), as "YYYY-MM-DD", local time. */
 export function addDays(day: string, n: number): string {
   const d = new Date(`${day}T00:00:00`)
@@ -184,4 +231,11 @@ export function upperFirst(text: string, lang: string): string {
 export function formatWeekdayDay(day: string, lang: string): string {
   const weekday = formatDay(day, lang, { weekday: 'long' })
   return `${upperFirst(weekday, lang)}, ${formatDay(day, lang)}`
+}
+
+/** A store's release date in the one format when it names a day; otherwise as it comes, in sentence case ("COMING SOON" → "Coming soon"). */
+export function formatStoreDate(s: string | null | undefined, lang: string): string | null {
+  if (!s) return null
+  const day = parseStoreDay(s)
+  return day ? formatDay(day, lang) : upperFirst(s.toLocaleLowerCase(lang), lang)
 }

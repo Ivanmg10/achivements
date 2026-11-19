@@ -6,6 +6,7 @@ import SteamGameInfoHeader from './SteamGameInfoHeader'
 import { en } from '@/translations/en'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 import type { SteamGameDetails } from '@/types/steam'
+import { formatDay } from '@/utils/dates'
 
 const GAME = toSteamGameProgress({ appid: 377160, name: 'Fallout 4', playtime_forever: 29055, has_community_visible_stats: true })
 
@@ -54,7 +55,8 @@ describe('SteamGameInfoHeader', () => {
       `${en.gameInfoPage.developer}Bethesda Game Studios`,
       `${en.gameInfoPage.publisher}Bethesda Softworks`,
       `${en.gameInfoPage.genre}Rol, Acción`,
-      `${en.gameInfoPage.released}9 NOV 2015`,
+      // Steam's own string, read as a day and shown in the one format (#167).
+      `${en.gameInfoPage.released}${formatDay('2015-11-09', 'en')}`,
     ]))
     expect(screen.getByText('Post-apocalyptic RPG')).toBeInTheDocument()
   })

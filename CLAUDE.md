@@ -71,7 +71,8 @@ stats, and personalization. Next.js 16 App Router + PostgreSQL + Tailwind v4.
   **the one date format** ("23 oct", the year only when it is not this year; on screen `ui/DateText`). Never a
   numeric one, never its options written by hand (`{ day, month: 'short' }`), never a `toLocaleDateString` and
   never a `toLocaleString` / `Intl.DateTimeFormat` with a day, month or year outside `utils/dates.ts` (a date with
-  its time is `formatDateTime`): the guard refuses them all (`docs/design-system.md` → One date format).
+  its time is `formatDateTime`; a store's date written as text, Steam's "15 ENE 2014", is `formatStoreDate`, never shown
+  raw): the guard refuses them all (`docs/design-system.md` → One date format).
 - **RA picture URLs** through `src/utils/raAssets.ts` (`raImageUrl`, `raBadgeUrl`, `raAvatarUrl`), never a
   hand-written `retroachievements.org` host.
 - **The platform list and names** are `GAME_SOURCES` and `PLATFORM_NAME` (`src/utils/gameRef.ts`); the shared

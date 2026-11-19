@@ -37,7 +37,9 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   `formatDate` / `formatDay`, is not "the date of something": a chart's axis, a month ("January 2024", the best
   month), a range of days (`MainPageMonthCompare`, its own formatter), a day with its weekday (the journal, the
   streak page's rows, a day modal's title, the heatmap tooltip). A test that pins a formatted date fixes the clock
-  (`jest.useFakeTimers({ now })`) or uses a past year, so it says the same next year.
+  (`jest.useFakeTimers({ now })`) or uses a past year, so it says the same next year. **A date a store writes as text**
+  (Steam's "15 ENE 2014", localized) goes through `formatStoreDate(s, lang)`: read as a day when it names one, otherwise
+  shown as it comes in sentence case ("Coming soon", "Q3 2026"); never shown raw (#167).
 - **A rule that starts with offenders lists them** (#120, 2026-11-08): `NEW_RULES` in the guard, each with its
   list of files still drawing the piece by hand in `ui/uiGuard.pending.json`. A file not on its list fails; a
   file on it that no longer offends fails too, so the list only shrinks. Migrate a file, then take it off.
