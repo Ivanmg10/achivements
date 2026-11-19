@@ -24,7 +24,7 @@ export default function UserGamePagePsn({ id, username, banner, comparing, mine,
   const { T } = useLanguage()
   const { library, libraryLoading } = usePsnGamesData()
   const { trophies, isLoading, error, retry } = usePsnTrophies(id)
-  const { details } = usePsnGameDetails(id)
+  const { details, isLoading: detailsLoading } = usePsnGameDetails(id)
   const theirs = useMemo(() => psnCompareList(trophies), [trophies])
 
   const game = library.find((g) => g.titleId === id) ?? null
@@ -35,7 +35,7 @@ export default function UserGamePagePsn({ id, username, banner, comparing, mine,
     <UserGameCompareBody
       background={<PsnGameHeroBackground src={psnBackdrop(game)} />}
       banner={banner}
-      header={<PsnGameInfoHeader game={game} details={details} />}
+      header={<PsnGameInfoHeader game={game} details={details} detailsLoading={detailsLoading} />}
       username={username}
       isLoading={isLoading}
       failed={Boolean(error)}

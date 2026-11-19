@@ -1,18 +1,16 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import Image from 'next/image'
 import { IconExternalLink } from '@tabler/icons-react'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import GameIcon from '@/components/game-icon/GameIcon'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import { psnPlatformTone } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
-import type { IgdbDetails } from '@/lib/igdbClient'
+import type { PsnGameDetails } from '@/hooks/usePsnGameDetails'
 import { buttonClass } from '@/components/ui/Button'
 import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
@@ -24,15 +22,19 @@ import { formatDate, formatDay } from '@/utils/dates'
  * The top of a PSN game page, on the shared `GameHero` as RA's and Steam's.
  * PSN adds the trophies by grade under the progress, and "Perfect" becomes the
  * platinum when there is one. Summary, studios, genres and screenshots come
- * from IGDB (`details`, null until loaded or when it has none, and in English).
+ * from IGDB (`details`, null until loaded or when it has none, and in English),
+ * and so does the cover of a game the Store gave none (`details.coverUrl`).
  */
 export default function PsnGameInfoHeader({
   game,
   details = null,
+  detailsLoading = false,
   actions,
 }: {
   game: PsnGameProgress
-  details?: IgdbDetails | null
+  details?: PsnGameDetails | null
+  /** IGDB has not answered yet: a game with no Store cover waits for its cover there. */
+  detailsLoading?: boolean
   /** The AI export, first among the buttons. */
   actions?: ReactNode
 }) {
@@ -47,13 +49,11 @@ export default function PsnGameInfoHeader({
 
   return (
     <GameHero
-      cover={
-        game.coverUrl ? (
-          <Image src={game.coverUrl} alt={game.title} width={216} height={324} className="block w-full aspect-2/3 object-cover" unoptimized />
-        ) : (
-          <GameIcon source="psn" id={game.id} imageUrl={game.imageIcon} size={216} className="block w-full aspect-square" />
-        )
-      }
+      cover={{
+        sources: [game.coverUrl, details?.coverUrl, game.imageIcon],
+        alt: game.title,
+        pending: !game.coverUrl && detailsLoading,
+      }}
       title={game.title}
       chips={
         <>

@@ -5,7 +5,7 @@ import GameHeroProgress from './game-hero-progress/GameHeroProgress'
 import GameHeroMedia from './game-hero-media/GameHeroMedia'
 
 const base = {
-  cover: <span>cover</span>,
+  cover: { sources: ['https://img/cover.jpg'], alt: 'Ultimate Spider-Man' },
   title: 'Ultimate Spider-Man',
   facts: [
     { label: 'Released', value: '22 Sep 2005' },

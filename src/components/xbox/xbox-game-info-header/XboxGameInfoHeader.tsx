@@ -3,14 +3,14 @@
 import type { ReactNode } from 'react'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import GameIcon from '@/components/game-icon/GameIcon'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import { xboxPlatformTone } from '@/utils/xboxTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { plural } from '@/utils/utils'
 import type { XboxGameProgress } from '@/types/xbox'
-import type { IgdbDetails } from '@/lib/igdbClient'
+import type { XboxGameDetails } from '@/hooks/useXboxGameDetails'
+import { https } from '@/utils/xboxMappers'
 import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
@@ -21,15 +21,19 @@ import { formatDate, formatDay } from '@/utils/dates'
  * The top of an Xbox game page, on the shared `GameHero` as the others: the
  * gamerscore is a tile beside the achievements. Summary, studios, genres,
  * release date and screenshots come from IGDB (`details`, null until loaded or
- * when it has none, and in English), since Xbox's library has none of them.
+ * when it has none, and in English), since Xbox's library has none of them, and
+ * so does the box art (`details.coverUrl`): the title's square tile until then, or without one.
  */
 export default function XboxGameInfoHeader({
   game,
   details = null,
+  detailsLoading = false,
   actions,
 }: {
   game: XboxGameProgress
-  details?: IgdbDetails | null
+  details?: XboxGameDetails | null
+  /** IGDB has not answered yet: the cover waits for its box art. */
+  detailsLoading?: boolean
   /** The AI export, first among the buttons. */
   actions?: ReactNode
 }) {
@@ -43,7 +47,7 @@ export default function XboxGameInfoHeader({
 
   return (
     <GameHero
-      cover={<GameIcon source="xbox" id={game.id} imageUrl={game.imageIcon} size={216} className="block w-full aspect-square" />}
+      cover={{ sources: [https(details?.coverUrl), https(game.imageIcon)], alt: game.title, pending: detailsLoading }}
       title={game.title}
       chips={
         <>

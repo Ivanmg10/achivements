@@ -15,7 +15,7 @@ afterEach(() => (console.error as jest.Mock).mockRestore())
 
 test('asks for nothing without a game', () => {
   const { result } = renderHook(() => useXboxGameDetails(null))
-  expect(result.current).toEqual({ details: null, error: null })
+  expect(result.current).toEqual({ details: null, error: null, isLoading: false })
   expect(global.fetch).not.toHaveBeenCalled()
 })
 
@@ -29,7 +29,7 @@ test('a 404 is no details, not an error', async () => {
   ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 404, json: async () => ({}) })
   const { result } = renderHook(() => useXboxGameDetails('1738914043'))
   await waitFor(() => expect(global.fetch).toHaveBeenCalled())
-  expect(result.current).toEqual({ details: null, error: null })
+  await waitFor(() => expect(result.current).toEqual({ details: null, error: null, isLoading: false }))
 })
 
 test('a failure is kept, and the page goes on without details', async () => {
@@ -50,4 +50,13 @@ test("on a public profile it asks as them", async () => {
   const wrapper = ({ children }: { children: ReactNode }) => createElement(SubjectContext.Provider, { value: 'ivan' }, children)
   renderHook(() => useXboxGameDetails('1738914043'), { wrapper })
   await waitFor(() => expect(global.fetch).toHaveBeenCalledWith('/api/xbox/details?id=1738914043&user=ivan'))
+})
+
+test('is loading until the server answers for this game', async () => {
+  let answer: (v: unknown) => void = () => {}
+  ;(fetch as jest.Mock).mockReturnValue(new Promise((r) => (answer = r)))
+  const { result } = renderHook(() => useXboxGameDetails('1738914043'))
+  expect(result.current.isLoading).toBe(true)
+  answer({ ok: false, status: 503 })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
 })

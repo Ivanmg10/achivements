@@ -246,3 +246,10 @@ test("an Xbox game's details come from its own platforms too", async () => {
   expect((global.fetch as jest.Mock).mock.calls[1][1].body).toContain('where platforms = (12)')
   expect(withSteamCache).toHaveBeenCalledWith('igdb:details:v2:12:halo 3', expect.any(Number), expect.any(Function))
 })
+
+test('a PS4/PS5 game is looked up on its own console, for its page (igdbPsnArt)', async () => {
+  ;(global.fetch as jest.Mock).mockResolvedValueOnce(ok({ access_token: 'tok', expires_in: 5_000_000 })).mockResolvedValue(ok([GAME]))
+  await igdb.igdbPsnArt('Jak II', 'PS4')
+  const [, init] = (global.fetch as jest.Mock).mock.calls.find(([url]) => String(url) === 'https://api.igdb.com/v4/games')!
+  expect(init.body).toContain('where platforms = (48)')
+})

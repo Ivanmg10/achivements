@@ -41,7 +41,7 @@ export default function XboxGamePage() {
   const enabled = useXboxEnabled()
   const { isLinked, fullLibrary, libraryLoading, libraryError, refetch } = useXboxGamesData()
   const { achievements, isLoading, error, retry } = useXboxAchievements(isLinked ? titleId : null)
-  const { details } = useXboxGameDetails(isLinked ? titleId : null)
+  const { details, isLoading: detailsLoading } = useXboxGameDetails(isLinked ? titleId : null)
 
   if (titleId === null) notFound()
   if (status === 'loading') return <GameInfoSkeleton />
@@ -61,7 +61,7 @@ export default function XboxGamePage() {
       <div className={GAME_COLUMN}>
         <XboxGameInfoHeader
           game={game}
-          details={details}
+          details={details} detailsLoading={detailsLoading}
           actions={achievements.length > 0 && <GameAiExport getSource={() => xboxAiSource({ game, achievements, details })} />}
         />
         <GameTableState

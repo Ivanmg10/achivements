@@ -83,6 +83,8 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   (`LibraryShelfBanner`) ask for the same, one card at a time as RA's screenshots,
   so at most a shelf's worth (`SHELF_CAP`); until it arrives, or with no match, they
   show the blurred tile. Lists and icons keep Xbox's own tile.
+  The page's cover is IGDB's box art from the same answer (`coverUrl`, through
+  `xboxMappers.https()`), the title's square tile until it answers or without one (#167).
   Do not enrich the whole library from IGDB at load (135 searches).
 - **Measured 2026-10-16:** an unknown gamertag answers HTTP 200 with `code: 404` in
   the body (→ `not-found`). A library the viewer cannot read answers like a

@@ -234,6 +234,14 @@ export async function igdbArt(title: string, consoleName: string): Promise<IgdbA
   return artOn(title, igdbPlatforms(consoleName))
 }
 
+/**
+ * The cover of a PS4/PS5 game the Store gave none (GTA: San Andreas), for its own page only (#167): never for the
+ * whole library. Same lookup and cache as PS3/Vita art, on every PlayStation it is on.
+ */
+export async function igdbPsnArt(title: string, consoleName: string): Promise<IgdbArt | null> {
+  return artOn(title, igdbPsnPlatforms(consoleName))
+}
+
 /** The same lookup for an Xbox game: its cover, backdrop and release year, which Xbox's library has none of. */
 export async function igdbXboxArt(title: string, consoleName: string): Promise<IgdbArt | null> {
   return artOn(title, igdbXboxPlatforms(consoleName))

@@ -369,7 +369,12 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 - **Numbers a reader sees are in their language:** `toLocaleString(lang)`, `decimal(n, lang)` for a
   fixed count of decimals, `formatRarity(pct, lang)`; never `toFixed` on screen ("0,8", not "0.8").
 - **A game page's top is `GameHero`** (chips, title, facts, actions, tiles, media) and its tables use
-  `ui/dataTable.ts` and `AchievementTableToolbar`; the four platforms share them.
+  `ui/dataTable.ts` and `AchievementTableToolbar`; the four platforms share them. **Its cover is `GameHeroCover`**
+  (#167), given as data (`cover={{ sources, alt, … }}`), never a picture drawn by the page: Steam, PlayStation and Xbox
+  share one 2:3 frame of the same size; a portrait covers it, any other shape (a square icon, Steam's wide header) is
+  shown whole over a blurred, darkened copy of itself; RA (`natural`) shows its box at the box's own ratio, the same
+  width, never cropped, holding `raBoxRatio(console)` until the picture is in. `pending` holds the frame while IGDB's
+  cover is on its way, so an icon is never swapped for it.
 - **The home layout is the person's choice** (`useHomeLayout`, synced key `home-layout`):
   `classic` (default) or `cover` (`MainPagePortada`, the game played last in big on top). It is in
   Preferences → General and in the welcome's preferences step.

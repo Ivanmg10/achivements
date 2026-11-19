@@ -35,7 +35,7 @@ export default function UserGamePageRa({ id, username, banner, comparing, mine, 
     )
   }
 
-  if (!current) return <GameInfoSkeleton />
+  if (!current) return <GameInfoSkeleton cover="natural" />
 
   return (
     <UserGameCompareBody

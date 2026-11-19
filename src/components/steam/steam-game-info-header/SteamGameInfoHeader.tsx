@@ -4,7 +4,6 @@ import type { ReactNode } from 'react'
 import { IconExternalLink } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import { steamAssetUrl, steamStoreUrl } from '@/lib/steamAssets'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
@@ -47,7 +46,15 @@ export default function SteamGameInfoHeader({
 
   return (
     <GameHero
-      cover={<SteamGameImage appId={appId} asset="cover" iconUrl={game?.imageIcon} alt={title} size={216} className="block w-full aspect-2/3" />}
+      cover={{
+        sources: [steamAssetUrl(appId, 'cover'), steamAssetUrl(appId, 'header'), game?.imageIcon],
+        alt: title,
+        fallback: (
+          <span className="flex w-full h-full items-center justify-center bg-steam-dark">
+            <SteamLogo size={64} className="text-steam" aria-hidden="true" />
+          </span>
+        ),
+      }}
       title={title}
       chips={
         <>

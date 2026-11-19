@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import GameHeroTile, { type GameHeroTileData } from './game-hero-tile/GameHeroTile'
+import GameHeroCover, { type GameHeroCoverProps } from './game-hero-cover/GameHeroCover'
 
 export type GameHeroFact = { label: string; value: string | null | undefined }
 
@@ -24,7 +25,8 @@ export default function GameHero({
   tiles,
   media,
 }: {
-  cover: ReactNode
+  /** The cover's pictures (`GameHeroCover`): one piece on every page, a 2:3 frame or RA's box at its own ratio. */
+  cover: GameHeroCoverProps
   chips?: ReactNode
   title: string
   description?: string | null
@@ -44,9 +46,7 @@ export default function GameHero({
 
   return (
     <section className="relative w-full px-4 sm:px-8 lg:px-14 pt-6 lg:pt-10 flex flex-col lg:flex-row gap-6 lg:gap-9 items-start">
-      <div className="w-32 sm:w-40 lg:w-[13.5rem] shrink-0 rounded-tile overflow-hidden shadow-[0_24px_60px_rgb(0_0_0/0.55)] ring-1 ring-inset ring-ink/10 enter-rise">
-        {cover}
-      </div>
+      <GameHeroCover {...cover} />
 
       <div className="flex-1 min-w-0 flex flex-col gap-3.5 lg:pt-1.5 enter-rows">
         {chips && <div className="flex flex-wrap items-center gap-2">{chips}</div>}

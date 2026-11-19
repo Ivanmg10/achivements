@@ -39,7 +39,7 @@ export default function GameInfo() {
     )
   }
 
-  if (!game) return <GameInfoSkeleton />
+  if (!game) return <GameInfoSkeleton cover="natural" />
 
   const showSelector = subsetsLoading || subsets.length > 0 || parentId !== null
   const heroImage = game.ImageTitle ?? game.ImageIngame ?? null

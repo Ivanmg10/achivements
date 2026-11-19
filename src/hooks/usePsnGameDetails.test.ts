@@ -16,7 +16,7 @@ afterEach(() => (console.error as jest.Mock).mockRestore())
 test('does nothing without a game', () => {
   const { result } = renderHook(() => usePsnGameDetails(null))
   expect(fetch).not.toHaveBeenCalled()
-  expect(result.current).toEqual({ details: null, error: null })
+  expect(result.current).toEqual({ details: null, error: null, isLoading: false })
 })
 
 test("loads the game's details", async () => {
@@ -30,7 +30,7 @@ test('a 404 is no details, not an error', async () => {
   ;(fetch as jest.Mock).mockResolvedValue({ ok: false, status: 404 })
   const { result } = renderHook(() => usePsnGameDetails('NPWR00001_00'))
   await waitFor(() => expect(fetch).toHaveBeenCalled())
-  await waitFor(() => expect(result.current).toEqual({ details: null, error: null }))
+  await waitFor(() => expect(result.current).toEqual({ details: null, error: null, isLoading: false }))
 })
 
 test('a failure is kept as an error, and logged', async () => {
@@ -55,4 +55,13 @@ test("on someone's profile it asks by the title in their list", async () => {
   const { result } = renderHook(() => usePsnGameDetails('NPWR00001_00'), { wrapper })
   await waitFor(() => expect(result.current.details).toEqual(DETAILS))
   expect(fetch).toHaveBeenCalledWith('/api/psn/details?id=NPWR00001_00&user=ivan')
+})
+
+test('is loading until the server answers for this game, a 404 included', async () => {
+  let answer: (v: unknown) => void = () => {}
+  ;(fetch as jest.Mock).mockReturnValue(new Promise((r) => (answer = r)))
+  const { result } = renderHook(() => usePsnGameDetails('NPWR00001_00'))
+  expect(result.current.isLoading).toBe(true)
+  answer({ ok: false, status: 404 })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
 })

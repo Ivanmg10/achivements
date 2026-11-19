@@ -9,7 +9,6 @@ import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { CONSOLES } from '@/constants'
 import { plural, sumAchievementPoints } from '@/utils/utils'
-import { FadeImage } from '@/components/ui/FadeImage'
 import { buttonClass } from '@/components/ui/Button'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
@@ -19,6 +18,7 @@ import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHero
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
 import { MISSABLES_ID } from '@/components/missable-panel/MissablePanel'
 import { formatDay } from '@/utils/dates'
+import { raBoxRatio } from '@/utils/raBoxRatio'
 import { raImageUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
 
@@ -78,22 +78,10 @@ export default function GameInfoHeader({
     ? formatDay(gameData.Released.slice(0, 10), lang)
     : gameData?.Released
 
-  const cover = gameData?.ImageBoxArt ? (
-    <FadeImage
-      src={raImageUrl(gameData.ImageBoxArt)!}
-      alt={gameData.Title ?? ''}
-      width={216}
-      height={306}
-      className="block w-full aspect-[216/306]"
-    />
-  ) : (
-    <span className="block w-full aspect-[216/306] bg-bg-card" />
-  )
-
   return (
     <>
       <GameHero
-        cover={cover}
+        cover={{ sources: [raImageUrl(gameData?.ImageBoxArt)], alt: gameData?.Title ?? '', natural: true, ratio: raBoxRatio(gameData?.ConsoleName), optimized: true }}
         title={gameData?.Title ?? ''}
         chips={
           <>
