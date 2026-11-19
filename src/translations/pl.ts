@@ -826,6 +826,7 @@ export const pl: Translations = {
     developer: 'Deweloper',
     genre: 'Gatunek',
     released: 'Data wydania',
+    lastAchievement: 'Ostatnie osiągnięcie',
     achievements: 'Osiągnięcia',
     points: 'Punkty',
     hashesCompatible: 'Zgodne hashe',

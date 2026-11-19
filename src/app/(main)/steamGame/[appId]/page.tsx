@@ -15,6 +15,7 @@ import SteamGameInfoHeader from '@/components/steam/steam-game-info-header/Steam
 import SteamGameInfoTable from '@/components/steam/steam-game-info-table/SteamGameInfoTable'
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { steamAiSource } from '@/utils/aiExport'
+import { latestUnlock } from '@/utils/dates'
 
 /**
  * A Steam game's page — the counterpart of /gameInfo/[gameId] for RA, built
@@ -65,6 +66,7 @@ export default function SteamGamePage() {
           game={game}
           details={details}
           counts={counts}
+          lastUnlock={latestUnlock(achievements.map((a) => a.dateEarned))}
           actions={
             achievements.length > 0 && (
               <GameAiExport

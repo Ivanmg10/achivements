@@ -826,6 +826,7 @@ export const ru: Translations = {
     developer: 'Разработчик',
     genre: 'Жанр',
     released: 'Дата выхода',
+    lastAchievement: 'Последнее достижение',
     achievements: 'Достижения',
     points: 'Очки',
     hashesCompatible: 'Совместимые хэши',

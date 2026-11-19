@@ -180,6 +180,8 @@ export type SteamGameProgress = GameProgressBase & {
   achievementsLoaded: boolean
   /** When the latest achievement was unlocked, once counts are loaded. */
   lastUnlock?: string | null
+  /** Steam's own last-played date (`rtime_last_played`), which it sends only for the API key's owner (#113); `lastPlayed` is an estimate for everyone else. */
+  lastPlayedBySteam?: string | null
 }
 
 type AchievementBase = {

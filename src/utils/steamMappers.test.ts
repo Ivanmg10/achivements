@@ -49,6 +49,8 @@ describe('toSteamGameProgress', () => {
       numAwarded: 0,
       pctWon: 0,
       lastPlayed: '2023-11-14T22:13:20.000Z',
+      // Steam's own date: GAME carries rtime_last_played, as for the API key's owner (#113).
+      lastPlayedBySteam: '2023-11-14T22:13:20.000Z',
       playtimeForever: 51234,
       playtime2Weeks: 120,
       imgLogoUrl: 'https://media.steampowered.com/steamcommunity/public/images/apps/730/logohash.jpg',
@@ -64,6 +66,7 @@ describe('toSteamGameProgress', () => {
     expect(sparse.imgLogoUrl).toBe('')
     expect(sparse.playtime2Weeks).toBe(0)
     expect(sparse.lastPlayed).toBeNull()
+    expect(sparse.lastPlayedBySteam).toBeNull()
     expect(sparse.hasStats).toBe(false)
   })
 

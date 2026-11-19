@@ -6,7 +6,7 @@ import SteamGameInfoHeader from './SteamGameInfoHeader'
 import { en } from '@/translations/en'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 import type { SteamGameDetails } from '@/types/steam'
-import { formatDay } from '@/utils/dates'
+import { formatDate, formatDay } from '@/utils/dates'
 
 const GAME = toSteamGameProgress({ appid: 377160, name: 'Fallout 4', playtime_forever: 29055, has_community_visible_stats: true })
 
@@ -129,5 +129,21 @@ describe('SteamGameInfoHeader — library and extras', () => {
   test('extra actions sit beside the store link', () => {
     renderHeader({ actions: <button>Ask</button> })
     expect(screen.getByRole('button', { name: 'Ask' })).toBeInTheDocument()
+  })
+})
+
+describe('the activity facts (#167)', () => {
+  const at = '2025-03-04T10:00:00Z'
+
+  test('the last achievement always; last played only when Steam sent its own date', () => {
+    renderHeader({ lastUnlock: at })
+    expect(facts()).toContain(`${en.gameInfoPage.lastAchievement}${formatDate(at, 'en')}`)
+    expect(facts().some((f) => f?.startsWith(en.steam.lastPlayed))).toBe(false)
+  })
+
+  test("with Steam's date it comes before the last achievement, as on the other pages", () => {
+    renderHeader({ game: { ...GAME, lastPlayedBySteam: at }, lastUnlock: at })
+    const labels = facts().map((f) => f?.replace(formatDate(at, 'en'), ''))
+    expect(labels.slice(-2)).toEqual([en.steam.lastPlayed, en.gameInfoPage.lastAchievement])
   })
 })

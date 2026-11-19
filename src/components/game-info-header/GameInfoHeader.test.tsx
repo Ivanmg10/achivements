@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import GameInfoHeader from "./GameInfoHeader";
 import type { RetroAchievementsGameWithAchievements } from "@/types/types";
 import { en } from "@/translations/en";
+import { formatDate } from "@/utils/dates";
 
 const mockGameData = {
   ID: 1,
@@ -97,4 +98,18 @@ test("a mastered game says so instead of 'in progress'", () => {
 test("an RA game can be pinned and hidden from its page, as on the other platforms", () => {
   render(<GameInfoHeader gameData={mockGameData} />);
   expect(screen.getByRole("button", { name: `${en.cards.hideGame}: Sly Cooper` })).toBeInTheDocument();
+});
+
+test("the last achievement is the newest unlock in the list, softcore or hardcore (#167)", () => {
+  const withList = {
+    ...mockGameData,
+    Achievements: {
+      1: { ID: 1, DateEarned: "2024-05-01 10:00:00", DateEarnedHardcore: "2024-05-01 10:00:00" },
+      2: { ID: 2, DateEarned: "2025-02-03 12:00:00" },
+      3: { ID: 3 },
+    },
+  } as unknown as RetroAchievementsGameWithAchievements;
+  render(<GameInfoHeader gameData={withList} />);
+  const list = screen.getByText("Sly Cooper").closest("section")?.querySelector("dl");
+  expect(list?.textContent).toContain(`${en.gameInfoPage.lastAchievement}${formatDate("2025-02-03 12:00:00", "en")}`);
 });

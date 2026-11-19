@@ -826,6 +826,7 @@ export const it: Translations = {
     developer: 'Sviluppatore',
     genre: 'Genere',
     released: 'Data di uscita',
+    lastAchievement: 'Ultimo obiettivo',
     achievements: 'Obiettivi',
     points: 'Punti',
     hashesCompatible: 'Hash compatibili',

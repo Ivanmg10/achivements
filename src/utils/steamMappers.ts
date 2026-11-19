@@ -76,6 +76,7 @@ export function toSteamGameProgress(game: SteamOwnedGame): SteamGameProgress {
     numAwarded: 0,
     pctWon: 0,
     lastPlayed: unixToIso(lastPlayedOf(game)),
+    lastPlayedBySteam: unixToIso(game.rtime_last_played),
     playtimeForever: game.playtime_forever ?? 0,
     playtime2Weeks: game.playtime_2weeks ?? 0,
     imgLogoUrl: gameLogoUrl(game.appid, game.img_logo_url),

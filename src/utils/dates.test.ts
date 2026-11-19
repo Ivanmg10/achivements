@@ -1,4 +1,4 @@
-import { addDays, dateFormat, formatDate, formatDateTime, formatDay, formatWeekdayDay, upperFirst, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay, weekDays, mondayOf, dayIn, unlockDay, isTimeZone, parseStoreDay, formatStoreDate } from './dates'
+import { addDays, dateFormat, formatDate, formatDateTime, formatDay, formatWeekdayDay, upperFirst, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay, weekDays, mondayOf, dayIn, unlockDay, isTimeZone, parseStoreDay, formatStoreDate, latestUnlock } from './dates'
 
 describe('parseUnlockTime', () => {
   test('a zone-less platform date is UTC, whatever the browser zone is', () => {
@@ -193,4 +193,10 @@ test('formatStoreDate: a day in the one format, anything else in sentence case',
   expect(formatStoreDate('15 ENE 2014', 'es')).toBe(formatDay('2014-01-15', 'es'))
   expect(formatStoreDate('COMING SOON', 'en')).toBe('Coming soon')
   expect(formatStoreDate(null, 'en')).toBeNull()
+})
+
+test('latestUnlock: the newest readable date, whatever its shape; none is null', () => {
+  expect(latestUnlock(['2026-10-17 18:30:00', null, '2026-10-18T01:00:00Z', 'nope', undefined])).toBe('2026-10-18T01:00:00Z')
+  expect(latestUnlock([null, 'nope'])).toBeNull()
+  expect(latestUnlock([])).toBeNull()
 })

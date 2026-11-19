@@ -14,7 +14,7 @@ import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
-import { formatStoreDate } from '@/utils/dates'
+import { formatDate, formatStoreDate } from '@/utils/dates'
 
 /**
  * The top of a Steam game page, on the shared `GameHero` as RA's: Steam swaps
@@ -29,6 +29,7 @@ export default function SteamGameInfoHeader({
   game,
   details,
   counts,
+  lastUnlock = null,
   actions,
 }: {
   appId: number
@@ -36,6 +37,8 @@ export default function SteamGameInfoHeader({
   game: SteamGameProgress | null
   details: SteamGameDetails | null
   counts: { earned: number; total: number } | null
+  /** The newest unlock in the achievement list. */
+  lastUnlock?: string | null
   /** The AI export, first among the buttons. */
   actions?: ReactNode
 }) {
@@ -84,6 +87,9 @@ export default function SteamGameInfoHeader({
         { label: T.gameInfoPage.developer, value: details?.developers.join(', ') },
         { label: T.gameInfoPage.publisher, value: details?.publishers.join(', ') },
         { label: T.gameInfoPage.genre, value: details?.genres.join(', ') },
+        // Only Steam's own date: for anyone but the API key's owner it is an estimate (#113).
+        ...(game?.lastPlayedBySteam ? [{ label: T.steam.lastPlayed, value: formatDate(game.lastPlayedBySteam, lang) }] : []),
+        { label: T.gameInfoPage.lastAchievement, value: lastUnlock && formatDate(lastUnlock, lang) },
       ]}
       actions={
         <>

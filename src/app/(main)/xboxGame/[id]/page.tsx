@@ -20,6 +20,7 @@ import XboxGameInfoTable from '@/components/xbox/xbox-game-info-table/XboxGameIn
 import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPartialListNote'
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { xboxAiSource } from '@/utils/aiExport'
+import { latestUnlock } from '@/utils/dates'
 
 /**
  * An Xbox game's page — the counterpart of /psnGame/[id], built the same way:
@@ -65,6 +66,7 @@ export default function XboxGamePage() {
         <XboxGameInfoHeader
           game={game}
           details={details} detailsLoading={detailsLoading}
+          lastUnlock={latestUnlock(achievements.map((a) => a.unlockedAt))}
           actions={achievements.length > 0 && <GameAiExport getSource={() => xboxAiSource({ game, achievements, details })} />}
         />
         <GameTableState

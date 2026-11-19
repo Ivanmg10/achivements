@@ -239,3 +239,14 @@ export function formatStoreDate(s: string | null | undefined, lang: string): str
   const day = parseStoreDay(s)
   return day ? formatDay(day, lang) : upperFirst(s.toLocaleLowerCase(lang), lang)
 }
+
+/** The newest of some unlock dates, as it came ("2026-10-17 18:30:00" or ISO); null when none can be read. */
+export function latestUnlock(dates: (string | null | undefined)[]): string | null {
+  let best: string | null = null
+  let bestT = -Infinity
+  for (const d of dates) {
+    const t = parseUnlockTime(d)
+    if (t > bestT) [best, bestT] = [d ?? null, t]
+  }
+  return best
+}

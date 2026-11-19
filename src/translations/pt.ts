@@ -826,6 +826,7 @@ export const pt: Translations = {
     developer: 'Desenvolvedora',
     genre: 'Gênero',
     released: 'Lançamento',
+    lastAchievement: 'Última conquista',
     achievements: 'Conquistas',
     points: 'Pontos',
     hashesCompatible: 'Hashes compatíveis',

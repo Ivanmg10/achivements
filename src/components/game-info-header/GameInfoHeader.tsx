@@ -17,7 +17,7 @@ import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
 import { MISSABLES_ID } from '@/components/missable-panel/MissablePanel'
-import { formatDay } from '@/utils/dates'
+import { formatDate, formatDay, latestUnlock } from '@/utils/dates'
 import { raBoxRatio } from '@/utils/raBoxRatio'
 import { raImageUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
@@ -69,6 +69,7 @@ export default function GameInfoHeader({
     () => raAchievementList(gameData).filter((a) => a.Type === 'missable' && !a.DateEarned && !a.DateEarnedHardcore).length,
     [gameData],
   )
+  const lastUnlock = useMemo(() => latestUnlock(raAchievementList(gameData).flatMap((a) => [a.DateEarnedHardcore, a.DateEarned])), [gameData])
   const earned = gameData?.NumAwardedToUser ?? 0
   const total = gameData?.NumAchievements ?? 0
   const hcPct = parseFloat(gameData?.UserCompletionHardcore ?? '0') || 0
@@ -111,6 +112,8 @@ export default function GameInfoHeader({
           { label: T.gameInfoPage.developer, value: gameData?.Developer },
           { label: T.gameInfoPage.publisher, value: gameData?.Publisher },
           { label: T.gameInfoPage.genre, value: gameData?.Genre },
+          // RA's game answer has no last-played date for the reader: only the last unlock.
+          { label: T.gameInfoPage.lastAchievement, value: lastUnlock && formatDate(lastUnlock, lang) },
         ]}
         actions={
           gameData?.ID && (

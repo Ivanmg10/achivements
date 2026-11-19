@@ -826,6 +826,7 @@ export const ja: Translations = {
     developer: '開発元',
     genre: 'ジャンル',
     released: '発売日',
+    lastAchievement: '最後の実績',
     achievements: '実績',
     points: 'ポイント',
     hashesCompatible: '対応ハッシュ',

@@ -28,12 +28,15 @@ export default function XboxGameInfoHeader({
   game,
   details = null,
   detailsLoading = false,
+  lastUnlock = null,
   actions,
 }: {
   game: XboxGameProgress
   details?: XboxGameDetails | null
   /** IGDB has not answered yet: the cover waits for its box art. */
   detailsLoading?: boolean
+  /** The newest unlock in the achievement list. */
+  lastUnlock?: string | null
   /** The AI export, first among the buttons. */
   actions?: ReactNode
 }) {
@@ -79,6 +82,7 @@ export default function XboxGameInfoHeader({
         { label: T.gameInfoPage.publisher, value: details?.publishers.join(', ') },
         { label: T.gameInfoPage.genre, value: details?.genres.join(', ') },
         { label: T.steam.lastPlayed, value: date(game.lastPlayed) },
+        { label: T.gameInfoPage.lastAchievement, value: date(lastUnlock) },
       ]}
       actions={actions}
       toggles={

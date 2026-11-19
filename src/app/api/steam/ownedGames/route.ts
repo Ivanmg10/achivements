@@ -29,8 +29,9 @@ export async function GET(req?: Request) {
   try {
     let complete = true
     const games = await withSteamCache<SteamGameProgress[]>(
-      // v3: games Steam does not date are dated by us (#113). A shared DB lets an older build rewrite the old shape under the old key.
-      `steamOwned3:${steamid}`,
+      // v4: Steam's own last-played date kept apart (lastPlayedBySteam, #167); v3 dated the games Steam does not (#113).
+      // A shared DB lets an older build rewrite the old shape under the old key.
+      `steamOwned4:${steamid}`,
       TTL.ownedGames,
       async () => {
         const data = await loadOwnedGames(auth.session)

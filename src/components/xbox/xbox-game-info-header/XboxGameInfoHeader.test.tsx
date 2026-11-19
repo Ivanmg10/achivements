@@ -5,6 +5,7 @@ import { render, screen } from '@testing-library/react'
 import XboxGameInfoHeader from './XboxGameInfoHeader'
 import { en } from '@/translations/en'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
+import { formatDate } from '@/utils/dates'
 
 const GAME = xboxGameFixture({
   id: 1738914043, titleId: '1738914043', title: 'Halo Infinite', consoleName: 'Xbox Series · PC',
@@ -71,4 +72,11 @@ test('extra actions go beside the facts, and nothing is drawn without them', () 
   expect(screen.queryByRole('button', { name: 'Ask' })).toBeNull()
   rerender(<XboxGameInfoHeader game={GAME} actions={<button>Ask</button>} />)
   expect(screen.getByRole('button', { name: 'Ask' })).toBeInTheDocument()
+})
+
+test('last played, then the last achievement, after the store facts (#167)', () => {
+  render(<XboxGameInfoHeader game={GAME} lastUnlock="2026-01-01T20:00:00Z" />)
+  const facts = [...document.querySelector('section dl')!.children].map((d) => d.firstChild?.textContent)
+  expect(facts.slice(-2)).toEqual([en.steam.lastPlayed, en.gameInfoPage.lastAchievement])
+  expect(screen.getByText(en.gameInfoPage.lastAchievement).nextElementSibling).toHaveTextContent(formatDate('2026-01-01T20:00:00Z', 'en'))
 })

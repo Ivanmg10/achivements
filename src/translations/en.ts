@@ -827,6 +827,7 @@ export const en = {
     developer: 'Developer',
     genre: 'Genre',
     released: 'Released',
+    lastAchievement: 'Last achievement',
     achievements: 'Achievements',
     points: 'Points',
     hashesCompatible: 'Compatible hashes',
