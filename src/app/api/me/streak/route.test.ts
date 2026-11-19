@@ -38,7 +38,23 @@ test('answers the viewer\'s own streak, privately', async () => {
     expect.objectContaining({ id: '7', rausername: 'me', raid: 'key', admin: false }),
     'es',
     { ra: new Set(['SNES']) },
+    'UTC',
   )
+})
+
+test('counts on the zone of the browser when it is a real IANA name, on UTC otherwise', async () => {
+  ;(loadStreak as jest.Mock).mockResolvedValue({ active: null, best: null, failed: [] })
+  const zoneOf = async (query: string) => {
+    ;(loadStreak as jest.Mock).mockClear()
+    await GET(req(query))
+    return (loadStreak as jest.Mock).mock.calls[0][3]
+  }
+  expect(await zoneOf('?tz=Europe%2FMadrid')).toBe('Europe/Madrid')
+  expect(await zoneOf('?tz=America%2FNew_York')).toBe('America/New_York')
+  expect(await zoneOf('?tz=Mars%2FOlympus')).toBe('UTC')
+  expect(await zoneOf('?tz=%2B01%3A00')).toBe('UTC')
+  expect(await zoneOf(`?tz=${'A'.repeat(80)}`)).toBe('UTC')
+  expect(await zoneOf('')).toBe('UTC')
 })
 
 test('never answers for someone else: ?user= is ignored', async () => {

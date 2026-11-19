@@ -10,6 +10,8 @@ jest.mock('@/lib/fetchWithRetry', () => ({ fetchWithRetry: jest.fn() }))
 jest.mock('@/hooks/useStorageValue', () => ({ useStorageValue: jest.fn() }))
 jest.mock('@/context/HiddenGamesContext', () => ({ useHiddenGames: jest.fn() }))
 
+// The browser's own zone, so the server counts the days on its calendar (2026-11-19).
+const TZ = encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)
 const SUMMARY = { active: { start: '2026-11-01', end: '2026-11-02', days: 2 }, best: { start: '2026-10-01', end: '2026-10-09', days: 9 }, failed: [] }
 let stored: Record<string, string | null | undefined>
 
@@ -29,14 +31,14 @@ test('reads the streak once and gives the days', async () => {
   await waitFor(() => expect(result.current.isLoading).toBe(false))
   expect(result.current).toMatchObject({ streak: 2, best: 9, error: false })
   expect(fetchWithRetry).toHaveBeenCalledTimes(1)
-  expect(fetchWithRetry).toHaveBeenCalledWith('/api/me/streak?lang=en')
+  expect(fetchWithRetry).toHaveBeenCalledWith(`/api/me/streak?lang=en&tz=${TZ}`)
 })
 
 test('sends the consoles unticked in this browser', async () => {
   stored['hidden-consoles:psn'] = '["PS3"]'
   renderHook(() => useStreakSummary())
   await waitFor(() => expect(fetchWithRetry).toHaveBeenCalled())
-  expect(fetchWithRetry).toHaveBeenCalledWith(`/api/me/streak?lang=en&hidden=${encodeURIComponent('{"psn":["PS3"]}')}`)
+  expect(fetchWithRetry).toHaveBeenCalledWith(`/api/me/streak?lang=en&tz=${TZ}&hidden=${encodeURIComponent('{"psn":["PS3"]}')}`)
 })
 
 test('waits for the browser\'s lists, and asks nothing signed out', () => {

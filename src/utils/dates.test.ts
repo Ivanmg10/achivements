@@ -1,4 +1,4 @@
-import { addDays, dateFormat, formatDate, formatDateTime, formatDay, formatWeekdayDay, upperFirst, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay, utcWeekDays } from './dates'
+import { addDays, dateFormat, formatDate, formatDateTime, formatDay, formatWeekdayDay, upperFirst, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay, weekDays, mondayOf, dayIn, unlockDay, isTimeZone } from './dates'
 
 describe('parseUnlockTime', () => {
   test('a zone-less platform date is UTC, whatever the browser zone is', () => {
@@ -95,19 +95,58 @@ describe('addDays', () => {
   })
 })
 
-describe('utcWeekDays', () => {
+describe('weekDays and mondayOf', () => {
   const OLD_TZ = process.env.TZ
   afterEach(() => { process.env.TZ = OLD_TZ })
 
   test('the seven days from a Monday, whatever the browser zone is', () => {
     for (const tz of ['UTC', 'Europe/Madrid', 'America/Los_Angeles', 'Pacific/Auckland']) {
       process.env.TZ = tz
-      expect(utcWeekDays('2026-10-05')).toEqual(['2026-10-05', '2026-10-06', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11'])
+      expect(weekDays('2026-10-05')).toEqual(['2026-10-05', '2026-10-06', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11'])
+      expect(mondayOf('2026-10-11')).toBe('2026-10-05')
+      expect(mondayOf('2026-10-05')).toBe('2026-10-05')
     }
   })
 
-  test('crosses a month and a year', () => {
-    expect(utcWeekDays('2026-12-28')).toEqual(['2026-12-28', '2026-12-29', '2026-12-30', '2026-12-31', '2027-01-01', '2027-01-02', '2027-01-03'])
+  test('crosses a month, a year and a clock change', () => {
+    expect(weekDays('2026-12-28')).toEqual(['2026-12-28', '2026-12-29', '2026-12-30', '2026-12-31', '2027-01-01', '2027-01-02', '2027-01-03'])
+    process.env.TZ = 'Europe/Madrid'
+    expect(weekDays('2026-10-19').at(-1)).toBe('2026-10-25')
+    expect(mondayOf('2026-10-25')).toBe('2026-10-19')
+  })
+})
+
+describe('dayIn and unlockDay: a person’s own calendar (2026-11-19)', () => {
+  // The owner's report: 00:50 on Nov 19 in Madrid is 23:50 UTC on Nov 18.
+  const UNLOCK = '2026-11-18 23:50:00'
+
+  test('an unlock lands on the day of the zone it is counted in', () => {
+    expect(unlockDay(UNLOCK, 'Europe/Madrid')).toBe('2026-11-19')
+    expect(unlockDay(UNLOCK, 'UTC')).toBe('2026-11-18')
+    // Behind UTC: 19:00 on Nov 18 in New York, and 23:30 UTC on Nov 19 is still Nov 19 there.
+    expect(unlockDay(UNLOCK, 'America/New_York')).toBe('2026-11-18')
+    expect(unlockDay('2026-11-19 03:30:00', 'America/New_York')).toBe('2026-11-18')
+  })
+
+  test('without a zone, the browser’s own (jest cannot switch the process zone: built from a local time)', () => {
+    // 00:50 on Nov 19 wherever the test runs, sent as the platforms send it: UTC, no zone.
+    const local = new Date(2026, 10, 19, 0, 50)
+    const sent = local.toISOString().slice(0, 19).replace('T', ' ')
+    expect(unlockDay(sent)).toBe('2026-11-19')
+    expect(dayIn(local)).toBe('2026-11-19')
+    expect(unlockDay(sent)).toBe(dayIn(local, Intl.DateTimeFormat().resolvedOptions().timeZone))
+  })
+
+  test('reads a date with a zone as it says, and nothing from an unreadable one', () => {
+    expect(unlockDay('2026-11-18T23:50:00+00:00', 'Europe/Madrid')).toBe('2026-11-19')
+    expect(unlockDay('2026-11-18T23:50:00Z', 'UTC')).toBe('2026-11-18')
+    expect(unlockDay(null, 'UTC')).toBe('')
+    expect(unlockDay('nope', 'UTC')).toBe('')
+  })
+
+  test('isTimeZone takes IANA names only', () => {
+    for (const zone of ['UTC', 'Europe/Madrid', 'America/New_York', 'America/Argentina/Buenos_Aires', 'Etc/GMT+3']) expect(isTimeZone(zone)).toBe(true)
+    for (const zone of ['Mars/Olympus', '+01:00', '', 'Europe/../Madrid', 'A'.repeat(80), null, 3]) expect(isTimeZone(zone)).toBe(false)
   })
 })
 

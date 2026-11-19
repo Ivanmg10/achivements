@@ -8,8 +8,8 @@ import DayAchievementsAwards from '@/components/day-achievements-awards/DayAchie
 import PeriodAchievementsDay from '@/components/period-achievements-day/PeriodAchievementsDay'
 import Modal from '@/components/ui/Modal'
 import Facts from '@/components/ui/Facts'
-import { formatWeekdayDay, utcDay } from '@/utils/dates'
-import { groupDays } from '@/utils/periodDays'
+import { formatWeekdayDay, unlockDay } from '@/utils/dates'
+import { dayOf, groupDays } from '@/utils/periodDays'
 import { plural } from '@/utils/utils'
 
 interface Props {
@@ -20,21 +20,17 @@ interface Props {
 
 const COMPLETION_TYPES = new Set(['Mastery/Completion', 'Game Beaten'])
 
-function awardDate(awardedAt: string): string {
-  return utcDay(new Date(awardedAt))
-}
-
 /** One day's unlocks, grouped by game as in the week and month dialogs (the same pane), under the day's mastery awards. */
 export default function DayAchievementsModal({ date, achievements, onClose }: Props) {
   const { T, lang } = useLanguage()
   const { awards } = useUserAwards()
-  const day = useMemo(() => groupDays(achievements.filter(a => a.Date.startsWith(date)))[0], [achievements, date])
+  const day = useMemo(() => groupDays(achievements.filter(a => dayOf(a) === date))[0], [achievements, date])
 
   const dayAwards = useMemo(() => {
     // Mastery/beaten awards are RA's; Steam unlocks in the list simply have none.
     if (!awards?.VisibleUserAwards) return []
     return awards.VisibleUserAwards.filter(
-      a => COMPLETION_TYPES.has(a.AwardType) && awardDate(a.AwardedAt) === date
+      a => COMPLETION_TYPES.has(a.AwardType) && unlockDay(a.AwardedAt) === date
     )
   }, [awards, date])
 

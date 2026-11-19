@@ -35,6 +35,12 @@ describe('friendStats', () => {
     expect(friendStats([at('2026-10-17 18:29:00')], [], now).week).toBe(0)
   })
 
+  test('the days are the viewer’s calendar: 00:50 local is that day, not the UTC day before (2026-11-19)', () => {
+    const sent = (d: number, h: number, min: number) => at(new Date(2026, 10, d, h, min).toISOString().slice(0, 19).replace('T', ' '))
+    const now = new Date(2026, 10, 19, 9, 0).getTime()
+    expect(friendStats([sent(17, 12, 0), sent(18, 12, 0), sent(19, 0, 50)], [], now)).toMatchObject({ streak: 3, activeDays: 3 })
+  })
+
   test('an unreadable date is skipped', () => {
     expect(friendStats([at('garbage')], [], NOW).week).toBe(0)
   })

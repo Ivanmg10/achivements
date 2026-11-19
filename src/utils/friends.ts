@@ -1,4 +1,4 @@
-import { parseUnlockTime, utcDay } from '@/utils/dates'
+import { localDay, parseUnlockTime, unlockDay } from '@/utils/dates'
 import type { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress, SteamRecentAchievement } from '@/types/steam'
 import type { PsnGameProgress, PsnRecentTrophy } from '@/types/psn'
@@ -74,12 +74,12 @@ export function friendStats(recent: RecentAchievement[], games: LibraryGame[], n
     const t = parseUnlockTime(a.Date)
     if (Number.isNaN(t)) continue
     if (t >= now - 7 * DAY) week++
-    if (t >= now - ACTIVITY_DAYS * DAY) days.add(a.Date.slice(0, 10))
+    if (t >= now - ACTIVITY_DAYS * DAY) days.add(unlockDay(a.Date))
   }
-  // A streak still counts when today has nothing yet: it runs up to yesterday.
-  let start = days.has(utcDay(now)) ? now : now - DAY
+  // A streak still counts when today has nothing yet: it runs up to yesterday. Days on the viewer's calendar.
+  let start = days.has(localDay(now)) ? now : now - DAY
   let streak = 0
-  while (streak < ACTIVITY_DAYS && days.has(utcDay(start))) {
+  while (streak < ACTIVITY_DAYS && days.has(localDay(start))) {
     streak++
     start -= DAY
   }

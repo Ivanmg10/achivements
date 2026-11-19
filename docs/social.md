@@ -111,7 +111,10 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   or `CircularProgress` in the theme's colour; tiers have their own hue only on their badge.
 - **Streaks in the rankings (2026-10-23)** are read from `score_games.unlocks` (UTC days, `streaksOf`),
   never from a platform: they lag the score refresh and may differ by a day from the streak page,
-  which reads the live feed. `?sort=streak|best` orders by them (no arrows, no points gap in the zone).
+  which reads the live feed on the person's own calendar. **The rule (2026-11-19): your own days are your local
+  calendar** (header, `/racha`, the home's heatmap, figures, charts and day dialogs, the friends' leaderboard, through
+  `dayOf` / `unlockDay` / `dayIn` in `utils/dates.ts`); **what compares people (rankings, Vault Points' periods) uses UTC
+  days, so everyone is measured on the same clock.** `?sort=streak|best` orders by them (no arrows, no points gap in the zone).
 - Rankings are labelled **Beta** in the UI; drop the label when the user says so.
 - **Later** (from the roadmap): ownership verification (the user found code-in-bio clumsy; revisit
   with care), a history chart, and CheevoVault's own achievements (advice: they should not give points).

@@ -61,18 +61,35 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   `hooks/useDetailOptions.tsx`, read by the table and the grid.
 - 7: `--figure-mark` (`"/"` slanted, `none` round) and `FIGURE_MARK` for the mark between bare figures; `Tabs` and `Facts` keep `--mark`.
   CLAUDE.md, `docs/design-system.md` and the `/design` catalogue say so.
+- Your own days on your own calendar (the owner's report, 2026-11-19: an unlock at 00:50 in Madrid showed "19 nov" but the
+  streak, the heatmap, today / this week / 30 days, the daily chart and the day dialog put it on the 18th, every platform). The
+  day keys were the UTC date part of the platforms' strings (`a.Date.split(' ')[0]`, `utcDay`). New in `utils/dates.ts`:
+  `dayIn(t, timeZone?)` (the browser's zone without one), `unlockDay(s, timeZone?)`, `isTimeZone`, `weekDays` / `mondayOf`
+  (replace `utcWeekDays`). Routed through them: `streaks.ts` (`calcAllStreaks` / `activeStreak` / `streakSummary` take a zone),
+  `periodDays.dayOf`, `utils.tsx` (`groupByDays`, `countByDay`, `groupByDaySource`, `activityKpis`, `getBestMonth`,
+  `calcThisMonth`), `friends.friendStats`, `MainPageHeatmap`, `MainPageBestPeriod` (weeks Monday to Sunday locally),
+  `MainPageTopGames`, `MainPagePeriodStats`, `DayAchievementsModal`, `StreakList`. The header: `useStreakSummary` sends
+  `&tz=<browser IANA zone>`, `/api/me/streak` keeps it only when `isTimeZone` (else UTC) and `loadStreak(…, timeZone, now)` counts on it.
 
-**Why** — the owner's review of the home on pre (2026-11-13), issue #164.
+**Why** — the owner's review of the home on pre (2026-11-13), issue #164; the days, the owner's report of 2026-11-19.
 
 **Decisions** — PSN tiles open the library on PlayStation, not on one console: the library has no PSN console filter (the owner
 chose the `?platform=` link, 2026-11-19). The owner has no PS3/PS4/PS5/Vita/Steam pixel icons and none of the free packs looked
 at (itch.io: Caz's consoles, BenJelter, thatdoc) has them in this style; drawing them is open.
+Days: one rule, "your own days are your local calendar; rankings use UTC days so everyone is measured on the same clock". Vault
+Points (`score_periods`, `vaultMe`'s weeks and seven days, `vaultLevel`) and the rankings' streaks (`streaksOf`) stay UTC, no
+`RULES_VERSION` bump; the landing's samples stay UTC (static page, its server and browser must agree). The 60-day `activitySince`
+cut in `MainPageCharts` is a window, not a day key, and was left.
 
 **Open** — Point 1 (the Overview's chart heights) not done: it needs the signed-in home on screen to tune the `48.25rem` floor,
 the trim and the spacing, and local sign-in failed for the owner (local dev reads the pre database). The console icons.
 
 **Watch out** — 3 and 5 not yet seen at 390 and in Firefox; 6 not yet in Firefox. Playwright (Chromium) can be signed in by the
 owner on `localhost:3000/authPage`; block every non-GET `/api` call while looking, never change the account.
+Days: a new feed or count of your own unlocks keys its days with `dayOf` / `unlockDay`, never `a.Date.slice(0, 10)` or `utcDay`.
+Your streak on the rankings can differ by a day from the header's near midnight (UTC there). `process.env.TZ = …` inside a jest
+test does not switch the zone (the sandbox's `process.env` is a copy, and `TZ=` on Windows is ignored): zone tests pass an
+explicit zone, or build the platform string from a local `new Date(y, m, d, h, min)`.
 
 ---
 

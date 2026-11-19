@@ -64,7 +64,9 @@ stats, and personalization. Next.js 16 App Router + PostgreSQL + Tailwind v4.
 
 ### Shared helpers — use them, never a copy (#119)
 - **Platform dates** through `src/utils/dates.ts`: `parseUnlockTime` / `unlockIso` read the platforms'
-  zone-less strings as UTC (never `.replace(' ', 'T')`), `utcDay` / `localDay` are the day keys, and
+  zone-less strings as UTC (never `.replace(' ', 'T')`). **Your own days are your local calendar**: an unlock's day is
+  `unlockDay` / `dayOf` (`dayIn(t, zone)` on the server, with the zone the browser sent, `isTimeZone`), never
+  `a.Date.slice(0, 10)`; `utcDay` only for what compares people (rankings, Vault Points), so all share one clock. And
   `formatDate(s, lang)` / `formatDay(day, lang)` show a date in the reader's language (never a fixed locale), in
   **the one date format** ("23 oct", the year only when it is not this year; on screen `ui/DateText`). Never a
   numeric one, never its options written by hand (`{ day, month: 'short' }`), never a `toLocaleDateString` and

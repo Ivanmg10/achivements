@@ -2,23 +2,19 @@ import { PinnedAchievement, RecentAchievement, RetroAchievement, RetroAchievemen
 import { CategoryGame } from '@/hooks/useGamesByCategory'
 import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
-import { localDay, parseUnlockTime, utcDay } from '@/utils/dates'
+import { localDay, parseUnlockTime, unlockDay } from '@/utils/dates'
 import { raBadgeUrl, raImageUrl } from '@/utils/raAssets'
 import type { GameSource, GameStatus } from '@/types/game'
 
-/** The last `totalDays` days up to `end` (today unless said otherwise), each with how many achievements fell on it. */
+/** The last `totalDays` days up to `end` (today unless said otherwise), each with how many achievements fell on it, on the reader's calendar. */
 export const groupByDays = (achievements: RecentAchievement[], totalDays: number, end: Date = new Date()) => {
   const days: string[] = []
   for (let i = totalDays - 1; i >= 0; i--) {
     const d = new Date(end)
     d.setDate(d.getDate() - i)
-    days.push(utcDay(d))
+    days.push(localDay(d))
   }
-  const grouped = achievements.reduce((acc, a) => {
-    const day = a.Date.split(' ')[0]
-    acc[day] = (acc[day] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const grouped = countByDay(achievements)
   return days.map((date) => ({ date, count: grouped[date] || 0 }))
 }
 
@@ -101,7 +97,7 @@ export function compareSortValues(
 export function getBestMonth(achievements: RecentAchievement[], by: 'pts' | 'ach' = 'pts'): [string, { pts: number; ach: number }] | null {
   const byMonth: Record<string, { pts: number; ach: number }> = {}
   for (const a of achievements) {
-    const key = a.Date.slice(0, 7)
+    const key = unlockDay(a.Date).slice(0, 7)
     if (!byMonth[key]) byMonth[key] = { pts: 0, ach: 0 }
     byMonth[key].pts += a.Points
     byMonth[key].ach++
@@ -110,10 +106,10 @@ export function getBestMonth(achievements: RecentAchievement[], by: 'pts' | 'ach
 }
 
 export function calcThisMonth(achievements: RecentAchievement[]): { pts: number; ach: number } {
-  const key = new Date().toISOString().slice(0, 7)
+  const key = localDay(new Date()).slice(0, 7)
   let pts = 0, ach = 0
   for (const a of achievements) {
-    if (a.Date.slice(0, 7) === key) { pts += a.Points; ach++ }
+    if (unlockDay(a.Date).slice(0, 7) === key) { pts += a.Points; ach++ }
   }
   return { pts, ach }
 }
@@ -129,18 +125,19 @@ export type ActivityKpis = { today: number; week: number; month: number; avgPerD
 
 /**
  * Unlocks today, in the last 7 days, this calendar month and per day over the
- * last 30, from any platform. Days are UTC, as everywhere else on the site.
+ * last 30, from any platform, on the reader's calendar (their own days, as the rest of the home).
  */
 export function activityKpis(achievements: RecentAchievement[], now: number = Date.now()): ActivityKpis {
-  const todayKey = utcDay(new Date(now))
+  const todayKey = localDay(now)
   const monthKey = todayKey.slice(0, 7)
   const weekAgo = now - 7 * 86400000
   const monthAgo = now - 30 * 86400000
   let today = 0, week = 0, month = 0, last30 = 0
   for (const a of achievements) {
     const t = parseUnlockTime(a.Date)
-    if (a.Date.startsWith(todayKey)) today++
-    if (a.Date.slice(0, 7) === monthKey) month++
+    const day = unlockDay(a.Date)
+    if (day === todayKey) today++
+    if (day.slice(0, 7) === monthKey) month++
     if (t >= weekAgo) week++
     if (t >= monthAgo) last30++
   }
@@ -244,11 +241,11 @@ export function groupByDaySource(achievements: RecentAchievement[], days = 7): D
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date()
     d.setDate(d.getDate() - i)
-    const date = utcDay(d)
+    const date = localDay(d)
     rows.set(date, { date, ra: 0, steam: 0, psn: 0, xbox: 0, total: 0 })
   }
   for (const a of Array.isArray(achievements) ? achievements : []) {
-    const row = rows.get(a.Date.split(' ')[0])
+    const row = rows.get(unlockDay(a.Date))
     if (!row) continue
     if (a.Source === 'steam') row.steam++
     else if (a.Source === 'psn') row.psn++
@@ -330,11 +327,12 @@ export function plural(n: number, forms: { zero?: string; one?: string; two?: st
   return form.replace('{n}', n.toLocaleString(lang))
 }
 
-/** Achievements per calendar day ("YYYY-MM-DD" → count). */
+/** Achievements per day of the reader's calendar ("YYYY-MM-DD" → count). */
 export function countByDay(achievements: RecentAchievement[]): Record<string, number> {
   const out: Record<string, number> = {}
   for (const a of achievements) {
-    const d = a.Date.split(' ')[0]
+    const d = unlockDay(a.Date)
+    if (!d) continue
     out[d] = (out[d] ?? 0) + 1
   }
   return out

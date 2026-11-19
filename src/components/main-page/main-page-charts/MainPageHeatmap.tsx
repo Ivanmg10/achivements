@@ -9,7 +9,7 @@ import { IconRefresh } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHeatmapGrid, HEATMAP_GAP as GAP, HEATMAP_MAX_DAYS } from '@/hooks/useHeatmapGrid'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { utcDay, formatDay } from '@/utils/dates'
+import { localDay, formatDay } from '@/utils/dates'
 import Kicker from '@/components/ui/Kicker'
 import Facts from '@/components/ui/Facts'
 
@@ -111,7 +111,7 @@ export default function MainPageHeatmap({
     gap: `${GAP}px`,
   } as const
   const gridWidth = weeks * cellWidth + (weeks - 1) * GAP
-  const today = utcDay(new Date())
+  const today = localDay(new Date())
 
   /** Shows the day's tooltip at (x, y) of the grid's box; a mouse gives its pointer, a focused cell its own corner. */
   function showTooltip(cellEl: HTMLElement | null, x: number, y: number) {

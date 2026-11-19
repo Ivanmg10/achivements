@@ -9,7 +9,8 @@ import MainPageBestPeriodRow from './main-page-best-period-row/MainPageBestPerio
 import { getBestMonth } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
-import { formatDay, parseUnlockTime, utcDay, utcWeekDays } from '@/utils/dates'
+import { formatDay, mondayOf, weekDays } from '@/utils/dates'
+import { dayOf } from '@/utils/periodDays'
 import Kicker from '@/components/ui/Kicker'
 
 // Downloaded the first time it opens, not with the page.
@@ -21,7 +22,7 @@ type Metric = 'pts' | 'ach'
 function getBestDay(achievements: RecentAchievement[], by: Metric) {
   const byDay: Record<string, { pts: number; ach: number }> = {}
   for (const a of achievements) {
-    const key = a.Date.split(' ')[0]
+    const key = dayOf(a)
     if (!byDay[key]) byDay[key] = { pts: 0, ach: 0 }
     byDay[key].pts += a.Points
     byDay[key].ach++
@@ -32,11 +33,7 @@ function getBestDay(achievements: RecentAchievement[], by: Metric) {
 function getBestWeek(achievements: RecentAchievement[], by: Metric) {
   const byWeek: Record<string, { pts: number; ach: number }> = {}
   for (const a of achievements) {
-    const d = new Date(parseUnlockTime(a.Date))
-    const day = d.getUTCDay() || 7
-    const monday = new Date(d)
-    monday.setUTCDate(d.getUTCDate() - day + 1)
-    const key = utcDay(monday)
+    const key = mondayOf(dayOf(a))
     if (!byWeek[key]) byWeek[key] = { pts: 0, ach: 0 }
     byWeek[key].pts += a.Points
     byWeek[key].ach++
@@ -78,11 +75,11 @@ export default function MainPageBestPeriod({
   const when = (p: { pts: number; ach: number }, date: string) =>
     isSteam ? date : `${p.ach} ${T.lineChart.achievements} · ${date}`
 
-  // The week's seven days are UTC ones, as the card counted them.
+  // The week's seven days, on the reader's calendar as the card counted them.
   const weekAchievements = useMemo(() => {
     if (!selectedWeek) return []
-    const days = new Set(utcWeekDays(selectedWeek))
-    return achievements.filter((a) => days.has(a.Date.split(' ')[0]))
+    const days = new Set(weekDays(selectedWeek))
+    return achievements.filter((a) => days.has(dayOf(a)))
   }, [achievements, selectedWeek])
 
   const closeDayModal = useCallback(() => setSelectedDay(null), [])
@@ -168,7 +165,7 @@ export default function MainPageBestPeriod({
         {selectedMonth && (
           <PeriodAchievementsModal
             title={`${T.cards.bestMonth} · ${month(selectedMonth)}`}
-            achievements={achievements.filter((a) => a.Date.startsWith(selectedMonth))}
+            achievements={achievements.filter((a) => dayOf(a).startsWith(selectedMonth))}
             onClose={closeMonthModal}
           />
         )}
