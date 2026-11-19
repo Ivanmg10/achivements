@@ -27,16 +27,15 @@ const state = (over: Partial<PsnSyncState> = {}): PsnSyncState => ({
 beforeEach(() => jest.useFakeTimers())
 afterEach(() => jest.useRealTimers())
 
-test('when the library was read, and a countdown until the refresh button reads it again', () => {
-  const now = Date.now()
-  render(<MainPageProfilePsnSync sync={null} syncedAt={now - 3 * MIN} nextSyncAt={now + 7 * MIN} />)
+test('when the account was read, and a countdown until the refresh button reads it again', () => {
+  render(<MainPageProfilePsnSync sync={state()} />)
   expect(screen.getByText(/Updated 3 minutes ago/)).toBeInTheDocument()
   expect(screen.getByText(/You can update again in 7:00/)).toBeInTheDocument()
 })
 
 test('once a refresh is allowed, only when it was read', () => {
   const now = Date.now()
-  render(<MainPageProfilePsnSync sync={null} syncedAt={now - 20 * MIN} nextSyncAt={now - 10 * MIN} />)
+  render(<MainPageProfilePsnSync sync={state({ syncedAt: now - 20 * MIN, nextSyncAt: now - 10 * MIN })} />)
   expect(screen.getByText(/Updated 20 minutes ago/)).toBeInTheDocument()
   expect(screen.queryByText(/update again/)).not.toBeInTheDocument()
 })

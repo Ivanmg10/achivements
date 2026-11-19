@@ -12,21 +12,21 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import MainPageProfilePsnSyncSteps from './main-page-profile-psn-sync-steps/MainPageProfilePsnSyncSteps'
 
 /**
- * Where the PSN sync stands, in the profile card (#180, docs/psn-multi-account-pool.md §9): when Sony was last
- * read and when the refresh button may read it again (a countdown), one line in plain words (a live region), and
- * while a sync runs its four steps, a real progress bar and a rounded wait. On a phone the steps fold behind a
- * chip, so the card is not pushed down. Someone else's page shows only the first line (`sync` is null there).
+ * Where the first PSN sync stands (#180, docs/psn-multi-account-pool.md §9), above the profile column's skeleton
+ * while the card has nothing to show yet; never inside the card. When Sony was last read and a countdown until
+ * the refresh button may read it again, one line in plain words (a live region), and while the sync runs its
+ * four steps, a real progress bar and a rounded wait. On a phone the steps fold behind a chip.
  */
-export default function MainPageProfilePsnSync({ sync, syncedAt, nextSyncAt }: { sync: PsnSyncState | null; syncedAt?: number | null; nextSyncAt?: number | null }) {
+export default function MainPageProfilePsnSync({ sync }: { sync: PsnSyncState }) {
   const { T, lang } = useLanguage()
   const copy = T.psn.sync
   const [open, setOpen] = useState(false)
-  const at = sync?.syncedAt ?? syncedAt ?? null
-  const secondsLeft = useSecondsLeft(sync ? sync.nextSyncAt : nextSyncAt)
-  const message = sync && psnSyncMessage(sync, copy, lang)
-  const running = sync !== null && sync.stage !== 'ready' && sync.stage !== 'private' && sync.trouble !== 'paused'
+  const at = sync.syncedAt
+  const secondsLeft = useSecondsLeft(sync.nextSyncAt)
+  const message = psnSyncMessage(sync, copy, lang)
+  const running = sync.stage !== 'ready' && sync.stage !== 'private' && sync.trouble !== 'paused'
   const eta = running ? psnSyncEta(sync.etaSeconds, copy, lang) : null
-  const pct = `${sync?.progress ?? 0}`
+  const pct = `${sync.progress}`
 
   return (
     <div className="flex flex-col gap-2 text-[0.8125rem] text-text-secondary">

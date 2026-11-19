@@ -25,9 +25,9 @@ const TIER_RING = ['border-warning', 'border-silver', 'border-hardcore', 'border
 /**
  * A linked PSN profile: header (avatar, name, trophy level, PS Plus, about me, link out), four stats,
  * the last game played with its progress, and the latest trophies. Library figures come from the
- * shared context — no extra calls. On the viewer's own page, where the sync stands (#180): above the
- * skeleton while the first sync reads the trophy list, inside the card after; the refresh button asks
- * for a sync, and what it brings is read again once it ends.
+ * shared context — no extra calls. On the viewer's own page, while the first sync reads the trophy list
+ * (#180), where it stands sits above the skeleton; the card itself stays as every platform's (nothing added
+ * to it). The refresh button asks for a sync, and what it brings is read again once it ends.
  */
 export default function MainPageProfilePsnLinked({
   summary,
@@ -97,7 +97,6 @@ export default function MainPageProfilePsnLinked({
               {summary.isPlus && <Tag tone="hardcore">PS Plus</Tag>}
             </div>
             {summary.aboutMe && <p className="text-[0.8125rem] text-text-secondary line-clamp-2">{summary.aboutMe}</p>}
-            <MainPageProfilePsnSync sync={subject ? null : psnSync.sync} syncedAt={summary.syncedAt} nextSyncAt={summary.nextSyncAt} />
           </>
         ),
       }}

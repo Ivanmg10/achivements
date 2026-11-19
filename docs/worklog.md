@@ -46,7 +46,9 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   `enrich` job so a crowd of links each gets its library first.
 - Client: `usePsnSync` (reads the state while it moves, toasts, the refresh button's POST), `useSecondsLeft`,
   `MainPageProfilePsnSync` (last read, countdown, a live line, steps, `ProgressBar` with `valueText`, ETA; a chip on
-  phones), `utils/psnSyncCopy.ts`; `T.psn.sync`, `T.psn.errors.paused` and four toasts in the nine languages
+  phones) **only above the skeleton during the first sync**: a first version put it inside the PSN profile card and
+  the owner rejected it (it broke the column's look; the card stays as every platform's, phase 4's "Updated…" line
+  removed too). Where routine syncs and "under maintenance" show once the card is there: to design on the canvas, `utils/psnSyncCopy.ts`; `T.psn.sync`, `T.psn.errors.paused` and four toasts in the nine languages
   (`T.psn.nextSync` removed: the countdown replaced it). `ProgressBar` gained `valueText` and stays still under reduced motion.
 - Admin: `AdminPsnPoolMetrics` under the accounts (p95s, reads served, queue, 429s; per account by function, 429 %,
   401, 403, p95, days left; the switches).
@@ -68,7 +70,11 @@ owner sees the numbers and is alerted, and there is a written plan for a bad day
 - Not designed on the canvas first: a status block inside the existing card, from library pieces; review it on localhost.
 
 **Open**
-- Check on localhost with a real account: link → status line and steps → toasts; the refresh countdown; the admin numbers.
+- Check on localhost with a real account: link → status line and steps → toasts; the admin numbers.
+- Design on the canvas where the sync state (routine sync, old data, under maintenance, the refresh countdown) lives
+  once the card is shown, without touching the card.
+- Pre's PSN-1 is quarantined since 2026-11-16 (Sony refused its sign-in; production's is fine): renew it from pre's
+  admin panel.
 - With two accounts: whether Sony's 429 is per account or per IP; PSN-4 / PSN-5 and the staggered expiries.
 - On Pro: `psn-worker` every minute and `psn-alerts` every 5 minutes.
 

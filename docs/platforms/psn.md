@@ -482,12 +482,16 @@ simulated links against a real database.
   none of the user's jobs runs, `stale` (data an hour old or more), `trouble` (`paused`: PSN_MODE=stale or no account
   can read; `failing`: a job failed in the last hour or keeps retrying; the app's own budget spent is not trouble).
 
-The card shows when Sony was last read and a **countdown** until the refresh button may read it again (10 minutes),
-one line in plain words in a live region (`psnSyncMessage`: trouble first, then old data, then the stage), and while a
-sync runs the steps (shape and word, never colour alone), a `ProgressBar` with `aria-valuenow` and `aria-valuetext`
-(still under reduced motion) and the wait. On a phone the steps fold behind a chip (`aria-expanded`), so the card is
-not pushed down and nothing covers it. During the first sync the line and steps sit above the card's skeleton (the
-card has nothing to show yet). Words in all nine languages (`T.psn.sync`), never "NPSSO", "429", "token" or "job".
+**Only during the first sync**, above the profile column's skeleton (the card has nothing to show yet):
+`MainPageProfilePsnSync` shows when Sony was last read and a **countdown** until the refresh button may read it again
+(10 minutes), one line in plain words in a live region (`psnSyncMessage`: trouble first, then old data, then the
+stage), the steps (shape and word, never colour alone), a `ProgressBar` with `aria-valuenow` and `aria-valuetext`
+(still under reduced motion) and the wait; on a phone the steps fold behind a chip (`aria-expanded`). **Never inside
+the profile card** (2026-11-19, the owner: a status line in the PSN card broke the column's look, every platform's
+card stays the same; phase 4's "Updated…" line went with it). Where routine syncs, old data and "PSN is under
+maintenance" are shown once the card is there is still to be designed on the canvas: today they reach the user only
+as toasts (an asked-for refresh) and `/api/psn/status`. Words in all nine languages (`T.psn.sync`), never "NPSSO",
+"429", "token" or "job".
 
 `usePsnSync` reads the state again every 4 s while the core lands and every 15 s after, never once it is done (or
 paused). The page's own reads wait out a first sync by themselves (202), so it refetches only after a refresh the user

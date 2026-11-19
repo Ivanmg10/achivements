@@ -77,3 +77,15 @@ test('the first sync: what is happening above the skeleton; the refresh button a
   fireEvent.click(screen.getByRole('button', { name: en.profileRa.refreshData }))
   expect(refresh).toHaveBeenCalled()
 })
+
+test('the card stays as every platform draws it: no sync line inside it once it has data (#180)', () => {
+  ;(usePsnSync as jest.Mock).mockReturnValue({
+    sync: { stage: 'enriching', steps: { trophies: 'done', library: 'done', playtime: 'done', history: 'active' }, progress: 60, games: { read: 5, total: 10 }, etaSeconds: 60, position: null, stale: true, trouble: 'paused', syncedAt: 0, nextSyncAt: 0 },
+    error: false,
+    refresh: jest.fn(),
+  })
+  render(<MainPageProfilePsnLinked summary={SUMMARY} isLoading={false} error={null} onRetry={jest.fn()} />)
+  expect(screen.queryByText(en.psn.sync.paused)).not.toBeInTheDocument()
+  expect(screen.queryByRole('progressbar', { name: en.psn.sync.progress })).not.toBeInTheDocument()
+  expect(screen.queryByText(/Updated/)).not.toBeInTheDocument()
+})
