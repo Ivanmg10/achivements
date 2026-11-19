@@ -64,7 +64,7 @@ They asked for this reminder on purpose, because it is easy to forget.
 
 ## Migrations that must be applied first
 
-`migrations/` holds `002`–`048`. **Every migration is applied twice**: to pre first, to production when
+`migrations/` holds `002`–`049`. **Every migration is applied twice**: to pre first, to production when
 the work reaches `main` (see Environments). Any other database needs each one before the code that
 reads it runs. What each breaks without it, as `CLAUDE.md` used to say section by section:
 
@@ -91,6 +91,7 @@ reads it runs. What each breaks without it, as `CLAUDE.md` used to say section b
 | `046_psn_verification` | `users.psn_verified_at`, `psn_verification_code`, `psn_verification_expires_at` and the partial unique index on `psnaccountid` where verified (#176) | pre 2026-11-15, prod 2026-11-16 | **Every signed-in request fails** (`userRecord` reads `psn_verified_at`), and the verification route and the rankings' PSN gate answer 500. Idempotent (`IF NOT EXISTS`), so a second run is harmless |
 | `047_psn_account_pool` | The PSN service-account pool (#178): `psn_service_accounts`, `psn_account_leases`, `psn_account_stats`, `psn_alert_state`, `psn_sync_jobs`; copies `psn_credentials` into PSN-1 when the pool is empty | pre and prod 2026-11-16 (PSN-1 seeded in both from `psn_credentials`) | **Every PSN call fails** (the pool's tables are missing): PSN pages answer `not-configured` / 502, the admin PlayStation tab 500. Idempotent (`IF NOT EXISTS`, the copy only into an empty pool) |
 | `048_psn_snapshots` | PSN snapshots (#179): `psn_players`, `psn_player_games`, `psn_player_trophies`, `psn_games`, `psn_trophies`, and indexes for the delta and the queue (`psn_sync_jobs_next`) | pre and prod 2026-11-16 (ahead of the code; production does not read them until #179 ships) | **Every PSN page answers 502** (the readers and the worker read these tables), linking PSN fails after the search, and the PSN score fill reads nothing. Idempotent (`IF NOT EXISTS`) |
+| `049_psn_metrics` | PSN numbers (#180): `psn_account_stats.forbidden` and `.by_fn`, the `psn_timings` table (each Sony call and PSN page read, two days), `psn_sync_jobs.started_at` | pre and prod 2026-11-19 (ahead of the code; additive, nothing before #180 reads it) | **Every Sony call fails to record** (the lease's statement writes the new columns and table) and the admin numbers, the alerts and `/api/psn/status`'s position fail. Idempotent (`IF NOT EXISTS`) |
 
 `—`: not written down in `CLAUDE.md` (the worklog archive may say). All of `041`–`044` are in production since the 1.7.0
 release (2026-11-02).

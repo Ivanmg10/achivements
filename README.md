@@ -85,6 +85,8 @@ missing:
 | `PSN_SECRET_KEY` | The pool's NPSSOs and tokens are sealed from `NEXTAUTH_SECRET`, as before #178 |
 | `TELEGRAM_BOT_TOKEN` / `TELEGRAM_CHAT_ID` | No Telegram alerts about the PSN pool; expiring sign-ins are mailed to the admins instead |
 | `PSN_STATUS_TOKEN` | `GET /api/ops/psn/status` (the pool's state for the owner's agent) is a 404 |
+| `PSN_MODE` | Nothing: `live`. `queue` reads only the core, `stale` never calls Sony (pages serve what is stored); the runbook in `docs/platforms/psn.md` says when |
+| `PSN_POOL_ENABLED` | Nothing: the pool is on. `false` makes the oldest active PSN account do everything, no failover |
 | `OPENXBL_API_KEY` | Xbox (admin-only for now) answers `not-configured` |
 | `TWITCH_CLIENT_ID` / `_SECRET` | PS3/Vita games keep their trophy icon, no IGDB details |
 | `RESEND_API_KEY` (+ `EMAIL_FROM`) | Password recovery and verification mail — see `docs/accounts.md` → Email |
