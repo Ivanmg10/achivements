@@ -14,3 +14,11 @@ test('reports its state, and the icon changes shape when on', () => {
   expect(screen.getByRole('button', { name: 'Pin it' })).toHaveAttribute('aria-pressed', 'true')
   expect(screen.getByTestId('IconStarFilled')).toBeInTheDocument()
 })
+
+test('positioned for its touch area, unless the caller places it: a badge corner star stays out of the flow (#164)', () => {
+  const { rerender } = render(<ToggleButton pressed={false} onToggle={() => {}} label="Pin it" icon={IconStar} />)
+  expect(screen.getByRole('button').className.split(' ')).toContain('relative')
+  rerender(<ToggleButton pressed={false} onToggle={() => {}} label="Pin it" icon={IconStar} className="absolute -top-1 -right-1" />)
+  expect(screen.getByRole('button').className.split(' ')).not.toContain('relative')
+  expect(screen.getByRole('button')).toHaveClass('absolute', 'tap-target')
+})

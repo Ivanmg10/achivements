@@ -51,7 +51,10 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   the top row (the grid sized the row by the card's content whatever the stats section, which is why the first fix, only
   exempting the open row from the Overview's "never shrink" rule, did nothing with Explore open). The profile column sets the
   height and the panel scrolls. Seen signed in: Overview and Explore at 2560×1440, 1280×800, the public profile; pinned fits.
-  `BadgeGrid` wraps with `content-start` (rows no longer spread).
+  The wide gaps between badge rows were not the wrap: `ToggleButton` got a fixed `relative` in #162 (for its touch area), which
+  beat the pin star's `absolute` on a badge's corner, so the star sat under the badge and each badge was 60 px tall. Only
+  PSN, Steam and Xbox grids pass `pins` (RA pins from its detail modal), so only they showed it, and only on your own pages.
+  `ToggleButton` now positions itself only when the caller does not. `BadgeGrid` also wraps with `content-start`.
 - 7: `--figure-mark` (`"/"` slanted, `none` round) and `FIGURE_MARK` for the mark between bare figures; `Tabs` and `Facts` keep `--mark`.
   CLAUDE.md, `docs/design-system.md` and the `/design` catalogue say so.
 
