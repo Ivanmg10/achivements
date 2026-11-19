@@ -33,6 +33,70 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-19 — Game page review, part A (`fix/167-game-page-review`, #167)
+
+**Did**
+- A3: Steam's "likely needs online play" guess is gone: `utils/steamOnline.ts` (+ test), its call and its
+  `steamOnlineModes:<appid>` cache in `api/steam/achievements`, `getAppCategories` in `steamClient.ts`, `likelyOnline`
+  (type, mapper, landing sample), `SteamOnlineBadge` (table tag, window, grid tooltip), the warning notice over Steam's
+  table, the `T.steam.likelyOnline*`, `T.plurals.onlineCount` and `T.gameInfoTable.onlineText` strings, and the AI
+  export's `mayNeedOnline` (its Steam prompt now asks the AI to flag online ones it knows of).
+  **How it worked, if it ever comes back** (git has the code, last in `f0804a0b`): the route read the store's
+  categories for the game (`appdetails?filters=categories`, English, cached 24 h as `steamOnlineModes:<appid>`):
+  MMO 20, cross-platform 27, online PvP 36, online co-op 38 meant online; plain multiplayer 1 meant online unless a
+  shared/split-screen category (24, 37, 39) was there. Then each achievement's English name + description was matched:
+  "online / ranked / matchmaking / lobby" always counted, "multiplayer / leaderboard" unless the store said no online
+  modes, "match / co-op / versus / pvp / friends / clan…" only in a game with online modes, and "local / split-screen /
+  offline / couch" beat everything. Shown as "Online?" with a hint that it was an estimate.
+- A2: the missables are a folded panel again (`missable-panel/MissablePanel`, on `Accordion` in a new `tone="danger"`):
+  the head says how many can be lost, open it lists each unearned one (badge, title, description, `ListRow wrap`); a
+  row opens the table's own window (`setSelectedId`, RA's `AchievementModal`). `MissableNotice`, the table's `notice`
+  filter, `showOnlyThese` / `showAllAgain` / `missableMore` are gone. The hero's "N perdibles" chip is a link to
+  `#missables` (`GameHeroChip href`, only on the viewer's own page: `GameInfoHeader linkMissables`), which opens the
+  panel; folding it by hand drops the fragment so the chip opens it again. `Accordion` also takes `open` /
+  `onOpenChange` / `id`.
+- A4: `ui/FoldList` (+ specimen in `/design`, guard rule): `ShowMore` and the list as one piece. Folded, the last row
+  fades out (`.fold-fade`, a mask); unfolding grows the box (a height transition run from JS measurements, CSS motion)
+  and brings the new rows in with `enter-rise`, staggered (`foldItem(i, cap)` marks them, only while
+  `[data-unfolding]`, so a later sort does not replay it); folding shrinks back, then drops the rows and focuses the
+  button. Nothing moves with reduced motion. Used by the four game tables (`ShowRestButton` deleted) and `BadgeGrid`
+  (`ShowAllButton` deleted). `ShowMore` takes a `ref`.
+- A1: `game-hero/game-hero-cover/GameHeroCover`, the one cover, given to `GameHero` as data (`cover={{ sources, alt,
+  natural, ratio, pending, optimized, fallback }}`). Steam, PSN and Xbox: a 2:3 frame; a portrait (within 0.06 of
+  2:3) covers it, any other shape is `object-contain` over a blurred, darkened copy. RA: `natural`, the box at its own
+  ratio, holding `raBoxRatio(console)` (`utils/raBoxRatio.ts`, measured on the owner's library) until loaded. Steam
+  tries cover → header → icon (its logo when none); PSN: Store cover → IGDB's (`details.coverUrl`) → trophy icon;
+  Xbox: IGDB's box art (`details.coverUrl`, through `xboxMappers.https()`, now exported) → the title's tile. The
+  detail hooks expose `isLoading`, so the cover waits (`pending`) instead of swapping an icon for the box art.
+  Server: `igdbPsnArt` (PS4/PS5 platforms, the same `artOn` cache as PS3/Vita) called by `/api/psn/details` only for a
+  game whose snapshot has no cover; Xbox's `/api/xbox/details` already sent `coverUrl`. `GameInfoSkeleton` takes
+  `cover="natural"` on RA's pages (a 0.71 box) and holds 2:3 elsewhere.
+
+**Why** — the owner's review of the game pages (#167, part A).
+
+**Decisions**
+- No `_vN` bump for Steam: the dropped field was built per request; no cached shape changed (the schema, player and
+  rarity caches are untouched). `steamOnlineModes:` rows just expire.
+- The missables chip uses the URL fragment, not shared state: the header and the table are siblings on the page and
+  the header is also drawn on other people's pages, where there is no panel.
+- FoldList keeps the caller's slicing (the hidden rows are not in the page while folded, so not focusable) and
+  animates with an inline height transition; `interpolate-size` would need no JS but Firefox lacks it.
+- The cover frame covers only within 0.06 of 2:3: an Xbox 360 box (≈0.75) is shown whole with thin blurred bands
+  rather than cropped.
+
+**Open** (part B of #167 is not done: B1–B8)
+- Firefox: the fold's motion was not tried in Firefox here (the Playwright Firefox build does not match the installed
+  playwright-core); the owner should try "Mostrar los N restantes" there.
+- `XboxGameHeroBackground` takes IGDB's `heroUrl` without `https()` (as before); harmless (IGDB is https).
+
+**Watch out**
+- The dev server (Turbopack on Windows) did not pick up `globals.css` written by a script: an edit through the editor
+  did. If a new class seems missing, check the served CSS before the code.
+- Steam's `library_600x900` is missing for some games (Assassin's Creed Liberation): the frame then shows the store
+  header whole over its blur, which is intended.
+
+---
+
 ## 2026-11-19 — Home review: the seven points, the local day and the badge window (`fix/164-home-review`, #164)
 
 **Did**
