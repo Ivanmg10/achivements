@@ -3,7 +3,7 @@ import { useLocationHash } from '@/hooks/useLocationHash'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { anchorOf, sortEntries, type SortDir, type TableEntry, type TableSort } from '@/utils/achievementTable'
 
-/** `notice`: only the ones the line above the table names (RA's missables, Steam's online ones). */
+/** `notice`: only the ones the line above the table names (RA's missables). */
 export type TableFilter = 'all' | 'earned' | 'unearned' | 'notice'
 
 /** Rows shown before "show the other N". */

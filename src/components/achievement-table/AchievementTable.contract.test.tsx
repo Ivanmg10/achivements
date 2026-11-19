@@ -67,7 +67,7 @@ const STEAM: Platform = {
   render: (specs) => {
     const list: SteamAchievementUnified[] = specs.map((s, i) => ({
       _source: 'steam', id: `K${i}`, apiname: `K${i}`, title: s.title, description: s.text ?? `${s.title} text`, badgeUrl: `${i}.jpg`,
-      displayOrder: i, hidden: !!s.secret, earned: !!s.earned, dateEarned: s.earned ? day(s.at) : null, globalPct: s.rarity ?? null, likelyOnline: !!s.noticed,
+      displayOrder: i, hidden: !!s.secret, earned: !!s.earned, dateEarned: s.earned ? day(s.at) : null, globalPct: s.rarity ?? null,
     }))
     render(<SteamGameInfoTable achievements={list} appId={620} gameTitle="Game" />)
   },
@@ -80,7 +80,7 @@ const STEAM: Platform = {
   texts: { none: en.steam.noAchievements, earned: en.steam.earned, locked: en.steam.locked },
   secret: { title: en.steam.hiddenAchievement },
   anchor: (i) => `ach-K${i}`,
-  hasNotice: true,
+  hasNotice: false,
 }
 
 const PSN: Platform = {

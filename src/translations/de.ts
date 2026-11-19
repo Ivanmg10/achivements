@@ -304,7 +304,6 @@ export const de: Translations = {
     inProgress: 'In Arbeit',
   },
   gameInfoTable: {
-    onlineText: 'und die Server können abgeschaltet werden:',
     searchPlaceholder: 'Erfolg suchen',
     sortGameOrder: 'Spielreihenfolge',
     showRest: 'Die übrigen {n} anzeigen',
@@ -1381,8 +1380,6 @@ export const de: Translations = {
     progressUnknown: 'Fortschritt nicht geladen',
     hiddenAchievement: 'Versteckter Erfolg',
     hiddenAchievementDesc: 'Spiel weiter, um ihn aufzudecken',
-    likelyOnline: 'Online?',
-    likelyOnlineHint: 'Erfordert wahrscheinlich Online-Spiel (anhand der Beschreibung geschätzt)',
     earned: 'Erhalten',
     locked: 'Gesperrt',
     achievementsError: 'Erfolge konnten nicht geladen werden',
@@ -1702,7 +1699,6 @@ export const de: Translations = {
     results: { one: '{n} Ergebnis', other: '{n} Ergebnisse' },
     missables: { one: '{n} verpassbar', other: '{n} verpassbar' },
     missableCount: { one: '{n} Erfolg ist verpassbar', other: '{n} Erfolge sind verpassbar' },
-    onlineCount: { one: '{n} Erfolg braucht evtl. Online-Spiel', other: '{n} Erfolge brauchen evtl. Online-Spiel' },
     hashes: { one: '{n} registrierter Hash', other: '{n} registrierte Hashes' },
   },
   welcome: {

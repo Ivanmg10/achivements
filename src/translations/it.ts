@@ -304,7 +304,6 @@ export const it: Translations = {
     inProgress: 'In corso',
   },
   gameInfoTable: {
-    onlineText: 'e i server potrebbero chiudere:',
     searchPlaceholder: 'Cerca un obiettivo',
     sortGameOrder: 'Ordine del gioco',
     showRest: 'Mostra gli altri {n}',
@@ -1381,8 +1380,6 @@ export const it: Translations = {
     progressUnknown: 'Progresso non caricato',
     hiddenAchievement: 'Obiettivo nascosto',
     hiddenAchievementDesc: 'Continua a giocare per scoprirlo',
-    likelyOnline: 'Online?',
-    likelyOnlineHint: 'Probabilmente richiede il gioco online (stimato dalla descrizione)',
     earned: 'Ottenuto',
     locked: 'Bloccato',
     achievementsError: 'Impossibile caricare gli obiettivi',
@@ -1702,7 +1699,6 @@ export const it: Translations = {
     results: { one: '{n} risultato', other: '{n} risultati' },
     missables: { one: '{n} perdibile', other: '{n} perdibili' },
     missableCount: { one: '{n} obiettivo si può perdere', other: '{n} obiettivi si possono perdere' },
-    onlineCount: { one: '{n} obiettivo potrebbe richiedere il gioco online', other: '{n} obiettivi potrebbero richiedere il gioco online' },
     hashes: { one: '{n} hash registrato', other: '{n} hash registrati' },
   },
   welcome: {

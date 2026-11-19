@@ -304,7 +304,6 @@ export const fr: Translations = {
     inProgress: 'En cours',
   },
   gameInfoTable: {
-    onlineText: 'et les serveurs peuvent fermer :',
     searchPlaceholder: 'Chercher un succès',
     sortGameOrder: 'Ordre du jeu',
     showRest: 'Afficher les {n} restants',
@@ -1381,8 +1380,6 @@ export const fr: Translations = {
     progressUnknown: 'Progression non chargée',
     hiddenAchievement: 'Succès caché',
     hiddenAchievementDesc: 'Continuez à jouer pour le découvrir',
-    likelyOnline: 'En ligne ?',
-    likelyOnlineHint: 'Nécessite probablement le jeu en ligne (estimé d’après sa description)',
     earned: 'Obtenu',
     locked: 'Verrouillé',
     achievementsError: 'Impossible de charger les succès',
@@ -1702,7 +1699,6 @@ export const fr: Translations = {
     results: { one: '{n} résultat', other: '{n} résultats' },
     missables: { one: '{n} manquable', other: '{n} manquables' },
     missableCount: { one: '{n} succès peut être manqué', other: '{n} succès peuvent être manqués' },
-    onlineCount: { one: '{n} succès peut demander de jouer en ligne', other: '{n} succès peuvent demander de jouer en ligne' },
     hashes: { one: '{n} hash enregistré', other: '{n} hashs enregistrés' },
   },
   welcome: {

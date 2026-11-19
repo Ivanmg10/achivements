@@ -38,11 +38,11 @@ export type AchievementTableProps<T> = {
   columns?: AchievementColumn<T>[]
   /** The order menu's keys after the game order; the sortable columns' by default. */
   sortMenu?: string[]
-  /** Beside the name in a row, at the end of a card's facts (RA's type, Steam's "online?"). */
+  /** Beside the name in a row, at the end of a card's facts (RA's type). */
   tags?: (e: TableEntry<T>) => ReactNode
   /** A line under the phone card's data line (RA's author); the desktop row has none. */
   cardNote?: (e: TableEntry<T>) => ReactNode
-  /** The line above the table that names some of them and can keep only those (RA's missables, Steam's online ones). */
+  /** The line above the table that names some of them and can keep only those (RA's missables). */
   notice?: { match: (e: TableEntry<T>) => boolean; tone?: 'danger' | 'warning'; lead?: (n: number) => string; text?: string }
   /** Tabs over the table that show one part of the game (PSN's DLC). */
   scopes?: { of: (t: T) => string; tabs: (scope: string, onSelect: (scope: string) => void, panelId: string) => ReactNode }

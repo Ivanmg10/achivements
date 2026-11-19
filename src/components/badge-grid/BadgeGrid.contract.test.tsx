@@ -78,7 +78,7 @@ const STEAM: Platform = {
   render: (specs, opts) => {
     const list: SteamAchievementUnified[] = specs.map((s, i) => ({
       _source: 'steam', id: `A${i}`, apiname: `A${i}`, title: s.title, description: s.text ?? `${s.title} text`, earned: !!s.earned,
-      dateEarned: s.earned ? day(s.at) : null, badgeUrl: 'icon.jpg', displayOrder: i, hidden: !!s.secret, globalPct: s.rarity ?? null, likelyOnline: false,
+      dateEarned: s.earned ? day(s.at) : null, badgeUrl: 'icon.jpg', displayOrder: i, hidden: !!s.secret, globalPct: s.rarity ?? null,
     }))
     render(<SteamAchievementGrid appId={620} gameTitle="Game" achievements={list} limit={opts?.limit} />)
   },

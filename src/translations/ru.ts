@@ -304,7 +304,6 @@ export const ru: Translations = {
     inProgress: 'В процессе',
   },
   gameInfoTable: {
-    onlineText: 'а серверы могут закрыться:',
     searchPlaceholder: 'Найти достижение',
     sortGameOrder: 'Порядок в игре',
     showRest: 'Показать остальные ({n})',
@@ -1381,8 +1380,6 @@ export const ru: Translations = {
     progressUnknown: 'Прогресс не загружен',
     hiddenAchievement: 'Скрытое достижение',
     hiddenAchievementDesc: 'Продолжайте играть, чтобы открыть его',
-    likelyOnline: 'Онлайн?',
-    likelyOnlineHint: 'Вероятно, требует онлайн-игры (оценка по описанию)',
     earned: 'Получено',
     locked: 'Не получено',
     achievementsError: 'Не удалось загрузить достижения',
@@ -1702,7 +1699,6 @@ export const ru: Translations = {
     results: { one: '{n} результат', few: '{n} результата', many: '{n} результатов', other: '{n} результата' },
     missables: { one: '{n} можно упустить', few: '{n} можно упустить', many: '{n} можно упустить', other: '{n} можно упустить' },
     missableCount: { one: '{n} достижение можно упустить', few: '{n} достижения можно упустить', many: '{n} достижений можно упустить', other: '{n} достижения можно упустить' },
-    onlineCount: { one: '{n} достижение может требовать игры онлайн', few: '{n} достижения могут требовать игры онлайн', many: '{n} достижений могут требовать игры онлайн', other: '{n} достижения могут требовать игры онлайн' },
     hashes: { one: '{n} зарегистрированный хэш', few: '{n} зарегистрированных хэша', many: '{n} зарегистрированных хэшей', other: '{n} зарегистрированного хэша' },
   },
   welcome: {

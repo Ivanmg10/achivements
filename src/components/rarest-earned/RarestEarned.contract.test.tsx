@@ -30,7 +30,7 @@ const psn = (s: Spec, i: number): PsnTrophy => ({
 })
 const steam = (s: Spec, i: number): SteamAchievementUnified => ({
   _source: 'steam', id: `K${i}`, apiname: `K${i}`, title: s.name, description: '', earned: s.earned ?? true, dateEarned: null, badgeUrl: `${i}.jpg`,
-  displayOrder: i, hidden: false, globalPct: s.rarity, likelyOnline: false,
+  displayOrder: i, hidden: false, globalPct: s.rarity,
 })
 
 const PLATFORMS: Platform[] = [

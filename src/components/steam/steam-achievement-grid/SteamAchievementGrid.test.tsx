@@ -24,7 +24,6 @@ function ach(overrides: Partial<SteamAchievementUnified> = {}): SteamAchievement
     displayOrder: 0,
     hidden: false,
     globalPct: null,
-    likelyOnline: false,
     ...overrides,
   }
 }
@@ -41,11 +40,11 @@ beforeEach(() => {
 })
 afterEach(() => jest.useRealTimers())
 
-test('a badge opens its window (with the online flag), and pins against that game', async () => {
-  render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach({ likelyOnline: true })]} />)
+test('a badge opens its window, and pins against that game', async () => {
+  render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
   jest.useRealTimers()
   fireEvent.click(screen.getByRole('button'))
-  expect(await screen.findByRole('dialog', { name: 'Win a Match' })).toHaveTextContent(en.steam.likelyOnline)
+  expect(await screen.findByRole('dialog', { name: 'Win a Match' })).toBeInTheDocument()
   expect(useAchievementPins).toHaveBeenCalledWith(STEAM_PINS, 620, 'Portal 2')
 })
 
@@ -81,8 +80,3 @@ test('a secret achievement keeps its picture, since Steam gives it, but not its 
   expect(screen.getByRole('button', { name: `${en.steam.hiddenAchievement} — ${en.steam.locked}` })).toBeInTheDocument()
 })
 
-test('the tooltip flags an achievement that probably needs online play', () => {
-  render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach({ likelyOnline: true })]} />)
-  hover()
-  expect(screen.getByRole('tooltip')).toHaveTextContent(en.steam.likelyOnline)
-})

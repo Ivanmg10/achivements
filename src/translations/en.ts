@@ -305,7 +305,6 @@ export const en = {
     inProgress: 'In Progress',
   },
   gameInfoTable: {
-    onlineText: 'and its servers may close:',
     searchPlaceholder: 'Search an achievement',
     sortGameOrder: 'Game order',
     showRest: 'Show the other {n}',
@@ -1382,8 +1381,6 @@ export const en = {
     progressUnknown: 'Progress not loaded',
     hiddenAchievement: 'Hidden achievement',
     hiddenAchievementDesc: 'Keep playing to reveal it',
-    likelyOnline: 'Online?',
-    likelyOnlineHint: 'Probably needs online play (estimated from its description)',
     earned: 'Earned',
     locked: 'Locked',
     achievementsError: 'Could not load achievements',
@@ -1703,7 +1700,6 @@ export const en = {
     results: { one: '{n} result', other: '{n} results' } as PluralForms,
     missables: { one: '{n} missable', other: '{n} missable' } as PluralForms,
     missableCount: { one: '{n} achievement can be missed', other: '{n} achievements can be missed' } as PluralForms,
-    onlineCount: { one: '{n} achievement may need online play', other: '{n} achievements may need online play' } as PluralForms,
     hashes: { one: '{n} registered hash', other: '{n} registered hashes' } as PluralForms,
   },
   welcome: {

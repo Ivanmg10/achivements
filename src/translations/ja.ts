@@ -304,7 +304,6 @@ export const ja: Translations = {
     inProgress: '進行中',
   },
   gameInfoTable: {
-    onlineText: 'サーバーが終了する可能性があります：',
     searchPlaceholder: '実績を検索',
     sortGameOrder: 'ゲーム内の順番',
     showRest: '残り{n}件を表示',
@@ -1381,8 +1380,6 @@ export const ja: Translations = {
     progressUnknown: '進捗は未読み込み',
     hiddenAchievement: '隠し実績',
     hiddenAchievementDesc: 'プレイを続けて解除しよう',
-    likelyOnline: 'オンライン?',
-    likelyOnlineHint: 'オンラインプレイが必要な可能性があります(説明文からの推定)',
     earned: '解除済み',
     locked: '未解除',
     achievementsError: '実績を読み込めませんでした',
@@ -1702,7 +1699,6 @@ export const ja: Translations = {
     results: { other: '{n}件' },
     missables: { other: '取り逃し{n}件' },
     missableCount: { other: '取り逃す可能性のある実績が{n}件' },
-    onlineCount: { other: 'オンラインが必要かもしれない実績が{n}件' },
     hashes: { other: '登録済みハッシュ {n} 件' },
   },
   welcome: {

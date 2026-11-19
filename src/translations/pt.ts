@@ -304,7 +304,6 @@ export const pt: Translations = {
     inProgress: 'Em progresso',
   },
   gameInfoTable: {
-    onlineText: 'e os servidores podem fechar:',
     searchPlaceholder: 'Buscar uma conquista',
     sortGameOrder: 'Ordem do jogo',
     showRest: 'Mostrar as {n} restantes',
@@ -1381,8 +1380,6 @@ export const pt: Translations = {
     progressUnknown: 'Progresso não carregado',
     hiddenAchievement: 'Conquista oculta',
     hiddenAchievementDesc: 'Continua a jogar para a descobrir',
-    likelyOnline: 'Online?',
-    likelyOnlineHint: 'Provavelmente requer jogo online (estimado pela descrição)',
     earned: 'Obtida',
     locked: 'Bloqueada',
     achievementsError: 'Não foi possível carregar as conquistas',
@@ -1702,7 +1699,6 @@ export const pt: Translations = {
     results: { one: '{n} resultado', other: '{n} resultados' },
     missables: { one: '{n} perdível', other: '{n} perdíveis' },
     missableCount: { one: '{n} conquista pode ser perdida', other: '{n} conquistas podem ser perdidas' },
-    onlineCount: { one: '{n} conquista pode exigir jogar online', other: '{n} conquistas podem exigir jogar online' },
     hashes: { one: '{n} hash registrado', other: '{n} hashes registrados' },
   },
   welcome: {

@@ -35,8 +35,6 @@ export type AiAchievement = {
   /** PSN */
   grade?: 'platinum' | 'gold' | 'silver' | 'bronze'
   dlc?: string
-  /** Steam */
-  mayNeedOnline?: boolean
   /** Xbox */
   gamerscore?: number
 }
@@ -145,7 +143,6 @@ export function steamAiSource({
         earnedAt: a.dateEarned,
         rarityPercent: a.globalPct !== null ? round1(a.globalPct) : null,
         hidden: a.hidden,
-        mayNeedOnline: a.likelyOnline,
       })),
   }
 }
@@ -243,7 +240,7 @@ function platformNotes(source: AiExportSource): string[] {
     return [
       'These are the game\'s Steam achievements. "nameEnglish" is the official English name when the player\'s list is in another language; guides and wikis use it.',
       '"hidden": true marks a secret achievement. Steam does not reveal a hidden achievement\'s description until it is unlocked, so "description" may be missing: identify it by its name, and say so if you cannot.',
-      '"mayNeedOnline": true is only a guess made from the description (Steam has no such flag), so it can be wrong either way. For online or multiplayer achievements, say whether the official servers are likely still up (or not, if you know they were shut down), whether they need other players, and any offline or private-match alternative.',
+      'Steam does not mark which achievements need online play. When you know one does, say whether the official servers are likely still up (or not, if you know they were shut down), whether it needs other players, and any offline or private-match alternative.',
       '"playtimeHours" is how long the player has played the game, a hint of how far they are.',
     ]
   }
@@ -344,7 +341,6 @@ export function buildAiExport(source: AiExportSource, { lang, question = '', now
         dlc: a.dlc,
         gamerscore: a.gamerscore,
         hidden: a.hidden,
-        mayNeedOnline: a.mayNeedOnline,
       }),
     )
   const total = all.length

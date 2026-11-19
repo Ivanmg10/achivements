@@ -203,8 +203,6 @@ export type SteamAchievementUnified = AchievementBase & {
   earned: boolean
   /** Share of all Steam players who have it, 0–100 — Steam's equivalent of RA rarity. */
   globalPct: number | null
-  /** Probably needs online play — guessed from its description, Steam has no such flag. */
-  likelyOnline: boolean
   /** Its English name, when the page is in another language and it differs: guides go by it. */
   titleEn?: string
 }

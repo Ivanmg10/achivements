@@ -103,7 +103,7 @@ The shell must keep these; an adapter carries each one. From the audit (HK, LB) 
   last in the row on all four (#129). Its data hooks keep their retry loop (`useRetryingRead`). RA's pictures go through Next's image
   optimizer; the other hosts are `unoptimized`.
 - **Steam:** the library loads in two steps (the recent games first, then the whole library: `SteamGamesDataContext`), secret ones
-  keep their picture and cannot be revealed (Steam gives no text), "Online?" and the online notice,
+  keep their picture and cannot be revealed (Steam gives no text), no online guess (dropped in #167),
   guides searched by the English name (`titleEn`), links `#ach-<apiname>` (any character: decode the
   fragment).
 - **PSN:** trophy grades (column, ring, chip), DLC groups as tabs (`PsnTrophyGroupTabs`, the guard's one

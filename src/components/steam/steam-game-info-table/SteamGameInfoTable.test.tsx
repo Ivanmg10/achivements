@@ -12,7 +12,7 @@ import type { SteamAchievementUnified } from '@/types/steam'
 function ach(apiname: string, overrides: Partial<SteamAchievementUnified> = {}): SteamAchievementUnified {
   return {
     _source: 'steam', id: apiname, apiname, title: apiname, description: `${apiname} desc`, earned: false, dateEarned: null,
-    badgeUrl: `${apiname}.jpg`, displayOrder: 0, hidden: false, globalPct: null, likelyOnline: false, ...overrides,
+    badgeUrl: `${apiname}.jpg`, displayOrder: 0, hidden: false, globalPct: null, ...overrides,
   }
 }
 
@@ -42,9 +42,3 @@ test('a secret one keeps its text but shows its picture', () => {
   expect(within(screen.getByRole('row', { name: new RegExp(en.steam.hiddenAchievement) })).getByRole('presentation')).toHaveAttribute('src', 'SECRET.jpg')
 })
 
-test('one that likely needs online play says so beside its name and in its window', async () => {
-  render(<SteamGameInfoTable achievements={[ach('MP', { title: 'Win online', likelyOnline: true })]} appId={620} gameTitle="Portal 2" />)
-  expect(within(screen.getByRole('table')).getByText(en.steam.likelyOnline)).toBeInTheDocument()
-  fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'Win online' }))
-  expect(within(await screen.findByRole('dialog')).getByText(en.steam.likelyOnline)).toBeInTheDocument()
-})

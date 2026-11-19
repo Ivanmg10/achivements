@@ -55,10 +55,10 @@ test("the player's question goes in, and is answered first", () => {
 
 const steamAch = (over: Partial<SteamAchievementUnified>): SteamAchievementUnified => ({
   _source: 'steam', id: 'x', apiname: 'x', title: 'x', description: '', dateEarned: null, badgeUrl: '', displayOrder: 0,
-  hidden: false, earned: false, globalPct: null, likelyOnline: false, ...over,
+  hidden: false, earned: false, globalPct: null, ...over,
 })
 
-test('Steam: English names, hidden and online flags, playtime; no RA-only fields', () => {
+test('Steam: English names, hidden flags, playtime; no RA-only fields', () => {
   const file = buildAiExport(
     steamAiSource({
       appId: 202970,
@@ -67,7 +67,7 @@ test('Steam: English names, hidden and online flags, playtime; no RA-only fields
       playtimeMinutes: 754,
       achievements: [
         steamAch({ apiname: 'B', title: 'Secreto', titleEn: 'Secret', hidden: true, displayOrder: 1, globalPct: 3.14159 }),
-        steamAch({ apiname: 'A', title: 'Partida', description: 'Gana una partida', likelyOnline: true, displayOrder: 0, earned: true, dateEarned: '2026-01-01T00:00:00Z' }),
+        steamAch({ apiname: 'A', title: 'Partida', description: 'Gana una partida', displayOrder: 0, earned: true, dateEarned: '2026-01-01T00:00:00Z' }),
       ],
     }),
     { lang: 'es', now: NOW },
@@ -76,7 +76,8 @@ test('Steam: English names, hidden and online flags, playtime; no RA-only fields
   expect(file.earned).toEqual([{ name: 'Partida', description: 'Gana una partida', earnedAt: '2026-01-01T00:00:00Z' }])
   expect(file.game).toMatchObject({ platform: 'Steam', developer: 'Treyarch', playtimeHours: 12.6, link: 'https://store.steampowered.com/app/202970' })
   expect(file.progress).toEqual({ earned: 1, total: 2, percent: 50 })
-  expect(file.instructions.join('\n')).toContain('"mayNeedOnline": true is only a guess')
+  expect(file.instructions.join('\n')).toContain('Steam does not mark which achievements need online play')
+  expect(JSON.stringify(file)).not.toContain('mayNeedOnline')
 })
 
 test('PSN: grades, DLC by name and the trophies by grade', () => {

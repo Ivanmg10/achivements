@@ -304,7 +304,6 @@ export const es: Translations = {
     inProgress: 'En progreso',
   },
   gameInfoTable: {
-    onlineText: 'y sus servidores pueden cerrar:',
     searchPlaceholder: 'Buscar un logro',
     sortGameOrder: 'Orden del juego',
     showRest: 'Mostrar los {n} restantes',
@@ -1381,8 +1380,6 @@ export const es: Translations = {
     progressUnknown: 'Progreso no cargado',
     hiddenAchievement: 'Logro oculto',
     hiddenAchievementDesc: 'Sigue jugando para descubrirlo',
-    likelyOnline: '¿Online?',
-    likelyOnlineHint: 'Probablemente requiere jugar online (estimado a partir de su descripción)',
     earned: 'Conseguido',
     locked: 'Bloqueado',
     achievementsError: 'No se pudieron cargar los logros',
@@ -1702,7 +1699,6 @@ export const es: Translations = {
     results: { one: '{n} resultado', other: '{n} resultados' },
     missables: { one: '{n} perdible', other: '{n} perdibles' },
     missableCount: { one: '{n} logro se puede perder', other: '{n} logros se pueden perder' },
-    onlineCount: { one: '{n} logro puede requerir jugar online', other: '{n} logros pueden requerir jugar online' },
     hashes: { one: '{n} hash registrado', other: '{n} hashes registrados' },
   },
   welcome: {
