@@ -10,7 +10,8 @@ jest.mock('@/lib/raKey', () => ({ sealRaKey: (key: string) => ({ sealed: `sealed
 jest.mock('@/lib/raProfile', () => ({ ...jest.requireActual('@/lib/raProfile'), fetchRaProfile: jest.fn() }))
 jest.mock('@/lib/steamCache', () => ({ clearUserCache: jest.fn(), withSteamCache: jest.fn() }))
 jest.mock('@/lib/steamUnlocks', () => ({ forgetUnlocks: jest.fn() }))
-jest.mock('@/lib/psnCache', () => ({ forgetPsnPrivate: jest.fn() }))
+jest.mock('@/lib/psnSync', () => ({ readPsnOnLink: jest.fn(), syncLinkedPsn: jest.fn() }))
+jest.mock('@/lib/serverLanguage', () => ({ serverLanguage: jest.fn(async () => null) }))
 jest.mock('@/lib/steamLinkNotice', () => ({ sendSteamLinkNotice: jest.fn() }))
 jest.mock('@/lib/steamClient', () => ({ getPlayerSummaries: jest.fn() }))
 jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))
@@ -20,7 +21,6 @@ jest.mock('@/lib/psnClient', () => ({
   ...jest.requireActual('@/lib/psnClient'),
   psnConfigured: jest.fn(),
   findPsnAccount: jest.fn(),
-  psnSummary: jest.fn(),
 }))
 jest.mock('@/lib/xboxClient', () => ({
   ...jest.requireActual('@/lib/xboxClient'),
@@ -40,7 +40,8 @@ import { getPlayerSummaries } from '@/lib/steamClient'
 import { forgetUser } from '@/lib/userRecord'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
 import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
-import { findPsnAccount, psnConfigured, psnSummary } from '@/lib/psnClient'
+import { findPsnAccount, psnConfigured } from '@/lib/psnClient'
+import { readPsnOnLink } from '@/lib/psnSync'
 import { findXboxAccount, xboxConfigured, xboxSummary } from '@/lib/xboxClient'
 import { POST as unlinkRa } from './unlinkRaUser/route'
 import { POST as unlinkSteam } from './steam/unlink/route'
@@ -90,7 +91,7 @@ beforeEach(() => {
   ;(getPlayerSummaries as jest.Mock).mockResolvedValue({ response: { players: [{ personaname: 'Bobby' }] } })
   ;(psnConfigured as jest.Mock).mockResolvedValue(true)
   ;(findPsnAccount as jest.Mock).mockResolvedValue({ accountId: '42', onlineId: 'BobPS' })
-  ;(psnSummary as jest.Mock).mockResolvedValue({})
+  ;(readPsnOnLink as jest.Mock).mockResolvedValue(undefined)
   ;(xboxConfigured as jest.Mock).mockReturnValue(true)
   ;(findXboxAccount as jest.Mock).mockResolvedValue({ xuid: '2535', gamertag: 'BobX' })
   ;(xboxSummary as jest.Mock).mockResolvedValue({})

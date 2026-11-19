@@ -1,16 +1,13 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
-jest.mock('@/lib/psnClient', () => ({
-  ...jest.requireActual('@/lib/psnClient'),
-  psnLatestTrophies: jest.fn(),
-  psnRecentTrophies: jest.fn(),
-}))
+jest.mock('@/lib/psnSnapshot', () => ({ psnLatestTrophies: jest.fn(), psnRecentTrophies: jest.fn() }))
 
 import { NextRequest } from 'next/server'
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
-import { psnLatestTrophies, psnRecentTrophies, PsnBusyError, PsnError, PsnSyncing } from '@/lib/psnClient'
+import { PsnBusyError, PsnError, PsnSyncing } from '@/lib/psnClient'
+import { psnLatestTrophies, psnRecentTrophies } from '@/lib/psnSnapshot'
 
 async function call(qs = '') {
   const res = await GET(new NextRequest(`http://localhost/api/psn/recentTrophies?${qs}`))

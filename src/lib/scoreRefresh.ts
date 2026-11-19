@@ -2,15 +2,14 @@ import { after } from 'next/server'
 import pool from '@/lib/db'
 import { queryRows } from '@/lib/queryRows'
 import { vaultTotals } from '@/lib/rankings'
-import { allowAttempt } from '@/lib/attemptLimit'
 import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raClient'
 import { getOwnedGames } from '@/lib/steamClient'
 import { readCache, withSteamCache, writeCache } from '@/lib/steamCache'
 import { fetchPlayerAchievements, isNoStats, loadGlobalPct, withLastPlayed } from '@/lib/steamProgress'
 import { steamBudgetLow } from '@/lib/upstreamCount'
 import { readRaKey } from '@/lib/raKey'
-import { PsnError, psnGameTrophies, psnTitlesCore } from '@/lib/psnClient'
-import { psnBackground } from '@/lib/psnBudget'
+import { PRIVATE_CODE, PsnError, PsnSyncing } from '@/lib/psnErrors'
+import { loadPsnGames, loadPsnGameTrophies, loadPsnPlayer } from '@/lib/psnStore'
 import { XboxError, xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
 import { runWithXboxTelemetry } from '@/lib/xboxTelemetry'
 import type { SteamOwnedGamesResponse } from '@/types/steam'
@@ -44,9 +43,9 @@ const RESUME_MINUTES = 15
 /**
  * How each platform is read, from what was measured: Steam took 8 at once with
  * no error (29 games/s); RA allows a burst of ~7, then 429s with no Retry-After,
- * and never failed one call every 250 ms; PSN read 4 at once without trouble,
- * but it is one app account for everyone, so it goes gently (2 at once, 100 a
- * pass, and PSN_BUDGET across the whole app); Xbox shares 150 calls an hour.
+ * and never failed one call every 250 ms; PSN is read from its stored snapshot
+ * since #179 (the sync worker paces Sony), at the pace it always had (2 at once,
+ * 100 a pass); Xbox shares 150 calls an hour.
  */
 export const PACE: Record<GameSource, { concurrency: number; gapMs: number; perPass: number }> = {
   steam: { concurrency: 8, gapMs: 0, perPass: Infinity },
@@ -202,26 +201,34 @@ function steamPlan(userId: number, steamid: string, apiKey: string): Plan {
   }
 }
 
-function psnPlan(userId: number, accountId: string): Plan {
+/**
+ * PSN from the stored snapshot (#179): no Sony call. A game's key is the date its stored trophies belong to, so
+ * it is scored again once the sync has read it anew; a game whose trophies are not stored yet stands in from the
+ * list (provisional) and stops the pass as "still reading" (PsnSyncing), to be scored after the sync.
+ */
+function psnPlan(accountId: string): Plan {
   return {
     source: 'psn',
     account: accountId,
-    // Background work: its Sony calls stop at the budget's background share (#177).
-    list: async () =>
-      (await psnBackground(() => psnTitlesCore(accountId, String(userId))))
-        .filter((g) => sum(g.earned) > 0)
-        .map((g) => ({
+    list: async () => {
+      const player = await loadPsnPlayer(accountId)
+      if (player?.state === 'private') throw new PsnError('private', PRIVATE_CODE)
+      if (!player?.titlesAt) throw new PsnSyncing()
+      return (await loadPsnGames(accountId))
+        .filter(({ game: g }) => sum(g.earned) > 0)
+        .map(({ game: g, trophiesAt }) => ({
           id: g.id,
           title: g.title,
           console: g.consoleName,
-          changeKey: g.lastTrophyAt ?? '',
+          changeKey: trophiesAt ?? '',
           provisional: provisionalScore(psnGradeShare(g.earned, g.defined), sum(g.earned), sum(g.defined), sum(g.earned) >= sum(g.defined)),
-          // Cached by the date of the last trophy, so a moved game is always read anew.
           read: async () => {
-            const trophies = await psnBackground(() => psnGameTrophies(accountId, g, String(userId)))
-            return { score: scoreGame(psnScoreInputs(trophies), undefined, psnBaseCompletedAt(trophies)), suspect: false }
+            const stored = trophiesAt === null ? null : await loadPsnGameTrophies(accountId, g.titleId, 'en-US')
+            if (!stored) throw new PsnSyncing()
+            return { score: scoreGame(psnScoreInputs(stored.trophies), undefined, psnBaseCompletedAt(stored.trophies)), suspect: false }
           },
-        })),
+        }))
+    },
   }
 }
 
@@ -257,7 +264,7 @@ function plansFor(user: UserRow): Plan[] {
   if (user.rausername && raKey) plans.push(raPlan(user.rausername, raKey))
   const steamKey = process.env.STEAM_API_KEY?.trim()
   if (user.steamid && steamKey) plans.push(steamPlan(user.id, user.steamid, steamKey))
-  if (user.psnaccountid) plans.push(psnPlan(user.id, user.psnaccountid))
+  if (user.psnaccountid) plans.push(psnPlan(user.psnaccountid))
   // Only admins can link Xbox while it is admin-only, so no other account has one.
   if (user.xboxxuid) plans.push(xboxPlan(user.id, user.xboxxuid))
   return plans
@@ -266,6 +273,8 @@ function plansFor(user: UserRow): Plan[] {
 /** Why a platform could not be read, in terms the user can act on (or wait out). */
 export function classifyFailure(source: GameSource, err: unknown): FillError {
   if (err instanceof SteamLibraryPrivate) return 'private'
+  // Not stored yet: the PSN sync is still reading it, so the fill goes on after it.
+  if (err instanceof PsnSyncing) return 'busy'
   if (err instanceof PsnError) return err.isPrivate ? 'private' : err.isRateLimited ? 'busy' : 'unavailable'
   if (source === 'xbox' && err instanceof XboxError && err.kind === 'rate-limited') return 'busy'
   const status = (err as { status?: number } | null)?.status
@@ -329,11 +338,6 @@ async function refreshSource(
   const worker = async () => {
     while (next < todo.length && next < pace.perPass && !stopped && Date.now() < deadline) {
       const c = todo[next++]
-      // PSN is one app account for everyone: a brake across the whole app, counted in the database.
-      if (plan.source === 'psn' && !(await allowAttempt('psn-score', 'app'))) {
-        stopped = 'busy'
-        return
-      }
       try {
         const { score, suspect } = await c.read()
         const row = stored.get(c.id)
@@ -642,6 +646,16 @@ async function startFill(userId: number, budgetMs = 60_000): Promise<void> {
 export async function onPlatformLinked(userId: number, source: GameSource): Promise<void> {
   await markFillPending(userId, source)
   after(() => startFill(userId))
+}
+
+/**
+ * The PSN sync stored new trophies (#179, the queue's `score` phase): a pass now, unless one is running. False
+ * when one was, so the job is tried again after it.
+ */
+export async function runScoreAfterSync(userId: number, budgetMs = 25_000): Promise<boolean> {
+  if (!(await claim(userId, `${CLAIM_SECONDS} seconds`))) return false
+  await runScorePass(userId, budgetMs)
+  return true
 }
 
 /**

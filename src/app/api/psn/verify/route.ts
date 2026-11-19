@@ -3,6 +3,8 @@ import pool from '@/lib/db'
 import { requirePsnSession } from '@/lib/apiAuth'
 import { reserveAttempt } from '@/lib/attemptLimit'
 import { psnAboutMe, psnFailure } from '@/lib/psnClient'
+import { PRIORITY } from '@/lib/psnQueue'
+import { requestPsnSync } from '@/lib/psnSync'
 import { aboutMeHasCode, makePsnVerificationCode, psnVerificationExpiry } from '@/lib/psnVerification'
 import { markRankingVisibilityChanged } from '@/lib/rankings'
 import { forgetUser } from '@/lib/userRecord'
@@ -116,6 +118,8 @@ export async function POST() {
     if (outcome === 'taken') return fail('taken', 409)
     if (outcome === 'changed') return fail('no-code', 409)
     await pointsChanged(id)
+    // The About Me just changed: the profile is read again, first in the queue (#179).
+    await requestPsnSync(id, PRIORITY.link).catch((err: unknown) => console.error('[psn/verify] sync', err))
     return NextResponse.json({ verified: true }, { headers: NO_STORE })
   } catch (err) {
     console.error('[psn/verify POST]', err)

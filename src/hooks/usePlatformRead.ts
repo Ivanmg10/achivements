@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
-import { fetchShared } from '@/lib/fetchShared'
+import { fetchUntilReady } from '@/lib/fetchUntilReady'
 
 type Outcome<T, E> = { data: T } | { error: E }
 
@@ -39,7 +39,8 @@ export function usePlatformRead<T, E>(url: string | null, spec: Spec<T, E>) {
     const { errorFrom, failure, parse, tag } = latest.current
     const read = async (): Promise<Outcome<T, E>> => {
       try {
-        const res = await fetchShared(url)
+        // A 202 (PSN's first sync, #179) is waited out: the read stays loading until the data is there.
+        const res = await fetchUntilReady(url, undefined, () => current)
         if (!res.ok) return { error: await errorFrom(res) }
         const body = await res.json()
         return { data: parse ? parse(body) : (body as T) }

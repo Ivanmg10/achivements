@@ -11,10 +11,10 @@ jest.mock('@/lib/xboxClient', () => ({
   xboxConfigured: jest.fn(),
   xboxSummary: jest.fn(),
 }))
+jest.mock('@/lib/psnSync', () => ({ readPsnOnLink: jest.fn(), syncLinkedPsn: jest.fn() }))
 jest.mock('@/lib/psnClient', () => ({
   findPsnAccount: jest.fn(),
   psnConfigured: jest.fn(),
-  psnSummary: jest.fn(),
   psnFailure: jest.fn(() => jest.requireActual('next/server').NextResponse.json({ error: 'private' }, { status: 403 })),
 }))
 
@@ -26,7 +26,8 @@ import { fetchRaProfile } from '@/lib/raProfile'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { clearUserCache } from '@/lib/steamCache'
 import { forgetUser } from '@/lib/userRecord'
-import { findPsnAccount, psnConfigured, psnSummary } from '@/lib/psnClient'
+import { findPsnAccount, psnConfigured } from '@/lib/psnClient'
+import { readPsnOnLink, syncLinkedPsn } from '@/lib/psnSync'
 import { XboxError, findXboxAccount, xboxConfigured, xboxSummary } from '@/lib/xboxClient'
 
 const ADMIN = { id: '3', username: 'boss', pwv: 'v1' }
@@ -146,7 +147,7 @@ describe('PSN', () => {
   beforeEach(() => {
     ;(psnConfigured as jest.Mock).mockResolvedValue(true)
     ;(findPsnAccount as jest.Mock).mockResolvedValue({ accountId: '123', onlineId: 'BobPS' })
-    ;(psnSummary as jest.Mock).mockResolvedValue({})
+    ;(readPsnOnLink as jest.Mock).mockResolvedValue(undefined)
   })
 
   test('links an online ID Sony knows and whose trophies are readable, and logs it', async () => {
@@ -156,6 +157,7 @@ describe('PSN', () => {
     expect(updates()[0][1]).toEqual(['123', 'BobPS', 11])
     expect(clearUserCache).not.toHaveBeenCalled()
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'link-psn', BOB, { psnaccountid: '123', psnusername: 'BobPS' })
+    expect(syncLinkedPsn).toHaveBeenCalledWith(11)
   })
 
   test('a malformed online ID is refused before asking Sony', async () => {
@@ -170,7 +172,7 @@ describe('PSN', () => {
   })
 
   test('private trophies are refused and nothing is stored', async () => {
-    ;(psnSummary as jest.Mock).mockRejectedValue(new Error('private'))
+    ;(readPsnOnLink as jest.Mock).mockRejectedValue(new Error('private'))
     expect((await POST(post({ id: 11, platform: 'psn', username: 'BobPS' }))).status).toBe(403)
     expect(updates()).toHaveLength(0)
   })

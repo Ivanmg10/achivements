@@ -427,11 +427,12 @@ with its tests; it is the part that decides whether the answers are any good.
   an account through `withPsnAccount` (429/5xx on another account twice at most, a refused token drops it, a hidden profile never retries) and
   spends that account's budget (`psnBudget.ts`, `rate_per_min` × 15; background work inside `psnBackground`): never a second limiter, never
   Sony called around the pool. The NPSSOs and tokens are sealed (`psnAccounts.sealPsn`, `PSN_SECRET_KEY`) and **never answered, logged or sent**
-  (Telegram alerts are send-only and carry labels and numbers). **A page waits for at most
-  ~10 Sony calls (#177):** a reader takes `psnTitlesCore` unless it needs play data (`psnLibrary`), an account-level cache goes
-  through `psnCached` (stale up to 7 days, one fetch per key, refreshed after the answer), anything costlier is built in the
-  background and answered 202; a game's defined trophies are cached per game and language, for everyone, apart from the
-  earned ones. **Do not try to automate Sony's sign-in.** A game counts by its whole set, DLC included.
+  (Telegram alerts are send-only and carry labels and numbers). **No PSN page calls Sony
+  (#179):** pages read the stored snapshot (`psnSnapshot.ts` over `psnStore.ts`, `migrations/048`; 202 before the first sync);
+  Sony is read only by the sync worker (`psnSync.ts`, jobs in `psnQueue.ts`, drained after PSN traffic with `after()` and by
+  `cron/psn-worker`), linking and verification. A new PSN reader is a function in `psnSnapshot.ts`; data the store lacks is
+  added to a sync phase, read as a delta (only games whose last trophy moved), never a `psnClient` call from a route. A game's
+  definitions and rarity are stored per game for everyone, texts per language. **Do not try to automate Sony's sign-in.** A game counts by its whole set, DLC included.
 - **Xbox stays admin-only on purpose, and the reason is money** (OpenXBL's free plan, 150 calls an hour for the
   whole app). **Do not set `XBOX_ADMIN_ONLY` to `false`, and do not suggest it as a next step**, until the user says
   they will pay for a plan. The gate is enforced in three places that must keep holding (routes, UI, and every

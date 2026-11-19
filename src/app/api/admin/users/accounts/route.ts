@@ -7,7 +7,8 @@ import { clearUserCache } from '@/lib/steamCache'
 import { sendSteamLinkNotice } from '@/lib/steamLinkNotice'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { readSteamId } from '@/lib/steamAccount'
-import { findPsnAccount, psnConfigured, psnFailure, psnSummary } from '@/lib/psnClient'
+import { findPsnAccount, psnConfigured, psnFailure } from '@/lib/psnClient'
+import { readPsnOnLink, syncLinkedPsn } from '@/lib/psnSync'
 import { findXboxAccount, isGamertag, xboxConfigured, xboxFailure, xboxSummary } from '@/lib/xboxClient'
 import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 import { forgetUser } from '@/lib/userRecord'
@@ -101,13 +102,14 @@ export async function POST(req: Request) {
       try {
         account = await findPsnAccount(name)
         if (!account) return NextResponse.json({ error: 'Sony has no account with that online ID' }, { status: 404 })
-        await psnSummary(account.accountId, String(target.id))
+        await readPsnOnLink(account.accountId)
       } catch (err) {
         return psnFailure(err, 'admin/users/accounts psn')
       }
 
       await saveLink(target.id, 'psn', account.accountId, account.onlineId)
       forgetUser(target.id)
+      await syncLinkedPsn(target.id)
       await logAdminAction(auth.admin, 'link-psn', target, { psnaccountid: account.accountId, psnusername: account.onlineId })
       return NextResponse.json({ ok: true, psnaccountid: account.accountId, psnusername: account.onlineId })
     }

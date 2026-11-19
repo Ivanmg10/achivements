@@ -99,6 +99,10 @@ admin panel's **PlayStation** tab: *Add account* or *Renew* walks through signin
 opening Sony's NPSSO page and pasting the value, which is tested before it is kept. Details: `docs/platforms/psn.md`
 → Service-account pool.
 
+PSN pages read what a background sync stored in Postgres (`migrations/048`), never Sony: a just-linked profile shows its
+skeleton for a minute or two, then the data. The sync runs after PSN traffic and from the daily `/api/cron/psn-worker`
+(make it `* * * * *` on a Vercel Pro plan). No new variable. Details: `docs/platforms/psn.md` → Snapshots and sync queue.
+
 - **Telegram** (optional): set `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` to the owner's existing bot (the one
   Hermes uses) and chat, in every Vercel environment. Only production sends: production's pool tagged `[PRO]`, and
   pre's tagged `[PRE]` when `PREVIEW_DATABASE_URL` is also set in Production. The app only calls `sendMessage`.

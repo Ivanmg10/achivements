@@ -34,7 +34,7 @@ page (src/app/(main)/…)            client component
 |---|---|---|
 | RetroAchievements | `get*` (gameData, recentAchievements, activityHeatmapYear…), `updateRaUser`, `unlinkRaUser` | Older flat names; keep them, the client calls them |
 | Steam | `steam/*` (ownedGames, achievements, recentlyPlayed…, unlink) | Linked through Steam sign-in (`auth/steam?intent=link`); admins by name (`src/lib/steamAccount.ts`) |
-| PlayStation | `psn/*` (link, titles, trophies, details, `verify`…) | A pool of the app's service accounts (#178: `psnPool.ts` picks one per call, `psnAccounts.ts` its SQL and sealing, `psnTokens.ts` each sign-in, `psnAccountCheck.ts` the canary, `psnMaintenance.ts` / `psnAlerts.ts` / `telegram.ts` the upkeep and alerts), `src/lib/psnClient.ts` (its caches `psnCache.ts`, the budget per account `psnBudget.ts`, errors `psnErrors.ts`, #177); `verify` proves the account is the user's (`src/lib/psnVerification.ts`, #176) and `src/lib/vaultGate.ts` lets only verified PSN count in Vault Points |
+| PlayStation | `psn/*` (link, `bootstrap`, `status`, `refresh`, `games`, `game/[npwr]`, titles, trophies, details, `verify`…) | **Pages read Postgres, never Sony (#179):** `psnSnapshot.ts` (the readers, 202 before the first sync), `psnStore.ts` (all SQL of the snapshot tables, `migrations/048`), `psnQueue.ts` (`psn_sync_jobs`) and `psnSync.ts` (the worker's phases, drained after PSN traffic and by `cron/psn-worker`); `psnRoutes.ts` the shared answers. Sony is reached by the worker, linking and verification only, through `src/lib/psnClient.ts` (the fetchers), the pool of service accounts (#178: `psnPool.ts` picks one per call, `psnAccounts.ts` its SQL and sealing, `psnTokens.ts` each sign-in, `psnAccountCheck.ts` the canary, `psnMaintenance.ts` / `psnAlerts.ts` / `telegram.ts` the upkeep and alerts), the budget per account `psnBudget.ts` and errors `psnErrors.ts`; `verify` proves the account is the user's (`src/lib/psnVerification.ts`, #176) and `src/lib/vaultGate.ts` lets only verified PSN count in Vault Points |
 | Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
@@ -42,7 +42,7 @@ page (src/app/(main)/…)            client component
 | Rankings | `rankings` (public), `rankings/me`, `rankings/fill`, `admin/rankings` | Read stored scores; `fill` runs a pass. See Vault Points below |
 | Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | `auth/ra/check`: an RA key checked before signing up with it (signed out, rate limited) |
 | Admin | `admin/*` | Every one starts with `requireAdmin(req)` |
-| Cron | `cron/sweepCache` (04:00), `cron/scores` (05:00), `cron/psnToken` (09:00, mail when Telegram is not set), `cron/psn-alerts` (09:15, PSN pool upkeep and Telegram; also run after PSN traffic every 15 min) | Scheduled in `vercel.json` (production only), need `CRON_SECRET` |
+| Cron | `cron/sweepCache` (04:00), `cron/psn-worker` (04:30, the PSN sync queue: due syncs queued, sweeps, then drained 55 s; every minute on a Pro plan), `cron/scores` (05:00), `cron/psnToken` (09:00, mail when Telegram is not set), `cron/psn-alerts` (09:15, PSN pool upkeep and Telegram; also run after PSN traffic every 15 min) | Scheduled in `vercel.json` (production only), need `CRON_SECRET` |
 | Ops | `ops/psn/status` | The PSN pool's state for the owner's agent, `Bearer PSN_STATUS_TOKEN`, nothing secret |
 | Admin PSN | `admin/psn/accounts` (+ `[id]`, `[id]/test`, `[id]/rotate`), `admin/psn/pool` | The PSN service accounts, `requireAdmin` + `logAdminAction` |
 
@@ -65,6 +65,7 @@ auth, 429 rate limited, 502/503 upstream).
 | Postgres | `steam_cache` table, `src/lib/steamCache.ts` | Second level for RA (`ra:` keys), Steam, PSN, Xbox (`xbox:`) and IGDB; swept daily, with expired Xbox successes kept 30 days for explicit stale-if-error |
 | Postgres | `steam_unlocks` table, `src/lib/steamUnlocks.ts` | Every Steam unlock read, dated, per user and Steam account: the streak and activity use it past the games read live. Not a cache: kept until Steam is unlinked |
 | Postgres | `steam_playtime` table (`migrations/045`), `src/lib/steamUnlocks.ts` | Each Steam game's minutes when the owned list was last read, and when they last rose: dates games Steam leaves undated (#113, `docs/platforms/steam.md`). Not a cache: kept until Steam is unlinked; without the table it only logs |
+| Postgres | `psn_players`, `psn_player_games`, `psn_player_trophies`, `psn_games`, `psn_trophies` (`migrations/048`), `src/lib/psnStore.ts` | PSN snapshots (#179): what Sony said about each linked account, written by the sync worker, read by every PSN page and the PSN score. Not a cache with a TTL: a sync replaces it (the delta: games whose last trophy moved), and an account nobody links any more is swept daily. Definitions and rarity are per game, shared by every player; texts per language |
 | HTTP | `src/lib/httpCache.ts` (`cachedJson`) | `Cache-Control` on the response |
 
 Change the shape of a cached value → bump its key's version (`gameData_v2:` →
@@ -90,11 +91,11 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
 `docs/rankings-plan.md`):
 
 1. **Refresh** — `src/lib/scoreRefresh.ts`. Lists each linked platform's library
-   once (RA `GetUserCompletionProgress`, Steam owned games, `psnTitles`,
+   once (RA `GetUserCompletionProgress`, Steam owned games, the PSN snapshot,
    `xboxLibrary`), and reads again only games whose last unlock moved
    (`change_key`), a few per run per platform (`READS`); the rest score
    provisionally from the list. Each platform at its measured pace (`PACE`; PSN
-   also under an app-wide budget in `attemptLimit`). Triggered when a platform is
+   from its stored trophies since #179, no Sony call; the sync's `score` phase runs a pass after new trophies). Triggered when a platform is
    linked (`onPlatformLinked`), by the client while the fill is unfinished
    (`useVaultFill` in `VaultFillProvider` → `POST /api/rankings/fill`), after the
    presence heartbeat when a score is 6 h old, and by `/api/cron/scores`. Progress

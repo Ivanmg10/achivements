@@ -16,16 +16,16 @@ import {
 } from 'psn-api'
 import { readCache, readCacheMany, withSteamCache, writeCache } from '@/lib/steamCache'
 import { igdbArt, igdbConfigured, igdbPlatforms, type IgdbArt } from '@/lib/igdbClient'
+import type { Enrichment, GameSnapshot, GroupDef, GroupEarned, KnownSet, PlayedGame, PsnSummaryCore, TrophyDef } from '@/lib/psnStore'
 import type { PoolAccount } from '@/lib/psnAccounts'
 import { psnPoolConfigured, withPsnAccount } from '@/lib/psnPool'
 import { maybeMaintainPsnPool } from '@/lib/psnMaintenance'
 import { psnAuthorization } from '@/lib/psnTokens'
 import { avatarUrl, countTrophies, https, psnNumericId, psnPlatformName } from '@/utils/psnTitles'
 import { mapLimit } from '@/utils/utils'
-import type { PsnGameProgress, PsnRecentTrophy, PsnTrophy, PsnTrophyGroup, TrophyCounts } from '@/types/psn'
+import type { PsnGameProgress, PsnTrophy, TrophyCounts } from '@/types/psn'
 import { PsnBusyError, PsnError, PsnSyncing, TIMED_OUT } from '@/lib/psnErrors'
 import { spendPsnCall } from '@/lib/psnBudget'
-import { psnCached, psnSyncedAt } from '@/lib/psnCache'
 import { needsBaseTrophies, withCompletion } from '@/lib/psnCompletion'
 import { psnBaseCompletedAt } from '@/utils/completionDates'
 
@@ -36,41 +36,19 @@ export { PsnBusyError, PsnError, PsnSyncing } from '@/lib/psnErrors'
  * mobile API. Every call is authenticated as one of the app's service
  * accounts (#178, psnPool), not as the user: any of them can read any profile
  * whose trophies are public. Their NPSSOs and tokens live in the database
- * (psnAccounts, psnTokens), added and renewed from the admin panel; the first
- * one comes from the old psn_credentials row or PSN_NPSSO.
+ * (psnAccounts, psnTokens), added and renewed from the admin panel.
  *
  * psn-api returns Sony's error bodies instead of throwing, so every response
  * goes through unwrap(). Every request spends its account's budget (psnBudget).
- * Responses are cached in the Steam cache table under "psn:" keys: the
- * account-level ones through psnCache (stale data, one fetch at a time), the
- * per-game ones split into what every player shares (a game's defined trophies
- * and groups, per language) and what is the account's (earned, keyed by the
- * game's last trophy).
  *
- * The library comes in two parts (#177): the core (the trophy list alone, one
- * request per 800 games) is what a page waits for; the enrichment (play time,
- * store art, IGDB, completion dates) is filled in the background, 20 games a
- * pass, and laid over the core when it is there.
+ * Since #179 nothing here serves a page: the sync worker (psnSync) calls these fetchers and stores what they
+ * return (psnStore); pages read the store (psnSnapshot). Only linking (the search), verification (the About Me)
+ * and the worker reach Sony.
  */
 
 /** psn-api takes no signal, so a hung call is left behind rather than aborted. */
 const CALL_TIMEOUT_MS = 8_000
-const SUMMARY_TTL_MS = 15 * 60 * 1000
 const NOT_FOUND_TTL_MS = 60 * 60 * 1000
-const TITLES_TTL_MS = 15 * 60 * 1000
-/** Play data, store art and completion dates: background work, read again at most hourly. */
-const ENRICHED_TTL_MS = 60 * 60 * 1000
-/** The year of trophies: rebuilt from per-game entries, so a rebuild costs only the games that moved. */
-const YEAR_TTL_MS = 15 * 60 * 1000
-/**
- * A game's earned trophies are keyed by when its last trophy was earned: they can
- * only change when that does, which changes the key. So an entry for a game
- * not touched since is still right a month later — the same idea as Steam's
- * settledProgress.
- */
-const SETTLED_TROPHIES_TTL_MS = 30 * 24 * 60 * 60 * 1000
-/** A game's defined trophies and groups, the same for every player; a DLC added since is caught by its ids. */
-const DEFINED_TTL_MS = 30 * 24 * 60 * 60 * 1000
 /** The most titles Sony returns per page. */
 const TITLES_PAGE = 800
 /** The most played games Sony returns per page. */
@@ -79,19 +57,12 @@ const PLAYED_PAGE = 200
 const LOOKUP_BATCH = 5
 /** A game's trophy sets never change, so the lookup is kept a long time. */
 const LOOKUP_TTL_MS = 90 * 24 * 60 * 60 * 1000
-/** How many games a background enrichment pass looks up (trophy sets, completion dates), most recent first. */
+/** How many played games an enrichment pass looks up the trophy sets of, most recent first. */
 const ENRICH_GAMES = 20
-const DAY_MS = 24 * 60 * 60 * 1000
-/** The year's window, as the streak and the heatmap read it. */
-const YEAR_DAYS = 366
-/**
- * How many games are asked of Sony at once when a list is built game by game
- * (the streak's year, the base-game progress). Enough to make a cold load
- * several times faster, few enough to stay clear of Sony's rate limit.
- */
+/** Requests in flight at once when a list is built game by game: faster than one by one, clear of Sony's limit. */
 const PARALLEL = 4
 /** The language trophy texts come in when none is asked for. */
-const DEFAULT_LANGUAGE = 'en-US'
+export const DEFAULT_LANGUAGE = 'en-US'
 /** Sony's language tags for the app's languages. */
 const LANGUAGES: Record<string, string> = {
   en: 'en-US', es: 'es-ES', de: 'de-DE', fr: 'fr-FR', it: 'it-IT', ja: 'ja-JP', pl: 'pl-PL', pt: 'pt-PT', ru: 'ru-RU',
@@ -161,51 +132,28 @@ export async function findPsnAccount(username: string): Promise<{ accountId: str
 
 export { avatarUrl } from '@/utils/psnTitles'
 
-export type PsnSummary = {
-  onlineId: string
-  avatarUrl: string | null
-  aboutMe: string
-  isPlus: boolean
-  trophyLevel: number
-  /** 1–10: bronze 1–3, silver 4–6, gold 7–9, platinum 10. */
-  tier: number
-  /** 0–100, toward the next level. */
-  levelProgress: number
-  earned: TrophyCounts
+export type PsnSummary = PsnSummaryCore & {
   games: number
-  /** When the library was last read from Sony (ms), and when the refresh button may read it again: the summary route adds them. */
+  /** When the library was last read from Sony (ms), and when the refresh button may read it again. */
   syncedAt?: number | null
   nextSyncAt?: number | null
 }
 
 /**
- * The headline numbers for one account. The games are the core library's (shared with it, so no request of its
- * own). Throws a PsnError with isPrivate when its trophies are hidden.
+ * The headline numbers for one account: 1 request, 2 with the profile (online ID, avatar, About Me), which the
+ * worker reads only when something moved or once a day. Without it, `known` keeps the last one read. Throws a
+ * PsnError with isPrivate when the trophies are hidden.
  */
-export async function psnSummary(accountId: string, userId: string | null = null): Promise<PsnSummary> {
-  return psnCached(
-    `psn:summary:v4:${accountId}`,
-    SUMMARY_TTL_MS,
-    async () => {
-      const [summary, profile, games] = await Promise.all([
-        psnCall('summary', (auth) => getUserTrophyProfileSummary(auth, accountId)),
-        psnCall('profile', (auth) => getProfileFromAccountId(auth, accountId)),
-        psnTitlesCore(accountId, userId),
-      ])
-      return {
-        onlineId: profile.onlineId,
-        avatarUrl: avatarUrl(profile.avatars ?? []),
-        aboutMe: profile.aboutMe ?? '',
-        isPlus: profile.isPlus === true,
-        trophyLevel: Number(summary.trophyLevel) || 0,
-        tier: summary.tier ?? 1,
-        levelProgress: summary.progress ?? 0,
-        earned: summary.earnedTrophies,
-        games: games.length,
-      }
-    },
-    { accountId, userId },
-  )
+export async function fetchPsnSummary(accountId: string, known: PsnSummaryCore | null): Promise<{ summary: PsnSummaryCore; withProfile: boolean }> {
+  const summary = await psnCall('summary', (auth) => getUserTrophyProfileSummary(auth, accountId))
+  const counts = { trophyLevel: Number(summary.trophyLevel) || 0, tier: summary.tier ?? 1, levelProgress: summary.progress ?? 0, earned: summary.earnedTrophies }
+  const moved = !known || JSON.stringify(known.earned) !== JSON.stringify(counts.earned)
+  if (known && !moved) return { summary: { ...known, ...counts }, withProfile: false }
+  const profile = await psnCall('profile', (auth) => getProfileFromAccountId(auth, accountId))
+  return {
+    summary: { onlineId: profile.onlineId, avatarUrl: avatarUrl(profile.avatars ?? []), aboutMe: profile.aboutMe ?? '', isPlus: profile.isPlus === true, ...counts },
+    withProfile: true,
+  }
 }
 
 /**
@@ -255,21 +203,6 @@ export function durationMinutes(iso: string | undefined): number | null {
   return Number(d ?? 0) * 1440 + Number(h ?? 0) * 60 + Number(min ?? 0)
 }
 
-/** One game the account has played, as Sony's game list reports it (PS4/PS5 only). */
-type PlayedGame = {
-  /** The game's own id ("CUSA01106_00"), not its trophy set's. */
-  titleId: string
-  name: string
-  lastPlayed: string | null
-  playtimeMinutes: number | null
-  playCount: number
-  /** Sony's square store icon. The trophy set's icon is a 320×176 banner on PS4/PS3, cropped when shown square. */
-  iconUrl: string | null
-  coverUrl: string | null
-  heroUrl: string | null
-  conceptId: number | null
-}
-
 // Only a portrait counts as a cover: most PS4 games have none, and their 16:9 hub art cropped to 2:3 was unreadable.
 const COVER_TYPES = ['PORTRAIT_BANNER']
 const HERO_TYPES = ['BACKGROUND_LAYER_ART', 'SIXTEEN_BY_NINE_BANNER', 'FOUR_BY_THREE_BANNER', 'GAMEHUB_COVER_ART']
@@ -310,7 +243,7 @@ async function playedGames(accountId: string): Promise<PlayedGame[]> {
  * five ids at a time, and the answer never changes, so each is kept long
  * (and shared: a game's sets are the same for every player).
  */
-async function trophySetsOf(accountId: string, titleIds: string[], userId: string | null, limit = Infinity): Promise<Map<string, string[]>> {
+async function trophySetsOf(accountId: string, titleIds: string[], limit = Infinity): Promise<Map<string, string[]>> {
   const key = (id: string) => `psn:sets:${id}`
   const cached = await readCacheMany<string[]>(titleIds.map(key))
   const found = new Map(titleIds.filter((id) => cached.has(key(id))).map((id) => [id, cached.get(key(id))!]))
@@ -382,136 +315,40 @@ export function withPlayData(games: PsnGameProgress[], played: PlayedGame[], set
     .sort((a, b) => (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? ''))
 }
 
-type GameRef = Pick<PsnGameProgress, 'titleId' | 'service' | 'lastTrophyAt'>
-type GroupDef = Pick<PsnTrophyGroup, 'id' | 'name' | 'iconUrl' | 'defined'>
-type GroupEarned = { id: string; earned: TrophyCounts; progress: number }
-type TrophyDef = Pick<PsnTrophy, 'id' | 'name' | 'detail' | 'iconUrl' | 'type' | 'groupId' | 'hidden'>
-type TrophyEarned = Pick<PsnTrophy, 'id' | 'earned' | 'earnedAt' | 'rarity'>
-
-/**
- * What every player of a game shares (its defined trophies or groups, in `language`) and what is the account's
- * (keyed by the game's last trophy, in no language), read apart so the shared half is paid once for everyone
- * (#177). A DLC added after the shared half was kept shows as an id it lacks: then it is read again.
- */
-async function splitRead<D extends { id: unknown }, E extends { id: unknown }>(
-  keys: { defined: string; earned: string },
-  userId: string | null,
-  defined: () => Promise<D[]>,
-  earned: () => Promise<E[]>,
-): Promise<{ defined: D[]; earned: E[] }> {
-  const [defs, mine] = await Promise.all([
-    withSteamCache(keys.defined, DEFINED_TTL_MS, defined),
-    withSteamCache(keys.earned, SETTLED_TROPHIES_TTL_MS, earned, { userId }),
-  ])
-  const known = new Set(defs.map((d) => d.id))
-  if (mine.every((e) => known.has(e.id))) return { defined: defs, earned: mine }
-  const fresh = await defined()
-  await writeCache(keys.defined, fresh, DEFINED_TTL_MS)
-  return { defined: fresh, earned: mine }
-}
-
-/**
- * A game's trophy groups — the base game ("default") and each DLC — with
- * their names in `language`, what each holds and what the account has
- * earned of it.
- */
-export async function psnGameGroups(accountId: string, game: GameRef, userId: string | null = null, language = DEFAULT_LANGUAGE): Promise<PsnTrophyGroup[]> {
-  const options = { npServiceName: game.service }
-  const { defined, earned } = await splitRead<GroupDef, GroupEarned>(
-    {
-      defined: `psn:groupdefs:v1:${game.titleId}:${language}`,
-      earned: `psn:groupearned:v1:${accountId}:${game.titleId}:${game.lastTrophyAt ?? ''}`,
-    },
-    userId,
-    async () => {
-      const res = await psnCall('gameGroups', (auth) => getTitleTrophyGroups(auth, game.titleId, { ...options, headerOverrides: { 'Accept-Language': language } }))
-      return (res.trophyGroups ?? []).map((g) => ({ id: g.trophyGroupId, name: g.trophyGroupName, iconUrl: g.trophyGroupIconUrl ? https(g.trophyGroupIconUrl) : null, defined: g.definedTrophies }))
-    },
-    async () => {
-      const res = await psnCall('gameGroups', (auth) => getUserTrophyGroupEarningsForTitle(auth, accountId, game.titleId, options))
-      return (res.trophyGroups ?? []).map((g) => ({ id: g.trophyGroupId, earned: g.earnedTrophies, progress: g.progress }))
-    },
-  )
-  const none: TrophyCounts = { bronze: 0, silver: 0, gold: 0, platinum: 0 }
-  const earnedById = new Map(earned.map((g) => [g.id, g]))
-  return defined.map((g) => ({ ...g, earned: earnedById.get(g.id)?.earned ?? none, progress: earnedById.get(g.id)?.progress ?? 0 }))
-}
-
-/**
- * The core of the library (#177): every game in the trophy list, from Sony's title list alone (one request per
- * 800 games), most recent trophy first. No play data, store art or completion dates: that is `psnLibrary`.
- */
-export async function psnTitlesCore(accountId: string, userId: string | null = null): Promise<PsnGameProgress[]> {
-  return psnCached(
-    titlesKey(accountId),
-    TITLES_TTL_MS,
-    async () => {
-      const games: PsnGameProgress[] = []
-      for (let offset = 0; ; offset += TITLES_PAGE) {
-        const page = await psnCall('titles', (auth) => getUserTitles(auth, accountId, { limit: TITLES_PAGE, offset }))
-        const titles = page.trophyTitles ?? []
-        for (const t of titles) {
-          const game = toPsnGameProgress(t)
-          if (game) games.push(game)
-        }
-        if (!page.nextOffset || titles.length === 0) break
-      }
-      return games.sort((a, b) => (b.lastTrophyAt ?? '').localeCompare(a.lastTrophyAt ?? ''))
-    },
-    { accountId, userId },
-  )
-}
-
-const titlesKey = (accountId: string) => `psn:titles:core:v1:${accountId}`
-
-/** When the account's library was last read from Sony (ms), for "last synced"; null before the first read. */
-export function psnLibrarySyncedAt(accountId: string): Promise<number | null> {
-  return psnSyncedAt(titlesKey(accountId))
-}
-
-/** What the background adds to the core: the played-games list, the trophy sets looked up so far, IGDB art and completion dates. */
-type Enrichment = {
-  played: PlayedGame[]
-  sets: Record<string, string[]>
-  art: Record<string, IgdbArt>
-  /** A DLC game's base-game completion date, by `titleId@lastTrophyAt` (it can only change when that does). */
-  completed: Record<string, string | null>
-}
-
-const completionKey = (g: Pick<PsnGameProgress, 'titleId' | 'lastTrophyAt'>) => `${g.titleId}@${g.lastTrophyAt ?? ''}`
-
-/**
- * Every game in the account's trophy list, most recently played first: the core, with what the background has
- * enriched so far laid over it. A page never waits for the enrichment: the first visit gets the core, and the
- * play time, art and completion dates arrive on a later read, 20 games a pass. A game's trophies are the whole
- * set, DLC included.
- */
-export async function psnLibrary(accountId: string, userId: string | null = null): Promise<PsnGameProgress[]> {
-  const core = await psnTitlesCore(accountId, userId)
-  let enrichment: Enrichment | null = null
-  try {
-    enrichment = await psnCached(`psn:enriched:v1:${accountId}`, ENRICHED_TTL_MS, () => enrich(accountId, userId), { accountId, userId, cold: 'background' })
-  } catch (err) {
-    if (!(err instanceof PsnSyncing)) console.error('[psn] enrichment unavailable, core only', err)
+/** Every game in the account's trophy list, from Sony's title list alone (one request per 800 games), most recent trophy first. */
+export async function fetchPsnTitles(accountId: string): Promise<PsnGameProgress[]> {
+  const games: PsnGameProgress[] = []
+  for (let offset = 0; ; offset += TITLES_PAGE) {
+    const page = await psnCall('titles', (auth) => getUserTitles(auth, accountId, { limit: TITLES_PAGE, offset }))
+    const titles = page.trophyTitles ?? []
+    for (const t of titles) {
+      const game = toPsnGameProgress(t)
+      if (game) games.push(game)
+    }
+    if (!page.nextOffset || titles.length === 0) break
   }
-  return withEnrichment(core, enrichment)
+  return games.sort((a, b) => (b.lastTrophyAt ?? '').localeCompare(a.lastTrophyAt ?? ''))
 }
 
-/** The core with the enrichment laid over it (both may come from different moments: the core wins on trophies). */
-export function withEnrichment(core: PsnGameProgress[], enrichment: Enrichment | null): PsnGameProgress[] {
-  if (!enrichment) return withCompletion(core, () => null)
+/**
+ * The core with the enrichment laid over it (play data, store and IGDB art) and each game's completion date:
+ * a complete game with DLC takes its base game's, from its stored trophies (`completed`), null until they are read.
+ */
+export function withEnrichment(core: PsnGameProgress[], enrichment: Enrichment | null, completed: (g: PsnGameProgress) => string | null = () => null): PsnGameProgress[] {
+  if (!enrichment) return withCompletion(core, completed)
   const played = withPlayData(core, enrichment.played, new Map(Object.entries(enrichment.sets)))
   const art = played.map((g) => {
     const a = enrichment.art[g.titleId]
     return a && !g.coverUrl ? { ...g, coverUrl: a.coverUrl ?? g.coverUrl, heroUrl: a.heroUrl ?? g.heroUrl } : g
   })
-  return withCompletion(art, (g) => enrichment.completed[completionKey(g)] ?? null)
+  return withCompletion(art, completed)
 }
 
-/** One background pass: the whole played list, trophy sets for up to ENRICH_GAMES more games, art, and completion dates for up to ENRICH_GAMES more. */
-async function enrich(accountId: string, userId: string | null): Promise<Enrichment> {
-  const core = await psnTitlesCore(accountId, userId)
-  const before = (await readCache<Enrichment>(`psn:enriched:v1:${accountId}`)) ?? null
+/**
+ * One enrichment pass (the worker's, after the trophy list moved, or once a day): the whole played list, the
+ * trophy sets of up to ENRICH_GAMES more played games (kept for everyone, so it converges) and IGDB art.
+ */
+export async function fetchPsnEnrichment(accountId: string, core: PsnGameProgress[]): Promise<Enrichment> {
   let played: PlayedGame[] = []
   try {
     played = await playedGames(accountId)
@@ -520,26 +357,8 @@ async function enrich(accountId: string, userId: string | null): Promise<Enrichm
     if (!(err instanceof PsnError && err.isPrivate)) throw err
   }
   const recentFirst = [...played].sort((a, b) => (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? '')).map((p) => p.titleId)
-  const sets = await trophySetsOf(accountId, recentFirst, userId, ENRICH_GAMES)
-  return {
-    played,
-    sets: Object.fromEntries(sets),
-    art: await igdbArtFor(withPlayData(core, played, sets)),
-    completed: await completionDates(accountId, core, before?.completed ?? {}, userId),
-  }
-}
-
-/** Base-game completion dates of DLC games, kept from the last pass while the game has not moved, up to ENRICH_GAMES more read. */
-async function completionDates(accountId: string, core: PsnGameProgress[], known: Record<string, string | null>, userId: string | null) {
-  const eligible = core.filter(needsBaseTrophies)
-  const kept = Object.fromEntries(eligible.filter((g) => completionKey(g) in known).map((g) => [completionKey(g), known[completionKey(g)]]))
-  const todo = eligible.filter((g) => !(completionKey(g) in kept)).slice(0, ENRICH_GAMES)
-  const results = await mapLimit(todo, 2, async (g) => psnBaseCompletedAt(await psnGameTrophies(accountId, g, userId)))
-  results.forEach((r, i) => {
-    if (r.status === 'fulfilled') kept[completionKey(todo[i])] = r.value
-    else if (!(r.reason instanceof PsnBusyError)) console.error('[psn] completion date unavailable', todo[i].titleId, r.reason)
-  })
-  return kept
+  const sets = await trophySetsOf(accountId, recentFirst, ENRICH_GAMES)
+  return { played, sets: Object.fromEntries(sets), art: await igdbArtFor(withPlayData(core, played, sets)) }
 }
 
 /**
@@ -561,121 +380,73 @@ async function igdbArtFor(games: PsnGameProgress[]): Promise<Record<string, Igdb
 }
 
 /**
- * A game's whole trophy set (base game and DLC, each trophy with its group),
- * merged with what the account has earned, its texts in `language`.
+ * One game's trophies for the worker (#179), as little as it can ask: the account's earned ones (1 request, none
+ * for a game never started), the set's definitions only when the store lacks them in `language` or a DLC brought
+ * ids it does not know (1), and, for a game with DLC, its groups (1 for the account's, 1 for the definitions when
+ * missing). A game without DLC is one group, built from the list. The rarity comes with the earned ones.
  */
-export async function psnGameTrophies(accountId: string, game: GameRef, userId: string | null = null, language = DEFAULT_LANGUAGE): Promise<PsnTrophy[]> {
+export async function fetchPsnGame(accountId: string, game: PsnGameProgress, known: KnownSet, language: string): Promise<GameSnapshot> {
   const options = { npServiceName: game.service }
-  const { defined, earned } = await splitRead<TrophyDef, TrophyEarned>(
-    {
-      defined: `psn:defs:v1:${game.titleId}:${language}`,
-      earned: `psn:earned:v1:${accountId}:${game.titleId}:${game.lastTrophyAt ?? ''}`,
-    },
-    userId,
-    async () => {
-      const res = await psnCall('gameTrophies', (auth) => getTitleTrophies(auth, game.titleId, 'all', { ...options, headerOverrides: { 'Accept-Language': language } }))
-      return (res.trophies ?? []).map((t) => ({
-        id: t.trophyId,
-        name: t.trophyName ?? '',
-        detail: t.trophyDetail ?? '',
-        iconUrl: t.trophyIconUrl ? https(t.trophyIconUrl) : null,
-        type: t.trophyType,
-        groupId: t.trophyGroupId ?? 'default',
-        hidden: t.trophyHidden,
-      }))
-    },
-    async () => {
-      const res = await psnCall('gameTrophies', (auth) => getUserTrophiesEarnedForTitle(auth, accountId, game.titleId, 'all', options))
-      return (res.trophies ?? []).map((t) => {
-        const rate = Number(t.trophyEarnedRate)
-        return { id: t.trophyId, earned: t.earned === true, earnedAt: t.earnedDateTime ?? null, rarity: t.trophyEarnedRate && Number.isFinite(rate) ? rate : null }
-      })
-    },
-  )
-  const earnedById = new Map(earned.map((t) => [t.id, t]))
-  return defined.map((t) => ({ ...t, earned: false, earnedAt: null, rarity: null, ...earnedById.get(t.id) }))
-}
-
-/** A game of the account's by Sony's ID, or null when it is not in their list. */
-export async function findPsnGame(accountId: string, titleId: string, userId: string | null = null): Promise<PsnGameProgress | null> {
-  return (await psnTitlesCore(accountId, userId)).find((g) => g.titleId === titleId) ?? null
-}
-
-function toRecentTrophy(game: PsnGameProgress, t: PsnTrophy & { earnedAt: string }): PsnRecentTrophy {
+  const started = game.numAwarded > 0
+  const mine = started ? await earnedTrophies(accountId, game.titleId, options) : []
+  const knownIds = new Set(known.known.map((t) => t.id))
+  const needDefs = !known.languages.includes(language) || mine.some((t) => !knownIds.has(t.id))
+  const [defined, groupDefs, groupsEarned] = await Promise.all([
+    needDefs ? definedTrophies(game.titleId, options, language) : null,
+    game.hasDlc && !known.groupLanguages.includes(language) ? definedGroups(game.titleId, options, language) : null,
+    game.hasDlc && started ? earnedGroups(accountId, game.titleId, options) : null,
+  ])
+  const earned = mine.filter((t) => t.earned).map((t) => ({ id: t.id, earnedAt: t.earnedAt }))
   return {
-    gameId: game.id,
     titleId: game.titleId,
-    gameTitle: game.title,
-    gameIconUrl: game.imageIcon,
-    trophyId: t.id,
-    name: t.name,
-    iconUrl: t.iconUrl,
-    type: t.type,
-    earnedAt: t.earnedAt,
-    rarity: t.rarity,
+    lastTrophyAt: game.lastTrophyAt,
+    language,
+    defined,
+    earned,
+    rarity: mine.map((t) => ({ id: t.id, rarity: t.rarity })),
+    groupDefs,
+    groupsEarned,
+    completedAt: needsBaseTrophies(game) ? psnBaseCompletedAt(withEarned(defined ?? known.known, earned)) : null,
   }
 }
 
-/** How many of the latest games the profile column's "recent trophies" look through. */
-const LATEST_GAMES = 3
-
-/**
- * The latest trophies, however long ago they were earned — from the last few
- * games played, for the profile column. Newest first. What a first visit reads
- * of trophies (#177): 2 requests per game, the year waits for the background.
- */
-export async function psnLatestTrophies(accountId: string, userId: string | null = null, language = DEFAULT_LANGUAGE): Promise<PsnRecentTrophy[]> {
-  const games = (await psnTitlesCore(accountId, userId)).filter((g) => countTrophies(g.earned) > 0).slice(0, LATEST_GAMES)
-  return earnedSince(accountId, games, '', userId, language)
+/** A set's trophies with what was earned, for its completion date (grade and group are all it reads). */
+function withEarned(defs: KnownSet['known'], earned: GameSnapshot['earned']): PsnTrophy[] {
+  const when = new Map(earned.map((e) => [e.id, e.earnedAt]))
+  return defs.map((t) => ({ ...t, name: '', detail: '', iconUrl: null, hidden: false, earned: when.has(t.id), earnedAt: when.get(t.id) ?? null, rarity: null }))
 }
 
-/**
- * Trophies earned on or after `since` (ISO; '' for all) across `games`, newest first, a few games at a time.
- * One game failing leaves it out; the budget running out stops the rest and fails the whole, so a part is never
- * kept as if it were all of it.
- */
-async function earnedSince(accountId: string, games: PsnGameProgress[], since: string, userId: string | null, language: string): Promise<PsnRecentTrophy[]> {
-  let busy: unknown = null
-  const lists = await mapLimit(games, PARALLEL, async (game) => {
-    if (busy) throw busy
-    return psnGameTrophies(accountId, game, userId, language).catch((err: unknown) => {
-      if (err instanceof PsnBusyError) busy = err
-      throw err
-    })
+type Options = { npServiceName: PsnGameProgress['service'] }
+
+async function earnedTrophies(accountId: string, titleId: string, options: Options): Promise<Array<{ id: number; earned: boolean; earnedAt: string | null; rarity: number | null }>> {
+  const res = await psnCall('gameTrophies', (auth) => getUserTrophiesEarnedForTitle(auth, accountId, titleId, 'all', options))
+  return (res.trophies ?? []).map((t) => {
+    const rate = Number(t.trophyEarnedRate)
+    return { id: t.trophyId, earned: t.earned === true, earnedAt: t.earnedDateTime ?? null, rarity: t.trophyEarnedRate && Number.isFinite(rate) ? rate : null }
   })
-  if (busy) throw busy
-  const unlocks: PsnRecentTrophy[] = []
-  lists.forEach((list, i) => {
-    if (list.status === 'rejected') return console.error('[psn] trophies for the feed', games[i].titleId, list.reason)
-    for (const t of list.value) {
-      if (t.earned && t.earnedAt && t.earnedAt >= since) unlocks.push(toRecentTrophy(games[i], { ...t, earnedAt: t.earnedAt }))
-    }
-  })
-  // Nothing at all came back: that is a failure, not an empty feed.
-  if (games.length > 0 && lists.every((l) => l.status === 'rejected')) throw (lists[0] as PromiseRejectedResult).reason
-  return unlocks.sort((a, b) => b.earnedAt.localeCompare(a.earnedAt))
 }
 
-/**
- * Every trophy earned in the last `days` days (at most a year), newest first. Sony has no feed for this, so the
- * year is built from the games whose last trophy falls in it, 2 requests per game: too many for a first visit,
- * so it is built in the background (#177) and this throws PsnSyncing (202) until it is there. Kept YEAR_TTL_MS
- * and served stale after; a rebuild reads only the games that moved, since each game's entry is keyed by its
- * last trophy.
- */
-export async function psnRecentTrophies(accountId: string, days: number, userId: string | null = null, language = DEFAULT_LANGUAGE): Promise<PsnRecentTrophy[]> {
-  const year = await psnCached(
-    `psn:year:v1:${accountId}:${language}`,
-    YEAR_TTL_MS,
-    async () => {
-      const since = new Date(Date.now() - YEAR_DAYS * DAY_MS).toISOString()
-      const games = (await psnTitlesCore(accountId, userId)).filter((g) => g.lastTrophyAt && g.lastTrophyAt >= since)
-      return earnedSince(accountId, games, since, userId, language)
-    },
-    { accountId, userId, cold: 'background' },
-  )
-  const since = new Date(Date.now() - Math.min(days, YEAR_DAYS) * DAY_MS).toISOString()
-  return year.filter((t) => t.earnedAt >= since)
+async function definedTrophies(titleId: string, options: Options, language: string): Promise<TrophyDef[]> {
+  const res = await psnCall('gameTrophies', (auth) => getTitleTrophies(auth, titleId, 'all', { ...options, headerOverrides: { 'Accept-Language': language } }))
+  return (res.trophies ?? []).map((t) => ({
+    id: t.trophyId,
+    name: t.trophyName ?? '',
+    detail: t.trophyDetail ?? '',
+    iconUrl: t.trophyIconUrl ? https(t.trophyIconUrl) : null,
+    type: t.trophyType,
+    groupId: t.trophyGroupId ?? 'default',
+    hidden: t.trophyHidden,
+  }))
+}
+
+async function definedGroups(titleId: string, options: Options, language: string): Promise<GroupDef[]> {
+  const res = await psnCall('gameGroups', (auth) => getTitleTrophyGroups(auth, titleId, { ...options, headerOverrides: { 'Accept-Language': language } }))
+  return (res.trophyGroups ?? []).map((g) => ({ id: g.trophyGroupId, name: g.trophyGroupName, iconUrl: g.trophyGroupIconUrl ? https(g.trophyGroupIconUrl) : null, defined: g.definedTrophies }))
+}
+
+async function earnedGroups(accountId: string, titleId: string, options: Options): Promise<GroupEarned[]> {
+  const res = await psnCall('gameGroups', (auth) => getUserTrophyGroupEarningsForTitle(auth, accountId, titleId, options))
+  return (res.trophyGroups ?? []).map((g) => ({ id: g.trophyGroupId, earned: g.earnedTrophies as TrophyCounts, progress: g.progress }))
 }
 
 /** A store page's release date does not change; kept half a year. */

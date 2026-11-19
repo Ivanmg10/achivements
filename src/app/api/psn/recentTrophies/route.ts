@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cachedJson } from '@/lib/httpCache'
 import { requirePsnSession } from '@/lib/apiAuth'
-import { psnFailure, psnLanguage, psnLatestTrophies, psnRecentTrophies } from '@/lib/psnClient'
+import { psnFailure, psnLanguage } from '@/lib/psnClient'
+import { psnLatestTrophies, psnRecentTrophies } from '@/lib/psnSnapshot'
 import { visibleGamesForUser } from '@/lib/gameVisibility'
 
 /** Days each scope looks back — the same windows as Steam's activity and year. */

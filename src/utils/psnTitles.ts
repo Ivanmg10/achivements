@@ -1,4 +1,4 @@
-import type { PsnGameProgress, TrophyCounts } from '@/types/psn'
+import type { PsnGameProgress, PsnTrophyGroup, TrophyCounts } from '@/types/psn'
 import type { GameStatus } from '@/types/game'
 import type { TagTone } from '@/components/ui/Tag'
 
@@ -153,4 +153,17 @@ export function trophiesByGroup<T extends { groupId: string }>(
   return groups
     .map((g) => ({ groupId: g.id, trophies: trophies.filter((t) => t.groupId === g.id) }))
     .filter((s) => s.trophies.length > 0)
+}
+
+const NONE: TrophyCounts = { bronze: 0, silver: 0, gold: 0, platinum: 0 }
+
+/** A game without DLC is one group, the game itself; Sony is asked for groups only for games that have DLC. */
+export function toGroups(
+  game: PsnGameProgress,
+  defs: Array<Pick<PsnTrophyGroup, 'id' | 'name' | 'iconUrl' | 'defined'>> | null,
+  earned: Array<{ id: string; earned: TrophyCounts; progress: number }> | null,
+): PsnTrophyGroup[] {
+  if (!defs) return [{ id: 'default', name: game.title, iconUrl: game.imageIcon, defined: game.defined, earned: game.earned, progress: game.pctWon }]
+  const byId = new Map((earned ?? []).map((g) => [g.id, g]))
+  return defs.map((g) => ({ ...g, earned: byId.get(g.id)?.earned ?? NONE, progress: byId.get(g.id)?.progress ?? 0 }))
 }

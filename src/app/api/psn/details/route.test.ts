@@ -1,15 +1,12 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
-jest.mock('@/lib/psnClient', () => ({
-  ...jest.requireActual('@/lib/psnClient'),
-  findPsnGame: jest.fn(),
-}))
+jest.mock('@/lib/psnSnapshot', () => ({ findPsnGame: jest.fn() }))
 jest.mock('@/lib/igdbClient', () => ({ igdbDetails: jest.fn() }))
 
 import { NextRequest } from 'next/server'
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
-import { findPsnGame } from '@/lib/psnClient'
+import { findPsnGame } from '@/lib/psnSnapshot'
 import { igdbDetails } from '@/lib/igdbClient'
 
 const GAME = { titleId: 'NPWR00001_00', title: 'Call of Duty®: Black Ops II', consoleName: 'PS3' }

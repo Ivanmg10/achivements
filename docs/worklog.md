@@ -33,6 +33,58 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-16 — PSN phase 4: snapshots in Postgres, a sync queue and delta sync (`feat/179-psn-snapshots-queue`, #179, epic #174)
+
+**Did**
+- `migrations/048_psn_snapshots.sql`: `psn_players`, `psn_player_games`, `psn_player_trophies` (earned only), `psn_games`,
+  `psn_trophies` (definitions and rarity for everyone, texts per language), indexes for the delta and the queue. **Not applied
+  by the agent: pre before this ships, production with its release** (`docs/releases.md`).
+- `psnStore.ts` (all the snapshot SQL), `psnQueue.ts` (`psn_sync_jobs`: enqueue that only raises urgency, `SKIP LOCKED` claim,
+  backoff, sweep), `psnSync.ts` (phases `summary` → `titles` → `recent` → `history` → `score`, 20 games a job, the kick after
+  traffic, link and cron helpers), `psnSnapshot.ts` (the readers: database only, 202 + a queued sync when nothing is stored).
+  `psnClient.ts` keeps only Sony fetchers (`fetchPsnSummary`, `fetchPsnTitles`, `fetchPsnEnrichment`, `fetchPsnGame`);
+  `psnCache.ts` is gone.
+- Routes: `bootstrap`, `status`, `refresh` (202/409/429), `games` (paged, hidden games and unticked consoles out),
+  `game/[npwr]`, `cron/psn-worker` (daily 04:30 in `vercel.json`); the old PSN routes read the snapshot. Link reads the summary
+  now and queues the rest (priority 0); verify queues a profile read (0).
+- Vault Points: scoreRefresh's PSN plan reads the store (key = the date its trophies belong to); the `psn-score` brake is gone
+  (no Sony call to brake). Scoring numbers unchanged, no `RULES_VERSION` bump; `psnScoreParity.test.ts` proves it on a fixture.
+- Client: `fetchUntilReady` waits out a 202 in `usePlatformRead` and the console library, so the summary, the library and a
+  game page keep their skeletons until the first sync lands (as the year already did).
+- Measured (`psnCallBaseline.test.ts`, rewritten with `test-utils/memoryPsn.ts`): a visit waits for **0** Sony calls (phase 2:
+  9 / 10); link 3; first sync 1,027 / 2,050 (once; phase 2's background plus score fill was ~960 / ~1,920); a quiet refresh 1;
+  one new trophy 10 / 13. Table in `docs/platforms/psn.md` → Snapshots and sync queue.
+- Docs: `docs/platforms/psn.md`, `docs/performance.md`, `docs/architecture.md`, `docs/releases.md`, `CLAUDE.md` → Platforms.
+
+**Why** — issue #179: with a page reading Sony, more accounts would only hide a live-call architecture; reads must come from
+Postgres and syncing must be a fair background job before PSN-4 and PSN-5 join.
+
+**Decisions**
+- **No frequent cron** (Hobby fails a sub-daily one): the queue is drained after PSN traffic (`after()`, 20 s, one drain per
+  instance) and by the daily cron (55 s). On Pro: `* * * * *` on `/api/cron/psn-worker`.
+- **No `s-maxage`** although the issue asked for it on public pages: every PSN read depends on the viewer (a private profile is
+  refused to others), so all stay `private` + `Vary: Cookie`. Images already go through `next/image`.
+- Jobs stay per user (the 047 table), snapshots per PSN account; two users of one account each sync it (rare).
+- The delta needs no cursor: a game is due while `trophies_at` differs from `last_trophy_at` (or a page asked for it).
+- A game without DLC is one group built from the list: 2 fewer calls per game. Groups' names come per language.
+- The language: the link stores the reader's (`serverLanguage()`); later readers set it for the next syncs. Texts already
+  stored stay in the old language until their game moves or is opened (a `ponytail:` note says how to re-read the year).
+- One game failing fails its job (others kept); a game Sony always refuses would hold its account's delta until the job fails
+  for good (`ponytail:` note in `psnSync.readDelta`).
+
+**Open**
+- Apply `048` to pre, then check with a real account: link → 202 → data within a minute or two; a game page; the refresh
+  button; `/api/psn/status`; the worker's `[psn] calls` log lines.
+- Not done here: adding PSN-4 / PSN-5 from the panel 1–2 days apart and staggering the five expiries (the owner's, with real
+  accounts); a load test of 100 links against a real database (the worker path is covered by tests, every read answers 202,
+  never 5xx). Phase 5 (#180): the UX states, progress, the friendlier 429 words, metrics and the load test.
+
+**Watch out**
+- A route that reads PSN must go through `psnSnapshot.ts`; `psnClient`'s fetchers are the worker's.
+- Without `048` every PSN page answers 502 and linking fails after the search.
+
+---
+
 ## 2026-11-16 — The admin unlock focuses the authenticator code (`fix/185-admin-code-focus`)
 
 **Did** — `AdminUnlockTotp`'s code field takes focus (`autoFocus`) when it appears after the password, with a test (#185).

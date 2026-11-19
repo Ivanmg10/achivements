@@ -6,6 +6,7 @@ import { consoleOptions, filterByConsole, type ConsoleOption } from '@/utils/con
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
+import { fetchUntilReady } from '@/lib/fetchUntilReady'
 
 export type ConsoleLibraryData<G, E> = {
   isLinked: boolean
@@ -71,7 +72,8 @@ export function createConsoleLibrary<G extends { id: number; consoleName: string
         setLibraryLoading(true)
         setLibraryError(null)
         try {
-          const res = await fetch(withSubject(url, subject), { cache: 'no-store' })
+          // A 202 (PSN's first sync, #179) is waited out: the list stays loading until it is stored.
+          const res = await fetchUntilReady(withSubject(url, subject), { cache: 'no-store' }, () => gen === generation.current)
           if (gen !== generation.current) return
           if (!res.ok) {
             setLibraryError(await errorFrom(res))
