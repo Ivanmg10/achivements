@@ -309,7 +309,7 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
   podium's steps. Small controls, fields, search, filters, secondary/quiet/danger buttons, the switch, tags and
   marks stand upright. **Data never leans:** `ProgressBar`, `DataBar` and every chart bar are upright. **The mark
   is the signature** (`--mark`: "/" slanted, "•" round, `MARK`): in front of the tab you are on (`Tabs`, the one
-  drawing of every tab bar; `TabMark` in a row of pressed buttons), between bare figures, and between facts on
+  drawing of every tab bar; `TabMark` in a row of pressed buttons), between bare figures (slanted only: none in round), and between facts on
   one line (`Facts`, never a hand-made `·`). **No label in capitals:** kickers, figure labels and table heads are in
   sentence case. Details: `docs/design-system.md` → The slant grammar.
 - **The round design is always rounder than the slanted one.** Radii come from tokens, chosen by what the thing

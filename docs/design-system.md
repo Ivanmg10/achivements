@@ -156,7 +156,8 @@ where it means something.
 - **The mark is the signature:** `--mark` ("/" slanted, "•" round; `MARK` on an `aria-hidden` span). In front of the
   tab you are on (`Tabs`, the one drawing of every tab bar: the profile tabs, the home's view switch, the stats rail,
   the account and public profile; `TabMark` in the top bar's links and the filter rows), in the search bar, between
-  bare figures (`Figure`) and between facts on one line (`Facts`: "15/49 achievements / 102/485 pts / 2 Nov 2026").
+  bare figures in the slanted design only (`Figure`, `--figure-mark`: none in round, the owner's call on 2026-11-13, #164)
+  and between facts on one line (`Facts`: "15/49 achievements / 102/485 pts / 2 Nov 2026").
 - **No label in capitals:** `Kicker` (13 px), figure labels, card titles and table heads are in sentence case. The guard
   refuses the `uppercase` class (the hash modal's dump-group names are the one exception).
 - **Round keeps its rule:** everything rounder than slanted, every one-line control a pill (`designTokens.test.ts`); it
@@ -338,7 +339,7 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   `online` draws the presence dot, `sizeSm` the size from `sm`), `ListRow` / `LIST_ROW` (media, title, sub line, trailing; the search panel's
   row), `Facts` (facts on one line joined by the mark; a screen reader hears a comma).
 - **Surfaces and data**: `SURFACE` (`ui/surface.ts`; cards use `rounded-card`), `Figure` (every labelled
-  number: `bare` has no box and the mark between figures, `tile` a small box, `card` the label first
+  number: `bare` has no box and, slanted only, the mark between figures, `tile` a small box, `card` the label first
   and the figure big, `compact` the account page's platform cards; `tone` from the theme, `color` for a tier's
   hue, `term` inside a `<dl>`; `StatPill` / `StatCard` are gone and the guard refuses their names),
   `DataBar` (a chart bar as long or as tall as its share, upright, optional track), `RarityBadge` (a tinted figure, never a bar), `ProgressBar` upright and

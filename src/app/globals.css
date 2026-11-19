@@ -239,6 +239,8 @@
   --slant: -12deg;
   /* The signature: in front of the tab you are on, between the facts of a line, between figures. */
   --mark: "/";
+  /* The mark between bare figures: the slanted design only (the owner, 2026-11-13, #164). */
+  --figure-mark: "/";
   --bar-radius: 0;
   --r-chip: 0.5rem;
   --r-button: 0.75rem;
@@ -375,6 +377,7 @@ html[data-font="fira"],
 [data-shape="slanted"] {
   --slant: -12deg;
   --mark: "/";
+  --figure-mark: "/";
   --bar-radius: 0;
   --r-chip: 0.5rem;
   --r-button: 0.75rem;
@@ -407,6 +410,7 @@ html[data-font="fira"],
 [data-shape="round"] {
   --slant: 0deg;
   --mark: "\2022";
+  --figure-mark: none;
   --bar-radius: 0.75rem;
   --r-chip: 9999px;
   --r-button: 9999px;

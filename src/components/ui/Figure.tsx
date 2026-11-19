@@ -3,7 +3,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { CountUp } from './CountUp'
 import { Skeleton } from './Skeleton'
 import { kickerClass } from './Kicker'
-import { MARK } from './shape'
+import { FIGURE_MARK } from './shape'
 
 export type FigureTone = 'main' | 'muted' | 'accent' | 'hardcore' | 'softcore' | 'success' | 'info' | 'warning' | 'danger' | 'platinum'
 export type FigureLook = 'bare' | 'tile' | 'card'
@@ -22,7 +22,7 @@ const TONES: Record<FigureTone, string> = {
   platinum: 'text-platinum',
 }
 
-// bare: figures side by side with the mark between them (identity B, #127: "/" slanted, "•" round); tile: a small centred box;
+// bare: figures side by side with a "/" between them in the slanted design, none in the round one (#127, #164); tile: a small centred box;
 // card: the label on top, the figure big under it (a profile or platform card). `compact` is the platform cards' size.
 const LOOKS = {
   bare: {
@@ -93,7 +93,7 @@ export default function Figure({ label, value, sub, look = 'bare', tone = 'main'
   const Value = term ? 'dd' : 'span'
   const inner = (
     <>
-      {look === 'bare' && <span aria-hidden="true" data-figure-mark className={`${MARK} absolute -left-0.5 top-1.5 text-[2.5rem] font-light leading-none text-accent/16 group-first/figure:hidden`} />}
+      {look === 'bare' && <span aria-hidden="true" data-figure-mark className={`${FIGURE_MARK} absolute -left-0.5 top-1.5 text-[2.5rem] font-light leading-none text-accent/16 group-first/figure:hidden`} />}
       <Label className={text.label}>{label}</Label>
       <Value className={`${text.value} ${color ? '' : TONES[tone]}`} style={color ? { color } : undefined}>
         {loading ? <Skeleton className={l.skeleton} /> : shown}
