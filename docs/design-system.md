@@ -110,6 +110,12 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   (the pickers) scrolls as a whole on `short:`** (#165, H2): its head, toolbar and list move together and the footer sticks
   to the bottom of the panel, because head + toolbar + footer left the list about 30 px at 760 × 360; the picker's help line is
   `short:hidden`. The platform chips of a picker are one row that scrolls (`useScrollFade`) at every width, never two rows.
+- **A screen where the home's Overview fits one screen is `fit:`** (≥ 1024 px wide and ≥ 1000 px tall, `@custom-variant fit`,
+  the same query as the `.home-fit` block and `FIT_SCREEN` in `lib/homeFit.ts`; #164). There the profile column and the gap above
+  "Stats & activity" are tighter (`fit:gap-2`, `fit:p-4`, `fit:py-1`, `fit:pt-0`), so the charts row gets the room, and the
+  heatmap's cells may grow to `FIT_MAX_CELL` (40 px, not 30) so its taller card fills with bigger days, not a blank band. The
+  profile column's floor with tabs (`min-height` in the block) is the tallest platform's profile measured with those sizes:
+  change a profile card's height there and measure it again. The home skeleton takes the same `fit:` classes.
 
 ## Entrances
 

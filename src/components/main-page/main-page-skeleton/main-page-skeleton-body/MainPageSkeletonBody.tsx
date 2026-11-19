@@ -37,7 +37,7 @@ export default function MainPageSkeletonBody({ cover, pinned, label }: { cover: 
           {cover ? (
             <PortadaSideSkeleton />
           ) : (
-            <section className="main-content m-3 rounded-tile flex flex-col items-center gap-3 overflow-y-auto">
+            <section className="main-content m-3 rounded-tile flex flex-col items-center gap-3 fit:gap-2 overflow-y-auto">
               <Skeleton radius="tile" className="if-platform-tabs h-[55px] lg:h-10 w-full shrink-0" />
               <MainPageProfileSkeleton label={label} />
             </section>
@@ -65,7 +65,7 @@ export default function MainPageSkeletonBody({ cover, pinned, label }: { cover: 
       </div>
 
       {/* The first section of Stats & Activity, the one that opens. */}
-      <div aria-hidden="true" data-stats-section="overview" className="p-4 flex flex-col gap-4">
+      <div aria-hidden="true" data-stats-section="overview" className="p-4 fit:pt-0 flex flex-col gap-4 fit:gap-3">
         <Skeleton className="h-7 w-44" />
         <div className="flex flex-col lg:grid lg:grid-cols-[minmax(180px,220px)_1fr] gap-4 lg:items-start">
           <div className="-mx-4 px-4 py-2 lg:mx-0 lg:p-2 lg:self-stretch lg:bg-bg-card lg:rounded-card flex lg:flex-col gap-1 overflow-hidden">
@@ -74,7 +74,7 @@ export default function MainPageSkeletonBody({ cover, pinned, label }: { cover: 
             ))}
           </div>
           <div className="min-w-0 flex flex-col gap-4">
-            <div className="flex flex-wrap content-start gap-3 min-h-[183px] lg:min-h-0">
+            <div className="flex flex-wrap content-start gap-3 min-h-[183px] lg:min-h-[83px]">
               {Array.from({ length: STATS }, (_, i) => (
                 <div key={i} className="px-3 py-1 flex flex-col gap-1 flex-1 min-w-24">
                   <Skeleton className="h-3 w-16" />

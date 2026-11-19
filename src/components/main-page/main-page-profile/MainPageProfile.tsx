@@ -71,7 +71,7 @@ export default function MainPageProfile() {
 
   // Several: one profile at a time, switched by low-key tabs at the top.
   return (
-    <section className="main-content text-text-main m-3 rounded-tile flex flex-col items-center gap-3 overflow-y-auto">
+    <section className="main-content text-text-main m-3 rounded-tile flex flex-col items-center gap-3 fit:gap-2 overflow-y-auto">
       <Tabs<GameSource>
         id={ID_PREFIX}
         aria-label={T.steam.profileTabsLabel}

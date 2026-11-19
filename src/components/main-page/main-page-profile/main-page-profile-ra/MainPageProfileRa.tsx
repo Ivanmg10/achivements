@@ -48,7 +48,7 @@ export default function MainPageProfileRa({
   const hasContribs = user && ((user.ContribCount ?? 0) > 0 || (user.ContribYield ?? 0) > 0)
 
   return (
-    <div className="flex flex-col gap-3.5 w-full h-full">
+    <div className="flex flex-col gap-3.5 fit:gap-2.5 w-full h-full">
       {user?.User ? (
         <>
           <MainPageProfileCard
@@ -88,7 +88,7 @@ export default function MainPageProfileRa({
           {!subject && <MainPageProfileRaAchievements achievements={recentAchievements} isLoading={achievementsLoading} />}
 
           {hasContribs && (
-            <div className={`${SURFACE} p-5 flex flex-col gap-3`}>
+            <div className={`${SURFACE} p-5 fit:p-4 flex flex-col gap-3`}>
               <p className="text-[1.0625rem] font-bold">{T.profileRa.contributions}</p>
               <div className="grid grid-cols-2 gap-2">
                 <Figure look="card" label={T.profileRa.achievementsCreated} value={(user.ContribCount ?? 0).toLocaleString(lang)} />

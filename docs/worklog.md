@@ -71,6 +71,20 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   `MainPageTopGames`, `MainPagePeriodStats`, `DayAchievementsModal`, `StreakList`. The header: `useStreakSummary` sends
   `&tz=<browser IANA zone>`, `/api/me/streak` keeps it only when `isTimeZone` (else UTC) and `loadStreak(…, timeZone, now)` counts on it.
 
+- 1 (the Overview's charts, done 2026-11-19): new `fit:` variant (`globals.css`, = the `.home-fit` query, `FIT_SCREEN` in
+  `lib/homeFit.ts`). On those screens: the stats section `fit:pt-0 fit:gap-3` (the gap above "Stats & activity" from 72 to 52 px),
+  the profile column tighter (`fit:gap-2` under the tabs, `fit:gap-2.5` between cards, `fit:p-4` on the profile card, recents and
+  contributions, `fit:py-1` on a recent row), so the tallest profile (PSN/RA) went from 777 to 737 px and the floor with tabs
+  from `48.25rem` to `46.125rem`. Daily chart `clamp(160px, 22dvh, 320px) - trim` (was `20dvh, 260px`), `MAX_TRIM` 160 (was
+  100). Heatmap: `useHeatmapGrid` takes `maxCell`; `MainPageHeatmap` asks for `FIT_MAX_CELL` (40) on `fit` screens, 30 elsewhere.
+  Skeleton: same classes, and its row of figures is `lg:min-h-[83px]` (it was 72 vs the loaded 83, an 11 px jump at load at
+  every desktop size, measured). Numbers (classic, Playwright, every profile tab the same): 2560×1440 chart 260→317, heatmap
+  card 366→422, cells 30→40 (306→236 days), rows 118→112, ends at 1440. 2560×1280 (the owner's real viewport, 1392 screenshot
+  minus the browser bar) chart 164→218, cells 22→29 (365→320 days), top 777→738, ends at 1280. 1920×1080 cannot fit (top 738 +
+  stats 420 > 1016): it scrolls 142 px (was 200), chart at its 160 floor as before. 1920×990, 1280×800, 800×450, 760×360, 390:
+  identical numbers. Cover at fit sizes: gap tighter, chart 260 (no trim, as before), cells 30→36 (306→264 days at 2560).
+  Skeleton = loaded at 1440, 1280, 1080 (±1 px).
+
 **Why** — the owner's review of the home on pre (2026-11-13), issue #164; the days, the owner's report of 2026-11-19.
 
 **Decisions** — PSN tiles open the library on PlayStation, not on one console: the library has no PSN console filter (the owner
@@ -81,8 +95,13 @@ Points (`score_periods`, `vaultMe`'s weeks and seven days, `vaultLevel`) and the
 `RULES_VERSION` bump; the landing's samples stay UTC (static page, its server and browser must agree). The 60-day `activitySince`
 cut in `MainPageCharts` is a window, not a day key, and was left.
 
-**Open** — Point 1 (the Overview's chart heights) not done: it needs the signed-in home on screen to tune the `48.25rem` floor,
-the trim and the spacing, and local sign-in failed for the owner (local dev reads the pre database). The console icons.
+Point 1: a taller heatmap at a fixed width shows fewer days (the height sets the cell); 30 px cells left a blank band in a
+taller card (the owner's rule: no blank inside a card), so the cap rises on `fit` screens only. The profile's 2×2 figures were
+left as they are (four across would win ~80 px more at 2560, but it changes the card's shape: canvas first).
+
+**Open** — Point 1, for the owner to judge on the real screen: the tighter profile column and gap, the heatmap's fewer, bigger
+days at 1440, and whether 2560×1280 is tall enough. At 1440 the profile column still has ~60 px spare at the bottom (the chart
+cap holds the heatmap filled). 1920×1080 stays a little taller than the screen: the profile alone is 738 px. The console icons.
 
 **Watch out** — 3 and 5 not yet seen at 390 and in Firefox; 6 not yet in Firefox. Playwright (Chromium) can be signed in by the
 owner on `localhost:3000/authPage`; block every non-GET `/api` call while looking, never change the account.

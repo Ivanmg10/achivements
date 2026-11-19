@@ -1,8 +1,14 @@
 /** Where the height the profile ended up with is kept (`width:height`, as `RememberedHeight`), for its skeleton. */
 export const HOME_PROFILE_KEY = 'block-height:home-profile'
 
+/** The screens where Overview fits one screen: the `.home-fit` block and the `fit:` variant in globals.css say the same. */
+export const FIT_SCREEN = '(min-width: 1024px) and (min-height: 1000px)'
+
+/** The heatmap's biggest cell there, in px: the charts row is taller, and bigger days fill it instead of a blank band (#164). */
+export const FIT_MAX_CELL = 40
+
 /** The most the daily chart gives up, in px (it never goes under its 160px either, see globals.css). */
-export const MAX_TRIM = 100
+export const MAX_TRIM = 160
 
 /**
  * Ref for the home's `.home-fit` box: on the screens where Overview fits one

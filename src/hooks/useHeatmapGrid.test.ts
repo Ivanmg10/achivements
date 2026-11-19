@@ -103,3 +103,11 @@ describe('useHeatmapGrid', () => {
     expect(result.current.cell * 7 + 6 * 3 + 36).toBeLessThanOrEqual(144)
   })
 })
+
+test('a page may ask for bigger days, and a tall card then fills with them instead of a blank band (#164)', () => {
+  const capped = measureHeatmapGrid(1481, 308, WEDNESDAY)
+  const bigger = measureHeatmapGrid(1481, 308, WEDNESDAY, 40)
+  expect(capped.cell).toBe(30)
+  expect(bigger.cell).toBe(40)
+  expect(bigger.days).toBeLessThan(capped.days)
+})

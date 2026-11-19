@@ -40,7 +40,7 @@ export default function MainPageProfileLinked(
   const { link, ...rest } = card
   return (
     // Fills the column like the RA card, so switching tabs does not resize it.
-    <div className="flex flex-col gap-3.5 w-full h-full">
+    <div className="flex flex-col gap-3.5 fit:gap-2.5 w-full h-full">
       <MainPageProfileCard
         {...rest}
         actions={link && <MainPageProfileActions href={link.href} linkLabel={link.label} ringClass={link.ringClass} onRefresh={subject ? undefined : onRefresh} />}

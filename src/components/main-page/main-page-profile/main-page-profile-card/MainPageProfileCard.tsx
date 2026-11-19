@@ -29,7 +29,7 @@ export default function MainPageProfileCard({
   stats: ReactNode
 }) {
   return (
-    <div className={`${SURFACE} relative overflow-hidden p-5 flex flex-col gap-3.5`}>
+    <div className={`${SURFACE} relative overflow-hidden p-5 fit:p-4 flex flex-col gap-3.5`}>
       {avatarSrc && (
         <Image
           src={avatarSrc}
