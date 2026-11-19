@@ -1420,7 +1420,7 @@ export const ja: Translations = {
     viewOnStore: 'PlayStation Store で見る',
     hiddenTrophyDesc: 'プレイを続けると表示されます',
     showHiddenTrophies: '隠しトロフィーを表示（ネタバレ）',
-    hideHiddenTrophies: '隠しトロフィーを非表示',
+    hideHiddenTrophies: 'ネタバレを隠す',
     revealTrophy: 'このトロフィーを表示',
     concealTrophy: 'このトロフィーを非表示',
     rarity: 'プレイヤーの{n}%',
@@ -1459,6 +1459,7 @@ export const ja: Translations = {
     collectionGames: '本のゲーム',
     platform: 'プラットフォーム',
     trophy: 'トロフィー',
+    searchTrophies: 'トロフィーを検索',
     grade: 'グレード',
     errors: {
       'invalid-username': '有効なオンラインIDではありません（3〜16文字の英数字、- または _）。',

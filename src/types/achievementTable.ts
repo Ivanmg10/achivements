@@ -7,6 +7,8 @@ export type TableTexts = {
   label: string
   /** The name column's head. */
   name: string
+  /** The search's placeholder in the platform's word ("Search a trophy"); "Search an achievement" when left out. */
+  search?: string
   /** A filter that leaves nothing. */
   none: string
   earned: string

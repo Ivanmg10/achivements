@@ -118,6 +118,7 @@ export default function AchievementTable<T>(props: AchievementTableProps<T>) {
         {missable && <MissablePanel views={table.missables.map(view)} unoptimized={source !== 'ra'} />}
         <AchievementTableToolbar
           label={texts.label}
+          searchPlaceholder={texts.search ?? T.gameInfoTable.searchPlaceholder}
           tabs={[
             { value: 'all', label: T.gameInfoTable.filterAll, count: table.counts.all },
             { value: 'earned', label: T.gameInfoTable.filterEarned, count: table.counts.earned },

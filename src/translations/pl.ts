@@ -1420,7 +1420,7 @@ export const pl: Translations = {
     viewOnStore: 'Zobacz w PlayStation Store',
     hiddenTrophyDesc: 'Graj dalej, aby je odkryć',
     showHiddenTrophies: 'Pokaż ukryte trofea (spoilery)',
-    hideHiddenTrophies: 'Ukryj ukryte trofea',
+    hideHiddenTrophies: 'Ukryj spoilery',
     revealTrophy: 'Pokaż to trofeum',
     concealTrophy: 'Ukryj to trofeum',
     rarity: '{n}% graczy',
@@ -1459,6 +1459,7 @@ export const pl: Translations = {
     collectionGames: 'gier',
     platform: 'Platforma',
     trophy: 'Trofeum',
+    searchTrophies: 'Szukaj trofeum',
     grade: 'Ranga',
     errors: {
       'invalid-username': 'To nie jest poprawne ID online (3–16 liter, cyfr, - lub _).',

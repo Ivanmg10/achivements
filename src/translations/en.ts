@@ -1421,7 +1421,7 @@ export const en = {
     viewOnStore: 'View on PlayStation Store',
     hiddenTrophyDesc: 'Keep playing to reveal it',
     showHiddenTrophies: 'Show hidden trophies (spoilers)',
-    hideHiddenTrophies: 'Hide hidden trophies',
+    hideHiddenTrophies: 'Hide spoilers',
     revealTrophy: 'Show this trophy',
     concealTrophy: 'Hide this trophy',
     rarity: '{n}% of players',
@@ -1460,6 +1460,7 @@ export const en = {
     collectionGames: 'games',
     platform: 'Platform',
     trophy: 'Trophy',
+    searchTrophies: 'Search a trophy',
     grade: 'Grade',
     errors: {
       'invalid-username': 'That is not a valid online ID (3–16 letters, numbers, - or _).',

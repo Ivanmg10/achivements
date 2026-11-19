@@ -1420,7 +1420,7 @@ export const fr: Translations = {
     viewOnStore: 'Voir sur le PlayStation Store',
     hiddenTrophyDesc: 'Continue à jouer pour le révéler',
     showHiddenTrophies: 'Afficher les trophées cachés (spoilers)',
-    hideHiddenTrophies: 'Masquer les trophées cachés',
+    hideHiddenTrophies: 'Masquer les spoilers',
     revealTrophy: 'Afficher ce trophée',
     concealTrophy: 'Masquer ce trophée',
     rarity: '{n} % des joueurs',
@@ -1459,6 +1459,7 @@ export const fr: Translations = {
     collectionGames: 'jeux',
     platform: 'Plateforme',
     trophy: 'Trophée',
+    searchTrophies: 'Chercher un trophée',
     grade: 'Grade',
     errors: {
       'invalid-username': 'Ce n’est pas un ID en ligne valide (3 à 16 lettres, chiffres, - ou _).',

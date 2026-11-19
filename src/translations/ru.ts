@@ -1420,7 +1420,7 @@ export const ru: Translations = {
     viewOnStore: 'Открыть в PlayStation Store',
     hiddenTrophyDesc: 'Продолжайте играть, чтобы открыть его',
     showHiddenTrophies: 'Показать скрытые трофеи (спойлеры)',
-    hideHiddenTrophies: 'Скрыть скрытые трофеи',
+    hideHiddenTrophies: 'Скрыть спойлеры',
     revealTrophy: 'Показать этот трофей',
     concealTrophy: 'Скрыть этот трофей',
     rarity: '{n}% игроков',
@@ -1459,6 +1459,7 @@ export const ru: Translations = {
     collectionGames: 'игр',
     platform: 'Платформа',
     trophy: 'Трофей',
+    searchTrophies: 'Найти трофей',
     grade: 'Ранг',
     errors: {
       'invalid-username': 'Это не корректный онлайн-ID (3–16 букв, цифр, - или _).',

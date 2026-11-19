@@ -29,7 +29,8 @@ type Platform = {
   pins: (o: { canPin?: boolean; pinned?: number[]; leading?: number[] }) => jest.Mock
   /** What the toggle receives for the achievement with this title. */
   pinArg: (title: string) => unknown
-  texts: { none: string; earned: string; locked: string }
+  /** `search` is the search's name, in the platform's word. */
+  texts: { none: string; earned: string; locked: string; search: string }
   /** The words a still-secret one shows; absent where the platform has none (RA). */
   secret?: { title: string; reveal?: { one: string; all: string; allOff: string } }
   /** The `#fragment` a link to the achievement at that place uses; absent where links land on the page only (RA). */
@@ -58,7 +59,7 @@ const RA: Platform = {
     return toggle
   },
   pinArg: (title) => expect.objectContaining({ Title: title }),
-  texts: { none: en.gameInfoTable.noMatches, earned: en.gameInfoTable.headerEarned, locked: en.achievementDetail.notEarned },
+  texts: { none: en.gameInfoTable.noMatches, earned: en.gameInfoTable.headerEarned, locked: en.achievementDetail.notEarned, search: en.gameInfoTable.searchPlaceholder },
   hasNotice: true,
 }
 
@@ -77,7 +78,7 @@ const STEAM: Platform = {
     return toggle
   },
   pinArg: (title) => expect.objectContaining({ title }),
-  texts: { none: en.steam.noAchievements, earned: en.steam.earned, locked: en.steam.locked },
+  texts: { none: en.steam.noAchievements, earned: en.steam.earned, locked: en.steam.locked, search: en.gameInfoTable.searchPlaceholder },
   secret: { title: en.steam.hiddenAchievement },
   anchor: (i) => `ach-K${i}`,
   hasNotice: false,
@@ -98,7 +99,7 @@ const PSN: Platform = {
     return toggle
   },
   pinArg: (title) => expect.objectContaining({ name: title }),
-  texts: { none: en.psn.noTrophies, earned: en.psn.earned, locked: en.psn.locked },
+  texts: { none: en.psn.noTrophies, earned: en.psn.earned, locked: en.psn.locked, search: en.psn.searchTrophies },
   secret: { title: en.psn.hiddenTrophy, reveal: { one: en.psn.revealTrophy, all: en.psn.showHiddenTrophies, allOff: en.psn.hideHiddenTrophies } },
   anchor: (i) => `trophy-${i}`,
   hasNotice: false,
@@ -121,7 +122,7 @@ const XBOX: Platform = {
     return toggle
   },
   pinArg: (title) => expect.objectContaining({ name: title }),
-  texts: { none: en.xbox.noAchievements, earned: en.xbox.earned, locked: en.xbox.locked },
+  texts: { none: en.xbox.noAchievements, earned: en.xbox.earned, locked: en.xbox.locked, search: en.gameInfoTable.searchPlaceholder },
   secret: { title: en.xbox.secretAchievement, reveal: { one: en.xbox.revealAchievement, all: en.xbox.showSecretAchievements, allOff: en.xbox.hideSecretAchievements } },
   anchor: (i) => `achievement-${100 + i}`,
   hasNotice: false,
@@ -195,7 +196,7 @@ describe.each(PLATFORMS)('$name', (p) => {
 
   test('a search shows every match, and says when there is none', () => {
     p.render(TEN)
-    const search = screen.getByRole('searchbox', { name: en.gameInfoTable.searchPlaceholder })
+    const search = screen.getByRole('searchbox', { name: p.texts.search })
     fireEvent.change(search, { target: { value: 'item 9' } })
     expect(names()).toEqual(['Item 9'])
     fireEvent.change(search, { target: { value: 'zzz' } })
@@ -265,7 +266,7 @@ describe.each(PLATFORMS.filter((p) => p.secret))('$name, secret ones', (p) => {
     p.render(SECRET)
     expect(names()).toEqual(['Open', p.secret!.title])
     expect(screen.queryByText('The ending')).not.toBeInTheDocument()
-    fireEvent.change(screen.getByRole('searchbox', { name: en.gameInfoTable.searchPlaceholder }), { target: { value: 'spoiler' } })
+    fireEvent.change(screen.getByRole('searchbox', { name: p.texts.search }), { target: { value: 'spoiler' } })
     expect(screen.getByText(en.gameInfoTable.noMatches)).toBeInTheDocument()
   })
 
