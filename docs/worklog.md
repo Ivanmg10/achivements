@@ -33,6 +33,58 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-19 — PSN phase 5: the sync on screen, numbers, alerts, switches, load test and runbook (`feat/180-psn-sync-ux`, #180, epic #174)
+
+**Did**
+- `migrations/049_psn_metrics.sql` (applied to pre and production on 2026-11-19, ahead of the code: additive):
+  `psn_account_stats.forbidden` and `.by_fn`, `psn_timings` (each Sony call and PSN page read), `psn_sync_jobs.started_at`.
+- Server: `utils/psnSyncStage.ts` (stage, steps, progress, ETA, place in line, stale, trouble) in `GET /api/psn/status`
+  (`psnQueue.psnQueueOf`, `psnAccounts.psnUsableRate`, `psnStore.psnDeltaCount` now counts started games);
+  `psnMetrics.ts` (`timedPsnRead` on the eight read routes, `psnMetrics`), carried by `psnPoolStatus` to the admin panel,
+  the alerts and `/api/ops/psn/status`; each Sony call records its function, 403s and time in the lease's statement
+  (`withPsnAccount(work, fn)`); `psnMode.ts` (`PSN_MODE`, `PSN_POOL_ENABLED`); the `titles` job's play data is its own
+  `enrich` job so a crowd of links each gets its library first.
+- Client: `usePsnSync` (reads the state while it moves, toasts, the refresh button's POST), `useSecondsLeft`,
+  `MainPageProfilePsnSync` (last read, countdown, a live line, steps, `ProgressBar` with `valueText`, ETA; a chip on
+  phones) **only above the skeleton during the first sync**: a first version put it inside the PSN profile card and
+  the owner rejected it (it broke the column's look; the card stays as every platform's, phase 4's "Updated…" line
+  removed too). Where routine syncs and "under maintenance" show once the card is there: to design on the canvas, `utils/psnSyncCopy.ts`; `T.psn.sync`, `T.psn.errors.paused` and four toasts in the nine languages
+  (`T.psn.nextSync` removed: the countdown replaced it). `ProgressBar` gained `valueText` and stays still under reduced motion.
+- Admin: `AdminPsnPoolMetrics` under the accounts (p95s, reads served, queue, 429s; per account by function, 429 %,
+  401, 403, p95, days left; the switches).
+- Alerts: 429 above 1 % in 5 minutes (was 5 % an hour), queue lag p95 above 15 minutes, page read p95 above 1 s.
+- `psnLoad.test.ts`: 10 / 100 / 1,000 links, chaos (one account 429, expired tokens, Sony 5xx, every account down, dead
+  worker); never a 5xx. Runbook in `docs/platforms/psn.md`.
+
+**Why** — issue #180: the last phase of the PSN-at-scale epic: a person sees what the queue is doing in plain words, the
+owner sees the numbers and is alerted, and there is a written plan for a bad day.
+
+**Decisions**
+- The issue's "core p95 under 60 s for 1,000 links" is not reachable with Sony's budget (one call a link at 150 calls a
+  minute on five accounts: 380 s); it holds to ~140 links a minute. Measured and written down, not promised.
+- No sheet over the profile on phones: the details fold behind a chip in the card (the spec's "a chip, not a modal").
+- Routine syncs are quiet: toasts only for a first sync seen from its start and a refresh the user asked for; only the
+  latter refetches (the reads wait out a first sync by themselves).
+- `PSN_MODE`/`PSN_POOL_ENABLED` are env vars (a redeploy), not a panel switch: no new mutable state for a rare lever.
+- A 403 now counts as `forbidden` (an answer, healthy) instead of `ok`.
+- Not designed on the canvas first: a status block inside the existing card, from library pieces; review it on localhost.
+
+**Open**
+- Check on localhost with a real account: link → status line and steps → toasts; the admin numbers.
+- Design on the canvas where the sync state (routine sync, old data, under maintenance, the refresh countdown) lives
+  once the card is shown, without touching the card.
+- Pre's PSN-1 is quarantined since 2026-11-16 (Sony refused its sign-in; production's is fine): renew it from pre's
+  admin panel.
+- With two accounts: whether Sony's 429 is per account or per IP; PSN-4 / PSN-5 and the staggered expiries.
+- On Pro: `psn-worker` every minute and `psn-alerts` every 5 minutes.
+
+**Watch out**
+- Without `049`, every Sony call fails to record (and the call's own answer is kept: `finish` logs and goes on), and the
+  status, numbers and alerts fail.
+- `psnLoad.test.ts` models time from calls; a change to what the core costs moves its table.
+
+---
+
 ## 2026-11-16 — PSN phase 4: snapshots in Postgres, a sync queue and delta sync (`feat/179-psn-snapshots-queue`, #179, epic #174)
 
 **Did**

@@ -468,3 +468,137 @@ rarities.
 **Left for later:** the "Done when" items that need a real pool (PSN-4 and PSN-5 added from the panel 1–2 days
 apart, each with its canary green; then the five expiries staggered; failover tested) and a load test of 100
 simulated links against a real database.
+
+## Sync on screen, numbers, alerts and the switches (#180, phase 5, 2026-11-19)
+
+**What a person sees** (the owner's own profile column, `MainPageProfilePsnSync`; spec: `docs/psn-multi-account-pool.md`
+§9). `GET /api/psn/status` now also says what the sync means (`src/utils/psnSyncStage.ts`, pure, tested):
+- `stage`: `syncing_core` (the trophy list is not stored yet), `ready_partial` (trophies and library there, the year
+  still being read), `enriching` (play data or older games still being read; nothing waits on it), `ready`, `private`.
+- four `steps` (trophies, library, play time, history: done, in progress, waiting), a real `progress` (10 with the
+  summary, 30 with the list, then 30 + 70 × games read / games with trophies; never a timer), `games` read / total,
+  `etaSeconds` (the calls left: 2 for the core, 22 for play data, 2 a game, 3 for each job ahead, at the usable
+  accounts' background rate; rounded on screen, "may take a while" past 30 minutes), `position` in the queue while
+  none of the user's jobs runs, `stale` (data an hour old or more), `trouble` (`paused`: PSN_MODE=stale or no account
+  can read; `failing`: a job failed in the last hour or keeps retrying; the app's own budget spent is not trouble).
+
+**Only during the first sync**, above the profile column's skeleton (the card has nothing to show yet):
+`MainPageProfilePsnSync` shows when Sony was last read and a **countdown** until the refresh button may read it again
+(10 minutes), one line in plain words in a live region (`psnSyncMessage`: trouble first, then old data, then the
+stage), the steps (shape and word, never colour alone), a `ProgressBar` with `aria-valuenow` and `aria-valuetext`
+(still under reduced motion) and the wait; on a phone the steps fold behind a chip (`aria-expanded`). **Never inside
+the profile card** (2026-11-19, the owner: a status line in the PSN card broke the column's look, every platform's
+card stays the same; phase 4's "Updated…" line went with it). Where routine syncs, old data and "PSN is under
+maintenance" are shown once the card is there is still to be designed on the canvas: today they reach the user only
+as toasts (an asked-for refresh) and `/api/psn/status`. Words in all nine languages (`T.psn.sync`), never "NPSSO",
+"429", "token" or "job".
+
+`usePsnSync` reads the state again every 4 s while the core lands and every 15 s after, never once it is done (or
+paused). The page's own reads wait out a first sync by themselves (202), so it refetches only after a refresh the user
+asked for. Toasts: the core landing and the end of a first sync seen from its start, and the end of an asked-for
+refresh; a routine sync is quiet. The refresh button posts `/api/psn/refresh`: queued (202), already running (409,
+"Your PlayStation is already being updated") or too soon (429, "You can update again in N min"), each a toast, never
+an error.
+
+**The core first.** The `titles` job now only stores the list (1 request per 800 games); the played list, trophy sets
+and IGDB art are their own `enrich` job at the same priority, queued after it. So a crowd of first links each gets
+its library before anyone's play data: the core costs one worker call per link. Call totals unchanged
+(`psnCallBaseline.test.ts`).
+
+**Numbers** (`src/lib/psnMetrics.ts`, `migrations/049_psn_metrics.sql`, database-wide so every instance adds up):
+- per account and minute (`psn_account_stats`, written with each call in the lease's own statement): calls, by
+  function (`by_fn`), ok, 429, 401 (`auth_errors`), 403 (`forbidden`: a hidden profile, an answer and not the
+  account's fault, so it counts as healthy), 5xx;
+- `psn_timings`: one row per Sony call (`sony`, its account, its time) and per PSN page read (`read`; `ok` = the store
+  answered, false = a 202). The eight read routes are wrapped in `timedPsnRead` (recorded after the answer). Swept
+  after two days by the pool's tidy-up;
+- `psn_sync_jobs.started_at`: the first claim's time, so the lag is `started_at - run_after` (plus the age of jobs
+  due and still waiting, so a dead worker shows).
+
+`psnPoolStatus` carries them (`metrics`), so the admin panel, the alerts (pre's too, read-only) and
+`/api/ops/psn/status` (`metrics`: queue due, lag p95, read and Sony p95, 429s in 5 minutes) read the same numbers.
+The PlayStation tab shows them under the accounts (`AdminPsnPoolMetrics`): Sony call p95, page read p95 (15 min),
+reads served at once, queue due / queued / running, lag p95, 429s in 5 minutes, and per account calls a minute, by
+function, 429 %, 401, 403, p95 and days left; with the switches this deployment runs with.
+
+**Alerts** added (`psnAlerts.ts`, Spanish texts in `psnAlertMessages.ts`): 429s above **1 % of ≥ 20 calls in the
+last 5 minutes** (replaces phase 3's 5 % in an hour), the queue's **lag p95 above 15 minutes** (≥ 5 jobs), a **page
+read's p95 above 1 s** (≥ 20 reads in 15 minutes). Kept: an NPSSO at 14 / 7 / 3 / 1 days (the issue's "< 7 days"),
+fewer than two usable accounts when two or more are meant to serve, quarantine, failing syncs, the digest. They are
+looked at when upkeep runs (after PSN traffic, at most every 15 minutes, and the 09:15 cron): on Hobby "5 minutes" is
+the window, not the frequency. On Pro, run `/api/cron/psn-alerts` every 5 minutes.
+
+**Switches** (`src/lib/psnMode.ts`, env vars read on every call; a redeploy applies them):
+
+| Variable | Value | What happens |
+|---|---|---|
+| `PSN_MODE` | `live` (default) | Everything runs |
+| | `queue` | Only the core (`summary`, `titles`) is read; play data, the year and the history wait in the queue |
+| | `stale` | Sony is never called (`psnCall` throws `paused`): pages serve the store, the queue waits, link and verify answer 503 `paused` ("PSN is under maintenance") |
+| `PSN_POOL_ENABLED` | `true` (default) / `false` | `false`: the oldest active account does everything, no failover |
+
+No flag for the verification gate: it is always on (the owner's decision, phase 1).
+
+### Load and chaos (phase 5)
+
+`src/lib/psnLoad.test.ts` runs links, the worker and the readers against the fake Sony, in memory (`PSN_LOAD=1 npx
+jest src/lib/psnLoad --coverage=false` prints the table). Every link at the same moment, 6 games each; the core's wait
+is modelled from the worker calls made before each list landed, at 30 worker calls a minute per account (40, three
+quarters for the worker):
+
+| links at once | accounts | worker calls a minute | core p95 | last core |
+|--:|--:|--:|--:|--:|
+| 10 | 1 | 30 | 22 s | 22 s |
+| 100 | 5 | 150 | 38 s | 40 s |
+| 1,000 | 5 | 150 | 380 s | 400 s |
+
+No read answers 5xx in any of them (202 before the worker, 200 after). **The issue's "core p95 under 60 s" holds up
+to about 140 links in the same minute on five accounts** (one call each); 1,000 at once is Sony's budget, not the
+code: they queue, each sees its place in line and a wait, and the links themselves are refused with 429 `busy` once
+the foreground share is spent (never a 5xx). More accounts or a higher `rate_per_min` (if Sony allows it) move the line.
+
+Chaos, 20 users on two accounts: one account answering 429 to everything (invisible: the other carries it, the
+first rests), every account's first token expired (dropped, signed in again, nobody notices), Sony's 5xx on a third
+of the list reads (retried until every core lands; reads never 5xx), every account resting (stored data served, 200;
+new links told 429 `busy`, never 5xx), a dead worker (synced users 200, new ones 202).
+
+Still to do with real accounts: whether Sony's 429 is per account or per IP (two accounts needed), and PSN-4 / PSN-5.
+
+## Runbook
+
+**Renew an account** (an alert "caduca en N días", or the panel's "Next renewal"): admin panel → PlayStation → Renew
+on that row. In a private window (or its own browser profile) sign in to playstation.com as that account, open
+`https://ca.account.sony.com/api/v1/ssocookie`, copy `npsso`, paste it. It is kept only if Sony gives its expiry, the
+sign-in works and the account reads its own profile. Renew about one every 12 days so they never die together (the
+panel suggests which and when; "Expires near another" marks crowded ones).
+
+**Drain an account** (to retire it, or it misbehaves): Drain on its row. It finishes what it has in flight, takes no
+more, and is paused by the next upkeep. Resume puts it back. Remove deletes its sign-in (the audit keeps who did it).
+
+**One account quarantined** (alert "en cuarentena": its refresh token and NPSSO were refused): renew it as above.
+Users notice nothing while another account is active. With PSN-1 alone, Sony is not read: pages serve the store, new
+links answer `busy`; renew at once.
+
+**Too many 429s** (alert above 1 % in 5 minutes): look at the numbers per account. One account: it rests by itself
+(60 s, doubling to 5 min); lower its `rate_per_min` (PATCH). All of them: set `PSN_MODE=queue` in Vercel and redeploy
+(only the core is read), and lower `rate_per_min`; back to `live` when it calms down.
+
+**The queue is late** (alert lag p95 above 15 minutes): the numbers say how many are due. Traffic drains it on Hobby;
+with no traffic only the 04:30 cron does. Call `GET /api/cron/psn-worker` with `Authorization: Bearer $CRON_SECRET`
+to drain 55 s by hand. Many due and Sony fine: the pool is too small for the load (more accounts). On Pro, schedule
+the worker every minute.
+
+**Pages slow** (alert read p95 above 1 s): reads are database only, so it is Neon, not Sony: check Neon's dashboard
+and the read routes in Vercel's logs.
+
+**Every account down, or Sony down**: set `PSN_MODE=stale` and redeploy. No call goes to Sony; pages serve what is
+stored with "PSN is under maintenance. Your data is still here."; linking and verifying answer `paused`. Renew or
+wait, then back to `live`: the queue resumes where it was.
+
+**Sony changes something** (a call starts failing for everyone, "failing" on many profiles, odd shapes):
+`PSN_MODE=stale` first (users keep their data), then read the `[psn]` and `[psnQueue]` lines in Vercel's logs and the
+401 / 403 / 5xx columns of the numbers, and psn-api's issues (sources at the top of this file). Fix the fetcher in
+`psnClient.ts` (the only place that calls Sony), test it against the fake (`test-utils/fakePsn.ts`), then `live`.
+
+**The pool itself misbehaves** (leases stuck, an account picked when it should not be): `PSN_POOL_ENABLED=false` makes
+the oldest active account do everything, as before the pool, until it is fixed.

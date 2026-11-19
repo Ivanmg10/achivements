@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import pool from '@/lib/db'
 import { queryRows } from '@/lib/queryRows'
 import { PsnBusyError, PsnError } from '@/lib/psnErrors'
+import { psnMode } from '@/lib/psnMode'
 
 /**
  * The PSN sync queue (#179): psn_sync_jobs (migration 047). A job is one phase of one user's sync; the worker
@@ -13,8 +14,10 @@ import { PsnBusyError, PsnError } from '@/lib/psnErrors'
  * from `after()`) and by `/api/cron/psn-worker` once a day. On a Pro plan that cron runs every minute and the kicks
  * only make a sync start sooner.
  */
-export type PsnPhase = 'summary' | 'titles' | 'recent' | 'history' | 'score'
-export const PSN_PHASES: readonly PsnPhase[] = ['summary', 'titles', 'recent', 'history', 'score']
+export type PsnPhase = 'summary' | 'titles' | 'enrich' | 'recent' | 'history' | 'score'
+export const PSN_PHASES: readonly PsnPhase[] = ['summary', 'titles', 'enrich', 'recent', 'history', 'score']
+/** The core: what PSN_MODE=queue still runs (#180). */
+export const CORE_PHASES: readonly PsnPhase[] = ['summary', 'titles']
 
 /** Lower runs first: what the user just did, then a first sync, then upkeep, then the long tail. */
 export const PRIORITY = { link: 0, manual: 1, first: 2, cron: 3, history: 4, score: 5 } as const
@@ -40,19 +43,23 @@ export async function enqueuePsn(userId: number | string, phase: PsnPhase, prior
   )
 }
 
-/** The next job due, now running on `worker`; null when none is. */
-export async function claimPsnJob(worker: string): Promise<PsnJob | null> {
+/**
+ * The next job due among `phases`, now running on `worker`; null when none is. The first claim stamps
+ * `started_at`, so the queue's lag (started_at - run_after) is measured (#180).
+ */
+export async function claimPsnJob(worker: string, phases: readonly PsnPhase[] = PSN_PHASES): Promise<PsnJob | null> {
   const [row] = await queryRows<{ id: string; user_id: number; phase: PsnPhase; priority: number; attempts: number }>(
     `UPDATE psn_sync_jobs SET status = 'running', locked_by = $1, locked_until = now() + make_interval(secs => $2),
-            attempts = attempts + 1, updated_at = now()
+            attempts = attempts + 1, updated_at = now(), started_at = COALESCE(started_at, now())
       WHERE id = (
         SELECT id FROM psn_sync_jobs
-         WHERE (status = 'queued' AND run_after <= now()) OR (status = 'running' AND locked_until < now())
+         WHERE ((status = 'queued' AND run_after <= now()) OR (status = 'running' AND locked_until < now()))
+           AND phase = ANY($3::text[])
          ORDER BY priority, run_after
          LIMIT 1
          FOR UPDATE SKIP LOCKED)
       RETURNING id, user_id, phase, priority, attempts`,
-    [worker, LOCK_SECONDS],
+    [worker, LOCK_SECONDS, phases],
   )
   return row ? { id: Number(row.id), userId: row.user_id, phase: row.phase, priority: row.priority, attempts: row.attempts } : null
 }
@@ -77,6 +84,33 @@ export async function psnJobsOf(userId: number | string): Promise<Array<{ phase:
   return queryRows(`SELECT phase, status, priority FROM psn_sync_jobs WHERE user_id = $1 AND status IN ('queued', 'running') ORDER BY priority, run_after`, [Number(userId)])
 }
 
+export type PsnQueueView = {
+  jobs: Array<{ phase: PsnPhase; status: 'queued' | 'running'; error: string | null }>
+  /** A job of the user's failed for good in the last hour. */
+  failedRecently: boolean
+  /** Jobs of others due before the user's most urgent queued one (0 while one of theirs runs). */
+  ahead: number
+}
+
+/** The user's place in the queue, for the sync state (#180): their jobs, a recent failure, and how many go first. */
+export async function psnQueueOf(userId: number | string): Promise<PsnQueueView> {
+  const [row] = await queryRows<{ jobs: PsnQueueView['jobs'] | null; failed: boolean; ahead: number }>(
+    `WITH mine AS (
+       SELECT phase, status, error, priority, run_after FROM psn_sync_jobs WHERE user_id = $1 AND status IN ('queued', 'running')
+     ), first AS (
+       SELECT priority, run_after FROM mine WHERE status = 'queued' ORDER BY priority, run_after LIMIT 1
+     )
+     SELECT (SELECT json_agg(json_build_object('phase', phase, 'status', status, 'error', error) ORDER BY priority, run_after) FROM mine) AS jobs,
+            EXISTS (SELECT 1 FROM psn_sync_jobs WHERE user_id = $1 AND status = 'failed' AND updated_at > now() - interval '1 hour') AS failed,
+            CASE WHEN EXISTS (SELECT 1 FROM mine WHERE status = 'running') THEN 0 ELSE
+              (SELECT count(*) FROM psn_sync_jobs j, first f
+                WHERE j.status = 'queued' AND j.run_after <= now() AND j.user_id <> $1
+                  AND (j.priority, j.run_after) < (f.priority, f.run_after)) END::int AS ahead`,
+    [Number(userId)],
+  )
+  return { jobs: row?.jobs ?? [], failedRecently: row?.failed ?? false, ahead: row?.ahead ?? 0 }
+}
+
 /** Finished jobs older than a week go: the alerts read the last hour only. */
 export async function sweepPsnJobs(): Promise<void> {
   await pool.query(`DELETE FROM psn_sync_jobs WHERE status IN ('done', 'failed') AND updated_at < now() - interval '7 days'`)
@@ -84,13 +118,17 @@ export async function sweepPsnJobs(): Promise<void> {
 
 /**
  * Runs due jobs until `deadline` (ms) or none is left, one at a time. A job's follow-ups are queued after it is
- * marked done, so a phase may queue itself again (history, 20 games a job). How many jobs ran.
+ * marked done, so a phase may queue itself again (history, 20 games a job). How many jobs ran. PSN_MODE=stale
+ * runs none and PSN_MODE=queue only the core (psnMode, #180): the rest waits in the queue.
  */
 export async function drainPsnQueue(run: JobRunner, deadline: number): Promise<number> {
+  const mode = psnMode()
+  if (mode === 'stale') return 0
+  const phases = mode === 'queue' ? CORE_PHASES : PSN_PHASES
   const worker = randomUUID()
   let ran = 0
   while (Date.now() < deadline - JOB_MARGIN_MS) {
-    const job = await claimPsnJob(worker)
+    const job = await claimPsnJob(worker, phases)
     if (!job) break
     ran++
     let next: NextJob[]

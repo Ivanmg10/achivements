@@ -84,8 +84,9 @@ export const memoryPsnStore = {
     })
   },
   async psnDeltaCount(accountId: string, since: string) {
-    const rows = [...mine(accountId).values()].filter((r) => stale(r) || r.wanted)
-    return { year: rows.filter((r) => inYear(r, since)).length, total: rows.length }
+    const all = [...mine(accountId).values()]
+    const rows = all.filter((r) => stale(r) || r.wanted)
+    return { year: rows.filter((r) => inYear(r, since)).length, total: rows.length, started: all.filter((r) => r.game.lastTrophyAt !== null).length }
   },
   async markPsnWanted(accountId: string, titleId: string) {
     const r = mine(accountId).get(titleId)
@@ -142,11 +143,16 @@ let nextId = 1
 
 export const memoryPsnQueue = {
   PRIORITY: { link: 0, manual: 1, first: 2, cron: 3, history: 4, score: 5 },
-  PSN_PHASES: ['summary', 'titles', 'recent', 'history', 'score'],
+  PSN_PHASES: ['summary', 'titles', 'enrich', 'recent', 'history', 'score'],
+  CORE_PHASES: ['summary', 'titles'],
   async enqueuePsn(userId: number | string, phase: PsnPhase, priority: number, delayMs = 0) {
     const active = jobs.find((j) => j.userId === Number(userId) && j.phase === phase && (j.status === 'queued' || j.status === 'running'))
     if (!active) jobs.push({ id: nextId++, userId: Number(userId), phase, priority, attempts: 0, runAfter: now() + delayMs, status: 'queued' })
     else if (active.status === 'queued') Object.assign(active, { priority: Math.min(active.priority, priority), runAfter: Math.min(active.runAfter, now() + delayMs) })
+  },
+  async psnQueueOf(userId: number | string) {
+    const mineJobs = jobs.filter((j) => j.userId === Number(userId) && (j.status === 'queued' || j.status === 'running'))
+    return { jobs: mineJobs.map(({ phase, status }) => ({ phase, status, error: null })), failedRecently: false, ahead: 0 }
   },
   async psnJobsOf(userId: number | string) {
     return jobs.filter((j) => j.userId === Number(userId) && (j.status === 'queued' || j.status === 'running')).map(({ phase, status, priority }) => ({ phase, status, priority }))
@@ -171,6 +177,8 @@ export const memoryPsnQueue = {
       for (const n of next) await memoryPsnQueue.enqueuePsn(job.userId, n.phase, n.priority, n.delayMs)
     }
   },
+  /** Jobs still waiting (a retry, a chunk queued again): the load test drains until none is left. */
+  queued: () => jobs.filter((j) => j.status === 'queued').length,
   /** The jobs that ran, oldest first: for asserting what a sync did. */
   history: () => jobs.filter((j) => j.status === 'done').map((j) => j.phase),
   clear() {

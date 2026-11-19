@@ -17,10 +17,11 @@ beforeEach(() => {
   ;(pool.query as jest.Mock).mockResolvedValue({ rows: [{ failed: 1, total: 3 }] })
 })
 
-test('the status is the accounts and their summary, sync outcomes included', async () => {
+test('the status is the accounts and their summary, sync outcomes and the numbers included', async () => {
   const status = await psnPoolStatus(NOW)
   expect(status.accounts).toHaveLength(1)
   expect(status.pool).toMatchObject({ accounts: 1, usable: 1, syncFailed: 1, syncTotal: 3 })
+  expect(status.metrics).toHaveProperty('queue')
 })
 
 test('which environment: production PRO, preview PRE, a local machine none', () => {

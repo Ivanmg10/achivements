@@ -433,6 +433,10 @@ with its tests; it is the part that decides whether the answers are any good.
   `cron/psn-worker`), linking and verification. A new PSN reader is a function in `psnSnapshot.ts`; data the store lacks is
   added to a sync phase, read as a delta (only games whose last trophy moved), never a `psnClient` call from a route. A game's
   definitions and rarity are stored per game for everyone, texts per language. **Do not try to automate Sony's sign-in.** A game counts by its whole set, DLC included.
+  **A new PSN read route is wrapped in `timedPsnRead`** (`psnMetrics.ts`, #180: its p95 and the share the store answers feed the
+  admin numbers and the alerts); where a sync stands for a person is `psnSyncStage.ts` (stage, steps, progress, wait), said in
+  plain words (`T.psn.sync`, never "NPSSO", "429", "token" or "job"). The bad-day switches are env vars (`PSN_MODE=live|queue|stale`,
+  `PSN_POOL_ENABLED`, `src/lib/psnMode.ts`); what to do when is the runbook in `docs/platforms/psn.md`.
 - **Xbox stays admin-only on purpose, and the reason is money** (OpenXBL's free plan, 150 calls an hour for the
   whole app). **Do not set `XBOX_ADMIN_ONLY` to `false`, and do not suggest it as a next step**, until the user says
   they will pay for a plan. The gate is enforced in three places that must keep holding (routes, UI, and every

@@ -57,5 +57,52 @@ export type PsnPoolSummary = {
   syncTotal: number
 }
 
-/** The pool as the admin panel reads it. */
-export type PsnPoolStatus = { accounts: PsnAccountInfo[]; pool: PsnPoolSummary }
+/** The pool as the admin panel reads it; `metrics` (#180) when they were read, `switches` this deployment's PSN_MODE and PSN_POOL_ENABLED. */
+export type PsnPoolStatus = {
+  accounts: PsnAccountInfo[]
+  pool: PsnPoolSummary
+  metrics?: PsnMetrics
+  switches?: { mode: 'live' | 'queue' | 'stale'; poolEnabled: boolean }
+}
+
+/** One account's last hour (#180): its calls by function, Sony's refusals by kind, and how long a call took. */
+export type PsnAccountMetrics = {
+  accountId: number
+  calls: number
+  callsPerMin: number
+  byFn: Record<string, number>
+  rateLimited: number
+  /** 0–100. */
+  rateLimitedPct: number
+  /** Its sign-in refused (401). */
+  authErrors: number
+  /** A hidden profile (403): the profile's answer, not the account's fault. */
+  forbidden: number
+  serverErrors: number
+  p95Ms: number | null
+}
+
+/** The pool's numbers for the dashboard and the alerts (#180). Times in ms. */
+export type PsnMetrics = {
+  accounts: PsnAccountMetrics[]
+  /** The last 5 minutes, for the "429 above 1 %" alert. */
+  calls5m: number
+  rateLimited5m: number
+  /** A call to Sony, the last hour. */
+  sonyP95Ms: number | null
+  /** A PSN page read, the last 15 minutes, and how many there were. */
+  readP95Ms: number | null
+  reads15m: number
+  /** The reads of the last hour answered from the store at once (the rest waited for a first sync), 0–100. */
+  readsServedPct: number | null
+  queue: {
+    /** Jobs due now and not taken. */
+    due: number
+    /** Jobs waiting, due or not (a chunk queued again, a retry). */
+    queued: number
+    running: number
+    /** How late a job starts after it is due: those started in the last hour and those still waiting. */
+    lagP95Ms: number | null
+    lagSamples: number
+  }
+}

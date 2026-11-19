@@ -66,23 +66,26 @@ test('a hidden profile is stored as such, and the chain stops', async () => {
   expect((await store.loadPsnPlayer('acc'))!.state).toBe('private')
 })
 
-test('titles: stores the list, enriches when something moved, and goes on to the delta', async () => {
+test('titles: stores the list, then play data when something moved and the delta, as their own jobs', async () => {
   ;(fetchPsnTitles as jest.Mock).mockResolvedValue([game(1), game(2, null)])
-  expect(await runPsnJob(job('titles', 0))).toEqual([{ phase: 'recent', priority: 0 }])
-  expect(fetchPsnEnrichment).toHaveBeenCalledTimes(1)
+  expect(await runPsnJob(job('titles', 0))).toEqual([{ phase: 'enrich', priority: 0 }, { phase: 'recent', priority: 0 }])
+  expect(fetchPsnEnrichment).not.toHaveBeenCalled()
   expect((await store.loadPsnGames('acc')).map((s) => s.game.id)).toEqual([1, 2])
+  expect(await runPsnJob(job('enrich', 0))).toEqual([])
+  expect(fetchPsnEnrichment).toHaveBeenCalledTimes(1)
   // The same list again, the enrichment fresh, the year read: nothing to do.
   await store.savePsnGameTrophies('acc', snapOf('acc', game(1)))
   await store.markPsnYearReady('acc')
   expect(await runPsnJob(job('titles', 3))).toEqual([])
-  expect(fetchPsnEnrichment).toHaveBeenCalledTimes(1)
 })
 
-test('a failed enrichment keeps the list and the chain moving', async () => {
+test('a failed enrichment keeps the list and ends quietly', async () => {
   jest.spyOn(console, 'error').mockImplementation(() => {})
   ;(fetchPsnTitles as jest.Mock).mockResolvedValue([game(1)])
+  await runPsnJob(job('titles'))
   ;(fetchPsnEnrichment as jest.Mock).mockRejectedValueOnce(new Error('played list down'))
-  expect(await runPsnJob(job('titles'))).toEqual([{ phase: 'recent', priority: 0 }])
+  expect(await runPsnJob(job('enrich'))).toEqual([])
+  expect((await store.loadPsnGames('acc')).length).toBe(1)
   ;(console.error as jest.Mock).mockRestore()
 })
 

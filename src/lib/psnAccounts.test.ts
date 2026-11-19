@@ -51,7 +51,7 @@ test('a lease is a weighted pick of a free slot on a usable account, never one t
   expect(await leasePsnAccount([1])).toEqual(LEASE)
   expect(sql()).toContain("a.status = 'active'")
   expect(sql()).toContain('/ a.weight')
-  expect(query.mock.calls[0][1]).toEqual([[1], 30])
+  expect(query.mock.calls[0][1]).toEqual([[1], 30, false])
   query.mockResolvedValueOnce({ rows: [] })
   expect(await leasePsnAccount([])).toBeNull()
 })
@@ -69,9 +69,16 @@ test('finishing a lease frees the slot and records the outcome in one statement'
   await finishPsnLease(LEASE, 'rate-limited')
   expect(sql()).toContain('DELETE FROM psn_account_leases')
   expect(sql()).toContain('INSERT INTO psn_account_stats')
-  expect(query.mock.calls[0][1]).toEqual([2, 1, 'rate-limited'])
+  expect(query.mock.calls[0][1]).toEqual([2, 1, 'rate-limited', null, null])
   await releasePsnLease(LEASE)
   expect(query.mock.calls[1][1]).toEqual([2, 1])
+})
+
+test('a timed call also counts its function and keeps its time (#180)', async () => {
+  await finishPsnLease(LEASE, 'forbidden', { fn: 'titles', ms: 212.4 })
+  expect(sql()).toContain('INSERT INTO psn_timings')
+  expect(sql()).toContain('by_fn')
+  expect(query.mock.calls[0][1]).toEqual([2, 1, 'forbidden', 'titles', 212])
 })
 
 test('sealed with PSN_SECRET_KEY when set (v1), the old derivation without; both open', () => {

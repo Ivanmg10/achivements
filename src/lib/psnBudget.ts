@@ -16,7 +16,7 @@ import type { PoolAccount } from '@/lib/psnAccounts'
  * refused here never reaches Sony; the pool then tries another account. Sony's own "too many requests" rests
  * the account itself (`psnAccounts.finishPsnLease`), not the app.
  */
-const BACKGROUND_SHARE = 0.75
+export const BACKGROUND_SHARE = 0.75
 const WINDOW_MINUTES = 15
 
 const background = new AsyncLocalStorage<true>()

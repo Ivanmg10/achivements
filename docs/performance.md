@@ -91,6 +91,11 @@ Rankings). Keep these true:
   function in `psnSnapshot.ts` over the store, never a `psnClient` call**; one that needs data the store lacks adds
   it to a sync phase. Every PSN answer is `private` with `Vary: Cookie` (a private profile is refused to others),
   so no `s-maxage`. Numbers: `docs/platforms/psn.md` → Snapshots and sync queue.
+- **Where the PSN sync stands is read only while it moves (#180).** `usePsnSync` (the owner's own profile column) reads
+  `/api/psn/status` (database only) every 4 s while the core lands and every 15 s after, and stops once it is done or
+  paused; it refetches the page's data only after a refresh the user asked for. Every PSN read route is timed
+  (`timedPsnRead`, one insert after the answer) and every Sony call too (in the lease's own statement): the numbers in
+  the admin panel and the alerts (read p95 above 1 s) come from them.
 - **A streak is drawn whole (2026-11-11):** the year's `isLoading` (`ActivityHeatmapYearContext`) is true
   before anything is asked and until every linked platform answered, and `useActivityHeatmapYear` also waits
   for the PSN/Xbox library `useConsoleVisibility` needs when one of their consoles is unticked. A reader of

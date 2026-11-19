@@ -8,6 +8,8 @@ export const NOT_CONFIGURED = -1
 export const AUTH_FAILED = -2
 /** Sony did not answer before the deadline. */
 export const TIMED_OUT = -3
+/** PSN_MODE=stale (#180): the app does not call Sony at all for now. */
+export const PAUSED = -4
 
 export class PsnError extends Error {
   constructor(message: string, readonly code?: number) {
@@ -15,6 +17,9 @@ export class PsnError extends Error {
   }
   get notConfigured() {
     return this.code === NOT_CONFIGURED
+  }
+  get isPaused() {
+    return this.code === PAUSED
   }
   get isPrivate() {
     return this.code === PRIVATE_CODE || /access control|privacy/i.test(this.message)

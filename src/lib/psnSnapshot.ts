@@ -1,6 +1,10 @@
 import { withEnrichment, type PsnSummary } from '@/lib/psnClient'
 import { PRIVATE_CODE, PsnError, PsnSyncing } from '@/lib/psnErrors'
-import { psnJobsOf, PRIORITY, type PsnPhase } from '@/lib/psnQueue'
+import { PRIORITY, psnQueueOf, type PsnPhase } from '@/lib/psnQueue'
+import { psnUsableRate } from '@/lib/psnAccounts'
+import { BACKGROUND_SHARE } from '@/lib/psnBudget'
+import { psnMode } from '@/lib/psnMode'
+import { describePsnSync, type PsnSyncView } from '@/utils/psnSyncStage'
 import {
   loadPsnEarnedSince,
   loadPsnGame,
@@ -130,7 +134,7 @@ async function waitFor(userId: string, phase: PsnPhase): Promise<never> {
   throw new PsnSyncing()
 }
 
-export type PsnSyncState = {
+export type PsnSyncState = PsnSyncView & {
   /** new: nothing stored yet; syncing: a sync is queued or running; ready; private: Sony says the trophies are hidden. */
   state: 'new' | 'syncing' | 'ready' | 'private'
   syncedAt: number | null
@@ -141,17 +145,33 @@ export type PsnSyncState = {
   jobs: Array<{ phase: PsnPhase; status: 'queued' | 'running' }>
 }
 
-/** Where the account's sync stands, for /api/psn/status and the bootstrap. Database only; queues nothing. */
+/**
+ * Where the account's sync stands, for /api/psn/status and the bootstrap: the raw facts and what they mean to a
+ * person (psnSyncStage, #180: stage, steps, progress, wait, place in line, trouble). Database only; queues nothing.
+ */
 export async function psnSyncState(accountId: string, userId: string): Promise<PsnSyncState> {
-  const [player, jobs] = await Promise.all([loadPsnPlayer(accountId), psnJobsOf(userId)])
-  const pending = player?.titlesAt ? await psnDeltaCount(accountId, yearStart()) : { year: 0, total: 0 }
+  const [player, queue, rate] = await Promise.all([loadPsnPlayer(accountId), psnQueueOf(userId), psnUsableRate()])
+  const counts = player?.titlesAt ? await psnDeltaCount(accountId, yearStart()) : { year: 0, total: 0, started: 0 }
   const syncedAt = player ? lastChecked(player) : null
+  const { jobs } = queue
   const state = player?.state === 'private' ? 'private' : !player?.titlesAt ? 'new' : jobs.length ? 'syncing' : 'ready'
+  const view = describePsnSync({
+    player,
+    jobs,
+    failedRecently: queue.failedRecently,
+    ahead: queue.ahead,
+    pending: counts,
+    callsPerMin: psnMode() === 'stale' ? 0 : rate * BACKGROUND_SHARE,
+    paused: psnMode() === 'stale' || (jobs.length > 0 && rate === 0),
+    syncedAt,
+    now: Date.now(),
+  })
   return {
+    ...view,
     state,
     syncedAt,
     nextSyncAt: syncedAt === null ? null : syncedAt + REFRESH_MS,
-    pending,
+    pending: { year: counts.year, total: counts.total },
     yearReady: Boolean(player?.yearAt),
     jobs: jobs.map(({ phase, status }) => ({ phase, status })),
   }

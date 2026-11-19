@@ -3,7 +3,7 @@ jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }
 
 import pool from '@/lib/db'
 import { PsnBusyError, PsnError } from '@/lib/psnErrors'
-import { claimPsnJob, drainPsnQueue, enqueuePsn, psnRetryFor, retryPsnJob, sweepPsnJobs } from './psnQueue'
+import { claimPsnJob, drainPsnQueue, enqueuePsn, psnQueueOf, psnRetryFor, retryPsnJob, sweepPsnJobs } from './psnQueue'
 
 const query = pool.query as jest.Mock
 const sql = (i: number) => String(query.mock.calls[i][0])
@@ -73,4 +73,29 @@ test('no time left: nothing is claimed', async () => {
 test('finished jobs older than a week are swept', async () => {
   await sweepPsnJobs()
   expect(sql(0)).toContain("status IN ('done', 'failed') AND updated_at < now() - interval '7 days'")
+})
+
+describe('PSN_MODE (#180)', () => {
+  const saved = process.env.PSN_MODE
+  afterEach(() => {
+    process.env.PSN_MODE = saved
+  })
+
+  test('stale runs nothing; queue claims only the core; a claim stamps when it started', async () => {
+    process.env.PSN_MODE = 'stale'
+    expect(await drainPsnQueue(jest.fn(), Date.now() + 60_000)).toBe(0)
+    expect(query).not.toHaveBeenCalled()
+    process.env.PSN_MODE = 'queue'
+    await drainPsnQueue(jest.fn(), Date.now() + 60_000)
+    expect(query.mock.calls[0][1][2]).toEqual(['summary', 'titles'])
+    expect(sql(0)).toContain('started_at = COALESCE(started_at, now())')
+  })
+})
+
+test("a user's place in the queue: their jobs, a recent failure, how many go first (#180)", async () => {
+  query.mockResolvedValueOnce({ rows: [{ jobs: [{ phase: 'titles', status: 'queued', error: null }], failed: false, ahead: 3 }] })
+  expect(await psnQueueOf('7')).toEqual({ jobs: [{ phase: 'titles', status: 'queued', error: null }], failedRecently: false, ahead: 3 })
+  expect(sql(0)).toContain('(j.priority, j.run_after) < (f.priority, f.run_after)')
+  expect(query.mock.calls[0][1]).toEqual([7])
+  expect(await psnQueueOf('7')).toEqual({ jobs: [], failedRecently: false, ahead: 0 })
 })

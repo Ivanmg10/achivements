@@ -6,6 +6,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { usePsnRecentTrophies } from '@/hooks/usePsnRecentTrophies'
 import { useConsoleVisibility } from '@/hooks/useConsoleVisibility'
+import { usePsnSync } from '@/hooks/usePsnSync'
+import { useSubject } from '@/context/SubjectContext'
 import type { PsnError } from '@/hooks/usePsnLink'
 import type { PsnSummary } from '@/lib/psnClient'
 import MainPageProfileLinked from '../../main-page-profile-linked/MainPageProfileLinked'
@@ -14,6 +16,7 @@ import MainPageProfilePsnGame from '../main-page-profile-psn-game/MainPageProfil
 import MainPageProfilePsnTrophies from '../main-page-profile-psn-trophies/MainPageProfilePsnTrophies'
 import MainPageProfilePsnSync from '../main-page-profile-psn-sync/MainPageProfilePsnSync'
 import MainPageProfileGameSkeleton from '../../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
+import MainPageProfileSkeleton from '../../main-page-profile-skeleton/MainPageProfileSkeleton'
 import Tag from '@/components/ui/Tag'
 
 /** Sony's trophy-level tiers in groups of three: bronze, silver, gold, then platinum at 10. */
@@ -22,7 +25,9 @@ const TIER_RING = ['border-warning', 'border-silver', 'border-hardcore', 'border
 /**
  * A linked PSN profile: header (avatar, name, trophy level, PS Plus, about me, link out), four stats,
  * the last game played with its progress, and the latest trophies. Library figures come from the
- * shared context — no extra calls.
+ * shared context — no extra calls. On the viewer's own page, while the first sync reads the trophy list
+ * (#180), where it stands sits above the skeleton; the card itself stays as every platform's (nothing added
+ * to it). The refresh button asks for a sync, and what it brings is read again once it ends.
  */
 export default function MainPageProfilePsnLinked({
   summary,
@@ -36,11 +41,27 @@ export default function MainPageProfilePsnLinked({
   onRetry: () => void
 }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const { library, libraryLoading, refetch } = usePsnGamesData()
   const latest = usePsnRecentTrophies('recent')
+  const psnSync = usePsnSync(!subject, () => {
+    onRetry()
+    latest.retry()
+    refetch()
+  })
   // Without the games on the consoles unticked in preferences.
   const { isGameShown } = useConsoleVisibility()
   const latestTrophies = useMemo(() => latest.trophies.filter((t) => isGameShown('psn', t.gameId)), [latest.trophies, isGameShown])
+
+  // The first sync: what is happening, above the card's skeleton (the card has no data to show yet).
+  if (isLoading && psnSync.sync?.stage === 'syncing_core') {
+    return (
+      <div className="flex flex-col gap-3 w-full h-full">
+        <MainPageProfilePsnSync sync={psnSync.sync} />
+        <MainPageProfileSkeleton label={T.cards.loading} />
+      </div>
+    )
+  }
 
   if (error || !summary) {
     return (
@@ -56,11 +77,7 @@ export default function MainPageProfilePsnLinked({
   return (
     <MainPageProfileLinked
       isLoading={isLoading}
-      onRefresh={() => {
-        onRetry()
-        latest.retry()
-        refetch()
-      }}
+      onRefresh={psnSync.refresh}
       card={{
         avatarSrc: summary.avatarUrl || null,
         avatarFallback: <span className="w-full h-full bg-psn-dark flex items-center justify-center"><PlaystationLogo size={32} className="text-white" /></span>,
@@ -80,7 +97,6 @@ export default function MainPageProfilePsnLinked({
               {summary.isPlus && <Tag tone="hardcore">PS Plus</Tag>}
             </div>
             {summary.aboutMe && <p className="text-[0.8125rem] text-text-secondary line-clamp-2">{summary.aboutMe}</p>}
-            <MainPageProfilePsnSync syncedAt={summary.syncedAt} nextSyncAt={summary.nextSyncAt} />
           </>
         ),
       }}

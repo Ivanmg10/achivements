@@ -3,18 +3,20 @@ import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
 import { insertPsnAccount } from '@/lib/psnAccounts'
 import { tryPsnNpsso } from '@/lib/psnAccountCheck'
 import { psnPoolStatus } from '@/lib/psnPoolStatus'
+import { psnMode, psnPoolEnabled } from '@/lib/psnMode'
 import { readNewAccount } from '@/utils/psnAccountInput'
 
 /**
- * The PSN service accounts (#178) for the admin panel. GET: every account and the pool at a glance, never a
- * secret. POST { label, hint?, weight?, npsso }: adds an account, only once Sony has taken its NPSSO and it has
+ * The PSN service accounts (#178) for the admin panel. GET: every account, the pool at a glance and its numbers,
+ * and the PSN switches this deployment runs with (#180), never a secret. POST { label, hint?, weight?, npsso }: adds an account, only once Sony has taken its NPSSO and it has
  * read its own profile. The NPSSO is never answered back or logged.
  */
 export async function GET(req: Request) {
   const auth = await requireAdmin(req)
   if (!auth.ok) return auth.response
   try {
-    return NextResponse.json(await psnPoolStatus(), { headers: { 'Cache-Control': 'no-store' } })
+    const switches = { mode: psnMode(), poolEnabled: psnPoolEnabled() }
+    return NextResponse.json({ ...(await psnPoolStatus()), switches }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (err) {
     console.error('[admin/psn/accounts GET]', err)
     return NextResponse.json({ error: 'failed' }, { status: 500 })

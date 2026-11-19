@@ -260,15 +260,17 @@ export async function psnDeltaGames(accountId: string, since: string, scope: 'ye
   }))
 }
 
-/** How many games still wait for their trophies: in the year, and in all. */
-export async function psnDeltaCount(accountId: string, since: string): Promise<{ year: number; total: number }> {
-  const [row] = await queryRows<{ year: number; total: number }>(
-    `SELECT count(*) FILTER (WHERE ${DELTA_YEAR})::int AS year, count(*)::int AS total
+/** How many games still wait for their trophies (in the year, and in all), and how many have any trophy (#180: the progress). */
+export async function psnDeltaCount(accountId: string, since: string): Promise<{ year: number; total: number; started: number }> {
+  const [row] = await queryRows<{ year: number; total: number; started: number }>(
+    `SELECT count(*) FILTER (WHERE ${DELTA_YEAR})::int AS year,
+            count(*) FILTER (WHERE ${STALE} OR p.wanted_at IS NOT NULL)::int AS total,
+            count(*) FILTER (WHERE p.last_trophy_at IS NOT NULL)::int AS started
        FROM psn_player_games p
-      WHERE p.account_id = $1 AND (${STALE} OR p.wanted_at IS NOT NULL)`,
+      WHERE p.account_id = $1`,
     [accountId, since],
   )
-  return row ?? { year: 0, total: 0 }
+  return row ?? { year: 0, total: 0, started: 0 }
 }
 
 /** A page wants this game's trophies (not read yet, or not in its language): the next sync reads it first. */

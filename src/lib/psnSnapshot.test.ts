@@ -4,6 +4,7 @@ jest.mock('@/lib/psnStore', () => jest.requireActual('@/test-utils/memoryPsn').m
 jest.mock('@/lib/psnQueue', () => jest.requireActual('@/test-utils/memoryPsn').memoryPsnQueue)
 jest.mock('@/lib/psnSync', () => ({ requestPsnSync: jest.fn(), yearStart: () => '2025-11-14T00:00:00.000Z' }))
 jest.mock('@/lib/wantsFresh', () => ({ wantsFresh: jest.fn(async () => false) }))
+jest.mock('@/lib/psnAccounts', () => ({ psnUsableRate: jest.fn(async () => 40) }))
 
 import { memoryPsnStore as store } from '@/test-utils/memoryPsn'
 import { psnGameFixture } from '@/test-utils/psnFixtures'
@@ -120,6 +121,8 @@ test('the sync state: new, syncing with its jobs, ready, private; it queues noth
   const { memoryPsnQueue } = jest.requireActual('@/test-utils/memoryPsn')
   await memoryPsnQueue.enqueuePsn(7, 'recent', 2)
   expect(await psnSyncState('acc', '7')).toMatchObject({ state: 'syncing', jobs: [{ phase: 'recent', status: 'queued' }] })
+  // What it means to a person (#180): the list is there, the year is being read.
+  expect(await psnSyncState('acc', '7')).toMatchObject({ stage: 'ready_partial', steps: { library: 'done', history: 'active' }, trouble: null })
   await store.markPsnPrivate('acc')
   expect((await psnSyncState('acc', '7')).state).toBe('private')
   expect(requestPsnSync).not.toHaveBeenCalled()

@@ -2,7 +2,6 @@ import { queryRows } from '@/lib/queryRows'
 import { DEFAULT_LANGUAGE, fetchPsnEnrichment, fetchPsnGame, fetchPsnSummary, fetchPsnTitles } from '@/lib/psnClient'
 import { psnBackground } from '@/lib/psnBudget'
 import { PsnBusyError, PsnError } from '@/lib/psnErrors'
-import type { PsnGameProgress } from '@/types/psn'
 import { drainPsnQueue, enqueuePsn, PRIORITY, type NextJob, type PsnJob, type PsnPhase } from '@/lib/psnQueue'
 import {
   loadPsnGames,
@@ -28,8 +27,10 @@ import { runScoreAfterSync } from '@/lib/scoreRefresh'
  *
  * - `summary`: the trophy counts (1 request; the profile too, 2, when they moved or once a day). Nothing moved
  *   and the list read in the last day: done. Else `titles`.
- * - `titles`: the trophy list (1 request per 800 games). The played list, trophy sets and IGDB art only when a
- *   game moved or once a day. Then `recent` when there is a delta.
+ * - `titles`: the trophy list (1 request per 800 games): the core, the library is there once it is stored. Then
+ *   `enrich` when a game moved or a day went by, and `recent` when there is a delta.
+ * - `enrich`: the played list, trophy sets and IGDB art (#180: its own job, so a crowd of first links each gets
+ *   its list before anyone's play data).
  * - `recent`: the trophies of the year's games that moved (the delta), 20 games a job, until the year is whole;
  *   then `history`, or `score`.
  * - `history`: the older games that moved and the games a page asked for, 20 a job, queued again until none is
@@ -55,7 +56,7 @@ const olderThan = (at: number | null, ms: number) => at === null || Date.now() -
 
 type Phase = (accountId: string, job: PsnJob) => Promise<NextJob[]>
 
-const PHASES: Record<PsnPhase, Phase> = { summary, titles, recent, history, score }
+const PHASES: Record<PsnPhase, Phase> = { summary, titles, enrich, recent, history, score }
 
 /** One job: its phase, for the account the user has linked now (none: nothing to do). */
 export async function runPsnJob(job: PsnJob): Promise<NextJob[]> {
@@ -90,19 +91,23 @@ async function titles(accountId: string, job: PsnJob): Promise<NextJob[]> {
   const before = new Map(stored.map((s) => [s.game.titleId, s.game.lastTrophyAt]))
   const moved = core.length !== stored.length || core.some((g) => before.get(g.titleId) !== g.lastTrophyAt)
   await savePsnTitles(accountId, core)
+  const next: NextJob[] = []
   // The played list only when needed: a game moved, or a day went by (play time grows without trophies).
-  if (moved || olderThan(player?.enrichedAt ?? null, DAY_MS)) await enrich(accountId, core)
+  if (moved || olderThan(player?.enrichedAt ?? null, DAY_MS)) next.push({ phase: 'enrich', priority: job.priority })
   const delta = await psnDeltaCount(accountId, yearStart())
-  return delta.total > 0 || !player?.yearAt ? [{ phase: 'recent', priority: job.priority }] : []
+  if (delta.total > 0 || !player?.yearAt) next.push({ phase: 'recent', priority: job.priority })
+  return next
 }
 
-/** Play data and art: a failure keeps the last pass's (tried again on the next sync), never the list from moving on. */
-async function enrich(accountId: string, core: PsnGameProgress[]): Promise<void> {
+/** Play data and art: a failure keeps the last pass's (tried again on the next sync), never the sync from moving on. */
+async function enrich(accountId: string): Promise<NextJob[]> {
   try {
+    const core = (await loadPsnGames(accountId)).map((s) => s.game)
     await savePsnEnrichment(accountId, await fetchPsnEnrichment(accountId, core))
   } catch (err) {
     if (!(err instanceof PsnBusyError)) console.error('[psnSync] enrichment', err)
   }
+  return []
 }
 
 async function recent(accountId: string, job: PsnJob): Promise<NextJob[]> {

@@ -34,10 +34,10 @@ test('only an unlocked admin gets in', async () => {
   expect((await POST(req({ label: 'PSN-2', npsso: NPSSO }))).status).toBe(403)
 })
 
-test('GET: the accounts and the pool; a database failure is a 500', async () => {
+test('GET: the accounts, the pool and the PSN switches; a database failure is a 500', async () => {
   const status = psnStatus([psnAccount()])
   ;(psnPoolStatus as jest.Mock).mockResolvedValue(status)
-  expect(data(await GET(req()))).toEqual(status)
+  expect(data(await GET(req()))).toEqual({ ...status, switches: { mode: 'live', poolEnabled: true } })
   ;(psnPoolStatus as jest.Mock).mockRejectedValue(new Error('down'))
   expect((await GET(req())).status).toBe(500)
 })

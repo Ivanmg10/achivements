@@ -1,14 +1,18 @@
 import pool from '@/lib/db'
 import { preDatabase } from '@/lib/preDb'
 import { daysLeft, listPsnAccounts, type PsnDb } from '@/lib/psnAccounts'
+import { psnMetrics } from '@/lib/psnMetrics'
 import { summarizePsnPool } from '@/utils/psnPool'
 import type { PsnPoolStatus } from '@/types/psnPool'
 import type { PsnAlertEnv } from '@/lib/psnAlertMessages'
 
-/** The pool as the admin panel, the alerts and the status route read it (#178). Database only; never a secret. */
+/**
+ * The pool as the admin panel, the alerts and the status route read it (#178), with its numbers (#180: calls by
+ * function, refusals, p95s, the queue). Database only; never a secret.
+ */
 export async function psnPoolStatus(now = Date.now(), db: PsnDb = pool): Promise<PsnPoolStatus> {
-  const [accounts, sync] = await Promise.all([listPsnAccounts(db), syncOutcomes(db)])
-  return { accounts, pool: summarizePsnPool(accounts, sync, now) }
+  const [accounts, sync, metrics] = await Promise.all([listPsnAccounts(db), syncOutcomes(db), psnMetrics(db)])
+  return { accounts, pool: summarizePsnPool(accounts, sync, now), metrics }
 }
 
 /** Sync jobs finished in the last hour (phase 4's queue, #179): none until it runs. */
@@ -55,7 +59,7 @@ const iso = (ms: number | null) => (ms === null ? null : new Date(ms).toISOStrin
  * What `/api/ops/psn/status` (the owner's own agent) may read: labels, states, days left, calls and the canary.
  * Not the hint, the online ID or anything else that could say whose account it is.
  */
-export function opsView({ accounts, pool: summary }: PsnPoolStatus, now = Date.now()) {
+export function opsView({ accounts, pool: summary, metrics }: PsnPoolStatus, now = Date.now()) {
   return {
     environment: psnPoolEnv() ?? 'local',
     pool: {
@@ -70,6 +74,10 @@ export function opsView({ accounts, pool: summary }: PsnPoolStatus, now = Date.n
       syncTotal: summary.syncTotal,
       nextRenewal: summary.suggestion ? { label: summary.suggestion.label, at: iso(summary.suggestion.at) } : null,
     },
+    // #180: how the queue and the reads are doing; numbers only.
+    metrics: metrics
+      ? { queueDue: metrics.queue.due, queueLagP95Ms: metrics.queue.lagP95Ms, readP95Ms: metrics.readP95Ms, sonyP95Ms: metrics.sonyP95Ms, rateLimited5m: metrics.rateLimited5m, calls5m: metrics.calls5m }
+      : null,
     accounts: accounts.map((a) => ({
       label: a.label,
       status: a.status,

@@ -37,7 +37,7 @@ test('what a failure says about the account', () => {
   expect(failureOf(new PsnError('x', AUTH_FAILED))).toBe('auth')
   expect(failureOf(new PsnError('late', TIMED_OUT))).toBe('server')
   expect(failureOf(new TypeError('fetch failed'))).toBe('server')
-  expect(failureOf(hidden())).toBe('final')
+  expect(failureOf(hidden())).toBe('forbidden')
   expect(failureOf(new PsnError('Resource not found', 2240525))).toBe('final')
 })
 
@@ -68,7 +68,7 @@ test("a hidden profile is never retried: it is the profile's answer, and no faul
   const { fn, seen } = work({ 1: hidden })
   await expect(withPsnAccount(fn)).rejects.toMatchObject({ isPrivate: true })
   expect(seen).toEqual([1])
-  expect(fakePsnStore.accounts[0].outcomes).toEqual(['ok'])
+  expect(fakePsnStore.accounts[0].outcomes).toEqual(['forbidden'])
 })
 
 test("an account whose own budget is spent is skipped at no cost to its health", async () => {
