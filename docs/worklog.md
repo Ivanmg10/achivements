@@ -33,7 +33,7 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
-## 2026-11-19 — Home review, points 2–7 (`fix/164-home-review`, #164)
+## 2026-11-19 — Home review: the seven points, the local day and the badge window (`fix/164-home-review`, #164)
 
 **Did**
 - 2: the trophy cabinet is five columns again (`grid-cols-[repeat(5,minmax(8.5rem,1fr))]`, a fifth each even with fewer games),
