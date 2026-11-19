@@ -53,7 +53,7 @@ import { tabIds } from '@/components/ui/Tabs'
  * controls in the same place in every view (`LibraryToolbar`), then the games as shelves, a list with the
  * game's detail beside it, or cards (each platform in its own section, or all together).
  */
-export default function LibraryPage({ category: cat }: { category: string }) {
+export default function LibraryPage({ category: cat, initialPlatform = 'all' }: { category: string; initialPlatform?: PlatformChoice }) {
   const { games, loading, error } = useGamesByCategory(cat)
   const extraData = useGameExtraData()
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
@@ -71,12 +71,12 @@ export default function LibraryPage({ category: cat }: { category: string }) {
     saveLayout(next)
   }
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
-  const [platform, setPlatform] = useState<PlatformChoice>('all')
+  const [platform, setPlatform] = useState<PlatformChoice>(initialPlatform)
   useWhenChanged([cat], () => {
     setQuick('all')
     setSearchedToList(false)
     setSelectedKey(null)
-    setPlatform('all')
+    setPlatform(initialPlatform)
   })
   // "All games" is the library with every status: its quick filters are the statuses (#129, MejTodosRework).
   const isAll = cat === 'all'
