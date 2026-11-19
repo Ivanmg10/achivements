@@ -9,13 +9,10 @@ import StreakDayRow from '../streak-day-row/StreakDayRow'
 import StreakCalendar from '../streak-calendar/StreakCalendar'
 import SectionHead from '@/components/ui/SectionHead'
 import Facts from '@/components/ui/Facts'
-import { utcDay } from '@/utils/dates'
+import { unlockDay } from '@/utils/dates'
+import { dayOf } from '@/utils/periodDays'
 
 const COMPLETION_TYPES = new Set(['Mastery/Completion', 'Game Beaten'])
-
-function awardDate(awardedAt: string): string {
-  return utcDay(new Date(awardedAt))
-}
 
 /**
  * A streak day by day: a calendar of its days, shaded by how much was
@@ -33,10 +30,10 @@ export default function StreakList({ selectedStreak, today }: { selectedStreak: 
     const { start, end } = selectedStreak
     return awards.VisibleUserAwards.filter((a) => {
       if (!COMPLETION_TYPES.has(a.AwardType)) return false
-      const d = awardDate(a.AwardedAt)
+      const d = unlockDay(a.AwardedAt)
       return d >= start && d <= end
     }).reduce<Record<string, UserAward[]>>((acc, a) => {
-      const d = awardDate(a.AwardedAt)
+      const d = unlockDay(a.AwardedAt)
       ;(acc[d] ??= []).push(a)
       return acc
     }, {})
@@ -45,7 +42,7 @@ export default function StreakList({ selectedStreak, today }: { selectedStreak: 
   const byDate = useMemo(
     () =>
       (selectedStreak?.achievements ?? []).reduce<Record<string, Streak['achievements']>>((acc, a) => {
-        ;(acc[a.Date.split(' ')[0]] ??= []).push(a)
+        ;(acc[dayOf(a)] ??= []).push(a)
         return acc
       }, {}),
     [selectedStreak],

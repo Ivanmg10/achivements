@@ -8,8 +8,10 @@ import { groupByDays, heatLevel, HEAT_LEVELS, plural } from '@/utils/utils'
 import { IconRefresh } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHeatmapGrid, HEATMAP_GAP as GAP, HEATMAP_MAX_DAYS } from '@/hooks/useHeatmapGrid'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { utcDay, formatDay } from '@/utils/dates'
+import { localDay, formatDay } from '@/utils/dates'
+import { FIT_MAX_CELL, FIT_SCREEN } from '@/lib/homeFit'
 import Kicker from '@/components/ui/Kicker'
 import Facts from '@/components/ui/Facts'
 
@@ -58,9 +60,10 @@ export default function MainPageHeatmap({
   const containerRef = useRef<HTMLDivElement>(null)
   const boxRef = useRef<HTMLDivElement>(null)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const fit = useMediaQuery(FIT_SCREEN)
 
   // How many days fit is a question about the card, not about the data.
-  const grid = useHeatmapGrid(boxRef, MONTH_ROW + LEGEND_ROW + 2 * ROW_GAP)
+  const grid = useHeatmapGrid(boxRef, MONTH_ROW + LEGEND_ROW + 2 * ROW_GAP, fit ? FIT_MAX_CELL : undefined)
   const { weeks, cell, cellWidth } = grid
   // The last column is the week the grid ends in: the days that fit depend on which weekday that is.
   const days = until ? Math.min(HEATMAP_MAX_DAYS, weeks * 7 - (6 - until.getDay())) : grid.days
@@ -111,7 +114,7 @@ export default function MainPageHeatmap({
     gap: `${GAP}px`,
   } as const
   const gridWidth = weeks * cellWidth + (weeks - 1) * GAP
-  const today = utcDay(new Date())
+  const today = localDay(new Date())
 
   /** Shows the day's tooltip at (x, y) of the grid's box; a mouse gives its pointer, a focused cell its own corner. */
   function showTooltip(cellEl: HTMLElement | null, x: number, y: number) {

@@ -27,7 +27,7 @@ signed-in request fails).
   it says so) and, where there is a line for it, `PresenceLabel` in place of the bio
   (the bio is its fallback). Today: Following (cards, hero), user search and the home's
   friend cards (`UserSummary`), the public profile hero (not on your own), compare,
-  someone's game page banner, the friends leaderboard and shared games. A new place
+  someone's game page banner, the friends leaderboard. A new place
   that shows other users must do the same. Never for your own picture.
 - `/privacy` says signed-in users who come across you see it; change it if that grows.
 - **"Now playing" on Steam** (2026-10-22, the user's ask): `/api/follows/playing` asks Steam, one
@@ -111,7 +111,10 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   or `CircularProgress` in the theme's colour; tiers have their own hue only on their badge.
 - **Streaks in the rankings (2026-10-23)** are read from `score_games.unlocks` (UTC days, `streaksOf`),
   never from a platform: they lag the score refresh and may differ by a day from the streak page,
-  which reads the live feed. `?sort=streak|best` orders by them (no arrows, no points gap in the zone).
+  which reads the live feed on the person's own calendar. **The rule (2026-11-19): your own days are your local
+  calendar** (header, `/racha`, the home's heatmap, figures, charts and day dialogs, the friends' leaderboard, through
+  `dayOf` / `unlockDay` / `dayIn` in `utils/dates.ts`); **what compares people (rankings, Vault Points' periods) uses UTC
+  days, so everyone is measured on the same clock.** `?sort=streak|best` orders by them (no arrows, no points gap in the zone).
 - Rankings are labelled **Beta** in the UI; drop the label when the user says so.
 - **Later** (from the roadmap): ownership verification (the user found code-in-bio clumsy; revisit
   with care), a history chart, and CheevoVault's own achievements (advice: they should not give points).

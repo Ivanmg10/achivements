@@ -2,10 +2,8 @@
 
 import type { ReactNode } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 import ConcealedBadge from '@/components/concealed-badge/ConcealedBadge'
 import RevealSecretButton from '@/components/reveal-secret-button/RevealSecretButton'
-import PinAchievementButton from '@/components/pin-achievement-button/PinAchievementButton'
 
 export const BADGE_SIZES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -17,11 +15,10 @@ const BADGE_CLASS =
 
 /**
  * One badge of a grid: the picture (greyed while locked, a stand-in when it has none or is secret), a ring
- * once earned, a link to the achievement or a button that opens it, and the star and the eye in its corners.
+ * once earned, a button that opens the achievement's window, and the eye on a secret one.
  * The name is in its accessible label, so the colours are never the only cue.
  */
 export default function BadgeGridBadge({
-  href,
   onSelect,
   label,
   ring,
@@ -30,13 +27,10 @@ export default function BadgeGridBadge({
   size,
   corner,
   eye,
-  pin,
   onShow,
   onHide,
 }: {
-  /** A link to the achievement on its game page... */
-  href?: string
-  /** ...or a button that opens it (RA's window). */
+  /** Opens the achievement's window; none on a sample (the landing's). */
   onSelect?: () => void
   label: string
   /** The ring an earned badge wears; none leaves it bare. */
@@ -48,7 +42,6 @@ export default function BadgeGridBadge({
   /** Over the badge's corner (RA's missable mark). */
   corner?: ReactNode
   eye?: { revealed: boolean; onToggle: () => void; labels: { reveal: string; conceal: string } }
-  pin?: { pinned: boolean; title: string; onToggle: () => void }
   onShow: (x: number, y: number, delay?: number) => void
   onHide: () => void
 }) {
@@ -85,39 +78,22 @@ export default function BadgeGridBadge({
 
   return (
     <li className="relative group/badge">
-      {href ? (
-        <Link href={href} {...props}>
-          {content}
-        </Link>
-      ) : (
-        <button
-          type="button"
-          {...props}
-          onClick={() => {
-            onHide()
-            onSelect?.()
-          }}
-        >
-          {content}
-        </button>
-      )}
+      <button
+        type="button"
+        {...props}
+        onClick={() => {
+          onHide()
+          onSelect?.()
+        }}
+      >
+        {content}
+      </button>
       {eye && (
         <RevealSecretButton
           revealed={eye.revealed}
           onToggle={eye.onToggle}
           labels={eye.labels}
           className="z-20 w-8 h-8 opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100"
-        />
-      )}
-      {pin && (
-        <PinAchievementButton
-          pinned={pin.pinned}
-          title={pin.title}
-          onToggle={pin.onToggle}
-          size={12}
-          className={`absolute -top-1 -right-1 z-20 w-5 h-5 rounded-full bg-bg-card/90 flex items-center justify-center ${
-            pin.pinned ? 'opacity-100' : 'opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100'
-          }`}
         />
       )}
     </li>

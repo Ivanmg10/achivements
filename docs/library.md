@@ -15,6 +15,11 @@ cards are always together (no "by platform" switch), and an opened game shows th
 order, size and views); the game count under the title only shows when neither the platform tabs nor the
 "all" quick filter say it.
 
+`/allGames?platform=psn` (or `steam`, `ra`, `xbox`) opens it on that platform's tab, read on the server
+(`allGames/page.tsx`, anything else is every platform). The home's "Your consoles" tiles link there for
+PlayStation and Steam (#164; `consoleTiles` in `utils/library.ts`); RA's keep `/playing/<consoleId>`. There is no
+per-console filter for PlayStation in the library yet, so a PS4 tile opens every PlayStation game.
+
 ## Preferences that follow the account
 
 The display preferences (which consoles show, library layout/view/columns/sort,

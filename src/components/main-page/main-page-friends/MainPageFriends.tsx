@@ -8,28 +8,26 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useFriendsData, DETAIL_LIMIT } from '@/hooks/useFriendsData'
 import { useProfileLibrary } from '@/hooks/useProfileLibrary'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
-import { ACTIVITY_DAYS, friendStats, friendsFeed, sharedWithFriends, type LeaderRow } from '@/utils/friends'
+import { ACTIVITY_DAYS, friendStats, friendsFeed, type LeaderRow } from '@/utils/friends'
 import { ChartCard } from '@/components/ui/ChartCard'
 import { RememberedHeight } from '@/components/ui/RememberedHeight'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import EmptyState from '@/components/empty-state/EmptyState'
 import MainPageFriendsLeaderboard from './main-page-friends-leaderboard/MainPageFriendsLeaderboard'
 import MainPageFriendsFeed from './main-page-friends-feed/MainPageFriendsFeed'
-import MainPageFriendsShared from './main-page-friends-shared/MainPageFriendsShared'
-import MainPageFriendsCard from './main-page-friends-card/MainPageFriendsCard'
+import MainPageFriendsCards from './main-page-friends-cards/MainPageFriendsCards'
 import MainPageFriendsSkeleton from './main-page-friends-skeleton/MainPageFriendsSkeleton'
-import Kicker from '@/components/ui/Kicker'
 
 /**
  * Stats & Activity's Friends section: how you rank against the people you
- * follow, what they unlocked lately, the games you share and a card for each.
+ * follow, what they unlocked lately and a card for each, folded.
  *
  * Nothing loads until the section is first opened; after that it stays. The
- * cards are our own data, for everyone; the activity and games are read for
+ * cards are our own data, for everyone; the activity and games (the leaderboard) are read for
  * the newest DETAIL_LIMIT follows only, through the routes their profiles use.
  */
 export default function MainPageFriends({ active, myRecent }: { active: boolean; myRecent: RecentAchievement[] }) {
-  const { T, lang } = useLanguage()
+  const { T } = useLanguage()
   const { data: session } = useSession()
   const [opened, setOpened] = useState(false)
   // Opened once is enough: switching away and back keeps what was loaded.
@@ -58,9 +56,9 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
     () => friendsFeed(detailed.filter((f) => details[f.username]).map((f) => ({ username: f.username, avatar: f.avatar, recent: details[f.username].recent }))),
     [detailed, details],
   )
-  const shared = useMemo(
-    () => sharedWithFriends(mine.games, detailed.filter((f) => details[f.username]).map((f) => ({ username: f.username, avatar: f.avatar, online: f.online, games: details[f.username].games }))),
-    [mine.games, detailed, details],
+  const weeks = useMemo(
+    () => Object.fromEntries(Object.entries(details).map(([username, d]) => [username, friendStats(d.recent, [], now).week])),
+    [details, now],
   )
   const partial = detailed.some((f) => details[f.username]?.partial)
 
@@ -121,24 +119,7 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
         </div>
       </div>
 
-      <ChartCard className="h-auto!">
-        <Kicker as="h3">
-          {T.friends.cards} <span className="tabular-nums">· {friends.length.toLocaleString(lang)}</span>
-        </Kicker>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 enter-cards">
-          {friends.map((f) => (
-            <MainPageFriendsCard
-              key={f.username}
-              friend={f}
-              week={details[f.username] ? friendStats(details[f.username].recent, [], now).week : null}
-            />
-          ))}
-        </div>
-      </ChartCard>
-
-      <ChartCard>
-        <MainPageFriendsShared rows={shared} />
-      </ChartCard>
+      <MainPageFriendsCards friends={friends} weeks={weeks} />
     </RememberedHeight>
   )
 }

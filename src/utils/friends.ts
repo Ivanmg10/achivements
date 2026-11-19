@@ -1,4 +1,4 @@
-import { parseUnlockTime, utcDay } from '@/utils/dates'
+import { localDay, parseUnlockTime, unlockDay } from '@/utils/dates'
 import type { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress, SteamRecentAchievement } from '@/types/steam'
 import type { PsnGameProgress, PsnRecentTrophy } from '@/types/psn'
@@ -74,12 +74,12 @@ export function friendStats(recent: RecentAchievement[], games: LibraryGame[], n
     const t = parseUnlockTime(a.Date)
     if (Number.isNaN(t)) continue
     if (t >= now - 7 * DAY) week++
-    if (t >= now - ACTIVITY_DAYS * DAY) days.add(a.Date.slice(0, 10))
+    if (t >= now - ACTIVITY_DAYS * DAY) days.add(unlockDay(a.Date))
   }
-  // A streak still counts when today has nothing yet: it runs up to yesterday.
-  let start = days.has(utcDay(now)) ? now : now - DAY
+  // A streak still counts when today has nothing yet: it runs up to yesterday. Days on the viewer's calendar.
+  let start = days.has(localDay(now)) ? now : now - DAY
   let streak = 0
-  while (streak < ACTIVITY_DAYS && days.has(utcDay(start))) {
+  while (streak < ACTIVITY_DAYS && days.has(localDay(start))) {
     streak++
     start -= DAY
   }
@@ -98,33 +98,6 @@ export type LeaderRow = { username: string; avatar: string | null; online?: bool
 /** Best first on the chosen measure; ties go to the longer streak, then by name. */
 export function rankBy(rows: LeaderRow[], key: StatKey): LeaderRow[] {
   return [...rows].sort((a, b) => b.stats[key] - a.stats[key] || b.stats.streak - a.stats.streak || a.username.localeCompare(b.username))
-}
-
-export type FriendGames = { username: string; avatar: string | null; online?: boolean; games: LibraryGame[] }
-export type SharedGameRow = { game: LibraryGame; friends: { username: string; avatar: string | null; online?: boolean; pct: number }[] }
-
-const unfinished = (row: SharedGameRow) => row.game.pct < 100 || row.friends.some((f) => f.pct < 100)
-
-/** Your games that people you follow also play, the most shared first. */
-export function sharedWithFriends(mine: LibraryGame[], friends: FriendGames[], limit = 12): SharedGameRow[] {
-  const byKey = new Map(friends.map((f) => [f.username, new Map(f.games.map((g) => [g.key, g.pct]))]))
-  return mine
-    .map((game) => ({
-      game,
-      friends: friends
-        .filter((f) => byKey.get(f.username)!.has(game.key))
-        .map((f) => ({ username: f.username, avatar: f.avatar, online: f.online, pct: byKey.get(f.username)!.get(game.key)! })),
-    }))
-    .filter((row) => row.friends.length > 0)
-    // Most shared first; then the ones somebody has still to finish, where there is a race to follow.
-    .sort(
-      (a, b) =>
-        b.friends.length - a.friends.length ||
-        Number(unfinished(b)) - Number(unfinished(a)) ||
-        b.game.pct - a.game.pct ||
-        a.game.title.localeCompare(b.game.title),
-    )
-    .slice(0, limit)
 }
 
 export type FeedItem = { username: string; avatar: string | null; achievement: RecentAchievement }

@@ -11,7 +11,10 @@ hook: they hold no state beyond open/closed. The home's pieces (family 3) are th
 (`MainPagePeriodStats`; since #128 one row for every platform, no adapters left), the nav cards (`MainPagePlatformNav`), the pinned rows (`PinnedGameCard`) and the profile
 column's glue (`MainPageProfileLinked`, `MainPageProfileRecentList`). Family 5 has four shells, each with
 its contract suite: the badge grid (`BadgeGrid`, generic over the platform's item like the table, with
-slots for what a badge is called, where it goes, its ring and its tooltip, and `LazyBadgeGrid` for the
+slots for what a badge is called, its ring, its tooltip and the window it opens (every badge is a button that opens
+its achievement window on all four platforms since #164: pinning is done there, never with a star on the badge; Steam,
+PSN and Xbox open `BadgeGridDetail`, the same window as their table row, with the tags from `hooks/useDetailOptions`),
+and `LazyBadgeGrid` for the
 grid's loading / failure / empty states), the feed row (`FeedGameCard`, a view model), the category
 section (`PlatformCategorySection`, the platform's hook result and its words) and the opened game
 (`GameExpandedLayout`). Family 8 put the account page's cards on one `UserPlatformCard` (identity as data, the

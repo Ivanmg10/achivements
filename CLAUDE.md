@@ -64,7 +64,9 @@ stats, and personalization. Next.js 16 App Router + PostgreSQL + Tailwind v4.
 
 ### Shared helpers — use them, never a copy (#119)
 - **Platform dates** through `src/utils/dates.ts`: `parseUnlockTime` / `unlockIso` read the platforms'
-  zone-less strings as UTC (never `.replace(' ', 'T')`), `utcDay` / `localDay` are the day keys, and
+  zone-less strings as UTC (never `.replace(' ', 'T')`). **Your own days are your local calendar**: an unlock's day is
+  `unlockDay` / `dayOf` (`dayIn(t, zone)` on the server, with the zone the browser sent, `isTimeZone`), never
+  `a.Date.slice(0, 10)`; `utcDay` only for what compares people (rankings, Vault Points), so all share one clock. And
   `formatDate(s, lang)` / `formatDay(day, lang)` show a date in the reader's language (never a fixed locale), in
   **the one date format** ("23 oct", the year only when it is not this year; on screen `ui/DateText`). Never a
   numeric one, never its options written by hand (`{ day, month: 'short' }`), never a `toLocaleDateString` and
@@ -309,7 +311,7 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
   podium's steps. Small controls, fields, search, filters, secondary/quiet/danger buttons, the switch, tags and
   marks stand upright. **Data never leans:** `ProgressBar`, `DataBar` and every chart bar are upright. **The mark
   is the signature** (`--mark`: "/" slanted, "•" round, `MARK`): in front of the tab you are on (`Tabs`, the one
-  drawing of every tab bar; `TabMark` in a row of pressed buttons), between bare figures, and between facts on
+  drawing of every tab bar; `TabMark` in a row of pressed buttons), between bare figures (slanted only: none in round), and between facts on
   one line (`Facts`, never a hand-made `·`). **No label in capitals:** kickers, figure labels and table heads are in
   sentence case. Details: `docs/design-system.md` → The slant grammar.
 - **The round design is always rounder than the slanted one.** Radii come from tokens, chosen by what the thing

@@ -1,4 +1,14 @@
 jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
+// Steam, PSN and Xbox's window, as the game page's table opens it: its title and its star.
+jest.mock('@/components/achievement-detail-modal/AchievementDetailModal', () => ({
+  __esModule: true,
+  default: ({ title, pinned, onTogglePin, onClose }: { title: string; pinned?: boolean; onTogglePin?: () => void; onClose: () => void }) => (
+    <div role="dialog" aria-label={title}>
+      {pinned !== undefined && <button aria-pressed={pinned} onClick={onTogglePin}>star</button>}
+      <button onClick={onClose}>close</button>
+    </div>
+  ),
+}))
 jest.mock('@/components/achievement-modal/AchievementModal', () => ({
   __esModule: true,
   default: ({ achievement, onClose }: { achievement: { Title: string }; onClose: () => void }) => (
@@ -31,10 +41,10 @@ type Spec = { title: string; earned?: boolean; secret?: boolean; rarity?: number
 
 type Platform = {
   name: string
-  /** A badge is a link to the achievement's page, or a button that opens its window (RA). */
-  role: 'link' | 'button'
+  /** A badge is a button that opens the achievement's window, on every platform (#164). */
+  role: 'button'
   render: (specs: Spec[], opts?: { limit?: number }) => void
-  /** The viewer's pins, by place in the list; returns the toggle the stars call. */
+  /** The viewer's pins, by place in the list; returns the toggle the window's star calls. */
   pins?: (o: { canPin: boolean; pinned?: number[] }) => jest.Mock
   /** What the toggle receives for the achievement at that place. */
   pinArg?: (i: number) => unknown
@@ -64,7 +74,7 @@ const RA: Platform = {
 
 const STEAM: Platform = {
   name: 'Steam',
-  role: 'link',
+  role: 'button',
   render: (specs, opts) => {
     const list: SteamAchievementUnified[] = specs.map((s, i) => ({
       _source: 'steam', id: `A${i}`, apiname: `A${i}`, title: s.title, description: s.text ?? `${s.title} text`, earned: !!s.earned,
@@ -84,7 +94,7 @@ const STEAM: Platform = {
 
 const PSN: Platform = {
   name: 'PlayStation',
-  role: 'link',
+  role: 'button',
   render: (specs, opts) => {
     const list: PsnTrophy[] = specs.map((s, i) => ({
       id: i, name: s.title, detail: s.text ?? `${s.title} text`, iconUrl: 'https://i.png', type: 'bronze', groupId: 'default',
@@ -104,7 +114,7 @@ const PSN: Platform = {
 
 const XBOX: Platform = {
   name: 'Xbox',
-  role: 'link',
+  role: 'button',
   render: (specs, opts) => {
     const list = specs.map((s, i) =>
       xboxAchievementFixture({
@@ -204,20 +214,28 @@ describe.each(PLATFORMS)('$name badge grid', (p) => {
 })
 
 describe.each(PLATFORMS.filter((p) => p.pins))('$name pins', (p) => {
-  const star = (verb: string, title: string) => screen.getByRole('button', { name: `${verb}: ${title}` })
+  // The badge has no star of its own: pinning is in its window, as on RA (#164).
+  const open = async (title: string) => {
+    jest.useRealTimers()
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${title}`) }))
+    return screen.findByRole('dialog', { name: title })
+  }
 
-  test('signed out, there is no star', () => {
+  test('signed out, the window has no star, and no badge has one', async () => {
     p.pins!({ canPin: false })
     p.render([{ title: 'First' }])
     expect(screen.queryByRole('button', { name: new RegExp(en.favorites.addFavorite) })).not.toBeInTheDocument()
+    const dialog = await open('First')
+    expect(dialog.querySelector('[aria-pressed]')).toBeNull()
   })
 
-  test('a star pins the badge, and says it is pinned once it is', () => {
+  test('the star in its window pins it, and says it is pinned once it is', async () => {
     const toggle = p.pins!({ canPin: true, pinned: [1] })
     p.render([{ title: 'First' }, { title: 'Second' }])
-    expect(star(en.favorites.addFavorite, 'First')).toHaveAttribute('aria-pressed', 'false')
-    expect(star(en.favorites.removeFavorite, 'Second')).toHaveAttribute('aria-pressed', 'true')
-    fireEvent.click(star(en.favorites.addFavorite, 'First'))
+    expect(screen.queryByRole('button', { name: new RegExp(en.favorites.addFavorite) })).not.toBeInTheDocument()
+    const first = await open('First')
+    expect(first.querySelector('[aria-pressed]')).toHaveAttribute('aria-pressed', 'false')
+    fireEvent.click(first.querySelector('[aria-pressed]')!)
     expect(toggle).toHaveBeenCalledWith(p.pinArg!(0))
   })
 })
@@ -262,7 +280,7 @@ describe.each(PLATFORMS.filter((p) => p.secret?.reveal))('$name eye', (p) => {
   })
 })
 
-describe.each([RA])('$name window', (p) => {
+describe.each(PLATFORMS)('$name window', (p) => {
   test('a badge opens its achievement', async () => {
     p.render([{ title: 'First' }])
     jest.useRealTimers()

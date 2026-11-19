@@ -2,6 +2,9 @@ import type { ComponentType, CSSProperties } from 'react'
 
 type IconType = ComponentType<{ style?: CSSProperties; 'aria-hidden'?: boolean | 'true' }>
 
+/** The caller already places it (a pin star on a badge's corner): `relative` would beat its `absolute` and put it in the flow (#164). */
+const PLACED = /(^|\s)(absolute|fixed|sticky)(\s|$)/
+
 /**
  * A button that is on or off (a pinned star, a bookmark): it reports its state
  * (`aria-pressed`), and its icon changes shape when on (the filled one), so
@@ -35,7 +38,8 @@ export default function ToggleButton({
       aria-label={label}
       title={label}
       onClick={onToggle}
-      className={`relative tap-target transition-colors duration-(--motion-hover) rounded-chip cursor-pointer focus-ring ${
+      // Positioned either way: the touch area (tap-target) hangs from it.
+      className={`${PLACED.test(className) ? '' : 'relative'} tap-target transition-colors duration-(--motion-hover) rounded-chip cursor-pointer focus-ring ${
         pressed ? 'text-hardcore' : 'text-text-secondary hover:text-hardcore'
       } ${className}`}
     >

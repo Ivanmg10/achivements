@@ -17,10 +17,6 @@ jest.mock('./main-page-friends-feed/MainPageFriendsFeed', () => ({
   __esModule: true,
   default: ({ items }: { items: unknown[] }) => <div data-testid="feed" data-count={items.length} />,
 }))
-jest.mock('./main-page-friends-shared/MainPageFriendsShared', () => ({
-  __esModule: true,
-  default: ({ rows }: { rows: unknown[] }) => <div data-testid="shared" data-count={rows.length} />,
-}))
 jest.mock('./main-page-friends-card/MainPageFriendsCard', () => ({
   __esModule: true,
   default: ({ friend, week }: { friend: { username: string }; week: number | null }) => <div data-testid="card" data-week={String(week)}>{friend.username}</div>,
@@ -82,7 +78,6 @@ test('the whole section waits until everyone is read, then lands at once', () =>
   rerender(<MainPageFriends active myRecent={[]} />)
   expect(screen.getByTestId('leaderboard')).toHaveAttribute('data-rows', 'me*,ana,bo')
   expect(screen.getByTestId('feed')).toHaveAttribute('data-count', '1')
-  expect(screen.getByTestId('shared')).toHaveAttribute('data-count', '1')
   expect(screen.getAllByTestId('card').map((c) => c.textContent)).toEqual(['ana', 'bo', 'cy'])
   expect(screen.getAllByTestId('card')[0]).toHaveAttribute('data-week', '1')
   expect(screen.getAllByTestId('card')[2]).toHaveAttribute('data-week', 'null')
@@ -97,5 +92,5 @@ test('the feed fills the height beside the leaderboard, never more; the cards ta
   expect(screen.getByTestId('feed').parentElement).toHaveClass('xl:absolute', 'xl:inset-0')
   expect(screen.getByTestId('feed').parentElement?.parentElement).toHaveClass('relative')
   // The cards are not in the leaderboard's column: their grid goes to three columns on wide screens.
-  expect(screen.getByTestId('card').parentElement).toHaveClass('xl:grid-cols-3')
+  expect(screen.getByTestId('card').parentElement?.parentElement).toHaveClass('xl:grid-cols-3')
 })

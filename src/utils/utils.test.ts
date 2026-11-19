@@ -1,4 +1,4 @@
-import { activityKpis, calcAvgPerDay, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, matchParts, decimal, asCategory } from "./utils";
+import { activityKpis, countByDay, groupByDays, calcAvgPerDay, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, matchParts, decimal, asCategory } from "./utils";
 import type { RecentAchievement } from '@/types/types'
 
 describe("getBestMonth", () => {
@@ -386,5 +386,19 @@ describe("asCategory", () => {
     expect(asCategory("playing")).toBe("playing")
     expect(asCategory(undefined)).toBe("playing")
     expect(asCategory("something-else")).toBe("playing")
+  })
+})
+
+describe('day keys are the reader’s calendar (2026-11-19)', () => {
+  // A platform date (UTC, no zone) of a local time wherever the test runs: jest cannot switch the process zone.
+  const sent = (h: number, min: number, d = 19) => ({ Date: new Date(2026, 10, d, h, min).toISOString().slice(0, 19).replace('T', ' '), Points: 5 }) as RecentAchievement
+  const now = new Date(2026, 10, 19, 9, 0).getTime()
+
+  test('an unlock at 00:50 local counts on that local day, everywhere it is counted', () => {
+    const list = [sent(0, 50), sent(23, 10, 18)]
+    expect(countByDay(list)).toEqual({ '2026-11-19': 1, '2026-11-18': 1 })
+    expect(groupByDays(list, 2, new Date(now))).toEqual([{ date: '2026-11-18', count: 1 }, { date: '2026-11-19', count: 1 }])
+    expect(activityKpis(list, now).today).toBe(1)
+    expect(getBestMonth([sent(0, 30, 1)], 'ach')?.[0]).toBe('2026-11')
   })
 })

@@ -36,12 +36,12 @@ export default function MainPageProfileRecent({
     // Room for the three rows it can hold, loading or loaded: the profile column
     // sets the height of the home page's top row, so this box changing size as
     // it filled made the whole page jump.
-    <div className={`${SURFACE} p-5 flex flex-col gap-1 flex-1 min-h-[12rem]`}>
+    <div className={`${SURFACE} p-5 fit:p-4 flex flex-col gap-1 flex-1 min-h-[12rem]`}>
       <p className="text-[1.0625rem] font-bold mb-1.5">{title}</p>
       {loading ? (
         <div aria-busy="true" className="flex flex-col">
           {Array.from({ length: 3 }).map((_, i) => (
-            <SkeletonRow key={i} className="gap-3 py-1.5" />
+            <SkeletonRow key={i} className="gap-3 py-1.5 fit:py-1" />
           ))}
         </div>
       ) : error ? (

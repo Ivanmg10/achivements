@@ -13,9 +13,9 @@ import SectionHead from '@/components/ui/SectionHead'
 import DateText from '@/components/ui/DateText'
 
 /**
- * The trophy cabinet: the latest games taken to 100%, newest first, as a row
- * of tiles from the left (a date order, not a ranking: no place on them,
- * #130). Every box has the same height and its own proportions (as on the
+ * The trophy cabinet: the latest games taken to 100%, newest first, as five
+ * tiles that share the card's width, a fifth each even with fewer games (a date
+ * order, not a ranking: no place on them, #130). Every box has the same height and its own proportions (as on the
  * game page), with name, console and date under it and how it was finished in
  * a word: hardcore, platinum or 100%. On a phone the row scrolls sideways.
  */
@@ -51,11 +51,11 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
       {games.length === 0 ? (
         <EmptyState icon={<IconTrophy className="w-6 h-6" />} title={T.cards.noCompletedGames} subtitle={T.cards.noCompletedGamesSub} size="compact" />
       ) : (
-        <ol className="flex gap-3 overflow-x-auto snap-x [scrollbar-width:none] enter-cards">
+        <ol className="grid grid-cols-[repeat(5,minmax(8.5rem,1fr))] gap-3 overflow-x-auto snap-x [scrollbar-width:none] enter-cards">
           {games.map((game) => {
             const finished = how(game)
             return (
-              <li key={game.key} className="snap-start w-36 shrink-0">
+              <li key={game.key} className="snap-start min-w-0">
                 <Link
                   href={gameHref(game.source, game.id, subject)}
                   className="group flex flex-col items-center gap-3 h-full rounded-tile bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-ring"

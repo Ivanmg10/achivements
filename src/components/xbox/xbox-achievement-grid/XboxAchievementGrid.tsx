@@ -2,13 +2,13 @@
 
 import { memo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSubject } from '@/context/SubjectContext'
 import { formatDate } from '@/utils/dates'
-import { gameHref } from '@/utils/gameRef'
-import { xboxAchievementAnchor } from '@/utils/xboxTitles'
+import { xboxCompareItem } from '@/utils/gameCompare'
+import { useXboxDetailOptions } from '@/hooks/useDetailOptions'
 import BadgeGrid from '@/components/badge-grid/BadgeGrid'
 import BadgeRarity from '@/components/badge-grid/badge-tip-parts/BadgeRarity'
 import BadgeEarnedChip from '@/components/badge-grid/badge-tip-parts/BadgeEarnedChip'
+import BadgeGridDetail from '@/components/badge-grid/badge-grid-detail/BadgeGridDetail'
 import { useRevealed } from '@/hooks/useRevealed'
 import { useXboxRevealSecrets } from '@/hooks/useXboxRevealSecrets'
 import { useAchievementPins, XBOX_PINS } from '@/hooks/useAchievementPins'
@@ -35,15 +35,17 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
   limit?: number
 }) {
   const { T, lang } = useLanguage()
-  const subject = useSubject()
   const { pins } = useAchievementPins(XBOX_PINS, gameId, gameTitle)
+  const options = useXboxDetailOptions()
   const reveal = useRevealed(useXboxRevealSecrets()[0], XBOX_PINS.idOf)
 
   return (
     <BadgeGrid<XboxAchievement>
       items={achievements}
       keyOf={(a) => a.id}
-      href={(a) => `${gameHref('xbox', gameId, subject)}#${xboxAchievementAnchor(a.id)}`}
+      detail={(a, shown, onClose) => (
+        <BadgeGridDetail item={a} shown={shown} source="xbox" gameId={gameId} gameTitle={gameTitle} toRow={xboxCompareItem} pins={pins} options={options} onClose={onClose} />
+      )}
       badgeSize={badgeSize}
       limit={limit}
       name={(a, concealed) => (concealed ? T.xbox.secretAchievement : a.name)}
@@ -53,7 +55,6 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
       icon={(a) => a.iconUrl || null}
       secret={(a) => a.secret && !a.unlocked}
       reveal={{ ...reveal, labels: { reveal: T.xbox.revealAchievement, conceal: T.xbox.concealAchievement } }}
-      pins={pins}
       tip={(a, concealed) => ({
         description: concealed ? T.xbox.secretAchievementDesc : a.description,
         chips: (

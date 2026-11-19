@@ -7,6 +7,7 @@ import { classifyXboxGame, xboxHasAchievements } from '@/utils/xboxTitles'
 import { XBOX_PLATFORM } from '@/utils/xboxMappers'
 import type { XboxGameProgress } from '@/types/xbox'
 import { normalizeTitle } from '@/utils/gameCandidates'
+import { consolesOf } from '@/utils/consoleFilter'
 import { raImageUrl } from '@/utils/raAssets'
 import type { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
@@ -117,6 +118,40 @@ export function summarizeConsoles(games: RetroAchievementsGameCompleted[]): Cons
       return { consoleId, console, games: best.size, completed, pct: Math.round((completed / best.size) * 100) }
     })
     .sort((a, b) => b.games - a.games || a.console.localeCompare(b.console))
+}
+
+export type ConsoleTile = { key: string; source: GameSource; name: string; consoleId?: number; games: number; completed: number; pct: number; href: string }
+
+const share = (completed: number, games: number) => Math.round((completed / games) * 100)
+
+/**
+ * Home's "Your consoles" (#164): RA's consoles, PlayStation's by the console each game is on (a
+ * "PS4 · PS5" game counts on both; a console unticked in preferences is left out) and Steam as one
+ * tile. A game is done at 100% of its whole set, DLC included. Each opens its list: RA's console page,
+ * the others the library on their platform. Xbox stays out (admin-only). Most games first.
+ */
+export function consoleTiles(ra: RetroAchievementsGameCompleted[], psn: PsnGameProgress[] = [], steam: SteamGameProgress[] = [], hiddenPsn: ReadonlySet<string> = new Set()): ConsoleTile[] {
+  const tiles: ConsoleTile[] = summarizeConsoles(ra).map((c) => ({
+    key: `ra:${c.consoleId}`, source: 'ra', name: c.console, consoleId: c.consoleId, games: c.games, completed: c.completed, pct: c.pct, href: `/playing/${c.consoleId}`,
+  }))
+  const byConsole = new Map<string, { games: number; completed: number }>()
+  for (const g of psn) {
+    for (const name of consolesOf(g.consoleName)) {
+      if (hiddenPsn.has(name)) continue
+      const c = byConsole.get(name) ?? { games: 0, completed: 0 }
+      byConsole.set(name, { games: c.games + 1, completed: c.completed + (g.pctWon >= 100 ? 1 : 0) })
+    }
+  }
+  for (const [name, c] of byConsole) {
+    tiles.push({ key: `psn:${name}`, source: 'psn', name, ...c, pct: share(c.completed, c.games), href: '/allGames?platform=psn' })
+  }
+  // Only the games started: an owned library is mostly games never opened.
+  const played = steam.filter((g) => g.numAwarded > 0)
+  if (played.length > 0) {
+    const completed = played.filter((g) => g.pctWon >= 100).length
+    tiles.push({ key: 'steam', source: 'steam', name: 'Steam', games: played.length, completed, pct: share(completed, played.length), href: '/allGames?platform=steam' })
+  }
+  return tiles.sort((a, b) => b.games - a.games || a.name.localeCompare(b.name))
 }
 
 /**

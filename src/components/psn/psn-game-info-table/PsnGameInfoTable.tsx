@@ -7,8 +7,9 @@ import type { AchievementColumn } from '@/types/achievementTable'
 import { useAchievementPins, PSN_PINS } from '@/hooks/useAchievementPins'
 import { useRevealed } from '@/hooks/useRevealed'
 import { usePsnRevealHidden } from '@/hooks/usePsnRevealHidden'
+import { usePsnDetailOptions } from '@/hooks/useDetailOptions'
 import { psnCompareItem } from '@/utils/gameCompare'
-import { BASE_GROUP, dlcShortName, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
+import { TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import AchievementTable from '@/components/achievement-table/AchievementTable'
 import PsnTrophyGroupTabs from './psn-trophy-group-tabs/PsnTrophyGroupTabs'
 
@@ -37,7 +38,7 @@ export default function PsnGameInfoTable({
     cell: ({ item }) => <span className={`font-bold ${TROPHY_GRADE_COLOR[item.type]}`}>{T.psn[item.type]}</span>,
     card: ({ item }) => gradeChip(item),
   }
-  const dlcOf = (t: PsnTrophy) => (groups.length > 1 ? groups.find((g) => g.id === t.groupId && g.id !== BASE_GROUP) : undefined)
+  const detail = usePsnDetailOptions(groups, gameTitle)
 
   return (
     <AchievementTable
@@ -70,17 +71,7 @@ export default function PsnGameInfoTable({
             }
           : undefined
       }
-      detail={{
-        tags: (t) => {
-          const dlc = dlcOf(t)
-          return (
-            <>
-              {gradeChip(t)}
-              {dlc && <span className="px-2 py-0.5 rounded-full bg-ink/10 text-text-secondary">DLC · {dlcShortName(dlc.name, gameTitle)}</span>}
-            </>
-          )
-        },
-      }}
+      detail={detail}
     />
   )
 }

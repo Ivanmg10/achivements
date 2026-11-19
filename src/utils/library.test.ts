@@ -1,4 +1,4 @@
-import { buildLibrary, filterLibrary, profileLibrary, sharedGames, summarizeByPlatform, summarizeConsoles, type LibraryGame } from './library'
+import { buildLibrary, filterLibrary, profileLibrary, sharedGames, summarizeByPlatform, summarizeConsoles, consoleTiles, type LibraryGame } from './library'
 import type { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import { psnGameFixture } from '@/test-utils/psnFixtures'
@@ -148,5 +148,29 @@ describe('Xbox in the library', () => {
   test('the platform summary lists Xbox, in the app order, after PlayStation', () => {
     const games = buildLibrary(none, [], [], [xboxGameFixture({ id: 1, pctWon: 100 })])
     expect(summarizeByPlatform(games).map((s: { source: string }) => s.source)).toEqual(['xbox'])
+  })
+})
+
+describe('consoleTiles (#164)', () => {
+  const ps = (id: number, consoleName: string, pctWon: number) => psnGameFixture({ id, consoleName, pctWon })
+
+  test('RA by console, PlayStation by the console each game is on, Steam as one tile, most games first', () => {
+    const tiles = consoleTiles(
+      [ra(1, '1.0'), ra(2, '0.5')],
+      [ps(10, 'PS4', 100), ps(11, 'PS4 · PS5', 40), ps(12, 'PS5', 100), ps(13, 'PS4', 0)],
+      [steam(620), steam(400, { numAwarded: 0, pctWon: 0 })],
+    )
+    expect(tiles.map((t) => [t.key, t.games, t.completed, t.pct, t.href])).toEqual([
+      ['psn:PS4', 3, 1, 33, '/allGames?platform=psn'],
+      ['ra:5', 2, 1, 50, '/playing/5'],
+      ['psn:PS5', 2, 1, 50, '/allGames?platform=psn'],
+      // A Steam game never started is not counted.
+      ['steam', 1, 1, 100, '/allGames?platform=steam'],
+    ])
+  })
+
+  test('a PlayStation console unticked in preferences has no tile; no Steam game played, no Steam tile', () => {
+    const tiles = consoleTiles([], [ps(10, 'PS4', 100), ps(11, 'PS4 · PS5', 40)], [steam(1, { numAwarded: 0 })], new Set(['PS4']))
+    expect(tiles.map((t) => [t.key, t.games])).toEqual([['psn:PS5', 1]])
   })
 })

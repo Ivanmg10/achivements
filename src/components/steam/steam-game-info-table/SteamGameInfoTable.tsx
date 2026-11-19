@@ -4,10 +4,10 @@ import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { SteamAchievementUnified } from '@/types/steam'
 import { useAchievementPins, STEAM_PINS } from '@/hooks/useAchievementPins'
+import { useSteamDetailOptions } from '@/hooks/useDetailOptions'
 import { steamCompareItem } from '@/utils/gameCompare'
 import { plural } from '@/utils/utils'
 import AchievementTable from '@/components/achievement-table/AchievementTable'
-import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 
 /**
  * A Steam game's achievements on the shared table, in Steam's order. Secret ones
@@ -28,7 +28,7 @@ export default function SteamGameInfoTable({
   const { T, lang } = useLanguage()
   const { pins } = useAchievementPins(STEAM_PINS, appId, gameTitle)
   const inOrder = useMemo(() => [...achievements].sort((a, b) => a.displayOrder - b.displayOrder), [achievements])
-  const onlineBadge = (a: SteamAchievementUnified) => (a.likelyOnline ? <SteamOnlineBadge /> : undefined)
+  const detail = useSteamDetailOptions()
 
   return (
     <AchievementTable
@@ -47,14 +47,14 @@ export default function SteamGameInfoTable({
         secretText: T.steam.hiddenAchievementDesc,
       }}
       pins={pins}
-      tags={({ item }) => onlineBadge(item)}
+      tags={({ item }) => detail.tags?.(item)}
       notice={{
         match: ({ item }) => item.likelyOnline && !item.earned,
         tone: 'warning',
         lead: (n) => plural(n, T.plurals.onlineCount, lang),
         text: T.gameInfoTable.onlineText,
       }}
-      detail={{ tags: onlineBadge, guideTitle: (a) => a.titleEn ?? a.title }}
+      detail={detail}
       keepSecretIcon
     />
   )

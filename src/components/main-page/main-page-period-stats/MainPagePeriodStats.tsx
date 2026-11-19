@@ -7,14 +7,13 @@ import type { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { streakInk, streakTier } from '@/utils/streakTier'
 import { calcAvgPerDay, decimal, plural } from '@/utils/utils'
-import { parseUnlockTime, utcDay } from '@/utils/dates'
+import { addDays, localDay } from '@/utils/dates'
+import { dayOf } from '@/utils/periodDays'
 import Figure, { FIGURES_BY_THREE } from '@/components/ui/Figure'
 
 // Downloaded the first time it opens, not with the page.
 const DayAchievementsModal = dynamic(() => import('@/components/day-achievements-modal/DayAchievementsModal'), { loading: () => null })
 const PeriodAchievementsModal = dynamic(() => import('@/components/period-achievements-modal/PeriodAchievementsModal'), { loading: () => null })
-
-const DAY_MS = 86_400_000
 
 /**
  * The home's summary of activity: today, the last 7 calendar days (today and the 6 before), the last 30 (today and the 29 before), the average per day and the
@@ -42,16 +41,15 @@ export default function MainPagePeriodStats({
   const [monthOpen, setMonthOpen] = useState(false)
 
   const stats = useMemo(() => {
-    const date = new Date()
-    const todayKey = utcDay(date)
-    // Calendar days keyed as the rest of the home keys them (UTC): today and the 6 before, today and the 29 before.
+    const todayKey = localDay(new Date())
+    // Days of the reader's calendar, as the rest of the home: today and the 6 before, today and the 29 before.
     const inLast = (days: number) => {
-      const since = utcDay(date.getTime() - (days - 1) * DAY_MS)
-      return (a: RecentAchievement) => utcDay(parseUnlockTime(a.Date)) >= since
+      const since = addDays(todayKey, 1 - days)
+      return (a: RecentAchievement) => dayOf(a) >= since
     }
     return {
       todayKey,
-      today: achievements.filter((a) => a.Date.startsWith(todayKey)),
+      today: achievements.filter((a) => dayOf(a) === todayKey),
       week: achievements.filter(inLast(7)),
       month: monthSource.filter(inLast(30)),
       avg: calcAvgPerDay(monthSource, 30),

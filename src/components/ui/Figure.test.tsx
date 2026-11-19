@@ -38,7 +38,7 @@ test('a pressed bare figure hovers upright, is a tile, never a chip, and the mar
   expect(screen.getByRole('button')).toHaveClass('hover:after:bg-ink/5')
   expect(screen.getByRole('button').className).not.toContain('skew')
   expect(container.firstChild).toHaveClass('min-w-24', 'rounded-tile')
-  expect(container.querySelector('[aria-hidden="true"]')).toHaveClass('before:content-(--mark)', 'group-first/figure:hidden')
+  expect(container.querySelector('[aria-hidden="true"]')).toHaveClass('before:content-(--figure-mark)', 'group-first/figure:hidden')
   expect(container.firstChild).not.toHaveClass('rounded-chip')
 })
 

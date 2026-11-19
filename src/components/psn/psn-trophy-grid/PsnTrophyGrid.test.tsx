@@ -1,4 +1,8 @@
 jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
+jest.mock('@/components/achievement-detail-modal/AchievementDetailModal', () => ({
+  __esModule: true,
+  default: ({ title, tags }: { title: string; tags?: React.ReactNode }) => <div role="dialog" aria-label={title}>{tags}</div>,
+}))
 
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { PsnTrophyGrid } from './PsnTrophyGrid'
@@ -29,26 +33,27 @@ const GROUPS = [
 ]
 const WITH_DLC = [trophy({ id: 0, name: 'Base one', groupId: 'default' }), trophy({ id: 1, name: 'DLC one', groupId: '001' })]
 
-test('each trophy links to its row on the game page, saying its grade and state', () => {
+test('each trophy opens its window, saying its grade and state', async () => {
   render(<PsnTrophyGrid gameId={2018800} gameTitle="Game" trophies={TROPHIES} />)
-  const earned = screen.getByRole('link', { name: `All of them — ${en.psn.platinum}, ${en.psn.earned}` })
-  expect(earned).toHaveAttribute('href', '/psnGame/NPWR20188_00#trophy-0')
+  const earned = screen.getByRole('button', { name: `All of them — ${en.psn.platinum}, ${en.psn.earned}` })
+  fireEvent.click(earned)
+  expect(await screen.findByRole('dialog', { name: 'All of them' })).toHaveTextContent(en.psn.platinum)
   // A hidden trophy keeps its name secret until earned.
-  expect(screen.getByRole('link', { name: `${en.psn.hiddenTrophy} — ${en.psn.bronze}, ${en.psn.locked}` })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: `${en.psn.hiddenTrophy} — ${en.psn.bronze}, ${en.psn.locked}` })).toBeInTheDocument()
   expect(screen.queryByText('Spoiler')).not.toBeInTheDocument()
 })
 
 test('focusing a trophy shows its details at once', () => {
   render(<PsnTrophyGrid gameId={100} gameTitle="Game" trophies={TROPHIES} />)
   jest.useFakeTimers()
-  fireEvent.focus(screen.getAllByRole('link')[0])
+  fireEvent.focus(screen.getAllByRole('button')[0])
   act(() => jest.runAllTimers())
   jest.useRealTimers()
   const tip = screen.getByRole('tooltip')
   expect(tip).toHaveTextContent('All of them')
   expect(tip).toHaveTextContent(en.psn.platinum)
   expect(tip).toHaveTextContent('3.4')
-  fireEvent.blur(screen.getAllByRole('link')[0])
+  fireEvent.blur(screen.getAllByRole('button')[0])
   expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
 })
 
@@ -62,7 +67,7 @@ test('with DLC, each group is a fold with its progress: all closed', () => {
   expect(folds[0]).not.toHaveAttribute('open')
   expect(folds[1].querySelector('summary')).toHaveTextContent('Winter Wonder0/1')
   expect(folds[1]).not.toHaveAttribute('open')
-  expect(folds[1].querySelectorAll('a')).toHaveLength(1)
+  expect(folds[1].querySelectorAll('li')).toHaveLength(1)
 })
 
 test('without DLC, no folds', () => {

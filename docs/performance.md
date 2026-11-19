@@ -78,7 +78,8 @@ Rankings). Keep these true:
 - **The header never reads the year.** Its streak is `useStreakSummary` → `GET /api/me/streak`, counted
   on the server from the same loaders and caches the streak page uses (`lib/raYear`, `lib/steamUnlockYear`,
   `psnRecentTrophies`, `xboxRecentAchievements`; `lib/meStreak.ts`), with hidden games and the consoles
-  unticked in the browser (`?hidden=`) left out, UTC days, `calcAllStreaks` from `utils/streaks.ts`.
+  unticked in the browser (`?hidden=`) left out, on the browser's calendar (`?tz=`, its IANA zone, checked by `isTimeZone`;
+  UTC otherwise), `calcAllStreaks` from `utils/streaks.ts`.
   Only the viewer's own (it ignores `?user=`); Xbox for admins; every platform failing is a 502.
   Anything else that only shows the streak number uses it too (the search modal does).
   Its `streak` is `null` until the first answer (the header draws `StreakTag loading`, never a 0 meanwhile).

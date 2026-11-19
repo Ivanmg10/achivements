@@ -2,6 +2,7 @@ import type { RecentAchievement } from '@/types/types'
 import type { GameSource } from '@/types/game'
 import { achievementGameIconUrl } from '@/utils/utils'
 import { gameKey } from '@/utils/gameRef'
+import { unlockDay } from '@/utils/dates'
 
 /** One game's unlocks inside a day: shown once with its cover, title and platform. */
 export type GameGroup = {
@@ -17,7 +18,7 @@ export type GameGroup = {
 }
 
 export type DayGroup = {
-  /** "YYYY-MM-DD", as the unlocks carry it. */
+  /** "YYYY-MM-DD", on the reader's calendar. */
   date: string
   count: number
   /** RA's points of the day; meaningful only when `hasPoints`. */
@@ -29,8 +30,8 @@ export type DayGroup = {
 
 const sourceOf = (a: RecentAchievement): GameSource => a.Source ?? 'ra'
 
-/** The calendar day of an unlock ("2024-01-15 20:30:00" → "2024-01-15"). */
-export const dayOf = (a: RecentAchievement) => a.Date.split(' ')[0]
+/** The day of an unlock on the reader's calendar ("2024-01-15 23:50:00" UTC → "2024-01-16" in Madrid). */
+export const dayOf = (a: RecentAchievement) => unlockDay(a.Date)
 
 /** Points are RA's only: a list that mixes platforms shows counts, never a total that leaves rows out. */
 export const allRa = (achievements: RecentAchievement[]) => achievements.every((a) => sourceOf(a) === 'ra')

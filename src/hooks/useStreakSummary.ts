@@ -60,7 +60,9 @@ export function useStreakSummary() {
   const accounts = [user?.rausername, user?.steamid, user?.psnaccountid, user?.xboxxuid].join('|')
   const read = ra !== undefined && psn !== undefined && xbox !== undefined
   const hidden = read ? hiddenParam({ ra, psn, xbox }) : ''
-  const url = `/api/me/streak?lang=${lang}${hidden ? `&hidden=${encodeURIComponent(hidden)}` : ''}`
+  // The days are this browser's calendar, as the streak page counts them; the server lives in UTC.
+  const tz = encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)
+  const url = `/api/me/streak?lang=${lang}&tz=${tz}${hidden ? `&hidden=${encodeURIComponent(hidden)}` : ''}`
   const wanted = status === 'authenticated' && read ? `${url}#${accounts}#${revision}#${attempt}` : null
 
   useEffect(() => {

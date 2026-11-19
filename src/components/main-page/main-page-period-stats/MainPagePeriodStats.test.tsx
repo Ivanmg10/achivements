@@ -13,6 +13,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import MainPagePeriodStats from './MainPagePeriodStats'
 import { en } from '@/translations/en'
 import type { RecentAchievement } from '@/types/types'
+import { localDay } from '@/utils/dates'
 
 const stamp = (daysAgo: number) => {
   const d = new Date()
@@ -21,7 +22,7 @@ const stamp = (daysAgo: number) => {
 }
 const unlock = (daysAgo: number, Source: RecentAchievement['Source'] = 'steam') =>
   ({ Date: stamp(daysAgo), HardcoreMode: '0', AchievementID: 0, Title: 't', Description: '', BadgeName: '', Points: 25, GameID: 1, GameTitle: 'g', ConsoleName: 'c', Source }) as RecentAchievement
-const TODAY = stamp(0).slice(0, 10)
+const TODAY = localDay(new Date())
 
 const pill = (label: string) => screen.getByText(label).parentElement!
 const order = () => [...document.querySelectorAll('.grid > *')].map((p) => p.querySelector('span:not([data-figure-mark])')?.textContent)
@@ -83,11 +84,10 @@ test.each([0, null])('while loading, the same figures in the same order as loade
 })
 
 test('the week is today and the 6 days before, the 30 days today and the 29 before, in calendar days (#165, H4)', () => {
-  const OLD_TZ = process.env.TZ
-  process.env.TZ = 'Pacific/Auckland'
-  jest.useFakeTimers({ now: new Date('2026-11-14T08:30:00Z') })
+  jest.useFakeTimers({ now: new Date(2026, 10, 14, 9, 30) })
   try {
-    const at = (day: string) => ({ ...unlock(0), Date: `${day} 23:59:00` }) as RecentAchievement
+    // Noon local time of each day, sent as the platforms send it (UTC, no zone).
+    const at = (day: string) => ({ ...unlock(0), Date: new Date(`${day}T12:00:00`).toISOString().slice(0, 19).replace('T', ' ') }) as RecentAchievement
     // Sat 14 is today: the week starts on Sun 8 (Sat 7 is out, which a rolling 7 x 24 h would have kept), the 30 days on Oct 16.
     const list = [at('2026-11-14'), at('2026-11-08'), at('2026-11-07'), at('2026-10-16'), at('2026-10-15')]
     render(<MainPagePeriodStats achievements={list} monthSource={list} streak={0} />)
@@ -97,6 +97,18 @@ test('the week is today and the 6 days before, the 30 days today and the 29 befo
     expect(screen.getByTestId('period-modal')).toHaveTextContent(`${en.pointsStats.thisWeek}:2`)
   } finally {
     jest.useRealTimers()
-    process.env.TZ = OLD_TZ
+  }
+})
+
+test('an unlock at 00:50 local time is today, not the day before in UTC (the owner, 2026-11-19)', () => {
+  jest.useFakeTimers({ now: new Date(2026, 10, 19, 9, 0) })
+  try {
+    const sent = new Date(2026, 10, 19, 0, 50).toISOString().slice(0, 19).replace('T', ' ')
+    render(<MainPagePeriodStats achievements={[{ ...unlock(0), Date: sent }]} streak={0} />)
+    expect(pill(en.pointsStats.today)).toHaveTextContent(/^Today1achievement$/)
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(en.pointsStats.today) }))
+    expect(screen.getByTestId('day-modal')).toHaveTextContent('2026-11-19')
+  } finally {
+    jest.useRealTimers()
   }
 })

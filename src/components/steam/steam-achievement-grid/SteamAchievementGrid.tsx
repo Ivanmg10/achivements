@@ -2,14 +2,14 @@
 
 import { memo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSubject } from '@/context/SubjectContext'
 import { useAchievementPins, STEAM_PINS } from '@/hooks/useAchievementPins'
 import { formatDate } from '@/utils/dates'
-import { gameHref } from '@/utils/gameRef'
-import { steamAchievementAnchor } from '@/utils/steamTitles'
+import { steamCompareItem } from '@/utils/gameCompare'
+import { useSteamDetailOptions } from '@/hooks/useDetailOptions'
 import BadgeGrid from '@/components/badge-grid/BadgeGrid'
 import BadgeRarity from '@/components/badge-grid/badge-tip-parts/BadgeRarity'
 import BadgeEarnedChip from '@/components/badge-grid/badge-tip-parts/BadgeEarnedChip'
+import BadgeGridDetail from '@/components/badge-grid/badge-grid-detail/BadgeGridDetail'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 import type { SteamAchievementUnified } from '@/types/steam'
 
@@ -33,14 +33,16 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
   limit?: number
 }) {
   const { T, lang } = useLanguage()
-  const subject = useSubject()
   const { pins } = useAchievementPins(STEAM_PINS, appId, gameTitle)
+  const options = useSteamDetailOptions()
 
   return (
     <BadgeGrid<SteamAchievementUnified>
       items={achievements}
       keyOf={(a) => a.apiname}
-      href={(a) => `${gameHref('steam', appId, subject)}#${steamAchievementAnchor(a.apiname)}`}
+      detail={(a, shown, onClose) => (
+        <BadgeGridDetail item={a} shown={shown} source="steam" gameId={appId} gameTitle={gameTitle} toRow={steamCompareItem} pins={pins} options={options} onClose={onClose} />
+      )}
       badgeSize={badgeSize}
       limit={limit}
       name={(a, concealed) => (concealed ? T.steam.hiddenAchievement : a.title)}
@@ -50,7 +52,6 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
       icon={(a) => a.badgeUrl || null}
       secret={(a) => a.hidden && !a.earned}
       keepSecretIcon
-      pins={pins}
       tip={(a, concealed) => ({
         description: concealed ? T.steam.hiddenAchievementDesc : a.description,
         chips: (

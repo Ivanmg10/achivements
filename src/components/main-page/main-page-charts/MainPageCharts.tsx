@@ -222,7 +222,7 @@ export default function MainPageCharts() {
   }
 
   return (
-    <section ref={sectionRef} className="p-4 flex flex-col gap-4 bg-bg-main scroll-mt-16" aria-labelledby={`${idPrefix}-title`} data-stats-section={section}>
+    <section ref={sectionRef} className="p-4 fit:pt-0 flex flex-col gap-4 fit:gap-3 bg-bg-main scroll-mt-16" aria-labelledby={`${idPrefix}-title`} data-stats-section={section}>
       <h2 id={`${idPrefix}-title`} className="text-xl font-semibold text-text-main">{T.cards.statsActivity}</h2>
 
       {/*

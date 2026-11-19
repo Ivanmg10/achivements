@@ -68,12 +68,13 @@ async function hiddenIds<G extends { id: number; consoleName: string }>(hidden: 
  * The header's streak, counted on the server from the same year the streak page
  * reads (the same loaders, so the same caches), with hidden games and unticked
  * consoles left out as the page does. A few bytes instead of a year of unlocks
- * and two libraries on every route (#101). Days are UTC, like the page's.
+ * and two libraries on every route (#101). Days are the person's own calendar (`timeZone`, the
+ * browser's zone the client sends; UTC without one), like the page's.
  *
  * Each platform is read on its own: one failing is named in `failed` and the
  * streak is counted from the rest, as the page does. Xbox only for whoever may use it.
  */
-export async function loadStreak(owner: StreakOwner, lang: string, hidden: HiddenConsoles, now = Date.now()): Promise<StreakResult> {
+export async function loadStreak(owner: StreakOwner, lang: string, hidden: HiddenConsoles, timeZone = 'UTC', now = Date.now()): Promise<StreakResult> {
   const { id } = owner
   const steamKey = process.env.STEAM_API_KEY?.trim()
 
@@ -128,7 +129,7 @@ export async function loadStreak(owner: StreakOwner, lang: string, hidden: Hidde
   })
   // Every platform failing is not "no streak": it is "try later".
   if (reads.length && failed.length === reads.length) throw new StreakUnavailable(failed)
-  return { ...streakSummary(achievements, now), failed }
+  return { ...streakSummary(achievements, now, timeZone), failed }
 }
 
 /** No linked platform's year could be read. */

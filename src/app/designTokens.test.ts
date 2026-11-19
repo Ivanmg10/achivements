@@ -5,7 +5,7 @@ const css: string = require('fs').readFileSync(require('path').join(__dirname, '
 
 const DESIGN_TOKENS = [
   '--hardcore', '--softcore',
-  '--slant', '--mark', '--bar-radius',
+  '--slant', '--mark', '--figure-mark', '--bar-radius',
   '--r-chip', '--r-control', '--r-field', '--r-card',
   '--r-button', '--r-tag', '--r-pane', '--r-tile', '--r-track', '--r-knob', '--knob-w', '--knob-h', '--knob-shift',
   '--r-sheet', '--r-area', '--r-icon', '--r-box', '--r-box-md', '--r-box-sm', '--r-tag-sm', '--r-badge', '--r-cell', '--r-nav', '--button-inset', '--area-resize',
@@ -34,6 +34,14 @@ const SHAPE_TOKEN_NAMES = ['--slant', '--mark', '--r-card', '--r-button', '--r-b
 test('a font preview shows its font: it takes the family, and Barlow can undo a page in another font', () => {
   for (const font of ['barlow', 'sofia', 'fira']) expect(css).toContain(`[data-font="${font}"]:not(html)`)
   expect(css).toMatch(/\[data-font\]:not\(html\) \{\s+@apply font-sans;/)
+})
+
+test('a recently played row never shrinks below its content, except the open card, which scrolls inside (#164)', () => {
+  const rules = css.match(/[^\n}]*\.home-fit-scroll > [^{]*\{ flex: 1 0 auto !important; \}/g) ?? []
+  expect(rules).toHaveLength(2)
+  for (const rule of rules) expect(rule).toContain('.home-fit-scroll > :not(:has([aria-expanded="true"]))')
+  // Whatever stats section is open: the open list stops counting toward the row, so the profile column sets its height.
+  expect(css).toMatch(/@media \(min-width: 1024px\) \{\s+\.home-fit-scroll:has\(\[aria-expanded="true"\]\) \{ contain: size;/)
 })
 
 test('the home keeps one height for the profile through its platform tabs', () => {
@@ -79,6 +87,7 @@ test('the slanted design leans on one angle, 12°, and marks with a slash (ident
   const slanted = designBlock('slanted')
   expect(valueIn(slanted, '--slant')).toBe('-12deg')
   expect(valueIn(slanted, '--mark')).toBe('"/"')
+  expect(valueIn(slanted, '--figure-mark')).toBe('"/"')
   expect(css).not.toMatch(/--slant-|--clip-\d/)
 })
 
@@ -86,6 +95,8 @@ test('the round design takes the slant out and rounds the controls', () => {
   const round = designBlock('round')
   expect(valueIn(round, '--slant')).toBe('0deg')
   expect(valueIn(round, '--mark')).toBe('"\\2022"')
+  // No mark between bare figures in the round design (the owner, #164); Tabs and Facts keep their dot.
+  expect(valueIn(round, '--figure-mark')).toBe('none')
   // A one-line control is a pill; what holds several lines keeps soft corners, or it would look deformed.
   for (const token of ['--r-chip', '--r-tag', '--r-tag-sm', '--r-badge', '--r-icon', '--r-nav', '--r-track', '--r-knob', '--r-button', '--r-field']) expect(round).toContain(`${token}: 9999px`)
   for (const token of ['--r-area', '--r-control', '--r-card', '--r-sheet']) expect(valueIn(round, token)).not.toBe('9999px')

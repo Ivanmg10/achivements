@@ -4,6 +4,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { XboxAchievement } from '@/types/xbox'
 import type { AchievementColumn } from '@/types/achievementTable'
 import { useAchievementPins, XBOX_PINS } from '@/hooks/useAchievementPins'
+import { useXboxDetailOptions } from '@/hooks/useDetailOptions'
 import { useRevealed } from '@/hooks/useRevealed'
 import { useXboxRevealSecrets } from '@/hooks/useXboxRevealSecrets'
 import { xboxCompareItem } from '@/utils/gameCompare'
@@ -26,7 +27,7 @@ export default function XboxGameInfoTable({
   const { T } = useLanguage()
   const { pins } = useAchievementPins(XBOX_PINS, gameId, gameTitle)
   const reveal = useRevealed(useXboxRevealSecrets()[0], XBOX_PINS.idOf)
-  const score = (a: XboxAchievement) => <span className="font-semibold text-success">{a.gamerscore} G</span>
+  const detail = useXboxDetailOptions()
   const gamerscore: AchievementColumn<XboxAchievement> = {
     key: 'gamerscore',
     label: T.xbox.score,
@@ -37,7 +38,7 @@ export default function XboxGameInfoTable({
         <span className="text-base font-extrabold">{item.gamerscore}</span> <span className="text-xs text-text-secondary">G</span>
       </>
     ),
-    card: ({ item }) => score(item),
+    card: ({ item }) => detail.tags?.(item),
   }
 
   return (
@@ -63,7 +64,7 @@ export default function XboxGameInfoTable({
       pins={pins}
       reveal={reveal}
       columns={[gamerscore]}
-      detail={{ tags: score }}
+      detail={detail}
     />
   )
 }

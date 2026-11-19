@@ -44,10 +44,10 @@ function clamp(value: number, min: number, max: number): number {
  * `todayDow` is today's weekday (0 = Sunday): the last column is the current
  * week, so the days counted back stop short by whatever is left of it.
  */
-export function measureHeatmapGrid(width: number, height: number, todayDow: number): HeatmapGrid {
+export function measureHeatmapGrid(width: number, height: number, todayDow: number, maxCell = MAX_CELL): HeatmapGrid {
   if (width <= 0 || height <= 0) return UNMEASURED
 
-  const cell = clamp(Math.floor((height - (ROWS - 1) * HEATMAP_GAP) / ROWS), MIN_CELL, MAX_CELL)
+  const cell = clamp(Math.floor((height - (ROWS - 1) * HEATMAP_GAP) / ROWS), MIN_CELL, maxCell)
   const weeks = clamp(Math.floor((width + HEATMAP_GAP) / (cell + HEATMAP_GAP)), MIN_WEEKS, MAX_WEEKS)
   const days = Math.min(HEATMAP_MAX_DAYS, weeks * ROWS - (6 - todayDow))
   const cellWidth = clamp(Math.floor((width + HEATMAP_GAP) / weeks) - HEATMAP_GAP, cell, Math.floor(cell * MAX_STRETCH))
@@ -61,9 +61,10 @@ export function measureHeatmapGrid(width: number, height: number, todayDow: numb
  *
  * `reserved` is the height drawn around the grid inside the same box (month
  * names, legend): left out of the cells, or a short box overflows into the
- * card's header.
+ * card's header. `maxCell` caps a cell's height (30 px unless a page asks
+ * for bigger days, as the home's Overview does when it fills one screen).
  */
-export function useHeatmapGrid(ref: RefObject<HTMLElement | null>, reserved = 0): HeatmapGrid {
+export function useHeatmapGrid(ref: RefObject<HTMLElement | null>, reserved = 0, maxCell = MAX_CELL): HeatmapGrid {
   const [grid, setGrid] = useState<HeatmapGrid>(UNMEASURED)
 
   useEffect(() => {
@@ -72,7 +73,7 @@ export function useHeatmapGrid(ref: RefObject<HTMLElement | null>, reserved = 0)
 
     const measure = () =>
       setGrid((prev) => {
-        const next = measureHeatmapGrid(box.clientWidth, box.clientHeight - reserved, new Date().getDay())
+        const next = measureHeatmapGrid(box.clientWidth, box.clientHeight - reserved, new Date().getDay(), maxCell)
         return next.weeks === prev.weeks && next.cell === prev.cell && next.cellWidth === prev.cellWidth ? prev : next
       })
 
@@ -80,7 +81,7 @@ export function useHeatmapGrid(ref: RefObject<HTMLElement | null>, reserved = 0)
     const observer = new ResizeObserver(measure)
     observer.observe(box)
     return () => observer.disconnect()
-  }, [ref, reserved])
+  }, [ref, reserved, maxCell])
 
   return grid
 }

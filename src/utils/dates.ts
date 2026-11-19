@@ -20,7 +20,10 @@ export function unlockIso(s: string | null | undefined): string | null {
   return Number.isNaN(t) ? null : new Date(t).toISOString()
 }
 
-/** "2026-10-17" of a moment, in UTC: the day key of every unlock count kept on the server. */
+/**
+ * "2026-10-17" of a moment, in UTC: the day key of what compares people with each other (Vault Points'
+ * periods, the rankings' streaks), so everyone is measured on the same clock. Never a person's own days.
+ */
 export function utcDay(d: Date | number): string {
   return new Date(d).toISOString().slice(0, 10)
 }
@@ -29,6 +32,41 @@ export function utcDay(d: Date | number): string {
 export function localDay(d: Date | number): string {
   const day = new Date(d)
   return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
+}
+
+const DAY_FORMATS = new Map<string, Intl.DateTimeFormat>()
+
+/**
+ * "2026-10-17" of a moment on a person's own calendar: `timeZone` (an IANA name, checked with
+ * `isTimeZone`) on the server, which does not live in theirs; the browser's own zone without it.
+ * An unlock at 00:50 in Madrid is that day, not the UTC day before (the owner's report, 2026-11-19).
+ */
+export function dayIn(d: Date | number, timeZone?: string): string {
+  if (!timeZone) return localDay(d)
+  let format = DAY_FORMATS.get(timeZone)
+  if (!format) {
+    format = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' })
+    DAY_FORMATS.set(timeZone, format)
+  }
+  const part = Object.fromEntries(format.formatToParts(new Date(d)).map((p) => [p.type, p.value]))
+  return `${part.year}-${part.month}-${part.day}`
+}
+
+/** The day of a platform date (its zone-less UTC string, or one with a zone) on a person's calendar; '' when unreadable. */
+export function unlockDay(s: string | null | undefined, timeZone?: string): string {
+  const t = parseUnlockTime(s)
+  return Number.isNaN(t) ? '' : dayIn(t, timeZone)
+}
+
+/** Whether `zone` is an IANA time zone name ("Europe/Madrid", "UTC") this runtime knows: what a client may send. */
+export function isTimeZone(zone: unknown): zone is string {
+  if (typeof zone !== 'string' || zone.length > 64 || !/^[A-Za-z][A-Za-z0-9_+-]*(\/[A-Za-z0-9_+-]+)*$/.test(zone)) return false
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: zone })
+    return true
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -127,10 +165,14 @@ export function daysBetween(start: string, end: string): string[] {
   return out
 }
 
-/** The seven day keys ("YYYY-MM-DD") of the week that starts on `monday`, in UTC: the weeks the best-week card counts. */
-export function utcWeekDays(monday: string): string[] {
-  const [y, m, d] = monday.split('-').map(Number)
-  return Array.from({ length: 7 }, (_, i) => utcDay(Date.UTC(y, m - 1, d + i)))
+/** The seven day keys ("YYYY-MM-DD") of the week that starts on `monday`: the weeks the best-week card counts. */
+export function weekDays(monday: string): string[] {
+  return Array.from({ length: 7 }, (_, i) => addDays(monday, i))
+}
+
+/** The Monday ("YYYY-MM-DD") of the week a day key falls in. */
+export function mondayOf(day: string): string {
+  return addDays(day, -((new Date(`${day}T00:00:00`).getDay() + 6) % 7))
 }
 
 /** `text` with only its first letter in capitals ("noviembre de 2026" → "Noviembre de 2026"): a name that starts a line, never the CSS `capitalize` that does it to every word. */

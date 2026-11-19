@@ -10,7 +10,7 @@ import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { useSubject } from '@/context/SubjectContext'
-import { utcDay } from '@/utils/dates'
+import { localDay, unlockDay } from '@/utils/dates'
 import Kicker from '@/components/ui/Kicker'
 
 export default function MainPageTopGames({ achievements, isLoading }: { achievements: RecentAchievement[]; isLoading?: boolean }) {
@@ -19,10 +19,10 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
   const data = useMemo(() => {
     const cutoff = new Date()
     cutoff.setDate(cutoff.getDate() - 30)
-    const cutoffStr = utcDay(cutoff)
+    const cutoffStr = localDay(cutoff)
 
     const byGame = achievements
-      .filter((a) => a.Date.split(' ')[0] >= cutoffStr)
+      .filter((a) => unlockDay(a.Date) >= cutoffStr)
       .reduce((acc, a) => {
         // RA game ids and Steam appids share a number space: key by both.
         const key = `${a.Source ?? 'ra'}:${a.GameID}`

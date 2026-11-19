@@ -9,3 +9,6 @@ export const SLANT_PLATE =
 
 /** The signature glyph (`--mark`: "/" slanted, "•" round), drawn by `::before`. Put it on an `aria-hidden` span. */
 export const MARK = 'before:content-(--mark)'
+
+/** The mark between bare figures (`--figure-mark`): "/" in the slanted design, nothing in the round one (#164). */
+export const FIGURE_MARK = 'before:content-(--figure-mark)'

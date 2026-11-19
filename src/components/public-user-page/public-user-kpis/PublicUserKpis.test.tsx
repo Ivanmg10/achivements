@@ -34,7 +34,7 @@ test('their pace and streaks, every platform together, as one row of bare figure
   expect(screen.getByText(en.userProfile.last30Days)).toBeInTheDocument()
   // No boxes: the figures sit side by side with the mark between them.
   expect(screen.getByText(en.userProfile.today).parentElement!.className).not.toContain('bg-bg-main')
-  expect(screen.getByText(en.userProfile.week).parentElement!.querySelector('[aria-hidden="true"]')).toHaveClass('before:content-(--mark)')
+  expect(screen.getByText(en.userProfile.week).parentElement!.querySelector('[aria-hidden="true"]')).toHaveClass('before:content-(--figure-mark)')
 })
 
 test('a streak is coloured by its tier; a zero is quiet', () => {

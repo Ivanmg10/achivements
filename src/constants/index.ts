@@ -16,3 +16,7 @@ export const CONSOLES = [
   { name: 'SNES/Super Famicom',  id: 3,  icon: '/media/SNES.png',     color: 'bg-console-snes/40 text-console-snes-ink'   },
   { name: 'Dreamcast',           id: 40, icon: '/media/dc.png',       color: 'bg-console-dreamcast/40 text-console-dreamcast-ink'   },
 ]
+
+// The other platforms' consoles, by the name their games carry ("PS4", "Steam"), in the same pixel style as the
+// RA icons above. Until a console has one, its tile shows the platform's logo (#164).
+export const PLATFORM_CONSOLE_ICONS: Record<string, string> = {}

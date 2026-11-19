@@ -33,6 +33,85 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-19 — Home review: the seven points, the local day and the badge window (`fix/164-home-review`, #164)
+
+**Did**
+- 2: the trophy cabinet is five columns again (`grid-cols-[repeat(5,minmax(8.5rem,1fr))]`, a fifth each even with fewer games),
+  skeleton too; #156's no-medals, `Facts`, "how it was finished" and date kept.
+- 3: `main-page-friends-cards/MainPageFriendsCards`: three cards, the next ones peeking under a mask (`inert`, `aria-hidden`),
+  "See more" (`T.friends.seeMore`, nine languages) to `/following`; the count through `Facts`. On two columns (sm to xl) a fourth
+  card is shown so the row has no hole. Skeleton folded the same way.
+- 4: "Games in common" gone: `MainPageFriendsShared`, `sharedWithFriends` and its types, `T.friends.shared` / `sharedEmpty`.
+- 5: "Your consoles" shows whatever the profile tab: `consoleTiles` (`utils/library.ts`) adds PlayStation by console ("PS4 · PS5"
+  counts on both, unticked consoles out, done = 100 % of the whole set) and Steam as one tile (started games); Xbox out. One skeleton
+  until RA, PSN and Steam libraries are in. PSN/Steam tiles link to `/allGames?platform=psn|steam` (new: `allGames/page.tsx` reads
+  `platform` on the server, `LibraryPage` takes `initialPlatform`). Icons: `PLATFORM_CONSOLE_ICONS` in `src/constants` (empty; the
+  platform logo stands in).
+- 6: from lg, `.home-fit-scroll:has([aria-expanded="true"]) { contain: size }`: the list with an open card stops counting toward
+  the top row (the grid sized the row by the card's content whatever the stats section, which is why the first fix, only
+  exempting the open row from the Overview's "never shrink" rule, did nothing with Explore open). The profile column sets the
+  height and the panel scrolls. Seen signed in: Overview and Explore at 2560×1440, 1280×800, the public profile; pinned fits.
+  The wide gaps between badge rows were not the wrap: `ToggleButton` got a fixed `relative` in #162 (for its touch area), which
+  beat the pin star's `absolute` on a badge's corner, so the star sat under the badge and each badge was 60 px tall. Only
+  PSN, Steam and Xbox grids pass `pins` (RA pins from its detail modal), so only they showed it, and only on your own pages.
+  `ToggleButton` now positions itself only when the caller does not. `BadgeGrid` also wraps with `content-start`.
+- Badges open a window on every platform (the owner's pick, 2026-11-19): `BadgeGrid` takes `detail` and keeps the open one; RA
+  opens `AchievementModal`, Steam/PSN/Xbox `BadgeGridDetail` (the table's `AchievementTableDetail`). The corner star and the
+  badge links to the game page are gone (`href`, `pins` and `BadgePins` removed); the tags each platform adds live in
+  `hooks/useDetailOptions.tsx`, read by the table and the grid.
+- 7: `--figure-mark` (`"/"` slanted, `none` round) and `FIGURE_MARK` for the mark between bare figures; `Tabs` and `Facts` keep `--mark`.
+  CLAUDE.md, `docs/design-system.md` and the `/design` catalogue say so.
+- Your own days on your own calendar (the owner's report, 2026-11-19: an unlock at 00:50 in Madrid showed "19 nov" but the
+  streak, the heatmap, today / this week / 30 days, the daily chart and the day dialog put it on the 18th, every platform). The
+  day keys were the UTC date part of the platforms' strings (`a.Date.split(' ')[0]`, `utcDay`). New in `utils/dates.ts`:
+  `dayIn(t, timeZone?)` (the browser's zone without one), `unlockDay(s, timeZone?)`, `isTimeZone`, `weekDays` / `mondayOf`
+  (replace `utcWeekDays`). Routed through them: `streaks.ts` (`calcAllStreaks` / `activeStreak` / `streakSummary` take a zone),
+  `periodDays.dayOf`, `utils.tsx` (`groupByDays`, `countByDay`, `groupByDaySource`, `activityKpis`, `getBestMonth`,
+  `calcThisMonth`), `friends.friendStats`, `MainPageHeatmap`, `MainPageBestPeriod` (weeks Monday to Sunday locally),
+  `MainPageTopGames`, `MainPagePeriodStats`, `DayAchievementsModal`, `StreakList`. The header: `useStreakSummary` sends
+  `&tz=<browser IANA zone>`, `/api/me/streak` keeps it only when `isTimeZone` (else UTC) and `loadStreak(…, timeZone, now)` counts on it.
+
+- 1 (the Overview's charts, done 2026-11-19): new `fit:` variant (`globals.css`, = the `.home-fit` query, `FIT_SCREEN` in
+  `lib/homeFit.ts`). On those screens: the stats section `fit:pt-0 fit:gap-3` (the gap above "Stats & activity" from 72 to 52 px),
+  the profile column tighter (`fit:gap-2` under the tabs, `fit:gap-2.5` between cards, `fit:p-4` on the profile card, recents and
+  contributions, `fit:py-1` on a recent row), so the tallest profile (PSN/RA) went from 777 to 737 px and the floor with tabs
+  from `48.25rem` to `46.125rem`. Daily chart `clamp(160px, 22dvh, 320px) - trim` (was `20dvh, 260px`), `MAX_TRIM` 160 (was
+  100). Heatmap: `useHeatmapGrid` takes `maxCell`; `MainPageHeatmap` asks for `FIT_MAX_CELL` (40) on `fit` screens, 30 elsewhere.
+  Skeleton: same classes, and its row of figures is `lg:min-h-[83px]` (it was 72 vs the loaded 83, an 11 px jump at load at
+  every desktop size, measured). Numbers (classic, Playwright, every profile tab the same): 2560×1440 chart 260→317, heatmap
+  card 366→422, cells 30→40 (306→236 days), rows 118→112, ends at 1440. 2560×1280 (the owner's real viewport, 1392 screenshot
+  minus the browser bar) chart 164→218, cells 22→29 (365→320 days), top 777→738, ends at 1280. 1920×1080 cannot fit (top 738 +
+  stats 420 > 1016): it scrolls 142 px (was 200), chart at its 160 floor as before. 1920×990, 1280×800, 800×450, 760×360, 390:
+  identical numbers. Cover at fit sizes: gap tighter, chart 260 (no trim, as before), cells 30→36 (306→264 days at 2560).
+  Skeleton = loaded at 1440, 1280, 1080 (±1 px).
+
+**Why** — the owner's review of the home on pre (2026-11-13), issue #164; the days, the owner's report of 2026-11-19.
+
+**Decisions** — PSN tiles open the library on PlayStation, not on one console: the library has no PSN console filter (the owner
+chose the `?platform=` link, 2026-11-19). The owner has no PS3/PS4/PS5/Vita/Steam pixel icons and none of the free packs looked
+at (itch.io: Caz's consoles, BenJelter, thatdoc) has them in this style; drawing them is open.
+Days: one rule, "your own days are your local calendar; rankings use UTC days so everyone is measured on the same clock". Vault
+Points (`score_periods`, `vaultMe`'s weeks and seven days, `vaultLevel`) and the rankings' streaks (`streaksOf`) stay UTC, no
+`RULES_VERSION` bump; the landing's samples stay UTC (static page, its server and browser must agree). The 60-day `activitySince`
+cut in `MainPageCharts` is a window, not a day key, and was left.
+
+Point 1: a taller heatmap at a fixed width shows fewer days (the height sets the cell); 30 px cells left a blank band in a
+taller card (the owner's rule: no blank inside a card), so the cap rises on `fit` screens only. The profile's 2×2 figures were
+left as they are (four across would win ~80 px more at 2560, but it changes the card's shape: canvas first).
+
+**Open** — Point 1, for the owner to judge on the real screen: the tighter profile column and gap, the heatmap's fewer, bigger
+days at 1440, and whether 2560×1280 is tall enough. At 1440 the profile column still has ~60 px spare at the bottom (the chart
+cap holds the heatmap filled). 1920×1080 stays a little taller than the screen: the profile alone is 738 px. The console icons.
+
+**Watch out** — 3 and 5 not yet seen at 390 and in Firefox; 6 not yet in Firefox. Playwright (Chromium) can be signed in by the
+owner on `localhost:3000/authPage`; block every non-GET `/api` call while looking, never change the account.
+Days: a new feed or count of your own unlocks keys its days with `dayOf` / `unlockDay`, never `a.Date.slice(0, 10)` or `utcDay`.
+Your streak on the rankings can differ by a day from the header's near midnight (UTC there). `process.env.TZ = …` inside a jest
+test does not switch the zone (the sandbox's `process.env` is a copy, and `TZ=` on Windows is ignored): zone tests pass an
+explicit zone, or build the platform string from a local `new Date(y, m, d, h, min)`.
+
+---
+
 ## 2026-11-19 — PSN phase 5: the sync on screen, numbers, alerts, switches, load test and runbook (`feat/180-psn-sync-ux`, #180, epic #174)
 
 **Did**
