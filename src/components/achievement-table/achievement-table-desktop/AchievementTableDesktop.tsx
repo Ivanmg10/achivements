@@ -4,6 +4,7 @@ import type { AchievementColumn, AchievementView } from '@/types/achievementTabl
 import type { TableEntry, TableSort } from '@/utils/achievementTable'
 import { TABLE, TH } from '@/components/ui/dataTable'
 import { SortableHeader } from '../sortable-header/SortableHeader'
+import { foldItem } from '@/components/ui/FoldList'
 import AchievementTableRow from '../achievement-table-row/AchievementTableRow'
 
 const ALIGN = { center: 'text-center', right: 'text-right' }
@@ -19,6 +20,7 @@ export default function AchievementTableDesktop<T>({
   pinColumn,
   tags,
   unoptimized,
+  cap,
 }: {
   /** The panel the PSN group tabs control. */
   id: string
@@ -30,6 +32,8 @@ export default function AchievementTableDesktop<T>({
   pinColumn: boolean
   tags?: (e: TableEntry<T>) => ReactNode
   unoptimized: boolean
+  /** The rows shown folded: those after it come in when the table unfolds. */
+  cap: number
 }) {
   const { T } = useLanguage()
   return (
@@ -62,8 +66,8 @@ export default function AchievementTableDesktop<T>({
           </tr>
         </thead>
         <tbody className="enter-rows">
-          {views.map((v) => (
-            <AchievementTableRow key={v.entry.row.id} view={v} columns={columns} tags={tags} unoptimized={unoptimized} />
+          {views.map((v, i) => (
+            <AchievementTableRow key={v.entry.row.id} view={v} columns={columns} tags={tags} unoptimized={unoptimized} fold={foldItem(i, cap)} />
           ))}
         </tbody>
       </table>

@@ -1067,6 +1067,17 @@ html[data-font="fira"],
 :is(.enter-rows, .enter-cards) > :nth-child(10) { --i: 9; }
 :is(.enter-rows, .enter-cards) > :nth-child(11) { --i: 10; }
 :is(.enter-rows, .enter-cards) > :nth-child(12) { --i: 11; }
+/*
+   ui/FoldList: the rows a "show the other N" brings in rise like a list's, only while it unfolds (a later sort or filter
+   does not replay them); folded, the last row fades out towards the button (its height: --fold-fade).
+*/
+[data-unfolding] [data-fold-new] {
+  animation: enter-rise var(--enter-duration) var(--enter-ease) calc(var(--i, 0) * var(--enter-stagger)) backwards;
+}
+.fold-fade {
+  mask-image: linear-gradient(to bottom, black calc(100% - var(--fold-fade, 4.5rem)), transparent);
+}
+
 /* A hero's title comes first, with whatever sits above it; its facts follow. */
 .enter-rows > :is(h1, :has(h1)):nth-child(n) { --i: 0; }
 

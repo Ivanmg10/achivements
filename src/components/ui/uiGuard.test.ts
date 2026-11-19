@@ -176,6 +176,16 @@ test('a disclosure and a show-more button come from the library (Accordion, Show
   expect(offenders(/aria-expanded=\{[^}]*\}[\s\S]{0,400}IconPlus/)).toEqual([])
 })
 
+test('a capped list folds through FoldList (its fade, its growing rows); a bare ShowMore only loads more pages', () => {
+  const pages = [
+    path.join('components', 'achievement-modal', 'achievement-modal-comments', 'AchievementModalComments.tsx'),
+    path.join('components', 'admin-panel', 'admin-users-tab', 'AdminUsersTab.tsx'),
+    path.join('components', 'design-catalog', 'design-catalog-disclosure', 'DesignCatalogDisclosure.tsx'),
+  ]
+  expect(offenders(/from '@\/components\/ui\/ShowMore'/).filter((f) => !pages.includes(f))).toEqual([])
+  expect(offenders(/fold-fade|data-fold-new/)).toEqual([])
+})
+
 // The rules added with #120 (docs/audits/antislop-v17.md, X2 and T-05/T-06). Each pattern is also what the
 // next migration greps for.
 const NEW_RULES = {

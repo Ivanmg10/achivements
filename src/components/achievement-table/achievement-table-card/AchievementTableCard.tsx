@@ -5,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { AchievementColumn, AchievementView, TableTexts } from '@/types/achievementTable'
 import { earnedRing, type TableEntry } from '@/utils/achievementTable'
 import { formatRarity, formatUnlock } from '@/utils/steamFeed'
+import type { FoldItemProps } from '@/components/ui/FoldList'
 import PinAchievementButton from '@/components/pin-achievement-button/PinAchievementButton'
 import RevealSecretButton from '@/components/reveal-secret-button/RevealSecretButton'
 
@@ -20,6 +21,7 @@ export default function AchievementTableCard<T>({
   note,
   texts,
   unoptimized,
+  fold,
 }: {
   view: AchievementView<T>
   columns: AchievementColumn<T>[]
@@ -27,6 +29,8 @@ export default function AchievementTableCard<T>({
   note?: (e: TableEntry<T>) => ReactNode
   texts: Pick<TableTexts, 'earned' | 'locked'>
   unoptimized: boolean
+  /** Past the fold: its entrance when the list unfolds (`foldItem`). */
+  fold?: FoldItemProps
 }) {
   const { T, lang } = useLanguage()
   const { entry: e, eye } = view
@@ -34,6 +38,7 @@ export default function AchievementTableCard<T>({
 
   return (
     <li
+      {...fold}
       data-anchor={row.anchor}
       className={`relative flex items-start gap-3 rounded-tile p-3 transition-colors duration-500 ${
         view.highlighted ? 'bg-accent/15' : view.pinned ? 'bg-warning/10' : 'bg-bg-main/40'

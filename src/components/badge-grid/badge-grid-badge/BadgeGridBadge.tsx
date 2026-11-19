@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import Image from 'next/image'
 import ConcealedBadge from '@/components/concealed-badge/ConcealedBadge'
 import RevealSecretButton from '@/components/reveal-secret-button/RevealSecretButton'
+import type { FoldItemProps } from '@/components/ui/FoldList'
 
 export const BADGE_SIZES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -29,6 +30,7 @@ export default function BadgeGridBadge({
   eye,
   onShow,
   onHide,
+  fold,
 }: {
   /** Opens the achievement's window; none on a sample (the landing's). */
   onSelect?: () => void
@@ -44,6 +46,8 @@ export default function BadgeGridBadge({
   eye?: { revealed: boolean; onToggle: () => void; labels: { reveal: string; conceal: string } }
   onShow: (x: number, y: number, delay?: number) => void
   onHide: () => void
+  /** Past the cap: its entrance when the grid unfolds (`foldItem`). */
+  fold?: FoldItemProps
 }) {
   const dims = BADGE_SIZES[size]
   const props = {
@@ -77,7 +81,7 @@ export default function BadgeGridBadge({
   )
 
   return (
-    <li className="relative group/badge">
+    <li {...fold} className="relative group/badge">
       <button
         type="button"
         {...props}

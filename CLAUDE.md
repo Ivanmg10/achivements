@@ -292,7 +292,7 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
   `Modal` (every dialog is one: its own head (`title`, `hint`, `icon`), the corner close, `footer` for the actions (the Cancel is `quiet`, never ringed: beside a disabled primary it would stand out), `tone="danger"` for a
   destructive one; no hand-drawn head or ✕, no Escape listener of its own, no `createPortal`, no `CommonModal` (deleted, #121); a `Modal` draws the frame,
   never a card inside it; `placement="top"` for a command panel or a menu), `Notice`, `ErrorRetry` (a failed read with its retry), `Spinner` (or `Button loading`),
-  `TOOLTIP_SURFACE`, `MENU_SURFACE`, `SURFACE`, `Accordion`, `ShowMore`, `Shelf`, `SectionHead`, `DropSlot`,
+  `TOOLTIP_SURFACE`, `MENU_SURFACE`, `SURFACE`, `Accordion`, `ShowMore` (a capped list: `FoldList`), `Shelf`, `SectionHead`, `DropSlot`,
   `ToggleButton`, `Kicker` (the small label, sentence case), `Tag`, `Avatar` (with the presence dot), `ListRow`, `Figure`
   (every labelled number; rows that wrap are `FIGURES_BY_THREE` / `_TO_LG`, no mark at a row's start), `DataBar` (a chart bar),
   `Facts` (facts on one line) and `useScrollFade` (a strip that scrolls sideways, or a box down with `axis: 'y'`, fades where it is cut; `Tabs` has it). `className` on them is for layout only,

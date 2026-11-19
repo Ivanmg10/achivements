@@ -1,6 +1,6 @@
 jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { en } from '@/translations/en'
 import { useAchievementPins, RA_PINS, STEAM_PINS, PSN_PINS, XBOX_PINS } from '@/hooks/useAchievementPins'
 import { mockPins } from '@/test-utils/pins'
@@ -202,13 +202,13 @@ describe.each(PLATFORMS)('$name', (p) => {
     expect(screen.getByText(en.gameInfoTable.noMatches)).toBeInTheDocument()
   })
 
-  test('a long list shows its first rows, the rest on asking, and folds again', () => {
+  test('a long list shows its first rows, the rest on asking, and folds again (after it shrinks)', async () => {
     p.render(TEN)
     expect(names()).toHaveLength(8)
     fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showRest.replace('{n}', '2') }))
     expect(names()).toHaveLength(10)
     fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showLess }))
-    expect(names()).toHaveLength(8)
+    await waitFor(() => expect(names()).toHaveLength(8))
   })
 
   test('a short list has no "show the rest"', () => {

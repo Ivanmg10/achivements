@@ -238,8 +238,12 @@ flag is read from the database, never the session).
   that design drew, so it does not move. Outside `ui/`, `uiGuard.test.ts` refuses `rounded-lg`, `-md`, `-sm`, `-xl`, `-2xl`,
   `-3xl` and arbitrary values, on any side, but for its short list of exceptions; a bare `rounded` is only a focus ring's corner.
   A `rounded-full` chip is a pill in both designs: left so on purpose, since moving it would change the slanted design.
-- **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `Shelf`, `DropSlot` and `ToggleButton`
-  are in `ui/`; an `Accordion` in `tone="danger"` folds a warning away (a game's missables, #167), and takes `open` /
+- **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `FoldList`, `Shelf`, `DropSlot` and `ToggleButton`
+  are in `ui/`; **a capped list is a `FoldList`** (#167): `ShowMore` and the list as one piece, the last row fading towards the
+  button while folded (`.fold-fade`), the box growing and the new rows rising (`foldItem(i, cap)` on each row, `.enter-rise`
+  staggered) on unfolding, shrinking back and handing the button its focus on folding; CSS motion only, none with reduced
+  motion; the caller renders only the first rows while folded, so the rest are out of the tab order. The game tables and
+  `BadgeGrid` use it; a bare `ShowMore` is only for loading more pages (RA comments, the admin's users), and the guard says so; an `Accordion` in `tone="danger"` folds a warning away (a game's missables, #167), and takes `open` /
   `onOpenChange` / `id` when a link elsewhere opens it; a `DropSlot` is a dashed border and nothing else (no stripes, #130); the big faint icon behind a hero card's title is
   `GhostIcon` (one size and opacity, whole inside its card at the title's line; never an oversized icon cut by the edge); a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **The signature:** `BrandMark` (the logo in the accent from `themeIcon`'s own shapes, `LOGO_PATHS`, and the name in the display italic) is the one way the

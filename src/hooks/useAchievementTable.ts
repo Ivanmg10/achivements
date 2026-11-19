@@ -90,6 +90,8 @@ export function useAchievementTable<T>({ items, entries, searchText, leads, isMi
     filtered,
     shown: folded ? filtered.slice(0, FIRST_ROWS) : filtered,
     folded,
+    /** The rows shown while folded. */
+    cap: FIRST_ROWS,
     /** "Show the other N" while folded, "show fewer" once unfolded; neither for a search or a short list. */
     rest: !q && filtered.length > FIRST_ROWS ? filtered.length - FIRST_ROWS : 0,
     toggleFold: () => setShowAll((v) => !v),

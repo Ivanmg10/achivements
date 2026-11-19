@@ -11,11 +11,11 @@ import type { CompareAchievement } from '@/utils/gameCompare'
 import type { TableEntry } from '@/utils/achievementTable'
 import { tableColumns } from './tableColumns'
 import AchievementTableToolbar from '@/components/achievement-table-toolbar/AchievementTableToolbar'
-import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
 import MissablePanel from '@/components/missable-panel/MissablePanel'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { SURFACE } from '@/components/ui/surface'
 import { buttonClass } from '@/components/ui/Button'
+import FoldList, { foldItem } from '@/components/ui/FoldList'
 import AchievementTableDesktop from './achievement-table-desktop/AchievementTableDesktop'
 import AchievementTableCard from './achievement-table-card/AchievementTableCard'
 import AchievementTableDetail from './achievement-table-detail/AchievementTableDetail'
@@ -145,7 +145,13 @@ export default function AchievementTable<T>(props: AchievementTableProps<T>) {
         {table.filtered.length === 0 ? (
           <p className="text-sm text-text-secondary self-center py-6">{table.searching ? T.gameInfoTable.noMatches : texts.none}</p>
         ) : (
-          <>
+          <FoldList
+            folded={table.folded}
+            onToggle={table.toggleFold}
+            hasMore={table.rest > 0}
+            more={T.gameInfoTable.showRest.replace('{n}', String(table.rest))}
+            less={T.gameInfoTable.showLess}
+          >
             <AchievementTableDesktop
               id={panelId}
               views={views}
@@ -156,14 +162,14 @@ export default function AchievementTable<T>(props: AchievementTableProps<T>) {
               pinColumn={pins.canPin}
               tags={tags}
               unoptimized={source !== 'ra'}
+              cap={table.cap}
             />
             <ul className="sm:hidden w-full flex flex-col gap-2 enter-rows">
-              {views.map((v) => (
-                <AchievementTableCard key={v.entry.row.id} view={v} columns={columns} tags={tags} note={cardNote} texts={texts} unoptimized={source !== 'ra'} />
+              {views.map((v, i) => (
+                <AchievementTableCard key={v.entry.row.id} view={v} columns={columns} tags={tags} note={cardNote} texts={texts} unoptimized={source !== 'ra'} fold={foldItem(i, table.cap)} />
               ))}
             </ul>
-            {table.rest > 0 && <ShowRestButton folded={table.folded} rest={table.rest} onToggle={table.toggleFold} />}
-          </>
+          </FoldList>
         )}
 
         <AnimatePresence>

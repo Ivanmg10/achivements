@@ -1,3 +1,4 @@
+import type { Ref } from 'react'
 import { IconChevronDown } from '@tabler/icons-react'
 import { buttonClass } from './Button'
 
@@ -13,6 +14,7 @@ export default function ShowMore({
   less,
   size = 'md',
   className = '',
+  ref,
 }: {
   expanded: boolean
   onToggle: () => void
@@ -23,9 +25,11 @@ export default function ShowMore({
   size?: 'sm' | 'md'
   /** Layout only. */
   className?: string
+  /** The button, for a list that gives it focus back on folding (`FoldList`). */
+  ref?: Ref<HTMLButtonElement>
 }) {
   return (
-    <button type="button" onClick={onToggle} aria-expanded={expanded} className={buttonClass('secondary', size, className)}>
+    <button ref={ref} type="button" onClick={onToggle} aria-expanded={expanded} className={buttonClass('secondary', size, className)}>
       {expanded ? less : more}
       <IconChevronDown aria-hidden="true" className={`w-4 h-4 transition-transform duration-(--motion-open) ${expanded ? 'rotate-180' : ''}`} />
     </button>

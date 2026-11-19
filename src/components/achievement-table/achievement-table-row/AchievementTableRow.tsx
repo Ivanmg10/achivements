@@ -3,6 +3,7 @@ import type { AchievementColumn, AchievementView } from '@/types/achievementTabl
 import { earnedRing, type TableEntry } from '@/utils/achievementTable'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { badgeClass, badgeImgClass, MID, NUM, ROW, TD, TD_FIRST } from '@/components/ui/dataTable'
+import type { FoldItemProps } from '@/components/ui/FoldList'
 import PinAchievementButton from '@/components/pin-achievement-button/PinAchievementButton'
 import RevealSecretButton from '@/components/reveal-secret-button/RevealSecretButton'
 
@@ -18,11 +19,14 @@ export default function AchievementTableRow<T>({
   columns,
   tags,
   unoptimized,
+  fold,
 }: {
   view: AchievementView<T>
   columns: AchievementColumn<T>[]
   tags?: (e: TableEntry<T>) => ReactNode
   unoptimized: boolean
+  /** Past the fold: its entrance when the list unfolds (`foldItem`). */
+  fold?: FoldItemProps
 }) {
   const { entry: e, eye } = view
   const pin = view.pinned !== undefined && (
@@ -31,6 +35,7 @@ export default function AchievementTableRow<T>({
 
   return (
     <tr
+      {...fold}
       id={e.row.anchor}
       data-anchor={e.row.anchor}
       className={`${ROW} group/row scroll-mt-24 ${view.highlighted ? '[&>td]:bg-accent/15' : view.pinned ? '[&>td]:bg-accent/[0.05]' : ''}`}

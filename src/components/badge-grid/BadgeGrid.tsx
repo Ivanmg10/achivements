@@ -2,11 +2,12 @@
 
 import { Fragment, useState, type ReactNode } from 'react'
 import { AnimatePresence } from 'framer-motion'
+import { useLanguage } from '@/context/LanguageContext'
 import { capList } from '@/utils/utils'
 import { useBadgeTooltip } from '@/hooks/useBadgeTooltip'
-import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import CursorTooltip from '@/components/ui/CursorTooltip'
 import { Skeleton } from '@/components/ui/Skeleton'
+import FoldList, { foldItem } from '@/components/ui/FoldList'
 import BadgeGridBadge, { BADGE_SIZES } from './badge-grid-badge/BadgeGridBadge'
 import type { BadgeReveal, BadgeSection, BadgeShown, BadgeTip } from '@/types/badgeGrid'
 
@@ -67,11 +68,13 @@ export default function BadgeGrid<T>({
   sections,
   loading = false,
 }: BadgeGridProps<T>) {
+  const { T } = useLanguage()
   const { tip: shownTip, show, hide } = useBadgeTooltip<T>()
   const [showAll, setShowAll] = useState(false)
   const [selected, setSelected] = useState<T | null>(null)
   const { visible: shown, capped } = capList(items, limit ?? Infinity, showAll)
   const dims = BADGE_SIZES[badgeSize]
+  const place = new Map(shown.map((a, i) => [keyOf(a), i]))
 
   const isConcealed = (a: T) => !!secret?.(a) && !reveal?.isRevealed(a)
   const iconOf = (a: T, concealed: boolean) => (concealed && !keepSecretIcon ? null : icon(a))
@@ -99,6 +102,7 @@ export default function BadgeGrid<T>({
             eye={reveal && secret?.(a) ? { revealed: reveal.isRevealed(a), onToggle: () => reveal.toggle(a), labels: reveal.labels } : undefined}
             onShow={(x, y, delay) => show(a, x, y, delay)}
             onHide={hide}
+            fold={limit === undefined ? undefined : foldItem(place.get(keyOf(a)) ?? 0, limit)}
           />
         )
       })}
@@ -117,10 +121,19 @@ export default function BadgeGrid<T>({
           ))}
         </div>
       )}
-      {parts.map((part) => (
-        <Fragment key={part.id}>{sections && parts.length > 1 ? sections.wrap(part.id, list(part)) : list(part)}</Fragment>
-      ))}
-      {!loading && capped && <ShowAllButton total={items.length} expanded={showAll} onToggle={() => setShowAll((v) => !v)} />}
+      <FoldList
+        folded={!showAll}
+        onToggle={() => setShowAll((v) => !v)}
+        hasMore={!loading && capped}
+        more={T.statusGameItem.showAllAchievements.replace('{n}', String(items.length))}
+        less={T.statusGameItem.showFewerAchievements}
+        size="sm"
+        buttonClassName="self-start mt-2"
+      >
+        {parts.map((part) => (
+          <Fragment key={part.id}>{sections && parts.length > 1 ? sections.wrap(part.id, list(part)) : list(part)}</Fragment>
+        ))}
+      </FoldList>
 
       {shownTip && details && (
         <CursorTooltip x={shownTip.x} y={shownTip.y}>
