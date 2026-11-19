@@ -33,6 +33,39 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-19 — Home review, points 2–7 (`fix/164-home-review`, #164)
+
+**Did**
+- 2: the trophy cabinet is five columns again (`grid-cols-[repeat(5,minmax(8.5rem,1fr))]`, a fifth each even with fewer games),
+  skeleton too; #156's no-medals, `Facts`, "how it was finished" and date kept.
+- 3: `main-page-friends-cards/MainPageFriendsCards`: three cards, the next ones peeking under a mask (`inert`, `aria-hidden`),
+  "See more" (`T.friends.seeMore`, nine languages) to `/following`; the count through `Facts`. On two columns (sm to xl) a fourth
+  card is shown so the row has no hole. Skeleton folded the same way.
+- 4: "Games in common" gone: `MainPageFriendsShared`, `sharedWithFriends` and its types, `T.friends.shared` / `sharedEmpty`.
+- 5: "Your consoles" shows whatever the profile tab: `consoleTiles` (`utils/library.ts`) adds PlayStation by console ("PS4 · PS5"
+  counts on both, unticked consoles out, done = 100 % of the whole set) and Steam as one tile (started games); Xbox out. One skeleton
+  until RA, PSN and Steam libraries are in. PSN/Steam tiles link to `/allGames?platform=psn|steam` (new: `allGames/page.tsx` reads
+  `platform` on the server, `LibraryPage` takes `initialPlatform`). Icons: `PLATFORM_CONSOLE_ICONS` in `src/constants` (empty; the
+  platform logo stands in).
+- 6: `.home-fit-scroll > :not(:has([aria-expanded="true"]))` (home and `.profile-recent`): the open card is exempt from
+  "never shrink", so it takes the column and its panel scrolls; `BadgeGrid` wraps with `content-start` (rows no longer spread).
+- 7: `--figure-mark` (`"/"` slanted, `none` round) and `FIGURE_MARK` for the mark between bare figures; `Tabs` and `Facts` keep `--mark`.
+  CLAUDE.md, `docs/design-system.md` and the `/design` catalogue say so.
+
+**Why** — the owner's review of the home on pre (2026-11-13), issue #164.
+
+**Decisions** — PSN tiles open the library on PlayStation, not on one console: the library has no PSN console filter (the owner
+chose the `?platform=` link, 2026-11-19). The owner has no PS3/PS4/PS5/Vita/Steam pixel icons and none of the free packs looked
+at (itch.io: Caz's consoles, BenJelter, thatdoc) has them in this style; drawing them is open.
+
+**Open** — Point 1 (the Overview's chart heights) not done: it needs the signed-in home on screen to tune the `48.25rem` floor,
+the trim and the spacing, and local sign-in failed for the owner (local dev reads the pre database). The console icons.
+
+**Watch out** — Not seen in a browser (no signed-in session here): check 3, 5 and 6 on pre at 2560, 1920, 1280×800 and 390,
+and Firefox for the mask and the open card.
+
+---
+
 ## 2026-11-19 — PSN phase 5: the sync on screen, numbers, alerts, switches, load test and runbook (`feat/180-psn-sync-ux`, #180, epic #174)
 
 **Did**
