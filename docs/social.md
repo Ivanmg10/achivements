@@ -27,7 +27,7 @@ signed-in request fails).
   it says so) and, where there is a line for it, `PresenceLabel` in place of the bio
   (the bio is its fallback). Today: Following (cards, hero), user search and the home's
   friend cards (`UserSummary`), the public profile hero (not on your own), compare,
-  someone's game page banner, the friends leaderboard and shared games. A new place
+  someone's game page banner, the friends leaderboard. A new place
   that shows other users must do the same. Never for your own picture.
 - `/privacy` says signed-in users who come across you see it; change it if that grows.
 - **"Now playing" on Steam** (2026-10-22, the user's ask): `/api/follows/playing` asks Steam, one

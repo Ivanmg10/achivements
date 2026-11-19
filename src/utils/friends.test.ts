@@ -1,6 +1,6 @@
 import type { RecentAchievement } from '@/types/types'
 import type { LibraryGame } from '@/utils/library'
-import { friendStats, friendsFeed, rankBy, sharedWithFriends, type LeaderRow, filterFollowing, lastPlayedGame, recentAsBadge, presenceOf } from './friends'
+import { friendStats, friendsFeed, rankBy, type LeaderRow, filterFollowing, lastPlayedGame, recentAsBadge, presenceOf } from './friends'
 
 const NOW = Date.parse('2026-10-14T12:00:00Z')
 const at = (Date: string, Title = 'A') => ({ Date, Title }) as RecentAchievement
@@ -47,21 +47,6 @@ test('ranks on the chosen measure, ties by streak then name', () => {
   expect(rankBy([row('b', 5, 1), row('a', 5, 1), row('c', 5, 3), row('d', 9, 0)], 'week').map((r) => r.username)).toEqual(['d', 'c', 'a', 'b'])
 })
 
-test('shared games: yours that friends play too, the most shared first', () => {
-  const rows = sharedWithFriends(
-    [lib('ra:1', 50), lib('ra:2', 10), lib('steam:3', 0)],
-    [
-      { username: 'x', avatar: null, games: [lib('ra:1', 80), lib('ra:2', 20)] },
-      { username: 'y', avatar: 'a.png', games: [lib('ra:2', 100)] },
-    ],
-  )
-  expect(rows.map((r) => [r.game.key, r.friends.map((f) => `${f.username}:${f.pct}`)])).toEqual([
-    ['ra:2', ['x:20', 'y:100']],
-    ['ra:1', ['x:80']],
-  ])
-  expect(sharedWithFriends([lib('ra:1', 1)], [], 5)).toEqual([])
-})
-
 test('the feed is everyone together, newest first, capped', () => {
   const feed = friendsFeed(
     [
@@ -71,11 +56,6 @@ test('the feed is everyone together, newest first, capped', () => {
     2,
   )
   expect(feed.map((f) => `${f.username}:${f.achievement.Title}`)).toEqual(['x:new', 'y:mid'])
-})
-
-test('among games shared by as many, the ones still to finish come first', () => {
-  const rows = sharedWithFriends([lib('ra:1', 100), lib('ra:2', 30)], [{ username: 'x', avatar: null, games: [lib('ra:1', 100), lib('ra:2', 100)] }])
-  expect(rows.map((r) => r.game.key)).toEqual(['ra:2', 'ra:1'])
 })
 
 test('who you follow, filtered by name and by every platform chosen', () => {

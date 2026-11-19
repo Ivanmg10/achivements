@@ -6,6 +6,9 @@ import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 const LEADERS = 5
 const CARDS = 6
+/** As many as the folded cards show (MainPageFriendsCards). */
+const SHOWN = 3
+const CARD = { icon: 'w-12 h-12', radius: 'circle', figure: true, className: 'bg-bg-main rounded-tile p-3 gap-3 min-h-[15.75rem] items-start' } as const
 
 /** The leaderboard: its title and measures, then each row's place, picture, name with its bar, and figure. */
 function Leaderboard({ rows }: { rows: number }) {
@@ -36,7 +39,7 @@ function Leaderboard({ rows }: { rows: number }) {
   )
 }
 
-/** Stats & Activity's Friends until everyone is read, so the section lands whole: leaderboard and feed, their cards, the shared games. Announced once. */
+/** Stats & Activity's Friends until everyone is read, so the section lands whole: leaderboard and feed, then the cards, folded. Announced once. */
 export default function MainPageFriendsSkeleton({ leaders = LEADERS, cards = CARDS }: { leaders?: number; cards?: number }) {
   const { T } = useLanguage()
 
@@ -55,20 +58,23 @@ export default function MainPageFriendsSkeleton({ leaders = LEADERS, cards = CAR
         </div>
       </div>
       <div aria-hidden="true" className="bg-bg-card rounded-tile p-4 flex flex-col gap-3">
-        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-3 w-24" />
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-          {Array.from({ length: cards }, (_, i) => (
-            <SkeletonRow key={i} icon="w-12 h-12" radius="circle" figure className="bg-bg-main rounded-tile p-3 gap-3 min-h-[15.75rem] items-start" />
+          {Array.from({ length: Math.min(cards, SHOWN) }, (_, i) => (
+            <SkeletonRow key={i} {...CARD} />
           ))}
+          {cards > SHOWN && <SkeletonRow {...CARD} className={`hidden sm:flex xl:hidden ${CARD.className}`} />}
         </div>
-      </div>
-      <div aria-hidden="true" className="bg-bg-card rounded-tile p-4 flex flex-col gap-3">
-        <Skeleton className="h-3 w-28" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {[0, 1, 2, 3].map((i) => (
-            <SkeletonRow key={i} icon="w-11 h-11" className="p-2.5 rounded-tile bg-bg-main gap-3" />
-          ))}
-        </div>
+        {cards > SHOWN && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 h-20 -mb-2 overflow-hidden [mask-image:linear-gradient(to_bottom,black,transparent)]">
+              {[0, 1, 2].map((i) => (
+                <SkeletonRow key={i} {...CARD} />
+              ))}
+            </div>
+            <Skeleton radius="button" className="h-10 w-28 self-center" />
+          </>
+        )}
       </div>
     </div>
   )

@@ -100,33 +100,6 @@ export function rankBy(rows: LeaderRow[], key: StatKey): LeaderRow[] {
   return [...rows].sort((a, b) => b.stats[key] - a.stats[key] || b.stats.streak - a.stats.streak || a.username.localeCompare(b.username))
 }
 
-export type FriendGames = { username: string; avatar: string | null; online?: boolean; games: LibraryGame[] }
-export type SharedGameRow = { game: LibraryGame; friends: { username: string; avatar: string | null; online?: boolean; pct: number }[] }
-
-const unfinished = (row: SharedGameRow) => row.game.pct < 100 || row.friends.some((f) => f.pct < 100)
-
-/** Your games that people you follow also play, the most shared first. */
-export function sharedWithFriends(mine: LibraryGame[], friends: FriendGames[], limit = 12): SharedGameRow[] {
-  const byKey = new Map(friends.map((f) => [f.username, new Map(f.games.map((g) => [g.key, g.pct]))]))
-  return mine
-    .map((game) => ({
-      game,
-      friends: friends
-        .filter((f) => byKey.get(f.username)!.has(game.key))
-        .map((f) => ({ username: f.username, avatar: f.avatar, online: f.online, pct: byKey.get(f.username)!.get(game.key)! })),
-    }))
-    .filter((row) => row.friends.length > 0)
-    // Most shared first; then the ones somebody has still to finish, where there is a race to follow.
-    .sort(
-      (a, b) =>
-        b.friends.length - a.friends.length ||
-        Number(unfinished(b)) - Number(unfinished(a)) ||
-        b.game.pct - a.game.pct ||
-        a.game.title.localeCompare(b.game.title),
-    )
-    .slice(0, limit)
-}
-
 export type FeedItem = { username: string; avatar: string | null; achievement: RecentAchievement }
 
 /** The latest unlocks of the people you follow, all together, newest first. */
