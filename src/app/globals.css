@@ -881,6 +881,17 @@ html[data-font="fira"],
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > :not(:has([aria-expanded="true"])) { flex: 1 0 auto !important; }
 }
 
+/*
+   An open recently played card takes the column's height, never more (#164):
+   the list stops counting toward the row's height (contain: size), so the
+   profile beside it sets it, and the card's panel scrolls inside. Any section
+   below, the pinned view and a user's profile alike. From lg only: on one
+   column nothing beside it gives a height, and the card grows with the page.
+*/
+@media (min-width: 1024px) {
+  .home-fit-scroll:has([aria-expanded="true"]) { contain: size; min-height: 24rem; }
+}
+
 /* A skeleton draws every variant; <html> says which ones show, before the first frame (LOOK_SCRIPT, then ShapeSync). */
 [data-home-layout="cover"] .home-if-classic,
 :root:not([data-home-layout="cover"]) .home-if-cover,

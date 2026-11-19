@@ -47,8 +47,11 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   until RA, PSN and Steam libraries are in. PSN/Steam tiles link to `/allGames?platform=psn|steam` (new: `allGames/page.tsx` reads
   `platform` on the server, `LibraryPage` takes `initialPlatform`). Icons: `PLATFORM_CONSOLE_ICONS` in `src/constants` (empty; the
   platform logo stands in).
-- 6: `.home-fit-scroll > :not(:has([aria-expanded="true"]))` (home and `.profile-recent`): the open card is exempt from
-  "never shrink", so it takes the column and its panel scrolls; `BadgeGrid` wraps with `content-start` (rows no longer spread).
+- 6: from lg, `.home-fit-scroll:has([aria-expanded="true"]) { contain: size }`: the list with an open card stops counting toward
+  the top row (the grid sized the row by the card's content whatever the stats section, which is why the first fix, only
+  exempting the open row from the Overview's "never shrink" rule, did nothing with Explore open). The profile column sets the
+  height and the panel scrolls. Seen signed in: Overview and Explore at 2560×1440, 1280×800, the public profile; pinned fits.
+  `BadgeGrid` wraps with `content-start` (rows no longer spread).
 - 7: `--figure-mark` (`"/"` slanted, `none` round) and `FIGURE_MARK` for the mark between bare figures; `Tabs` and `Facts` keep `--mark`.
   CLAUDE.md, `docs/design-system.md` and the `/design` catalogue say so.
 
@@ -61,8 +64,8 @@ at (itch.io: Caz's consoles, BenJelter, thatdoc) has them in this style; drawing
 **Open** — Point 1 (the Overview's chart heights) not done: it needs the signed-in home on screen to tune the `48.25rem` floor,
 the trim and the spacing, and local sign-in failed for the owner (local dev reads the pre database). The console icons.
 
-**Watch out** — Not seen in a browser (no signed-in session here): check 3, 5 and 6 on pre at 2560, 1920, 1280×800 and 390,
-and Firefox for the mask and the open card.
+**Watch out** — 3 and 5 not yet seen at 390 and in Firefox; 6 not yet in Firefox. Playwright (Chromium) can be signed in by the
+owner on `localhost:3000/authPage`; block every non-GET `/api` call while looking, never change the account.
 
 ---
 

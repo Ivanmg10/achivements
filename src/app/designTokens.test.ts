@@ -40,6 +40,8 @@ test('a recently played row never shrinks below its content, except the open car
   const rules = css.match(/[^\n}]*\.home-fit-scroll > [^{]*\{ flex: 1 0 auto !important; \}/g) ?? []
   expect(rules).toHaveLength(2)
   for (const rule of rules) expect(rule).toContain('.home-fit-scroll > :not(:has([aria-expanded="true"]))')
+  // Whatever stats section is open: the open list stops counting toward the row, so the profile column sets its height.
+  expect(css).toMatch(/@media \(min-width: 1024px\) \{\s+\.home-fit-scroll:has\(\[aria-expanded="true"\]\) \{ contain: size;/)
 })
 
 test('the home keeps one height for the profile through its platform tabs', () => {
