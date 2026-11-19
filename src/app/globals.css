@@ -876,8 +876,9 @@ html[data-font="fira"],
   /* Less what the box would run past the screen (--home-fit-trim, set by homeFit), so the stats end where the screen does. */
   /* Portada already has its hero above the home: trimming this chart made its heatmap cells smaller than Classic's. */
   .home-fit:not(:has(.home-cover)):has([data-stats-section="overview"]) .home-fit-chart { height: max(160px, clamp(160px, 20dvh, 260px) - var(--home-fit-trim, 0px)); }
-  /* The rows carry flex: 1 1 0 inline (ROW_STYLE). Here they may grow to share spare height but never shrink: short of room, the list scrolls. */
-  .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * { flex: 1 0 auto !important; }
+  /* The rows carry flex: 1 1 0 inline (ROW_STYLE). Here they may grow to share spare height but never shrink: short of room, the list scrolls.
+     An open card is exempt: it takes the column's height, never more, and its panel scrolls inside (#164). */
+  .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > :not(:has([aria-expanded="true"])) { flex: 1 0 auto !important; }
 }
 
 /* A skeleton draws every variant; <html> says which ones show, before the first frame (LOOK_SCRIPT, then ShapeSync). */
@@ -1118,6 +1119,7 @@ html[data-font="fira"],
 /*
    A user's profile, Overview: Recently played sits beside their platform
    profile, as tall as that column. Its rows (flex: 1 1 0 inline, ROW_STYLE)
-   may grow to share the spare height but never shrink below their content.
+   may grow to share the spare height but never shrink below their content;
+   an open card takes the column's height and scrolls inside (#164).
 */
-.profile-recent .home-fit-scroll > * { flex: 1 0 auto !important; }
+.profile-recent .home-fit-scroll > :not(:has([aria-expanded="true"])) { flex: 1 0 auto !important; }

@@ -36,6 +36,12 @@ test('a font preview shows its font: it takes the family, and Barlow can undo a 
   expect(css).toMatch(/\[data-font\]:not\(html\) \{\s+@apply font-sans;/)
 })
 
+test('a recently played row never shrinks below its content, except the open card, which scrolls inside (#164)', () => {
+  const rules = css.match(/[^\n}]*\.home-fit-scroll > [^{]*\{ flex: 1 0 auto !important; \}/g) ?? []
+  expect(rules).toHaveLength(2)
+  for (const rule of rules) expect(rule).toContain('.home-fit-scroll > :not(:has([aria-expanded="true"]))')
+})
+
 test('the home keeps one height for the profile through its platform tabs', () => {
   expect(css).toMatch(/\.home-fit-side:has\(\[role="tablist"\]\) \{ min-height: /)
 })

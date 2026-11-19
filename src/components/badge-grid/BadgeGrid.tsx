@@ -79,7 +79,7 @@ export default function BadgeGrid<T>({
   const parts = sections ? sections.split(shown) : [{ id: '', items: shown }]
 
   const list = (part: BadgeSection<T>) => (
-    <ul className={loading ? 'hidden' : 'flex flex-wrap gap-1'}>
+    <ul className={loading ? 'hidden' : 'flex flex-wrap content-start gap-1'}>
       {part.items.map((a) => {
         const concealed = isConcealed(a)
         const text = name(a, concealed)
@@ -110,7 +110,7 @@ export default function BadgeGrid<T>({
   return (
     <>
       {loading && (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap content-start gap-1">
           {shown.map((a) => (
             <Skeleton key={keyOf(a)} radius="tile" className={dims.badge} />
           ))}
