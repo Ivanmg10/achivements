@@ -17,6 +17,7 @@ import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
+import { MISSABLES_ID } from '@/components/missable-panel/MissablePanel'
 import { formatDay } from '@/utils/dates'
 import { raImageUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
@@ -49,9 +50,12 @@ export default function GameInfoHeader({
   gameData,
   children,
   actions,
+  linkMissables = false,
 }: {
   gameData?: RetroAchievementsGameWithAchievements | null
   children?: ReactNode
+  /** The missables chip opens their panel, on the page that has one (the viewer's own). */
+  linkMissables?: boolean
   /** The AI export, first among the buttons. */
   actions?: ReactNode
 }) {
@@ -100,7 +104,7 @@ export default function GameInfoHeader({
               </GameHeroChip>
             )}
             {status && <GameHeroChip tone={STATUS_TONE[status]}>{T.gameStatus[status]}</GameHeroChip>}
-            {missables > 0 && <GameHeroChip tone="danger">{plural(missables, T.plurals.missables, lang)}</GameHeroChip>}
+            {missables > 0 && <GameHeroChip tone="danger" href={linkMissables ? `#${MISSABLES_ID}` : undefined}>{plural(missables, T.plurals.missables, lang)}</GameHeroChip>}
           </>
         }
         progress={

@@ -239,7 +239,8 @@ flag is read from the database, never the session).
   `-3xl` and arbitrary values, on any side, but for its short list of exceptions; a bare `rounded` is only a focus ring's corner.
   A `rounded-full` chip is a pill in both designs: left so on purpose, since moving it would change the slanted design.
 - **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `Shelf`, `DropSlot` and `ToggleButton`
-  are in `ui/`; a `DropSlot` is a dashed border and nothing else (no stripes, #130); the big faint icon behind a hero card's title is
+  are in `ui/`; an `Accordion` in `tone="danger"` folds a warning away (a game's missables, #167), and takes `open` /
+  `onOpenChange` / `id` when a link elsewhere opens it; a `DropSlot` is a dashed border and nothing else (no stripes, #130); the big faint icon behind a hero card's title is
   `GhostIcon` (one size and opacity, whole inside its card at the title's line; never an oversized icon cut by the edge); a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **The signature:** `BrandMark` (the logo in the accent from `themeIcon`'s own shapes, `LOGO_PATHS`, and the name in the display italic) is the one way the
   site signs itself: the visitors' bar, the sign-in screens and the landing's title (`size="title" logoAfter`: the name as big as the screen allows, the logo

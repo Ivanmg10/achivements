@@ -52,6 +52,11 @@ test('a chip takes its tone and stands upright, as every tag does', () => {
   expect(chip.className).not.toContain('skew')
 })
 
+test('a chip with href is a link to that place on the page', () => {
+  render(<GameHeroChip tone="danger" href="#missables">2 missable</GameHeroChip>)
+  expect(screen.getByRole('link', { name: '2 missable' })).toHaveAttribute('href', '#missables')
+})
+
 test('the progress: the bar, the share and the count', () => {
   render(<GameHeroProgress pct={12.8} softPct={20} label="Game" left="12.8 % in hardcore" right="5 of 39" />)
   expect(screen.getByRole('progressbar', { name: 'Game' })).toHaveAttribute('aria-valuenow', '20')

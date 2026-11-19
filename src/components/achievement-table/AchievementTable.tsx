@@ -12,7 +12,7 @@ import type { TableEntry } from '@/utils/achievementTable'
 import { tableColumns } from './tableColumns'
 import AchievementTableToolbar from '@/components/achievement-table-toolbar/AchievementTableToolbar'
 import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
-import MissableNotice from '@/components/missable-notice/MissableNotice'
+import MissablePanel from '@/components/missable-panel/MissablePanel'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { SURFACE } from '@/components/ui/surface'
 import { buttonClass } from '@/components/ui/Button'
@@ -42,8 +42,8 @@ export type AchievementTableProps<T> = {
   tags?: (e: TableEntry<T>) => ReactNode
   /** A line under the phone card's data line (RA's author); the desktop row has none. */
   cardNote?: (e: TableEntry<T>) => ReactNode
-  /** The line above the table that names some of them and can keep only those (RA's missables). */
-  notice?: { match: (e: TableEntry<T>) => boolean; tone?: 'danger' | 'warning'; lead?: (n: number) => string; text?: string }
+  /** The ones that can be lost (RA's missables still to earn): a folded panel above the table lists them. */
+  missable?: (e: TableEntry<T>) => boolean
   /** Tabs over the table that show one part of the game (PSN's DLC). */
   scopes?: { of: (t: T) => string; tabs: (scope: string, onSelect: (scope: string) => void, panelId: string) => ReactNode }
   detail?: DetailOptions<T>
@@ -59,7 +59,7 @@ export type AchievementTableProps<T> = {
  * Each platform is a small adapter around it: `docs/platform-shells.md`.
  */
 export default function AchievementTable<T>(props: AchievementTableProps<T>) {
-  const { source, gameId, gameTitle, items, toRow, texts, pins, reveal, sortMenu, tags, cardNote, notice, scopes, detail, keepSecretIcon } = props
+  const { source, gameId, gameTitle, items, toRow, texts, pins, reveal, sortMenu, tags, cardNote, missable, scopes, detail, keepSecretIcon } = props
   const { T } = useLanguage()
   const panelId = useId()
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -74,7 +74,7 @@ export default function AchievementTable<T>(props: AchievementTableProps<T>) {
     entries,
     searchText: (e) => (concealed(e) ? titleOf(e) : `${e.row.title} ${e.row.description}`),
     leads: (e) => pins.canPin && pins.leads(e.item),
-    inNotice: notice?.match,
+    isMissable: missable,
     scopeOf: scopes && ((e) => scopes.of(e.item)),
     sortValue: (key) => columns.find((c) => c.key === key)?.sort?.value,
     firstDir: (key) => columns.find((c) => c.key === key)?.sort?.first ?? 'asc',
@@ -115,16 +115,7 @@ export default function AchievementTable<T>(props: AchievementTableProps<T>) {
     <div className={WRAP}>
       <section aria-label={texts.label} className={`${SURFACE} p-4 sm:p-6 flex flex-col gap-4`}>
         {scopes?.tabs(table.scope, table.setScope, panelId)}
-        {notice && (
-          <MissableNotice
-            tone={notice.tone}
-            lead={notice.lead?.(table.noticed.length)}
-            text={notice.text}
-            names={table.noticed.map(titleOf)}
-            only={table.filter === 'notice'}
-            onToggleOnly={table.toggleNotice}
-          />
-        )}
+        {missable && <MissablePanel views={table.missables.map(view)} unoptimized={source !== 'ra'} />}
         <AchievementTableToolbar
           label={texts.label}
           tabs={[

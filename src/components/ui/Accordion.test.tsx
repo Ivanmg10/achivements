@@ -26,3 +26,15 @@ test('can start open, and numbers itself only when it is given a place', () => {
   rerender(<AccordionItem title="Q" defaultOpen>A</AccordionItem>)
   expect(screen.queryByText('03')).not.toBeInTheDocument()
 })
+
+test('follows open and onOpenChange when it is controlled, and carries its id', () => {
+  const onOpenChange = jest.fn()
+  const { rerender } = render(<AccordionItem title="Q" id="here" tone="danger" open={false} onOpenChange={onOpenChange}>A</AccordionItem>)
+  const button = screen.getByRole('button', { name: 'Q' })
+  fireEvent.click(button)
+  expect(onOpenChange).toHaveBeenCalledWith(true)
+  expect(button).toHaveAttribute('aria-expanded', 'false')
+  rerender(<AccordionItem title="Q" id="here" tone="danger" open onOpenChange={onOpenChange}>A</AccordionItem>)
+  expect(button).toHaveAttribute('aria-expanded', 'true')
+  expect(document.getElementById('here')).toContainElement(button)
+})

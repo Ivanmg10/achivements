@@ -18,8 +18,7 @@ const AchievementModal = dynamic(() => import('../achievement-modal/AchievementM
 /**
  * An RA game's achievements on the shared table: players, hardcore players and
  * points as columns, each one's type beside its name (missable in red), the
- * missables still to earn in a line on top, and RA's
- * own detail window.
+ * missables still to earn in a folded panel on top, and RA's own detail window.
  */
 export default function GameInfoTable({ gameData }: { gameData?: RetroAchievementsGameWithAchievements | null }) {
   const { T, lang } = useLanguage()
@@ -76,7 +75,7 @@ export default function GameInfoTable({ gameData }: { gameData?: RetroAchievemen
       sortMenu={['points', 'rarity', 'players', 'earned']}
       tags={typeTag}
       cardNote={({ item }) => item.Author && <p className="mt-1 text-[10px] text-text-secondary">{T.achievement.by} {item.Author}</p>}
-      notice={{ match: ({ item, row }) => item.Type === 'missable' && !row.earned }}
+      missable={({ item, row }) => item.Type === 'missable' && !row.earned}
       detail={{
         render: (a, { pinned, onTogglePin, onClose }) => (
           <AchievementModal

@@ -332,14 +332,34 @@ describe.each(PLATFORMS.filter((p) => p.anchor))('$name, opened from a link to o
   })
 })
 
-describe.each(PLATFORMS.filter((p) => p.hasNotice))('$name, the line above the table', (p) => {
-  test('names the locked ones it is about, and can keep only them', () => {
-    p.render([{ title: 'Lose me', noticed: true }, { title: 'Got it', noticed: true, earned: true }, { title: 'Plain' }])
-    expect(screen.getByRole('status')).toHaveTextContent('«Lose me»')
-    expect(screen.getByRole('status')).not.toHaveTextContent('Got it')
-    fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showOnlyThese }))
-    expect(names()).toEqual(['Lose me'])
-    fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showAllAgain }))
+describe.each(PLATFORMS.filter((p) => p.hasNotice))('$name, the missables panel above the table', (p) => {
+  const SPECS: Spec[] = [{ title: 'Lose me', noticed: true }, { title: 'Got it', noticed: true, earned: true }, { title: 'Plain' }]
+  const head = () => screen.getByRole('button', { name: /can be missed/ })
+
+  test('is folded, says how many can still be lost, and lists only those, each opening its window', async () => {
+    p.render(SPECS)
+    expect(head()).toHaveAttribute('aria-expanded', 'false')
+    expect(head()).toHaveTextContent(`1 achievement can be missed ${en.gameInfoTable.missableText}`)
+    fireEvent.click(head())
+    expect(head()).toHaveAttribute('aria-expanded', 'true')
+    const panel = document.getElementById(head().getAttribute('aria-controls')!)!
+    expect(within(panel).getAllByRole('button').map((b) => b.textContent)).toEqual(['Lose meLose me text'])
     expect(names()).toHaveLength(3)
+    fireEvent.click(within(panel).getByRole('button', { name: /Lose me/ }))
+    expect(await screen.findByRole('dialog', { name: 'Lose me' })).toBeInTheDocument()
+  })
+
+  test('opens on its link (the hero chip), and folding drops the link', () => {
+    window.history.replaceState(null, '', '/game#missables')
+    p.render(SPECS)
+    expect(head()).toHaveAttribute('aria-expanded', 'true')
+    fireEvent.click(head())
+    expect(head()).toHaveAttribute('aria-expanded', 'false')
+    expect(window.location.hash).toBe('')
+  })
+
+  test('is not there when none is left to lose', () => {
+    p.render([{ title: 'Got it', noticed: true, earned: true }])
+    expect(screen.queryByRole('button', { name: /can be missed/ })).not.toBeInTheDocument()
   })
 })

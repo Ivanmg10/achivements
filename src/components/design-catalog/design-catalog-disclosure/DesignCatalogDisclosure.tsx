@@ -53,6 +53,7 @@ export default function DesignCatalogDisclosure() {
             <AccordionItem title="What are Vault Points?" index={0} defaultOpen>One score worth the same on every platform: it counts how hard and how rare each achievement is.</AccordionItem>
             <AccordionItem title="Who sees my profile?" index={1}>Anyone, while it is public; only you, otherwise.</AccordionItem>
             <AccordionItem title="Without a number">An accordion with no place in a list draws no number.</AccordionItem>
+            <AccordionItem tone="danger" title={<><strong className="text-danger">2 achievements can be missed</strong> if you move on without them</>}>The danger tone folds a warning away: a game&apos;s missables.</AccordionItem>
           </div>
         </Panel>
       </DesignCatalogPiece>

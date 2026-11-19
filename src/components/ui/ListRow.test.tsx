@@ -16,3 +16,10 @@ test('with href it is a link that looks the same', () => {
   render(<ListRow href="/game/1" media={null} title="Celeste" />)
   expect(screen.getByRole('link', { name: 'Celeste' })).toHaveAttribute('href', '/game/1')
 })
+
+test('cuts its line to one, unless it wraps', () => {
+  const { rerender } = render(<ListRow media={null} title="T" sub="A long line" />)
+  expect(screen.getByText('A long line')).toHaveClass('truncate')
+  rerender(<ListRow media={null} title="T" sub="A long line" wrap />)
+  expect(screen.getByText('A long line')).not.toHaveClass('truncate')
+})
