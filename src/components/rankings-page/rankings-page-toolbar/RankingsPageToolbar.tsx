@@ -3,6 +3,7 @@
 import type { RankingsView } from '@/hooks/useRankings'
 import type { RankPeriod, RankScope, RankSort, RankSource } from '@/lib/rankings'
 import { useLanguage } from '@/context/LanguageContext'
+import { useScrollFade } from '@/hooks/useScrollFade'
 import { PLATFORM_FILL, PLATFORM_NAMES } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { pillClass } from '@/components/ui/Pill'
 import Tabs from '@/components/ui/Tabs'
@@ -29,6 +30,7 @@ export default function RankingsPageToolbar({
   xbox: boolean
 }) {
   const { T } = useLanguage()
+  const { ref: sourcesRef, fade } = useScrollFade()
   const scopes: RankScope[] = signedIn ? ['global', 'following'] : ['global']
   const sources: RankSource[] = ['all', 'ra', 'steam', 'psn', ...(xbox ? (['xbox'] as const) : [])]
   const set = (change: Partial<RankingsView>) => onChange({ ...view, ...change })
@@ -47,9 +49,15 @@ export default function RankingsPageToolbar({
       )}
 
       <div className="flex flex-wrap items-center gap-2 lg:ml-auto lg:mb-1.5">
-        <div role="group" aria-label={T.rankings.platform} className="flex flex-wrap gap-1 pr-2.5 mr-0.5 shadow-[inset_-1px_0_0_rgb(var(--ink)/0.1)]">
+        {/* Below lg one row that scrolls (with its fade), Period and Order sharing the next; the rule before them only where they sit beside it. */}
+        <div
+          ref={sourcesRef}
+          role="group"
+          aria-label={T.rankings.platform}
+          className={`flex gap-1 max-lg:basis-full min-w-0 overflow-x-auto [scrollbar-width:none] p-0.5 -m-0.5 lg:pr-3 lg:mr-0.5 lg:shadow-[inset_-1px_0_0_rgb(var(--ink)/0.1)] ${fade}`}
+        >
           {sources.map((s) => (
-            <button key={s} type="button" aria-pressed={view.source === s} onClick={() => set({ source: s })} className={pillClass(view.source === s)}>
+            <button key={s} type="button" aria-pressed={view.source === s} onClick={() => set({ source: s })} className={`shrink-0 ${pillClass(view.source === s)}`}>
               {s !== 'all' && <span aria-hidden="true" className={`w-3 h-3 rounded-cell ${PLATFORM_FILL[s]}`} />}
               {s === 'all' ? T.rankings.allPlatforms : PLATFORM_NAMES[s]}
             </button>
@@ -59,6 +67,7 @@ export default function RankingsPageToolbar({
           aria-label={T.rankings.period}
           prefix={T.rankings.period}
           size="sm"
+          className="max-lg:flex-auto"
           value={view.period}
           onChange={(period) => set({ period })}
           options={PERIODS.map((p) => ({ value: p, label: T.rankings[p] }))}
@@ -67,6 +76,7 @@ export default function RankingsPageToolbar({
           aria-label={T.rankings.sort}
           prefix={T.rankings.sort}
           size="sm"
+          className="max-lg:flex-auto"
           value={view.sort ?? 'points'}
           onChange={(sort) => set({ sort })}
           options={SORTS.map((s) => ({ value: s, label: T.rankings[SORT_LABEL[s]] }))}
