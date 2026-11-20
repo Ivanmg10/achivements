@@ -254,6 +254,14 @@ flag is read from the database, never the session).
 - **A group's banner** is `groups/group-cover-strip/GroupCoverStrip`: the band split between its games' covers (up to four), on the
   album card and the landing's example groups. A cover too small for its slice (`sharpEnough`, never stretched past twice its size: an
   RA box of 96 px) is drawn at that size over a blurred copy of itself, so the slice is full and nothing is smeared.
+  **A game's art anywhere in a group** (the band, a group page's tiles and banner, the mosaic, the home's featured group) is
+  `groups/group-cover-image/GroupCoverImage` fed by `coverSources(item)` (#168): never the stored `image_icon` alone, since for
+  Steam that is the desktop client icon (often a 32 px .ico); a Steam game is its 600×900 cover cut from its top, then its
+  header, then that icon, read from `source` + `game_id`. `SteamGameImage` never blows its small icon fallback up past its own
+  size in a box over 64 px.
+- **A row that opens someone** (the rankings' table, phone rows, podium and "most active this week") has one link, the name,
+  stretched over the row (`after:absolute after:inset-0` on the link, `relative` on the row); hover and the focus ring are on
+  the row (`RankingsPageUser`, #168). Never a second link or an `onClick` on the row.
 - **The art wall's covers** (#136) come from one pool, `utils/artWall.ts`, and are drawn one way, `cover-tile/CoverTile` (the framed, tilted box; decoration,
   lazy, low priority, hidden when dead): the sign-in's sliding columns (`AuthCollagePanel`), the landing's blurred backdrop (`LandingBackdrop`) and its closing
   band (`cover-reel/CoverReel`, a row sliding sideways in two identical halves). `CoverBand` is the window onto the sign-in's wall over the name on a phone.
