@@ -324,6 +324,8 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 - **Bare figures that wrap** (#134): `FIGURES_BY_THREE` (`ui/Figure`; three to a row on a phone, side by side from `sm`, the home's
   activity row) and `FIGURES_BY_THREE_TO_LG` (three to a row until `lg`, then six: a profile's figures) hide the mark in front of
   each row's first figure (the mark carries `data-figure-mark`); a hand-made grid of bare figures leaves it hanging at the row's start.
+  The library's detail uses it too (#169): its figures share the row's width instead of sitting in small boxes at its start. A
+  platform's own figure (a play time) takes its tone (`steam`, `psn`, `xbox`), never a hex.
 - `className` on them is for layout only (margin, width, flex), never colours.
 - **The look lives in tokens** in `globals.css` (`--slant`, `--mark`, `--r-*`, `--h-*`, `--motion-*`,
   `--hardcore`/`--softcore`), defined once for every theme (`designTokens.test.ts`): a future

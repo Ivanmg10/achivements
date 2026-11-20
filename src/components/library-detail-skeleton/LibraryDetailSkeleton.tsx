@@ -10,9 +10,10 @@ import { Skeleton } from '@/components/ui/Skeleton'
 export default function LibraryDetailSkeleton() {
   return (
     <>
-      <div aria-hidden="true" className="@3xl:col-span-3 flex flex-wrap gap-2">
-        {[28, 32, 28, 36].map((w, i) => (
-          <Skeleton key={i} radius="tile" className="h-14" style={{ width: `${w * 0.25}rem` }} />
+      {/* The row of figures: bare figures sharing the width, 65 px tall (a label and a figure). */}
+      <div aria-hidden="true" className="@3xl:col-span-3 grid grid-cols-3 gap-3">
+        {Array.from({ length: 3 }, (_, i) => (
+          <Skeleton key={i} radius="tile" className="h-[4.0625rem]" />
         ))}
       </div>
       <Skeleton radius="tile" className="h-72 @3xl:col-span-2" />

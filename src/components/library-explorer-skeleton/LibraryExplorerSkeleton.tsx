@@ -34,9 +34,9 @@ function Detail() {
         </div>
         <Skeleton radius="tile" className="h-80" />
         <Skeleton radius="tile" className="h-80" />
-        <div className="xl:col-span-3 flex flex-wrap gap-2">
-          {[28, 32, 28, 36].map((w, i) => (
-            <Skeleton key={i} radius="tile" className="h-14" style={{ width: `${w * 0.25}rem` }} />
+        <div className="xl:col-span-3 grid grid-cols-3 gap-3">
+          {Array.from({ length: 3 }, (_, i) => (
+            <Skeleton key={i} radius="tile" className="h-[4.0625rem]" />
           ))}
         </div>
         <Skeleton radius="tile" className="h-72 xl:col-span-2" />

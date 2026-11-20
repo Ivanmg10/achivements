@@ -34,7 +34,7 @@ describe('the skeleton of the list screen', () => {
 
 test('the detail skeleton holds the room of the figures and the two panels under the ring', () => {
   const { container } = render(<LibraryDetailSkeleton />)
-  expect(container.querySelectorAll('.h-14')).toHaveLength(4)
+  expect(container.querySelectorAll('[class*="h-[4.0625rem]"]')).toHaveLength(3)
   expect(container.querySelectorAll('.h-72')).toHaveLength(2)
   expect([...container.children].every((el) => el.getAttribute('aria-hidden') === 'true')).toBe(true)
 })
