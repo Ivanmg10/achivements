@@ -5,7 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import LibraryEntryCover, { entryIcon } from '@/components/library-entry-cover/LibraryEntryCover'
 import LibraryPlatformBadge from '@/components/library-platform-badge/LibraryPlatformBadge'
 import { ProgressBar } from '@/components/ui/ProgressBar'
-import { entryHref } from '@/utils/libraryEntries'
+import { entryConsole, entryHref } from '@/utils/libraryEntries'
 import type { LibraryEntry } from '@/utils/libraryInsights'
 import { detailCategory } from '@/utils/libraryCategory'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
@@ -52,7 +52,7 @@ export default function LibraryListRow({ entry, current, category, onSelect }: {
           >
             {entry.title}
           </Link>
-          <LibraryPlatformBadge source={entry.kind} size="tag" />
+          <LibraryPlatformBadge source={entry.kind} size="tag" label={entryConsole(entry)} />
         </div>
         {/* Every game has its bar, 0 % too (#169); one with no achievements keeps the line's room so the rows stay one height. */}
         {pct !== null ? (

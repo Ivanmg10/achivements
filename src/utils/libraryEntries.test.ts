@@ -1,4 +1,4 @@
-import { countBySource, entryHref, entryId, filterEntries } from './libraryEntries'
+import { countBySource, entryConsole, entryHref, entryId, filterEntries } from './libraryEntries'
 import type { LibraryEntry } from './libraryInsights'
 
 const NOW = Date.parse('2026-10-11T12:00:00Z')
@@ -34,4 +34,13 @@ describe('filterEntries', () => {
   test('the platform chip', () => expect(ids(filterEntries(list, { ...all, source: 'psn' }, NOW))).toEqual(['Hades']))
   test('the quick filter', () => expect(ids(filterEntries(list, { ...all, quick: 'almost' }, NOW))).toEqual(['Hades', 'Celeste']))
   test('all together', () => expect(filterEntries(list, { query: 'cel', source: 'steam', quick: 'stalled' }, NOW)).toHaveLength(1))
+})
+
+test('a row names the console: the RA one, the PSN one, the first of an Xbox game; Steam has none, so the platform', () => {
+  const of = (kind: string, game: object) => entryConsole({ kind, game } as unknown as LibraryEntry)
+  expect(of('ra', { ConsoleName: 'GameCube' })).toBe('GameCube')
+  expect(of('psn', { consoleName: 'PS4' })).toBe('PS4')
+  expect(of('xbox', { consoleName: 'Xbox 360 · Xbox One · Xbox Series' })).toBe('Xbox 360')
+  expect(of('xbox', { consoleName: '' })).toBe('Xbox')
+  expect(of('steam', { id: 1 })).toBe('Steam')
 })
