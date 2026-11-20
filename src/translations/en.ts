@@ -1637,6 +1637,7 @@ export const en = {
     trendA11y: 'Points per week, last {n} weeks: {list}',
     hotTitle: 'Most active this week',
     hotSee: "See this week's ranking",
+    hotEmpty: 'Nobody has earned points this week yet.',
     ahead: '{n} VP ahead',
     behind: '{n} VP behind',
     more: 'Show more',

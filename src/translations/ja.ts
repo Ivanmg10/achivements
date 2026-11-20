@@ -1636,6 +1636,7 @@ export const ja: Translations = {
     trendA11y: '週ごとのポイント、直近{n}週: {list}',
     hotTitle: '今週もっともアクティブ',
     hotSee: '今週のランキングを見る',
+    hotEmpty: '今週はまだ誰もポイントを獲得していません。',
     ahead: '{n} VP リード',
     behind: '{n} VP 差',
     more: 'もっと見る',

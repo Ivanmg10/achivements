@@ -141,10 +141,11 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
             )}
           </div>
 
-          <aside className="flex flex-col gap-4 lg:sticky lg:top-24 enter-card [--i:4]">
+          {/* From lg the column is as tall as the screen below the bar (never shorter than its content), so this week's card fills it down to the foot. */}
+          <aside className="flex flex-col gap-4 lg:sticky lg:top-24 lg:h-[calc(100dvh-7rem)] lg:min-h-min enter-card [--i:4]">
             {signedIn ? vault && <RankingsPageLevelPanel me={vault} /> : <RankingsPageJoin />}
-            {(data?.hot ?? []).length > 0 && (
-              <RankingsPageHot rows={data?.hot ?? []} linked onSeeWeek={weekView ? undefined : () => setView({ scope: 'global', period: 'week', source: 'all', sort: 'points' })} />
+            {data && (
+              <RankingsPageHot rows={data.hot ?? []} linked onSeeWeek={weekView ? undefined : () => setView({ scope: 'global', period: 'week', source: 'all', sort: 'points' })} />
             )}
           </aside>
         </div>

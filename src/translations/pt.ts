@@ -1636,6 +1636,7 @@ export const pt: Translations = {
     trendA11y: 'Pontos por semana, últimas {n} semanas: {list}',
     hotTitle: 'Os mais ativos esta semana',
     hotSee: 'Ver o ranking semanal',
+    hotEmpty: 'Ninguém somou pontos esta semana ainda.',
     ahead: '{n} PV à frente',
     behind: '{n} PV atrás',
     more: 'Ver mais',
