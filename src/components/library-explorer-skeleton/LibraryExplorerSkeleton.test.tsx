@@ -21,8 +21,9 @@ describe('the skeleton of the list screen', () => {
   test('draws the header the page has: title with platform tabs, count, search and view buttons', () => {
     const { container } = render(<LibraryExplorerSkeleton />)
     expect(container.querySelectorAll('.rounded-full.w-\\[30rem\\]')).toHaveLength(1)
-    expect(container.querySelectorAll('[class*="w-[21.25rem]"]')).toHaveLength(1)
-    expect(container.querySelectorAll('[class*="w-[18.375rem]"]')).toHaveLength(1)
+    // The search as wide as the list column, at the toolbar's one height; the order and the two views beside it.
+    expect(container.querySelectorAll('[class*="h-(--h-control) w-full"]')).toHaveLength(1)
+    expect(container.querySelectorAll('[class*="w-[12.375rem]"]')).toHaveLength(1)
   })
 
   test('everything but the announcement is hidden from assistive technology', () => {

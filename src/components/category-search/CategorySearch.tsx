@@ -6,7 +6,7 @@ import IconButton from '@/components/ui/IconButton'
 /**
  * Filters a category page by title across every platform at once, so a game
  * is found without knowing which platform it is on. The library's search
- * field, with a button to empty it.
+ * field, compact, with a button to empty it; the toolbar gives its width.
  */
 export default function CategorySearch({
   value,
@@ -20,10 +20,10 @@ export default function CategorySearch({
 }) {
   const { T } = useLanguage()
   return (
-    <div className="relative w-full sm:w-[21.25rem]">
+    <div className="relative w-full">
       <SearchInput
         id={id}
-        size="md"
+        size="sm"
         aria-label={T.categoryPage.searchGames}
         autoComplete="off"
         spellCheck={false}

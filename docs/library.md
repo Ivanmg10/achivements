@@ -11,8 +11,8 @@ status there, not a page of its own. What each status takes is `inCategory` (`ut
 used by the four `use*GamesByCategory` hooks; on "all" each game keeps its own status (`LibraryEntry.status`),
 its quick filters are the statuses (`quickFiltersFor`), its
 cards are always together (no "by platform" switch), and an opened game shows the detail of its own status
-(`detailCategory`). Every view has the same row of controls (`LibraryToolbar`: search, filters, then the
-order, size and views); the game count under the title only shows when neither the platform tabs nor the
+(`detailCategory`). Every view has the same row of controls (`LibraryToolbar`: the compact search as wide as the list column, `LIBRARY_COLUMNS`, then the filters,
+the order, size and views, one height; below lg the search has its own row); the game count under the title only shows when neither the platform tabs nor the
 "all" quick filter say it.
 
 **Two layouts, the list first (#169, 2026-11-20):** the list with the game's detail beside it (`LibraryExplorer`,

@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { LIBRARY_COLUMNS } from '@/components/library-toolbar/LibraryToolbar'
 
 const ROWS = 8
 
@@ -65,13 +66,15 @@ export default function LibraryExplorerSkeleton() {
           </div>
           <Skeleton radius="circle" className="h-[59px] lg:h-11 w-[30rem] max-w-full" />
         </div>
-        <div className="flex items-center gap-3 flex-wrap">
-          <Skeleton radius="field" className="h-[3.25rem] w-full sm:w-[21.25rem]" />
-          <span className="hidden sm:block grow" />
-          <Skeleton radius="tile" className="h-11 w-[11.5rem]" />
-          <Skeleton radius="tile" className="h-10 w-[16rem] sm:w-[18.375rem]" />
+        <div className={`flex flex-col gap-3 lg:grid lg:gap-5 lg:items-center ${LIBRARY_COLUMNS}`}>
+          <Skeleton radius="field" className="h-(--h-control) w-full" />
+          <div className="flex items-center gap-2">
+            <span className="hidden lg:block grow" />
+            <Skeleton radius="tile" className="h-11 w-[11.5rem]" />
+            <Skeleton radius="tile" className="h-11 w-[10.375rem] sm:w-[12.375rem]" />
+          </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(22rem,37rem)_minmax(0,1fr)] gap-5 items-start">
+        <div className={`grid grid-cols-1 ${LIBRARY_COLUMNS} gap-5 items-start`}>
           <div className="flex flex-col gap-px">
             {Array.from({ length: ROWS }, (_, i) => (
               <Row key={i} />

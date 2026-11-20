@@ -7,6 +7,7 @@ import { useFillViewport } from '@/hooks/useFillViewport'
 import LibraryListRow from '@/components/library-list-row/LibraryListRow'
 import LibraryEntryDetail from '@/components/library-entry-detail/LibraryEntryDetail'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { LIBRARY_COLUMNS } from '@/components/library-toolbar/LibraryToolbar'
 import type { LibraryEntry } from '@/utils/libraryInsights'
 
 /**
@@ -47,7 +48,7 @@ export default function LibraryList({
   }
 
   return (
-    <div ref={block} className="grid grid-cols-1 lg:grid-cols-[minmax(22rem,35rem)_minmax(0,1fr)] gap-5 items-start">
+    <div ref={block} className={`grid grid-cols-1 ${LIBRARY_COLUMNS} gap-5 items-start`}>
       <ul
         ref={list}
         style={fill}
