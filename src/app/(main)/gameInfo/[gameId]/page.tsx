@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useGameInfo } from '@/hooks/useGameInfo'
 import Button from '@/components/ui/Button'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
+import { raBoxRatio } from '@/utils/coverRatio'
 import GameInfoHeroBackground from '@/components/game-info-hero-background/GameInfoHeroBackground'
 import GameInfoHeader from '@/components/game-info-header/GameInfoHeader'
 import GameInfoTable from '@/components/game-info-table/GameInfoTable'
@@ -39,7 +40,7 @@ export default function GameInfo() {
     )
   }
 
-  if (!game) return <GameInfoSkeleton cover="natural" />
+  if (!game) return <GameInfoSkeleton ratio={raBoxRatio(null)} />
 
   const showSelector = subsetsLoading || subsets.length > 0 || parentId !== null
   const heroImage = game.ImageTitle ?? game.ImageIngame ?? null

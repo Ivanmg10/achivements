@@ -13,6 +13,7 @@ import type { PsnGameProgress } from '@/types/psn'
 import type { PsnGameDetails } from '@/hooks/usePsnGameDetails'
 import { buttonClass } from '@/components/ui/Button'
 import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
+import { IGDB_COVER, PORTRAIT } from '@/utils/coverRatio'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
@@ -52,6 +53,8 @@ export default function PsnGameInfoHeader({
       cover={{
         sources: [game.coverUrl, details?.coverUrl, game.imageIcon],
         alt: game.title,
+        // The Store's portrait is 2:3; without one the cover is IGDB's, 3:4.
+        ratio: game.coverUrl ? PORTRAIT : IGDB_COVER,
         pending: !game.coverUrl && detailsLoading,
       }}
       title={game.title}

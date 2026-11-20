@@ -12,6 +12,7 @@ import type { XboxGameProgress } from '@/types/xbox'
 import type { XboxGameDetails } from '@/hooks/useXboxGameDetails'
 import { https } from '@/utils/xboxMappers'
 import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
+import { IGDB_COVER } from '@/utils/coverRatio'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
@@ -50,7 +51,7 @@ export default function XboxGameInfoHeader({
 
   return (
     <GameHero
-      cover={{ sources: [https(details?.coverUrl), https(game.imageIcon)], alt: game.title, pending: detailsLoading }}
+      cover={{ sources: [https(details?.coverUrl), https(game.imageIcon)], alt: game.title, ratio: IGDB_COVER, pending: detailsLoading }}
       title={game.title}
       chips={
         <>

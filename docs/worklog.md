@@ -33,6 +33,39 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-20 — Game page covers at their natural ratio (`fix/203-natural-covers`, #203)
+
+**Did** — `GameHeroCover` draws every platform's cover at its own ratio, as RA's since #167: the same width on the
+four pages (`COVER_SLOT`), height from the picture, no crop, no blurred bands, no 2:3 frame (`FRAME`, `FITS`, the
+blurred copy and the `natural` prop are gone). A picture narrower than the slot keeps its pixel width (`maxWidth`), so
+an icon is never blown up. The shapes held until the size is known moved with `raBoxRatio` into `utils/coverRatio.ts`
+(`PORTRAIT` 2:3, `IGDB_COVER` 3:4); each header passes its `ratio` (PSN: 2:3 with a Store cover, else 3:4; Xbox 3:4)
+and `GameInfoSkeleton` takes `ratio` instead of `cover="frame" | "natural"`. Steam's cover asks for
+`library_600x900_2x.jpg` first (`steamAssetUrl(id, 'cover2x')`).
+Measured on the owner's games (2560 / 1280 / 390, cover box page skeleton → hero → loaded):
+Sly Cooper PS5 (IGDB 528×704) 324 → 288 → 288; GTA VI (Store 1440×2160) 324 throughout; GTA San Andreas PS4 (IGDB
+528×704) 324 → 288; Portal 2 (`_2x` 600×900, was 300×450) 324; Assassin's Creed Liberation (no library cover, header
+460×215) 324 → 101; Minecraft 360 (IGDB 528×704) 288 throughout; Pokémon Mystery Dungeon DS (RA 320×286) 304 → 195 → 193;
+Pokémon Sapphire GBA (320×320) 304 → 216.
+
+**Why** — the owner's decision on #203: no letterboxing on any page.
+
+**Decisions**
+- IGDB stays at `t_cover_big_2x` (528 px, 2.4× the 216 px drawn); `t_1080p` is 810×1080, triple the bytes, nothing
+  seen. Sony's Store URL is already the original. No cached shape changed (the Steam URL is built in the browser, the
+  IGDB and Store URLs are unchanged), so no `_vN` bump.
+- Lists and cards keep Steam's 300×450 `cover`; only the page's cover takes the `_2x`.
+- The ratio constants live in a plain util, not in the client component: a server `loading.tsx` importing a constant
+  from a `'use client'` file gets a client reference, not the number.
+
+**Open**
+- A Steam game with no library cover now shows its wide header as a short band (Liberation: 216×101). That is the rule
+  as decided; if the owner wants a portrait there, IGDB's cover on the page (as PSN does) would be the way.
+- The page skeleton does not know the console (RA) or whether the Store has a cover (PSN), so it holds the platform's
+  usual shape and the hero's own placeholder adjusts once (PSN 324 → 288, RA 304 → the console's box), as before.
+
+---
+
 ## 2026-11-20 — The home's recent achievements fill their card (`fix/202-recent-fill`, #202)
 
 **Did** — the profile column's "Logros / Trofeos recientes" (`MainPageProfileRecentList`, every platform) shows as many rows

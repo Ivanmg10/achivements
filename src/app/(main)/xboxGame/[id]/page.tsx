@@ -11,6 +11,7 @@ import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { isXboxTitleId, xboxBackdrop, xboxProgressFromList } from '@/utils/xboxTitles'
 import { https } from '@/utils/xboxMappers'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
+import { IGDB_COVER } from '@/utils/coverRatio'
 import GamePageNotLinked from '@/components/game-page-states/game-page-not-linked/GamePageNotLinked'
 import GamePageLibraryError from '@/components/game-page-states/game-page-library-error/GamePageLibraryError'
 import GameTableState from '@/components/game-page-states/game-table-state/GameTableState'
@@ -46,12 +47,12 @@ export default function XboxGamePage() {
   const { details, isLoading: detailsLoading } = useXboxGameDetails(isLinked ? titleId : null)
 
   if (titleId === null) notFound()
-  if (status === 'loading') return <GameInfoSkeleton />
+  if (status === 'loading') return <GameInfoSkeleton ratio={IGDB_COVER} />
   if (!enabled) notFound()
   if (!isLinked) return <GamePageNotLinked platform="Xbox" connectLabel={T.xbox.connect} />
 
   const listed = fullLibrary.find((g) => g.titleId === titleId) ?? null
-  if (!listed && libraryLoading) return <GameInfoSkeleton />
+  if (!listed && libraryLoading) return <GameInfoSkeleton ratio={IGDB_COVER} />
   if (!listed && libraryError) {
     return <GamePageLibraryError title={T.xbox.gamesError} reason={T.xbox.errors[libraryError]} retryLabel={T.xbox.retry} onRetry={refetch} />
   }

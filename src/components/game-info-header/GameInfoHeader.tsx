@@ -18,7 +18,7 @@ import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHero
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
 import { MISSABLES_ID } from '@/components/missable-panel/MissablePanel'
 import { formatDate, formatDay, latestUnlock } from '@/utils/dates'
-import { raBoxRatio } from '@/utils/raBoxRatio'
+import { raBoxRatio } from '@/utils/coverRatio'
 import { raImageUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
 
@@ -82,7 +82,7 @@ export default function GameInfoHeader({
   return (
     <>
       <GameHero
-        cover={{ sources: [raImageUrl(gameData?.ImageBoxArt)], alt: gameData?.Title ?? '', natural: true, ratio: raBoxRatio(gameData?.ConsoleName), optimized: true }}
+        cover={{ sources: [raImageUrl(gameData?.ImageBoxArt)], alt: gameData?.Title ?? '', ratio: raBoxRatio(gameData?.ConsoleName), optimized: true }}
         title={gameData?.Title ?? ''}
         chips={
           <>

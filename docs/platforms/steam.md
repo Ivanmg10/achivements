@@ -57,3 +57,12 @@ game with minutes in the last two weeks gets the one-hour TTL; the score refresh
 were never read again). The derived date is left out of the key on purpose: its two-week part moves every read,
 its unlock part is written by the refresh's own read (one useless re-read each), and a rise in hours already
 moves the minutes.
+
+## Pictures (#203, measured 2026-11-20)
+
+`steamAssetUrl` (`src/lib/steamAssets.ts`) builds the CDN's fixed paths. Despite its name, `library_600x900.jpg` is
+**300×450**; `library_600x900_2x.jpg` is the real 600×900 (`cover2x`). The game page's cover asks for the `_2x`
+first, then the plain one, the store header (460×215, wide), then the icon; lists and cards keep the 300×450 one
+(they draw it smaller). Some games have no library cover at all (Assassin's Creed Liberation: both 404), so the page
+shows the header at its own wide shape (`GameHeroCover`, natural ratio).
+

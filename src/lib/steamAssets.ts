@@ -21,10 +21,12 @@ export function gameLogoUrl(appId: number, imgLogoUrl?: string): string {
   return imgLogoUrl ? `${MEDIA_BASE}/${appId}/${imgLogoUrl}.jpg` : ''
 }
 
-export type SteamAsset = 'cover' | 'header' | 'hero' | 'logo'
+export type SteamAsset = 'cover' | 'cover2x' | 'header' | 'hero' | 'logo'
 
 const ASSET_FILES: Record<SteamAsset, string> = {
+  // Despite its name, 300×450 (measured 2026-11-20); the `_2x` is the 600×900 one, for the game page's cover (#203).
   cover: 'library_600x900.jpg',
+  cover2x: 'library_600x900_2x.jpg',
   header: 'header.jpg',
   hero: 'library_hero.jpg',
   logo: 'logo.png',

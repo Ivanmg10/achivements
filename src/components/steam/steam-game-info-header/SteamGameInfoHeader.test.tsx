@@ -45,7 +45,7 @@ describe('SteamGameInfoHeader', () => {
   test('shows the cover, title and Steam chip', () => {
     renderHeader()
     expect(screen.getByRole('heading', { level: 1, name: 'Fallout 4' })).toBeInTheDocument()
-    expect(screen.getByRole('img', { name: 'Fallout 4' }).getAttribute('src')).toContain('/377160/library_600x900.jpg')
+    expect(screen.getByRole('img', { name: 'Fallout 4' }).getAttribute('src')).toContain('/377160/library_600x900_2x.jpg')
     expect(screen.getByText('Steam')).toBeInTheDocument()
   })
 

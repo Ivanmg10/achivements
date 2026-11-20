@@ -31,3 +31,9 @@ test("the pictures' column holds the hero's room: as tall as the row from lg, tw
   expect(grid.className).toBe(`${MEDIA_GRID} ${MEDIA_ROWS[1]}`)
   for (const box of Array.from(grid.children)) expect(box.className).toContain(`${MEDIA_BOX} lg:col-span-2`)
 })
+
+test("the cover holds the platform's shape: a 2:3 portrait unless told otherwise (#203)", () => {
+  const cover = (c: HTMLElement) => c.querySelector('section')!.children[0] as HTMLElement
+  expect(Number(cover(render(<GameInfoSkeleton />).container).style.aspectRatio)).toBeCloseTo(2 / 3)
+  expect(cover(render(<GameInfoSkeleton ratio={0.75} />).container).style.aspectRatio).toBe('0.75')
+})

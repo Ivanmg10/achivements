@@ -8,6 +8,7 @@ import { useXboxGameDetails } from '@/hooks/useXboxGameDetails'
 import { xboxBackdrop } from '@/utils/xboxTitles'
 import { xboxCompareList } from '@/utils/gameCompare'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
+import { IGDB_COVER } from '@/utils/coverRatio'
 import XboxGameHeroBackground from '@/components/xbox/xbox-game-hero-background/XboxGameHeroBackground'
 import XboxGameInfoHeader from '@/components/xbox/xbox-game-info-header/XboxGameInfoHeader'
 import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPartialListNote'
@@ -29,7 +30,7 @@ export default function UserGamePageXbox({ id, username, banner, comparing, mine
   const theirs = useMemo(() => xboxCompareList(achievements), [achievements])
 
   const game = library.find((g) => g.titleId === id) ?? null
-  if (!game && libraryLoading) return <GameInfoSkeleton />
+  if (!game && libraryLoading) return <GameInfoSkeleton ratio={IGDB_COVER} />
   if (!game) return <UserGameNotInList banner={banner} username={username} />
 
   return (
