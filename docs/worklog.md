@@ -33,6 +33,16 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-20 — The home overview's activity a step smaller (`fix/195-smaller-activity`, #195)
+
+**Did** — `.home-fit-chart` is `clamp(160px, 15dvh, 260px)` less the trim (was `22dvh, 320px` since #164 point 1) and the heatmap cell caps at 34 px on tall screens (`FIT_MAX_CELL`, was 40). At 2560×1280 the daily chart is 192 px (218 after #164, 164 before) and the heatmap shows 356 days (320); at 2560×1440, 216 px (317). The room goes back to the recently played rows; the Overview still ends at the screen's bottom.
+
+**Why** — the owner (2026-11-20): #164 made the activity too big; a step between the old and the new size.
+
+**Watch out** — the chart's height on a fit screen is what the screen leaves, capped by this clamp: lowering the cap is what shrinks it; the trim alone only removes overflow.
+
+---
+
 ## 2026-11-20 — Library review (`fix/169-library-review`, #169)
 
 **Did**
