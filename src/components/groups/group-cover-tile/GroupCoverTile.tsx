@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { GameGroupItem } from '@/types/types'
 import type { ItemProgress } from '@/utils/groupItems'
 import { gameHref } from '@/utils/gameRef'
+import Facts from '@/components/ui/Facts'
 import { coverSources } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import GroupCoverImage from '@/components/groups/group-cover-image/GroupCoverImage'
 
@@ -83,9 +84,8 @@ export default function GroupCoverTile({
         {item.title}
       </Link>
       {/* No bar under the cover (the user's choice, 2026-10-24): the percentage and what is left. */}
-      <span className="flex items-baseline gap-1 min-w-0 text-xs -mt-1">
-        <span className={`tabular-nums font-extrabold ${done ? 'text-success' : 'text-text-main'}`}>{pct}%</span>
-        <span className="text-text-secondary truncate">· {status}</span>
+      <span className="block truncate text-xs text-text-secondary -mt-1">
+        <Facts items={[<span key="pct" className={`tabular-nums font-extrabold ${done ? 'text-success' : 'text-text-main'}`}>{pct}%</span>, status]} />
       </span>
     </li>
   )
