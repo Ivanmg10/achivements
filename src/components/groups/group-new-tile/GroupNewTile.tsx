@@ -9,7 +9,7 @@ export default function GroupNewTile({ remaining, onClick }: { remaining: number
     <DropSlot
       label={T.groups.newGroup}
       onClick={onClick}
-      className="flex-col min-h-[16.75rem]"
+      className="flex-col min-h-[13.25rem]"
     >
       <IconPlus className="w-[1.625rem] h-[1.625rem] text-accent" aria-hidden="true" />
       <span className="text-base font-bold">{T.groups.newGroup}</span>
