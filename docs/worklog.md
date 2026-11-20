@@ -33,6 +33,36 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-20 — The home's recent achievements fill their card (`fix/202-recent-fill`, #202)
+
+**Did** — the profile column's "Logros / Trofeos recientes" (`MainPageProfileRecentList`, every platform) shows as many rows
+as fit its card, three at least, through `useFitCount`; the list's box is `flex-1 h-0` with a floor of three rows
+(`min-h-[9.75rem]`, `fit:min-h-[9rem]`), so its rows never count toward the column's own height (as "Most active" in #168).
+Its loading shapes are the same count in the same box, and the profile's skeleton (`MainPageProfileSkeleton`) fills its
+recents block the same way. `useFitCount` takes a callback ref now, so a box swapped for another (the shapes for the list)
+is measured and followed. Steam's recent list (`loadRecentAchievements`) keeps 12 (was 5) and leaves hidden games out
+before it counts. Measured signed in (Overview, classic): 2560×1440 RA 6 / Steam 6 / PSN 6 (under a row left: 19 to 45 px); 2560×1280
+RA 4 / Steam 4 / PSN 3 (27 px left, under a row); 1920×1080, 1280×800, 390: 3. The Overview still ends at the screen at
+1440 and 1280; 1920×1080 scrolls the same 142 px as before. Skeleton rows = loaded rows at 1440, 1280 and 1080.
+
+**Why** — the owner (2026-11-20): since #164 and #195 the column is taller on a fit screen and a blank band sat under the
+third row at 2560×~1280.
+
+**Decisions** — RA's feed (two weeks, up to 500) and PSN's (every trophy of the last games) already return more than a
+screen holds; only Steam was asked for more. Its extra unlocks cost nothing new: the ten games scanned are the same, and
+only games that make the list need a schema (cached per language). Hidden games were dropped by the route after the cap,
+so a hidden game's unlocks could take the places of shown ones; they are now skipped before the scan (the route still
+filters, so hiding a game shows at once; unhiding waits for the 5-minute cache). The cover layout's side card
+(`MainPagePortadaSideRecent`, 4 rows) is unchanged: it does not pass `listRef`.
+
+**Open** — the Steam list's cache (5 minutes) still holds five per account after the deploy until it expires.
+
+**Watch out** — the three-row floor is written in rem in `MainPageProfileRecent` (52 px rows, 48 on a fit screen): a row
+that changes height must change it too. The skeleton's remembered height is per width only, so a test that changes the
+screen's height at the same width sees a skeleton the old height for one load.
+
+---
+
 ## 2026-11-20 — Annual wrap, first canvas round (`docs/wrap-design`, #172)
 
 **Did** — the first round of clickable concepts for the annual wrap on a design canvas

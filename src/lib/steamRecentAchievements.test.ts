@@ -31,6 +31,7 @@ function schema(...names: string[]) {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
   ;(withSteamCache as jest.Mock).mockImplementation(async (_k, _t, fetcher) => fetcher())
   ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
     { appid: 1, name: 'Fallout 4', playtime_forever: 10, rtime_last_played: 1700000200, has_community_visible_stats: true },
@@ -83,6 +84,20 @@ test('caps the list and fetches schemas only for games that made it', async () =
   expect(list.map((a) => a.apiname)).toEqual(['NEWEST'])
   expect(getSchemaForGame).toHaveBeenCalledTimes(1)
   expect(getSchemaForGame).toHaveBeenCalledWith(1, 'key', 'spanish')
+})
+
+test('keeps twelve by default: as many rows as a tall screen shows, a few to spare for hidden games (#202)', async () => {
+  ;(getPlayerAchievements as jest.Mock).mockResolvedValue({
+    playerstats: { success: true, achievements: Array.from({ length: 20 }, (_, i) => unlock(`A${i}`, 100 + i)) },
+  })
+  expect(await loadRecentAchievements(AUTH, 'english')).toHaveLength(12)
+})
+
+test('leaves hidden games out before counting, so they never take the places of shown ones (#202)', async () => {
+  ;(pool.query as jest.Mock).mockResolvedValue({ rows: [{ source: 'steam', game_id: 1 }] })
+  const list = await loadRecentAchievements(AUTH, 'english')
+  expect(list.map((a) => a.apiname)).toEqual(['MIDDLE'])
+  expect((getPlayerAchievements as jest.Mock).mock.calls.map((c) => c[2])).toEqual([2])
 })
 
 test('scans the ten games played last, however long ago, and only those with stats', async () => {

@@ -1,4 +1,5 @@
 import { useStorageValue } from '@/hooks/useStorageValue'
+import { useFitCount } from '@/hooks/useFitCount'
 import { HOME_PROFILE_KEY } from '@/lib/homeFit'
 import { rememberedHeight } from '@/components/ui/RememberedHeight'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -14,11 +15,13 @@ const ROWS = 3
  * so switching platforms shows the shape of what is coming, not a cut-off box.
  * It holds the height the real one had here last time (`homeFit` keeps it): it
  * sets the height of the top of the home, and a fixed guess made the skeleton
- * taller than the page it becomes.
+ * taller than the page it becomes. Its recent unlocks fill what is left, as
+ * many rows as the loaded card will show there (#202), three at least.
  */
 export default function MainPageProfileSkeleton({ label }: { label: string }) {
   const [saved] = useStorageValue(HOME_PROFILE_KEY)
   const height = saved ? rememberedHeight(saved, window.innerWidth) : null
+  const [rowsRef, rows] = useFitCount<HTMLDivElement>(ROWS, ROWS)
 
   return (
     <div role="status" aria-busy="true" aria-label={label} style={height ? { height } : undefined} className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-tile w-full h-full overflow-hidden">
@@ -43,8 +46,8 @@ export default function MainPageProfileSkeleton({ label }: { label: string }) {
       <MainPageProfileGameSkeleton />
       <div aria-hidden="true" className="bg-bg-main rounded-tile p-3 flex flex-col gap-1 flex-1">
         <Skeleton className="h-4 w-28 mb-1.5" />
-        <div className="flex flex-col">
-          {Array.from({ length: ROWS }).map((_, i) => (
+        <div ref={rowsRef} className="flex flex-col flex-1 h-0 min-h-[9.75rem] overflow-hidden">
+          {Array.from({ length: rows }).map((_, i) => (
             <SkeletonRow key={i} className="gap-3 py-1.5" />
           ))}
         </div>

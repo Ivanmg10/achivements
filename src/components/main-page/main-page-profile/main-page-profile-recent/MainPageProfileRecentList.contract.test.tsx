@@ -18,6 +18,21 @@ type Platform = {
 }
 
 const AT = '2026-01-02T12:00:00.000Z'
+
+/** A box `box` px tall with rows of 48 px, as a fit screen measures it (jsdom lays nothing out). */
+function measured(box: number) {
+  ;(globalThis as { ResizeObserver?: unknown }).ResizeObserver = class {
+    observe() {}
+    disconnect() {}
+  }
+  const row = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(48)
+  const height = jest.spyOn(Element.prototype, 'clientHeight', 'get').mockReturnValue(box)
+  return () => {
+    row.mockRestore()
+    height.mockRestore()
+    delete (globalThis as { ResizeObserver?: unknown }).ResizeObserver
+  }
+}
 const upTo = (n: number) => Array.from({ length: n }, (_, i) => i + 1)
 
 const PLATFORMS: Platform[] = [
@@ -80,6 +95,22 @@ describe.each(PLATFORMS)('the latest unlocks under a profile: $name', (p) => {
     expect(links[0]).toHaveTextContent('Unlock 1')
     expect(links[0]).toHaveAttribute('href', expect.stringContaining(p.href.split('#')[0]))
     expect(container.querySelector('time')).toHaveAttribute('dateTime')
+  })
+
+  test('fills its room with as many rows as fit, loading or loaded, never fewer than three (#202)', () => {
+    const restore = measured(250)
+    const loading = render(p.row({ count: 0, isLoading: true }))
+    expect(loading.container.querySelector('[aria-busy="true"]')!.children).toHaveLength(5)
+    loading.unmount()
+    const { unmount } = render(p.row({ count: 8 }))
+    expect(screen.getAllByRole('link')).toHaveLength(5)
+    expect(screen.getByRole('list')).toHaveClass('h-0', 'min-h-[9.75rem]')
+    unmount()
+    restore()
+    const small = measured(60)
+    render(p.row({ count: 8 }))
+    expect(screen.getAllByRole('link')).toHaveLength(3)
+    small()
   })
 
   test('says so when nothing is earned yet, and keeps its room', () => {

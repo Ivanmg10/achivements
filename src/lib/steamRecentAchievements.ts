@@ -1,4 +1,5 @@
 import { storedUnlocks } from '@/lib/steamUnlocks'
+import { visibleGamesForUser } from '@/lib/gameVisibility'
 import { loadGlobalPct, loadOwnedGames, loadPlayerAchievements, loadSchema, mapWithConcurrency, SteamAuth } from '@/lib/steamProgress'
 import { lastPlayedGames, lastPlayedOf, unixToIso } from '@/utils/steamMappers'
 import type {
@@ -9,6 +10,11 @@ import type {
 /** Recent games scanned for unlocks — new achievements come from games played lately. */
 const GAMES_SCANNED = 10
 const CONCURRENCY = 4
+/**
+ * Unlocks the profile column may show: as many rows as fit a tall screen (#202), with a few to spare
+ * for hidden games. Only a game that makes the list costs its schema (cached per language).
+ */
+const RECENT_MAX = 12
 /**
  * Games scanned for the activity window. Each costs one unlock-list call
  * (cached per player for an hour), so the most recently played are kept.
@@ -78,7 +84,8 @@ async function describe(auth: SteamAuth, lang: string, unlocks: Unlock[]): Promi
  * The player's latest unlocks across their recently played games — Steam has
  * no single "recent achievements" call like RA's, so it is assembled:
  *
- * 1. the recently played games,
+ * 1. the recently played games the player has not hidden (a hidden game's unlocks would fill the list and
+ *    then be dropped by the route, leaving the card short, #202),
  * 2. each game's unlock list (cached per player, shared with the game page),
  * 3. the newest `limit` unlocks overall,
  * 4. names and badges from those games' schemas (cached per language).
@@ -88,15 +95,13 @@ async function describe(auth: SteamAuth, lang: string, unlocks: Unlock[]): Promi
 export async function loadRecentAchievements(
   auth: SteamAuth,
   lang: string,
-  limit = 5,
+  limit = RECENT_MAX,
 ): Promise<SteamRecentAchievement[]> {
   // The games played last, from the owned list: Steam's recent list covers two
   // weeks only, and someone who stopped a while ago would see no unlocks at all.
   const owned = await loadOwnedGames(auth)
-  const games = lastPlayedGames(
-    (owned?.response?.games ?? []).filter((g) => g.has_community_visible_stats),
-    GAMES_SCANNED,
-  )
+  const withStats = (owned?.response?.games ?? []).filter((g) => g.has_community_visible_stats)
+  const games = lastPlayedGames(await visibleGamesForUser(auth.id, withStats, 'steam', (g) => g.appid), GAMES_SCANNED)
   const newest = (await unlocksOf(auth, games))
     .sort((a, b) => b.unlocktime - a.unlocktime)
     .slice(0, limit)
