@@ -43,3 +43,11 @@ test('a game at 0 % has its bar, as every other; one with nothing to measure kee
   expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
   expect(none.container.querySelector('[data-no-progress]')).toHaveAttribute('aria-hidden', 'true')
 })
+
+test('the date line joins its facts with the site\'s mark, never a hand-made dot', () => {
+  const { container } = row(ENTRY, 'playing')
+  const line = screen.getByText(new RegExp(en.statusGameItem.lastPlayed))
+  expect(line.textContent).not.toContain('·')
+  expect(line.querySelector('[aria-hidden="true"]')).not.toBeNull()
+  expect(container.textContent).toContain(', ')
+})

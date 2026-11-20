@@ -47,6 +47,7 @@ import LibraryLayoutToggle from '@/components/library-layout-toggle/LibraryLayou
 import LibraryPlatformTabs, { PLATFORM_TABS_ID, type PlatformChoice } from '@/components/library-platform-tabs/LibraryPlatformTabs'
 import LibraryToolbar from '@/components/library-toolbar/LibraryToolbar'
 import { tabIds } from '@/components/ui/Tabs'
+import Facts from '@/components/ui/Facts'
 
 /**
  * A status page of the library ("in progress", "completed", "want to play"): its title, then one row of
@@ -177,7 +178,7 @@ export default function LibraryPage({ category: cat, initialPlatform = 'all' }: 
     psnError && T.psn.gamesError,
     xboxError && T.xbox.gamesError,
   ].filter(Boolean)
-  const errorLine = errors.length > 0 && <p role="alert" className="text-sm text-danger">{errors.join(' · ')}</p>
+  const errorLine = errors.length > 0 && <p role="alert" className="text-sm text-danger"><Facts items={errors} /></p>
 
   const layoutToggle = platformCount > 0 && <LibraryLayoutToggle value={layout} onChange={setLayout} />
   const quickRow = quickFilters.length > 0 && <LibraryQuickFilters value={quick} counts={quickCounts} filters={quickFilters} onChange={setQuick} />

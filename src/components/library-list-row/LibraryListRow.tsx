@@ -10,6 +10,7 @@ import type { LibraryEntry } from '@/utils/libraryInsights'
 import { detailCategory } from '@/utils/libraryCategory'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/dates'
+import Facts from '@/components/ui/Facts'
 
 /**
  * One game in the list: icon, title and platform, progress, and when it was
@@ -62,7 +63,7 @@ export default function LibraryListRow({ entry, current, category, onSelect }: {
         ) : (
           <span aria-hidden="true" data-no-progress className="h-[1lh] text-[0.8125rem]" />
         )}
-        {when && <span className="text-xs text-text-secondary truncate">{finished ? T.libraryDetail.finished : T.statusGameItem.lastPlayed} · {when}</span>}
+        {when && <span className="text-xs text-text-secondary truncate"><Facts items={[finished ? T.libraryDetail.finished : T.statusGameItem.lastPlayed, when]} /></span>}
       </div>
       <button
         type="button"
