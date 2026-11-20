@@ -49,7 +49,7 @@ test('completed: the calendar, and the milestones with the days they were reache
 })
 
 test('wantToPlay: the hardest ones, and what is known of the game beside them', () => {
-  render(<LibraryGameDetail {...base} category="wantToPlay" items={notStarted} game={game} info={[{ label: L.developer, value: 'Supergiant' }]} />)
+  render(<LibraryGameDetail {...base} category="wantToPlay" items={notStarted} game={game} info={[{ label: L.developer, value: 'Supergiant' }, { label: L.genre, value: 'Roguelike' }]} />)
   const hard = within(screen.getByText(L.hardestTitle).parentElement!).getAllByRole('link')
   expect(hard[0].getAttribute('href')).toBe('/g#hard')
   expect(screen.getByText('Supergiant')).toBeInTheDocument()
@@ -60,6 +60,19 @@ test('wantToPlay with nothing known of the game: the hardest take the whole row'
   render(<LibraryGameDetail {...base} category="wantToPlay" items={notStarted} game={game} />)
   expect(screen.queryByText(L.infoTitle)).not.toBeInTheDocument()
   expect(screen.getByText(L.hardestTitle).parentElement!.parentElement).toHaveClass('@3xl:col-span-2')
+})
+
+test('wantToPlay with one fact alone (the console): the hardest take the whole row, no near-empty card beside them', () => {
+  render(<LibraryGameDetail {...base} category="wantToPlay" items={notStarted} game={game} info={[{ label: L.console, value: 'Xbox 360' }]} />)
+  expect(screen.queryByText(L.infoTitle)).not.toBeInTheDocument()
+  expect(screen.getByText(L.hardestTitle).parentElement!.parentElement).toHaveClass('@3xl:col-span-2')
+})
+
+test('wantToPlay while the facts are on their way: their panel holds its room', () => {
+  render(<LibraryGameDetail {...base} category="wantToPlay" items={notStarted} game={game} info={[{ label: L.console, value: 'Xbox 360' }]} infoLoading />)
+  expect(screen.getByText(L.infoTitle)).toBeInTheDocument()
+  expect(screen.queryByText('Xbox 360')).not.toBeInTheDocument()
+  expect(screen.getByText(L.hardestTitle).parentElement!.parentElement).not.toHaveClass('@3xl:col-span-2')
 })
 
 test('no calendar when the game is not said, but the list of latest stays', () => {

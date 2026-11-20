@@ -22,6 +22,8 @@ import DateText from '@/components/ui/DateText'
 import type { GameStatus } from '@/types/game'
 
 const SKELETON_BADGES = 24
+/** Fewer facts than this and "About the game" gives its room to the hardest achievements. */
+const MIN_INFO_ROWS = 2
 
 const PANEL = 'bg-bg-main/55 ring-1 ring-inset ring-ink/[0.06] rounded-pane p-3.5 min-w-0'
 
@@ -56,6 +58,7 @@ export default function LibraryGameDetail({
   completedAt = null,
   game,
   info = [],
+  infoLoading = false,
   grid,
   empty,
 }: {
@@ -75,6 +78,8 @@ export default function LibraryGameDetail({
   game?: InsightGame
   /** What is known of the game itself (who made it, when), shown for one not yet played. */
   info?: InfoRow[]
+  /** The facts of the game are still on their way (IGDB, the Steam store): its panel holds their room. */
+  infoLoading?: boolean
   grid: ReactNode
   /** Said in place of the grid when the game has no achievements. */
   empty: string
@@ -140,6 +145,8 @@ export default function LibraryGameDetail({
     )
 
   const steps = useMemo(() => milestones(items), [items])
+  // One fact alone (the console) left the card nearly empty beside a full list (#169 B1): then the list takes the row.
+  const showInfo = infoLoading || info.length >= MIN_INFO_ROWS
   const ago = (a: InsightAchievement) => <DateText value={a.earnedAt} />
 
   // Under the figures, the part that is each list's own: what a game in progress, a finished one and
@@ -169,12 +176,12 @@ export default function LibraryGameDetail({
       </>
     ) : (
       <>
-        <motion.div variants={PANEL_IN} className={`${PANEL} ${info.length > 0 ? '' : '@3xl:col-span-2'}`}>
+        <motion.div variants={PANEL_IN} className={`${PANEL} ${showInfo ? '' : '@3xl:col-span-2'}`}>
           <LibraryDetailList title={L.hardestTitle} items={hardest(items, 6)} empty={L.noTargets} columns={2} />
         </motion.div>
-        {info.length > 0 && (
+        {showInfo && (
           <motion.div variants={PANEL_IN} className={PANEL}>
-            <LibraryDetailInfo rows={info} />
+            <LibraryDetailInfo rows={info} isLoading={infoLoading} />
           </motion.div>
         )}
       </>

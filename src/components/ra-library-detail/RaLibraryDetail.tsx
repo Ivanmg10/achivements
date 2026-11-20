@@ -10,10 +10,10 @@ import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetai
 import { asCategory } from '@/utils/utils'
 import { fromRa } from '@/utils/gameInsights'
 import { parseReleaseYear } from '@/utils/utils'
-import type { InfoRow } from '@/components/library-game-detail/library-detail-info/LibraryDetailInfo'
 import { raAwardCompletedAt } from '@/utils/completionDates'
 import { raImageUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
+import { gameInfoRows } from '@/utils/gameInfoRows'
 
 
 
@@ -58,16 +58,15 @@ export default function RaLibraryDetail({
   const earned = items.length > 0 ? items.filter((a) => a.earned).length : known.earned
 
   // Who made it and when, as RA knows it; what it does not say is left out.
-  const L = T.libraryDetail
   const year = parseReleaseYear(data?.Released)
-  const info: InfoRow[] = data
-    ? [
-        { label: L.console, value: data.ConsoleName ?? '' },
-        { label: L.developer, value: data.Developer ?? '' },
-        { label: L.publisher, value: data.Publisher ?? '' },
-        { label: L.genre, value: data.Genre ?? '' },
-        { label: L.released, value: year ? String(year) : '' },
-      ].filter((r) => r.value)
+  const info = data
+    ? gameInfoRows(T.libraryDetail, {
+        console: data.ConsoleName,
+        developers: data.Developer ? [data.Developer] : [],
+        publishers: data.Publisher ? [data.Publisher] : [],
+        genres: data.Genre ? [data.Genre] : [],
+        released: year ? String(year) : null,
+      })
     : []
 
   return (
