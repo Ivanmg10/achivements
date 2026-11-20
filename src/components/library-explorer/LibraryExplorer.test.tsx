@@ -1,13 +1,3 @@
-jest.mock('@/components/library-shelves/LibraryShelves', () => ({
-  __esModule: true,
-  default: ({ entries, flyKey, onPick, onSeeShelf, onSeeAll }: { entries: { key: string; title: string }[]; flyKey?: string | null; onPick: (e: unknown) => void; onSeeShelf: (q: string) => void; onSeeAll: () => void }) => (
-    <div data-testid="shelves" data-flykey={flyKey ?? ''}>
-      {entries.map((e) => <button key={e.key} onClick={() => onPick(e)}>{`pick ${e.title}`}</button>)}
-      <button onClick={() => onSeeShelf('stalled')}>see-shelf</button>
-      <button onClick={onSeeAll}>see-all</button>
-    </div>
-  ),
-}))
 jest.mock('@/components/library-list/LibraryList', () => ({
   __esModule: true,
   default: ({ entries, selected, wide, flyKey, onSelect }: { entries: { key: string }[]; selected?: { key: string }; wide: boolean; flyKey?: string | null; onSelect: (e: { key: string }) => void }) => (
@@ -32,45 +22,19 @@ const entries = [
 ]
 const sort = { key: 'name' as const, dir: 'asc' as const }
 const make = (over: Record<string, unknown> = {}) => ({
-  category: 'playing', entries, platform: 'all' as const, layout: 'list' as const, onLayout: jest.fn(), query: '', onQuery: jest.fn(), quick: 'all' as const, onQuick: jest.fn(),
+  category: 'playing', entries, platform: 'all' as const, query: '', onQuery: jest.fn(), quick: 'all' as const, onQuick: jest.fn(),
   sort, onSort: jest.fn(), selectedKey: null, onSelectKey: jest.fn(), ...over,
 })
 const rows = () => screen.getByTestId('list').textContent!.replace('select-last', '')
 
 beforeEach(() => jest.clearAllMocks())
 
-describe('shelves', () => {
-  test('a picked card opens the list on that game', () => {
-    const p = make({ layout: 'shelves' })
-    render(<LibraryExplorer {...p} />)
-    fireEvent.click(screen.getByRole('button', { name: 'pick Alpha' }))
-    expect(p.onSelectKey).toHaveBeenCalledWith('ra:2')
-    expect(p.onLayout).toHaveBeenCalledWith('list')
-    // Whatever filter was left over is cleared, so the game picked is the one shown.
-    expect(p.onQuick).toHaveBeenCalledWith('all')
-  })
-  test('"see N" of a shelf opens the list with its filter, "see all" the cards', () => {
-    const p = make({ layout: 'shelves' })
-    render(<LibraryExplorer {...p} />)
-    fireEvent.click(screen.getByText('see-shelf'))
-    expect(p.onQuick).toHaveBeenCalledWith('stalled')
-    expect(p.onLayout).toHaveBeenCalledWith('list')
-    fireEvent.click(screen.getByText('see-all'))
-    expect(p.onLayout).toHaveBeenLastCalledWith('cards')
-  })
-  test('no filters on the shelves', () => {
-    render(<LibraryExplorer {...make({ layout: 'shelves' })} />)
-    expect(screen.queryByRole('group', { name: 'Quick filters' })).not.toBeInTheDocument()
-  })
-})
-
 describe('changing platform', () => {
-  test('the entries given are what is shown, and the view is keyed by the platform so it is swapped as a whole', () => {
-    const { rerender } = render(<LibraryExplorer {...make({ layout: 'shelves' })} />)
-    expect(screen.getByTestId('shelves')).toHaveTextContent('pick Beta')
-    rerender(<LibraryExplorer {...make({ layout: 'shelves', platform: 'ra', entries: [entries[1]] })} />)
-    expect(screen.getByTestId('shelves')).toHaveTextContent('pick Alpha')
-    expect(screen.getByTestId('shelves')).not.toHaveTextContent('pick Beta')
+  test('the entries given are what is shown', () => {
+    const { rerender } = render(<LibraryExplorer {...make()} />)
+    expect(rows()).toBe('ra:2,steam:1,psn:3')
+    rerender(<LibraryExplorer {...make({ platform: 'ra', entries: [entries[1]] })} />)
+    expect(rows()).toBe('ra:2')
   })
 })
 
@@ -130,15 +94,10 @@ describe('list', () => {
     expect(p.onSelectKey).toHaveBeenLastCalledWith('ra:2')
   })
 
-  test('Escape clears the search, and with none goes back', () => {
+  test('Escape clears the search', () => {
     const p = make({ query: 'x' })
-    const { unmount } = render(<LibraryExplorer {...p} />)
+    render(<LibraryExplorer {...p} />)
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(p.onQuery).toHaveBeenCalledWith('')
-    unmount()
-    const q = make()
-    render(<LibraryExplorer {...q} />)
-    fireEvent.keyDown(document, { key: 'Escape' })
-    expect(q.onLayout).toHaveBeenCalledWith('shelves')
   })
 })

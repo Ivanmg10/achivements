@@ -605,6 +605,8 @@ describe('the feeds', () => {
     fetchMock.mockImplementation(async (url: string) => {
       if (url.includes('/titles/')) return answer({ titles })
       if (url.endsWith('/1')) return answer(null, { status: 429, code: 429 })
+      // The other games answer a moment later, as a real network does: the 429 is seen first, not raced (it failed on CI).
+      await new Promise((resolve) => setTimeout(resolve, 20))
       return answer({ achievements: [earned('ok', daysAgo(1))] })
     })
 

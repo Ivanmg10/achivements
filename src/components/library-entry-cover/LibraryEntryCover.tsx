@@ -4,7 +4,7 @@ import GameIcon from '@/components/game-icon/GameIcon'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import { psnBackdrop } from '@/utils/psnTitles'
 import { xboxBackdrop } from '@/utils/xboxTitles'
-import { entryId } from '@/utils/libraryShelves'
+import { entryId } from '@/utils/libraryEntries'
 import type { LibraryEntry } from '@/utils/libraryInsights'
 import { raImageUrl } from '@/utils/raAssets'
 

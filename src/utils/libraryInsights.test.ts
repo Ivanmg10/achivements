@@ -54,6 +54,12 @@ test('an RA game is started from its first achievement, however small the share'
   expect(raProgress(want).status).toBe('wantToPlay')
 })
 
+test('an RA game not started is at 0 %, as on the other platforms; one with no achievements has nothing to measure', () => {
+  expect(raProgress({ ID: 2, Title: 'B', AchievementsPublished: 40 } as never).pct).toBe(0)
+  expect(raProgress({ ID: 2, Title: 'B' } as never).pct).toBe(0)
+  expect(raProgress({ ID: 2, Title: 'B', AchievementsPublished: 0 } as never).pct).toBeNull()
+})
+
 describe('mixed list', () => {
   const steam = { id: 1, title: 'Beta', pctWon: 50, lastPlayed: daysAgo(5) } as SteamGameProgress
   const psn = { id: 2, title: 'Alpha', pctWon: 90, lastPlayed: null, lastTrophyAt: daysAgo(1) } as PsnGameProgress

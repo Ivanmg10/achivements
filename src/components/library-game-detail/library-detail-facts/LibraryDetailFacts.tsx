@@ -1,16 +1,14 @@
-import Kicker from '@/components/ui/Kicker'
-export type DetailFact = { label: string; value: string; className?: string }
+import Figure, { FIGURES_BY_THREE, type FigureTone } from '@/components/ui/Figure'
 
-/** A game's figures as a row of tiles: what is left, the pace, the points, the playtime. */
+export type DetailFact = { label: string; value: string; tone?: FigureTone }
+
+/** A game's figures as one row that spreads over the width (#169): what is left, the pace, the points, the playtime. */
 export default function LibraryDetailFacts({ facts }: { facts: DetailFact[] }) {
   if (facts.length === 0) return null
   return (
-    <dl className="flex flex-wrap gap-2">
+    <dl className={FIGURES_BY_THREE}>
       {facts.map((f) => (
-        <div key={f.label} className="bg-bg-main/55 ring-1 ring-inset ring-ink/[0.06] rounded-tile px-3 py-2.5 flex flex-col gap-0.5">
-          <Kicker as="dt" size="sm">{f.label}</Kicker>
-          <dd className={`text-xl font-extrabold tabular-nums ${f.className ?? 'text-text-main'}`}>{f.value}</dd>
-        </div>
+        <Figure key={f.label} term label={f.label} value={f.value} tone={f.tone} />
       ))}
     </dl>
   )

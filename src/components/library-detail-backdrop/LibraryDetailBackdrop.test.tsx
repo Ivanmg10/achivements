@@ -1,4 +1,4 @@
-jest.mock('@/components/library-shelf-banner/LibraryShelfBanner', () => ({
+jest.mock('@/components/library-entry-banner/LibraryEntryBanner', () => ({
   __esModule: true,
   default: ({ entry }: { entry: { key: string } }) => <div data-testid="banner">{entry.key}</div>,
 }))

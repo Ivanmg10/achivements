@@ -21,7 +21,7 @@ import { raPreviewGames } from '@/utils/sectionPreview'
 import {
   buildEntries, countQuick, matchesQuick, quickFiltersFor, mixedSortKeys, psnProgress, raProgress, sortEntries, steamProgress, xboxProgress, type QuickFilter,
 } from '@/utils/libraryInsights'
-import { countBySource } from '@/utils/libraryShelves'
+import { countBySource } from '@/utils/libraryEntries'
 import { raGameId } from '@/utils/gameRef'
 import StatusGameList from '@/components/statusGameList/StatusGameList'
 import StatusPageHeader from '@/components/status-page-header/StatusPageHeader'
@@ -43,14 +43,15 @@ import LibraryViewToggle from '@/components/library-view-toggle/LibraryViewToggl
 import LibraryAllList from '@/components/library-all-list/LibraryAllList'
 import LibraryExplorer from '@/components/library-explorer/LibraryExplorer'
 import LibraryExplorerSkeleton from '@/components/library-explorer-skeleton/LibraryExplorerSkeleton'
-import LibraryLayoutToggle, { type LibraryLayout } from '@/components/library-layout-toggle/LibraryLayoutToggle'
+import LibraryLayoutToggle from '@/components/library-layout-toggle/LibraryLayoutToggle'
 import LibraryPlatformTabs, { PLATFORM_TABS_ID, type PlatformChoice } from '@/components/library-platform-tabs/LibraryPlatformTabs'
 import LibraryToolbar from '@/components/library-toolbar/LibraryToolbar'
 import { tabIds } from '@/components/ui/Tabs'
+import Facts from '@/components/ui/Facts'
 
 /**
  * A status page of the library ("in progress", "completed", "want to play"): its title, then one row of
- * controls in the same place in every view (`LibraryToolbar`), then the games as shelves, a list with the
+ * controls in the same place in every view (`LibraryToolbar`), then the games as a list with the
  * game's detail beside it, or cards (each platform in its own section, or all together).
  */
 export default function LibraryPage({ category: cat, initialPlatform = 'all' }: { category: string; initialPlatform?: PlatformChoice }) {
@@ -59,22 +60,13 @@ export default function LibraryPage({ category: cat, initialPlatform = 'all' }: 
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
   const { selected, toggle, clear } = useConsoleFilter()
   const { T } = useLanguage()
-  const { sortState, setSortState, allSortState, setAllSortState, gridCols, setGridCols, view, setView, layout: savedLayout, setLayout: saveLayout } = useLibraryPrefs(cat)
+  const { sortState, setSortState, allSortState, setAllSortState, gridCols, setGridCols, view, setView, layout, setLayout } = useLibraryPrefs(cat)
   // "Almost done" and "stalled" only make sense for games in progress; each category starts without one.
   const [quickChoice, setQuick] = useState<QuickFilter>('all')
-  // The layout the user left is the one it opens on (remembered across visits); typing a search on the
-  // shelves moves to the list only for as long as the search is there, without overwriting the choice.
-  const [searchedToList, setSearchedToList] = useState(false)
-  const layout: LibraryLayout = savedLayout === 'shelves' && searchedToList ? 'list' : savedLayout
-  const setLayout = (next: LibraryLayout) => {
-    setSearchedToList(false)
-    saveLayout(next)
-  }
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const [platform, setPlatform] = useState<PlatformChoice>(initialPlatform)
   useWhenChanged([cat], () => {
     setQuick('all')
-    setSearchedToList(false)
     setSelectedKey(null)
     setPlatform(initialPlatform)
   })
@@ -108,8 +100,8 @@ export default function LibraryPage({ category: cat, initialPlatform = 'all' }: 
   // On "all games" the cards are always together: a game's status, not its platform, is what the page sorts by.
   const mixed = platformCount > 0 && (isAll || (platformCount > 1 && view === 'all'))
   const mixedLoading = (showRa && loading) || (steamLinked && steamLoading) || (psnShown && psnLoading) || (xboxShown && xboxLoading)
-  // Shelves and the list read every platform together; only the cards view keeps them apart.
-  const explorer = layout !== 'cards' && platformCount > 0
+  // The list reads every platform together; only the cards view keeps them apart.
+  const explorer = layout === 'list' && platformCount > 0
   const explorerEntries = useMemo(
     () => buildEntries(showRa ? games : [], extraData, steamLinked ? allSteamGames : [], psnShown ? allPsnGames : [], xboxShown ? allXboxGames : []),
     [showRa, games, extraData, steamLinked, allSteamGames, psnShown, allPsnGames, xboxShown, allXboxGames],
@@ -122,11 +114,6 @@ export default function LibraryPage({ category: cat, initialPlatform = 'all' }: 
     [explorerEntries, activePlatform],
   )
   const hasTabs = Object.values(perPlatform).filter((n) => n > 0).length > 1
-  // Typing while on the shelves goes to the list, where the matches are.
-  function changeQuery(next: string) {
-    setQuery(next)
-    if (layout === 'shelves' && next.trim()) setSearchedToList(true)
-  }
   const mixedEntries = useMemo(
     () =>
       buildEntries(
@@ -191,13 +178,13 @@ export default function LibraryPage({ category: cat, initialPlatform = 'all' }: 
     psnError && T.psn.gamesError,
     xboxError && T.xbox.gamesError,
   ].filter(Boolean)
-  const errorLine = errors.length > 0 && <p role="alert" className="text-sm text-danger">{errors.join(' · ')}</p>
+  const errorLine = errors.length > 0 && <p role="alert" className="text-sm text-danger"><Facts items={errors} /></p>
 
   const layoutToggle = platformCount > 0 && <LibraryLayoutToggle value={layout} onChange={setLayout} />
   const quickRow = quickFilters.length > 0 && <LibraryQuickFilters value={quick} counts={quickCounts} filters={quickFilters} onChange={setQuick} />
   const viewToggle = !isAll && platformCount > 1 && <LibraryViewToggle value={view} onChange={setView} />
   const gridControl = <StatusGridControl cols={gridCols} onChange={setGridCols} />
-  const search = <CategorySearch value={query} onChange={explorer ? changeQuery : setQuery} />
+  const search = <CategorySearch value={query} onChange={setQuery} />
   const completedFilter = cat === 'completed' && <CompletedFilter value={completedMode} onChange={setCompletedMode} />
   const raSort = <StatusSortControl cat={cat} sortState={sortState} onChange={setSortState} />
 
@@ -232,8 +219,8 @@ export default function LibraryPage({ category: cat, initialPlatform = 'all' }: 
 
   function body() {
     if (explorer) {
-      if (mixedLoading) return <LibraryExplorerSkeleton layout={layout === 'list' ? 'list' : 'shelves'} />
-      const quickShown = layout === 'list' && quickFilters.length > 0
+      if (mixedLoading) return <LibraryExplorerSkeleton />
+      const quickShown = quickFilters.length > 0
       return (
         <>
           <StatusPageHeader category={cat} gameCount={hasTabs || quickShown ? undefined : platformEntries.length}>
@@ -253,8 +240,6 @@ export default function LibraryPage({ category: cat, initialPlatform = 'all' }: 
                 category={cat}
                 entries={platformEntries}
                 platform={activePlatform}
-                layout={layout === 'list' ? 'list' : 'shelves'}
-                onLayout={setLayout}
                 query={query}
                 onQuery={setQuery}
                 quick={quick}

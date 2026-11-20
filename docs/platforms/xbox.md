@@ -84,7 +84,7 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   to the game; a game with no achievements and no twin stays.
 - **Backdrop:** a game page's wide picture is IGDB's (`heroUrl` in
   `/api/xbox/details`), fetched when the page opens. The library's shelf cards
-  (`LibraryShelfBanner`) ask for the same, one card at a time as RA's screenshots,
+  (`LibraryEntryBanner`) ask for the same, one card at a time as RA's screenshots,
   so at most a shelf's worth (`SHELF_CAP`); until it arrives, or with no match, they
   show the blurred tile. Lists and icons keep Xbox's own tile.
   The page's cover is IGDB's box art from the same answer (`coverUrl`, through

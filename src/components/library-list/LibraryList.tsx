@@ -7,6 +7,7 @@ import { useFillViewport } from '@/hooks/useFillViewport'
 import LibraryListRow from '@/components/library-list-row/LibraryListRow'
 import LibraryEntryDetail from '@/components/library-entry-detail/LibraryEntryDetail'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { LIBRARY_COLUMNS } from '@/components/library-toolbar/LibraryToolbar'
 import type { LibraryEntry } from '@/utils/libraryInsights'
 
 /**
@@ -47,12 +48,13 @@ export default function LibraryList({
   }
 
   return (
-    <div ref={block} className="grid grid-cols-1 lg:grid-cols-[minmax(22rem,35rem)_minmax(0,1fr)] gap-5 items-start">
+    <div ref={block} className={`grid grid-cols-1 ${LIBRARY_COLUMNS} gap-5 items-start`}>
       <ul
         ref={list}
         style={fill}
-        // Until it is measured, a guess that fits most screens.
-        className={`enter-rows flex flex-col gap-0.5 p-1 -m-1 lg:overflow-y-auto lg:overscroll-contain lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] ${height === undefined ? 'lg:max-h-[calc(100dvh-16rem)] lg:min-h-88' : ''}`}
+        // Until it is measured, a guess that fits most screens. No overscroll-contain on either pane: at its end the
+        // wheel goes on to the page, which scrolls too (#169: contained, it could not be scrolled back up over them).
+        className={`enter-rows flex flex-col gap-0.5 p-1 -m-1 lg:overflow-y-auto lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] ${height === undefined ? 'lg:max-h-[calc(100dvh-16rem)] lg:min-h-88' : ''}`}
       >
         {entries.map((e) => {
           const current = e.key === selected?.key
@@ -71,7 +73,7 @@ export default function LibraryList({
       {wide && selected && (
         <aside
           style={fill}
-          className={`enter-card [--i:3] sticky top-4 lg:flex lg:flex-col lg:overflow-y-auto lg:overscroll-contain ${height === undefined ? 'lg:h-[calc(100dvh-2rem)]' : ''}`}
+          className={`enter-card [--i:3] sticky top-4 lg:flex lg:flex-col lg:overflow-y-auto ${height === undefined ? 'lg:h-[calc(100dvh-2rem)]' : ''}`}
         >
           <LibraryEntryDetail key={selected.key} entry={selected} category={category} />
         </aside>

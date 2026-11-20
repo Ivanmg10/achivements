@@ -33,6 +33,58 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-20 — Library review (`fix/169-library-review`, #169)
+
+**Did**
+- A1: the shelves layout is gone: `LibraryShelves`, `LibraryShelf`, `LibraryShelfCard`, `utils/bentoLayout`, `LibraryEntryProgress`,
+  `ui/Shelf` (only the shelves used it; its specimen and catalogue entry removed, CLAUDE.md and `docs/design-system.md` updated),
+  the `.enter-shelves` cascade, the shelves skeleton, the search-to-list workaround and the list's back/Escape step to the
+  shelves; their strings in the nine languages (`shelvesLabel`, `seeAll`, `seeShelf`, `openInList`, `shelves`). `LibraryLayout`
+  is `list | cards`, the list the default; a saved or synced `shelves` is not an option of `useLibraryPrefs` and reads as the
+  list. `LibraryShelfBanner` (the detail's backdrop) is `LibraryEntryBanner`; `utils/libraryShelves` is `utils/libraryEntries`.
+  `/allGames?platform=psn` checked: it opens the list on PlayStation.
+- A2: `LibraryToolbar` shares the list's columns (`LIBRARY_COLUMNS`): a compact search (`SearchInput` `sm`) as wide as the list,
+  then the filters, the order and the views, all 44 px (the segmented `md` size, used only by the layout toggle, is 38 + 6).
+  Below lg the search has its own row; on a phone the toggle shows its icons only, so the order and it share a line. At 1280
+  the second column wraps, each piece holding the toolbar's height so its first line sits beside the search. "/" already
+  focused the search.
+- A3: an RA game with no progress record is at 0 % (`raUnstartedPct` in `libraryInsights`, used by the list and the folded
+  previews); null only for a game with no achievements, whose row keeps the bar's room.
+- A4: already fixed by #164 (`ToggleButton` and `content-start`); measured on LEGO Star Wars III (Xbox, 48 badges, 2560): two
+  rows, 100 px. A contract test pins `content-start gap-1` on every platform's grid.
+- A5: `overscroll-contain` removed from both list panes and from `LandingLibrary`'s panel. Chromium, /wantToPlay at 1920:
+  before, a wheel up over a pane at its top left scrollY at 113; after, 0. Firefox (Playwright's, signed out, on the landing's
+  sample library, the same pattern): 1074 to 0, and a wheel down still scrolls the pane first.
+- B1: "About the game" for Steam (the store), PSN and Xbox (IGDB) on a game not started: console, developer, publisher, genre,
+  release date, through `utils/gameInfoRows` (RA too). Each detail asks only on that list. While the facts load the panel holds
+  its room (`infoLoading`); with fewer than two rows the hardest list takes the whole row.
+- B2: the detail's figures are bare `Figure`s in `FIGURES_BY_THREE`, sharing the row; Xbox gets its gamerscore as RA its points.
+  `Figure` has `steam`, `psn`, `xbox` tones (a play time). `InsightAchievement` types the `grade` and `gamerscore` it carried.
+  Both skeletons draw the 65 px row.
+- B3: the short lists show RA's points, Xbox's gamerscore ("10 G") or PSN's grade in the same place.
+- B4: the row's date line and the page's error line use `Facts`.
+- B5: a row's tag names the console (`entryConsole`: RA's, PSN's, the first of an Xbox game's; "Steam" for Steam) with the
+  platform's logo, which a screen reader hears as the platform.
+
+**Why** — the owner's review of the library (2026-11-14) and what the reviewer found (#169).
+
+**Decisions**
+- The open game's header badge still names the platform; only the rows changed (B5 asked for the rows).
+- B1 asks for the facts on "Not started" only: it is the only list whose detail has "About the game".
+- A2 keeps the quick filters in the toolbar, between the search and the order.
+
+**Open**
+- A5 not tried with a trackpad, nor signed in in Firefox (the Playwright Firefox has no session); the same CSS rule decides both.
+- `PeriodAchievementsDay` / `PeriodAchievementsDays` keep `overscroll-contain` in a page that scrolls: they may trap the wheel
+  the same way (not checked). The showcase picker's are in a dialog, which is right.
+- Sly Cooper shows twice in the owner's PSN "Not started" list (two titles); not looked into.
+
+**Watch out**
+- A third layout needs its option in `useLibraryPrefs`, `LibraryLayoutToggle`, the `if-library-*` rules and `LOOK_SCRIPT`.
+- The platform detail tests mock the details hooks (`use*GameDetails`); a detail that reads another needs its mock.
+
+---
+
 ## 2026-11-20 — Groups and rankings review (`fix/168-groups-rankings-review`, #168)
 
 **Did**

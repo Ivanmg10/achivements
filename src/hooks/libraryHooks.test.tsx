@@ -28,9 +28,9 @@ describe('useMediaQuery', () => {
 })
 
 describe('useLibraryKeys', () => {
-  const setup = (over: { layout?: 'shelves' | 'list'; hasQuery?: boolean } = {}) => {
-    const m = { onClearQuery: jest.fn(), onBack: jest.fn(), onMove: jest.fn() }
-    const { unmount } = renderHook(() => useLibraryKeys({ layout: 'list', hasQuery: false, searchId: 'search', ...m, ...over }))
+  const setup = (over: { hasQuery?: boolean } = {}) => {
+    const m = { onClearQuery: jest.fn(), onMove: jest.fn() }
+    const { unmount } = renderHook(() => useLibraryKeys({ hasQuery: false, searchId: 'search', ...m, ...over }))
     return { ...m, unmount }
   }
   const press = (key: string) => fireEvent.keyDown(document, { key })
@@ -41,27 +41,16 @@ describe('useLibraryKeys', () => {
     expect(k.onMove.mock.calls).toEqual([[1], [-1]])
   })
 
-  test('the arrows do nothing on the shelves', () => {
-    const k = setup({ layout: 'shelves' })
-    press('ArrowDown')
-    expect(k.onMove).not.toHaveBeenCalled()
-  })
-
   test('Escape clears the search first', () => {
     const k = setup({ hasQuery: true })
     press('Escape')
     expect(k.onClearQuery).toHaveBeenCalled()
-    expect(k.onBack).not.toHaveBeenCalled()
   })
 
-  test('with no search, Escape goes back; on the shelves it has nowhere to go', () => {
-    const list = setup()
+  test('with no search, Escape does nothing (there is no other view to go back to)', () => {
+    const k = setup()
     press('Escape')
-    expect(list.onBack).toHaveBeenCalled()
-    list.unmount()
-    const shelves = setup({ layout: 'shelves' })
-    press('Escape')
-    expect(shelves.onBack).not.toHaveBeenCalled()
+    expect(k.onClearQuery).not.toHaveBeenCalled()
   })
 
   test('"/" goes to the search, and the arrows are left alone while typing in it', () => {

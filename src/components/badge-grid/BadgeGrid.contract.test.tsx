@@ -211,6 +211,14 @@ describe.each(PLATFORMS)('$name badge grid', (p) => {
     p.render([{ title: 'One' }, { title: 'Two' }], { limit: 5 })
     expect(screen.queryByRole('button', { name: /Show all/ })).not.toBeInTheDocument()
   })
+
+  // In a box taller than its badges (the library's detail, #169 A4, #164 item 6) a wrapping flex box
+  // spreads the spare height between its rows unless its lines are packed at the top.
+  test('its rows stay packed at the top, gap-1 apart, in a box taller than they are', () => {
+    p.render([{ title: 'One' }, { title: 'Two' }])
+    const row = badge('One').closest('ul')!
+    expect(row).toHaveClass('flex', 'flex-wrap', 'content-start', 'gap-1')
+  })
 })
 
 describe.each(PLATFORMS.filter((p) => p.pins))('$name pins', (p) => {

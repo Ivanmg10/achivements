@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import LibraryShelfBanner from '@/components/library-shelf-banner/LibraryShelfBanner'
+import LibraryEntryBanner from '@/components/library-entry-banner/LibraryEntryBanner'
 import type { LibraryEntry } from '@/utils/libraryInsights'
 
 /**
@@ -30,7 +30,7 @@ export default function LibraryDetailBackdrop({ entry }: { entry: LibraryEntry }
           transition={{ duration: 0.6 }}
           className="absolute inset-0 scale-110 blur-lg"
         >
-          <LibraryShelfBanner entry={entry} />
+          <LibraryEntryBanner entry={entry} />
         </motion.div>
       </AnimatePresence>
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-bg-card/35 to-bg-card" />

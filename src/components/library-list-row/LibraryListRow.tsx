@@ -5,11 +5,12 @@ import { useLanguage } from '@/context/LanguageContext'
 import LibraryEntryCover, { entryIcon } from '@/components/library-entry-cover/LibraryEntryCover'
 import LibraryPlatformBadge from '@/components/library-platform-badge/LibraryPlatformBadge'
 import { ProgressBar } from '@/components/ui/ProgressBar'
-import { entryHref } from '@/utils/libraryShelves'
+import { entryConsole, entryHref } from '@/utils/libraryEntries'
 import type { LibraryEntry } from '@/utils/libraryInsights'
 import { detailCategory } from '@/utils/libraryCategory'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/dates'
+import Facts from '@/components/ui/Facts'
 
 /**
  * One game in the list: icon, title and platform, progress, and when it was
@@ -51,15 +52,18 @@ export default function LibraryListRow({ entry, current, category, onSelect }: {
           >
             {entry.title}
           </Link>
-          <LibraryPlatformBadge source={entry.kind} size="tag" />
+          <LibraryPlatformBadge source={entry.kind} size="tag" label={entryConsole(entry)} />
         </div>
-        {pct !== null && (
+        {/* Every game has its bar, 0 % too (#169); one with no achievements keeps the line's room so the rows stay one height. */}
+        {pct !== null ? (
           <span className="flex items-center gap-2.5">
             <ProgressBar pct={pct} label={entry.title} className="flex-1" />
             <span className={`w-9 text-right text-[0.8125rem] font-extrabold tabular-nums ${pct >= 100 ? 'text-success' : ''}`}>{Math.round(pct)}%</span>
           </span>
+        ) : (
+          <span aria-hidden="true" data-no-progress className="h-[1lh] text-[0.8125rem]" />
         )}
-        {when && <span className="text-xs text-text-secondary truncate">{finished ? T.libraryDetail.finished : T.statusGameItem.lastPlayed} · {when}</span>}
+        {when && <span className="text-xs text-text-secondary truncate"><Facts items={[finished ? T.libraryDetail.finished : T.statusGameItem.lastPlayed, when]} /></span>}
       </div>
       <button
         type="button"

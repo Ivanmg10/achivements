@@ -80,6 +80,24 @@ test('the platform\'s own figures come first', () => {
   expect(labels.length).toBeGreaterThan(1)
 })
 
+test('the figures are one row of bare figures that spreads over the width (#169 B2)', () => {
+  render(<LibraryGameDetail {...base} category="playing" items={inProgress} facts={[{ label: 'Playtime', value: '12 h' }]} />)
+  const row = screen.getByText('Playtime').closest('dl')!
+  expect(row.className).toContain('sm:flex-wrap')
+  // Each figure grows to share the row instead of sitting in a small box at its start.
+  expect(screen.getByText('Playtime').parentElement).toHaveClass('flex-1')
+})
+
+test('Xbox gamerscore is a figure, as RA points are: the total for a game not started, else earned of total', () => {
+  const xbox = [a('x', { gamerscore: 10, earned: true }), a('y', { gamerscore: 1000 })]
+  const { unmount } = render(<LibraryGameDetail {...base} category="playing" items={xbox} />)
+  expect(screen.getByText(en.xbox.gamerscore).nextSibling).toHaveTextContent('10 / 1,010 G')
+  unmount()
+  render(<LibraryGameDetail {...base} category="wantToPlay" items={xbox.map((x) => ({ ...x, earned: false }))} />)
+  expect(screen.getByText(en.xbox.gamerscore).nextSibling).toHaveTextContent(/^1,010 G$/)
+  expect(screen.queryByText(en.gameExpanded.points)).not.toBeInTheDocument()
+})
+
 test('while loading it shows placeholders, and neither the grid nor computed figures', () => {
   const { container } = render(<LibraryGameDetail {...base} category="playing" items={[]} state="loading" facts={[{ label: 'Playtime', value: '12 h' }]} />)
   expect(container.querySelectorAll('[aria-busy="true"]').length).toBeGreaterThan(0)

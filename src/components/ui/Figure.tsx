@@ -5,7 +5,7 @@ import { Skeleton } from './Skeleton'
 import { kickerClass } from './Kicker'
 import { FIGURE_MARK } from './shape'
 
-export type FigureTone = 'main' | 'muted' | 'accent' | 'hardcore' | 'softcore' | 'success' | 'info' | 'warning' | 'danger' | 'platinum'
+export type FigureTone = 'main' | 'muted' | 'accent' | 'hardcore' | 'softcore' | 'success' | 'info' | 'warning' | 'danger' | 'platinum' | 'steam' | 'psn' | 'xbox'
 export type FigureLook = 'bare' | 'tile' | 'card'
 
 const TONES: Record<FigureTone, string> = {
@@ -20,6 +20,10 @@ const TONES: Record<FigureTone, string> = {
   warning: 'text-warning',
   danger: 'text-danger',
   platinum: 'text-platinum',
+  // A platform's own figure (its play time) in its colour, from its token.
+  steam: 'text-steam',
+  psn: 'text-psn',
+  xbox: 'text-xbox',
 }
 
 // bare: figures side by side with a "/" between them in the slanted design, none in the round one (#127, #164); tile: a small centred box;

@@ -53,11 +53,17 @@ export function countQuick(items: Progress[], now = Date.now()): Record<QuickFil
   return Object.fromEntries(ALL_QUICK.map((q) => [q, items.filter((p) => matchesQuick(p, q, now)).length])) as Record<QuickFilter, number>
 }
 
+/**
+ * RA's want-to-play list has no progress record: such a game is at 0 %, as a game not started is on
+ * the other platforms (#169). Null only when there is nothing to measure, a game with no achievements.
+ */
+export const raUnstartedPct = (g: CategoryGame): number | null => ('AchievementsPublished' in g && g.AchievementsPublished === 0 ? null : 0)
+
 export const raProgress = (g: CategoryGame, extra?: GameExtraData): StatusProgress => {
-  // RA's want-to-play list has no progress; a game it reports progress for is started, done at 100 %.
+  // A game RA reports progress for is started, done at 100 %.
   const won = 'PctWon' in g ? parseFloat((g as RetroAchievementsGameCompleted).PctWon) : null
   const status: GameStatus = won === null ? 'wantToPlay' : won >= 1 ? 'completed' : 'playing'
-  return { pct: won === null ? null : Math.round(won * 100), lastPlayed: extra?.lastPlayed ?? null, status }
+  return { pct: won === null ? raUnstartedPct(g) : Math.round(won * 100), lastPlayed: extra?.lastPlayed ?? null, status }
 }
 // A Steam game listed has known counts (its lists leave out the rest), so its status is never null here.
 export const steamProgress = (g: SteamGameProgress): StatusProgress => ({ pct: g.pctWon, lastPlayed: g.lastPlayed, status: classifySteamGame(g) ?? 'playing' })

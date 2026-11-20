@@ -33,7 +33,7 @@ export default function LandingLibrary() {
             shifts, fading where it is cut. */}
         <div
           ref={panel}
-          className={`lg:h-[42.625rem] lg:overflow-y-auto lg:overscroll-contain lg:[scrollbar-gutter:stable] [scrollbar-width:thin] ${fade}`}
+          className={`lg:h-[42.625rem] lg:overflow-y-auto lg:[scrollbar-gutter:stable] [scrollbar-width:thin] ${fade}`}
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.ul

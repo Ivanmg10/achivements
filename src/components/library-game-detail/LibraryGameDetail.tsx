@@ -22,6 +22,8 @@ import DateText from '@/components/ui/DateText'
 import type { GameStatus } from '@/types/game'
 
 const SKELETON_BADGES = 24
+/** Fewer facts than this and "About the game" gives its room to the hardest achievements. */
+const MIN_INFO_ROWS = 2
 
 const PANEL = 'bg-bg-main/55 ring-1 ring-inset ring-ink/[0.06] rounded-pane p-3.5 min-w-0'
 
@@ -56,6 +58,7 @@ export default function LibraryGameDetail({
   completedAt = null,
   game,
   info = [],
+  infoLoading = false,
   grid,
   empty,
 }: {
@@ -75,6 +78,8 @@ export default function LibraryGameDetail({
   game?: InsightGame
   /** What is known of the game itself (who made it, when), shown for one not yet played. */
   info?: InfoRow[]
+  /** The facts of the game are still on their way (IGDB, the Steam store): its panel holds their room. */
+  infoLoading?: boolean
   grid: ReactNode
   /** Said in place of the grid when the game has no achievements. */
   empty: string
@@ -87,13 +92,22 @@ export default function LibraryGameDetail({
   const computed = useMemo<DetailFact[]>(() => {
     const out: DetailFact[] = []
     const left = items.filter((a) => !a.earned).length
-    if (category !== 'completed' && items.length > 0) out.push({ label: T.gameExpanded.remaining, value: String(left), className: 'text-info' })
+    if (category !== 'completed' && items.length > 0) out.push({ label: T.gameExpanded.remaining, value: String(left), tone: 'info' })
 
     const withPoints = items.filter((a) => a.points !== null)
     if (withPoints.length > 0) {
       const total = withPoints.reduce((sum, a) => sum + a.points!, 0)
       const earned = withPoints.filter((a) => a.earned).reduce((sum, a) => sum + a.points!, 0)
-      out.push({ label: T.gameExpanded.points, value: category === 'wantToPlay' ? String(total) : `${earned} / ${total}`, className: 'text-warning' })
+      out.push({ label: T.gameExpanded.points, value: category === 'wantToPlay' ? String(total) : `${earned} / ${total}`, tone: 'warning' })
+    }
+
+    // Xbox's gamerscore, as RA's points: the total of a game not started, else earned of total.
+    const withScore = items.filter((a) => a.gamerscore !== undefined)
+    if (withScore.length > 0) {
+      const total = withScore.reduce((sum, a) => sum + a.gamerscore!, 0)
+      const earned = withScore.filter((a) => a.earned).reduce((sum, a) => sum + a.gamerscore!, 0)
+      const n = (x: number) => x.toLocaleString(lang)
+      out.push({ label: T.xbox.gamerscore, value: category === 'wantToPlay' ? `${n(total)} G` : `${n(earned)} / ${n(total)} G`, tone: 'xbox' })
     }
 
     if (category === 'playing') {
@@ -101,10 +115,10 @@ export default function LibraryGameDetail({
       if (beaten) {
         const done = beaten.done >= beaten.total
         const value = done ? L.storyDone : L.storyOf.replace('{n}', beaten.done.toLocaleString(lang)).replace('{total}', beaten.total.toLocaleString(lang))
-        out.push({ label: L.beaten, value, className: done ? 'text-success' : undefined })
+        out.push({ label: L.beaten, value, tone: done ? 'success' : undefined })
       }
       const missed = missablesLeft(items)
-      if (missed > 0) out.push({ label: L.missable, value: String(missed), className: 'text-warning' })
+      if (missed > 0) out.push({ label: L.missable, value: String(missed), tone: 'warning' })
       const pace = paceEstimate(items)
       if (pace) {
         out.push({ label: L.pace, value: L.perWeek.replace('{n}', pace.perWeek.toLocaleString(lang, { maximumFractionDigits: pace.perWeek >= 10 ? 0 : 1 })) })
@@ -115,7 +129,7 @@ export default function LibraryGameDetail({
     }
 
     if (category === 'completed') {
-      if (completedAt) out.push({ label: L.finished, value: formatDate(completedAt, lang), className: 'text-success' })
+      if (completedAt) out.push({ label: L.finished, value: formatDate(completedAt, lang), tone: 'success' })
       const span = unlockSpan(items.map((a) => a.earnedAt), {
         underMinute: T.statusGameItem.spanUnderMinute,
         minutes: T.statusGameItem.spanMinutes,
@@ -140,6 +154,8 @@ export default function LibraryGameDetail({
     )
 
   const steps = useMemo(() => milestones(items), [items])
+  // One fact alone (the console) left the card nearly empty beside a full list (#169 B1): then the list takes the row.
+  const showInfo = infoLoading || info.length >= MIN_INFO_ROWS
   const ago = (a: InsightAchievement) => <DateText value={a.earnedAt} />
 
   // Under the figures, the part that is each list's own: what a game in progress, a finished one and
@@ -169,12 +185,12 @@ export default function LibraryGameDetail({
       </>
     ) : (
       <>
-        <motion.div variants={PANEL_IN} className={`${PANEL} ${info.length > 0 ? '' : '@3xl:col-span-2'}`}>
+        <motion.div variants={PANEL_IN} className={`${PANEL} ${showInfo ? '' : '@3xl:col-span-2'}`}>
           <LibraryDetailList title={L.hardestTitle} items={hardest(items, 6)} empty={L.noTargets} columns={2} />
         </motion.div>
-        {info.length > 0 && (
+        {showInfo && (
           <motion.div variants={PANEL_IN} className={PANEL}>
-            <LibraryDetailInfo rows={info} />
+            <LibraryDetailInfo rows={info} isLoading={infoLoading} />
           </motion.div>
         )}
       </>

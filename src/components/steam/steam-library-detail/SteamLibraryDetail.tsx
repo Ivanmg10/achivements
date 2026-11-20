@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
+import { useSteamGameDetails } from '@/hooks/useSteamGameDetails'
 import { SteamAchievementGrid } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import LibraryGameDetail from '@/components/library-game-detail/LibraryGameDetail'
 import { asCategory } from '@/utils/utils'
@@ -11,6 +12,8 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
 import { latestFullSetCompletedAt } from '@/utils/completionDates'
 import ErrorRetry from '@/components/ui/ErrorRetry'
+import { gameInfoRows } from '@/utils/gameInfoRows'
+import { formatStoreDate } from '@/utils/dates'
 
 
 /**
@@ -22,6 +25,15 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
   const { T, lang } = useLanguage()
   const { achievements, isLoading, error, retry } = useSteamAchievements(game.id)
   const items = useMemo(() => fromSteam(achievements, game.id), [achievements, game.id])
+  const detailCategory = asCategory(category)
+  // What the game page's top says of it (the store), for a game not started: the only list that shows it.
+  const { details, isLoading: detailsLoading } = useSteamGameDetails(detailCategory === 'wantToPlay' ? game.id : null)
+  const info = gameInfoRows(T.libraryDetail, {
+    developers: details?.developers,
+    publishers: details?.publishers,
+    genres: details?.genres,
+    released: formatStoreDate(details?.releaseDate, lang),
+  })
 
   const loaded = achievements.length > 0
   const total = loaded ? achievements.length : game.maxPossible
@@ -29,8 +41,10 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
 
   return (
     <LibraryGameDetail
-      category={asCategory(category)}
+      category={detailCategory}
       game={{ source: 'steam', id: game.id, title: game.title, iconUrl: game.imageIcon || undefined }}
+      info={info}
+      infoLoading={detailsLoading}
       items={items}
       completedAt={latestFullSetCompletedAt(items)}
       state={isLoading ? 'loading' : error ? 'error' : 'ready'}
@@ -39,7 +53,7 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
       }
       ring={{ earned, total, label: T.gameExpanded.allAchievements }}
       facts={[
-        { label: T.steam.playtime, value: formatPlaytime(game.playtimeForever, T.steam, lang), className: 'text-steam' },
+        { label: T.steam.playtime, value: formatPlaytime(game.playtimeForever, T.steam, lang), tone: 'steam' },
         ...(game.playtime2Weeks > 0 ? [{ label: T.steam.last2Weeks, value: formatPlaytime(game.playtime2Weeks, T.steam, lang) }] : []),
       ]}
       empty={T.steam.noAchievements}

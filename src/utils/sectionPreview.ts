@@ -3,6 +3,7 @@ import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
 import type { XboxGameProgress } from '@/types/xbox'
 import { raGameId } from '@/utils/gameRef'
+import { raUnstartedPct } from '@/utils/libraryInsights'
 import type { GameSource } from '@/types/game'
 
 /**
@@ -44,7 +45,7 @@ export function raPreviewGames(games: CategoryGame[], count = PREVIEW_MAX): Prev
       title: g.Title,
       subtitle: g.ConsoleName,
       imageRef: g.ImageIcon,
-      pct: Number.isFinite(pctWon) ? Math.min(pctWon * 100, 100) : null,
+      pct: Number.isFinite(pctWon) ? Math.min(pctWon * 100, 100) : raUnstartedPct(g),
     }
   })).slice(0, count)
 }

@@ -20,6 +20,13 @@ describe('LibraryDetailList', () => {
     // No rarity known, none claimed.
     expect(second).not.toHaveTextContent('%')
   })
+  test('each platform shows its own value where RA has its points: Xbox gamerscore, PSN grade (#169 B3)', () => {
+    render(<LibraryDetailList title="Easiest" empty="none" items={[a('x', { gamerscore: 1000 }), a('p', { grade: 'gold' }), a('s')]} />)
+    const [xbox, psn, steam] = screen.getAllByRole('link')
+    expect(xbox).toHaveTextContent('1,000 G')
+    expect(psn).toHaveTextContent(en.psn.gold)
+    expect(steam).not.toHaveTextContent(/points| G$/)
+  })
   test('says what to when empty, and shows placeholders while loading', () => {
     const { rerender, container } = render(<LibraryDetailList title="Next" empty="Nothing here" items={[]} />)
     expect(screen.getByText('Nothing here')).toBeInTheDocument()

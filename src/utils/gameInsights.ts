@@ -10,8 +10,8 @@ import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
 import { raCompareItem, steamCompareItem, psnCompareItem, xboxCompareItem, type CompareAchievement } from '@/utils/gameCompare'
 
 /** An achievement or trophy of any platform, reduced to what a library card tells. */
-export type InsightAchievement = GameAchievement & {
-  /** RA points; the other platforms have none. */
+export type InsightAchievement = GameAchievement & Pick<CompareAchievement, 'grade' | 'gamerscore'> & {
+  /** RA points; the other platforms have none (PSN has its grade, Xbox its gamerscore). */
   points: number | null
   /** RA tags: what the game needs to be beaten, and what can be missed for good. */
   kind: 'progression' | 'win_condition' | 'missable' | null

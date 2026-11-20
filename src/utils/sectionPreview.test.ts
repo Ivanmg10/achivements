@@ -14,9 +14,10 @@ test('RA: as many as asked for, with completion as a percentage', () => {
   expect(preview[0].pct).toBe(100)
 })
 
-test('RA want-to-play games have no progress and use their ID', () => {
+test('RA want-to-play games are at 0 % (none with no achievements) and use their ID', () => {
   const want = { ID: 9, Title: 'W', ImageIcon: '/w.png', ConsoleID: 1, ConsoleName: 'NES', PointsTotal: 0, AchievementsPublished: 3, GameTitle: 'W' }
-  expect(raPreviewGames([want])[0]).toMatchObject({ key: 'ra:9', id: 9, pct: null })
+  expect(raPreviewGames([want])[0]).toMatchObject({ key: 'ra:9', id: 9, pct: 0 })
+  expect(raPreviewGames([{ ...want, AchievementsPublished: 0 }])[0].pct).toBeNull()
 })
 
 test('Steam: progress only once counts are known', () => {

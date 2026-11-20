@@ -17,11 +17,17 @@ describe('the platform badge', () => {
     expect(container.firstElementChild).toHaveClass('text-xs', 'px-2')
   })
 
-  test('is a plain tag in a list row: the name, and on a phone only the logo (#129)', () => {
+  test('is a plain tag in a list row: the name with the logo, and on a phone only the logo (#129)', () => {
     const { container } = render(<LibraryPlatformBadge source="steam" size="tag" />)
     expect(screen.getByText('Steam')).toBeInTheDocument()
-    expect(container.querySelector('svg')).toHaveClass('sm:hidden')
+    expect(container.querySelector('svg')).not.toBeNull()
     expect(screen.getByText('Steam')).toHaveClass('max-sm:sr-only')
+  })
+
+  test('in a list row it names the console, and its logo says the platform aloud (#169)', () => {
+    render(<LibraryPlatformBadge source="psn" size="tag" label="PS4" />)
+    expect(screen.getByText('PS4')).toBeInTheDocument()
+    expect(screen.getByLabelText('PlayStation')).toBeInTheDocument()
   })
 })
 

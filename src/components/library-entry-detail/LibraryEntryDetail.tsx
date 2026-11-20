@@ -12,7 +12,7 @@ import RaLibraryDetail from '@/components/ra-library-detail/RaLibraryDetail'
 import SteamLibraryDetail from '@/components/steam/steam-library-detail/SteamLibraryDetail'
 import PsnLibraryDetail from '@/components/psn/psn-library-detail/PsnLibraryDetail'
 import XboxLibraryDetail from '@/components/xbox/xbox-library-detail/XboxLibraryDetail'
-import { entryHref, entryId } from '@/utils/libraryShelves'
+import { entryHref, entryId } from '@/utils/libraryEntries'
 import type { LibraryEntry } from '@/utils/libraryInsights'
 import { detailCategory } from '@/utils/libraryCategory'
 

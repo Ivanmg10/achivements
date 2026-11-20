@@ -1,7 +1,6 @@
 jest.mock('@/hooks/useRaScreenshot', () => ({ useRaScreenshot: jest.fn(() => undefined) }))
 
 import { fireEvent, render, screen } from '@testing-library/react'
-import LibraryShelfCard from './library-shelf-card/LibraryShelfCard'
 import LibraryListRow from './library-list-row/LibraryListRow'
 import { libraryEntry } from '@/test-utils/libraryFixtures'
 import { en } from '@/translations/en'
@@ -17,13 +16,11 @@ const click = (el: Element) => {
 }
 
 /*
- * A game in a shelf and a game in the list work the same way: the icon and the
- * name open the game's own page, and the rest opens the game beside the list
- * (from the shelves, the list itself). That rest is a button laid over the
+ * A row of the list: the icon and the name open the game's own page, and the
+ * rest opens the game beside the list. That rest is a button laid over the
  * whole, with the two links above it.
  */
 describe.each([
-  ['a card on a shelf', (onTake: jest.Mock, e = ra) => <LibraryShelfCard entry={e} onPick={onTake} />],
   ['a row in the list', (onTake: jest.Mock, e = ra) => <LibraryListRow entry={e} current={false} onSelect={onTake} />],
 ])('%s: only the icon and the name open the game', (_, draw) => {
   test('the name is a link to the game of its platform', () => {
@@ -74,11 +71,6 @@ describe.each([
     container.querySelectorAll('a[aria-hidden="true"]').forEach(click)
     expect(onTake).not.toHaveBeenCalled()
   })
-})
-
-test('the button of a card on a shelf says what it does, by name', () => {
-  render(<LibraryShelfCard entry={ra} onPick={jest.fn()} />)
-  expect(screen.getByRole('button', { name: `${en.libraryLayout.openInList}: Sonic` })).toBeInTheDocument()
 })
 
 test('the button of a row says the game, which the list already shows', () => {

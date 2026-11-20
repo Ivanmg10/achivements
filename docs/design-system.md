@@ -141,7 +141,6 @@ One set of CSS classes in `globals.css` for the whole site (issue #61; families 
   passed plays nothing. A page with `data-motion="still"` (the landing's stop button) shows it at once. This is the one exception to
   "no scroll triggers" below, and only for whole sections under a first screen (the landing).
 - **Only for what appears on its own.** A list that is mounted with its skeleton inside would play on the skeleton: keep the skeleton outside. What opens on a click may stay in Framer (dialogs, toasts, the library's swaps and opened rows); the guard in `uiGuard.test.ts` lists those. No `whileInView`: entrances are not scroll-triggered, but for `EnterOnView` above.
-- **The library's shelves keep their own cascade** (`.enter-shelves` on their root, the user's call, 2026-10-31): each shelf 160 ms after the last, its title sliding in, its cards lifting and settling with a bounce 55 ms apart, "see all" closing it. The general `.enter-cards` was too plain there. It is built on the same tokens, so reduced motion needs nothing more, and its progress bars do not grow.
 - The home's left card (`ViewEntrance`) and profile column (`MainPageProfile.module.css`) came first and keep their own keyframes (the user confirmed it on 2026-10-31). The welcome keeps its own too (`WelcomePage.module.css`): they are timed to its curtain.
 
 ## The slant grammar (identity B v2, #127, 2026-11-09)
@@ -240,7 +239,7 @@ flag is read from the database, never the session).
   that design drew, so it does not move. Outside `ui/`, `uiGuard.test.ts` refuses `rounded-lg`, `-md`, `-sm`, `-xl`, `-2xl`,
   `-3xl` and arbitrary values, on any side, but for its short list of exceptions; a bare `rounded` is only a focus ring's corner.
   A `rounded-full` chip is a pill in both designs: left so on purpose, since moving it would change the slanted design.
-- **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `FoldList`, `Shelf`, `DropSlot` and `ToggleButton`
+- **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `FoldList`, `DropSlot` and `ToggleButton`
   are in `ui/`; **a capped list is a `FoldList`** (#167): `ShowMore` and the list as one piece, the last row fading towards the
   button while folded (`.fold-fade`), the box growing and the new rows rising (`foldItem(i, cap)` on each row, `.enter-rise`
   staggered) on unfolding, shrinking back and handing the button its focus on folding; CSS motion only, none with reduced
@@ -297,7 +296,7 @@ flag is read from the database, never the session).
   what opens on a click may stay in Framer), and never hide an element until a frame, idle callback or observer.
 - A block that waits for a fetch holds its exact room, measured, or the same element unseen: the account page's level
   and rankings switch did not, and the page jumped 118 px when they landed. `useVaultMe`'s `isLoading` covers the session read.
-- Entrance-only: no scroll triggers (but `EnterOnView`, the sections under the landing's first screen), no loops. The library's shelves and the home keep their own keyframes: do not fold
+- Entrance-only: no scroll triggers (but `EnterOnView`, the sections under the landing's first screen), no loops. The home keeps its own keyframes: do not fold
   them into the general families.
 
 ### The library's pieces (`src/components/ui`, 2026-10-24)
@@ -325,6 +324,8 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 - **Bare figures that wrap** (#134): `FIGURES_BY_THREE` (`ui/Figure`; three to a row on a phone, side by side from `sm`, the home's
   activity row) and `FIGURES_BY_THREE_TO_LG` (three to a row until `lg`, then six: a profile's figures) hide the mark in front of
   each row's first figure (the mark carries `data-figure-mark`); a hand-made grid of bare figures leaves it hanging at the row's start.
+  The library's detail uses it too (#169): its figures share the row's width instead of sitting in small boxes at its start. A
+  platform's own figure (a play time) takes its tone (`steam`, `psn`, `xbox`), never a hex.
 - `className` on them is for layout only (margin, width, flex), never colours.
 - **The look lives in tokens** in `globals.css` (`--slant`, `--mark`, `--r-*`, `--h-*`, `--motion-*`,
   `--hardcore`/`--softcore`), defined once for every theme (`designTokens.test.ts`): a future
@@ -354,7 +355,7 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   `menuItemClass` (`ui/menu.ts`); the toasts are the dark card.
 - **Labels, people and rows** (#120): `Kicker` / `kickerClass(tone, size)` (the small label, in sentence case: `xs` the
   home's chart heads, `sm` a panel's, `md` the welcome's; muted, accent, danger, warning, inherit), `SectionHead` (title, hint, an
-  aside at the end; `md` a shelf, `lg` a streak card; Shelf draws its head with it), `Tag` (tinted label; tones
+  aside at the end; `md` a section, `lg` a streak card), `Tag` (tinted label; tones
   muted, neutral, accent, info, success, warning, danger, hardcore, gold, surface, overlay, the platforms' steam, psn, xbox and the consoles' white, black, sky, and custom for a tier's hue in `style`; sizes xs a row's console, sm 20 px, md 22 px, lg 24 px;
   `slant` leans it on `--slant`, only for a mark of the player's own: the level), `Avatar` (round picture, initial or icon fallback,
   `online` draws the presence dot, `sizeSm` the size from `sm`), `ListRow` / `LIST_ROW` (media, title, sub line, trailing; the search panel's

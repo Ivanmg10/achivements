@@ -6,7 +6,6 @@ import AccordionItem from '@/components/ui/Accordion'
 import ShowMore from '@/components/ui/ShowMore'
 import FoldList, { foldItem } from '@/components/ui/FoldList'
 import ToggleButton from '@/components/ui/ToggleButton'
-import Shelf from '@/components/ui/Shelf'
 import SectionHead from '@/components/ui/SectionHead'
 import DropSlot from '@/components/ui/DropSlot'
 import GhostIcon from '@/components/ui/GhostIcon'
@@ -82,13 +81,6 @@ export default function DesignCatalogDisclosure() {
         <Panel>
           <SectionHead title="Keep playing" hint="The games with something left" aside="12 games" />
           <SectionHead size="lg" as="h3" title="Best streaks" aside="5 streaks · 8 days on average" />
-        </Panel>
-      </DesignCatalogPiece>
-      <DesignCatalogPiece id="shelf">
-        <Panel>
-          <Shelf title="Keep playing" hint="The games with something left">
-            <div className="grid grid-cols-2 gap-3"><div className="rounded-tile bg-bg-card p-5">A game card</div><div className="rounded-tile bg-bg-card p-5">Another game</div></div>
-          </Shelf>
         </Panel>
       </DesignCatalogPiece>
       <DesignCatalogPiece id="drop-slot">

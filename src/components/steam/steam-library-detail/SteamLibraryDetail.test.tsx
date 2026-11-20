@@ -10,10 +10,12 @@ jest.mock('@/components/steam/steam-achievement-grid/SteamAchievementGrid', () =
   SteamAchievementGrid: () => <div data-testid="grid" />,
 }))
 jest.mock('@/hooks/useSteamAchievements', () => ({ useSteamAchievements: jest.fn() }))
+jest.mock('@/hooks/useSteamGameDetails', () => ({ useSteamGameDetails: jest.fn(() => ({ details: null, isLoading: false })) }))
 
 import { fireEvent, render, screen } from '@testing-library/react'
 import SteamLibraryDetail from './SteamLibraryDetail'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
+import { useSteamGameDetails } from '@/hooks/useSteamGameDetails'
 import { en } from '@/translations/en'
 import type { SteamGameProgress } from '@/types/steam'
 
@@ -60,4 +62,15 @@ test('on error it says so, with the hint and a retry that asks again', () => {
   expect(screen.getByText(en.steam.privateProfileHint)).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: en.steam.retry }))
   expect(retry).toHaveBeenCalled()
+})
+
+test('a game not started: what the store says of it, asked for only on that list', () => {
+  hook({})
+  ;(useSteamGameDetails as jest.Mock).mockReturnValue({ details: { developers: ['Supergiant'], publishers: ['Supergiant'], genres: ['Action', 'Indie'], releaseDate: '17 Sep, 2020' }, isLoading: false })
+  const { unmount } = render(<SteamLibraryDetail game={GAME} category="wantToPlay" />)
+  expect(useSteamGameDetails).toHaveBeenLastCalledWith(7)
+  expect((last().info as { value: string }[]).map((r) => r.value)).toEqual(['Supergiant', 'Supergiant', 'Action, Indie', expect.stringContaining('2020')])
+  unmount()
+  render(<SteamLibraryDetail game={GAME} category="playing" />)
+  expect(useSteamGameDetails).toHaveBeenLastCalledWith(null)
 })

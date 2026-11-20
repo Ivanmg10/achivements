@@ -9,11 +9,14 @@ jest.mock('@/components/library-game-detail/LibraryGameDetail', () => ({
 jest.mock('@/components/psn/psn-trophy-grid/PsnTrophyGrid', () => ({ PsnTrophyGrid: () => <div data-testid="grid" /> }))
 jest.mock('@/components/psn/psn-trophy-counts/PsnTrophyCounts', () => ({ __esModule: true, default: () => <div data-testid="counts" /> }))
 jest.mock('@/hooks/usePsnTrophies', () => ({ usePsnTrophies: jest.fn() }))
+jest.mock('@/hooks/usePsnGameDetails', () => ({ usePsnGameDetails: jest.fn(() => ({ details: null, isLoading: false })) }))
 
 import { fireEvent, render, screen } from '@testing-library/react'
 import PsnLibraryDetail from './PsnLibraryDetail'
 import { usePsnTrophies } from '@/hooks/usePsnTrophies'
+import { usePsnGameDetails } from '@/hooks/usePsnGameDetails'
 import { en } from '@/translations/en'
+import { formatDay } from '@/utils/dates'
 import { psnGameFixture } from '@/test-utils/psnFixtures'
 
 const GAME = psnGameFixture({ maxPossible: 40, numAwarded: 12, playtimeMinutes: null })
@@ -61,4 +64,16 @@ test('another failure has no privacy hint', () => {
   hook({ error: 'failed' })
   render(<PsnLibraryDetail game={GAME} />)
   expect(screen.queryByText(en.psn.errors.private)).not.toBeInTheDocument()
+})
+
+test('a game not started: what IGDB knows of it beside the console, its panel waiting while it is asked', () => {
+  hook({})
+  ;(usePsnGameDetails as jest.Mock).mockReturnValue({ details: null, isLoading: true })
+  const { unmount } = render(<PsnLibraryDetail game={GAME} category="wantToPlay" />)
+  expect(usePsnGameDetails).toHaveBeenLastCalledWith(GAME.titleId)
+  expect(last().infoLoading).toBe(true)
+  unmount()
+  ;(usePsnGameDetails as jest.Mock).mockReturnValue({ details: { developers: ['TT Games'], publishers: ['LucasArts'], genres: ['Action'], releaseDate: '2011-03-22', summary: null, screenshots: [] }, isLoading: false })
+  render(<PsnLibraryDetail game={GAME} category="wantToPlay" />)
+  expect((last().info as { value: string }[]).map((r) => r.value)).toEqual([GAME.consoleName, 'TT Games', 'LucasArts', 'Action', formatDay('2011-03-22', 'en')])
 })

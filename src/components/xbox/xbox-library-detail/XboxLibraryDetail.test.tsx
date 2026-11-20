@@ -1,4 +1,5 @@
 jest.mock('@/hooks/useXboxAchievements', () => ({ useXboxAchievements: jest.fn() }))
+jest.mock('@/hooks/useXboxGameDetails', () => ({ useXboxGameDetails: jest.fn(() => ({ details: null, isLoading: false })) }))
 jest.mock('@/components/library-game-detail/LibraryGameDetail', () => ({
   __esModule: true,
   default: ({ facts, ring, state, info, grid }: { facts: { label: string; value: string }[]; ring: { earned: number; total: number }; state: string; info: { value: string }[]; grid: React.ReactNode }) => (
@@ -12,9 +13,11 @@ jest.mock('@/components/library-game-detail/LibraryGameDetail', () => ({
 import { render, screen } from '@testing-library/react'
 import XboxLibraryDetail from './XboxLibraryDetail'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
+import { useXboxGameDetails } from '@/hooks/useXboxGameDetails'
 import { xboxAchievementFixture, xboxGameFixture } from '@/test-utils/xboxFixtures'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { en } from '@/translations/en'
+import { formatDay } from '@/utils/dates'
 
 const GAME = xboxGameFixture({ consoleName: 'Xbox Series', maxPossible: 10, numAwarded: 4, totalKnown: true })
 
@@ -55,4 +58,15 @@ test('the opened game shows its whole grid, as the other three platforms do: no 
   setup(Array.from({ length: 93 }, (_, i) => xboxAchievementFixture({ id: String(i + 1), name: `A${i + 1}` })))
   render(<XboxLibraryDetail game={GAME} category="playing" />)
   expect(screen.getByTestId('grid').querySelectorAll('li')).toHaveLength(93)
+})
+
+test('a game not started: what IGDB knows of it beside the console, asked for only on that list', () => {
+  setup()
+  ;(useXboxGameDetails as jest.Mock).mockReturnValue({ details: { developers: ['TT Games'], publishers: ['LucasArts'], genres: ['Action'], releaseDate: '2011-03-22', summary: null, screenshots: [] }, isLoading: false })
+  const { unmount } = render(<XboxLibraryDetail game={GAME} category="wantToPlay" />)
+  expect(useXboxGameDetails).toHaveBeenLastCalledWith(GAME.titleId)
+  expect(screen.getByTestId('detail')).toHaveTextContent(`Xbox Series,TT Games,LucasArts,Action,${formatDay('2011-03-22', 'en')}|`)
+  unmount()
+  render(<XboxLibraryDetail game={GAME} category="playing" />)
+  expect(useXboxGameDetails).toHaveBeenLastCalledWith(null)
 })
