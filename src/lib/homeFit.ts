@@ -5,7 +5,7 @@ export const HOME_PROFILE_KEY = 'block-height:home-profile'
 export const FIT_SCREEN = '(min-width: 1024px) and (min-height: 1000px)'
 
 /** The heatmap's biggest cell there, in px: the charts row is taller, and bigger days fill it instead of a blank band (#164). */
-export const FIT_MAX_CELL = 40
+export const FIT_MAX_CELL = 34
 
 /** The most the daily chart gives up, in px (it never goes under its 160px either, see globals.css). */
 export const MAX_TRIM = 160
