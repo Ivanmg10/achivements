@@ -72,7 +72,14 @@ export default function LibraryDetailList({
                   ) : (
                     <>
                       {a.rarity !== null && <span>{T.libraryDetail.rarityOf.replace('{n}', formatRarity(a.rarity, lang))}</span>}
-                      {a.points !== null && <span className="text-text-main font-medium">{plural(a.points, T.plurals.points, lang)}</span>}
+                      {/* Each platform's own value, in the same place: RA's points, Xbox's gamerscore, PSN's grade. */}
+                      {a.points !== null ? (
+                        <span className="text-text-main font-medium">{plural(a.points, T.plurals.points, lang)}</span>
+                      ) : a.gamerscore !== undefined ? (
+                        <span className="text-text-main font-medium">{a.gamerscore.toLocaleString(lang)} G</span>
+                      ) : (
+                        a.grade && <span className="text-text-main font-medium">{T.psn[a.grade]}</span>
+                      )}
                     </>
                   )}
                 </span>
