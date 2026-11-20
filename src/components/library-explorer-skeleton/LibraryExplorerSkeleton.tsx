@@ -66,12 +66,12 @@ export default function LibraryExplorerSkeleton() {
           </div>
           <Skeleton radius="circle" className="h-[59px] lg:h-11 w-[30rem] max-w-full" />
         </div>
-        <div className={`flex flex-col gap-3 lg:grid lg:gap-5 lg:items-center ${LIBRARY_COLUMNS}`}>
+        <div className={`flex flex-col gap-3 lg:grid lg:gap-x-5 lg:items-start ${LIBRARY_COLUMNS}`}>
           <Skeleton radius="field" className="h-(--h-control) w-full" />
           <div className="flex items-center gap-2">
             <span className="hidden lg:block grow" />
             <Skeleton radius="tile" className="h-11 w-[11.5rem]" />
-            <Skeleton radius="tile" className="h-11 w-[10.375rem] sm:w-[12.375rem]" />
+            <Skeleton radius="tile" className="h-11 w-[6.375rem] sm:w-[13rem]" />
           </div>
         </div>
         <div className={`grid grid-cols-1 ${LIBRARY_COLUMNS} gap-5 items-start`}>
