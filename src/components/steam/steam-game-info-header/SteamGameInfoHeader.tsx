@@ -51,7 +51,7 @@ export default function SteamGameInfoHeader({
   return (
     <GameHero
       cover={{
-        sources: [steamAssetUrl(appId, 'cover'), steamAssetUrl(appId, 'header'), game?.imageIcon],
+        sources: [steamAssetUrl(appId, 'cover2x'), steamAssetUrl(appId, 'cover'), steamAssetUrl(appId, 'header'), game?.imageIcon],
         alt: title,
         fallback: (
           <span className="flex w-full h-full items-center justify-center bg-steam-dark">

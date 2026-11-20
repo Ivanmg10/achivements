@@ -132,6 +132,7 @@ describe('store and artwork', () => {
 
   test.each([
     ['cover', 'library_600x900.jpg'],
+    ['cover2x', 'library_600x900_2x.jpg'],
     ['header', 'header.jpg'],
     ['hero', 'library_hero.jpg'],
     ['logo', 'logo.png'],
