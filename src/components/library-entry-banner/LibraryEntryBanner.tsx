@@ -7,7 +7,7 @@ import { entryBackdrop } from '@/components/library-entry-cover/LibraryEntryCove
 import { useRaScreenshot } from '@/hooks/useRaScreenshot'
 import { useXboxGameDetails } from '@/hooks/useXboxGameDetails'
 import { sharpEnough } from '@/utils/homeHero'
-import { entryId } from '@/utils/libraryShelves'
+import { entryId } from '@/utils/libraryEntries'
 import type { LibraryEntry } from '@/utils/libraryInsights'
 
 const FILL = 'absolute inset-0 w-full h-full object-cover'
@@ -23,7 +23,7 @@ const FILL = 'absolute inset-0 w-full h-full object-cover'
  * so each card still has its game's colour without a blurry picture.
  * Decorative: the card says the game in words.
  */
-export default function LibraryShelfBanner({ entry }: { entry: LibraryEntry }) {
+export default function LibraryEntryBanner({ entry }: { entry: LibraryEntry }) {
   const screenshot = useRaScreenshot(entry.kind === 'ra' ? entryId(entry) : null)
   const { details: xbox } = useXboxGameDetails(entry.kind === 'xbox' ? String(entryId(entry)) : null)
   // The wide picture found too small for this box: the fallback takes its place.

@@ -172,7 +172,7 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   status. Its one row of controls is `library-toolbar/LibraryToolbar`; which page takes which game is
   `utils/libraryCategory.ts` (`inCategory`, and `detailCategory`: on "all" a game opens as its own status).
 - **Utils** (`src/utils/`): pure functions — mappers per platform
-  (`steamMappers`, `psnMappers`), library shelves and insights, `aiExport`. The shared helpers
+  (`steamMappers`, `psnMappers`), library entries and insights, `aiExport`. The shared helpers
   (#119): `dates.ts` (the platforms' UTC dates, day keys (yours on your calendar, the rankings' in UTC), dates in the reader's language),
   `raAssets.ts` (RA's picture URLs, as `lib/steamAssets.ts` is Steam's), `gameRef.ts`
   (`GAME_SOURCES`, `PLATFORM_NAME`, `raGameId`, game keys and pages), `gameAchievements.ts`

@@ -9,11 +9,17 @@ task that lists games.
 `LibraryPage`, with the status as its `category` (`all` is every status). A new library page is a new
 status there, not a page of its own. What each status takes is `inCategory` (`utils/libraryCategory.ts`),
 used by the four `use*GamesByCategory` hooks; on "all" each game keeps its own status (`LibraryEntry.status`),
-its quick filters are the statuses (`quickFiltersFor`), its shelves are "continue" and one per status, its
+its quick filters are the statuses (`quickFiltersFor`), its
 cards are always together (no "by platform" switch), and an opened game shows the detail of its own status
 (`detailCategory`). Every view has the same row of controls (`LibraryToolbar`: search, filters, then the
 order, size and views); the game count under the title only shows when neither the platform tabs nor the
 "all" quick filter say it.
+
+**Two layouts, the list first (#169, 2026-11-20):** the list with the game's detail beside it (`LibraryExplorer`,
+the default) and the cards. The shelves ("Estantes") were removed at the owner's request: of little use, and they
+muddied the design. A `shelves` still saved in a browser or in `users.preferences` (`library-layout`) is not one of
+`useLibraryPrefs`' options, so it reads as the list; nothing rewrites it. A third layout needs its option there,
+in `LibraryLayoutToggle`, in the `if-library-*` rules of `globals.css` and in the root layout's `LOOK_SCRIPT`.
 
 `/allGames?platform=psn` (or `steam`, `ra`, `xbox`) opens it on that platform's tab, read on the server
 (`allGames/page.tsx`, anything else is every platform). The home's "Your consoles" tiles link there for
@@ -101,7 +107,7 @@ completion, while Steam/Xbox deliberately use full-current-set completion (user 
 | **Steam** | When the current set is 100%, use `lastUnlock` (the latest earned achievement). Do not attempt base/DLC separation. | `null` without a valid unlock date; never `lastPlayed`. |
 | **Xbox** | When the current set is 100%, `/api/xbox/titles` reads achievements and uses the latest `unlockedAt`. Do not attempt base/DLC separation. | `null` when the read or date is unavailable; never `lastPlayed`. Partial enrichment is not cached as complete. |
 
-**The Completed lists go by this date, not by activity (#99):** on `/completed` the mixed list orders by it by default (`completed` sort key, `mixedSortKeys`), the platforms' own lists too (`byCompletedDesc`), and rows, cards and shelf cards say "Finished" with it, falling back to the last session only when it is unknown. Playing a DLC later must not move a completed game. RA's own list keeps its orders: it has no such key.
+**The Completed lists go by this date, not by activity (#99):** on `/completed` the mixed list orders by it by default (`completed` sort key, `mixedSortKeys`), the platforms' own lists too (`byCompletedDesc`), and rows and cards say "Finished" with it, falling back to the last session only when it is unknown. Playing a DLC later must not move a completed game. RA's own list keeps its orders: it has no such key.
 
 Collection grids keep undated games in their existing **Undated** group and library details omit
 **Finished** when the date is unknown. Activity feeds, `/racha` and charts still show DLC on its real

@@ -897,9 +897,7 @@ html[data-font="fira"],
 /* A skeleton draws every variant; <html> says which ones show, before the first frame (LOOK_SCRIPT, then ShapeSync). */
 [data-home-layout="cover"] .home-if-classic,
 :root:not([data-home-layout="cover"]) .home-if-cover,
-[data-library-layout="list"] .if-library-shelves,
-[data-library-layout="cards"] .if-library-shelves,
-:root:not([data-library-layout="list"]) .if-library-list,
+[data-library-layout="cards"] .if-library-list,
 :root:not([data-library-layout="cards"]) .if-library-cards,
 [data-session] .if-signed-out,
 :root:not([data-session]) .if-signed-in,
@@ -1087,42 +1085,6 @@ html[data-font="fira"],
 */
 .enter-on-view.enter-wait { opacity: 0; }
 [data-motion="still"] .enter-on-view { opacity: 1; animation: none; }
-
-/*
-   The library's shelves keep their own, livelier cascade (the user's call, 2026-10-31):
-   shelf after shelf, each one's title slides in, its cards lift and settle with a
-   bounce, and "see all" closes it. The next shelf is already arriving while the cards
-   above settle. Built on the same tokens, so reduced motion makes it a plain fade too.
-*/
-@keyframes enter-shelf-title {
-  from { opacity: 0; transform: translateX(calc(var(--enter-rise) * -5 / 3)); }
-}
-@keyframes enter-shelf-card {
-  from { opacity: 0; transform: translateY(calc(var(--enter-rise) * 3)) scale(calc(1 - (1 - var(--enter-scale)) * 5)); }
-}
-@keyframes enter-shelf-end {
-  from { opacity: 0; transform: translateY(calc(var(--enter-rise) * 2)); }
-}
-.enter-shelves > * { --shelf-at: calc(var(--shelf, 0) * 4 * var(--enter-stagger)); }
-.enter-shelves > :nth-child(2) { --shelf: 1; }
-.enter-shelves > :nth-child(3) { --shelf: 2; }
-.enter-shelves > :nth-child(4) { --shelf: 3; }
-.enter-shelves > :nth-child(5) { --shelf: 4; }
-.enter-shelves .enter-rise,
-.enter-shelves .enter-cards:not([data-entered]) > :nth-child(-n + 12) {
-  animation-duration: calc(var(--enter-duration) * 4 / 3);
-  animation-timing-function: var(--ease-spring);
-}
-.enter-shelves .enter-rise {
-  --enter-name: enter-shelf-title;
-  animation-delay: var(--shelf-at);
-}
-.enter-shelves .enter-cards:not([data-entered]) > :nth-child(-n + 12) {
-  --enter-name: enter-shelf-card;
-  animation-delay: calc(var(--shelf-at) + (var(--i, 0) + 1) * 1.375 * var(--enter-stagger));
-}
-.enter-shelves > .enter-rise { --enter-name: enter-shelf-end; }
-.enter-shelves .enter-cards:not([data-entered]) > :nth-child(-n + 12) [data-fill] { animation: none; }
 
 /* The top line while a page is on its way (NavigationProgress): fills fast, then slows down and waits. */
 @keyframes nav-progress {

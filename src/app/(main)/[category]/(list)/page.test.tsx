@@ -74,12 +74,11 @@ jest.mock('@/components/library-all-list/LibraryAllList', () => ({
 
 jest.mock('@/components/library-explorer/LibraryExplorer', () => ({
   __esModule: true,
-  default: ({ layout, entries, onLayout, search, layoutToggle }: { layout: string; entries: { key: string }[]; onLayout: (l: string) => void; search?: React.ReactNode; layoutToggle?: React.ReactNode }) => (
-    <div data-testid="explorer" data-layout={layout}>
+  default: ({ entries, search, layoutToggle }: { entries: { key: string }[]; search?: React.ReactNode; layoutToggle?: React.ReactNode }) => (
+    <div data-testid="explorer">
       {search}
       {layoutToggle}
       {entries.map((e) => e.key).join(',')}
-      <button onClick={() => onLayout('list')}>to-list</button>
     </div>
   ),
 }))
@@ -98,7 +97,7 @@ import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import { fireEvent } from '@testing-library/react'
 import { en } from '@/translations/en'
 
-/** The page opens on its shelves; most of these tests are about the cards, so go there first. */
+/** The page opens on its list; most of these tests are about the cards, so go there first. */
 function renderCards() {
   const view = render(<CategoryPage />)
   const cards = screen.queryByRole('button', { name: 'Cards' })
@@ -117,7 +116,7 @@ beforeEach(() => {
   ;(useRaLinked as jest.Mock).mockReturnValue(true)
 })
 
-test('renders loading state: the skeleton of the shelves it opens on', () => {
+test('renders loading state: the skeleton of the list it opens on', () => {
   ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: true, error: null })
   render(<CategoryPage />)
   expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'true')
@@ -380,7 +379,7 @@ describe('library filters and views', () => {
   })
 })
 
-describe('shelves and list', () => {
+describe('list and cards', () => {
   const ra = { GameID: 1, Title: 'Sly Cooper', ConsoleID: 21, ConsoleName: 'PS2', PctWon: '0.5' }
   const steam = { id: 5, title: 'Hades', pctWon: 30, lastPlayed: null }
 
@@ -396,55 +395,41 @@ describe('shelves and list', () => {
     ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [] })
   })
 
-  test('opens on the shelves, with the games of every platform together', () => {
+  test('opens on the list, with the games of every platform together', () => {
     render(<CategoryPage />)
     const explorer = screen.getByTestId('explorer')
-    expect(explorer).toHaveAttribute('data-layout', 'shelves')
     expect(explorer).toHaveTextContent('ra:1,steam:5')
     expect(screen.queryByTestId('steam-section')).not.toBeInTheDocument()
   })
 
   test('the layout left is the one it opens on next time, whatever the category', () => {
     const { unmount } = render(<CategoryPage />)
-    fireEvent.click(screen.getByRole('button', { name: 'List' }))
-    expect(localStorage.getItem('library-layout')).toBe('list')
+    fireEvent.click(screen.getByRole('button', { name: 'Cards' }))
+    expect(localStorage.getItem('library-layout')).toBe('cards')
     unmount()
     ;(useParams as jest.Mock).mockReturnValue({ category: 'completed' })
     render(<CategoryPage />)
-    expect(screen.getByTestId('explorer')).toHaveAttribute('data-layout', 'list')
+    expect(screen.queryByTestId('explorer')).not.toBeInTheDocument()
+    expect(screen.getByTestId('steam-section')).toBeInTheDocument()
   })
 
-  test('a search that moves the shelves to the list does not overwrite the saved layout', () => {
+  test('the toggle moves between the two views, and the cards are the platform sections', () => {
     render(<CategoryPage />)
-    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'had' } })
-    expect(screen.getByTestId('explorer')).toHaveAttribute('data-layout', 'list')
-    expect(localStorage.getItem('library-layout')).toBeNull()
-  })
-
-  test('typing in the search while on the shelves goes to the list', () => {
-    render(<CategoryPage />)
-    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'had' } })
-    expect(screen.getByTestId('explorer')).toHaveAttribute('data-layout', 'list')
-  })
-
-  test('the toggle moves between the three views, and the cards are the platform sections', () => {
-    render(<CategoryPage />)
-    fireEvent.click(screen.getByRole('button', { name: 'List' }))
-    expect(screen.getByTestId('explorer')).toHaveAttribute('data-layout', 'list')
+    expect(screen.queryByRole('button', { name: 'Shelves' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Cards' }))
     expect(screen.queryByTestId('explorer')).not.toBeInTheDocument()
     expect(screen.getByTestId('steam-section')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Shelves' }))
-    expect(screen.getByTestId('explorer')).toHaveAttribute('data-layout', 'shelves')
+    fireEvent.click(screen.getByRole('button', { name: 'List' }))
+    expect(screen.getByTestId('explorer')).toBeInTheDocument()
   })
 
-  test('the explorer can ask for the list itself, as a picked card does', () => {
+  test('a saved shelves layout (removed in #169) opens the list', () => {
+    localStorage.setItem('library-layout', 'shelves')
     render(<CategoryPage />)
-    fireEvent.click(screen.getByText('to-list'))
-    expect(screen.getByTestId('explorer')).toHaveAttribute('data-layout', 'list')
+    expect(screen.getByTestId('explorer')).toBeInTheDocument()
   })
 
-  test('a platform selector beside the title narrows what the shelves and the list show', () => {
+  test('a platform selector beside the title narrows what the list shows', () => {
     render(<CategoryPage />)
     expect(screen.getByTestId('explorer')).toHaveTextContent('ra:1,steam:5')
     fireEvent.click(screen.getByRole('tab', { name: 'Steam 1' }))

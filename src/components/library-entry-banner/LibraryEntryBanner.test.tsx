@@ -1,5 +1,5 @@
 import { fireEvent, render, waitFor } from '@testing-library/react'
-import LibraryShelfBanner from './LibraryShelfBanner'
+import LibraryEntryBanner from './LibraryEntryBanner'
 import { fetchShared } from '@/lib/fetchShared'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
 import type { LibraryEntry } from '@/utils/libraryInsights'
@@ -16,12 +16,12 @@ const xboxEntry = () => {
 
 const img = (container: HTMLElement) => container.querySelector('img')!
 
-describe('LibraryShelfBanner (Xbox)', () => {
+describe('LibraryEntryBanner (Xbox)', () => {
   beforeEach(() => mockFetch.mockReset())
 
   it('shows IGDB wide art sharp once it arrives', async () => {
     mockFetch.mockResolvedValue({ ok: true, status: 200, json: async () => ({ heroUrl: HERO }) })
-    const { container } = render(<LibraryShelfBanner entry={xboxEntry()} />)
+    const { container } = render(<LibraryEntryBanner entry={xboxEntry()} />)
     await waitFor(() => expect(img(container)).toHaveAttribute('src', HERO))
     expect(img(container).className).not.toMatch(/blur/)
     expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/xbox/details?id='))
@@ -29,7 +29,7 @@ describe('LibraryShelfBanner (Xbox)', () => {
 
   it('a wide picture far smaller than its card gives way to the blurred tile, not a stretched blur', async () => {
     mockFetch.mockResolvedValue({ ok: true, status: 200, json: async () => ({ heroUrl: HERO }) })
-    const { container } = render(<LibraryShelfBanner entry={xboxEntry()} />)
+    const { container } = render(<LibraryEntryBanner entry={xboxEntry()} />)
     await waitFor(() => expect(img(container)).toHaveAttribute('src', HERO))
     const loaded = img(container)
     Object.defineProperties(loaded, {
@@ -43,7 +43,7 @@ describe('LibraryShelfBanner (Xbox)', () => {
 
   it('keeps the blurred tile when IGDB has no match', async () => {
     mockFetch.mockResolvedValue({ ok: false, status: 404, json: async () => ({}) })
-    const { container } = render(<LibraryShelfBanner entry={xboxEntry()} />)
+    const { container } = render(<LibraryEntryBanner entry={xboxEntry()} />)
     await waitFor(() => expect(mockFetch).toHaveBeenCalled())
     expect(img(container).getAttribute('src')).toBe(xboxGameFixture().imageIcon)
     expect(img(container).className).toMatch(/blur/)

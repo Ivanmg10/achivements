@@ -4,9 +4,6 @@ import { useLanguage } from '@/context/LanguageContext'
 import { Skeleton } from '@/components/ui/Skeleton'
 
 const ROWS = 8
-/** The first shelf runs over two rows of the widest grid, the next ones start below it. */
-const FIRST_SHELF_CARDS = 8
-const SHELF_CARDS = 4
 
 /** The list's own shape: icon, title, platform, bar. Same height as a real row. */
 function Row() {
@@ -48,36 +45,12 @@ function Detail() {
   )
 }
 
-/** One shelf: its title and its cards. */
-function Shelf({ cards = SHELF_CARDS }: { cards?: number }) {
-  return (
-    <div className="flex flex-col gap-3">
-      <Skeleton className="h-5 w-48" />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {Array.from({ length: cards }, (_, i) => (
-          <div key={i} className="rounded-card bg-bg-card ring-1 ring-ink/5 overflow-hidden">
-            <Skeleton radius="none" className="aspect-video" />
-            <div className="p-4 min-h-[7.25rem] flex flex-col justify-end gap-3">
-              <Skeleton className="h-4 w-2/3" />
-              <Skeleton className="h-1.5 w-full" />
-              <div className="flex justify-between">
-                <Skeleton className="h-3 w-10" />
-                <Skeleton className="h-3 w-12" />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 /**
- * The shelves, or the list with a game's panel beside it, while a status list
- * loads: in the page's own layout, under the header, so the real thing takes
- * its place where it stands. Announced once.
+ * The list with a game's panel beside it, while a status list loads: in the
+ * page's own layout, under the header, so the real thing takes its place
+ * where it stands. Announced once.
  */
-export default function LibraryExplorerSkeleton({ layout }: { layout: 'shelves' | 'list' }) {
+export default function LibraryExplorerSkeleton() {
   const { T } = useLanguage()
 
   return (
@@ -95,26 +68,19 @@ export default function LibraryExplorerSkeleton({ layout }: { layout: 'shelves' 
         <div className="flex items-center gap-3 flex-wrap">
           <Skeleton radius="field" className="h-[3.25rem] w-full sm:w-[21.25rem]" />
           <span className="hidden sm:block grow" />
-          {layout === 'list' && <Skeleton radius="tile" className="h-11 w-[11.5rem]" />}
+          <Skeleton radius="tile" className="h-11 w-[11.5rem]" />
           <Skeleton radius="tile" className="h-10 w-[16rem] sm:w-[18.375rem]" />
         </div>
-        {layout === 'list' ? (
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(22rem,37rem)_minmax(0,1fr)] gap-5 items-start">
-            <div className="flex flex-col gap-px">
-              {Array.from({ length: ROWS }, (_, i) => (
-                <Row key={i} />
-              ))}
-            </div>
-            <div className="hidden lg:block">
-              <Detail />
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(22rem,37rem)_minmax(0,1fr)] gap-5 items-start">
+          <div className="flex flex-col gap-px">
+            {Array.from({ length: ROWS }, (_, i) => (
+              <Row key={i} />
+            ))}
           </div>
-        ) : (
-          <div className="flex flex-col gap-8">
-            <Shelf cards={FIRST_SHELF_CARDS} />
-            <Shelf />
+          <div className="hidden lg:block">
+            <Detail />
           </div>
-        )}
+        </div>
       </div>
     </div>
   )

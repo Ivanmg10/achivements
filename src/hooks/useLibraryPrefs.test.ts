@@ -14,6 +14,7 @@ test('starts from the category\'s default order, two columns, platforms apart', 
   expect(result.current.sortState).toEqual({ key: 'lastPlayed', dir: 'desc' })
   expect(result.current.gridCols).toBe(2)
   expect(result.current.view).toBe('platform')
+  expect(result.current.layout).toBe('list')
 })
 
 test('wantToPlay starts by name', () => {
@@ -28,18 +29,18 @@ test('remembers each choice, and the order per category', () => {
     result.current.setAllSortState({ key: 'name', dir: 'desc' })
     result.current.setGridCols(3)
     result.current.setView('all')
-    result.current.setLayout('list')
+    result.current.setLayout('cards')
   })
   expect(result.current.sortState).toEqual({ key: 'percent', dir: 'asc' })
   expect(result.current.allSortState).toEqual({ key: 'name', dir: 'desc' })
   expect(result.current.gridCols).toBe(3)
   expect(result.current.view).toBe('all')
-  expect(result.current.layout).toBe('list')
+  expect(result.current.layout).toBe('cards')
   // Another category keeps its own order; the layout choices are shared.
   const other = renderHook(() => useLibraryPrefs('completed')).result
   expect(other.current.sortState).toEqual({ key: 'lastPlayed', dir: 'desc' })
   expect(other.current.gridCols).toBe(3)
-  expect(other.current.layout).toBe('list')
+  expect(other.current.layout).toBe('cards')
 })
 
 test('ignores a stored value that is not an option', () => {
@@ -48,6 +49,12 @@ test('ignores a stored value that is not an option', () => {
   localStorage.setItem('library-sort:playing', 'bogus')
   const { result } = renderHook(() => useLibraryPrefs('playing'))
   expect(result.current.gridCols).toBe(2)
-  expect(result.current.layout).toBe('shelves')
+  expect(result.current.layout).toBe('list')
   expect(result.current.sortState).toEqual({ key: 'lastPlayed', dir: 'desc' })
+})
+
+test('a saved shelves layout (removed in #169), from this browser or the account, reads as the list', () => {
+  localStorage.setItem('library-layout', 'shelves')
+  const { result } = renderHook(() => useLibraryPrefs('playing'))
+  expect(result.current.layout).toBe('list')
 })
