@@ -33,6 +33,35 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-20 — Annual wrap, first canvas round (`docs/wrap-design`, #172)
+
+**Did** — the first round of clickable concepts for the annual wrap on a design canvas
+(https://claude.ai/artifact/P4EH6b81mF7NUKNytkUc4o): A El telón (the story in four acts with the welcome's curtain
+between them), B Las cartas (each moment a card that grows; pick four for the image), C El mapa del año (the heatmap as
+the stage of the story; the page month by month). Each has the story (first time), the long page (coming back) and the
+share image, at desktop and 390, beside today's closest screens (real captures of the home's Resumen, `/racha` and the
+Collection), with grande / tranquilo / nuevo, accent and reduced-motion tweaks. Entry added to `docs/designs.md`.
+Nothing in `src/` changed.
+
+**Why** — #172: the owner wants the design on the canvas first ("los diseños quiero solo el canvas", 2026-11-19), from
+their answers on the issue (2026-11-14): story first, page after; 1 January to 24 December; a share image with only what
+the player picks; comparisons yes.
+
+**Decisions** — real data only: the owner's 2026 from the app's own GET routes (RA heatmap year, Steam `unlockYear`,
+PSN `recentTrophies?scope=year`, RA awards), local days (Europe/Madrid), cut at 20 November; the rest of the year is drawn
+empty. The quiet year is the owner's Steam 2026 alone and the new account is a player who started on 10 November (both
+labelled as illustrations). Comparisons and the year's Vault Points are [placeholders]: they need the computed-ahead
+snapshot. No Xbox. The share images never carry "achievements to get" or follows.
+
+**Open** — the owner picks a concept or a mix and answers on the canvas (where it lives and after 6 January, time zone,
+archetype, what the image may show, which comparisons, a new account's year, hours). Then `docs/wrap-plan.md`.
+
+**Watch out** — a new account still gets its whole year from RA, Steam and PlayStation (they give history before
+sign-up), so a "short wrap" only happens for someone new to achievements; decide which year a new account's wrap counts.
+The concepts were not render-checked by the agent (the canvas type forbids it); the owner may find layout slips.
+
+---
+
 ## 2026-11-20 — Trayectoria, first canvas round (`docs/trayectoria-design`, #170)
 
 **Did** — the first round of clickable concepts for Trayectoria on a design canvas
