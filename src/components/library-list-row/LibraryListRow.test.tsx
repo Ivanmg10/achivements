@@ -32,3 +32,14 @@ test('elsewhere, or with no completion date, it shows the last session', () => {
   row({ ...ENTRY, completedAt: null }, 'completed')
   expect(screen.getByText(new RegExp(en.statusGameItem.lastPlayed))).toBeInTheDocument()
 })
+
+test('a game at 0 % has its bar, as every other; one with nothing to measure keeps the line\'s room', () => {
+  const { container, unmount } = row({ ...ENTRY, pct: 0 })
+  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
+  expect(screen.getByText('0%')).toBeInTheDocument()
+  expect(container.querySelector('[data-no-progress]')).toBeNull()
+  unmount()
+  const none = row({ ...ENTRY, pct: null })
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+  expect(none.container.querySelector('[data-no-progress]')).toHaveAttribute('aria-hidden', 'true')
+})

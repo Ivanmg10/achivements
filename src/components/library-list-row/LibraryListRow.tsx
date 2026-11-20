@@ -53,11 +53,14 @@ export default function LibraryListRow({ entry, current, category, onSelect }: {
           </Link>
           <LibraryPlatformBadge source={entry.kind} size="tag" />
         </div>
-        {pct !== null && (
+        {/* Every game has its bar, 0 % too (#169); one with no achievements keeps the line's room so the rows stay one height. */}
+        {pct !== null ? (
           <span className="flex items-center gap-2.5">
             <ProgressBar pct={pct} label={entry.title} className="flex-1" />
             <span className={`w-9 text-right text-[0.8125rem] font-extrabold tabular-nums ${pct >= 100 ? 'text-success' : ''}`}>{Math.round(pct)}%</span>
           </span>
+        ) : (
+          <span aria-hidden="true" data-no-progress className="h-[1lh] text-[0.8125rem]" />
         )}
         {when && <span className="text-xs text-text-secondary truncate">{finished ? T.libraryDetail.finished : T.statusGameItem.lastPlayed} · {when}</span>}
       </div>
