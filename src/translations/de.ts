@@ -837,6 +837,7 @@ export const de: Translations = {
     titleScreen: 'Titelbildschirm',
     inGame: 'Im Spiel',
     mainGame: 'Hauptspiel',
+    achievementSets: 'Erfolgssets',
     hashesCopy: 'Hash kopieren',
     hashesCopied: 'Kopiert',
     hashesLoadError: 'Die Hashes konnten nicht geladen werden. Versuche es gleich noch einmal.',

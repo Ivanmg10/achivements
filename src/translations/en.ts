@@ -838,6 +838,7 @@ export const en = {
     titleScreen: 'Title screen',
     inGame: 'In game',
     mainGame: 'Main game',
+    achievementSets: 'Achievement sets',
     hashesCopy: 'Copy hash',
     hashesCopied: 'Copied',
     hashesLoadError: 'Could not load the hashes. Try again in a moment.',

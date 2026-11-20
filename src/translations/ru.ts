@@ -837,6 +837,7 @@ export const ru: Translations = {
     titleScreen: 'Титульный экран',
     inGame: 'В игре',
     mainGame: 'Основная игра',
+    achievementSets: 'Наборы достижений',
     hashesCopy: 'Копировать хэш',
     hashesCopied: 'Скопировано',
     hashesLoadError: 'Не удалось загрузить хэши. Попробуйте ещё раз через минуту.',

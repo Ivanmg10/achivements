@@ -837,6 +837,7 @@ export const pt: Translations = {
     titleScreen: 'Tela de título',
     inGame: 'No jogo',
     mainGame: 'Jogo principal',
+    achievementSets: 'Conjuntos de conquistas',
     hashesCopy: 'Copiar hash',
     hashesCopied: 'Copiado',
     hashesLoadError: 'Não foi possível carregar os hashes. Tenta novamente daqui a um momento.',

@@ -837,6 +837,7 @@ export const pl: Translations = {
     titleScreen: 'Ekran tytułowy',
     inGame: 'W grze',
     mainGame: 'Gra podstawowa',
+    achievementSets: 'Zestawy osiągnięć',
     hashesCopy: 'Kopiuj hash',
     hashesCopied: 'Skopiowano',
     hashesLoadError: 'Nie udało się wczytać hashy. Spróbuj ponownie za chwilę.',

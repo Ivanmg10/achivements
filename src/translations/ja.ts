@@ -837,6 +837,7 @@ export const ja: Translations = {
     titleScreen: 'タイトル画面',
     inGame: 'ゲーム中',
     mainGame: '本編',
+    achievementSets: '実績セット',
     hashesCopy: 'ハッシュをコピー',
     hashesCopied: 'コピーしました',
     hashesLoadError: 'ハッシュを読み込めませんでした。しばらくしてからもう一度お試しください。',
