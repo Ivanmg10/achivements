@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import GameInfoSkeleton from './GameInfoSkeleton'
 import GameInfoSkeletonTable from './game-info-skeleton-table/GameInfoSkeletonTable'
 import { en } from '@/translations/en'
+import { MEDIA_BOX, MEDIA_GRID, MEDIA_ROWS } from '@/components/game-hero/game-hero-media/GameHeroMedia'
 
 test('announces loading once and hides the shapes', () => {
   const { container } = render(<GameInfoSkeleton />)
@@ -20,4 +21,13 @@ test('the table skeleton draws the rows it is asked for', () => {
   // The card holds the tabs' line, then one shape per row.
   expect(container.firstElementChild!.firstElementChild!.children).toHaveLength(4)
   expect(container.firstElementChild).toHaveAttribute('aria-hidden', 'true')
+})
+
+test("the pictures' column holds the hero's room: as tall as the row from lg, two pictures stacked in its grid (#167)", () => {
+  const { container } = render(<GameInfoSkeleton />)
+  const column = container.querySelector('section')!.children[2]
+  expect(column).toHaveClass('lg:self-stretch')
+  const grid = column.lastElementChild!
+  expect(grid.className).toBe(`${MEDIA_GRID} ${MEDIA_ROWS[1]}`)
+  for (const box of Array.from(grid.children)) expect(box.className).toContain(`${MEDIA_BOX} lg:col-span-2`)
 })

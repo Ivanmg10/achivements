@@ -1,15 +1,24 @@
-import type { CSSProperties } from 'react'
 import Image from 'next/image'
 import { FadeImage } from '@/components/ui/FadeImage'
 
 /** `alt` names the picture for a screen reader; `caption` is shown under it, only when it says more than a number. */
 export type GameHeroShot = { src: string; alt: string; caption?: string; full?: string }
 
-/** The least a picture that grows may be, so the column never folds to nothing beside a short hero. */
-const MIN_ROW = 'minmax(8.75rem,1fr)'
+/** The pictures' grid: from lg it takes the column's room left under the tiles. `GameInfoSkeleton` draws the same. */
+export const MEDIA_GRID = 'grid grid-cols-2 gap-2 lg:flex-1 lg:min-h-0'
 
-/** From lg, by how many pictures there are: one fills the room, two share it, a third pair sits under the first. */
-const ROWS = ['lg:grid-rows-[var(--row)]', 'lg:grid-rows-[repeat(2,var(--row))]', 'lg:grid-rows-[var(--row)_auto]']
+/**
+ * Its rows from lg, by how many pictures there are: one fills the room, two share it, a third pair sits under the
+ * first. A row that grows is 8.75rem at least, so the column never folds to nothing beside a short hero.
+ */
+export const MEDIA_ROWS = [
+  'lg:grid-rows-[minmax(8.75rem,1fr)]',
+  'lg:grid-rows-[repeat(2,minmax(8.75rem,1fr))]',
+  'lg:grid-rows-[minmax(8.75rem,1fr)_auto]',
+]
+
+/** A picture's box: 320:224 on a phone; from lg, one that grows fills its row across the column. */
+export const MEDIA_BOX = 'aspect-[320/224] lg:aspect-auto lg:h-full'
 
 /**
  * The pictures under a game's figures (RA's title screen and in-game shot, with
@@ -28,15 +37,12 @@ export default function GameHeroMedia({ shots }: { shots: (GameHeroShot | null)[
   const three = shown.length === 3
 
   return (
-    <div
-      className={`grid grid-cols-2 gap-2 lg:flex-1 lg:min-h-0 ${ROWS[shown.length - 1]}`}
-      style={{ '--row': MIN_ROW } as CSSProperties}
-    >
+    <div className={`${MEDIA_GRID} ${MEDIA_ROWS[shown.length - 1]}`}>
       {shown.map((s, i) => {
         const grows = !three || i === 0
         const img = (
           <span
-            className={`relative block w-full aspect-[320/224] rounded-tile overflow-hidden ring-1 ring-inset ring-ink/10 ${grows ? 'lg:aspect-auto lg:h-full' : ''}`}
+            className={`relative block w-full rounded-tile overflow-hidden ring-1 ring-inset ring-ink/10 ${grows ? MEDIA_BOX : 'aspect-[320/224]'}`}
           >
             {grows && (
               <Image src={s.src} alt="" aria-hidden="true" fill sizes="420px" unoptimized className="max-lg:hidden object-cover scale-125 blur-xl brightness-[0.45]" />

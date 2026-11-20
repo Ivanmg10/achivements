@@ -66,6 +66,8 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
   first over the other two; a growing picture is `object-contain` over its blurred copy (as the cover). A phone keeps
   two side by side (the third is hidden there). Rows have a 8.75rem floor, so beside a short hero (Steam at 2560) the
   right column is ~20 px taller than the middle, no more.
+  The skeleton draws the same (`GameInfoSkeleton` reads `MEDIA_GRID` / `MEDIA_ROWS` / `MEDIA_BOX` from `GameHeroMedia`): its right
+  column went from 231 px (pictures 144) to 375 (288), the loaded one being 379 to 616 by game.
 
 **Decisions**
 - "Hide spoilers" rather than a `Switch`: the button is the table's one extra control and the owner said not to touch
@@ -76,7 +78,8 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 **Open**
 - The owner should look at B8's stacked RA pictures (DS shots are tall, so they sit narrow over the blur) and B2's
   sizes at 1280 / 2560; at 1280 "Pokémon Sapphire Version" still takes three lines (74 px, as before).
-- `GameInfoSkeleton`'s right column still draws the two pictures at their old size; the real column grows when it lands.
+- `GameInfoSkeleton`'s middle column (250 to 294 px) is shorter than the loaded one (340 to 616: title, summary, subsets),
+  so the hero still grows on load at 1280 and on RA/PSN at 2560; the right column follows the row, not its own content.
 
 **Watch out**
 - `TITLE_SIZE` needs `@container` on its parent and `w-full` on it below lg (the column is `items-start`; with

@@ -3,6 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import GameInfoSkeletonTable from './game-info-skeleton-table/GameInfoSkeletonTable'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { MEDIA_BOX, MEDIA_GRID, MEDIA_ROWS } from '@/components/game-hero/game-hero-media/GameHeroMedia'
 
 /**
  * A game page (RA or Steam) while it loads, in the page's own layout: the
@@ -43,14 +44,15 @@ export default function GameInfoSkeleton({ cover = 'frame' }: { cover?: 'frame' 
               <Skeleton radius="button" className="h-11 w-40" />
             </div>
           </div>
-          <div className="flex flex-col gap-3 w-full lg:w-[26.25rem] shrink-0">
+          {/* As the hero's: from lg the column is as tall as the row, two pictures stacked in the room under the tiles. */}
+          <div className="flex flex-col gap-3 w-full lg:w-[26.25rem] shrink-0 lg:self-stretch">
             <div className="grid grid-cols-2 gap-2">
               <Skeleton radius="tile" className="h-[4.6875rem]" />
               <Skeleton radius="tile" className="h-[4.6875rem]" />
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Skeleton radius="tile" className="aspect-[320/224]" />
-              <Skeleton radius="tile" className="aspect-[320/224]" />
+            <div className={`${MEDIA_GRID} ${MEDIA_ROWS[1]}`}>
+              <Skeleton radius="tile" className={`${MEDIA_BOX} lg:col-span-2`} />
+              <Skeleton radius="tile" className={`${MEDIA_BOX} lg:col-span-2`} />
             </div>
           </div>
         </section>
