@@ -72,7 +72,7 @@ test('the progress: the bar, the share and the count', () => {
   expect(screen.getByText('5 of 39')).toBeInTheDocument()
 })
 
-test('media: two pictures at most, with captions; one with a full version links to it', () => {
+test('media: three pictures at most, with captions; one with a full version links to it', () => {
   render(
     <GameHeroMedia
       shots={[
@@ -80,12 +80,22 @@ test('media: two pictures at most, with captions; one with a full version links 
         null,
         { src: 'b.png', alt: 'In game', caption: 'In game', full: 'b-full.png' },
         { src: 'c.png', alt: 'Third', caption: 'Third' },
+        { src: 'd.png', alt: 'Fourth', caption: 'Fourth' },
       ]}
     />,
   )
   expect(screen.getByText('Title screen')).toBeInTheDocument()
   expect(screen.getByText('In game').closest('figure')!.querySelector('a')).toHaveAttribute('href', 'b-full.png')
-  expect(screen.queryByText('Third')).not.toBeInTheDocument()
+  expect(screen.queryByText('Fourth')).not.toBeInTheDocument()
+  // From lg the first fills the column and the other two sit under it; a phone shows two (#167).
+  expect(screen.getByText('Title screen').closest('figure')).toHaveClass('lg:col-span-2')
+  expect(screen.getByText('In game').closest('figure')).not.toHaveClass('lg:col-span-2')
+  expect(screen.getByText('Third').closest('figure')).toHaveClass('max-lg:hidden')
+})
+
+test('media: two pictures are stacked from lg, each as wide as the column', () => {
+  render(<GameHeroMedia shots={[{ src: 'a.png', alt: 'A', caption: 'A' }, { src: 'b.png', alt: 'B', caption: 'B' }]} />)
+  for (const c of ['A', 'B']) expect(screen.getByText(c).closest('figure')).toHaveClass('lg:col-span-2')
 })
 
 test('media: a screenshot that would only say its number has no caption, only its name for a screen reader', () => {

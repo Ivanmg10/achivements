@@ -90,7 +90,7 @@ export default function GameHero({
       </div>
 
       {(tiles.length > 0 || media) && (
-        <div className="w-full lg:w-[26.25rem] shrink-0 flex flex-col gap-3 enter-rise [--i:5]">
+        <div className="w-full lg:w-[26.25rem] shrink-0 lg:self-stretch flex flex-col gap-3 enter-rise [--i:5]">
           {tiles.length > 0 && (
             <dl className="grid grid-cols-2 gap-2">
               {tiles.map((t) => (
