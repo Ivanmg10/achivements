@@ -33,7 +33,57 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
-## 2026-11-19 — Game page review, part A (`fix/167-game-page-review`, #167)
+## 2026-11-20 — Game page review (`fix/167-game-page-review`, #167)
+
+### Part B (B1–B8)
+
+**Did**
+- B1: Xbox's tiles said 73, the tabs 72 (Minecraft 360). Cause: `xbox:achievements:v5` was keyed by `lastPlayed`
+  alone, and Xbox keeps the session's start while the game runs, so a list read mid-session kept its key after a later
+  unlock. The key now carries `numAwarded` too, and the page reads the hero's count, gamerscore and share from a whole
+  list (`xboxProgressFromList`, `utils/xboxTitles.ts`). Checked on the real page: 73 / 93 and 73 / 20. PSN (40 games,
+  title list vs stored trophies) and Steam (counts from the list already) and RA (one answer) agree. IGDB's hero art on
+  the Xbox page goes through `https()`.
+- B2: the title's size is `clamp(2rem, 400cqi / chars, today's size)` over a container query on the middle column
+  (`GameHero` `TITLE_SIZE`, `--title-chars`): about two lines' worth. At 1280 "Pokémon Mystery Dungeon: Blue Rescue
+  Team" is 43 px on two lines (was four); short titles and every title at 2560 stay at 76 px.
+- B3: `TAB_ROW` (every horizontal `Tabs`) lacked `[scrollbar-width:none]`, which the rail and the card-title rows had:
+  that was the grey bar. Below sm the table's search takes its own row (`max-sm:order-first max-sm:basis-full`).
+- B4: `TableTexts.search` (PSN: `T.psn.searchTrophies`, "Buscar un trofeo"); `T.psn.hideHiddenTrophies` is now "Ocultar
+  spoilers" / "Hide spoilers", nine languages; both in `docs/i18n.md` → Vocabulary.
+- B5: `formatStoreDate` / `parseStoreDay` (`utils/dates.ts`): Steam's text date read against every month name of the
+  nine languages (Intl, short and long, alone and in a date), or year-first ("2014年1月15日"); no day → as it comes in
+  sentence case. Rule added to CLAUDE.md and `docs/design-system.md` → One date format.
+- B6: the facts end, on all four pages, with "Jugado por última vez" (where the platform gives it for the reader) then
+  "Último logro" / PSN's "Último trofeo" (`T.gameInfoPage.lastAchievement`, `latestUnlock` in `utils/dates.ts`, from
+  each page's list). Steam shows last played only with Steam's own date (`lastPlayedBySteam`, owned cache
+  `steamOwned4:`, demo seed updated); RA has none in its game answer, so only the last achievement.
+- B7: `GameInfoSubsetSelector` is a `nav` labelled by a Kicker ("Conjuntos de logros", `T.gameInfoPage.achievementSets`):
+  each set a link with its badge (`alt=""`, the name is beside it) and its name, the open one `aria-current="page"` with
+  the mark. Skeleton matches.
+- B8: after B2 the right column still ended at ~250 px beside 340–620. From lg it stretches to the row
+  (`lg:self-stretch`); `GameHeroMedia` takes up to three pictures: two are stacked and share the height, three put the
+  first over the other two; a growing picture is `object-contain` over its blurred copy (as the cover). A phone keeps
+  two side by side (the third is hidden there). Rows have a 8.75rem floor, so beside a short hero (Steam at 2560) the
+  right column is ~20 px taller than the middle, no more.
+
+**Decisions**
+- "Hide spoilers" rather than a `Switch`: the button is the table's one extra control and the owner said not to touch
+  the dialogs; the label now says what it does.
+- Steam's estimated last-played (#113 steps 2–3) is not shown as a fact: it is "never later than the truth", not a date.
+- No `_vN` bump for Xbox: the key gained a part, so old entries are simply not read again.
+
+**Open**
+- The owner should look at B8's stacked RA pictures (DS shots are tall, so they sit narrow over the blur) and B2's
+  sizes at 1280 / 2560; at 1280 "Pokémon Sapphire Version" still takes three lines (74 px, as before).
+- `GameInfoSkeleton`'s right column still draws the two pictures at their old size; the real column grows when it lands.
+
+**Watch out**
+- `TITLE_SIZE` needs `@container` on its parent and `w-full` on it below lg (the column is `items-start`; with
+  inline-size containment it would collapse to 0).
+- Python heredocs in Git Bash mangled `\b` and `\u` in a regex; write such edits with the editor or a Node script file.
+
+### Part A (A1–A4)
 
 **Did**
 - A3: Steam's "likely needs online play" guess is gone: `utils/steamOnline.ts` (+ test), its call and its
@@ -84,10 +134,10 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 - The cover frame covers only within 0.06 of 2:3: an Xbox 360 box (≈0.75) is shown whole with thin blurred bands
   rather than cropped.
 
-**Open** (part B of #167 is not done: B1–B8)
+**Open**
 - Firefox: the fold's motion was not tried in Firefox here (the Playwright Firefox build does not match the installed
   playwright-core); the owner should try "Mostrar los N restantes" there.
-- `XboxGameHeroBackground` takes IGDB's `heroUrl` without `https()` (as before); harmless (IGDB is https).
+- `XboxGameHeroBackground` took IGDB's `heroUrl` without `https()`: fixed in part B (B1).
 
 **Watch out**
 - The dev server (Turbopack on Windows) did not pick up `globals.css` written by a script: an edit through the editor

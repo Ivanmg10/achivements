@@ -48,6 +48,10 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   environment: refused attempts are removed and a database failure refuses the
   call. OpenXBL headers remain authoritative across environments sharing the key.
   Bump a key's `_vN` when its value's shape changes.
+- **A game's achievements are keyed by its last session and its unlocked count** (`xbox:achievements:v5:…:<lastPlayed>:<numAwarded>:<lang>`,
+  #167): Xbox keeps a session's start as `lastTimePlayed` while the game runs, so the date alone left a list read mid-session
+  one unlock behind the library (Minecraft 360: 73 in the tiles, 72 in the tabs). Once the list is whole, the game page
+  reads its figures from it (`xboxProgressFromList`), so the tiles, the progress and the tabs say the same.
 - **OpenXBL answers errors with HTTP 200** and the real status in the body
   (`{ code: 400 }`): `xboxCall` checks both. It also refuses
   `Accept-Language: *`, which Node's fetch sends by default, so a language is
