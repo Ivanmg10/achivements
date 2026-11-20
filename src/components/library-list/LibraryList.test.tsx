@@ -69,6 +69,14 @@ describe('the height of the list and of the panel of the game', () => {
     expect(list()).toHaveClass('lg:max-h-[calc(100dvh-16rem)]', 'lg:overflow-y-auto', 'lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)]')
   })
 
+  // #169 A5: the page scrolls too, so a pane at its end hands the wheel on to it; contained, the page
+  // could not be scrolled back up with the pointer over either pane.
+  test('neither pane keeps the scroll to itself', () => {
+    render(<LibraryList {...base} selected={entries[0]} wide />)
+    expect(aside().className).not.toMatch(/overscroll/)
+    expect(list().className).not.toMatch(/overscroll/)
+  })
+
   test('once measured, both take what is left of the screen from where they start, the same', () => {
     jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => (cb(0), 0))
     jest.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ top: 270 } as DOMRect)

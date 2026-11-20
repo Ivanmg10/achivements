@@ -52,8 +52,9 @@ export default function LibraryList({
       <ul
         ref={list}
         style={fill}
-        // Until it is measured, a guess that fits most screens.
-        className={`enter-rows flex flex-col gap-0.5 p-1 -m-1 lg:overflow-y-auto lg:overscroll-contain lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] ${height === undefined ? 'lg:max-h-[calc(100dvh-16rem)] lg:min-h-88' : ''}`}
+        // Until it is measured, a guess that fits most screens. No overscroll-contain on either pane: at its end the
+        // wheel goes on to the page, which scrolls too (#169: contained, it could not be scrolled back up over them).
+        className={`enter-rows flex flex-col gap-0.5 p-1 -m-1 lg:overflow-y-auto lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] ${height === undefined ? 'lg:max-h-[calc(100dvh-16rem)] lg:min-h-88' : ''}`}
       >
         {entries.map((e) => {
           const current = e.key === selected?.key
@@ -72,7 +73,7 @@ export default function LibraryList({
       {wide && selected && (
         <aside
           style={fill}
-          className={`enter-card [--i:3] sticky top-4 lg:flex lg:flex-col lg:overflow-y-auto lg:overscroll-contain ${height === undefined ? 'lg:h-[calc(100dvh-2rem)]' : ''}`}
+          className={`enter-card [--i:3] sticky top-4 lg:flex lg:flex-col lg:overflow-y-auto ${height === undefined ? 'lg:h-[calc(100dvh-2rem)]' : ''}`}
         >
           <LibraryEntryDetail key={selected.key} entry={selected} category={category} />
         </aside>
