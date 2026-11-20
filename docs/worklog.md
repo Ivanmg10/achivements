@@ -33,6 +33,14 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-20 — The feats' second and third canvas rounds (`docs/design-rounds-2-3`)
+
+**Did** — recorded in `docs/designs.md`: collection v2 (three variants on C; the owner picked b "El ritmo"), trayectoria v2 (Cuaderno and Álbum) and v3 (one background rule, one thumbnail frame), the annual wrap v2 (per-platform wraps, history) and v3 (one CheevoVault wrap with a "Cada plataforma" act, covers at their natural ratio).
+
+**Watch out** — a design PR must close a docs issue of its own: the feat issue stays open, and a branch named with the feat's number makes CI write "Closes" on it (#171 had to be reopened).
+
+---
+
 ## 2026-11-20 — Game page covers at their natural ratio (`fix/203-natural-covers`, #203)
 
 **Did** — `GameHeroCover` draws every platform's cover at its own ratio, as RA's since #167: the same width on the
