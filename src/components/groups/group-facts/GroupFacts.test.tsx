@@ -20,3 +20,9 @@ test('leaves out what a group has none of, with its mark', () => {
   expect(line).toHaveTextContent('4 games, 12 days ago')
   expect(line).not.toHaveTextContent(/in progress|achievements/)
 })
+
+test('a wrapping line breaks between facts, never inside one', () => {
+  render(<GroupFacts group={group} />)
+  expect(screen.getByText('12 days ago')).toHaveClass('whitespace-nowrap')
+  expect(screen.getByText('4 in progress')).toHaveClass('whitespace-nowrap')
+})
