@@ -601,12 +601,13 @@ describe('the feeds', () => {
   })
 
   test('a 429 stops scheduling new games and never returns a partial feed as complete', async () => {
-    const titles = Array.from({ length: 10 }, (_, i) => title(String(i + 1)))
+    // One moment for every game: the library sorts by last played, and stamps taken one by one differed by a
+    // millisecond on a slow CI, which put game 1 (the 429) last and let the other nine be asked first.
+    const playedAt = daysAgo(1)
+    const titles = Array.from({ length: 10 }, (_, i) => title(String(i + 1), { titleHistory: { lastTimePlayed: playedAt } }))
     fetchMock.mockImplementation(async (url: string) => {
       if (url.includes('/titles/')) return answer({ titles })
       if (url.endsWith('/1')) return answer(null, { status: 429, code: 429 })
-      // The other games answer a moment later, as a real network does: the 429 is seen first, not raced (it failed on CI).
-      await new Promise((resolve) => setTimeout(resolve, 20))
       return answer({ achievements: [earned('ok', daysAgo(1))] })
     })
 
