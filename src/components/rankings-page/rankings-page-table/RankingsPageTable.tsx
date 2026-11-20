@@ -57,7 +57,7 @@ export default function RankingsPageTable({
         </thead>
         <tbody className="enter-rows">
           {rows.map((r) => (
-            <tr key={r.username} className={`group transition-colors hover:[&>td]:bg-accent/[0.06] ${r.isMe ? '[&>td]:bg-accent/10' : ''}`}>
+            <tr key={r.username} className={`group relative transition-colors hover:[&>td]:bg-accent/[0.06] ${r.isMe ? '[&>td]:bg-accent/10' : ''}`}>
               <td className={`${TD} relative font-display italic font-extrabold text-[1.625rem] leading-none tabular-nums ${r.isMe ? "text-accent before:content-[''] before:absolute before:left-0 before:top-2.5 before:bottom-2.5 before:w-1 before:bg-accent" : 'text-text-secondary'}`}><RankingsPageRank rank={r.rank} tied={r.tied} /></td>
               <td className={`${TD} max-w-0 w-[30%]`}>
                 <RankingsPageUser row={r} size="md" linked={linked} nameClass="text-[0.9375rem] font-extrabold">

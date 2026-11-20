@@ -20,9 +20,9 @@ export default function RankingsPageHot({ rows, linked, onSeeWeek }: { rows: Ran
       </h2>
       <ol className="flex flex-col enter-rows">
         {rows.map((r, i) => (
-          <li key={r.username} className="grid grid-cols-[1.125rem_minmax(0,1fr)_auto] items-center gap-2.5 py-1.5 text-sm">
+          <li key={r.username} className={`relative grid grid-cols-[1.125rem_minmax(0,1fr)_auto] items-center gap-2.5 py-1.5 -mx-2 px-2 rounded-box text-sm transition-colors ${linked ? 'hover:bg-ink/[0.05]' : ''}`}>
             <span className="font-display italic font-extrabold text-lg leading-none tabular-nums text-text-secondary">{i + 1}</span>
-            <RankingsPageUser row={r} linked={linked} nameClass="font-bold" />
+            <RankingsPageUser row={r} linked={linked} nameClass="font-bold" rowRadius="after:rounded-box" />
             <span className="font-extrabold tabular-nums text-success whitespace-nowrap">
               +{r.points.toLocaleString(lang)} <span className="text-[10px] font-semibold text-text-secondary">{T.rankings.vp}</span>
             </span>
