@@ -9,7 +9,6 @@ import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { CONSOLES } from '@/constants'
 import { plural, sumAchievementPoints } from '@/utils/utils'
-import { FadeImage } from '@/components/ui/FadeImage'
 import { buttonClass } from '@/components/ui/Button'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
@@ -17,7 +16,9 @@ import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
-import { formatDay } from '@/utils/dates'
+import { MISSABLES_ID } from '@/components/missable-panel/MissablePanel'
+import { formatDate, formatDay, latestUnlock } from '@/utils/dates'
+import { raBoxRatio } from '@/utils/raBoxRatio'
 import { raImageUrl } from '@/utils/raAssets'
 import { raAchievementList } from '@/utils/gameAchievements'
 
@@ -49,9 +50,12 @@ export default function GameInfoHeader({
   gameData,
   children,
   actions,
+  linkMissables = false,
 }: {
   gameData?: RetroAchievementsGameWithAchievements | null
   children?: ReactNode
+  /** The missables chip opens their panel, on the page that has one (the viewer's own). */
+  linkMissables?: boolean
   /** The AI export, first among the buttons. */
   actions?: ReactNode
 }) {
@@ -65,6 +69,7 @@ export default function GameInfoHeader({
     () => raAchievementList(gameData).filter((a) => a.Type === 'missable' && !a.DateEarned && !a.DateEarnedHardcore).length,
     [gameData],
   )
+  const lastUnlock = useMemo(() => latestUnlock(raAchievementList(gameData).flatMap((a) => [a.DateEarnedHardcore, a.DateEarned])), [gameData])
   const earned = gameData?.NumAwardedToUser ?? 0
   const total = gameData?.NumAchievements ?? 0
   const hcPct = parseFloat(gameData?.UserCompletionHardcore ?? '0') || 0
@@ -74,22 +79,10 @@ export default function GameInfoHeader({
     ? formatDay(gameData.Released.slice(0, 10), lang)
     : gameData?.Released
 
-  const cover = gameData?.ImageBoxArt ? (
-    <FadeImage
-      src={raImageUrl(gameData.ImageBoxArt)!}
-      alt={gameData.Title ?? ''}
-      width={216}
-      height={306}
-      className="block w-full aspect-[216/306]"
-    />
-  ) : (
-    <span className="block w-full aspect-[216/306] bg-bg-card" />
-  )
-
   return (
     <>
       <GameHero
-        cover={cover}
+        cover={{ sources: [raImageUrl(gameData?.ImageBoxArt)], alt: gameData?.Title ?? '', natural: true, ratio: raBoxRatio(gameData?.ConsoleName), optimized: true }}
         title={gameData?.Title ?? ''}
         chips={
           <>
@@ -100,7 +93,7 @@ export default function GameInfoHeader({
               </GameHeroChip>
             )}
             {status && <GameHeroChip tone={STATUS_TONE[status]}>{T.gameStatus[status]}</GameHeroChip>}
-            {missables > 0 && <GameHeroChip tone="danger">{plural(missables, T.plurals.missables, lang)}</GameHeroChip>}
+            {missables > 0 && <GameHeroChip tone="danger" href={linkMissables ? `#${MISSABLES_ID}` : undefined}>{plural(missables, T.plurals.missables, lang)}</GameHeroChip>}
           </>
         }
         progress={
@@ -119,6 +112,8 @@ export default function GameInfoHeader({
           { label: T.gameInfoPage.developer, value: gameData?.Developer },
           { label: T.gameInfoPage.publisher, value: gameData?.Publisher },
           { label: T.gameInfoPage.genre, value: gameData?.Genre },
+          // RA's game answer has no last-played date for the reader: only the last unlock.
+          { label: T.gameInfoPage.lastAchievement, value: lastUnlock && formatDate(lastUnlock, lang) },
         ]}
         actions={
           gameData?.ID && (

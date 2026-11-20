@@ -4,16 +4,15 @@ import type { PsnTrophy, PsnTrophyGroup } from '@/types/psn'
 import type { SteamAchievementUnified } from '@/types/steam'
 import type { XboxAchievement } from '@/types/xbox'
 import { BASE_GROUP, dlcShortName, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
-import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 
 /**
  * What each platform's achievement window adds (its tags, the name guides are searched by), one set per
  * platform for both ways in: a row of the game page's table and a badge of the grid (#164).
  */
 
-/** Steam: the online flag, and guides searched by the English name. */
+/** Steam: guides searched by the English name. */
 export function useSteamDetailOptions(): DetailOptions<SteamAchievementUnified> {
-  return { tags: (a) => (a.likelyOnline ? <SteamOnlineBadge /> : undefined), guideTitle: (a) => a.titleEn ?? a.title }
+  return { guideTitle: (a) => a.titleEn ?? a.title }
 }
 
 /** Xbox: the gamerscore. */

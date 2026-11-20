@@ -33,6 +33,123 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-20 — Game page review (`fix/167-game-page-review`, #167)
+
+### Part B (B1–B8)
+
+**Did**
+- B1: Xbox's tiles said 73, the tabs 72 (Minecraft 360). Cause: `xbox:achievements:v5` was keyed by `lastPlayed`
+  alone, and Xbox keeps the session's start while the game runs, so a list read mid-session kept its key after a later
+  unlock. The key now carries `numAwarded` too, and the page reads the hero's count, gamerscore and share from a whole
+  list (`xboxProgressFromList`, `utils/xboxTitles.ts`). Checked on the real page: 73 / 93 and 73 / 20. PSN (40 games,
+  title list vs stored trophies) and Steam (counts from the list already) and RA (one answer) agree. IGDB's hero art on
+  the Xbox page goes through `https()`.
+- B2: the title's size is `clamp(2rem, 400cqi / chars, today's size)` over a container query on the middle column
+  (`GameHero` `TITLE_SIZE`, `--title-chars`): about two lines' worth. At 1280 "Pokémon Mystery Dungeon: Blue Rescue
+  Team" is 43 px on two lines (was four); short titles and every title at 2560 stay at 76 px.
+- B3: `TAB_ROW` (every horizontal `Tabs`) lacked `[scrollbar-width:none]`, which the rail and the card-title rows had:
+  that was the grey bar. Below sm the table's search takes its own row (`max-sm:order-first max-sm:basis-full`).
+- B4: `TableTexts.search` (PSN: `T.psn.searchTrophies`, "Buscar un trofeo"); `T.psn.hideHiddenTrophies` is now "Ocultar
+  spoilers" / "Hide spoilers", nine languages; both in `docs/i18n.md` → Vocabulary.
+- B5: `formatStoreDate` / `parseStoreDay` (`utils/dates.ts`): Steam's text date read against every month name of the
+  nine languages (Intl, short and long, alone and in a date), or year-first ("2014年1月15日"); no day → as it comes in
+  sentence case. Rule added to CLAUDE.md and `docs/design-system.md` → One date format.
+- B6: the facts end, on all four pages, with "Jugado por última vez" (where the platform gives it for the reader) then
+  "Último logro" / PSN's "Último trofeo" (`T.gameInfoPage.lastAchievement`, `latestUnlock` in `utils/dates.ts`, from
+  each page's list). Steam shows last played only with Steam's own date (`lastPlayedBySteam`, owned cache
+  `steamOwned4:`, demo seed updated); RA has none in its game answer, so only the last achievement.
+- B7: `GameInfoSubsetSelector` is a `nav` labelled by a Kicker ("Conjuntos de logros", `T.gameInfoPage.achievementSets`):
+  each set a link with its badge (`alt=""`, the name is beside it) and its name, the open one `aria-current="page"` with
+  the mark. Skeleton matches.
+- B8: after B2 the right column still ended at ~250 px beside 340–620. From lg it stretches to the row
+  (`lg:self-stretch`); `GameHeroMedia` takes up to three pictures: two are stacked and share the height, three put the
+  first over the other two; a growing picture is `object-contain` over its blurred copy (as the cover). A phone keeps
+  two side by side (the third is hidden there). Rows have a 8.75rem floor, so beside a short hero (Steam at 2560) the
+  right column is ~20 px taller than the middle, no more.
+  The skeleton draws the same (`GameInfoSkeleton` reads `MEDIA_GRID` / `MEDIA_ROWS` / `MEDIA_BOX` from `GameHeroMedia`): its right
+  column went from 231 px (pictures 144) to 375 (288), the loaded one being 379 to 616 by game.
+
+**Decisions**
+- "Hide spoilers" rather than a `Switch`: the button is the table's one extra control and the owner said not to touch
+  the dialogs; the label now says what it does.
+- Steam's estimated last-played (#113 steps 2–3) is not shown as a fact: it is "never later than the truth", not a date.
+- No `_vN` bump for Xbox: the key gained a part, so old entries are simply not read again.
+
+**Open**
+- The owner should look at B8's stacked RA pictures (DS shots are tall, so they sit narrow over the blur) and B2's
+  sizes at 1280 / 2560; at 1280 "Pokémon Sapphire Version" still takes three lines (74 px, as before).
+- `GameInfoSkeleton`'s middle column (250 to 294 px) is shorter than the loaded one (340 to 616: title, summary, subsets),
+  so the hero still grows on load at 1280 and on RA/PSN at 2560; the right column follows the row, not its own content.
+
+**Watch out**
+- `TITLE_SIZE` needs `@container` on its parent and `w-full` on it below lg (the column is `items-start`; with
+  inline-size containment it would collapse to 0).
+- Python heredocs in Git Bash mangled `\b` and `\u` in a regex; write such edits with the editor or a Node script file.
+
+### Part A (A1–A4)
+
+**Did**
+- A3: Steam's "likely needs online play" guess is gone: `utils/steamOnline.ts` (+ test), its call and its
+  `steamOnlineModes:<appid>` cache in `api/steam/achievements`, `getAppCategories` in `steamClient.ts`, `likelyOnline`
+  (type, mapper, landing sample), `SteamOnlineBadge` (table tag, window, grid tooltip), the warning notice over Steam's
+  table, the `T.steam.likelyOnline*`, `T.plurals.onlineCount` and `T.gameInfoTable.onlineText` strings, and the AI
+  export's `mayNeedOnline` (its Steam prompt now asks the AI to flag online ones it knows of).
+  **How it worked, if it ever comes back** (git has the code, last in `f0804a0b`): the route read the store's
+  categories for the game (`appdetails?filters=categories`, English, cached 24 h as `steamOnlineModes:<appid>`):
+  MMO 20, cross-platform 27, online PvP 36, online co-op 38 meant online; plain multiplayer 1 meant online unless a
+  shared/split-screen category (24, 37, 39) was there. Then each achievement's English name + description was matched:
+  "online / ranked / matchmaking / lobby" always counted, "multiplayer / leaderboard" unless the store said no online
+  modes, "match / co-op / versus / pvp / friends / clan…" only in a game with online modes, and "local / split-screen /
+  offline / couch" beat everything. Shown as "Online?" with a hint that it was an estimate.
+- A2: the missables are a folded panel again (`missable-panel/MissablePanel`, on `Accordion` in a new `tone="danger"`):
+  the head says how many can be lost, open it lists each unearned one (badge, title, description, `ListRow wrap`); a
+  row opens the table's own window (`setSelectedId`, RA's `AchievementModal`). `MissableNotice`, the table's `notice`
+  filter, `showOnlyThese` / `showAllAgain` / `missableMore` are gone. The hero's "N perdibles" chip is a link to
+  `#missables` (`GameHeroChip href`, only on the viewer's own page: `GameInfoHeader linkMissables`), which opens the
+  panel; folding it by hand drops the fragment so the chip opens it again. `Accordion` also takes `open` /
+  `onOpenChange` / `id`.
+- A4: `ui/FoldList` (+ specimen in `/design`, guard rule): `ShowMore` and the list as one piece. Folded, the last row
+  fades out (`.fold-fade`, a mask); unfolding grows the box (a height transition run from JS measurements, CSS motion)
+  and brings the new rows in with `enter-rise`, staggered (`foldItem(i, cap)` marks them, only while
+  `[data-unfolding]`, so a later sort does not replay it); folding shrinks back, then drops the rows and focuses the
+  button. Nothing moves with reduced motion. Used by the four game tables (`ShowRestButton` deleted) and `BadgeGrid`
+  (`ShowAllButton` deleted). `ShowMore` takes a `ref`.
+- A1: `game-hero/game-hero-cover/GameHeroCover`, the one cover, given to `GameHero` as data (`cover={{ sources, alt,
+  natural, ratio, pending, optimized, fallback }}`). Steam, PSN and Xbox: a 2:3 frame; a portrait (within 0.06 of
+  2:3) covers it, any other shape is `object-contain` over a blurred, darkened copy. RA: `natural`, the box at its own
+  ratio, holding `raBoxRatio(console)` (`utils/raBoxRatio.ts`, measured on the owner's library) until loaded. Steam
+  tries cover → header → icon (its logo when none); PSN: Store cover → IGDB's (`details.coverUrl`) → trophy icon;
+  Xbox: IGDB's box art (`details.coverUrl`, through `xboxMappers.https()`, now exported) → the title's tile. The
+  detail hooks expose `isLoading`, so the cover waits (`pending`) instead of swapping an icon for the box art.
+  Server: `igdbPsnArt` (PS4/PS5 platforms, the same `artOn` cache as PS3/Vita) called by `/api/psn/details` only for a
+  game whose snapshot has no cover; Xbox's `/api/xbox/details` already sent `coverUrl`. `GameInfoSkeleton` takes
+  `cover="natural"` on RA's pages (a 0.71 box) and holds 2:3 elsewhere.
+
+**Why** — the owner's review of the game pages (#167, part A).
+
+**Decisions**
+- No `_vN` bump for Steam: the dropped field was built per request; no cached shape changed (the schema, player and
+  rarity caches are untouched). `steamOnlineModes:` rows just expire.
+- The missables chip uses the URL fragment, not shared state: the header and the table are siblings on the page and
+  the header is also drawn on other people's pages, where there is no panel.
+- FoldList keeps the caller's slicing (the hidden rows are not in the page while folded, so not focusable) and
+  animates with an inline height transition; `interpolate-size` would need no JS but Firefox lacks it.
+- The cover frame covers only within 0.06 of 2:3: an Xbox 360 box (≈0.75) is shown whole with thin blurred bands
+  rather than cropped.
+
+**Open**
+- Firefox: the fold's motion was not tried in Firefox here (the Playwright Firefox build does not match the installed
+  playwright-core); the owner should try "Mostrar los N restantes" there.
+- `XboxGameHeroBackground` took IGDB's `heroUrl` without `https()`: fixed in part B (B1).
+
+**Watch out**
+- The dev server (Turbopack on Windows) did not pick up `globals.css` written by a script: an edit through the editor
+  did. If a new class seems missing, check the served CSS before the code.
+- Steam's `library_600x900` is missing for some games (Assassin's Creed Liberation): the frame then shows the store
+  header whole over its blur, which is intended.
+
+---
+
 ## 2026-11-19 — Home review: the seven points, the local day and the badge window (`fix/164-home-review`, #164)
 
 **Did**

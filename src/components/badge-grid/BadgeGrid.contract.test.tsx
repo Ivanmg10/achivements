@@ -18,7 +18,7 @@ jest.mock('@/components/achievement-modal/AchievementModal', () => ({
   ),
 }))
 
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { en } from '@/translations/en'
 import { useAchievementPins, RA_PINS, STEAM_PINS, PSN_PINS, XBOX_PINS } from '@/hooks/useAchievementPins'
 import { mockPins } from '@/test-utils/pins'
@@ -78,7 +78,7 @@ const STEAM: Platform = {
   render: (specs, opts) => {
     const list: SteamAchievementUnified[] = specs.map((s, i) => ({
       _source: 'steam', id: `A${i}`, apiname: `A${i}`, title: s.title, description: s.text ?? `${s.title} text`, earned: !!s.earned,
-      dateEarned: s.earned ? day(s.at) : null, badgeUrl: 'icon.jpg', displayOrder: i, hidden: !!s.secret, globalPct: s.rarity ?? null, likelyOnline: false,
+      dateEarned: s.earned ? day(s.at) : null, badgeUrl: 'icon.jpg', displayOrder: i, hidden: !!s.secret, globalPct: s.rarity ?? null,
     }))
     render(<SteamAchievementGrid appId={620} gameTitle="Game" achievements={list} limit={opts?.limit} />)
   },
@@ -198,13 +198,13 @@ describe.each(PLATFORMS)('$name badge grid', (p) => {
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
   })
 
-  test('a long list shows the first few until asked for the rest', () => {
+  test('a long list shows the first few until asked for the rest', async () => {
     p.render(Array.from({ length: 20 }, (_, i) => ({ title: `Title ${i}` })), { limit: 5 })
     expect(screen.getAllByRole(p.role, { name: /^Title [0-9]/ })).toHaveLength(5)
     fireEvent.click(screen.getByRole('button', { name: `Show all 20` }))
     expect(screen.getAllByRole(p.role, { name: /^Title [0-9]/ })).toHaveLength(20)
     fireEvent.click(screen.getByRole('button', { name: en.statusGameItem.showFewerAchievements }))
-    expect(screen.getAllByRole(p.role, { name: /^Title [0-9]/ })).toHaveLength(5)
+    await waitFor(() => expect(screen.getAllByRole(p.role, { name: /^Title [0-9]/ })).toHaveLength(5))
   })
 
   test('a list that fits is not capped', () => {

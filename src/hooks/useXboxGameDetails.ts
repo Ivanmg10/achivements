@@ -5,8 +5,8 @@ import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { fetchShared } from '@/lib/fetchShared'
 
-/** IGDB's facts, and a wide picture for the page's backdrop when it has one. */
-export type XboxGameDetails = IgdbDetails & { heroUrl?: string | null }
+/** IGDB's facts, a wide picture for the page's backdrop and the box art, when it has them. */
+export type XboxGameDetails = IgdbDetails & { heroUrl?: string | null; coverUrl?: string | null }
 
 type Outcome = { details: XboxGameDetails | null } | { error: string }
 
@@ -22,6 +22,8 @@ export function useXboxGameDetails(titleId: string | null) {
   const subject = useSubject()
   const [details, setDetails] = useState<XboxGameDetails | null>(null)
   const [error, setError] = useState<string | null>(null)
+  // The game the server last answered for: until it is this one, the cover waits (no icon swapped for the box art).
+  const [answered, setAnswered] = useState<string | null>(null)
 
   /** Asks the server; what came back, not yet applied. */
   const request = useCallback(async (id: string): Promise<Outcome> => {
@@ -48,6 +50,7 @@ export function useXboxGameDetails(titleId: string | null) {
     let current = true
     request(titleId).then((outcome) => {
       if (!current) return
+      setAnswered(titleId)
       if ('error' in outcome) setError(outcome.error)
       else setDetails(outcome.details)
     })
@@ -56,5 +59,5 @@ export function useXboxGameDetails(titleId: string | null) {
     }
   }, [titleId, request])
 
-  return { details, error }
+  return { details, error, isLoading: titleId !== null && answered !== titleId }
 }

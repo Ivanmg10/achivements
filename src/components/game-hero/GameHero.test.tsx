@@ -5,7 +5,7 @@ import GameHeroProgress from './game-hero-progress/GameHeroProgress'
 import GameHeroMedia from './game-hero-media/GameHeroMedia'
 
 const base = {
-  cover: <span>cover</span>,
+  cover: { sources: ['https://img/cover.jpg'], alt: 'Ultimate Spider-Man' },
   title: 'Ultimate Spider-Man',
   facts: [
     { label: 'Released', value: '22 Sep 2005' },
@@ -17,6 +17,14 @@ const base = {
 test('the title is the page heading, in the display face', () => {
   render(<GameHero {...base} />)
   expect(screen.getByRole('heading', { level: 1, name: 'Ultimate Spider-Man' })).toHaveClass('font-display')
+})
+
+test('the title is sized by its length against its column, capped at the old size', () => {
+  const { container } = render(<GameHero {...base} />)
+  const h1 = screen.getByRole('heading', { level: 1 })
+  expect(h1.style.getPropertyValue('--title-chars')).toBe('19')
+  expect(h1.parentElement).toHaveClass('@container')
+  expect(container.querySelector('h1')?.className).toContain('var(--title-max)')
 })
 
 test('facts: a missing value says so instead of a dash', () => {
@@ -52,6 +60,11 @@ test('a chip takes its tone and stands upright, as every tag does', () => {
   expect(chip.className).not.toContain('skew')
 })
 
+test('a chip with href is a link to that place on the page', () => {
+  render(<GameHeroChip tone="danger" href="#missables">2 missable</GameHeroChip>)
+  expect(screen.getByRole('link', { name: '2 missable' })).toHaveAttribute('href', '#missables')
+})
+
 test('the progress: the bar, the share and the count', () => {
   render(<GameHeroProgress pct={12.8} softPct={20} label="Game" left="12.8 % in hardcore" right="5 of 39" />)
   expect(screen.getByRole('progressbar', { name: 'Game' })).toHaveAttribute('aria-valuenow', '20')
@@ -59,7 +72,7 @@ test('the progress: the bar, the share and the count', () => {
   expect(screen.getByText('5 of 39')).toBeInTheDocument()
 })
 
-test('media: two pictures at most, with captions; one with a full version links to it', () => {
+test('media: three pictures at most, with captions; one with a full version links to it', () => {
   render(
     <GameHeroMedia
       shots={[
@@ -67,12 +80,22 @@ test('media: two pictures at most, with captions; one with a full version links 
         null,
         { src: 'b.png', alt: 'In game', caption: 'In game', full: 'b-full.png' },
         { src: 'c.png', alt: 'Third', caption: 'Third' },
+        { src: 'd.png', alt: 'Fourth', caption: 'Fourth' },
       ]}
     />,
   )
   expect(screen.getByText('Title screen')).toBeInTheDocument()
   expect(screen.getByText('In game').closest('figure')!.querySelector('a')).toHaveAttribute('href', 'b-full.png')
-  expect(screen.queryByText('Third')).not.toBeInTheDocument()
+  expect(screen.queryByText('Fourth')).not.toBeInTheDocument()
+  // From lg the first fills the column and the other two sit under it; a phone shows two (#167).
+  expect(screen.getByText('Title screen').closest('figure')).toHaveClass('lg:col-span-2')
+  expect(screen.getByText('In game').closest('figure')).not.toHaveClass('lg:col-span-2')
+  expect(screen.getByText('Third').closest('figure')).toHaveClass('max-lg:hidden')
+})
+
+test('media: two pictures are stacked from lg, each as wide as the column', () => {
+  render(<GameHeroMedia shots={[{ src: 'a.png', alt: 'A', caption: 'A' }, { src: 'b.png', alt: 'B', caption: 'B' }]} />)
+  for (const c of ['A', 'B']) expect(screen.getByText(c).closest('figure')).toHaveClass('lg:col-span-2')
 })
 
 test('media: a screenshot that would only say its number has no caption, only its name for a screen reader', () => {

@@ -78,7 +78,7 @@ const STEAM: Platform = {
   asked: 377160,
   loadedRing: '1 / 2',
   render: (s, known = 10) => {
-    const ach = (earned: boolean) => ({ _source: 'steam', id: 'A', apiname: 'A', title: 'A', description: '', earned, dateEarned: null, badgeUrl: '', displayOrder: 0, hidden: false, globalPct: null, likelyOnline: false })
+    const ach = (earned: boolean) => ({ _source: 'steam', id: 'A', apiname: 'A', title: 'A', description: '', earned, dateEarned: null, badgeUrl: '', displayOrder: 0, hidden: false, globalPct: null })
     answer(useSteamAchievements as jest.Mock, s.loaded ? [ach(true), ach(false)] : [], s)
     render(<SteamRecentlyPlayedExpanded game={{ ...toSteamGameProgress({ appid: 377160, name: 'Fallout 4', playtime_forever: 60, has_community_visible_stats: true }), achievementsLoaded: true, maxPossible: known, numAwarded: known ? 4 : 0 }} />)
   },

@@ -9,6 +9,7 @@ import {
   xboxHasAchievements,
   xboxNumericId,
   xboxPlatformTone,
+  xboxProgressFromList,
   xboxTitleId,
 } from './xboxTitles'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
@@ -83,5 +84,21 @@ describe('foldTwinTitles', () => {
   test('keeps games with no achievements that have no twin, and games of other names', () => {
     const list = [game('1', 'Minecraft Launcher'), game('2', 'Minecraft Dungeons', { totalGamerscore: 3000 })]
     expect(foldTwinTitles(list).map((g) => g.titleId)).toEqual(['1', '2'])
+  })
+})
+
+describe('xboxProgressFromList', () => {
+  const game = xboxGameFixture({ numAwarded: 73, maxPossible: 3, totalKnown: true, earnedGamerscore: 40, totalGamerscore: 100, pctWon: 40 })
+  const a = (unlocked: boolean, gamerscore: number) => ({ unlocked, gamerscore })
+
+  test('a whole list that says otherwise wins: count, gamerscore and the share by gamerscore', () => {
+    expect(xboxProgressFromList({ ...game, numAwarded: 1 }, [a(true, 40), a(true, 35), a(false, 25)])).toMatchObject({ numAwarded: 2, earnedGamerscore: 75, pctWon: 75 })
+  })
+
+  test('the summary stays when the list agrees, is partial or is not there', () => {
+    const same = { ...game, numAwarded: 1 }
+    expect(xboxProgressFromList(same, [a(true, 40), a(false, 35), a(false, 25)])).toBe(same)
+    expect(xboxProgressFromList(game, [a(true, 40)])).toBe(game)
+    expect(xboxProgressFromList(game, [])).toBe(game)
   })
 })

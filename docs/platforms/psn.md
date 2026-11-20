@@ -72,7 +72,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   platform, cached half a year. Without the keys they keep the trophy icon.
   Every PSN game page also asks IGDB for its summary, studios, genres and
   screenshots (`igdbDetails`, `GET /api/psn/details?id=`, keyed by Sony's
-  title from the user's list, never by text from the request). English only;
+  title from the user's list, never by text from the request), and **a PS4/PS5
+  game the Store gave no cover takes IGDB's on its own page only** (`coverUrl`,
+  `igdbPsnArt`, same lookup and half-year cache as PS3/Vita art, #167): never
+  for the library, and no Sony call. English only;
   a 404 just means the page goes without them.
 - Sony returns errors as bodies, not throws: every call goes through
   `psnCall(fn, (auth) => …)` (`fn` names the endpoint for the call counters, see Call baseline; `unwrap()`, and the pool's

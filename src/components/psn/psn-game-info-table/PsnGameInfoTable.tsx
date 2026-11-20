@@ -50,6 +50,7 @@ export default function PsnGameInfoTable({
       texts={{
         label: T.psn.trophies,
         name: T.psn.trophy,
+        search: T.psn.searchTrophies,
         none: T.psn.noTrophies,
         earned: T.psn.earned,
         locked: T.psn.locked,

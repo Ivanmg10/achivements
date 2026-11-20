@@ -17,6 +17,8 @@ type Props = {
   sub?: ReactNode
   /** Whatever sits on the right: a count, a tag, a chevron. */
   trailing?: ReactNode
+  /** The title and the line under it wrap instead of being cut (a description to read whole). */
+  wrap?: boolean
   /** Layout only. */
   className?: string
 }
@@ -31,6 +33,7 @@ export default function ListRow({
   title,
   sub,
   trailing,
+  wrap = false,
   className = '',
   href,
   ...button
@@ -39,8 +42,8 @@ export default function ListRow({
     <>
       <span className="w-10 h-10 rounded-box overflow-hidden shrink-0 flex items-center justify-center bg-ink/10">{media}</span>
       <span className="flex-1 min-w-0">
-        <span className="block font-bold truncate">{title}</span>
-        {sub && <span className="block text-[0.8125rem] text-text-secondary truncate">{sub}</span>}
+        <span className={`block font-bold ${wrap ? '' : 'truncate'}`}>{title}</span>
+        {sub && <span className={`block text-[0.8125rem] text-text-secondary ${wrap ? '' : 'truncate'}`}>{sub}</span>}
       </span>
       {trailing}
     </>

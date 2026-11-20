@@ -10,13 +10,12 @@ import BadgeGrid from '@/components/badge-grid/BadgeGrid'
 import BadgeRarity from '@/components/badge-grid/badge-tip-parts/BadgeRarity'
 import BadgeEarnedChip from '@/components/badge-grid/badge-tip-parts/BadgeEarnedChip'
 import BadgeGridDetail from '@/components/badge-grid/badge-grid-detail/BadgeGridDetail'
-import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 import type { SteamAchievementUnified } from '@/types/steam'
 
 /**
  * A Steam game's achievements in the shared badge grid. Locked ones are the colour badge greyed out (Steam's
  * own grey icons are often too dark to make out). Steam keeps a secret achievement's text hidden until it
- * is unlocked, but gives its picture, so that stays; the tooltip flags one that probably needs online play.
+ * is unlocked, but gives its picture, so that stays.
  */
 export const SteamAchievementGrid = memo(function SteamAchievementGrid({
   appId,
@@ -58,7 +57,6 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
           <>
             <BadgeRarity pct={a.globalPct} />
             <BadgeEarnedChip earned={a.earned} label={T.steam.earned} className="bg-steam/20 text-steam" />
-            {a.likelyOnline && <SteamOnlineBadge />}
           </>
         ),
         date: a.dateEarned ? formatDate(a.dateEarned, lang) : null,

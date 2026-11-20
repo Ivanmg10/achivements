@@ -62,7 +62,6 @@ export function toSteamAchievements(appId: number, raw: SampleSteamAchievement[]
     earned: daysAgo !== null,
     dateEarned: daysAgo === null ? null : `${addDays(today, -daysAgo)} ${timeOf(i)}`,
     globalPct: pct,
-    likelyOnline: false,
   }))
 }
 

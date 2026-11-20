@@ -1,15 +1,15 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/psnSnapshot', () => ({ findPsnGame: jest.fn() }))
-jest.mock('@/lib/igdbClient', () => ({ igdbDetails: jest.fn() }))
+jest.mock('@/lib/igdbClient', () => ({ igdbDetails: jest.fn(), igdbPsnArt: jest.fn() }))
 
 import { NextRequest } from 'next/server'
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
 import { findPsnGame } from '@/lib/psnSnapshot'
-import { igdbDetails } from '@/lib/igdbClient'
+import { igdbDetails, igdbPsnArt } from '@/lib/igdbClient'
 
-const GAME = { titleId: 'NPWR00001_00', title: 'Call of Duty®: Black Ops II', consoleName: 'PS3' }
+const GAME = { titleId: 'NPWR00001_00', title: 'Call of Duty®: Black Ops II', consoleName: 'PS3', coverUrl: 'https://store/cover.png' }
 const DETAILS = { summary: 'x', developers: ['Treyarch'], publishers: [], genres: [], releaseDate: null, screenshots: [] }
 
 async function call(qs: string) {
@@ -39,7 +39,7 @@ test('400 for a malformed id, before anything is asked', async () => {
 })
 
 test("the details of the game in the user's list, searched by Sony's title and platform", async () => {
-  expect(await call('id=NPWR00001_00')).toEqual({ status: 200, body: DETAILS })
+  expect(await call('id=NPWR00001_00')).toEqual({ status: 200, body: { ...DETAILS, coverUrl: null } })
   expect(findPsnGame).toHaveBeenCalledWith('42', 'NPWR00001_00', '7')
   expect(igdbDetails).toHaveBeenCalledWith('Call of Duty®: Black Ops II', 'PS3')
 })
@@ -56,4 +56,14 @@ test('503 when IGDB cannot be reached; 502 when Sony fails', async () => {
   expect(await call('id=NPWR00001_00')).toEqual({ status: 503, body: { error: 'details-unavailable' } })
   ;(findPsnGame as jest.Mock).mockRejectedValueOnce(new Error('network'))
   expect((await call('id=NPWR00001_00')).status).toBe(502)
+})
+
+test("a game with no cover gets IGDB's, for its page only; a failure there is no cover, not an error", async () => {
+  expect(igdbPsnArt).not.toHaveBeenCalled()
+  ;(findPsnGame as jest.Mock).mockResolvedValue({ ...GAME, consoleName: 'PS4', coverUrl: null })
+  ;(igdbPsnArt as jest.Mock).mockResolvedValueOnce({ coverUrl: 'https://images.igdb.com/c.jpg', heroUrl: null, releaseYear: 2015 })
+  expect((await call('id=NPWR00001_00')).body).toMatchObject({ coverUrl: 'https://images.igdb.com/c.jpg' })
+  expect(igdbPsnArt).toHaveBeenCalledWith('Call of Duty®: Black Ops II', 'PS4')
+  ;(igdbPsnArt as jest.Mock).mockRejectedValueOnce(new Error('IGDB answered 500'))
+  expect(await call('id=NPWR00001_00')).toEqual({ status: 200, body: { ...DETAILS, coverUrl: null } })
 })

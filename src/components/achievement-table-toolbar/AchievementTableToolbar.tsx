@@ -11,6 +11,7 @@ import Select from '@/components/ui/Select'
  */
 export default function AchievementTableToolbar<F extends string, S extends string>({
   label,
+  searchPlaceholder,
   tabs,
   filter,
   onFilter,
@@ -23,6 +24,8 @@ export default function AchievementTableToolbar<F extends string, S extends stri
 }: {
   /** The tabs' accessible name. */
   label: string
+  /** In the platform's word ("Search a trophy"). */
+  searchPlaceholder: string
   tabs: { value: F; label: string; count: number }[]
   filter: F
   onFilter: (f: F) => void
@@ -50,11 +53,11 @@ export default function AchievementTableToolbar<F extends string, S extends stri
       <div className="flex flex-wrap items-center gap-2.5 lg:pb-1.5">
         {extra}
         <SearchInput
-          aria-label={T.gameInfoTable.searchPlaceholder}
-          placeholder={T.gameInfoTable.searchPlaceholder}
+          aria-label={searchPlaceholder}
+          placeholder={searchPlaceholder}
           value={query}
           onChange={(e) => onQuery(e.target.value)}
-          className="flex-1 lg:w-[16.25rem] lg:flex-none"
+          className="max-sm:order-first max-sm:basis-full flex-1 lg:w-[16.25rem] lg:flex-none"
         />
         <Select<S> look="button" size="sm" aria-label={T.gameInfoTable.sortLabel} value={sort} onChange={onSort} options={sortOptions} />
       </div>

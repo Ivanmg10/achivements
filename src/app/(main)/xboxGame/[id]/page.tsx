@@ -8,7 +8,8 @@ import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { useXboxGameDetails } from '@/hooks/useXboxGameDetails'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
-import { isXboxTitleId, xboxBackdrop } from '@/utils/xboxTitles'
+import { isXboxTitleId, xboxBackdrop, xboxProgressFromList } from '@/utils/xboxTitles'
+import { https } from '@/utils/xboxMappers'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
 import GamePageNotLinked from '@/components/game-page-states/game-page-not-linked/GamePageNotLinked'
 import GamePageLibraryError from '@/components/game-page-states/game-page-library-error/GamePageLibraryError'
@@ -19,6 +20,7 @@ import XboxGameInfoTable from '@/components/xbox/xbox-game-info-table/XboxGameIn
 import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPartialListNote'
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { xboxAiSource } from '@/utils/aiExport'
+import { latestUnlock } from '@/utils/dates'
 
 /**
  * An Xbox game's page — the counterpart of /psnGame/[id], built the same way:
@@ -41,27 +43,30 @@ export default function XboxGamePage() {
   const enabled = useXboxEnabled()
   const { isLinked, fullLibrary, libraryLoading, libraryError, refetch } = useXboxGamesData()
   const { achievements, isLoading, error, retry } = useXboxAchievements(isLinked ? titleId : null)
-  const { details } = useXboxGameDetails(isLinked ? titleId : null)
+  const { details, isLoading: detailsLoading } = useXboxGameDetails(isLinked ? titleId : null)
 
   if (titleId === null) notFound()
   if (status === 'loading') return <GameInfoSkeleton />
   if (!enabled) notFound()
   if (!isLinked) return <GamePageNotLinked platform="Xbox" connectLabel={T.xbox.connect} />
 
-  const game = fullLibrary.find((g) => g.titleId === titleId) ?? null
-  if (!game && libraryLoading) return <GameInfoSkeleton />
-  if (!game && libraryError) {
+  const listed = fullLibrary.find((g) => g.titleId === titleId) ?? null
+  if (!listed && libraryLoading) return <GameInfoSkeleton />
+  if (!listed && libraryError) {
     return <GamePageLibraryError title={T.xbox.gamesError} reason={T.xbox.errors[libraryError]} retryLabel={T.xbox.retry} onRetry={refetch} />
   }
-  if (!game) notFound()
+  if (!listed) notFound()
+  // The tiles and the progress read the same count as the tabs.
+  const game = xboxProgressFromList(listed, achievements)
 
   return (
     <main className="flex-1 flex flex-col items-center text-text-main relative">
-      <XboxGameHeroBackground src={details?.heroUrl ?? xboxBackdrop(game)} />
+      <XboxGameHeroBackground src={https(details?.heroUrl) ?? xboxBackdrop(game)} />
       <div className={GAME_COLUMN}>
         <XboxGameInfoHeader
           game={game}
-          details={details}
+          details={details} detailsLoading={detailsLoading}
+          lastUnlock={latestUnlock(achievements.map((a) => a.unlockedAt))}
           actions={achievements.length > 0 && <GameAiExport getSource={() => xboxAiSource({ game, achievements, details })} />}
         />
         <GameTableState

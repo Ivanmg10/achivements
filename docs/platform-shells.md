@@ -98,12 +98,13 @@ from a flag).
 The shell must keep these; an adapter carries each one. From the audit (HK, LB) and `docs/platforms/`:
 
 - **RA:** hardcore and softcore (ring, the mode under the date in the earned column), points, players and hardcore
-  players as columns, the type tags (missable in red, `win_condition` reads "Win"), missables named in a
-  line above, its own detail window (`AchievementModal`, with comments and unlocks). The pin is
+  players as columns, the type tags (missable in red, `win_condition` reads "Win"), the missables still to
+  earn in a folded panel above (`MissablePanel` on `Accordion` in the danger tone, `#missables`, opened by the
+  hero's chip; a row opens the same window as the table, no table filter, #167), its own detail window (`AchievementModal`, with comments and unlocks). The pin is
   last in the row on all four (#129). Its data hooks keep their retry loop (`useRetryingRead`). RA's pictures go through Next's image
   optimizer; the other hosts are `unoptimized`.
 - **Steam:** the library loads in two steps (the recent games first, then the whole library: `SteamGamesDataContext`), secret ones
-  keep their picture and cannot be revealed (Steam gives no text), "Online?" and the online notice,
+  keep their picture and cannot be revealed (Steam gives no text), no online guess (dropped in #167),
   guides searched by the English name (`titleEn`), links `#ach-<apiname>` (any character: decode the
   fragment).
 - **PSN:** trophy grades (column, ring, chip), DLC groups as tabs (`PsnTrophyGroupTabs`, the guard's one

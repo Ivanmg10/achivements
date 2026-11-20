@@ -56,7 +56,7 @@ export type Raw360Achievement = {
  * page) refuses. Their plain hosts have no certificate for https, so they are
  * swapped for the `-ssl` twins that serve the very same files.
  */
-function https(url: string | null | undefined): string | null {
+export function https(url: string | null | undefined): string | null {
   return url
     ? url
         .replace(/^https?:\/\/images-eds\.xboxlive\.com/, 'https://images-eds-ssl.xboxlive.com')

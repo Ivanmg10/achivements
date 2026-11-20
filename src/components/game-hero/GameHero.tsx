@@ -1,8 +1,18 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import GameHeroTile, { type GameHeroTileData } from './game-hero-tile/GameHeroTile'
+import GameHeroCover, { type GameHeroCoverProps } from './game-hero-cover/GameHeroCover'
 
 export type GameHeroFact = { label: string; value: string | null | undefined }
+
+/**
+ * The title's size follows its column's width over its length (#167: a long
+ * title took four lines at 1280): about two lines' worth, never under 2rem,
+ * never over today's size (3rem on a phone, 4.75rem from lg), so a short title
+ * stays as big as it was.
+ */
+const TITLE_SIZE =
+  '[--title-max:3rem] lg:[--title-max:4.75rem] text-[length:clamp(2rem,calc(400cqi/var(--title-chars)),var(--title-max))]'
 
 /**
  * The top of every game page (RA, Steam, PlayStation, Xbox), as agreed on the
@@ -24,7 +34,8 @@ export default function GameHero({
   tiles,
   media,
 }: {
-  cover: ReactNode
+  /** The cover's pictures (`GameHeroCover`): one piece on every page, a 2:3 frame or RA's box at its own ratio. */
+  cover: GameHeroCoverProps
   chips?: ReactNode
   title: string
   description?: string | null
@@ -44,13 +55,16 @@ export default function GameHero({
 
   return (
     <section className="relative w-full px-4 sm:px-8 lg:px-14 pt-6 lg:pt-10 flex flex-col lg:flex-row gap-6 lg:gap-9 items-start">
-      <div className="w-32 sm:w-40 lg:w-[13.5rem] shrink-0 rounded-tile overflow-hidden shadow-[0_24px_60px_rgb(0_0_0/0.55)] ring-1 ring-inset ring-ink/10 enter-rise">
-        {cover}
-      </div>
+      <GameHeroCover {...cover} />
 
-      <div className="flex-1 min-w-0 flex flex-col gap-3.5 lg:pt-1.5 enter-rows">
+      <div className="@container w-full flex-1 min-w-0 flex flex-col gap-3.5 lg:pt-1.5 enter-rows">
         {chips && <div className="flex flex-wrap items-center gap-2">{chips}</div>}
-        <h1 className="font-display italic font-extrabold text-5xl lg:text-[4.75rem] leading-[0.9] pr-2 text-text-main break-words">{title}</h1>
+        <h1
+          className={`font-display italic font-extrabold ${TITLE_SIZE} leading-[0.9] pr-2 text-text-main break-words`}
+          style={{ '--title-chars': Math.max(title.length, 1) } as CSSProperties}
+        >
+          {title}
+        </h1>
         {description && <p className="text-sm text-text-secondary max-w-2xl line-clamp-3">{description}</p>}
         {progress}
         {children}
@@ -76,7 +90,7 @@ export default function GameHero({
       </div>
 
       {(tiles.length > 0 || media) && (
-        <div className="w-full lg:w-[26.25rem] shrink-0 flex flex-col gap-3 enter-rise [--i:5]">
+        <div className="w-full lg:w-[26.25rem] shrink-0 lg:self-stretch flex flex-col gap-3 enter-rise [--i:5]">
           {tiles.length > 0 && (
             <dl className="grid grid-cols-2 gap-2">
               {tiles.map((t) => (

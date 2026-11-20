@@ -76,6 +76,7 @@ export function toSteamGameProgress(game: SteamOwnedGame): SteamGameProgress {
     numAwarded: 0,
     pctWon: 0,
     lastPlayed: unixToIso(lastPlayedOf(game)),
+    lastPlayedBySteam: unixToIso(game.rtime_last_played),
     playtimeForever: game.playtime_forever ?? 0,
     playtime2Weeks: game.playtime_2weeks ?? 0,
     imgLogoUrl: gameLogoUrl(game.appid, game.img_logo_url),
@@ -93,7 +94,6 @@ export function toSteamAchievements(
   schema: SteamSchemaAchievement[],
   player: SteamPlayerAchievement[],
   globalPct: Map<string, number> = new Map(),
-  likelyOnline: Set<string> = new Set(),
   englishTitles: Map<string, string> = new Map(),
 ): SteamAchievementUnified[] {
   const unlocked = new Map(player.map((p) => [p.apiname, p]))
@@ -115,7 +115,6 @@ export function toSteamAchievements(
       displayOrder: index,
       hidden: def.hidden === 1,
       globalPct: globalPct.get(def.name) ?? null,
-      likelyOnline: likelyOnline.has(def.name),
       ...(englishTitles.get(def.name) && englishTitles.get(def.name) !== def.displayName && { titleEn: englishTitles.get(def.name) }),
     }
   })

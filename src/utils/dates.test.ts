@@ -1,4 +1,4 @@
-import { addDays, dateFormat, formatDate, formatDateTime, formatDay, formatWeekdayDay, upperFirst, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay, weekDays, mondayOf, dayIn, unlockDay, isTimeZone } from './dates'
+import { addDays, dateFormat, formatDate, formatDateTime, formatDay, formatWeekdayDay, upperFirst, localDay, parseUnlockTime, relativeTime, unlockIso, utcDay, weekDays, mondayOf, dayIn, unlockDay, isTimeZone, parseStoreDay, formatStoreDate, latestUnlock } from './dates'
 
 describe('parseUnlockTime', () => {
   test('a zone-less platform date is UTC, whatever the browser zone is', () => {
@@ -162,4 +162,41 @@ describe('upperFirst', () => {
     expect(upperFirst('noviembre de 2026', 'es')).toBe('Noviembre de 2026')
     expect(upperFirst('', 'es')).toBe('')
   })
+})
+
+describe('parseStoreDay', () => {
+  test.each([
+    ['15 ENE 2014', '2014-01-15'],
+    ['15 Jan, 2014', '2014-01-15'],
+    ['Jan 15, 2014', '2014-01-15'],
+    ['9 NOV 2015', '2015-11-09'],
+    ['15. Jan. 2014', '2014-01-15'],
+    ['5. März 2020', '2020-03-05'],
+    ['15 janv. 2014', '2014-01-15'],
+    ['1 févr. 2019', '2019-02-01'],
+    ['15 gen 2014', '2014-01-15'],
+    ['15 STY 2014', '2014-01-15'],
+    ['15/jan./2014', '2014-01-15'],
+    ['15 янв. 2014', '2014-01-15'],
+    ['2014年1月15日', '2014-01-15'],
+    ['31 SEPT 2014', null],
+  ])('%s → %s', (s, day) => {
+    expect(parseStoreDay(s)).toBe(day)
+  })
+
+  test('no day in it is no day', () => {
+    for (const s of ['Coming soon', 'Q3 2026', 'Jan 2014', 'Próximamente', '', null, undefined]) expect(parseStoreDay(s)).toBeNull()
+  })
+})
+
+test('formatStoreDate: a day in the one format, anything else in sentence case', () => {
+  expect(formatStoreDate('15 ENE 2014', 'es')).toBe(formatDay('2014-01-15', 'es'))
+  expect(formatStoreDate('COMING SOON', 'en')).toBe('Coming soon')
+  expect(formatStoreDate(null, 'en')).toBeNull()
+})
+
+test('latestUnlock: the newest readable date, whatever its shape; none is null', () => {
+  expect(latestUnlock(['2026-10-17 18:30:00', null, '2026-10-18T01:00:00Z', 'nope', undefined])).toBe('2026-10-18T01:00:00Z')
+  expect(latestUnlock([null, 'nope'])).toBeNull()
+  expect(latestUnlock([])).toBeNull()
 })

@@ -1,6 +1,6 @@
 jest.mock('@/hooks/useAchievementPins', () => ({ ...jest.requireActual('@/hooks/useAchievementPins'), useAchievementPins: jest.fn() }))
 
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { en } from '@/translations/en'
 import { useAchievementPins, RA_PINS, STEAM_PINS, PSN_PINS, XBOX_PINS } from '@/hooks/useAchievementPins'
 import { mockPins } from '@/test-utils/pins'
@@ -29,7 +29,8 @@ type Platform = {
   pins: (o: { canPin?: boolean; pinned?: number[]; leading?: number[] }) => jest.Mock
   /** What the toggle receives for the achievement with this title. */
   pinArg: (title: string) => unknown
-  texts: { none: string; earned: string; locked: string }
+  /** `search` is the search's name, in the platform's word. */
+  texts: { none: string; earned: string; locked: string; search: string }
   /** The words a still-secret one shows; absent where the platform has none (RA). */
   secret?: { title: string; reveal?: { one: string; all: string; allOff: string } }
   /** The `#fragment` a link to the achievement at that place uses; absent where links land on the page only (RA). */
@@ -58,7 +59,7 @@ const RA: Platform = {
     return toggle
   },
   pinArg: (title) => expect.objectContaining({ Title: title }),
-  texts: { none: en.gameInfoTable.noMatches, earned: en.gameInfoTable.headerEarned, locked: en.achievementDetail.notEarned },
+  texts: { none: en.gameInfoTable.noMatches, earned: en.gameInfoTable.headerEarned, locked: en.achievementDetail.notEarned, search: en.gameInfoTable.searchPlaceholder },
   hasNotice: true,
 }
 
@@ -67,7 +68,7 @@ const STEAM: Platform = {
   render: (specs) => {
     const list: SteamAchievementUnified[] = specs.map((s, i) => ({
       _source: 'steam', id: `K${i}`, apiname: `K${i}`, title: s.title, description: s.text ?? `${s.title} text`, badgeUrl: `${i}.jpg`,
-      displayOrder: i, hidden: !!s.secret, earned: !!s.earned, dateEarned: s.earned ? day(s.at) : null, globalPct: s.rarity ?? null, likelyOnline: !!s.noticed,
+      displayOrder: i, hidden: !!s.secret, earned: !!s.earned, dateEarned: s.earned ? day(s.at) : null, globalPct: s.rarity ?? null,
     }))
     render(<SteamGameInfoTable achievements={list} appId={620} gameTitle="Game" />)
   },
@@ -77,10 +78,10 @@ const STEAM: Platform = {
     return toggle
   },
   pinArg: (title) => expect.objectContaining({ title }),
-  texts: { none: en.steam.noAchievements, earned: en.steam.earned, locked: en.steam.locked },
+  texts: { none: en.steam.noAchievements, earned: en.steam.earned, locked: en.steam.locked, search: en.gameInfoTable.searchPlaceholder },
   secret: { title: en.steam.hiddenAchievement },
   anchor: (i) => `ach-K${i}`,
-  hasNotice: true,
+  hasNotice: false,
 }
 
 const PSN: Platform = {
@@ -98,7 +99,7 @@ const PSN: Platform = {
     return toggle
   },
   pinArg: (title) => expect.objectContaining({ name: title }),
-  texts: { none: en.psn.noTrophies, earned: en.psn.earned, locked: en.psn.locked },
+  texts: { none: en.psn.noTrophies, earned: en.psn.earned, locked: en.psn.locked, search: en.psn.searchTrophies },
   secret: { title: en.psn.hiddenTrophy, reveal: { one: en.psn.revealTrophy, all: en.psn.showHiddenTrophies, allOff: en.psn.hideHiddenTrophies } },
   anchor: (i) => `trophy-${i}`,
   hasNotice: false,
@@ -121,7 +122,7 @@ const XBOX: Platform = {
     return toggle
   },
   pinArg: (title) => expect.objectContaining({ name: title }),
-  texts: { none: en.xbox.noAchievements, earned: en.xbox.earned, locked: en.xbox.locked },
+  texts: { none: en.xbox.noAchievements, earned: en.xbox.earned, locked: en.xbox.locked, search: en.gameInfoTable.searchPlaceholder },
   secret: { title: en.xbox.secretAchievement, reveal: { one: en.xbox.revealAchievement, all: en.xbox.showSecretAchievements, allOff: en.xbox.hideSecretAchievements } },
   anchor: (i) => `achievement-${100 + i}`,
   hasNotice: false,
@@ -195,20 +196,20 @@ describe.each(PLATFORMS)('$name', (p) => {
 
   test('a search shows every match, and says when there is none', () => {
     p.render(TEN)
-    const search = screen.getByRole('searchbox', { name: en.gameInfoTable.searchPlaceholder })
+    const search = screen.getByRole('searchbox', { name: p.texts.search })
     fireEvent.change(search, { target: { value: 'item 9' } })
     expect(names()).toEqual(['Item 9'])
     fireEvent.change(search, { target: { value: 'zzz' } })
     expect(screen.getByText(en.gameInfoTable.noMatches)).toBeInTheDocument()
   })
 
-  test('a long list shows its first rows, the rest on asking, and folds again', () => {
+  test('a long list shows its first rows, the rest on asking, and folds again (after it shrinks)', async () => {
     p.render(TEN)
     expect(names()).toHaveLength(8)
     fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showRest.replace('{n}', '2') }))
     expect(names()).toHaveLength(10)
     fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showLess }))
-    expect(names()).toHaveLength(8)
+    await waitFor(() => expect(names()).toHaveLength(8))
   })
 
   test('a short list has no "show the rest"', () => {
@@ -265,7 +266,7 @@ describe.each(PLATFORMS.filter((p) => p.secret))('$name, secret ones', (p) => {
     p.render(SECRET)
     expect(names()).toEqual(['Open', p.secret!.title])
     expect(screen.queryByText('The ending')).not.toBeInTheDocument()
-    fireEvent.change(screen.getByRole('searchbox', { name: en.gameInfoTable.searchPlaceholder }), { target: { value: 'spoiler' } })
+    fireEvent.change(screen.getByRole('searchbox', { name: p.texts.search }), { target: { value: 'spoiler' } })
     expect(screen.getByText(en.gameInfoTable.noMatches)).toBeInTheDocument()
   })
 
@@ -332,14 +333,34 @@ describe.each(PLATFORMS.filter((p) => p.anchor))('$name, opened from a link to o
   })
 })
 
-describe.each(PLATFORMS.filter((p) => p.hasNotice))('$name, the line above the table', (p) => {
-  test('names the locked ones it is about, and can keep only them', () => {
-    p.render([{ title: 'Lose me', noticed: true }, { title: 'Got it', noticed: true, earned: true }, { title: 'Plain' }])
-    expect(screen.getByRole('status')).toHaveTextContent('«Lose me»')
-    expect(screen.getByRole('status')).not.toHaveTextContent('Got it')
-    fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showOnlyThese }))
-    expect(names()).toEqual(['Lose me'])
-    fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showAllAgain }))
+describe.each(PLATFORMS.filter((p) => p.hasNotice))('$name, the missables panel above the table', (p) => {
+  const SPECS: Spec[] = [{ title: 'Lose me', noticed: true }, { title: 'Got it', noticed: true, earned: true }, { title: 'Plain' }]
+  const head = () => screen.getByRole('button', { name: /can be missed/ })
+
+  test('is folded, says how many can still be lost, and lists only those, each opening its window', async () => {
+    p.render(SPECS)
+    expect(head()).toHaveAttribute('aria-expanded', 'false')
+    expect(head()).toHaveTextContent(`1 achievement can be missed ${en.gameInfoTable.missableText}`)
+    fireEvent.click(head())
+    expect(head()).toHaveAttribute('aria-expanded', 'true')
+    const panel = document.getElementById(head().getAttribute('aria-controls')!)!
+    expect(within(panel).getAllByRole('button').map((b) => b.textContent)).toEqual(['Lose meLose me text'])
     expect(names()).toHaveLength(3)
+    fireEvent.click(within(panel).getByRole('button', { name: /Lose me/ }))
+    expect(await screen.findByRole('dialog', { name: 'Lose me' })).toBeInTheDocument()
+  })
+
+  test('opens on its link (the hero chip), and folding drops the link', () => {
+    window.history.replaceState(null, '', '/game#missables')
+    p.render(SPECS)
+    expect(head()).toHaveAttribute('aria-expanded', 'true')
+    fireEvent.click(head())
+    expect(head()).toHaveAttribute('aria-expanded', 'false')
+    expect(window.location.hash).toBe('')
+  })
+
+  test('is not there when none is left to lose', () => {
+    p.render([{ title: 'Got it', noticed: true, earned: true }])
+    expect(screen.queryByRole('button', { name: /can be missed/ })).not.toBeInTheDocument()
   })
 })

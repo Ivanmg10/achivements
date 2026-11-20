@@ -39,7 +39,7 @@ export default function GameInfo() {
     )
   }
 
-  if (!game) return <GameInfoSkeleton />
+  if (!game) return <GameInfoSkeleton cover="natural" />
 
   const showSelector = subsetsLoading || subsets.length > 0 || parentId !== null
   const heroImage = game.ImageTitle ?? game.ImageIngame ?? null
@@ -48,7 +48,7 @@ export default function GameInfo() {
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <GameInfoHeroBackground imagePath={heroImage} />
       <div className={GAME_COLUMN}>
-        <GameInfoHeader gameData={game} actions={(game.NumAchievements ?? 0) > 0 && <GameAiExport getSource={() => raAiSource(game)} />}>
+        <GameInfoHeader gameData={game} linkMissables actions={(game.NumAchievements ?? 0) > 0 && <GameAiExport getSource={() => raAiSource(game)} />}>
           {showSelector && (
             <GameInfoSubsetSelector
               currentId={game.ID!}

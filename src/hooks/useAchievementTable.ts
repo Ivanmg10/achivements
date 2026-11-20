@@ -3,8 +3,7 @@ import { useLocationHash } from '@/hooks/useLocationHash'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { anchorOf, sortEntries, type SortDir, type TableEntry, type TableSort } from '@/utils/achievementTable'
 
-/** `notice`: only the ones the line above the table names (RA's missables, Steam's online ones). */
-export type TableFilter = 'all' | 'earned' | 'unearned' | 'notice'
+export type TableFilter = 'all' | 'earned' | 'unearned'
 
 /** Rows shown before "show the other N". */
 const FIRST_ROWS = 8
@@ -18,7 +17,8 @@ type Options<T> = {
   searchText: (e: TableEntry<T>) => string
   /** Pinned when the page loaded: these lead the list. */
   leads: (e: TableEntry<T>) => boolean
-  inNotice?: (e: TableEntry<T>) => boolean
+  /** RA's missables still to earn, listed in a panel above the table. */
+  isMissable?: (e: TableEntry<T>) => boolean
   /** PSN's trophy group; the table then shows one group or all. */
   scopeOf?: (e: TableEntry<T>) => string
   sortValue: (key: string) => ((e: TableEntry<T>) => number) | undefined
@@ -31,7 +31,7 @@ type Options<T> = {
  * clears what would hide that row, scrolls to the copy on screen (row or card)
  * and lights it up for a moment.
  */
-export function useAchievementTable<T>({ items, entries, searchText, leads, inNotice, scopeOf, sortValue, firstDir }: Options<T>) {
+export function useAchievementTable<T>({ items, entries, searchText, leads, isMissable, scopeOf, sortValue, firstDir }: Options<T>) {
   const [filter, setFilter] = useState<TableFilter>('all')
   const [scope, setScope] = useState('all')
   const [sort, setSort] = useState<TableSort>({ key: 'default', dir: 'asc' })
@@ -63,9 +63,9 @@ export function useAchievementTable<T>({ items, entries, searchText, leads, inNo
 
   const inScope = scopeOf && scope !== 'all' ? entries.filter((e) => scopeOf(e) === scope) : entries
   const earned = inScope.filter((e) => e.row.earned).length
-  const noticed = inNotice ? inScope.filter(inNotice) : []
+  const missables = isMissable ? inScope.filter(isMissable) : []
   const q = query.trim().toLowerCase()
-  const byFilter = { all: inScope, earned: inScope.filter((e) => e.row.earned), unearned: inScope.filter((e) => !e.row.earned), notice: noticed }[filter]
+  const byFilter = { all: inScope, earned: inScope.filter((e) => e.row.earned), unearned: inScope.filter((e) => !e.row.earned) }[filter]
   const matching = q ? byFilter.filter((e) => searchText(e).toLowerCase().includes(q)) : byFilter
   const sorted = sortEntries(matching, sort, sortValue(sort.key))
   const filtered = [...sorted.filter(leads), ...sorted.filter((e) => !leads(e))]
@@ -74,7 +74,6 @@ export function useAchievementTable<T>({ items, entries, searchText, leads, inNo
   return {
     filter,
     setFilter,
-    toggleNotice: () => setFilter((f) => (f === 'notice' ? 'all' : 'notice')),
     scope,
     setScope,
     query,
@@ -87,10 +86,12 @@ export function useAchievementTable<T>({ items, entries, searchText, leads, inNo
       setSort((prev) => (prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: firstDir(key) })),
     highlighted,
     counts: { all: inScope.length, earned, unearned: inScope.length - earned },
-    noticed,
+    missables,
     filtered,
     shown: folded ? filtered.slice(0, FIRST_ROWS) : filtered,
     folded,
+    /** The rows shown while folded. */
+    cap: FIRST_ROWS,
     /** "Show the other N" while folded, "show fewer" once unfolded; neither for a search or a short list. */
     rest: !q && filtered.length > FIRST_ROWS ? filtered.length - FIRST_ROWS : 0,
     toggleFold: () => setShowAll((v) => !v),

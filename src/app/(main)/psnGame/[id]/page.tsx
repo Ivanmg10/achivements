@@ -35,7 +35,7 @@ export default function PsnGamePage() {
   const { status } = useAuthSession()
   const { isLinked, fullLibrary, libraryLoading, libraryError, refetch } = usePsnGamesData()
   const { trophies, groups, isLoading, error, retry } = usePsnTrophies(isLinked ? titleId : null)
-  const { details } = usePsnGameDetails(isLinked ? titleId : null)
+  const { details, isLoading: detailsLoading } = usePsnGameDetails(isLinked ? titleId : null)
 
   if (titleId === null) notFound()
   if (status === 'loading') return <GameInfoSkeleton />
@@ -54,7 +54,7 @@ export default function PsnGamePage() {
       <div className={GAME_COLUMN}>
         <PsnGameInfoHeader
           game={game}
-          details={details}
+          details={details} detailsLoading={detailsLoading}
           actions={trophies.length > 0 && <GameAiExport getSource={() => psnAiSource({ game, trophies, groups, details })} />}
         />
         <GameTableState

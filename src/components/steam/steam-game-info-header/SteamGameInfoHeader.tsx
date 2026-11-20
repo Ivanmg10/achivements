@@ -4,7 +4,6 @@ import type { ReactNode } from 'react'
 import { IconExternalLink } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import { steamAssetUrl, steamStoreUrl } from '@/lib/steamAssets'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
@@ -15,6 +14,7 @@ import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
+import { formatDate, formatStoreDate } from '@/utils/dates'
 
 /**
  * The top of a Steam game page, on the shared `GameHero` as RA's: Steam swaps
@@ -29,6 +29,7 @@ export default function SteamGameInfoHeader({
   game,
   details,
   counts,
+  lastUnlock = null,
   actions,
 }: {
   appId: number
@@ -36,6 +37,8 @@ export default function SteamGameInfoHeader({
   game: SteamGameProgress | null
   details: SteamGameDetails | null
   counts: { earned: number; total: number } | null
+  /** The newest unlock in the achievement list. */
+  lastUnlock?: string | null
   /** The AI export, first among the buttons. */
   actions?: ReactNode
 }) {
@@ -47,7 +50,15 @@ export default function SteamGameInfoHeader({
 
   return (
     <GameHero
-      cover={<SteamGameImage appId={appId} asset="cover" iconUrl={game?.imageIcon} alt={title} size={216} className="block w-full aspect-2/3" />}
+      cover={{
+        sources: [steamAssetUrl(appId, 'cover'), steamAssetUrl(appId, 'header'), game?.imageIcon],
+        alt: title,
+        fallback: (
+          <span className="flex w-full h-full items-center justify-center bg-steam-dark">
+            <SteamLogo size={64} className="text-steam" aria-hidden="true" />
+          </span>
+        ),
+      }}
       title={title}
       chips={
         <>
@@ -72,10 +83,13 @@ export default function SteamGameInfoHeader({
         )
       }
       facts={[
-        { label: T.gameInfoPage.released, value: details?.releaseDate },
+        { label: T.gameInfoPage.released, value: formatStoreDate(details?.releaseDate, lang) },
         { label: T.gameInfoPage.developer, value: details?.developers.join(', ') },
         { label: T.gameInfoPage.publisher, value: details?.publishers.join(', ') },
         { label: T.gameInfoPage.genre, value: details?.genres.join(', ') },
+        // Only Steam's own date: for anyone but the API key's owner it is an estimate (#113).
+        ...(game?.lastPlayedBySteam ? [{ label: T.steam.lastPlayed, value: formatDate(game.lastPlayedBySteam, lang) }] : []),
+        { label: T.gameInfoPage.lastAchievement, value: lastUnlock && formatDate(lastUnlock, lang) },
       ]}
       actions={
         <>

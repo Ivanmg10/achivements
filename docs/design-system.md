@@ -37,7 +37,9 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   `formatDate` / `formatDay`, is not "the date of something": a chart's axis, a month ("January 2024", the best
   month), a range of days (`MainPageMonthCompare`, its own formatter), a day with its weekday (the journal, the
   streak page's rows, a day modal's title, the heatmap tooltip). A test that pins a formatted date fixes the clock
-  (`jest.useFakeTimers({ now })`) or uses a past year, so it says the same next year.
+  (`jest.useFakeTimers({ now })`) or uses a past year, so it says the same next year. **A date a store writes as text**
+  (Steam's "15 ENE 2014", localized) goes through `formatStoreDate(s, lang)`: read as a day when it names one, otherwise
+  shown as it comes in sentence case ("Coming soon", "Q3 2026"); never shown raw (#167).
 - **A rule that starts with offenders lists them** (#120, 2026-11-08): `NEW_RULES` in the guard, each with its
   list of files still drawing the piece by hand in `ui/uiGuard.pending.json`. A file not on its list fails; a
   file on it that no longer offends fails too, so the list only shrinks. Migrate a file, then take it off.
@@ -238,8 +240,13 @@ flag is read from the database, never the session).
   that design drew, so it does not move. Outside `ui/`, `uiGuard.test.ts` refuses `rounded-lg`, `-md`, `-sm`, `-xl`, `-2xl`,
   `-3xl` and arbitrary values, on any side, but for its short list of exceptions; a bare `rounded` is only a focus ring's corner.
   A `rounded-full` chip is a pill in both designs: left so on purpose, since moving it would change the slanted design.
-- **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `Shelf`, `DropSlot` and `ToggleButton`
-  are in `ui/`; a `DropSlot` is a dashed border and nothing else (no stripes, #130); the big faint icon behind a hero card's title is
+- **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `FoldList`, `Shelf`, `DropSlot` and `ToggleButton`
+  are in `ui/`; **a capped list is a `FoldList`** (#167): `ShowMore` and the list as one piece, the last row fading towards the
+  button while folded (`.fold-fade`), the box growing and the new rows rising (`foldItem(i, cap)` on each row, `.enter-rise`
+  staggered) on unfolding, shrinking back and handing the button its focus on folding; CSS motion only, none with reduced
+  motion; the caller renders only the first rows while folded, so the rest are out of the tab order. The game tables and
+  `BadgeGrid` use it; a bare `ShowMore` is only for loading more pages (RA comments, the admin's users), and the guard says so; an `Accordion` in `tone="danger"` folds a warning away (a game's missables, #167), and takes `open` /
+  `onOpenChange` / `id` when a link elsewhere opens it; a `DropSlot` is a dashed border and nothing else (no stripes, #130); the big faint icon behind a hero card's title is
   `GhostIcon` (one size and opacity, whole inside its card at the title's line; never an oversized icon cut by the edge); a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **The signature:** `BrandMark` (the logo in the accent from `themeIcon`'s own shapes, `LOGO_PATHS`, and the name in the display italic) is the one way the
   site signs itself: the visitors' bar, the sign-in screens and the landing's title (`size="title" logoAfter`: the name as big as the screen allows, the logo
@@ -364,7 +371,12 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 - **Numbers a reader sees are in their language:** `toLocaleString(lang)`, `decimal(n, lang)` for a
   fixed count of decimals, `formatRarity(pct, lang)`; never `toFixed` on screen ("0,8", not "0.8").
 - **A game page's top is `GameHero`** (chips, title, facts, actions, tiles, media) and its tables use
-  `ui/dataTable.ts` and `AchievementTableToolbar`; the four platforms share them.
+  `ui/dataTable.ts` and `AchievementTableToolbar`; the four platforms share them. **Its cover is `GameHeroCover`**
+  (#167), given as data (`cover={{ sources, alt, … }}`), never a picture drawn by the page: Steam, PlayStation and Xbox
+  share one 2:3 frame of the same size; a portrait covers it, any other shape (a square icon, Steam's wide header) is
+  shown whole over a blurred, darkened copy of itself; RA (`natural`) shows its box at the box's own ratio, the same
+  width, never cropped, holding `raBoxRatio(console)` until the picture is in. `pending` holds the frame while IGDB's
+  cover is on its way, so an icon is never swapped for it.
 - **The home layout is the person's choice** (`useHomeLayout`, synced key `home-layout`):
   `classic` (default) or `cover` (`MainPagePortada`, the game played last in big on top). It is in
   Preferences → General and in the welcome's preferences step.

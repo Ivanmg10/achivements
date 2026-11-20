@@ -5,7 +5,10 @@ import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { fetchShared } from '@/lib/fetchShared'
 
-type Outcome = { details: IgdbDetails | null } | { error: string }
+/** IGDB's facts, and its cover for a game the Store gave none. */
+export type PsnGameDetails = IgdbDetails & { coverUrl?: string | null }
+
+type Outcome = { details: PsnGameDetails | null } | { error: string }
 
 /**
  * IGDB's facts for one PSN game page (summary, studios, genres, screenshots).
@@ -16,8 +19,10 @@ type Outcome = { details: IgdbDetails | null } | { error: string }
 export function usePsnGameDetails(titleId: string | null) {
   // Keyed by the title in the owner's list: on a profile, theirs.
   const subject = useSubject()
-  const [details, setDetails] = useState<IgdbDetails | null>(null)
+  const [details, setDetails] = useState<PsnGameDetails | null>(null)
   const [error, setError] = useState<string | null>(null)
+  // The game the server last answered for: until it is this one, the cover waits (no icon swapped for the box art).
+  const [answered, setAnswered] = useState<string | null>(null)
 
   /** Asks the server; what came back, not yet applied. */
   const request = useCallback(async (id: string): Promise<Outcome> => {
@@ -25,7 +30,7 @@ export function usePsnGameDetails(titleId: string | null) {
       const res = await fetchShared(withSubject(`/api/psn/details?id=${encodeURIComponent(id)}`, subject))
       if (res.status === 404) return { details: null }
       if (!res.ok) throw new Error(`Failed to load game details (${res.status})`)
-      return { details: (await res.json()) as IgdbDetails }
+      return { details: (await res.json()) as PsnGameDetails }
     } catch (err) {
       console.error('[usePsnGameDetails]', id, err)
       return { error: err instanceof Error ? err.message : 'Unknown error' }
@@ -44,6 +49,7 @@ export function usePsnGameDetails(titleId: string | null) {
     let current = true
     request(titleId).then((outcome) => {
       if (!current) return
+      setAnswered(titleId)
       if ('error' in outcome) setError(outcome.error)
       else setDetails(outcome.details)
     })
@@ -52,5 +58,5 @@ export function usePsnGameDetails(titleId: string | null) {
     }
   }, [titleId, request])
 
-  return { details, error }
+  return { details, error, isLoading: titleId !== null && answered !== titleId }
 }

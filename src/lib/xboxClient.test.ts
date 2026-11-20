@@ -438,7 +438,7 @@ describe('xboxSummary', () => {
 describe('xboxGameAchievements', () => {
   test('a modern game uses the player endpoint, in the language asked', async () => {
     fetchMock.mockResolvedValue(answer({ achievements: [RAW_ACHIEVED, RAW_LOCKED] }))
-    const list = await xboxGameAchievements(XUID, { titleId: '1738914043', is360: false, lastPlayed: '2026-10-01T00:00:00Z' }, '7', 'es-ES')
+    const list = await xboxGameAchievements(XUID, { titleId: '1738914043', is360: false, lastPlayed: '2026-10-01T00:00:00Z', numAwarded: 1 }, '7', 'es-ES')
     expect(list).toHaveLength(2)
     expect(list[0]).toMatchObject({ name: 'Prologue', gamerscore: 10, unlocked: true })
     expect(fetchMock.mock.calls[0][0]).toBe(`https://api.xbl.io/v2/achievements/player/${XUID}/1738914043`)
@@ -452,26 +452,28 @@ describe('xboxGameAchievements', () => {
       [`achievements/player/${XUID}/title/1096157159`]: answer({ achievements: [titleList, locked] }),
       [`achievements/x360/${XUID}/title/1096157159`]: answer({ achievements: [RAW_360_ACHIEVEMENT] }),
     })
-    const list = await xboxGameAchievements(XUID, { titleId: '1096157159', is360: true, lastPlayed: null })
+    const list = await xboxGameAchievements(XUID, { titleId: '1096157159', is360: true, lastPlayed: null, numAwarded: 1 })
     expect(list).toHaveLength(2)
     expect(list[0]).toMatchObject({ id: '49', gamerscore: 30, unlocked: true, unlockedAt: RAW_360_ACHIEVEMENT.timeUnlocked })
     expect(list[1]).toMatchObject({ id: '50', unlocked: false, unlockedAt: null })
   })
 
-  test('the cache key changes with the last session and the language, so a played game is asked again', async () => {
+  test('the cache key changes with the last session, the unlocked count and the language, so a played game is asked again', async () => {
     fetchMock.mockResolvedValue(answer({ achievements: [] }))
-    const base = { titleId: '5', is360: false }
+    const base = { titleId: '5', is360: false, numAwarded: 3 }
     await xboxGameAchievements(XUID, { ...base, lastPlayed: 'A' })
     await xboxGameAchievements(XUID, { ...base, lastPlayed: 'B' })
     await xboxGameAchievements(XUID, { ...base, lastPlayed: 'A' }, null, 'es-ES')
+    // An unlock late in a session: Xbox keeps the session's start, the count moves.
+    await xboxGameAchievements(XUID, { ...base, lastPlayed: 'A', numAwarded: 4 })
     const keys = (withSteamCache as jest.Mock).mock.calls.map((c) => c[0])
-    expect(new Set(keys).size).toBe(3)
-    expect(keys[0]).toBe(`xbox:achievements:v5:${XUID}:5:A:en-US`)
+    expect(new Set(keys).size).toBe(4)
+    expect(keys[0]).toBe(`xbox:achievements:v5:${XUID}:5:A:3:en-US`)
   })
 
   test('a game with none is an empty list', async () => {
     fetchMock.mockResolvedValue(answer({}))
-    expect(await xboxGameAchievements(XUID, { titleId: '5', is360: false, lastPlayed: null })).toEqual([])
+    expect(await xboxGameAchievements(XUID, { titleId: '5', is360: false, lastPlayed: null, numAwarded: 0 })).toEqual([])
   })
 })
 

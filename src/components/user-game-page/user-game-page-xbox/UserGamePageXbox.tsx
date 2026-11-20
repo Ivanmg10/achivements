@@ -25,7 +25,7 @@ export default function UserGamePageXbox({ id, username, banner, comparing, mine
   const { T } = useLanguage()
   const { library, libraryLoading } = useXboxGamesData()
   const { achievements, isLoading, error, retry } = useXboxAchievements(id)
-  const { details } = useXboxGameDetails(id)
+  const { details, isLoading: detailsLoading } = useXboxGameDetails(id)
   const theirs = useMemo(() => xboxCompareList(achievements), [achievements])
 
   const game = library.find((g) => g.titleId === id) ?? null
@@ -36,7 +36,7 @@ export default function UserGamePageXbox({ id, username, banner, comparing, mine
     <UserGameCompareBody
       background={<XboxGameHeroBackground src={details?.heroUrl ?? xboxBackdrop(game)} />}
       banner={banner}
-      header={<XboxGameInfoHeader game={game} details={details} />}
+      header={<XboxGameInfoHeader game={game} details={details} detailsLoading={detailsLoading} />}
       username={username}
       isLoading={isLoading}
       failed={Boolean(error)}

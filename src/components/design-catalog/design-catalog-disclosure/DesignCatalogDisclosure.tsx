@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { IconBookmark, IconBookmarkFilled, IconPlus, IconStar, IconStarFilled, IconTrophy } from '@tabler/icons-react'
 import AccordionItem from '@/components/ui/Accordion'
 import ShowMore from '@/components/ui/ShowMore'
+import FoldList, { foldItem } from '@/components/ui/FoldList'
 import ToggleButton from '@/components/ui/ToggleButton'
 import Shelf from '@/components/ui/Shelf'
 import SectionHead from '@/components/ui/SectionHead'
@@ -18,6 +19,23 @@ function ShowMoreDemo() {
     <div className="flex flex-wrap items-center gap-3">
       <ShowMore expanded={open} onToggle={() => setOpen((v) => !v)} more="Show the other 31" less="Show fewer" />
       <ShowMore size="sm" expanded={small} onToggle={() => setSmall((v) => !v)} more="Show all 87" less="Show fewer" />
+    </div>
+  )
+}
+
+const FOLD_ROWS = ['Win a race', 'Finish the story', 'Collect every coin', 'Beat the boss on hard', 'Find the secret room', 'Never get hit', 'Max out a car']
+
+function FoldListDemo() {
+  const [folded, setFolded] = useState(true)
+  return (
+    <div className="flex flex-col gap-3 w-full max-w-md">
+      <FoldList folded={folded} onToggle={() => setFolded((f) => !f)} hasMore more="Show the other 4" less="Show fewer">
+        <ul className="flex flex-col gap-2">
+          {(folded ? FOLD_ROWS.slice(0, 3) : FOLD_ROWS).map((r, i) => (
+            <li key={r} {...foldItem(i, 3)} className="rounded-tile bg-bg-card px-4 py-3 text-sm">{r}</li>
+          ))}
+        </ul>
+      </FoldList>
     </div>
   )
 }
@@ -53,10 +71,12 @@ export default function DesignCatalogDisclosure() {
             <AccordionItem title="What are Vault Points?" index={0} defaultOpen>One score worth the same on every platform: it counts how hard and how rare each achievement is.</AccordionItem>
             <AccordionItem title="Who sees my profile?" index={1}>Anyone, while it is public; only you, otherwise.</AccordionItem>
             <AccordionItem title="Without a number">An accordion with no place in a list draws no number.</AccordionItem>
+            <AccordionItem tone="danger" title={<><strong className="text-danger">2 achievements can be missed</strong> if you move on without them</>}>The danger tone folds a warning away: a game&apos;s missables.</AccordionItem>
           </div>
         </Panel>
       </DesignCatalogPiece>
       <DesignCatalogPiece id="show-more"><Compare><ShowMoreDemo /></Compare></DesignCatalogPiece>
+      <DesignCatalogPiece id="fold-list"><Panel><FoldListDemo /></Panel></DesignCatalogPiece>
       <DesignCatalogPiece id="toggle-button"><Panel><ToggleDemo /></Panel></DesignCatalogPiece>
       <DesignCatalogPiece id="section-head">
         <Panel>

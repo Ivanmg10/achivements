@@ -47,6 +47,10 @@ dates), and a date only chooses which games' unlocks are read. A game with no ac
 `steam_playtime` started stays undated and sorts last. Without migration 045 the hours are not kept (each read
 logs it) and steps 1, 2 (unlocks) and 3 still work.
 
+The game page's "last played" fact shows **only step 1** (`lastPlayedBySteam` on `SteamGameProgress`, owned list
+`steamOwned4:`, #167): steps 2 and 3 are good for sorting, not a date to show as "played on". Everyone else sees the
+last achievement, which every game page shows.
+
 What changed with it: the counts cache is keyed by `playtime_forever` (`steamProgress3:`), not the date, and a
 game with minutes in the last two weeks gets the one-hour TTL; the score refresh's `changeKey` is
 `playtime_forever:rtime_last_played` (it was the date alone, `''` for everyone but the owner, so their games
