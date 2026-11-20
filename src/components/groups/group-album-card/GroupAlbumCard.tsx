@@ -4,7 +4,7 @@ import { GameGroup } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { plural } from '@/utils/utils'
 import { ProgressBar } from '@/components/ui/ProgressBar'
-import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
+import { coverSources } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import GroupCoverStrip from '@/components/groups/group-cover-strip/GroupCoverStrip'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
 import GroupFacts from '@/components/groups/group-facts/GroupFacts'
@@ -18,7 +18,7 @@ import Tag from '@/components/ui/Tag'
  */
 export default function GroupAlbumCard({ group }: { group: GameGroup }) {
   const { T, lang } = useLanguage()
-  const covers = (group.covers ?? []).map(coverSrc).filter((s): s is string => !!s).slice(0, 4)
+  const covers = (group.covers ?? []).map(coverSources).filter((s) => s.length > 0).slice(0, 4)
   const pct = group.total_possible > 0 ? Math.min(100, Math.round((group.total_awarded / group.total_possible) * 100)) : 0
   const Privacy = group.is_public ? IconWorld : IconLock
   const empty = group.game_count === 0

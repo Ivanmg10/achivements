@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -7,7 +6,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { GameGroupItem } from '@/types/types'
 import type { ItemProgress } from '@/utils/groupItems'
 import { gameHref } from '@/utils/gameRef'
-import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
+import { coverSources } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
+import GroupCoverImage from '@/components/groups/group-cover-image/GroupCoverImage'
 
 const OVERLAY = 'absolute z-10 p-1.5 rounded-chip bg-bg-main/80 text-text-secondary transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2'
 
@@ -29,7 +29,6 @@ export default function GroupCoverTile({
 }) {
   const { T } = useLanguage()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id, disabled: !draggable })
-  const src = coverSrc(item)
   const href = gameHref(item.source ?? 'ra', item.game_id)
   const pct = Math.min(100, Math.round(progress.pct * 100))
   const done = pct >= 100
@@ -50,7 +49,7 @@ export default function GroupCoverTile({
           aria-hidden="true"
           className={`block aspect-square rounded-card overflow-hidden bg-bg-card ring-2 transition-all ${done ? 'ring-progress' : 'ring-transparent group-hover:ring-ink/30'}`}
         >
-          {src && <Image src={src} alt="" width={240} height={240} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" unoptimized />}
+          <GroupCoverImage sources={coverSources(item)} className="w-full h-full group-hover:scale-105 transition-transform duration-500" />
         </Link>
         {done && (
           <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-bg-main/90 text-success">

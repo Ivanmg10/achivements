@@ -50,7 +50,7 @@ export default function SteamSortableItem({
       href={gameHref('steam', item.game_id)}
       title={game?.title ?? item.title}
       backdrop={steamAssetUrl(item.game_id, 'header')}
-      cover={<SteamGameImage appId={item.game_id} asset="icon" iconUrl={game?.imageIcon ?? item.image_icon ?? ''} size={96} className={COVER_IMAGE} />}
+      cover={<SteamGameImage appId={item.game_id} asset="cover" iconUrl={game?.imageIcon ?? item.image_icon ?? ''} size={96} className={COVER_IMAGE} />}
       ring={done ? 'steam-perfect' : undefined}
       chips={
         <>

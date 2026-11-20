@@ -20,7 +20,7 @@ const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/Ad
 import GroupDetailHero from '@/components/groups/group-detail-hero/GroupDetailHero'
 import GroupToolbar from '@/components/groups/group-toolbar/GroupToolbar'
 import GroupCoverGrid from '@/components/groups/group-cover-grid/GroupCoverGrid'
-import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
+import { coverSources } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import { GROUP_DETAIL_VIEWS, type GroupDetailView } from '@/components/groups/group-view-toggle/GroupViewToggle'
 import GroupGameGrid from '@/components/groups/group-game-grid/GroupGameGrid'
 import GroupDetailSkeleton from '@/components/groups/group-detail-skeleton/GroupDetailSkeleton'
@@ -45,7 +45,7 @@ export default function GroupDetailPage() {
   const items = useMemo(() => group?.items ?? [], [group])
   const { ra, live, summary, states, progress } = useGroupProgress(items)
   const filtered = useMemo(() => filterGroupItems(items, filters, live, ra.ach), [items, filters, live, ra.ach])
-  const covers = useMemo(() => items.map(coverSrc).filter((s): s is string => !!s).slice(0, 8), [items])
+  const covers = useMemo(() => items.map(coverSources).filter((s) => s.length > 0).slice(0, 8), [items])
   const existingKeys = useMemo(() => new Set(items.map(itemKey)), [items])
 
   async function handleDelete() {

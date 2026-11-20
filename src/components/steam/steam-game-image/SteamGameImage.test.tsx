@@ -77,3 +77,14 @@ test('the square icon comes first and falls back to the cover', () => {
   expect(img(container)?.getAttribute('src')).toBe(`${CDN}/library_600x900.jpg`)
   expect(img(container)).toHaveClass('object-top')
 })
+
+test('the small library icon, reached as a fallback in a big box, is never blown up past its own size', () => {
+  const { container } = render(<SteamGameImage appId={620} iconUrl="icon.jpg" size={96} />)
+  fireEvent.error(img(container)!)
+  fireEvent.error(img(container)!)
+  expect(img(container)).toHaveClass('object-scale-down')
+  const small = render(<SteamGameImage appId={620} iconUrl="icon.jpg" size={56} />).container
+  fireEvent.error(img(small)!)
+  fireEvent.error(img(small)!)
+  expect(img(small)).toHaveClass('object-cover')
+})

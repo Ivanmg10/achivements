@@ -23,7 +23,8 @@ test('opens the group and shows its covers, progress and counts', () => {
   expect(screen.getByText(/4 games/).closest('p')).toHaveTextContent(/^4 games, 3 in progress, 103\/176 achievements, /)
   expect(screen.queryByText('1 completed')).not.toBeInTheDocument()
   expect(container.querySelector('img[src="https://retroachievements.org/Images/1.png"]')).toBeInTheDocument()
-  expect(container.querySelector('img[src="https://cdn/2.jpg"]')).toBeInTheDocument()
+  // Steam's art is its 600×900 cover, not the stored icon.
+  expect(container.querySelector('img[src="https://cdn.akamai.steamstatic.com/steam/apps/2/library_600x900.jpg"]')).toBeInTheDocument()
 })
 
 test('an empty group asks for games and shows no bar', () => {

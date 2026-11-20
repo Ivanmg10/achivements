@@ -7,7 +7,7 @@ jest.mock('next/image', () => ({ src, alt, ...props }: React.ComponentProps<'img
 const group = { id: 1, title: 'SNES platformers', description: 'The ones left', icon: null, is_public: true } as GameGroup
 const props = {
   group,
-  covers: ['https://a/1.png', 'https://a/2.png'],
+  covers: [['https://a/1.png'], ['https://a/2.png']],
   gameCount: 12,
   summary: { earned: 412, total: 503 },
   onAdd: jest.fn(),

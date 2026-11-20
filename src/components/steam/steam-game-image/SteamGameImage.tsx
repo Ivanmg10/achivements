@@ -72,7 +72,8 @@ export default function SteamGameImage({
       height={size}
       // A portrait cover cut to a square keeps its top, where the title is printed.
       ref={ref}
-      className={`object-cover ${art === 'cover' && sources[index] === steamAssetUrl(appId, 'cover') ? 'object-top' : ''} ${loaded ? '' : `bg-skeleton ${SKELETON_PULSE}`} ${className}`}
+      // The small library icon, reached only when the art failed, is never blown up past its own size in a big box.
+      className={`${asset !== 'icon' && sources[index] === iconUrl && size > 64 ? 'object-scale-down' : 'object-cover'} ${art === 'cover' && sources[index] === steamAssetUrl(appId, 'cover') ? 'object-top' : ''} ${loaded ? '' : `bg-skeleton ${SKELETON_PULSE}`} ${className}`}
       onLoad={() => setLoaded(true)}
       onError={() => {
         setLoaded(false)
