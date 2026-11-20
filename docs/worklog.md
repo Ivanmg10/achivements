@@ -33,6 +33,33 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-20 — Trayectoria, first canvas round (`docs/trayectoria-design`, #170)
+
+**Did** — the first round of clickable concepts for Trayectoria on a design canvas
+(https://claude.ai/artifact/HEE7BBB6FJ1uEnxiQzWypq): A El diario (the 2026-10-23 "Tu diario" board done well: a step per
+day, a tinted card per game that grows into its day, the month calendar, milestones, the rarest, the streak, optional
+private notes), B La tira (days side by side with their games and an upright bar; a calendar in Mes; the chosen day's
+detail grows below), C Por juego (a row per game with a bar per day on a shared axis; three moments below). Each beside
+today's closest screens (real captures of the home's Resumen and Actividad and of `/racha`) at desktop and 390 px, with
+tranquilo / intenso / vacío and accent tweaks. Entry added to `docs/designs.md`. Nothing in `src/` changed.
+
+**Why** — #170: the owner wants the design on the canvas first ("los diseños quiero solo el canvas", 2026-11-19), from
+their answers on the issue (2026-11-14): the last ~10 days by default, week and month filters, no year, notes as an option.
+
+**Decisions** — real data only: the owner's unlocks from 2026-09-01 to 2026-11-20 read from the app's own GET routes
+(RA year, Steam `unlockYear`, PSN `recentTrophies?scope=year`), grouped by local day (Europe/Madrid). No Xbox (admin-only;
+the Hoy captures show it because the owner is an admin). The "rarest" mixes % for Steam/PSN and RA true points, as the
+home's "Desbloqueos raros recientes" does. Playtime is shown only where a platform gives it (Steam's last played and
+two-week minutes); no sessions are invented. Vault Points per week are not drawn (an open question).
+
+**Open** — the owner picks a concept or a mix and answers on the canvas: where it lives, unlocks only or also playtime,
+notes (a table, limits and a `/privacy` change), how far back, Vault Points. Then a plan doc (`docs/trayectoria-plan.md`).
+
+**Watch out** — the home's "Esta semana" figure counts the last 7 days, not Monday to Sunday; the concepts' "Semana" is
+Monday to Sunday. Decide which one the page means before building.
+
+---
+
 ## 2026-11-20 — Collection page, first canvas round (`docs/171-collection-design`, #171)
 
 **Did** — the first round of clickable concepts for the collection page on a design canvas
