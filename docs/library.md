@@ -79,6 +79,10 @@ nothing is deleted.
   the canonical detail loaders to “fix” a listing.
 - Stored pins, groups, favorites and showcases stay stored and are excluded at read time, so unhide
   restores them. Groups filter with the group owner's id. Friends' libraries use the friend's keys.
+- **A group's stored counts follow its page** (#168): the groups list reads `game_group_items`' own
+  `num_awarded` / `max_possible`; the group page reads live progress (`useGroupProgress`) and
+  `useGroupCountsSync` writes back every game whose live numbers differ, on every platform, so the
+  list and the page say the same once the page has been seen. The list itself never reads a platform.
 - `score_games` also keeps hidden rows as raw data, but every ranking/streak/total read excludes them.
   Hide/show rebuilds `score_periods` and bumps the shared ranking-cache revision in Postgres; stack
   factors and periods count only visible games. Historical `score_snapshots` stay point-in-time records. Never delete a hidden row just

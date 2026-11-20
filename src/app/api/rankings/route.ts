@@ -23,8 +23,8 @@ import { canUseXbox } from '@/utils/xboxAccess'
 
 /** The list comes twenty at a time: the top, then more on demand. */
 const PAGE = 20
-/** "Most active this week": how many of the global weekly list go beside your level. */
-const HOT = 5
+/** "Most active this week": how many of the global weekly list go beside your level (the card shows as many as fit). */
+const HOT = 10
 /** Places shown on each side of the viewer in "your zone" at first, and the most it can widen to. */
 const ZONE = 2
 const ZONE_MAX = 50

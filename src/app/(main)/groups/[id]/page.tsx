@@ -5,11 +5,11 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
-import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useGroupPage } from '@/hooks/useGroupPage'
 import { useGroupFilters } from '@/hooks/useGroupFilters'
 import { useStoredChoice } from '@/hooks/useStoredChoice'
 import { useGroupProgress } from '@/hooks/useGroupProgress'
+import { useGroupCountsSync } from '@/hooks/useGroupCountsSync'
 import { filterGroupItems, itemKey } from '@/utils/groupItems'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
@@ -20,7 +20,7 @@ const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/Ad
 import GroupDetailHero from '@/components/groups/group-detail-hero/GroupDetailHero'
 import GroupToolbar from '@/components/groups/group-toolbar/GroupToolbar'
 import GroupCoverGrid from '@/components/groups/group-cover-grid/GroupCoverGrid'
-import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
+import { coverSources } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import { GROUP_DETAIL_VIEWS, type GroupDetailView } from '@/components/groups/group-view-toggle/GroupViewToggle'
 import GroupGameGrid from '@/components/groups/group-game-grid/GroupGameGrid'
 import GroupDetailSkeleton from '@/components/groups/group-detail-skeleton/GroupDetailSkeleton'
@@ -34,8 +34,7 @@ export default function GroupDetailPage() {
   const groupId = parseInt(id as string)
   const router = useRouter()
   const { T } = useLanguage()
-  const { games: recentlyPlayed } = useRecentlyPlayedGames()
-  const { group, status, retry, reorder, removeGame, addItems, edit, remove } = useGroupPage(groupId, recentlyPlayed)
+  const { group, status, retry, reorder, removeGame, addItems, edit, remove } = useGroupPage(groupId)
   const { filters, active: filtersActive, setPct, setDecade, toggleConsole, clearConsoles, clear } = useGroupFilters()
   const [editOpen, setEditOpen] = useState(false)
   const [addGameOpen, setAddGameOpen] = useState(false)
@@ -44,8 +43,9 @@ export default function GroupDetailPage() {
 
   const items = useMemo(() => group?.items ?? [], [group])
   const { ra, live, summary, states, progress } = useGroupProgress(items)
+  useGroupCountsSync(groupId, items, progress, ra.pts)
   const filtered = useMemo(() => filterGroupItems(items, filters, live, ra.ach), [items, filters, live, ra.ach])
-  const covers = useMemo(() => items.map(coverSrc).filter((s): s is string => !!s).slice(0, 8), [items])
+  const covers = useMemo(() => items.map(coverSources).filter((s) => s.length > 0).slice(0, 8), [items])
   const existingKeys = useMemo(() => new Set(items.map(itemKey)), [items])
 
   async function handleDelete() {

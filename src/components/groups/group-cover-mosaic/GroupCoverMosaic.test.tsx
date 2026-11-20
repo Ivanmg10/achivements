@@ -1,12 +1,12 @@
 import { render } from '@testing-library/react'
-import GroupCoverMosaic from './GroupCoverMosaic'
+import GroupCoverMosaic, { coverSources } from './GroupCoverMosaic'
 import type { GameGroup } from '@/types/types'
 
 jest.mock('next/image', () => ({ src, alt, ...props }: React.ComponentProps<'img'>) => <img src={src as string} alt={alt} {...props} />)
 
 const group = (over: Partial<GameGroup>) => ({ id: 1, title: 'G', icon: null, covers: [], ...over }) as GameGroup
 
-test('the first games’ covers, RA art from RA and Steam art as stored, at most four', () => {
+test('the first games’ covers, RA art from RA and Steam’s 600×900 cover, at most four', () => {
   const { container } = render(
     <GroupCoverMosaic
       group={group({
@@ -21,7 +21,7 @@ test('the first games’ covers, RA art from RA and Steam art as stored, at most
     />,
   )
   const srcs = [...container.querySelectorAll('img')].map((i) => i.getAttribute('src'))
-  expect(srcs).toEqual(['https://retroachievements.org/Images/1.png', '/api/steam/icon?appid=2', 'https://retroachievements.org/Images/3.png', 'https://retroachievements.org/Images/4.png'])
+  expect(srcs).toEqual(['https://retroachievements.org/Images/1.png', 'https://cdn.akamai.steamstatic.com/steam/apps/2/library_600x900.jpg', 'https://retroachievements.org/Images/3.png', 'https://retroachievements.org/Images/4.png'])
 })
 
 test('the owner’s icon sits on a corner of the covers, or alone when there are none', () => {
@@ -35,4 +35,14 @@ test('the owner’s icon sits on a corner of the covers, or alone when there are
 test('decorative: hidden from screen readers', () => {
   const { container } = render(<GroupCoverMosaic group={group({})} />)
   expect(container.firstChild).toHaveAttribute('aria-hidden', 'true')
+})
+
+test('Steam art is its cover, then its header, then the stored icon; others as stored', () => {
+  expect(coverSources({ source: 'steam', game_id: 2, image_icon: '/api/steam/icon?appid=2' })).toEqual([
+    'https://cdn.akamai.steamstatic.com/steam/apps/2/library_600x900.jpg',
+    'https://cdn.akamai.steamstatic.com/steam/apps/2/header.jpg',
+    '/api/steam/icon?appid=2',
+  ])
+  expect(coverSources({ source: 'ra', game_id: 1, image_icon: '/Images/1.png' })).toEqual(['https://retroachievements.org/Images/1.png'])
+  expect(coverSources({ source: 'psn', game_id: 3, image_icon: null })).toEqual([])
 })

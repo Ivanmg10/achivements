@@ -2,7 +2,9 @@ import Image from 'next/image'
 import { IconFolder } from '@tabler/icons-react'
 import type { GameGroup } from '@/types/types'
 import { raImageUrl } from '@/utils/raAssets'
+import { steamAssetUrl } from '@/lib/steamAssets'
 import type { GameSource } from '@/types/game'
+import GroupCoverImage from '@/components/groups/group-cover-image/GroupCoverImage'
 
 const isUrl = (s: string) => /^https?:\/\//i.test(s)
 
@@ -12,6 +14,17 @@ export function coverSrc(c: { source?: GameSource; image_icon: string | null }):
   return c.source === 'steam' || c.image_icon.startsWith('/api/') || isUrl(c.image_icon)
     ? c.image_icon
     : raImageUrl(c.image_icon) ?? null
+}
+
+/**
+ * A game's art for a group, as the sources to try in turn. Steam's stored picture is its desktop client icon
+ * (often a 32 px .ico), so a Steam game is its 600×900 cover, then its store header, then that icon; any other
+ * platform is its stored art. Read from `source` + `game_id`, so rows saved long ago get it too.
+ */
+export function coverSources(c: { source?: GameSource; game_id?: number; image_icon: string | null }): string[] {
+  const stored = coverSrc(c)
+  const steam = c.source === 'steam' && c.game_id ? [steamAssetUrl(c.game_id, 'cover'), steamAssetUrl(c.game_id, 'header')] : []
+  return [...steam, ...(stored ? [stored] : [])]
 }
 
 // How the tile is split for 1 to 4 covers.
@@ -28,7 +41,7 @@ const LAYOUT: Record<number, string> = {
  * folder. Decorative; the card's title names the group.
  */
 export default function GroupCoverMosaic({ group, size = 'w-24 h-24' }: { group: GameGroup; size?: string }) {
-  const covers = (group.covers ?? []).map(coverSrc).filter((s): s is string => !!s).slice(0, 4)
+  const covers = (group.covers ?? []).map(coverSources).filter((s) => s.length > 0).slice(0, 4)
   const icon = group.icon?.trim() || null
 
   const iconMark = icon ? (
@@ -43,8 +56,8 @@ export default function GroupCoverMosaic({ group, size = 'w-24 h-24' }: { group:
     <div aria-hidden="true" className={`relative shrink-0 ${size}`}>
       {covers.length > 0 ? (
         <div className={`grid gap-0.5 w-full h-full rounded-tile overflow-hidden bg-bg-main ${LAYOUT[covers.length]}`}>
-          {covers.map((src, i) => (
-            <Image key={i} src={src} alt="" width={96} height={96} className="w-full h-full object-cover" unoptimized />
+          {covers.map((sources, i) => (
+            <GroupCoverImage key={i} sources={sources} />
           ))}
         </div>
       ) : (

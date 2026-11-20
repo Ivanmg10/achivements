@@ -47,7 +47,7 @@ export default function RankingsPagePodium({ rows, linked, approx = false }: { r
           <li
             key={r.username}
             style={arrival(place)}
-            className={`enter-card relative rounded-sheet pt-4 sm:pt-[1.125rem] px-2 sm:px-3.5 flex flex-col items-center gap-1.5 overflow-hidden ring-1 ring-inset ${r.isMe ? 'ring-accent/50' : 'ring-ink/[0.06]'} ${
+            className={`enter-card relative rounded-sheet pt-4 sm:pt-[1.125rem] px-2 sm:px-3.5 flex flex-col items-center gap-1.5 overflow-hidden ring-1 ring-inset transition-shadow ${r.isMe ? 'ring-accent/50' : linked ? 'ring-ink/[0.06] hover:ring-ink/25' : 'ring-ink/[0.06]'} ${
               place === 1 ? 'bg-[linear-gradient(180deg,rgb(var(--accent)/0.16),rgb(var(--bg-card))_60%)]' : 'bg-bg-card'
             }`}
           >
@@ -56,6 +56,7 @@ export default function RankingsPagePodium({ rows, linked, approx = false }: { r
               size={SIZE[place as 1 | 2 | 3]}
               ring={RING[place]}
               linked={linked}
+              rowRadius="after:rounded-sheet"
               stacked
               nameClass="text-base sm:text-[1.1875rem] font-extrabold"
             >

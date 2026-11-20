@@ -30,13 +30,13 @@ export default function RankingsPageList({
       {rows.map((r) => (
         <li
           key={r.username}
-          className={`grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2.5 bg-bg-card rounded-tile px-3 py-2.5 ${r.isMe ? 'ring-[1.5px] ring-accent/60' : ''}`}
+          className={`relative grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2.5 bg-bg-card rounded-tile px-3 py-2.5 transition-shadow ${r.isMe ? 'ring-[1.5px] ring-accent/60' : linked ? 'hover:ring-1 hover:ring-inset hover:ring-ink/20' : ''}`}
         >
           <span className={`text-center font-extrabold tabular-nums ${r.isMe ? 'text-accent' : 'text-text-secondary'}`}>
             <span className="sr-only">{T.rankings.colRank} </span>
             <RankingsPageRank rank={r.rank} tied={r.tied} />
           </span>
-          <RankingsPageUser row={r} size="md" linked={linked}>
+          <RankingsPageUser row={r} size="md" linked={linked} rowRadius="after:rounded-tile">
             <VaultLevelBadge points={r.totalPoints} className="self-start" />
             <RankingsPageStreak streak={r.streak} best={r.bestStreak} className="text-xs" />
             {gapFrom !== undefined && !r.isMe && (

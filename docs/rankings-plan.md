@@ -137,8 +137,11 @@ Details: `docs/platforms/psn.md`, `docs/social.md`.
 - **Following without a podium** below 15 people. The list shows 20 at a time; when you are not
   in it, **your zone** below it (two above and below you, widened ten at a time) replaced the
   "close rivals" panel (2026-10-20, the user's choice of three options). Each row has its last
-  8 weeks as a small line (`VaultSparkline`). Under your level, the five most active this week
-  (`RankingsPageHot`), with a way to the weekly ranking.
+  8 weeks as a small line (`VaultSparkline`). Under your level, the most active this week
+  (`RankingsPageHot`, up to ten since #168), with a way to the weekly ranking. The card keeps its room
+  whatever the week has (quiet numbered rows where nobody is yet); from lg the column beside the table
+  is as tall as the screen below the bar and the card shows as many rows as fit (`useFitCount`).
+  The whole row of any ranking list opens the person (the name stretched over it, #168).
 - `show_in_rankings` is **not in the session** on purpose (unlike `show_presence`): it is read
   with the rankings, so a database without migration 040 breaks only the rankings.
 

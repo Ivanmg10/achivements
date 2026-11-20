@@ -30,6 +30,12 @@ beforeEach(() => {
   ;(streaksOf as jest.Mock).mockResolvedValue(new Map([[1, { current: 2, best: 4 }], [3, { current: 6, best: 6 }]]))
 })
 
+test('the most active this week are the first ten of the weekly list', async () => {
+  ;(loadRanking as jest.Mock).mockResolvedValue(Array.from({ length: 12 }, (_, i) => entry(i + 1, i + 1, 1000 - i)))
+  const res = await get()
+  expect((res.data.hot as { username: string }[]).map((r) => r.username)).toEqual(Array.from({ length: 10 }, (_, i) => `u${i + 1}`))
+})
+
 test('signed out: the global list, with arrows, no presence and no ids', async () => {
   const res = await get()
   expect(res.status).toBe(200)

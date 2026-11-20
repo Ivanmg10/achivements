@@ -33,6 +33,56 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-20 — Groups and rankings review (`fix/168-groups-rankings-review`, #168)
+
+**Did**
+- A1: group art no longer draws the stored `image_icon` alone (for Steam the desktop client icon, often a 32 px .ico blown up to
+  180 px). `coverSources(item)` (`group-cover-mosaic/GroupCoverMosaic.tsx`) gives the sources to try: Steam's 600×900 cover,
+  its header, then that icon, from `source` + `game_id` (no migration); other platforms their stored art. `GroupCoverImage`
+  (new, `groups/group-cover-image/`, the old strip slice generalised) steps through them on error, cuts a portrait from its
+  top and draws a too-small picture at twice its size at most over a blurred copy. Used by the album card's band, a group's
+  tiles and banner, the mosaic, the home's featured group and its tiles. The Steam list row (`SteamSortableItem`) asks for
+  the cover; `SteamGameImage` never blows up its small icon fallback in a box over 64 px (`object-scale-down`).
+- A2: the "Vitrinas" view is gone: `GroupShelfRow`, the list's view switch, `GROUP_VIEWS` / `GroupView`, the `groups-view`
+  stored choice and its synced key, `T.groups.viewShelves` (nine languages). `GroupAlbumCard` and `GroupViewToggle` stay (the
+  covers view and the group page's covers/list switch use them); `GroupCoverStrip` stays for the landing.
+- A3: the whole ranking row opens the person: `RankingsPageUser`'s name link is stretched over its row (`after:absolute
+  after:inset-0 after:z-[1]`, focus ring on the `::after`, `rowRadius` for its rounding); rows are `relative` (table `tr`,
+  phone `li`, podium card, "most active" row) with a hover. `linked={false}` stays plain.
+- A4: `HOT` 10 in `/api/rankings` (`HOT_MAX` in `useRankings` for the client). `RankingsPageHot` always draws (with data),
+  numbered quiet rows where nobody is yet, "Nobody has earned points this week yet." (`T.rankings.hotEmpty`, nine languages)
+  with nobody. From lg the aside is `h-[calc(100dvh-7rem)] min-h-min` and the card `flex-1 h-0 min-h-[9.625rem]`, rows by
+  `useFitCount`: stuck, it ends 16 px above the screen's foot at 2560×1340 (9 rows) and 1920×1080 (3 rows); at 1280×800 the
+  column was already taller than the screen and keeps one row (as tall as before). A phone shows all ten.
+- B1: the list said 77/112 and the page 78/112 for "Noviembre": the list sums the stored counts and only RA games were ever
+  written back (from the recently played feed). `useGroupCountsSync` (new, called by the group page) PATCHes every game whose
+  live numbers (`useGroupProgress`) differ, once per value per visit, RA with its live points; `useGroupPage` lost its RA-only
+  sync and its `recentlyPlayed` argument. Seen: the page sent Steam 2419090 22/37.
+- B2: the new-group tile was 16.75rem tall and set the row; it is 13.25rem (the cards' 212 px), and the card's band is
+  `flex-1` so a taller row grows the art, never a blank. Skeleton 212 px from sm.
+- B3: a tile's "75% · Faltan 19" is `Facts`. B6: each fact of `GroupFacts` is `whitespace-nowrap`.
+- B4: below lg the rankings platform chips are one row that scrolls (`useScrollFade`), the divider only from lg; Period and
+  Order share a row when both fit (`max-lg:flex-auto`), else each takes the width (at 390 in Spanish they would truncate).
+- B5: nothing to change: the group page's state strip already scrolls with its fade and no bar (#134), and `Tabs`' row lost its
+  bar in #167 B3; checked at 390.
+
+**Why** — the owner's review of groups and rankings (#168), and what the reviewer found there.
+
+**Decisions**
+- B1 writes back from the page rather than reading every library on `/groups`: the list stays one DB read.
+- A4 fills the column to the screen instead of a fixed ten rows: ten rows overflow 1920×1080 by ~270 px.
+- B4 keeps the selects whole on a phone rather than sharing a row with "Ordenar por Pu…".
+
+**Open**
+- The list catches up only once the group page has been opened (or a game added); the home's featured group does not write back.
+- Firefox: the stretched row link relies on `position: relative` on a `tr`; checked in Chromium only.
+
+**Watch out**
+- `RankingsPage.test.tsx` mocks `useRankings`: a new constant exported there must be in the mock (`HOT_MAX`).
+- `min-h-min` on the aside counts each child's min-content: the hot card needs `h-0` or its ten rows set the floor.
+
+---
+
 ## 2026-11-20 — Game page review (`fix/167-game-page-review`, #167)
 
 ### Part B (B1–B8)

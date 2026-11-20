@@ -28,12 +28,6 @@ jest.mock('@/components/groups/group-list/GroupList', () => ({
   ),
 }))
 
-jest.mock('@/components/groups/group-view-toggle/GroupViewToggle', () => ({
-  __esModule: true,
-  GROUP_VIEWS: ['covers', 'shelves'],
-  default: () => <div data-testid="grid-control" />,
-}))
-
 jest.mock('@/components/empty-state/EmptyState', () => ({
   __esModule: true,
   default: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
@@ -54,19 +48,18 @@ test('renders loading skeleton', () => {
   expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
 })
 
-test('renders group list and grid control when groups exist', () => {
+test('renders the group list when groups exist, with no view switch (covers only)', () => {
   ;(useGroups as jest.Mock).mockReturnValue({ groups: mockGroups, isLoading: false, error: null, createGroup: jest.fn() })
   render(<GroupsPage />)
   expect(screen.getByTestId('group-list')).toBeInTheDocument()
   expect(screen.getByText('Speedruns')).toBeInTheDocument()
-  expect(screen.getByTestId('grid-control')).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: /Shelves/ })).not.toBeInTheDocument()
 })
 
 test('renders empty state when no groups', () => {
   ;(useGroups as jest.Mock).mockReturnValue({ groups: [], isLoading: false, error: null, createGroup: jest.fn() })
   render(<GroupsPage />)
   expect(screen.getByTestId('empty-state')).toBeInTheDocument()
-  expect(screen.queryByTestId('grid-control')).not.toBeInTheDocument()
 })
 
 test('renders error message on fetch error', () => {

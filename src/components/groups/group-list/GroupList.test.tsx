@@ -6,22 +6,16 @@ jest.mock('@/components/groups/group-album-card/GroupAlbumCard', () => ({
   __esModule: true,
   default: ({ group }: { group: { title: string } }) => <div>album {group.title}</div>,
 }))
-jest.mock('@/components/groups/group-shelf-row/GroupShelfRow', () => ({
-  __esModule: true,
-  default: ({ group }: { group: { title: string } }) => <div>shelf {group.title}</div>,
-}))
 
 const mockGroups = [
   { id: 1, title: 'Speedruns' },
   { id: 2, title: 'Backlog' },
 ] as GameGroup[]
 
-test('cover cards by default, shelves when asked', () => {
-  const { rerender } = render(<GroupList groups={mockGroups} />)
+test('a cover card per group', () => {
+  render(<GroupList groups={mockGroups} />)
   expect(screen.getByText('album Speedruns')).toBeInTheDocument()
   expect(screen.getByText('album Backlog')).toBeInTheDocument()
-  rerender(<GroupList groups={mockGroups} view="shelves" />)
-  expect(screen.getByText('shelf Speedruns')).toBeInTheDocument()
 })
 
 test('renders without crashing with empty list', () => {

@@ -2,9 +2,6 @@ import type { IconLayoutGrid } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 
-/** The groups list: cover cards or shelves of games. */
-export const GROUP_VIEWS = ['covers', 'shelves'] as const
-export type GroupView = (typeof GROUP_VIEWS)[number]
 /** A group's page: a grid of covers or the detailed list. */
 export const GROUP_DETAIL_VIEWS = ['covers', 'list'] as const
 export type GroupDetailView = (typeof GROUP_DETAIL_VIEWS)[number]

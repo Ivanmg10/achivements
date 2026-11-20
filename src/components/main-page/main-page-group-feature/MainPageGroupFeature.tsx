@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
-import Image from 'next/image'
 import Link from 'next/link'
 import { IconArrowRight, IconEdit, IconFolder, IconPlus } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -15,7 +14,8 @@ import { plural } from '@/utils/utils'
 import { notify } from '@/lib/notify'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import GroupIcon from '@/components/groups/group-icon/GroupIcon'
-import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
+import GroupCoverImage from '@/components/groups/group-cover-image/GroupCoverImage'
+import { coverSources } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import MainPageGroupFeatureGame from '@/components/main-page/main-page-group-feature-game/MainPageGroupFeatureGame'
@@ -56,7 +56,7 @@ export default function MainPageGroupFeature({
   const [editing, setEditing] = useState(false)
   const items = useMemo(() => [...(detail?.items ?? []), ...added], [detail, added])
   const { summary, states, closest, progress } = useGroupProgress(items)
-  const covers = useMemo(() => items.map(coverSrc).filter((s): s is string => !!s).slice(0, 6), [items])
+  const covers = useMemo(() => items.map(coverSources).filter((s) => s.length > 0).slice(0, 6), [items])
   const existingKeys = useMemo(() => new Set(items.map(itemKey)), [items])
 
   // Until its games are read, the group's own stored totals.
@@ -79,8 +79,8 @@ export default function MainPageGroupFeature({
       <div className="relative rounded-card overflow-hidden ring-1 ring-ink/5 bg-bg-main">
         {covers.length > 0 && (
           <div aria-hidden="true" className="absolute inset-0 grid opacity-25" style={{ gridTemplateColumns: `repeat(${covers.length}, minmax(0, 1fr))` }}>
-            {covers.map((src, i) => (
-              <Image key={i} src={src} alt="" width={160} height={160} className="w-full h-full object-cover blur-[2px]" unoptimized />
+            {covers.map((sources, i) => (
+              <GroupCoverImage key={i} sources={sources} className="blur-[2px]" />
             ))}
           </div>
         )}

@@ -7,12 +7,16 @@ import Avatar from '@/components/ui/Avatar'
 import Tag from '@/components/ui/Tag'
 
 const SIZES = { sm: 32, md: 40, lg: 56, xl: 72, p1: 84, p2: 64, p3: 60 }
+/** The name's hit area over its whole row; above whatever else is positioned there. */
+const STRETCHED = "after:absolute after:inset-0 after:z-[1] after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-accent/70"
 
 /**
  * Someone in the rankings: picture (with the green dot while they are online,
  * never on your own; a pulse while it loads, their initial without one or when
  * it fails, as an uploaded one does signed out), name, and "You" in words on your own row. The name
- * opens their profile (signed out, its public card: ProfileTeaser).
+ * opens their profile (signed out, its public card: ProfileTeaser), and is stretched over the row it sits in
+ * (the nearest positioned box: a table row, a card), so the whole row opens it while the name stays the one
+ * link, announced once; the ring of its focus goes round the row.
  */
 export default function RankingsPageUser({
   row,
@@ -22,6 +26,7 @@ export default function RankingsPageUser({
   ring = '',
   nameClass = 'font-semibold',
   children,
+  rowRadius = '',
 }: {
   row: Pick<RankRow, 'username' | 'avatar' | 'isMe' | 'online'>
   size?: keyof typeof SIZES
@@ -35,6 +40,8 @@ export default function RankingsPageUser({
   nameClass?: string
   /** Whatever goes under the name (a level, a gap). */
   children?: React.ReactNode
+  /** The rounding of the row the link is stretched over (`after:rounded-tile`), so its focus ring follows it. */
+  rowRadius?: string
 }) {
   const { T } = useLanguage()
   const name = (
@@ -51,7 +58,7 @@ export default function RankingsPageUser({
         {linked ? (
           <Link
             href={`/user/${encodeURIComponent(row.username)}`}
-            className="min-w-0 truncate hover:underline rounded focus-ring"
+            className={`min-w-0 truncate hover:underline ${STRETCHED} ${rowRadius}`}
           >
             {name}
           </Link>

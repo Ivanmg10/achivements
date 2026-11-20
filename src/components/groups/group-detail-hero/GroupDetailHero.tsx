@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { IconArrowLeft, IconEdit, IconLock, IconPlus, IconTrash, IconWorld } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -6,6 +5,7 @@ import type { GameGroup } from '@/types/types'
 import type { Counts } from '@/utils/groupItems'
 import { plural } from '@/utils/utils'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
+import GroupCoverImage from '@/components/groups/group-cover-image/GroupCoverImage'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import { CountUp } from '@/components/ui/CountUp'
 import Button from '@/components/ui/Button'
@@ -29,7 +29,8 @@ export default function GroupDetailHero({
 }: {
   group: GameGroup
   /** Cover images of the group's first games, in order. */
-  covers: string[]
+  /** Each game's art, as the sources to try in turn (`coverSources`). */
+  covers: string[][]
   gameCount: number
   summary: Counts
   onAdd: () => void
@@ -45,8 +46,8 @@ export default function GroupDetailHero({
       <div aria-hidden="true" className="absolute inset-0">
         {covers.length > 0 && (
           <div className="absolute inset-0 grid opacity-60" style={{ gridTemplateColumns: `repeat(${covers.length}, minmax(0, 1fr))` }}>
-            {covers.map((src, i) => (
-              <Image key={i} src={src} alt="" width={240} height={240} className="w-full h-full object-cover blur-[6px] scale-105" unoptimized />
+            {covers.map((sources, i) => (
+              <GroupCoverImage key={i} sources={sources} className="blur-[6px] scale-105" />
             ))}
           </div>
         )}

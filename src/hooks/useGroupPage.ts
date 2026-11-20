@@ -6,8 +6,9 @@ import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import { isRa } from '@/utils/groupItems'
 import { mapLimit } from '@/utils/utils'
-import type { GameGroup, GameGroupItem, RecentlyPlayedGame } from '@/types/types'
+import type { GameGroup, GameGroupItem } from '@/types/types'
 import { raAchievementList } from '@/utils/gameAchievements'
+import { saveGroupCounts } from '@/hooks/useGroupCountsSync'
 
 export type GroupWithItems = GameGroup & { items: GameGroupItem[] }
 export type GroupStatus = 'loading' | 'ready' | 'missing' | 'error'
@@ -27,33 +28,19 @@ function mergeCounts(items: GameGroupItem[], updates: SyncItem[]): GameGroupItem
   })
 }
 
-function saveCounts(groupId: number, updates: SyncItem[]) {
-  fetch(`/api/groups/${groupId}/games`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updates),
-  })
-    .then((r) => {
-      if (!r.ok) throw new Error(`sync ${r.status}`)
-    })
-    // Only the cached counts; the page already shows the fresh ones.
-    .catch((err) => console.error('[useGroupPage] sync counts', err))
-}
-
 /**
  * One group and everything done to it on its page: loading (with a state for
  * a group that is gone or not yours, and one for a failure that can be
  * retried), release years for the decade filter (looked up once, on the
- * server), keeping the stored achievement counts fresh, reordering, removing a
+ * server), counts for games stored without any, reordering, removing a
  * game (with undo), editing and deleting the group.
  */
-export function useGroupPage(groupId: number, recentlyPlayed: RecentlyPlayedGame[]) {
+export function useGroupPage(groupId: number) {
   const { T } = useLanguage()
   const [group, setGroup] = useState<GroupWithItems | null>(null)
   const [status, setStatus] = useState<GroupStatus>('loading')
   const hasFetched = useRef(false)
   const yearsAsked = useRef(false)
-  const rpSynced = useRef<number | null>(null)
   const progressSynced = useRef<number | null>(null)
   const saveOrderTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
@@ -101,27 +88,6 @@ export function useGroupPage(groupId: number, recentlyPlayed: RecentlyPlayedGame
 
   useEffect(() => () => clearTimeout(saveOrderTimer.current), [])
 
-  // Counts from the recently played feed into the stored copy, once per visit.
-  useEffect(() => {
-    if (!group || !recentlyPlayed.length || rpSynced.current === group.id) return
-    rpSynced.current = group.id
-    const updates: SyncItem[] = group.items.filter(isRa).flatMap((item) => {
-      const rp = recentlyPlayed.find((g) => g.GameID === item.game_id)
-      if (!rp) return []
-      return [{
-        source: 'ra' as const,
-        game_id: item.game_id,
-        num_awarded: rp.NumAchievedHardcore || rp.NumAchieved,
-        max_possible: rp.NumPossibleAchievements || item.max_possible,
-        points_won: rp.ScoreAchievedHardcore || rp.ScoreAchieved,
-        max_points: rp.PossibleScore,
-      }]
-    })
-    // The page already reads these numbers live (raProgressMaps); only the
-    // stored copy, used by the groups list, needs them.
-    if (updates.length) saveCounts(groupId, updates)
-  }, [group, recentlyPlayed, groupId])
-
   // Games with no counts anywhere: ask RA, a few at a time.
   useEffect(() => {
     if (!group || progressSynced.current === group.id) return
@@ -147,7 +113,7 @@ export function useGroupPage(groupId: number, recentlyPlayed: RecentlyPlayedGame
       const ok = results.flatMap((r) => (r.status === 'fulfilled' && r.value ? [r.value] : []))
       if (!ok.length) return
       setGroup((g) => (g ? { ...g, items: mergeCounts(g.items, ok) } : g))
-      saveCounts(groupId, ok)
+      saveGroupCounts(groupId, ok)
     })
   }, [group, groupId])
 

@@ -1,11 +1,11 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { en } from '@/translations/en'
 import RankingsPage from './RankingsPage'
 import { useRankings } from '@/hooks/useRankings'
 import { useVaultMe } from '@/hooks/useVaultMe'
 import { levelOf } from '@/utils/vaultLevel'
 
-jest.mock('@/hooks/useRankings', () => ({ useRankings: jest.fn(), ZONE_MAX: 50 }))
+jest.mock('@/hooks/useRankings', () => ({ useRankings: jest.fn(), ZONE_MAX: 50, HOT_MAX: 10 }))
 jest.mock('@/hooks/useVaultMe', () => ({ useVaultMe: jest.fn() }))
 jest.mock('@/hooks/useXboxEnabled', () => ({ useXboxEnabled: () => false }))
 
@@ -129,6 +129,22 @@ test('beside your level, who is most active this week, and a way to that ranking
   expect(useRankings).toHaveBeenLastCalledWith({ scope: 'global', period: 'week', source: 'all', sort: 'points' })
   // Already on the weekly ranking: no way to it.
   expect(screen.queryByRole('button', { name: en.rankings.hotSee })).not.toBeInTheDocument()
+})
+
+test('the week card keeps the room of ten: quiet rows where nobody is yet, and a line with nobody at all', () => {
+  setup({ data: { total: 60, rows, me: null, zone: [], zoneStart: 0, arrows: true, hot: [row(1, 'blazing', { points: 677 })] } })
+  const { unmount } = render(<RankingsPage signedIn />)
+  let hot = screen.getByRole('region', { name: en.rankings.hotTitle })
+  expect(hot.querySelectorAll('li')).toHaveLength(10)
+  expect(hot.querySelectorAll('li[aria-hidden="true"]')).toHaveLength(9)
+  // The whole row opens the person: the name is the one link.
+  expect(within(hot).getAllByRole('link')).toHaveLength(1)
+  unmount()
+  setup({ data: { total: 60, rows, me: null, zone: [], zoneStart: 0, arrows: true, hot: [] } })
+  render(<RankingsPage signedIn />)
+  hot = screen.getByRole('region', { name: en.rankings.hotTitle })
+  expect(hot).toHaveTextContent(en.rankings.hotEmpty)
+  expect(hot.querySelectorAll('li[aria-hidden="true"]')).toHaveLength(10)
 })
 
 test('leads to how points work', () => {

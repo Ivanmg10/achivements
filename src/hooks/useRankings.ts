@@ -12,6 +12,8 @@ type ZoneSize = { above: number; below: number }
 const ZONE: ZoneSize = { above: 2, below: 2 }
 const ZONE_STEP = 10
 export const ZONE_MAX = 50
+/** How many "most active this week" the API sends at most (its HOT): the card keeps room for them all. */
+export const HOT_MAX = 10
 
 async function request(view: RankingsView, offset: number, zone: ZoneSize): Promise<RankingsResponse | null> {
   try {

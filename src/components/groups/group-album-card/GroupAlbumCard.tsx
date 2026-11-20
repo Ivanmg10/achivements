@@ -4,7 +4,7 @@ import { GameGroup } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { plural } from '@/utils/utils'
 import { ProgressBar } from '@/components/ui/ProgressBar'
-import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
+import { coverSources } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import GroupCoverStrip from '@/components/groups/group-cover-strip/GroupCoverStrip'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
 import GroupFacts from '@/components/groups/group-facts/GroupFacts'
@@ -18,7 +18,7 @@ import Tag from '@/components/ui/Tag'
  */
 export default function GroupAlbumCard({ group }: { group: GameGroup }) {
   const { T, lang } = useLanguage()
-  const covers = (group.covers ?? []).map(coverSrc).filter((s): s is string => !!s).slice(0, 4)
+  const covers = (group.covers ?? []).map(coverSources).filter((s) => s.length > 0).slice(0, 4)
   const pct = group.total_possible > 0 ? Math.min(100, Math.round((group.total_awarded / group.total_possible) * 100)) : 0
   const Privacy = group.is_public ? IconWorld : IconLock
   const empty = group.game_count === 0
@@ -28,7 +28,8 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
       href={`/groups/${group.id}`}
       className="group relative flex flex-col h-full bg-bg-card rounded-card overflow-hidden ring-1 ring-inset ring-ink/[0.06] hover:ring-accent/60 transition-shadow focus-ring"
     >
-      <div className="relative h-[9.375rem] overflow-hidden" aria-hidden="true">
+      {/* The band takes whatever room the row gives the card (the new-group tile can be taller), so there is no blank inside. */}
+      <div className="relative flex-1 min-h-[9.375rem] overflow-hidden" aria-hidden="true">
         {covers.length > 0 ? (
           <GroupCoverStrip covers={covers} />
         ) : (
@@ -46,7 +47,7 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
         )}
       </div>
 
-      <div className="relative -mt-10 px-5 pb-5 flex flex-col gap-2.5 flex-1">
+      <div className="relative -mt-10 px-5 pb-5 flex flex-col gap-2.5">
         <span className="flex items-center gap-2 min-w-0">
           <span className="text-2xl font-extrabold truncate group-hover:text-accent transition-colors">{group.title}</span>
           <Tag className="shrink-0">

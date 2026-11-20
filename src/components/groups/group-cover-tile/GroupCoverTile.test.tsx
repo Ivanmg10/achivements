@@ -19,12 +19,14 @@ test('opens the game and says how much is left', () => {
   expect(screen.getByRole('link', { name: 'Portal 2' })).toHaveAttribute('href', '/steamGame/620')
   expect(screen.getByText('67%')).toBeInTheDocument()
   expect(screen.getByText('Steam')).toBeInTheDocument()
-  expect(screen.getByText('· 10 left')).toBeInTheDocument()
+  // The percentage and what is left joined by the site's mark (Facts), never a hand-made "·".
+  expect(screen.getByText('67%').parentElement).toHaveTextContent(/^67%, 10 left$/)
+  expect(screen.queryByText(/·/)).not.toBeInTheDocument()
 })
 
 test('a finished game is marked, and its percentage turns the done colour', () => {
   tile({ earned: 30, total: 30, pct: 1 })
-  expect(screen.getByText('· Finished')).toBeInTheDocument()
+  expect(screen.getByText('Finished')).toBeInTheDocument()
   expect(screen.getAllByText(/100%/).some((el) => el.classList.contains('text-success'))).toBe(true)
 })
 

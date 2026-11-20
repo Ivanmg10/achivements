@@ -9,6 +9,7 @@ import Facts from '@/components/ui/Facts'
  * A group's foot, said once on one line: "4 games / 4 in progress / 141/176
  * achievements / 12 d ago", the platforms' logos beside the games. What a group
  * has none of (no game started, no achievements to earn) is left out with its mark.
+ * A line that wraps breaks between facts, never inside one ("12 d" stays with "ago").
  */
 export default function GroupFacts({ group, className = '' }: { group: GameGroup; className?: string }) {
   const { T, lang } = useLanguage()
@@ -18,14 +19,14 @@ export default function GroupFacts({ group, className = '' }: { group: GameGroup
     <p className={`text-xs text-text-secondary ${className}`}>
       <Facts
         items={[
-          <span key="games" className="inline-flex items-center gap-1.5 align-middle">
+          <span key="games" className="inline-flex items-center gap-1.5 align-middle whitespace-nowrap">
             {plural(group.game_count, T.plurals.games, lang)}
             <GroupPlatformLogos group={group} />
           </span>,
           started > 0 && T.groups.startedCount.replace('{n}', started.toLocaleString(lang)),
           group.total_possible > 0 && T.groups.achievementsCount.replace('{earned}', group.total_awarded.toLocaleString(lang)).replace('{total}', group.total_possible.toLocaleString(lang)),
           relativeTime(group.updated_at, lang),
-        ]}
+        ].map((fact, i) => (typeof fact === 'string' ? <span key={i} className="whitespace-nowrap">{fact}</span> : fact))}
       />
     </p>
   )
