@@ -33,6 +33,29 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-20 — Collection page, first canvas round (`docs/171-collection-design`, #171)
+
+**Did** — the first round of clickable concepts for the collection page on a design canvas
+(https://claude.ai/artifact/4S4wdVf6yhgWH8WpX4q8iF): A Estantería (shelves in the owner's order, cards that grow
+into their detail, reorder in place), B Línea del tiempo (year / month / week with a chart on top), C Las cifras
+(records and charts, the collection compact at the end). Each beside today's section (real captures) at desktop and
+390 px, with an empty / few / many tweak. Entry added to `docs/designs.md`. Nothing in `src/` changed.
+
+**Why** — #171: the owner wants a page of its own for the collection, designed on the canvas first ("los diseños
+quiero solo el canvas", 2026-11-19); the home's section stays and gets a "Ver todo".
+
+**Decisions** — all three keep the home section's filters and wording (`T.cards`), no Xbox, upright bars, the one date
+format. Only real data is shown; what cannot be known yet (time each game took) is a `[por calcular]` placeholder.
+
+**Open** — the owner picks a concept or a mix and answers: one order or several, which charts, public or private, and
+the link with groups. Then a plan doc (`docs/collection-page-plan.md`) before any build.
+
+**Watch out** — today's collection grid (`CollectionTile`) dates Steam games by last played, while
+`docs/library.md` says a Steam completion date is the last unlock: the mock copies today's dates; a time view needs the
+last unlock.
+
+---
+
 ## 2026-11-20 — The home overview's activity a step smaller (`fix/195-smaller-activity`, #195)
 
 **Did** — `.home-fit-chart` is `clamp(160px, 15dvh, 260px)` less the trim (was `22dvh, 320px` since #164 point 1) and the heatmap cell caps at 34 px on tall screens (`FIT_MAX_CELL`, was 40). At 2560×1280 the daily chart is 192 px (218 after #164, 164 before) and the heatmap shows 356 days (320); at 2560×1440, 216 px (317). The room goes back to the recently played rows; the Overview still ends at the screen's bottom.
