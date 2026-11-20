@@ -1,13 +1,15 @@
 import { cleanStoredPreferences, isSyncedKey, MAX_PREFERENCE_KEYS, MAX_PREFERENCE_VALUE, readPreferenceChanges } from './syncedPreferences'
 
 test.each([
-  'hidden-consoles:ra', 'hidden-consoles:xbox', 'library-layout', 'library-view', 'library-cols', 'groups-view', 'group-detail-view', 'library-sort:playing', 'library-sort-all:completed',
+  'hidden-consoles:ra', 'hidden-consoles:xbox', 'library-layout', 'library-view', 'library-cols', 'group-detail-view', 'library-sort:playing', 'library-sort-all:completed',
   'psn-completion', 'psn-hidden-trophies', 'xbox-secret-achievements', 'font-style',
 ])('%s is stored on the account', (key) => expect(isSyncedKey(key)).toBe(true))
 
 test.each([
   'hidden-consoles:switch', 'hidden-consoles:', 'library-sort:', 'library-sort:../x', 'library-sort:a-b', 'language', 'cookie-consent', 'main-profile-tab',
   'account-preferences-tab', '__proto__', 'constructor', 'library-layout ', '',
+  // Retired: the groups list has one view since #168, and a value an account still holds is dropped on read.
+  'groups-view',
 ])('%j is not', (key) => expect(isSyncedKey(key)).toBe(false))
 
 describe('readPreferenceChanges', () => {

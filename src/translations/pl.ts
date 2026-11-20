@@ -1071,7 +1071,6 @@ export const pl: Translations = {
     updatedAgo: 'zaktualizowano {when}',
     viewLabel: 'Widok',
     viewCovers: 'Okładki',
-    viewShelves: 'Gabloty',
     completedCount: 'Ukończone: {n}',
     startedCount: 'W trakcie: {n}',
     nextUp: 'Najbliżej końca',

@@ -1072,7 +1072,6 @@ export const en = {
     updatedAgo: 'updated {when}',
     viewLabel: 'View',
     viewCovers: 'Covers',
-    viewShelves: 'Shelves',
     completedCount: '{n} completed',
     startedCount: '{n} in progress',
     nextUp: 'Closest to done',

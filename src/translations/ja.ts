@@ -1071,7 +1071,6 @@ export const ja: Translations = {
     updatedAgo: '{when}に更新',
     viewLabel: '表示',
     viewCovers: 'カバー',
-    viewShelves: 'ショーケース',
     completedCount: '{n} 本完了',
     startedCount: '{n} 本プレイ中',
     nextUp: 'あと少し',

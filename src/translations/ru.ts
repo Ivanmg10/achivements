@@ -1071,7 +1071,6 @@ export const ru: Translations = {
     updatedAgo: 'обновлено {when}',
     viewLabel: 'Вид',
     viewCovers: 'Обложки',
-    viewShelves: 'Витрины',
     completedCount: 'Завершено: {n}',
     startedCount: 'В процессе: {n}',
     nextUp: 'Ближе всего к финишу',

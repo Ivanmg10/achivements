@@ -1071,7 +1071,6 @@ export const fr: Translations = {
     updatedAgo: 'mis à jour {when}',
     viewLabel: 'Vue',
     viewCovers: 'Jaquettes',
-    viewShelves: 'Vitrines',
     completedCount: '{n} terminés',
     startedCount: '{n} en cours',
     nextUp: 'Le plus proche de la fin',
