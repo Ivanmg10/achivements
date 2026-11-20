@@ -5,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { raCompareList } from '@/utils/gameCompare'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
+import { raBoxRatio } from '@/utils/coverRatio'
 import GameInfoHeroBackground from '@/components/game-info-hero-background/GameInfoHeroBackground'
 import GameInfoHeader from '@/components/game-info-header/GameInfoHeader'
 import GameCompareTable from '@/components/game-compare-table/GameCompareTable'
@@ -35,7 +36,7 @@ export default function UserGamePageRa({ id, username, banner, comparing, mine, 
     )
   }
 
-  if (!current) return <GameInfoSkeleton cover="natural" />
+  if (!current) return <GameInfoSkeleton ratio={raBoxRatio(null)} />
 
   return (
     <UserGameCompareBody

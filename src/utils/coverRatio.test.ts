@@ -1,4 +1,4 @@
-import { raBoxRatio } from './raBoxRatio'
+import { raBoxRatio } from './coverRatio'
 
 test("a console's box keeps its shape; any other holds a PS2 box", () => {
   expect(raBoxRatio('Nintendo DS')).toBeGreaterThan(1)

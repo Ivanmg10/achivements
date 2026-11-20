@@ -45,7 +45,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
 - **Icons: the store's, not the trophy set's.** A PS4/PS3 trophy icon is a 320×176
   banner (PS5's are square); the played-games `imageUrl` is square on PS4 too, so it
   wins (`withPlayData`), except for a collection's games. The cover is only a
-  `PORTRAIT_BANNER`; PS4's 16:9 hub art is a backdrop. `GameIcon` letterboxes PSN
+  `PORTRAIT_BANNER`; PS4's 16:9 hub art is a backdrop. The Store's URL with no `?w=` is the original, the
+  biggest there is (GTA VI: 1440×2160, measured 2026-11-20, #203); IGDB's cover is `t_cover_big_2x`, 528 px wide at
+  3:4 (Sly Cooper PS5, GTA San Andreas PS4: 528×704), 2.4× the 216 px it is drawn at, so `t_1080p` (810×1080) would
+  triple the bytes for nothing seen. `GameIcon` letterboxes PSN
   (no blurred fill: the user tried it and preferred plain bands).
 - **A collection is one played game for several trophy sets** (Ezio Collection →
   AC II, Brotherhood), and Sony does not say which was played: its session goes only
