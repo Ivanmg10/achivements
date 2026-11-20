@@ -48,3 +48,28 @@ test('without ResizeObserver it keeps the fallback', () => {
   render(<List />)
   expect(screen.getByRole('list')).toHaveAccessibleName('6')
 })
+
+function Swapped({ loaded }: { loaded: boolean }) {
+  const [ref, count] = useFitCount<HTMLElement>(3)
+  return loaded ? <ol ref={ref} aria-label={String(count)}><li /></ol> : <div ref={ref} role="status" aria-label={String(count)}><span /></div>
+}
+
+test('a box swapped for another (a skeleton for the list) is measured too', () => {
+  ;(globalThis as { ResizeObserver?: unknown }).ResizeObserver = class {
+    observe() {}
+    disconnect() {}
+  }
+  let height = 200
+  const rowHeight = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(50)
+  const boxHeight = jest.spyOn(Element.prototype, 'clientHeight', 'get').mockImplementation(() => height)
+
+  const { rerender } = render(<Swapped loaded={false} />)
+  expect(screen.getByRole('status')).toHaveAccessibleName('4')
+  height = 300
+  rerender(<Swapped loaded />)
+  expect(screen.getByRole('list')).toHaveAccessibleName('6')
+
+  rowHeight.mockRestore()
+  boxHeight.mockRestore()
+  delete (globalThis as { ResizeObserver?: unknown }).ResizeObserver
+})
