@@ -33,6 +33,14 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-21 — The feats' canvas rounds of 21 November (`docs/design-rounds-4`)
+
+**Did** — recorded in `docs/designs.md`: collection v3 (b: group all games by year or month, a hover on the growth chart, the hero photo fading into the text), trayectoria v4 (Cuaderno chosen: the 2026-10-23 diary reference beside it, real badges per day, days raw with an optional grouping switch), the annual wrap v4 (texts through antislop, games played and new, game of the year by hours as [por calcular] pending #208, badges for achievements and covers for games, a chapter per platform, DLC and Steam library sections removed).
+
+**Open** — #208 (hours played per game and day) decides whether the wrap can show hours this year.
+
+---
+
 ## 2026-11-20 — The feats' second and third canvas rounds (`docs/design-rounds-2-3`)
 
 **Did** — recorded in `docs/designs.md`: collection v2 (three variants on C; the owner picked b "El ritmo"), trayectoria v2 (Cuaderno and Álbum) and v3 (one background rule, one thumbnail frame), the annual wrap v2 (per-platform wraps, history) and v3 (one CheevoVault wrap with a "Cada plataforma" act, covers at their natural ratio).
